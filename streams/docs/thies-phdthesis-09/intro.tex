@@ -37,10 +37,10 @@ addition, a performance expert may leverage detailed knowledge of the
 target architecture -- such as the type and extent of parallel
 resources, the communication substrate, and the cache sizes -- to
 match the structure and granularity of the application to that of the
-underlying machine.  In order to make headway against this
-long-standing problem, it will likely be necessary to empower the
-compiler with new information that is not currently embedded in
-general-purpose programming languages.
+underlying machine.  To overcome this long-standing problem and make
+high-performance programming accessible to non-experts, it will likely
+be necessary to empower the compiler with new information that is not
+currently embedded in general-purpose programming languages.
 
 One promising approach to automating performance optimization is to
 embed specific domain knowledge into the language and compiler.  By
@@ -661,47 +661,50 @@ subsequent updates.
 
 \section{Contributions}
 
-% As the joint contributions of the group have not been summarized to
-% date, we do so in Chapter~\cite{chap:experience} of this thesis.
-
 My role in the StreamIt project has been very collaborative,
 contributing ideas and implementation support to many aspects of the
 project.  This dissertation focuses on ideas that have not been
 presented previously in theses by other group members.  However, to
 provide a self-contained view of the breadth and applications of
-StreamIt, Chapter~3 also provides a survey of others' experience in
-using and optimizing the language.
+StreamIt, Chapter~\cite{chap:optimizing} also provides a survey of
+others' experience in optimizing the language.
 
 The specific contributions of this dissertation are as follows:
 
 \begin{enumerate}
 
-\item {\it A design rationale for the StreamIt language, which
-  contains novel constructs to simultaneously improve the
-  programmability and analyzability of stream programs (Chapter~2).}
-  StreamIt is the first language to introduce hierarchical and
-  structured streams, as well as a construct (termed {\it teleport
-    messaging}) for timing the delivery of irregular control messages
-  relative to regular flows of data in the program.  Other novelties
-  include built-in language support for composable data reordering as
-  well as sliding window operations, both of which expose key
-  information to the compiler.
+\item {\it A design rationale and experience report for the StreamIt
+  language, which contains novel constructs to simultaneously improve
+  the programmability and analyzability of stream programs
+  (Chapter~2).}  StreamIt is the first language to introduce
+  structured streams, as well as hierarchical, parameterized data
+  reordering.  We also describe the lessons learned in developing the
+  60,000-line StreamIt benchmark suite.
 
-\item {\it A review of the key results and experienced gained in using
-  and optimizing StreamIt, spanning parallelization, domain-specific
-  optimization, and programmability (Chapter~3)}.  This chapter
-  validates key concepts of the StreamIt language by highlighting the
-  gains in performance and programmability that have been achieved,
-  largely due to the work of others in the StreamIt group.  We focus
-  on automatic parallelization (providing an 11.6x speedup on a
-  16-core machine), domain-specific optimization of linear
-  computations (eliminating up to 85\% of the floating point
-  operations), and cache optimizations (providing a 3.5x speedup on
-  embedded processors).  We also describe the experience of
-  application programmers in developing the StreamIt benchmark suite.
+\item {\it A new language construct, termed teleport messaging, that
+  enables precise event handling in a distributed environment
+  (Chapter~3).}  Teleport messaging is a general approach that uses
+  the flow of data in the stream to provide a deterministic and
+  meaningful timeframe for delivering events between decoupled nodes.
+%  We formulate a stream dependence function, {\sdep}, which provides
+%  the first coordinated timeframe between distributed actors.
+  Teleport messaging allows irregular control messages to be
+  integrated into a synchronous dataflow program while preserving
+  static scheduling.
+
+\item {\it A review of the key results in optimizing StreamIt,
+  spanning parallelization and domain-specific optimization
+  (Chapter~4)}.  This chapter validates key concepts of the StreamIt
+  language by highlighting the gains in performance and
+  programmability that have been achieved, largely due to the work of
+  others in the StreamIt group.  We focus on automatic parallelization
+  (providing an 11.6x speedup on a 16-core machine), domain-specific
+  optimization of linear computations (eliminating up to 85\% of the
+  floating point operations), and cache optimizations (providing a
+  3.5x speedup on embedded processors).
 
 \item {\it The first translation of stream programs into the
-  lossless-compressed domain (Chapter~4)}.  This domain-specific
+  lossless-compressed domain (Chapter~5)}.  This domain-specific
   optimization allows stream programs to operate directly on
   compressed data formats, rather than requiring conversion to an
   uncompressed format prior to processing.  While previous researchers
@@ -713,7 +716,7 @@ The specific contributions of this dissertation are as follows:
   proportional to the compression factor, with a median of 15x.
 
 \item {\it The first dynamic analysis tool that detects and exploits
-  likely coarse-grained parallelism in C programs (Chapter~5).}  To
+  likely coarse-grained parallelism in C programs (Chapter~6).}  To
   assist programmers in migrating legacy C code into a streaming
   representation, this tool generates a stream graph depicting dynamic
   communication between programmer-annotated sections of code.  The
@@ -728,7 +731,7 @@ The specific contributions of this dissertation are as follows:
 % support claim of order-of-magnitude
 
 \noindent Lessons learned and future work are described in the
-conclusion (Chapter~6).
+conclusion (Chapter~7).
 
 \newpage
 

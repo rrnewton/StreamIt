@@ -4,8 +4,24 @@
 \usepackage{reader}
 \usepackage{times}
 \usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+%\usepackage{doublespace}
+%\setstretch{1}
+
+% replace courier with beramono, a fixed-width font that is more condensed
+% see more fonts here:  http://www.tug.dk/FontCatalogue/
+\usepackage[T1]{fontenc}
+%\renewcommand*\ttdefault{lcmtt}     % Computer Modern Teletype L
+%\renewcommand*\ttdefault{cmvtt}    % Computer Modern Teletype Proportional
+\usepackage[scaled=0.88]{beramono}
 
 % some handy font sizes
+\newcommand{\sevenpoint}{\fontsize{7pt}{9pt}\selectfont}
+\newcommand{\eightpoint}{\fontsize{8pt}{10pt}\selectfont}
+\newcommand{\ninepoint}{\fontsize{9pt}{11pt}\selectfont}
 \newcommand{\tenpoint}{\fontsize{10pt}{12pt}\selectfont}
 \newcommand{\elevenpoint}{\fontsize{11pt}{13pt}\selectfont}
 \newcommand{\twelvepoint}{\fontsize{12pt}{14pt}\selectfont}
@@ -39,22 +55,27 @@
 % do not list sub-sub sections in table of contents
 \setcounter{tocdepth}{1}
 
+% need sdep as early as intro
+\newcommand{\sdep}[0]{\textsc{sdep}}
+\newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
+
 \pagestyle{plain}
 
 \begin{document}
 
-%\include{cover}
-%\include{contents}
+\include{cover}
+\include{contents}
 
 \include{intro}
-%\include{language}
-%\include{experience}
-%\include{compression}
-%\include{profiling}
-%\include{conclusion}
+\include{language}
+\include{messaging}
+\include{experience}
+\include{compression}
+\include{profiling}
+\include{conclusion}
 
 {\tenpoint
-\bibliography{references,faculty-app,zotero}
+\bibliography{references,faculty-app,messaging,zotero}
 \bibliographystyle{amsalpha}
 \end{document}
 }
