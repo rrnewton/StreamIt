@@ -1,3 +1,19 @@
 \chapter{Conclusions}
 \label{chap:conclusions}
 
+Future Work
+-----------
+- zeroing out arrays is expensive, should optimize away (move to lessons learned?)
+- buffer reuse
+- interesting messaging optimization:
+  - speculatively fuse or linearly-collapse sections that have messages
+  - if message observed, rollback and deliver on slow path afterwards
+- decimation propagation
+
+Conclusions
+-----------
+- show evolution of c++ graph?
+
+Where to fit in?
+----------------
+- different fusion strategies?  (contradicts other research)

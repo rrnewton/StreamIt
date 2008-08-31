@@ -57,7 +57,7 @@ printerrors:
         echo "*************************"; \
 	echo
 
-main.bbl: references.bib zotero.bib $(TEXFILES) Makefile done.flag
+main.bbl: references.bib zotero.bib messaging.bib faculty-app.bib $(TEXFILES) Makefile done.flag
 	latex -interaction=batchmode main.tex || true
 	rm -f $*.dvi
 	bibtex -terse $*
