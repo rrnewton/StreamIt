@@ -314,3 +314,22 @@ model of comp 2:15-3:15 (1:00)
 filters 3:15-6:15 (3:00)
 streams 6:15-11:35 (4:20)
 teleport 
+
+---------------
+
+from murthy'94, actually explains CD-DAT:
+
+The recently introduced Digital Audio Tape @AT) technology operates at
+a sampling rate of 48 khz while compact disk (CD) players operate at a
+sampling rate of 44.1 khz. Interfacing the two, for example, to record
+a CD onto a digital tape, requires a sample rate conversion.
+
+The naive way to do this is shown in fig. 2. It is more efficient to
+perform the rate-change in stages. Rate conversion ratios are chosen
+by examining the prime factors of the two sampling rates.  The prime
+factors of 44100 and 48000 are 2?325272 and 273153, respectively. Thus
+the ratio 44100:48000 is 3172:2551 or 147: 160. One way to perform the
+conversion in three stages is 4:3, 8:7, and 5:7. Fig. 3 shows the
+multistage implementation.  Explicit upsamplers and downsamplers are
+omitted; it is assumed that the FIR filters are general polyphase
+filters [3].

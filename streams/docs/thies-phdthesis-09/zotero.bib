@@ -419,6 +419,18 @@
 	pages = {666--677}
 },
 
+@inproceedings{murthy_minimizing_1994,
+	title = {Minimizing memory requirements for chain-structured synchronous dataflow programs},
+	volume = {ii},
+	doi = {10.1109/ICASSP.1994.389625},
+	abstract = {This paper addresses trade-offs between the minimization of program memory and data memory requirements in the compilation of dataflow programs for multirate signal processing. Our techniques are specific to the synchronous dataflow (SDF) model of Lee and Messerschmitt (1987), which has been used extensively in software synthesis environments for DSP. We focus on programs that are represented as chain-structured SDF graphs. We show that there is an O(n 3) dynamic programming algorithm for determining a schedule that minimizes data memory usage among the set of schedules that minimize program memory usage. A practical example to illustrate the efficacy of this approach is given. Some extensions of this algorithm are also given; for example, we show that the algorithm applies to the more general class of well-ordered graphs},
+	booktitle = {Acoustics, Speech, and Signal Processing, 1994. ICASSP-94., 1994 IEEE International Conference on},
+	author = {P.K. Murthy and S.S. Bhattacharyya and E.A. Lee},
+	year = {1994},
+	keywords = {chain-structured SDF graphs,chain-structured synchronous dataflow programs,data flow computing,data flow graphs,data memory,digital storage,DSP,dynamic programming,dynamic programming algorithm,memory requirements minimisation,minimisation,multirate signal processing,program memory,signal processing,software synthesis environments,well-ordered graphs},
+	pages = {II/453--II/456 vol.2}
+},
+
 @phdthesis{karczmarek_constrained_2002,
 	type = {S.M. Thesis},
 	title = {Constrained and Phased Scheduling of Synchronous Data Flow Graphs for StreamIt Language},
@@ -548,6 +560,20 @@
 	note = {PMID: 2054915},
 	keywords = {Data Collection,Gambia,Health Surveys,Humans,Malaria,Microcomputers,Questionnaires,Software},
 	pages = {107--11}
+},
+
+@inproceedings{teich_3d_1999,
+	address = {Rome, Italy},
+	title = {3D exploration of software schedules for DSP algorithms},
+	isbn = {1-58113-132-1},
+	url = {http://portal.acm.org/citation.cfm?id=301177.301522\&type=series},
+	doi = {10.1145/301177.301522},
+	abstract = {Note: OCR errors may be found in this Reference List extracted from the full text article. ACM has opted to expose the complete List rather than only correct and linked references.},
+	booktitle = {Proceedings of the seventh international workshop on Hardware/software codesign},
+	publisher = {ACM},
+	author = {J. Teich and E. Zitzler and S. S. Bhattacharyya},
+	year = {1999},
+	pages = {168--172}
 },
 
 @article{maraninchi_argos:automaton-based_2001,
@@ -1033,6 +1059,19 @@
 	author = {Ed Ashcroft and Bill Wadge},
 	year = {1980},
 	pages = {15--26}
+},
+
+@inproceedings{bhattacharya_quasi-static_2000,
+	title = {Quasi-Static Scheduling of Reconfigurable Dataflow Graphs for DSP Systems},
+	isbn = {0-7695-0668-2},
+	url = {http://portal.acm.org/citation.cfm?id=827261.828219},
+	abstract = {Dataflow programming has proven to be popular for representing applications in rapid prototyping tools for digital signal processing (DSP); however, existing dataflow design tools are limited in their ability to effectively handle dynamic application behavior. In this paper, we develop efficient quasi-static scheduling techniques for a broad class of dynamically reconfigurable dataflow specifications. We use a CD to DAT sample rate conversion system and a speech compression application to illustrate the efficacy of our scheduling techniques in real life DSP systems.},
+	booktitle = {Proceedings of the 11th IEEE International Workshop on Rapid System Prototyping (RSP 2000)},
+	publisher = {IEEE Computer Society},
+	author = {Bishnupriya Bhattacharya and Shuvra S. Bhattacharyya},
+	year = {2000},
+	keywords = {cd-dat,configurable computing,dataflow,digital signal processing,rapid prototyping,software synthesis},
+	pages = {84}
 },
 
 @techreport{arvind_asynchronous_1978,
@@ -1613,6 +1652,29 @@
 	author = {William R. Mark and R. Steven Glanville and Kurt Akeley and Mark J. Kilgard},
 	year = {2003},
 	pages = {896--907}
+},
+
+@inproceedings{ko_memory-constrained_2006,
+	title = {Memory-constrained Block Processing Optimization for Synthesis of DSP Software},
+	doi = {10.1109/ICSAMOS.2006.300820},
+	abstract = {Digital signal processing (DSP) applications involve processing long streams of input data. It is important to take into account this form of processing when implementing embedded software for DSP systems. Task-level vectorization, or block processing, is a useful dataflow graph transformation that can significantly improve execution performance by allowing subsequences of data items to be processed through individual task invocations. In this way, several benefits can be obtained, including reduced context switch overhead, increased memory locality, improved utilization of processor pipelines, and use of more efficient DSP-oriented addressing modes. On the other hand, block processing generally results in increased memory requirements since it effectively increases the sizes of the input and output values associated with processing tasks. In this paper, we investigate the memory-performance tradeoff associated with block processing. We develop novel block processing algorithms that take carefully take into account memory constraints to achieve efficient block processing configurations within given memory space limitations. Our experimental results indicate that these methods derive optimal memory-constrained block processing solutions most of the time. We demonstrate the advantages of our block processing techniques on practical kernel functions and applications in the DSP domain},
+	booktitle = {Embedded Computer Systems: Architectures, Modeling and Simulation, 2006. IC-SAMOS 2006. International Conference on},
+	author = {Ming-Yung  Ko and Chung-Ching  Shen and Shuvra S.  Bhattacharyya},
+	year = {2006},
+	keywords = {data flow analysis,data flow graphs,dataflow graph transformation,digital signal processing application,DSP software synthesis,DSP-oriented addressing mode,embedded software,embedded systems,memory locality,memory-constrained block processing optimization algorithm,optimising compilers,processor pipeline utilization,signal processing,storage management,task-level vectorization},
+	pages = {137--143}
+},
+
+@inproceedings{chandrachoodan_efficient_2001,
+	title = {An efficient timing model for hardware implementation of multirate dataflow graphs},
+	volume = {2},
+	doi = {10.1109/ICASSP.2001.941126},
+	abstract = {We consider the problem of representing timing information associated with functions in a dataflow graph used to represent a signal processing system in the context of high-level hardware (architectural) synthesis. This information is used for synthesis of appropriate architectures for implementing the graph. Conventional models for timing suffer from shortcomings that make it difficult to represent timing information in a hierarchical manner, especially for multirate signal processing systems. We identify some of these shortcomings, and provide an alternate model that does not have these problems. We show that with some reasonable assumptions on the way hardware implementations of multirate systems operate, we can derive general hierarchical descriptions of multirate systems similarly to single rate systems. Several analytical results such as the computation of the iteration period bound, that previously applied only to single rate systems can also easily be extended to multirate systems under the new assumptions. We have applied our model to several multirate signal processing applications, and obtained favorable results. We present results of the timing information computed for several multirate DSP applications that show how the new treatment can streamline the problem of performance analysis and synthesis of such systems},
+	booktitle = {Acoustics, Speech, and Signal Processing, 2001. Proceedings. (ICASSP '01). 2001 IEEE International Conference on},
+	author = {N. Chandrachoodan and S.S. Bhattacharyaa and K.J.R. Liu},
+	year = {2001},
+	keywords = {data flow graphs,efficient timing model,hardware implementation,hierarchical descriptions,hierarchical timing pair model,high level synthesis,high-level hardware synthesis,iteration period bound,multirate dataflow graphs,multirate DSP applications,multirate FIR filter,multirate signal processing systems,performance analysis,signal processing,systems synthesis,timing,timing information representation},
+	pages = {1153--1156 vol.2}
 },
 
 @article{corbett_cancellphone_2008,

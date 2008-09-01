@@ -3,7 +3,7 @@
 
 This chapter provides an overview and experience report on the basics
 of the StreamIt language.  An advanced feature, teleport messaging, is
-reserved for Chapter~\ref{sec:lang-messaging}.  For more details on
+reserved for Chapter~\ref{chap:messaging}.  For more details on
 the StreamIt language, please consult the StreamIt language
 specification~\cite{streamit-lang-spec} or the StreamIt
 cookbook~\cite{streamit-cookbook}.  A case study on MPEG-2 also
@@ -50,7 +50,7 @@ StreamIt differs from synchronous dataflow in five respects:
 \item {\it Teleport messaging.}  Our support for irregular,
   out-of-band control messaging falls outside of the traditional
   synchronous dataflow model.  However, it does not impede static
-  scheduling.  See Chapter~\ref{sec:lang-messaging} for details.
+  scheduling.  See Chapter~\ref{chap:messaging} for details.
 
 \item {\it Peeking.}  StreamIt allows actors to ``peek'' at data items
   on their input tapes, reading a value without dequeuing it from the
@@ -486,54 +486,292 @@ our application set.
 \section{Experience Report}
 \label{sec:lang-experience}
 
-- streamit benchmark suite
-  - table:
-    - benchmark name
-    - benchmark description / reference
-    - number of static / dynamic streams
-    - number peeking
-    - number stateless?
-      - better: fraction of stateful work, largest work in stateful filter
-    - number of messaging pairs
-    - parameterized by -- how the benchmark can grow
-    - number of splitjoins, feedback loops
-    - author(s)
-    - lines of code
-    - dynamic control flow?
-  - graph:
-    - all the stream graphs
+\begin{table}[t]
+%% - streamit benchmark suite
+%%   - table:
+%%     - benchmark name
+%%     - benchmark description / reference
+%%     - number of static / dynamic streams
+%%     - number peeking
+%%     - number stateless?
+%%       - better: fraction of stateful work, largest work in stateful filter
+%%     - number of messaging pairs
+%%     - parameterized by -- how the benchmark can grow
+%%     - number of splitjoins, feedback loops
+%%     - author(s)
+%%     - lines of code
+%%     - dynamic control flow?
+% TODO: benchmark characteristics table
+\caption{StreamIt benchmark suite.\protect\label{tab:benchmarks}}
+\end{table}
 
-Remarks on benchmark suite:
- - did not explore feedback loops as well as we could have
- - most messages sent downstream with latency zero
- - dynamic control flow is rare
- - also cite applications developed at other schools
+%% TODO: add all the stream graphs?
+%% could be annotated with:
+%% - amount of work
+%% - stateful / stateless
+%% - dynamic control flow
+%% - peeking
+%% - I/O rates
 
-Interesting idioms:
-- data-dependent feedback loop in mosaic
-- synchronized splitter/joiner switching in mpeg
-  - matt drake proposes modes to fix this
+The StreamIt benchmark suite is detailed in
+Table~\ref{tab:benchmarks}.  In addition to our own benchmarks,
+researchers at Halmstad University have used StreamIt to develop a
+medium pulse repitition frequency doppler radar
+(MPD)~\cite{ola-techrep}.  The largest benchmarks are GMTI, MPEG-2,
+FAT, and SAR.  At the time of this writing, shortcomings in the
+compiler have prevented us from obtaining performance numbers for
+these complete applications.  However, their functional correctness
+has been verified in the Java runtime for the StreamIt language.
 
-Lessons learned:
-  - matched i/o rates
-  - don't use phases
-  - programmers can introduce mutable state
-  - structure was useful and tractable for programmers, though it was
-    occasionally unnatural and, in rare cases, insufficient.
-    - bypassing/interleaving issue: bundling data, splitting apart, etc.
-      - case 1: operating on only one piece of data in parallel
-      - case 2: trying to thread some data down a piece of hierarchy
-      - drawbacks:
-        - programmer has to keep track of rates at splits \& joins
-        - bad for software engineering (non-local influence of models)
-      - undone by sync removal in compiler, but still bad
-    - certain constructs not handled
-      - parameterized triangle joiner
-      - communicating to both your neighbors
-  - rate declarations are good.
-    - we are frequently asked if they could be inferred or checked
-    - in most cases, yes, but undecidable in general
-    - redundancy provides good documentation on the behavior of filter
+While our initial conception of stream programs proved to be generally
+accurate, in developing the benchmark suite we encountered a few
+surprises regarding the benchmarks' common-case behavior.  The
+following observations should be taken in the context of our own
+benchmark suite, which is necessarily limited and biased.  However,
+they might notheless be informative for other researchers:
+
+\begin{enumerate}
+
+\item {\it Filters rarely contain mutable state.}  While other
+  researchers have noted that stream programs are rich in data
+  parallelism~\cite{imagine03ieee}, we nonetheless expected to see a
+  greater proportion of filters that retained mutable state between
+  execution steps.  Without mutable state, filters can be split into
+  multiple instances that operate on separate sections of the input
+  stream; this is perhaps the most straightforward parallelism to
+  exploit.  However, with mutable state, only one instance of the
+  filter is possible, and the compiler must exploit task- and
+  pipeline-parallelism between the filter and others in the graph.
+
+  The state observed can be explained as follows.  Vocoder performs an
+  adaptive DFT that uses a stateful decay to ensure stability; it also
+  needs to retain the previous output across one iteration within a
+  phase transformation.  MPEGDecoder maintains significant state in
+  the parser, and also has negligible state in retaining predicted
+  motion vectors across one iteration of work.  Radar repeatedly
+  operates on long columns of an array requiring special behavior at
+  the boundaries; thus, the state tracks the position in the column
+  and does some internal buffering.  Radar can be rewritten at a
+  coarse level of granularity to eliminate this state.
+
+  We are currently expanding our benchmark suite to explore more
+  stateful applications, including intelligent network routing (which
+  maintains per-flow state) as well as cache simulation (in which the
+  simulated memories represent state).
+
+\item {\it Neighboring filters often have matched I/O rates.}  Many of
+  the advanced scheduling strategies for synchronous dataflow graphs
+  have the highest payoff when the input and output rates of
+  neighboring filters are mis-matched.  For example, the CD-DAT
+  benchmark (shown in Figure~\ref{fig:mismatched}) is used in many
+  studies~\cite{murthy_minimizing_1994,bhattacharyya_optimal_1995,teich_3d_1999,bhattacharya_quasi-static_2000,chandrachoodan_efficient_2001,murthy_buffer_2004,ko_memory-constrained_2006};
+% TODO: this was first page of google results for unquoted string, ``cd-dat dataflow''
+%  - fill in the rest
+  it converts compact disk auto (sampled at 44.1 khz) to digital audio
+  tape (sampled at 48 khz).  Performing this conversion in stages
+  improves efficiency~\cite{murthy_minimizing_1994}.  However,
+  neighboring filters have different communication rates which share
+  no common factors, resulting in a large steady-state schedule.
+
+  In our benchmark suite, mismatched communication rates as seen in
+  CD-DAT are very rare.  The common case is that the entire benchmark
+  is operating on a logical frame of data which is passed through the
+  entire application (such as in FFT, see
+  Figure~\ref{fig:mismatched}).  Sometimes there are difference in the
+  input and output rates for filters that operate at different levels
+  of granularity; for example, processing one frame at a time, one
+  macroblock at a time, or one pixel at a time.  However, these rates
+  have a small common multiple (i.e., the frame size) and can be
+  accommodated without growing the steady state schedule.
+
+  The most quantitative evidence that we have to this effect is
+  detailed in our paper on phased
+  scheduling~\cite{karczmarek:lctes:2003}.  The paper develops a new
+  scheduling algorithm that reduces the buffer requirements needed to
+  execute a synchronous dataflow graph.  The space saved on CD-DAT is
+  over 14x.  However, the median savings across our entire benchmark
+  suite is less than 1.2x.  The reason is that the potential savings
+  on most benchmarks was extremely small due to matched input and
+  output rates; simply executing each node once would often give the
+  minimal possible buffering.
+
+\begin{figure}[t]
+% TODO: figure with CD-DAT next to FFT2
+\caption[Example of matched and mis-matched I/O rates]{An example of
+  (a) matched I/O rates (in a coarse-grained version of our FFT
+  benchmark), and (b) mis-matched I/O rates (in the CD-DAT
+  benchmark~\cite{murthy_buffer_2004}).  While mis-matched I/O rates
+  demand clever scheduling strategies to avoid exploding the buffer
+  sizes, matched I/O rates are the common case in our benchmark suite.
+ \protect\label{fig:mismatched}}
+\end{figure}
+
+\item {\it There are few feedback loops in our benchmarks.}  While we
+  did not intend to focus on acyclic programs, the benchmarks we
+  encountered were often free of feedback loops.  Notable exceptions
+  are MPEG-2 encoding and mosaic imaging, which both contain irregular
+  feedback loops that are implemented using teleport messaging.
+  messaging.
+
+\end{enumerate}
+
+In addition to our observations about the benchmark charcateristics,
+we also offer some lessons learned from developers' experiences in
+implementing stream programs:
+
+\begin{enumerate}
+
+\item {\it Structured streams are a useful and tractable means of
+  writing programs.  However, they are occasionally unnatural and, in
+  rare cases, insufficient.}  Overall, we found structured streams --
+  the hierarchical composition of pipelines, splitjoins, and
+  feedbackloops -- to be a good match for the applications in our
+  benchmark suite.  While the developer sometimes had to refactor an
+  unstructured block diagram into structured components, the result
+  was nonetheless a viable way to represent the application.
+
+\begin{figure}[t]
+% TODO: interleaving figure
+% part 1: interleaving downstream
+% part 2: bypass
+\caption{TODO.\protect\label{fig:interleaving}}
+\end{figure}
+
+  One shortcoming of structure is that it can force programmers to
+  multiplex and demultiplex conceptually-distinct data streams into a
+  single channel.  An example of this hazard is illustrated in
+  Figure~\ref{fig:interleaving}.
+
+  TODO - programmer has
+  to keep track of rates at splits \& joins - bad for software
+  engineering (non-local influence of models)
+
+   - certain constructs not handled
+    - parameterized triangle joiner
+    - communicating to both your neighbors
+
+\begin{figure}[t]
+\hspace{0.1\textwidth}
+\begin{minipage}{0.35\textwidth}
+\centering
+\ninepoint
+\begin{verbatim}
+void->int filter SquareWave() {
+  work push 2 {
+    push(0);
+    push(1);
+  }
+}
+\end{verbatim}
+\end{minipage}
+\hspace{0.1\textwidth}
+\begin{minipage}{0.35\textwidth}
+\centering
+\ninepoint
+\begin{verbatim}
+void->int filter SquareWave() {
+  int x = 0;
+ 
+  work push 1 {
+    push(x);
+    x = 1 - x;
+  }
+}
+\end{verbatim}
+\end{minipage}
+
+\hspace{0.1\textwidth}
+\begin{minipage}{0.35\textwidth}
+\centering
+(a) Stateless
+\end{minipage}
+\hspace{0.1\textwidth}
+\begin{minipage}{0.35\textwidth}
+\centering
+(b) Stateful
+\end{minipage}
+
+\caption[Accidental introduction of filter state]{Programmers can
+  accidentally introduce unnecessary filter state when writing
+  programs.  In this example, the intended output is a square wave,
+  emitting alternate values of 0 and 1.  Both implementations shown
+  are functionally equivalent.  However, the stateless version (a)
+  appears data-parallel to the compiler, while the stateful version
+  (b) appears sequential.\protect\label{fig:state}}
+\end{figure}
+
+\item {\it Programmers can accidentally introduce unnecessary mutable
+  state in filters.}  Filters that have no mutable state are
+  attractive because they can be run in a data-parallel fashion.
+  Unfortunately, the performance cost of introducing state is not
+  exposed in the current StreamIt language.  Thus, we found that
+  several programmers, when faced with two alternative implementations
+  of an algorithm, would sometimes choose the one that included
+  mutable state (see Figure~\ref{fig:state} for an example).  Prior to
+  conducting our performance evaluations, we examined all stateful
+  filters in the benchmarks and rewrote them as stateless filters when
+  it was natural to do so.  In a future stream languages, it may be
+  desirable to require an extra type modifier on stateful filters,
+  such as a {\it stateful} keyword in ther declaration, to force
+  programmers to be cognizant of any added state and to avoid it when
+  possible.
+
+\item {\it Multi-phase filters confuse programmers and are not
+  necessary.}  At one point in the StreamIt project, we embraced the
+  cyclo-static dataflow
+  model~\cite{bilsen_cyclo-static_1995,parks_comparison_1995} for all
+  filters.  Under this model, the programmer can define multiple work
+  functions that are executed under a specified pattern.  By dividing
+  execution into more fine-grained units, cyclo-static dataflow can
+  offer lower latency than synchronous dataflow, and can also avoid
+  deadlock in tightly constrained loops.
+
+  However, our experience is that having the option of multiple
+  execution steps is confusing to beginning StreamIt programmers.
+  There is a tendency to interpret multiple execution steps as
+  beloning to multiple distinct filters.  It is also difficult to
+  explain to a non-expert why one method should be designated as an
+  execution step, rather than as a plain subroutine call.
+
+  Multiple execution steps did prove to be important to the semantics
+  of splitters and joiners, which would have an unreasonably large
+  granularity if they were forced to transfer a full cycle of data at
+  a single time.  However, because StreamIt relies on a few built-in
+  primitives for splitting and joining, the subtlety of this execution
+  semantics could be hidden from the programmer.  Apart from splitters
+  and joiners, we did not enconter any scenarious (in our limited
+  benchmark suite) that demanded multiple execution steps in filters.
+
+  Thus, after making a significant investment to support the full
+  generality of cyclo-static dataflow in the StreamIt compiler, we
+  eventually changed course and removed the capability from the
+  language.
+
+\item {\it Input and output rates can typically be inferred from the
+  code inside a filter.  However, it is still worthwhile for the
+  programmer to declare them.}  We were surprised how many StreamIt
+  benchmarks contained completely static control flow inside the body
+  of filters.  That is, the path of control taken through the {\it
+    work} function is often independent of the data values input to
+  the filter.  Exceptions to this pattern include sorting algorithms,
+  compression algorithms, and parsing algorithms (e.g., the MPEG-2
+  bitstream parser).
+
+  When the control flow is static, it is often feasible for the
+  compiler to infer the number of items pushed and popped via a static
+  analysis.  Such an analysis could save the programmer the trouble of
+  annotating each work function with its input and output rates.
+
+  However, we did find that it is valuable for programmers to annotate
+  the input and output rates even when they can be inferred.  As is
+  commonly the case with type declarations, these annotations provided
+  documentation to other users regarding the intended behavior of the
+  filter, making it easier to understand and maintain.  They also
+  provided a level of redundancy, so that, when possible, the compiler
+  could check the consistency between the declared rates and the
+  actual implementation.
+
+\end{enumerate}
 
 \section{Related Work}
 \label{sec:lang-related}
@@ -567,6 +805,12 @@ Spidle~\cite{spidle03} is also a recent stream language that was
 influenced by StreamIt.
 
 \section{Future Work}
+
+In his thesis, Matthew Drake makes a sound case for 
+- programmable splitters and joiners
+- stream graph re-initialiation
+- stream graph draining
+- switch splitjoins
 
 - multidimensional streams not handled well.  fundamentally tied to a
 1-D representation, difficult for compiler to understand (or
