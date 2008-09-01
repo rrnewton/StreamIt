@@ -1,6 +1,6 @@
-%\usepackage{amsmath}
-%\usepackage{psfig}
-%\usepackage{url}
+% TODO:
+% - integrate description of splitters
+% - possibly show screenshots from all videos?
 
 \chapter{Translating Stream Programs into the Compressed Domain}
 \label{chap:compression}
@@ -198,15 +198,9 @@ The paper concludes with related work (Section 6) and conclusions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Program Representation}
-
-Our transformation requires a specific representation for compressed
-data, as well as for programs that transform the data.  The data must
-be compressed with LZ77, while the transformation must be expressed in
-the cyclo-static dataflow model (e.g., in the StreamIt language).
-
 \subsection{LZ77 Compression}
 
+Our technique supports compressed data formats that are based on LZ77.
 LZ77 is a lossless, dictionary-based compression algorithm that is
 asymptotically optimal~\cite{wyner94optimal}.  LZ77 forms the basis
 for many popular compression formats, including ZIP, GZIP and PNG, and
@@ -231,68 +225,17 @@ $\tup{1}{3}$ results in an output of ``A A A''.  An additional example
 is given in Figure~\ref{fig:lz77}.
 
 \begin{figure}[t]
-\begin{minipage}{0.21in}
-\mbox{~}
-\end{minipage}
+\centering
 \psfig{file=compression/lz77-figure.eps,width=2.6in}
 \caption{Example of LZ77 decompression.
 \protect\label{fig:lz77}}
 \end{figure}
 
-\subsection{Cyclo-Static Dataflow}
-
-The basic idea behind cyclo-static
-dataflow~\cite{bilsen95-cyclostatic,LM87-i} is to represent a program
-as a block diagram, in which independent components (called {\it
-  actors}) communicate over FIFO data channels (see
-Figure~\ref{fig:streamit}).  One can think of an actor as a function
-(called repeatedly by the runtime system) that consumes items from the
-input tapes and produces items on the output tapes.  Actors must
-declare how many items they will produce and consume on each
-execution; these I/O rates must either be constant across all
-executions, or must follow a fixed cycle.  In this paper, actors may
-not retain internal state between executions.
-
-We use the StreamIt language~\cite{streamitcc} to express cyclo-static
-dataflow programs.  An example StreamIt program appears in
-Figure~\ref{fig:streamit}.  It reads lines of an RGB image from a
-file, shrinks the image by a factor of two, inverts the color of each
-pixel, then writes the data to a file.  There are three kinds of
-actors in StreamIt, and our analysis handles each one separately:
-\begin{itemize}
-
-\item {\bf Filters} have a single input stream and a single output
-  stream, and perform general-purpose computation.  For example, in
-  the {\tt InvertColor} filter, the {\tt work} function specifies the
-  atomic execution step; it declares that on each execution, it pops
-  (inputs) 1 item from the input tape and pushes (outputs) 1 item to
-  the output tape.
-
-\item {\bf Joiners} interleave multiple input streams
-  into a single output stream.  Items are interleaved in a roundrobin
-  pattern according to a set of {\it weights}; for example, weights of
-  $(n_1, n_2)$ indicate that the first $n_1$ items are drawn from the
-  first input stream, and the next $n_2$ items are drawn from the
-  second input stream.  In Figure~\ref{fig:streamit}, the joiner reads
-  one pixel at a time from each input stream, serving to interleave
-  the pixels from neighboring lines.  Once the pixels are interleaved,
-  each group of 4 pixels is averaged together in order to decrease the
-  picture width by two.
-
-\item {\bf Splitters} have a single input stream and
-  multiple output streams.  They may perform either roundrobin
-  distribution, or duplicate distribution. In
-  Figure~\ref{fig:streamit}, the splitter sends {\tt WIDTH} pixels in
-  each direction, distributing the lines of the image across alternate
-  streams.
-
-\begin{figure}[t]
-\psfig{file=compression/streamit-figure.eps,width=3.408in}
-\caption{Example StreamIt program.
-\protect\label{fig:streamit}}
-\end{figure}
-
-\end{itemize}
+%% \begin{figure}[t]
+%% \psfig{file=compression/streamit-figure.eps,width=3.408in}
+%% \caption{Example StreamIt program.
+%% \protect\label{fig:streamit}}
+%% \end{figure}
 
 \section{Mapping into the Compressed Domain}
 
@@ -307,13 +250,16 @@ conditions the output is guaranteed to be fully compressed (relative
 to the compression of the input).  We quantify this issue later.
 
 To describe the mapping into the compressed domain, we consider each
-StreamIt construct in turn.  Filters and joiners are described below,
-while (due to space limitations) splitters are described in our
-companion technical report~\cite{techreport}.
+StreamIt construct in turn.  Filters and joiners are described here,
+while splitters are described in our technical
+report~\cite{techreport}.
 
+\newlength{\oldtextwidth}
+\setlength{\oldtextwidth}{7in}
 \newcommand{\mynewline}[0]{\\}
 \begin{figure*}[t]
-\begin{minipage}{0.48\textwidth}
+{\ninepoint
+\begin{minipage}{0.48\oldtextwidth}
 {\it Execute a filter in the compressed domain, given that it \\consumes
   $n$ items and produces $m$ items on each execution.}\mynewline
 \textsc{Execute-Compressed-Filter}~(int $n$, int $m$) \{\mynewline
@@ -345,7 +291,7 @@ companion technical report~\cite{techreport}.
 \}\mynewline
 \mbox{~}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{\bf (a)}\mynewline
 \end{minipage}
-\begin{minipage}{0.52\textwidth}
+\begin{minipage}{0.52\oldtextwidth}
 {\it Execute a roundrobin joiner in the compressed domain, given that
   it inputs $n_1$ items from input1 and $n_2$ items from input2 on
   each execution.}\mynewline
@@ -389,11 +335,11 @@ from input1\mynewline \mbox{~~~~}\}\mynewline
 \}\mynewline
 \mbox{~}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{\bf (b)}\mynewline
 \end{minipage}
+}
 \caption{Translation of (a) filters and (b) joiners into the
   compressed domain.  We use $\%$ to denote a modulo operation.
 %Helper functions appear in Figure~\ref{fig:helpers}.
 \protect\label{fig:translate}}
-\vspace{6pt}
 \end{figure*}
 
 \subsection{Filters}
@@ -490,7 +436,6 @@ decompression~\cite{ziviani00compression}.
 
 \begin{figure*}[t]
 \psfig{file=compression/compressed-filters-in-streamit.eps,width=\textwidth}
-\vspace{6pt}
 \caption{Example filter, splitter, and joiner in StreamIt.  The
   splitter and joiner combine to form a Transpose. Translation to the
   compressed domain is illustrated in Figures~\ref{fig:filter-example}
@@ -499,7 +444,6 @@ decompression~\cite{ziviani00compression}.
 
 \begin{figure*}[t]
 \psfig{file=compression/compressed-filter-example.eps,width=\textwidth}
-\vspace{6pt}
 \caption{Example execution of a filter in the uncompressed and
   compressed domains.  See Figure~\ref{fig:streamit-example}(a) for the
   source filter.\protect\label{fig:filter-example}}
@@ -523,7 +467,6 @@ the fundamental ideas; extension to additional streams is
 straightforward.  In addition, we use the following notations:
 
 \begin{figure*}[t]
-\vspace{-1\baselineskip}
 \psfig{file=compression/compressed-splitjoin-example.eps,width=\textwidth}
 \caption{Example execution of splitters and joiners in the compressed
   domain.  As illustrated by the input/output pairs in
@@ -537,26 +480,27 @@ straightforward.  In addition, we use the following notations:
 
 \begin{itemize}
 
-\vspace{4pt} \item As mentioned previously, splitters and joiners
-  adopt a fine-grained cyclo-static execution model, in which each
-  execution step transfers only one item from an input tape to an
-  output tape.  That is, a roundrobin$(n_1, n_2)$ joiner has $n_1 +
-  n_2$ distinct execution steps.  We refer to every group of $n_1 +
-  n_2$ steps as an {\it execution cycle}.
+\item As mentioned previously, splitters and joiners adopt a
+  fine-grained cyclo-static execution model, in which each execution
+  step transfers only one item from an input tape to an output tape.
+  That is, a roundrobin$(n_1, n_2)$ joiner has $n_1 + n_2$ distinct
+  execution steps.  We refer to every group of $n_1 + n_2$ steps as an
+  {\it execution cycle}.
 
-\vspace{4pt} \item The pseudocode in Figure~\ref{fig:translate}
-  assumes, without loss of generality, that the next execution step of
-  the joiner will read from the first input stream (input1).
+\item The pseudocode in Figure~\ref{fig:translate} assumes, without
+  loss of generality, that the next execution step of the joiner will
+  read from the first input stream (input1).
 
-\vspace{4pt} \item We use $\pos$ to denote the number of items (in
-  terms of the uncompressed domain) that have already been read from
-  the current input stream (input1) in the current execution cycle.
-  For brevity, the pseudocode does not maintain the value of $\pos$,
-  though it is straightforward to do so.
+\item We use $\pos$ to denote the number of items (in terms of the
+  uncompressed domain) that have already been read from the current
+  input stream (input1) in the current execution cycle.  For brevity,
+  the pseudocode does not maintain the value of $\pos$, though it is
+  straightforward to do so.
 
 \end{itemize}
 
 \begin{figure}[t]
+{\elevenpoint
 \begin{minipage}{0.1in}
 \vspace{-1.75pt}
 {\it // // // // // //}
@@ -591,13 +535,12 @@ straightforward.  In addition, we use the following notations:
 \tab\}\\
 ~ \vspace{-6pt}\\ 
 \tab$\mbox{\bf return~}(n_1*\mbox{total\_cycles} + L_1, n_2*\mbox{total\_cycles} + L_2)$
-\}
+\}}
 \caption{The \textsc{Repeat\_Lengths} function is called during
   compressed joiner execution.  In the case where the input tokens to
   the joiner have compatible repeat distances, it calculates the
   maximum repeat lengths that can be passed to the
   output.\protect\label{fig:repeat-lengths}}
-\vspace{-2pt}
 \end{figure}
 
 There are two ways to pass repeat tokens through a joiner.  If the
@@ -707,13 +650,13 @@ widely used to render frame sequences in the computer animation and
 video industries.  The format includes an optional RLE compression
 stage, making it a good target for our technique.
 
-%% \paragraph{PXY.}
-%% The pxy format is a research-based image format designed to support
-%% efficient transpose and rotation of black-and-white
-%% images~\cite{shoji95}.  It consists of the series of $(x,y)$
-%% coordinates at which the image changes color during a horizontal scan.
-%% As this information can be converted to a run-length encoding, it can
-%% also be targetted by our technique.
+\paragraph{PXY.}
+The pxy format is a research-based image format designed to support
+efficient transpose and rotation of black-and-white
+images~\cite{shoji95}.  It consists of the series of $(x,y)$
+coordinates at which the image changes color during a horizontal scan.
+As this information can be converted to a run-length encoding, it can
+also be targetted by our technique.
 
 \subsection{Medium-Efficiency Mappings}
 \label{sec:formats-med}
@@ -765,11 +708,11 @@ increase the memory footprint.  In addition, as DEFLATE's LZ77
 algorithm operates on individual bytes, there may be an exaggerated
 alignment cost if the application operates on a larger word size.
 
-%% \paragraph{TSCC.}
-%% The TechSmith Screen Capture Codec is very similar to Microsoft RLE,
-%% except that the final output is further compressed using DEFLATE.
-%% Thus, any overheads incurred by our technique on DEFLATE also extend
-%% to TSCC.
+\paragraph{TSCC.}
+The TechSmith Screen Capture Codec is very similar to Microsoft RLE,
+except that the final output is further compressed using DEFLATE.
+Thus, any overheads incurred by our technique on DEFLATE also extend
+to TSCC.
 
 \paragraph{PNG.}
 The PNG image format also relies on DEFLATE to compress the pixels in
@@ -784,8 +727,7 @@ scenario, there is a large amount of overhead due to the Huffman
 coding in DEFLATE.
 
 \begin{table*}[t]
-\vspace{-1\baselineskip}
-\psfig{file=compression/table-benchmarks.eps,width=7.02in}
+\hspace{-0.26in}\psfig{file=compression/table-benchmarks.eps,width=7.02in}
 \caption{Characteristics of the video workloads.
 \protect\label{tab:videos}}
 \end{table*}
@@ -939,7 +881,7 @@ compressed data, avoiding data expansion implied by decompression and
 multiple frame buffers, before copying the data to the output file.
 
 \begin{table*}[t]
-\psfig{file=compression/table-pixel-speedup.eps,width=7.02in}
+\hspace{-0.26in}\psfig{file=compression/table-pixel-speedup.eps,width=7.02in}
 \caption{Results for pixel transformations.
 \protect\label{tab:pixel-speedup}}
 \end{table*}
@@ -1010,7 +952,8 @@ variations in the first frame; for the same reason, some cases
 experience a 0.1\% increase in size (not visisble in the table).
 
 \begin{figure}[t]
-\psfig{file=compression/graph-speedup-pixel.eps,width=3.35in}
+\centering
+\psfig{file=compression/graph-speedup-pixel.eps,width=4.355in}
 \caption{Speedup on pixel transformations.
 \protect\label{fig:pixel-speedup}}
 \end{figure}
@@ -1096,51 +1039,54 @@ allocation/deallocation for each frame.
 % this fell out of removing the redundant memory deallocation
 
 \begin{figure}[t]
-\vspace{1.5pt}
-\psfig{file=compression/graph-speedup-scatter.eps,width=3.47in}
+\centering
+\psfig{file=compression/graph-speedup-scatter.eps,width=4.511in}
 \caption{Speedup vs. compression factor for all transformations.
 \protect\label{fig:speedup-scatter}}
-\vspace{-7.5pt}
 \end{figure}
 
 \begin{figure}[t]
-\begin{minipage}{1.1in}
-\vspace{-4pt}
-\psfig{file=compression/blender-background1-frame5.eps,width=1.09in}
+\centering
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{file=compression/blender-background1-frame5.eps,width=1.9in}
 \vspace{2pt}
 \end{minipage}
-\begin{minipage}{1.1in}
-\vspace{-4pt}
-\psfig{file=compression/blender-foreground2-frame5.eps,width=1.09in}
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{file=compression/blender-foreground2-frame5.eps,width=1.9in}
 \vspace{2pt}
 \end{minipage}
-\begin{minipage}{1.1in}
-\vspace{-4pt}
-\psfig{file=compression/blender-composite-frame5.eps,width=1.09in}
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{file=compression/blender-composite-frame5.eps,width=1.9in}
 \vspace{2pt}
 \end{minipage}
 
-{\small ~~~~~~~~~~anim-scene1~~~~~~~~~+~~~~~~anim-character2~~~~~~=~~~~~~video composite}
+{\small ~~~~~~~~~~~anim-scene1~~~~~~~~~~~~~~+~~~~~~~~~~~~~anim-character2~~~~~~~~~~~=~~~~~~~~~~~~~video composite~~~~~~~}
 
 \begin{center}
 \vspace{-3pt}
 (a) Computer animation composite (alpha-under)
-\end{center} \vspace{3pt}
+\end{center} \vspace{12pt}
 
-\begin{minipage}{1.1in}
-\psfig{file=compression/digvid-background1.eps,width=1.09in}
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{file=compression/digvid-background1.eps,width=1.9in}
 \vspace{2pt}
 \end{minipage}
-\begin{minipage}{1.1in}
-\psfig{file=compression/digvid-matte1-frame.eps,width=1.09in}
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{file=compression/digvid-matte1-frame.eps,width=1.9in}
 \vspace{2pt}
 \end{minipage}
-\begin{minipage}{1.1in}
-\psfig{file=compression/digvid-composite.eps,width=1.09in}
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{file=compression/digvid-composite.eps,width=1.9in}
 \vspace{2pt}
 \end{minipage}
 
-{\small ~~~~digvid-background1~~+~~~~~digvid-matte-frame~~~=~~~~~video composite}
+{\small ~~~digvid-background1~~~~~~~~~~+~~~~~~~~~~~~digvid-matte-frame~~~~~~~~=~~~~~~~~~~~~~video composite~~~~~~~}
 
 \begin{center}
 \vspace{-3pt}
@@ -1148,14 +1094,10 @@ allocation/deallocation for each frame.
 \end{center}
 \vspace{-3pt}
 \caption{Examples of video compositing operations.\protect\label{fig:videos}}
-\vspace{-3pt}
 \end{figure}
 
 \begin{table*}[t]
-\vspace{-1.5\baselineskip}
-\begin{minipage}{0.6in}
-\mbox{~}
-\end{minipage}
+\centering
 \psfig{file=compression/table-composite-speedup.eps,width=5.8in}
 \caption{Results for composite transformations.
 \protect\label{tab:composite-speedup}}
@@ -1185,7 +1127,8 @@ achieved on composite videos is roughly proportional to the minimum
 compression across the two input files.
 
 \begin{figure}[t]
-\psfig{file=compression/graph-speedup-composite.eps,width=3.35in}
+\centering
+\psfig{file=compression/graph-speedup-composite.eps,width=4.355in}
 \caption{Speedup on composite transformations.
 \protect\label{fig:composite-speedup}}
 \end{figure}
