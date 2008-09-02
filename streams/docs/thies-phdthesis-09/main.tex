@@ -8,9 +8,6 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 
-%\usepackage{doublespace}
-%\setstretch{1}
-
 % replace courier with beramono, a fixed-width font that is more condensed
 % see more fonts here:  http://www.tug.dk/FontCatalogue/
 \usepackage[T1]{fontenc}
@@ -67,13 +64,15 @@
 %\include{contents}
 
 %\include{intro}
-%\include{language}
+\include{language}
 %\include{messaging}
-%\include{experience}
-\include{compression}
+%\include{optimizing}
+%\include{compression}
 %\include{profiling}
 %\include{conclusion}
 
+\clearpage
+\addcontentsline{toc}{chapter}{Bibliography}
 {\tenpoint
 \bibliography{references,faculty-app,messaging,zotero}
 \bibliographystyle{amsalpha}

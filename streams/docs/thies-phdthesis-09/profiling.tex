@@ -79,7 +79,7 @@ executions).
 %% \setlength{\myoffset}{-\textwidth}
 %% \addtolength{\myoffset}{\columnwidth}
 %% \hspace{\myoffset}
-\psfig{file=profiling/intro-overview.eps,width=\textwidth}
+\hspace{-0.25in}\psfig{file=profiling/intro-overview.eps,width=7in}
 \caption{Overview of our approach.\protect\label{fig:overview}}
 \end{figure}
 
@@ -245,10 +245,10 @@ overall communication footprint.  The only other file to contain
 layer-1 frames is track 9, resulting in a small address jump at
 iteration 17,900 (not illustrated).
 
-\begin{figure*}[t]
-\begin{minipage}{\columnwidth}
-\psfig{file=profiling/mpeg2-addresses.eps,width=\columnwidth}
-\vspace{-6pt}
+\begin{figure}[t]
+\begin{minipage}{3.075in}
+\hspace{-0.05in}\psfig{file=profiling/mpeg2-addresses.eps,width=3.125in}
+\vspace{-12pt}
 \caption{Stability of streaming communication patterns for MPEG-2
   decoding.  The decoder was monitored while processing the top 10
   short videos
@@ -256,35 +256,34 @@ iteration 17,900 (not illustrated).
 from YouTube.  See Figure~\ref{fig:mpeg2-mp3-graphs}a for a stream
 graph of the application.\protect\label{fig:mpeg2-addresses}}
 \end{minipage}
-\hspace{\columnsep}
-\begin{minipage}{\columnwidth}
-\psfig{file=profiling/mp3-addresses.eps,width=\columnwidth}
-\vspace{-6pt}
+\hspace{0.3in}
+\begin{minipage}{3.02in}
+\hspace{-0.05in}\psfig{file=profiling/mp3-addresses.eps,width=3.125in}
+\vspace{-12pt}
 \caption{Stability of streaming communication patterns for MP3
   decoding.  The decoder was monitored while processing the top 10
   tracks from MP3.com.  See Figure~\ref{fig:mpeg2-mp3-graphs}b for a
   stream graph of the application.  \protect\label{fig:mp3-addresses}}
 \end{minipage}
-\end{figure*}
+\end{figure}
 
-\begin{table*}[t]
-\vspace{12pt}
-\begin{minipage}{\columnwidth}
-\psfig{file=profiling/mpeg2-matrix.eps,width=\columnwidth}
-\vspace{-6pt}
+\begin{figure}[t]
+\begin{minipage}{3.075in}
+\psfig{file=profiling/mpeg2-matrix.eps,width=3.07in}
+\vspace{-12pt}
 \caption{Minimum number of training iterations (frames) needed on each
   video in order to correctly decode the other videos.
   \protect\label{tab:mpeg2-matrix}}
 \end{minipage}
-\hspace{\columnsep}
-\begin{minipage}{\columnwidth}
-\psfig{file=profiling/mp3-matrix.eps,width=\columnwidth}
-\vspace{-6pt}
+\hspace{0.3in}
+\begin{minipage}{3.02in}
+\psfig{file=profiling/mp3-matrix.eps,width=3.07in}
+\vspace{-12pt}
 \caption{Minimum number of training iterations (frames) needed on each
   track in order to correctly decode the other tracks.
   \protect\label{tab:mp3-matrix}}
 \end{minipage}
-\end{table*}
+\end{figure}
 
 It is important to note that there does exist a dynamic component to
 these applications; however, the dynamism is contained within a single
@@ -492,7 +491,7 @@ certain storage locations (see Section~\ref{sec:results} for details).
 
 \begin{figure}[t]
 \centering
-\psfig{file=profiling/data-parallelism.eps,width=\columnwidth}
+\psfig{file=profiling/data-parallelism.eps,width=3.5in}
 \vspace{-6pt}
 \caption{Programmers can specify data parallelism by passing an extra
   argument to the pipeline annotation.  In this case, the runtime
@@ -625,6 +624,7 @@ non-deterministic and would likely lead to incorrect outputs.
 
 \begin{table*}[t]
 \begin{center}
+{\tenpoint
 \begin{tabular}{|l|l|l|l|}
 \hline
 {\bf Benchmark} & {\bf Description} & {\bf Source} & {\bf Lines of Code} \\ \hline \hline
@@ -634,7 +634,7 @@ GMTI  & Ground Moving Target Indicator & MIT Lincoln Laboratory~\cite{reuther03g
 197.parser & Grammatical parser of English language & SPECINT 2000 & 11,000 \\ \hline
 256.bzip2 & bzip2 compression and decompression & SPECINT 2000 & 5,000 \\ \hline
 456.hmmer & Calibrating HMMs for biosequence analysis & SPECCPU 2006 & 36,000 \\ \hline
-\end{tabular}
+\end{tabular}}
 \caption{Benchmark characteristics.\protect\label{tab:benchmarks}}
 \end{center}
 \end{table*}
@@ -733,7 +733,7 @@ place them in the same pipeline stage that the counters were utilized.
 \begin{figure}[t]
 \centering
 \vspace{-6pt}
-\psfig{file=profiling/mpeg2-mp3-graph.eps,width=\columnwidth}
+\psfig{file=profiling/mpeg2-mp3-graph.eps,width=3.5in}
 \caption{Extracted stream graphs for MPEG-2 and MP3 decoding.\protect\label{fig:mpeg2-mp3-graphs}}
 \vspace{-10pt}
 \end{figure}
@@ -818,8 +818,7 @@ The programmer directed the tool to patch the parallel version so that
 the entire array was communicated at once.
 
 \begin{figure*}[t]
-\centering
-\psfig{file=profiling/program-changes.eps,width=\textwidth}
+\hspace{-0.25in}\psfig{file=profiling/program-changes.eps,width=7in}
 \caption{Steps taken by the programmer to assist in parallelizing each
   benchmark.  Assistance may be needed to expose parallelism in the
   original code, to verify parallelism using the tool, or to handle
@@ -1008,9 +1007,10 @@ inter-process communication mechanisms (e.g., using shared memory).
 
 \begin{table}[t]
 \begin{center}
+{\tenpoint
 \begin{tabular}{|l|c|c|c|}
 \hline
-\hspace{-1pt}{\bf Benchmark}\hspace{-1pt} & \hspace{-2pt}\parbox{0.57in}{\vspace{1pt} {\bf ~Pipeline}\\ {\bf \mbox{~~}Depths} ~ \\ \vspace{-9.5pt}}\hspace{-2pt} & \hspace{-2pt}\parbox{0.95in}{\centering \vspace{-\baselineskip} \vspace{1pt} {\bf Data-Parallel}\\ {\bf Widths} ~ \\ \vspace{-9.5pt}}\hspace{-2pt} & \hspace{-4pt} {\bf Speedup} \hspace{-4pt} \\ \hline \hline
+{\bf Benchmark} & {\bf ~Pipeline Depths} & {\bf Data-Parallel Widths} & {\bf Speedup} \\ \hline \hline
 GMTI & 9 & --- & 3.03x \\ \hline
 MPEG-2 & 7 & --- & 2.03x \\ \hline
 MP3 & 6 & 2,2 & 2.48x \\ \hline
@@ -1021,7 +1021,7 @@ MP3 & 6 & 2,2 & 2.48x \\ \hline
 %\hspace{3pt}{\small uncompress} & {\small 2} & --- & \vspace{0pt}{\small 1.78x} \vspace{0pt} \\ \hline
 456.hmmer & 2 & 4 & 3.89x \\ \hline
 {\bf GeoMean} & & & {\bf {\meanspeedup}} \\ \hline 
-\end{tabular}
+\end{tabular}}
 \caption{Characteristics of the parallel stream graphs and performance
   results on a 4-core machine.  Data-parallel width refers to the
   number of ways any data-parallel stage was
