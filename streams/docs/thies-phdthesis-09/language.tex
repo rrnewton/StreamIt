@@ -501,7 +501,7 @@ our application set.
 %%     - author(s)
 %%     - lines of code
 %%     - dynamic control flow?
-% TODO: benchmark characteristics table
+\framebox{TODO} % table of benchmark characteristics
 \caption{StreamIt benchmark suite.\protect\label{tab:benchmarks}}
 \end{table}
 
@@ -562,8 +562,8 @@ they might notheless be informative for other researchers:
 \item {\it Neighboring filters often have matched I/O rates.}  Many of
   the advanced scheduling strategies for synchronous dataflow graphs
   have the highest payoff when the input and output rates of
-  neighboring filters are mis-matched.  For example, the CD-DAT
-  benchmark (shown in Figure~\ref{fig:mismatched}) is used in many
+  neighboring filters are mismatched.  For example, the CD-DAT
+  benchmark (shown in Figure~\ref{fig:cd-dat}) is used in many
   studies~\cite{murthy_minimizing_1994,bhattacharyya_optimal_1995,teich_3d_1999,bhattacharya_quasi-static_2000,chandrachoodan_efficient_2001,murthy_buffer_2004,ko_memory-constrained_2006};
 % TODO: this was first page of google results for unquoted string, ``cd-dat dataflow''
 %  - fill in the rest
@@ -576,13 +576,13 @@ they might notheless be informative for other researchers:
   In our benchmark suite, mismatched communication rates as seen in
   CD-DAT are very rare.  The common case is that the entire benchmark
   is operating on a logical frame of data which is passed through the
-  entire application (such as in FFT, see
-  Figure~\ref{fig:mismatched}).  Sometimes there are difference in the
-  input and output rates for filters that operate at different levels
-  of granularity; for example, processing one frame at a time, one
-  macroblock at a time, or one pixel at a time.  However, these rates
-  have a small common multiple (i.e., the frame size) and can be
-  accommodated without growing the steady state schedule.
+  entire application (such as in FFT, see Figure~\ref{fig:fft}).
+  Sometimes there are difference in the input and output rates for
+  filters that operate at different levels of granularity; for
+  example, processing one frame at a time, one macroblock at a time,
+  or one pixel at a time.  However, these rates have a small common
+  multiple (i.e., the frame size) and can be accommodated without
+  growing the steady state schedule.
 
   The most quantitative evidence that we have to this effect is
   detailed in our paper on phased
@@ -596,14 +596,27 @@ they might notheless be informative for other researchers:
   minimal possible buffering.
 
 \begin{figure}[t]
-% TODO: figure with CD-DAT next to FFT2
-\caption[Example of matched and mis-matched I/O rates]{An example of
-  (a) matched I/O rates (in a coarse-grained version of our FFT
-  benchmark), and (b) mis-matched I/O rates (in the CD-DAT
-  benchmark~\cite{murthy_buffer_2004}).  While mis-matched I/O rates
-  demand clever scheduling strategies to avoid exploding the buffer
-  sizes, matched I/O rates are the common case in our benchmark suite.
- \protect\label{fig:mismatched}}
+\centering
+\psfig{file=cd-dat,width=4.5in}
+\caption[CD-DAT, an example of mismatched I/O rates]{The CD-DAT
+  benchmark~\cite{murthy_buffer_2004} exhibits unusually mis-matched
+  I/O rates.  Nodes are annotated with the number of items pushed and
+  popped per execution, as well as their exection multiplicity in the
+  steady state. Since neighboring filters produce different numbers of
+  items, each filter has a large multiplicity in the steady state.
+  This demands clever scheduling strategies to avoid extremely large
+  buffer sizes.\protect\label{fig:cd-dat}}
+
+\psfig{file=fft.eps,width=4in}
+\caption[FFT, an example of matched I/O rates]{The FFT benchmark, like
+  many benchmarks, exhibits matched I/O rates.  Nodes are annotated
+  with the number of items pushed and popped per execution, as well as
+  their exection multiplicity in the steady state.  Since neighboring
+  filters produce the same number of items on each execution, each
+  filter executes only once in the steady state.  This provides less
+  flexibility and benefit for optimizing the
+  schedule.\protect\label{fig:fft}}
+
 \end{figure}
 
 \item {\it There are few feedback loops in our benchmarks.}  While we
@@ -631,10 +644,21 @@ implementing stream programs:
   was nonetheless a viable way to represent the application.
 
 \begin{figure}[t]
-% TODO: interleaving figure
-% part 1: interleaving downstream
-% part 2: bypass
+\psfig{file=interleaving.eps,width=4in}
 \caption{TODO.\protect\label{fig:interleaving}}
+\end{figure}
+
+\begin{figure}[t]
+\vspace{-0.96in}
+\psfig{file=3gpp.eps,height=\textheight}
+\vspace{-1.25in} ~ \\
+\begin{minipage}{4in}
+\caption[Stream graph for 3GPP]{Stream graph a 3GPP Radio Access
+  Protocol application.  Shaded filters indicate Identity nodes that
+  are used to bypass data items around intermediate filters.  They are
+  also used in splitjoins for data duplication and
+  reordering.\protect\label{fig:3gpp}}
+\end{minipage}
 \end{figure}
 
   One shortcoming of structure is that it can force programmers to
@@ -642,7 +666,7 @@ implementing stream programs:
   single channel.  An example of this hazard is illustrated in
   Figure~\ref{fig:interleaving}.
 
-  TODO - programmer has
+  - programmer has
   to keep track of rates at splits \& joins - bad for software
   engineering (non-local influence of models)
 

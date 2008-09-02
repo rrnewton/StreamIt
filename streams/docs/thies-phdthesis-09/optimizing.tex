@@ -1,0 +1,43 @@
+\chapter{Optimizing StreamIt}
+\label{chap:optimizing}
+
+\section{Parallelization}
+
+\section{Optimizing Linear Computations}
+
+\section{Cache Optimizations}
+
+\section{Related Work}
+
+\section{Future Work}
+
+%% this section mainly describes optimizing an SDF language. generally
+%% applies for languages outside streamit as well.
+
+%% - optimizations
+%%   - parallelization
+%%   - linear + statespace
+%%   - cache
+%%   n phased scheduling
+%% - mention standard transformations:
+%%   - fission / fusion
+%%   - sync removal
+
+%% ----------------------
+
+%% - lessons learned
+%%   - fine-grained communication on Raw not worth it
+%%   - greedy is good?  dynamic programming solution
+%%   - what was useful in language for compiler's sake?
+%%    - peeking was useful for compiler
+%%    - data reordering was useful for compiler
+%%    - structure was less useful for compiler
+%%      - mostly just dynamic programming solution
+%%      - phased scheduling was easier to formulate
+%%      - COULD have been useful for parameterized IR
+
+%% - leaving out?
+%%   - third-party uses?
+%%     - bit-streaming / sketching
+%%     - mani / VIRAM
+%%   - debugging / gui's
