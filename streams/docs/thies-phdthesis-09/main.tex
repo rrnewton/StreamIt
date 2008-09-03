@@ -15,6 +15,10 @@
 %\renewcommand*\ttdefault{cmvtt}    % Computer Modern Teletype Proportional
 \usepackage[scaled=0.88]{beramono}
 
+% bold italic font
+\newfont{\boldit}{cmbxti10}
+\newfont{\boldslant}{cmbxsl10}
+
 % some handy font sizes
 \newcommand{\sevenpoint}{\fontsize{7pt}{9pt}\selectfont}
 \newcommand{\eightpoint}{\fontsize{8pt}{10pt}\selectfont}
@@ -52,27 +56,34 @@
 % do not list sub-sub sections in table of contents
 \setcounter{tocdepth}{1}
 
-% need sdep as early as intro
-\newcommand{\sdep}[0]{\textsc{sdep}}
-\newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
+% for adding chapter titles to list of figures
+\newcommand{\startchapter}[1]{\chapter{#1}\addcontentsline{lof}{figure}{\hspace{-18pt}{\bf \thechapter \hspace{9.5pt} #1}}}
 
 \pagestyle{plain}
 
+% ----------------------------------------------------------------------
+
+% for my thesis only:  need sdep as early as intro an dtable of contents
+\newcommand{\sdep}[0]{\textsc{sdep}}
+\newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
+\newcommand{\figsdep}[0]{\mt{SDEP}}
+\newcommand{\figsdepf}[2]{\mt{SDEP}_{#1 \small{\leftarrow} #2}}
+
 \begin{document}
 
-%\include{cover}
-%\include{contents}
+\include{cover}
+\include{contents}
 
-%\include{intro}
+\include{intro}
 \include{language}
-%\include{messaging}
-%\include{optimizing}
-%\include{compression}
-%\include{profiling}
-%\include{conclusion}
+\include{messaging}
+\include{optimizing}
+\include{compression}
+\include{profiling}
+\include{conclusion}
 
-\clearpage
-\addcontentsline{toc}{chapter}{Bibliography}
+%\clearpage
+%\addcontentsline{toc}{chapter}{Bibliography}
 {\tenpoint
 \bibliography{references,faculty-app,messaging,zotero}
 \bibliographystyle{amsalpha}
