@@ -1,4 +1,4 @@
-\chapter{My Thesis}
+\startchapter{My Thesis}
 
 % John Ellis:
 %% Ordinary scientific programs can be compiled for a new parallel
@@ -41,6 +41,26 @@ underlying machine.  To overcome this long-standing problem and make
 high-performance programming accessible to non-experts, it will likely
 be necessary to empower the compiler with new information that is not
 currently embedded in general-purpose programming languages.
+
+%% While the advent of high-level programming languages has made it
+%% easier for beginner programmers to construct working applications,
+%% optimizing the performance of those applications is a more difficult
+%% task that is often beyond the reach of non-experts.  To improve the
+%% execution time, a performance expert may re-write large sections of
+%% the application, employing alternative algorithms, data structures, or
+%% task decompositions, to produce a version that is functionally
+%% equivalent to (but structurally very different from) the original
+%% program.  They may also utilize in-depth knowledge of the target
+%% architecture, such as the type and extent of parallel resources, the
+%% communication substrate, and the cache sizes, to match the structure
+%% and granularity of the application to that of the underlying machine.
+%% While it has been a long-term goal of the computer science community
+%% to replicate the role of performance experts via systematic
+%% transformations within the compiler, many optimizations remain beyond
+%% the reach of automation because the compiler does not have the
+%% information needed -- either about the program itself, or about the
+%% class of transformations known to the expert -- to match the
+%% hand-tuned performance.
 
 One promising approach to automating performance optimization is to
 embed specific domain knowledge into the language and compiler.  By
@@ -732,28 +752,3 @@ The specific contributions of this dissertation are as follows:
 
 \noindent Lessons learned and future work are described in the
 conclusion (Chapter~7).
-
-\newpage
-
-Alternate opening paragraph:
-\medskip
-
-While the advent of high-level programming languages has made it
-easier for beginner programmers to construct working applications,
-optimizing the performance of those applications is a more difficult
-task that is often beyond the reach of non-experts.  To improve the
-execution time, a performance expert may re-write large sections of
-the application, employing alternative algorithms, data structures, or
-task decompositions, to produce a version that is functionally
-equivalent to (but structurally very different from) the original
-program.  They may also utilize in-depth knowledge of the target
-architecture, such as the type and extent of parallel resources, the
-communication substrate, and the cache sizes, to match the structure
-and granularity of the application to that of the underlying machine.
-While it has been a long-term goal of the computer science community
-to replicate the role of performance experts via systematic
-transformations within the compiler, many optimizations remain beyond
-the reach of automation because the compiler does not have the
-information needed -- either about the program itself, or about the
-class of transformations known to the expert -- to match the
-hand-tuned performance.

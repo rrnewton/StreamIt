@@ -1,4 +1,7 @@
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2008/08/25 17:36:16  thies
+% *** empty log message ***
+%
 % Revision 1.2  1999/10/21 14:51:33  boojum
 % changed references to documentstyle to documentclass in comments
 %
@@ -298,12 +301,12 @@
    \thispagestyle{plain}	% Page style of chapter page is 'plain'
    \global\@topnum\z@		% Prevents figures from going at top of page.
    \@afterindentfalse		% Suppresses indent in first paragraph.  Change
-   \secdef\@chapter\@schapter}	% to \@afterindenttrue to have indent.
+   \secdef\@chapter\@schapter   % to \@afterindenttrue to have indent.
+}
 
 % If using the report style, use - instead of . in the figure number.
-% BILL - change - to .
-\@ifundefined{thechapter}{}{\def\thefigure{\thechapter.\arabic{figure}}}
-
+% BILL - change - to . (toggled back and forth...)
+\@ifundefined{thechapter}{}{\def\thefigure{\thechapter-\arabic{figure}}}
 
 %%%%%%%%%  End of Style parameters %%%%
 

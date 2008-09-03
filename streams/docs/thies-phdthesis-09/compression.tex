@@ -2,33 +2,41 @@
 % - integrate description of splitters
 % - possibly show screenshots from all videos?
 
-\chapter{Translating Stream Programs into the Compressed Domain}
+\startchapter{Translating Stream Programs into the Compressed Domain}
 \label{chap:compression}
-
-%% With the emergence of data-intensive applications such as digital
-%% film, medical imaging and geographic information systems, the
-%% performance of next-generation systems will often depend on their
-%% ability to process huge volumes of data.  For example, each frame of a
-%% digital film requires approximately 2 megabytes, implying that a
-%% fully-edited 90-minute video demands about 300 gigabytes of data for
-%% the imagery alone~\cite{ibm-video}.  Industrial Light and Magic
-%% reports that, in 2003, their processing pipeline output 13.7 million
-%% frames and their internal network processed 9 petabytes of
-%% data~\cite{ilm-interview}.  The U.S. Geological Survey had archived
-%% over 13 million frames of photographic data by the end of 2004, and
-%% estimates that 5 years is needed to digitize 8.6 million additional
-%% images~\cite{usgs}.  In all of these situations, the data is highly
-%% compressed to reduce storage costs.  At the same time, extensive
-%% post-processing is often required for adding captions, watermarking,
-%% resizing, compositing, adjusting colors, converting formats, and so
-%% on.  As such processing logically operates on the uncompressed format,
-%% the usual practice is to decompress and re-compress the data whenever
-%% it needs to be modified.
 
 %YouTube manages about 45 terabytes of video data~\cite{wsj-youtube},
 %with 65,000 videos uploaded daily~\cite{youtube}.  Microsoft
 %TerraServer holds upwards of 22 terabytes of image data, serving 69
 %gigabytes per day~\cite{terraserver}.
+
+This chapter presents a new domain-specific optimization for stream
+programs: translation to the compressed domain.  This transformation
+allows programs to operate directly on compressed data, accelerating
+common video editing operations by a median of 15x.  Unlike the
+optimization of linear nodes in StreamIt, this represents a
+domain-specific optimization that was previously unknown (it was not
+performed even by experts).  We define the transformation in general
+terms and also evaluates it experimentally in the context of StreamIt.
+
+\section{Introduction}
+
+Stream programs often operate on huge volumes of data.  For example,
+each frame of a digital film requires approximately 2 megabytes,
+implying that a fully-edited 90-minute video demands about 300
+gigabytes of data for the imagery alone~\cite{ibm-video}.  Industrial
+Light and Magic reports that, in 2003, their processing pipeline
+output 13.7 million frames and their internal network processed 9
+petabytes of data~\cite{ilm-interview}.  The U.S. Geological Survey
+had archived over 13 million frames of photographic data by the end of
+2004, and estimates that 5 years is needed to digitize 8.6 million
+additional images~\cite{usgs}.  In all of these situations, the data
+is highly compressed to reduce storage costs.  At the same time,
+extensive post-processing is often required for adding captions,
+watermarking, resizing, compositing, adjusting colors, converting
+formats, and so on.  As such processing logically operates on the
+uncompressed format, the usual practice is to decompress and
+re-compress the data whenever it needs to be modified.
 
 In order to accelerate the process of editing compressed data,
 researchers have identified specific transformations that can be
@@ -52,20 +60,16 @@ computational intensity of professional video editing, there is a
 large demand for new techniques that could accelerate operations on
 lossless formats.
 
-In this paper, we present a technique for translating a specific class
-of computations to operate directly on losslessly-compressed data.  We
+In this chapter, we present a technique for translating stream
+programs to operate directly on losslessly-compressed data.  We
 consider compression formats that are based on LZ77, a compression
 algorithm that is utilized by ZIP and fully encapsulates common
-formats such as Apple Animation, Microsoft RLE, and Targa.  Our
-transformation applies to a restricted class of programs, termed {\it
-  stream programs}~\cite{streamitcc}, that operate on continuous
-streams of data.  The transformation is most efficient when each
-element of the stream is transformed in a uniform way (e.g., adjusting
-the brightness of each pixel).  However, it also applies to cases in
-which multiple items are processed at once (e.g., averaging pixels) or
-in which multiple streams are split or combined (e.g., compositing
-frames).  The precise coverage of our transformation is defined in
-Section 2.
+formats such as Apple Animation, Microsoft RLE, and Targa.  The
+transformation is most efficient when each element of a stream is
+transformed in a uniform way (e.g., adjusting the brightness of each
+pixel).  However, it also applies to cases in which multiple items are
+processed at once (e.g., averaging pixels) or in which multiple
+streams are split or combined (e.g., compositing frames).
 
 %% However, existing techniques for operating directly on compressed data
 %% have two limitations.  First, they focus on lossy compression formats
@@ -127,16 +131,15 @@ computing on the uncompressed data.
 %programs: those which input and output multiple data items at a time,
 %and those which split, combine, and reorder the data in the stream.
 
-In this paper, we extend this simple idea to encompass a broad class
-of programs that can be expressed in the StreamIt programming
-language~\cite{streamitcc}.  We have implemented a subset of our
-general technique in the StreamIt compiler.  The end result is a
-fully-automatic system in which the user writes programs that operate
-on uncompressed data, and our compiler emits an optimized program that
-operates directly on compressed data.  Our compiler generates plugins
-for two popular video editing tools (MEncoder and Blender), allowing
-the optimized transformations to be used as part of a standard video
-editing process.
+In this work, we extend this simple idea to encompass a broad class of
+programs that can be expressed in StreamIt.  We have implemented a
+subset of our general technique in the StreamIt compiler.  The end
+result is a fully-automatic system in which the user writes programs
+that operate on uncompressed data, and our compiler emits an optimized
+program that operates directly on compressed data.  Our compiler
+generates plugins for two popular video editing tools (MEncoder and
+Blender), allowing the optimized transformations to be used as part of
+a standard video editing process.
 
 Using a suite of 12 videos (screencasts, animations, and stock
 footage) in Apple Animation format, our transformation offers a
@@ -148,44 +151,22 @@ mattes), speedups range from 1.1x to 32x, with a median of 6.6x.  We
 believe this is the first demonstration of compressed-domain
 techniques for losslessly compressed video content.
 
-%% In the general case, compressed processing techniques may need to
-%% partially decompress the input data to support the behavior of certain
-%% programs.  Even if no decompression is performed, the output may
-%% benefit from an additional re-compression step if new redundancy is
-%% introduced during the processing (for example, increasing image
-%% brightness can whiteout parts of the image).  This effect turns out to
-%% be minor in the case of our experiments.  For pixel transformations,
-%% output sizes are within 0.1\% of input sizes and often (more than half
-%% the time) are within 5\% of a full re-compression.  For video
-%% compositing, output files maintain a sizable compression ratio of 8.8x
-%% (median) while full re-compression results in a ratio of 13x (median).
+In the general case, compressed processing techniques may need to
+partially decompress the input data to support the behavior of certain
+programs.  Even if no decompression is performed, the output may
+benefit from an additional re-compression step if new redundancy is
+introduced during the processing (for example, increasing image
+brightness can whiteout parts of the image).  This effect turns out to
+be minor in the case of our experiments.  For pixel transformations,
+output sizes are within 0.1\% of input sizes and often (more than half
+the time) are within 5\% of a full re-compression.  For video
+compositing, output files maintain a sizable compression ratio of 8.8x
+(median) while full re-compression results in a ratio of 13x (median).
 
-%% In the rest of this paper, we describe additional background material
-%% (Section 2), our transformation into the compressed domain (Section 3)
-%% and our experimental evaluation (Section 4).  We close with related
-%% work (Section 5) and conclusions (Section 6).
-
-To summarize, this paper makes the following contributions:
-\begin{itemize}
-
-\item An algorithm for mapping an arbitrary stream program to operate
-  directly on lossless LZ77-compressed data.  In addition to
-  transforming a single stream, programs may interleave and
-  de-interleave multiple streams while maintaining compression
-  (Sections 2-3).
-
-\item An analysis of popular lossless compression formats and the
-  opportunities for direct processing on each (Section 4).
-
-\item An experimental evaluation in the StreamIt compiler,
-  demonstrating that automatic translation to the compressed domain
-  can speedup realistic operations in popular video editing tools.
-  Across our benchmarks, the median speedup is 15x (Section 5).
-
-\end{itemize}
-
-The paper concludes with related work (Section 6) and conclusions
-(Section 7).
+In the remainder of the chapter, we give an overview of LZ77
+compression before describing our technique and its compatibility with
+popular file formats.  We then present an experimental evaluation
+before closing with related work and a chapter summary.
 
 % HELPER FOR REPEATS:
 \newcommand{\tupp}[2]{\langle#1, #2\rangle}
@@ -198,7 +179,7 @@ The paper concludes with related work (Section 6) and conclusions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{LZ77 Compression}
+\subsection*{LZ77 Compression}
 
 Our technique supports compressed data formats that are based on LZ77.
 LZ77 is a lossless, dictionary-based compression algorithm that is
@@ -351,7 +332,7 @@ from input1\mynewline \mbox{~~~~}\}\mynewline
 \protect\label{fig:translate-joiner}}
 \end{figure}
 
-\subsection{Filters}
+\subsection*{Filters}
 
 The procedure for translating a filter into the compressed domain is
 given in Figure~\ref{fig:translate-filter}, and an example appears in
@@ -364,20 +345,20 @@ those inputs, transforming $n$ input items to $m$ output items.  The
 rest of the code deals with repeat tokens, attempting to translate
 them across the filter with the minimum decompression needed.
 
-The {\bf key idea of the paper} is encapsulated in the {\it
-  pass-compressed} case in Figure~\ref{fig:translate-filter}.  This rule
-specifies how to translate a repeat token directly from a filter's
-input tape to a filter's output tape without invoking the filter's
-computation.  This translation is possible whenever the repeat
-distance $d$ is a multiple of the filter's input rate $n$.  In other
-words, the repeat is aligned with the execution boundaries of the
-actor, so invoking the actor would produce the same results as before.
-In transferring the repeat token to the output tape, two adjustments
-are made: 1) the distance and count are scaled by a factor of $m/n$ to
-reflect possible differences between the output ($m$) and input ($n$)
-rates of the actor, and 2) if the count is not an even multiple of the
-input rate, then some leftover items ($c\%n$, where $\%$ represents
-the modulo operation) are left on the input tape.
+The {\bf key idea behind our technique} is encapsulated in the {\it
+  pass-compressed} case in Figure~\ref{fig:translate-filter}.  This
+rule specifies how to translate a repeat token directly from a
+filter's input tape to a filter's output tape without invoking the
+filter's computation.  This translation is possible whenever the
+repeat distance $d$ is a multiple of the filter's input rate $n$.  In
+other words, the repeat is aligned with the execution boundaries of
+the actor, so invoking the actor would produce the same results as
+before.  In transferring the repeat token to the output tape, two
+adjustments are made: 1) the distance and count are scaled by a factor
+of $m/n$ to reflect possible differences between the output ($m$) and
+input ($n$) rates of the actor, and 2) if the count is not an even
+multiple of the input rate, then some leftover items ($c\%n$, where
+$\%$ represents the modulo operation) are left on the input tape.
 
 In cases where the repeat distance does not match the granularity of
 the actor, the distance can sometimes be adjusted to allow
@@ -445,7 +426,8 @@ decompression~\cite{ziviani00compression}.
 
 \begin{figure*}[t]
 \psfig{file=compression/compressed-filters-in-streamit.eps,width=\textwidth}
-\caption{Example filter, splitter, and joiner in StreamIt.  The
+\caption[Example StreamIt code to be mapped into the compressed
+  domain]{Example filter, splitter, and joiner in StreamIt.  The
   splitter and joiner combine to form a Transpose. Translation to the
   compressed domain is illustrated in Figures~\ref{fig:filter-example}
   and~\ref{fig:sj-example}.\protect\label{fig:streamit-example}}
@@ -453,12 +435,14 @@ decompression~\cite{ziviani00compression}.
 
 \begin{figure*}[t]
 \psfig{file=compression/compressed-filter-example.eps,width=\textwidth}
-\caption{Example execution of a filter in the uncompressed and
-  compressed domains.  See Figure~\ref{fig:streamit-example}(a) for the
-  source filter.\protect\label{fig:filter-example}}
+\caption[Example execution of a filter in the uncompressed and
+  compressed domains]{Example execution of a filter in the
+  uncompressed and compressed domains.  See
+  Figure~\ref{fig:streamit-example}(a) for the source
+  filter.\protect\label{fig:filter-example}}
 \end{figure*}
 
-\subsection{Joiners}
+\subsection*{Joiners}
 
 %% It is necessary to consider splitters and joiners separately from
 %% general-purpose actors because of their pass-through semantics: the
@@ -477,24 +461,25 @@ straightforward.  In addition, we use the following notations:
 
 \begin{figure*}[t]
 \psfig{file=compression/compressed-splitjoin-example.eps,width=\textwidth}
-\caption{Example execution of splitters and joiners in the compressed
+\caption[Example execution of splitters and joiners in the compressed
+  domain]{Example execution of splitters and joiners in the compressed
   domain.  As illustrated by the input/output pairs in
-  Figure~\ref{fig:streamit-example}(b), the example performs a transpose
-  of a 2x5 matrix.  When the matrix is linearized as shown here, the
-  input stream traverses the elements row-wise while the output stream
-  traverses column-wise.  Due to redundancy in the matrix, this
-  reordering can be done largely in the compressed domain.
-  \protect\label{fig:sj-example}}
+  Figure~\ref{fig:streamit-example}(b), the example performs a
+  transpose of a 2x5 matrix.  When the matrix is linearized as shown
+  here, the input stream traverses the elements row-wise while the
+  output stream traverses column-wise.  Due to redundancy in the
+  matrix, this reordering can be done largely in the compressed
+  domain.  \protect\label{fig:sj-example}}
 \end{figure*}
 
 \begin{itemize}
 
-\item As mentioned previously, splitters and joiners adopt a
-  fine-grained cyclo-static execution model, in which each execution
-  step transfers only one item from an input tape to an output tape.
-  That is, a roundrobin$(n_1, n_2)$ joiner has $n_1 + n_2$ distinct
-  execution steps.  We refer to every group of $n_1 + n_2$ steps as an
-  {\it execution cycle}.
+\item Splitters and joiners adopt a fine-grained cyclo-static
+  execution model, in which each execution step transfers only one
+  item from an input tape to an output tape.  That is, a
+  roundrobin$(n_1, n_2)$ joiner has $n_1 + n_2$ distinct execution
+  steps.  We refer to every group of $n_1 + n_2$ steps as an {\it
+    execution cycle}.
 
 \item The pseudocode in Figure~\ref{fig:translate-joiner} assumes,
   without loss of generality, that the next execution step of the
@@ -588,18 +573,21 @@ describe the practical considerations involved in targeting various
 compression formats with our technique.  Formats are ordered by
 approximate goodness of the achievable mapping.
 
-\subsection{High-Efficiency Mappings}
+\subsection*{High-Efficiency Mappings}
 \label{sec:formats-good}
 
 All of the formats in this category can be considered to be subsets of
 LZ77.
 
-\paragraph{Apple Animation.}  
-The Apple Animation codec (which forms the basis for our experimental
-evaluation) is supported as part of the Quicktime MOV container
-format.  It serves as an industry standard for exchanging computer
-animations and digital video content before they are rendered to lossy
-formats for final distribution~\cite[p.~106]{adobe-anim}\cite[p.~284]{harrington-anim} \cite[p.~367]{long-anim}\cite[p.~280]{pogue-anim}.
+\begin{enumerate}
+
+\item {\it Apple Animation.}  The Apple Animation codec (which forms
+  the basis for our experimental evaluation) is supported as part of
+  the Quicktime MOV container format.  It serves as an industry
+  standard for exchanging computer animations and digital video
+  content before they are rendered to lossy formats for final
+  distribution~\cite[p.~106]{adobe-anim}\cite[p.~284]{harrington-anim}
+  \cite[p.~367]{long-anim}\cite[p.~280]{pogue-anim}.
 
 The Animation codec represents a restricted form of LZ77 in which
 repeat distances are limited to two values: a full frame or a single
@@ -608,7 +596,7 @@ not change from one frame to the next, while a repeat across pixels
 indicates that a stretch of pixels has the same color within a frame.
 % mention bit depths?
 
-\paragraph{Flic Video.}
+\item {\it Flic Video.}
 Flic Video files (FLI/FLC) were originally produced by Autodesk
 Animator and are still supported by many animation packages today.
 Their compression of frame data is almost identical to Apple
@@ -630,63 +618,66 @@ d$\%$n_1$\\ \tab$\mbox{{\bf if~}} \mbox{offset} \leq \pos
   of range}\\ \tab\tab$\mbox{\bf return~} \mbox{offset} -
 \pos$\\ \tab$\}$\\ \}
 \end{minipage}
-\caption{The \textsc{Join\_Potential} function is called during
+\caption[\textsc{Join\_Potential} function for compressed joiner
+  execution]{The \textsc{Join\_Potential} function is called during
   compressed joiner execution.  In the case where the input tokens to
   the joiner have incompatible repeat distances, it calculates the
   maximum length of the current token that may be passable to the
   output. \protect\label{fig:join-potential}}
 \end{figure}
 
-\paragraph{Microsoft RLE.}
-Microsoft RLE compression can appear in both BMP images and AVI
-animations.  Apart from bit-depth and formatting details, its
-capabilities are identical to Apple Animation; it can perform
-run-length encoding within a frame, and can skip over pixels to
-exploit inter-frame redundancy.
+\item {\it Microsoft RLE.}  Microsoft RLE compression can appear in
+  both BMP images and AVI animations.  Apart from bit-depth and
+  formatting details, its capabilities are identical to Apple
+  Animation; it can perform run-length encoding within a frame, and
+  can skip over pixels to exploit inter-frame redundancy.
 
-\paragraph{Targa.}
-The Truevision Targa (TGA) format is a simple image format that is
-widely used to render frame sequences in the computer animation and
-video industries.  The format includes an optional RLE compression
-stage, making it a good target for our technique.
+\item {\it Targa.} The Truevision Targa (TGA) format is a simple image
+  format that is widely used to render frame sequences in the computer
+  animation and video industries.  The format includes an optional RLE
+  compression stage, making it a good target for our technique.
 
-\paragraph{PXY.}
-The pxy format is a research-based image format designed to support
-efficient transpose and rotation of black-and-white
-images~\cite{shoji95}.  It consists of the series of $(x,y)$
-coordinates at which the image changes color during a horizontal scan.
-As this information can be converted to a run-length encoding, it can
-also be targetted by our technique.
+\item {\it PXY.} The pxy format is a research-based image format
+  designed to support efficient transpose and rotation of
+  black-and-white images~\cite{shoji95}.  It consists of the series of
+  $(x,y)$ coordinates at which the image changes color during a
+  horizontal scan.  As this information can be converted to a
+  run-length encoding, it can also be targeted by our technique.
 
-\subsection{Medium-Efficiency Mappings}
+\end{enumerate}
+
+\subsection*{Medium-Efficiency Mappings}
 \label{sec:formats-med}
 
 While the formats in this category utilize an encoding that is
 compatible with LZ77, they incur extra overhead because the data is
 reorganized prior to the compression stage.
 
-\paragraph{Planar RGB.}
-The Planar RGB video format is supported by Apple Quicktime files.  It
-utilizes run-length encoding for pixels within a frame, with partial
-support for expressing inter-frame repeats (only the end of lines can
-be skipped).  The red, green, and blue planes are encoded separately
-in order to increase compression.  For user transformations that need
-to process red, green, and blue values together, this introduces
-additional alignment overhead when applying our technique.
+\begin{enumerate}
 
-\paragraph{OpenEXR.}
-OpenEXR is an emerging image format (backed by Industrial Light and
-Magic) for use in digital film.  It offers several compression
-options, including run-length encoding, zip, and wavelet-based
-compression.  However, in run-length encoding mode, the low and high
-bytes of the pixels are separated and encoded as separate run-length
-sequences; this enables pixels with variations in the low bytes to
-nonetheless benefit from compression of the high bytes.  As most user
-transformations would utilize the entire bit-width of the pixel, our
-technique suffers additional alignment overhead in processing these
-files.
+\item {\it Planar RGB.} The Planar RGB video format is supported by
+  Apple Quicktime files.  It utilizes run-length encoding for pixels
+  within a frame, with partial support for expressing inter-frame
+  repeats (only the end of lines can be skipped).  The red, green, and
+  blue planes are encoded separately in order to increase compression.
+  For user transformations that need to process red, green, and blue
+  values together, this introduces additional alignment overhead when
+  applying our technique.
 
-\subsection{Low-Efficiency Mappings}
+\item {\it OpenEXR.} OpenEXR is an emerging image format (backed by
+  Industrial Light and Magic) for use in digital film.  It offers
+  several compression options, including run-length encoding, zip, and
+  wavelet-based compression.  However, in run-length encoding mode,
+  the low and high bytes of the pixels are separated and encoded as
+  separate run-length sequences; this enables pixels with variations
+  in the low bytes to nonetheless benefit from compression of the high
+  bytes.  As most user transformations would utilize the entire
+  bit-width of the pixel, our technique suffers additional alignment
+  overhead in processing these files.
+
+\end{enumerate}
+
+\subsection*{Low-Efficiency Mappings}
 \label{sec:formats-bad}
 
 The formats in this category are supersets of LZ77.  While our
@@ -695,36 +686,38 @@ it would have to undo any compression sitting on top of LZ77 and
 offers limited benefit for filters (as in PNG) applied underneath
 LZ77.
 
-\paragraph{DEFLATE.}
-DEFLATE is a general-purpose algorithm that provides all of the
-compression for popular formats such as ZIP and GZIP.  The algorithm
-consists of a full LZ77 encoder followed by Huffman coding, which
-resizes the symbols in the stream to match their usage frequencies.
-In targeting ZIP or GZIP with our transformations, we would first
-have to undo the Huffman coding (unless the application simply
-reordered data, in which case the coding could remain intact).  Though
-Huffman decoding is a lightweight lookup operation, it would also
-increase the memory footprint.  In addition, as DEFLATE's LZ77
-algorithm operates on individual bytes, there may be an exaggerated
-alignment cost if the application operates on a larger word size.
+\begin{enumerate}
 
-\paragraph{TSCC.}
-The TechSmith Screen Capture Codec is very similar to Microsoft RLE,
-except that the final output is further compressed using DEFLATE.
-Thus, any overheads incurred by our technique on DEFLATE also extend
-to TSCC.
+\item {\it DEFLATE.}  DEFLATE is a general-purpose algorithm that
+  provides all of the compression for popular formats such as ZIP and
+  GZIP.  The algorithm consists of a full LZ77 encoder followed by
+  Huffman coding, which resizes the symbols in the stream to match
+  their usage frequencies.  In targeting ZIP or GZIP with our
+  transformations, we would first have to undo the Huffman coding
+  (unless the application simply reordered data, in which case the
+  coding could remain intact).  Though Huffman decoding is a
+  lightweight lookup operation, it would also increase the memory
+  footprint.  In addition, as DEFLATE's LZ77 algorithm operates on
+  individual bytes, there may be an exaggerated alignment cost if the
+  application operates on a larger word size.
 
-\paragraph{PNG.}
-The PNG image format also relies on DEFLATE to compress the pixels in
-the image.  However, before running DEFLATE, the pixels are usually
-filtered with a delta encoding; each pixel is replaced with the
-difference between its value and a predicted value, where the
-prediction is a linear combination of neighboring pixels.  While
-program segments that compute a linear function~\cite{aalamb} could
-perhaps be mapped to this compressed format, our current technique
-only applies if the delta encoding is turned off.  Even in this
-scenario, there is a large amount of overhead due to the Huffman
-coding in DEFLATE.
+\item {\it TSCC.}  The TechSmith Screen Capture Codec is very similar
+  to Microsoft RLE, except that the final output is further compressed
+  using DEFLATE.  Thus, any overheads incurred by our technique on
+  DEFLATE also extend to TSCC.
+
+\item {\it PNG.}  The PNG image format also relies on DEFLATE to
+  compress the pixels in the image.  However, before running DEFLATE,
+  the pixels are usually filtered with a delta encoding; each pixel is
+  replaced with the difference between its value and a predicted
+  value, where the prediction is a linear combination of neighboring
+  pixels.  While program segments that compute a linear
+  function~\cite{aalamb} could perhaps be mapped to this compressed
+  format, our current technique only applies if the delta encoding is
+  turned off.  Even in this scenario, there is a large amount of
+  overhead due to the Huffman coding in DEFLATE.
+
+\end{enumerate}
 
 \begin{table*}[t]
 \hspace{-0.26in}\psfig{file=compression/table-benchmarks.eps,width=7.02in}
@@ -778,7 +771,7 @@ The following sections provide more details on our video workloads,
 the evaluation of pixel transformations, and the evaluation of video
 compositing.
 
-\subsection{Video Workloads}
+\subsection*{Video Workloads}
 
 Our evaluation utilizes a suite of 12 video workloads that are
 described in Table~\ref{tab:videos}; some of the videos are also
@@ -840,7 +833,7 @@ The Apple Animation format supports various bit depths.  All of our
 source videos use 32 bits per pixel, allocating a single byte for each
 of the red, green, blue, and alpha channels.
 
-\subsection{Pixel Transformations}
+\subsection*{Pixel Transformations}
 
 The pixel transformations adjust the color of each pixel in a uniform
 way.  We evaluated three transformations:
@@ -860,15 +853,13 @@ We implemented each transformation as a single StreamIt filter that
 transforms one pixel to another.  Because the filter has a pop rate of
 one, it does not incur any alignment overhead.
 
-\subsubsection{Setup}
-
-The pixel transformations were compiled into plugins for MEncoder, a
-popular command-line tool (bundled with MPlayer) for video decoding,
-encoding, and filtering.  MEncoder relies on the FFMPEG library to
-decode the Apple Animation format; as FFMPEG lacked an encoder for
-this format, the authors implemented one.  Additionally, as MEncoder
-lacks an interface for toggling only brightness or contrast, the
-baseline configuration was implemented by the authors.
+\paragraph*{Setup}  The pixel transformations were compiled into plugins for
+MEncoder, a popular command-line tool (bundled with MPlayer) for video
+decoding, encoding, and filtering.  MEncoder relies on the FFMPEG
+library to decode the Apple Animation format; as FFMPEG lacked an
+encoder for this format, the authors implemented one.  Additionally,
+as MEncoder lacks an interface for toggling only brightness or
+contrast, the baseline configuration was implemented by the authors.
 
 The baseline configuration performs decompression, pixel
 transformations, then re-compression.  Because the main video frame is
@@ -882,7 +873,7 @@ multiple frame buffers, before copying the data to the output file.
 
 \begin{table*}[t]
 \hspace{-0.26in}\psfig{file=compression/table-pixel-speedup.eps,width=7.02in}
-\caption{Results for pixel transformations.
+\caption[Table of results for pixel transformations]{Results for pixel transformations.
 \protect\label{tab:pixel-speedup}}
 \end{table*}
 
@@ -891,10 +882,8 @@ Our evaluation platform is a dual-processor Intel Xeon (2.2 GHz) with
 second processor is not utilized.  For the timing measurements, we
 execute each program five times and report the median user time.
 
-\subsubsection{Results}
-
-Detailed results for the pixel transformations appear in
-Table~\ref{tab:pixel-speedup}.  Figure~\ref{fig:pixel-speedup}
+\paragraph*{Results}  Detailed results for the pixel transformations appear
+in Table~\ref{tab:pixel-speedup}.  Figure~\ref{fig:pixel-speedup}
 illustrates the speedups, which range from 2.5x to 471x.  As
 illustrated in Figure~\ref{fig:speedup-scatter}, the speedups are
 closely correlated with the compression factor in the original video.
@@ -954,7 +943,7 @@ experience a 0.1\% increase in size (not visisble in the table).
 \begin{figure}[t]
 \centering
 \psfig{file=compression/graph-speedup-pixel.eps,width=4.355in}
-\caption{Speedup on pixel transformations.
+\caption[Speedup graph for pixel transformations]{Speedup on pixel transformations.
 \protect\label{fig:pixel-speedup}}
 \end{figure}
 
@@ -993,7 +982,7 @@ regions can be extended without being rediscovered).
 % improvement comes from decreased data volume rather than decreased
 % re-compression cost.
 
-\subsection{Video Compositing}
+\subsection*{Video Compositing}
 
 In video compositing, two videos are combined using a specific
 function to derive each output pixel from a pair of input pixels (see
@@ -1014,11 +1003,9 @@ of repeat (inter-frame or intra-frame), then the repeat is copied
 directly to the output.  If they have different kinds of repeats, or
 if one stream is uncompressed, then both streams are uncompressed.
 
-\subsubsection{Setup}
-
-The compositing operations were compiled into plugins for Blender, a
-popular tool for modeling, rendering, and post-processing 3-D
-animations.  Blender has logged 1.8 million downloads in the last
+\paragraph*{Setup} The compositing operations were compiled into plugins for
+Blender, a popular tool for modeling, rendering, and post-processing
+3-D animations.  Blender has logged 1.8 million downloads in the last
 year~\cite{blender-stats} and was used in the production of Spiderman
 2~\cite{blender-wikipedia}.  Like MEncoder, Blender relies on the
 FFMPEG library for video coding, so we utilize the same Apple
@@ -1099,7 +1086,7 @@ allocation/deallocation for each frame.
 \begin{table*}[t]
 \centering
 \psfig{file=compression/table-composite-speedup.eps,width=5.8in}
-\caption{Results for composite transformations.
+\caption[Table of results for composite transformations]{Results for composite transformations.
 \protect\label{tab:composite-speedup}}
 \end{table*}
 
@@ -1110,9 +1097,7 @@ operations in
 the Blender source code to copy only the compressed frame data rather
 than the full frame dimensions.
 
-\subsubsection{Results}
-
-Full results for the compositing operations appear in
+\paragraph*{Results} Full results for the compositing operations appear in
 Table~\ref{tab:composite-speedup}.  Figure~\ref{fig:composite-speedup}
 illustrates the speedups, which range from 1.1x to 32x.  As in the
 case of the pixel transformations, the speedups are closely correlated
@@ -1129,7 +1114,7 @@ compression across the two input files.
 \begin{figure}[t]
 \centering
 \psfig{file=compression/graph-speedup-composite.eps,width=4.355in}
-\caption{Speedup on composite transformations.
+\caption[Speedup graph for composite transformations]{Speedup on composite transformations.
 \protect\label{fig:composite-speedup}}
 \end{figure}
 
@@ -1255,15 +1240,28 @@ multiple compression formats, users will be able to write their
 transformations once, in a high-level language, and rely on the
 compiler to map the computations to each of the compressed domains.
 
-\section{Conclusions}
-\label{sec:conclusions}
+While we formulated our transformation in terms of a streaming model,
+the techniques can be applied within other functional and
+general-purpose languages so long as the right information is
+available and certain constraints are satisfied.  The transformation
+relies on a regular pattern of data access; we use a streaming
+abstraction, but structured iteration over arrays could also suffice.
+We rely on static data rates in actors, which could also be expressed
+as functions with a fixed number of arguments and return values.
+Actors (functions) must be pure, without side effects or unresolvable
+dependences on potentially mutable data.  While these properties are
+intrinsic to a language such as StreamIt, they also come naturally in
+most functional languages and may be adaptable to general-purpose
+languages in the form of a runtime library with a restricted API.
+
+\section{Chapter Summary}
 
 %% Many of the applications that will drive the next generation of
 %% computing systems---digital video editing, computer vision, computer
 %% graphics and animation---operate on image and video formats that are
 %% universally stored in compressed data formats.  
 
-In order to accelerate operations on compressible data, this paper
+In order to accelerate operations on compressible data, this chapter
 presents a general technique for translating stream programs into the
 compressed domain.  Given a natural program that operates on
 uncompressed data, our transformation outputs a program that directly
@@ -1273,20 +1271,6 @@ transformed program may need to partially decompress the data to
 perform the computation, though this decompression is minimized
 throughout the process and significant compression ratios are
 preserved without resorting to an explicit re-compression step.
-
-%% While we formulated our transformation in terms of the cyclo-static
-%% dataflow model, the techniques can be applied within other functional
-%% and general-purpose languages so long as the right information is
-%% available and certain constraints are satisfied.  The transformation
-%% relies on a regular pattern of data access; we use a streaming
-%% abstraction, but structured iteration over arrays could also suffice.
-%% We rely on static data rates in actors, which could also be expressed
-%% as functions with a fixed number of arguments and return values.
-%% Actors (functions) must be pure, without side effects or unresolvable
-%% dependences on potentially mutable data.  While these properties are
-%% intrinsic to a language such as StreamIt, they also come naturally in
-%% most functional languages and may be adaptable to general-purpose
-%% languages in the form of a runtime library with a restricted API.
 
 We implemented some of our transformations in the StreamIt compiler
 and demonstrated excellent speedups.  Across a suite of 12 videos in

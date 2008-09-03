@@ -1,78 +1,111 @@
-%% \usepackage{latex8}
-%% \usepackage{psfig}
-%% \usepackage{times}
-
-\chapter{Extracting Stream Parallelism from Legacy C Programs}
-\label{chap:profiling}
-
 % SPEEDUPS
 \newcommand{\meanspeedup}[0]{2.78x}
 
-As multicore processors are becoming ubiquitous, it is increasingly
-important to provide programmers with the right abstractions and tools
-to express new and existing programs in a parallel style.  The problem
-of legacy code is especially daunting, as decades' worth of
-(often-undocumented) C programs need to be reverse-engineered and
-gradually migrated to a parallel representation.  Given the broad
-array of programming tasks, there is unlikely to be a ``silver
-bullet'' solution to these problems; rather, it will be beneficial to
-develop a number of orthogonal techniques, each of which caters to a
-style of parallelism that is present in a certain class of algorithms.
-Already, several kinds of parallelism have good language-level
-support.  For example, task parallelism -- in which separate routines
-execute independently -- is naturally supported by threads.  Also,
-data parallelism -- in which one routine is parallelized across many
-data elements -- is naturally expressed using dialects such as OpenMP.
-However, one style of parallelism that has been largely neglected is
-pipeline parallelism, in which a loop is split into multiple stages
-that communicate in a pipelined fashion.  
-%Each pipeline stage can
-%progress independently, so long as there is input data available from
-%the previous stage.
+\startchapter{Migrating Legacy C Programs to a Streaming Representation}
+\label{chap:profiling}
 
-Pipeline parallelism is an important abstraction, suitable to both new
-and existing programs, that all parallel programmers should have at
-their disposal.  Firstly, pipeline parallelism is often lurking in
-otherwise sequential codes.  Loops with carried dependences can admit
-a pipeline-parallel mapping (the dependence being carried by a single
-pipeline stage) even though a data-parallel mapping is impossible.
-Secondly, pipeline parallelism can be more efficient than data
-parallelism due to improved instruction and data locality within each
-pipeline stage, as well as point-to-point communication between cores
-(there is no global scatter/gather).  Pipeline parallelism also offers
-appeals over task parallelism, as all shared data can be communicated
-in a deterministic producer/consumer style, eliminating the
-possibility of data races.
+This chapter stands independently of the StreamIt project.  Rather
+than starting with a stream programming language, we consider the
+problem of starting with a legacy C application and migrating the code
+to a streaming representation.  To address this problem, we equip the
+programmer with a simple set of annotations (indicating possible
+filter boundaries) and a dynamic analysis that tracks all
+communication across those boundaries.  Our analysis outputs a stream
+graph of the application as well as a set of macros for (unsoundly)
+parallelizing the program and communicating the data needed.  We apply
+our methodology to six case studies, including MPEG-2 decoding, MP3
+decoding, GMTI radar processing, and three SPEC benchmarks.  Our
+analysis extracts a useful block diagram for each application,
+facilitating a translation to StreamIt and other stream languages.  In
+addition, the parallelized versions offer a {\meanspeedup} mean
+speedup on a 4-core machine.
 
-Previous efforts to exploit pipeline parallelism in C programs have
-been very fine-grained, partitioning individual instructions across
-processing cores~\cite{ottoni05decoupled}.  Such fine-grained
-communication is inefficient on commodity machines and demands new
-hardware support~\cite{ottoni05decoupled,rangan04array}.  While a
+\section{Introduction}
+
+While adopting a stream programming model is an attractive approach
+for improving the performance of future applications, one of the
+drawbacks of relying on a new programming model is that it does not
+immediately address the vast quantities of legacy code that have
+already been written in other languages.  There are 310 billion lines
+of legacy code in industry today, and 60-80\% of the typical IT budget
+is spent re-engineering legacy code (Source: Gartner Group).  While
+much of this code is amenable to streaming, the process of migrating
+the code to a streaming representation is an arduous and
+time-consuming process.  The most important resources that could help
+with the translation -- such as the original author of the code, or
+the high-level design documents that guided its implementation -- are
+often unavailable.  Thus, a fresh programmer is left with the daunting
+task of obtaining an in-depth understanding of all the program
+modules, the dependences between them, and the possibilities for
+safely extracting parallelism.
+
+While there have been many efforts to automatically parallelize legacy
+codes, few of them have focused on the pipeline parallelism that is
+characteristic of the streaming domain.  It is even difficult to
+express pipeline parallelism in a traditional programming model.  This
+is in stark contrast to task parallelism, which is naturally supported
+by threads, as well as data parallelism, which is supported by
+dialects such as OpenMP.  The only efforts to exploit pipeline
+parallelism in C programs have been very fine-grained, partitioning
+individual instructions across processing
+cores~\cite{ottoni05decoupled}.  Such fine-grained communication is
+inefficient on commodity machines and demands new hardware
+support~\cite{ottoni05decoupled,rangan04array}.  While a
 coarse-grained partitioning is more desirable, it is difficult to
 achieve at compile time due to the obscured data dependences in C;
 constructs such as pointer arithmetic, function pointers, and circular
 buffers (with modulo operations) make it nearly impossible to extract
 coarse-grained parallelism from realistic C programs.
 
-In this paper, we overcome the traditional barriers in exploiting
+%Each pipeline stage can
+%progress independently, so long as there is input data available from
+%the previous stage.
+
+%% Pipeline parallelism is an important abstraction, suitable to both new
+%% and existing programs, that all parallel programmers should have at
+%% their disposal.  Firstly, pipeline parallelism is often lurking in
+%% otherwise sequential codes.  Loops with carried dependences can admit
+%% a pipeline-parallel mapping (the dependence being carried by a single
+%% pipeline stage) even though a data-parallel mapping is impossible.
+%% Secondly, pipeline parallelism can be more efficient than data
+%% parallelism due to improved instruction and data locality within each
+%% pipeline stage, as well as point-to-point communication between cores
+%% (there is no global scatter/gather).  Pipeline parallelism also offers
+%% appeals over task parallelism, as all shared data can be communicated
+%% in a deterministic producer/consumer style, eliminating the
+%% possibility of data races.
+
+In this work, we overcome the traditional barriers in exploiting
 coarse-grained pipeline parallelism by embracing an {\it unsound}
-program transformation.  Our key insight is that, for a large class of
-applications, the data communicated across pipeline-parallel stages is
-stable throughout the lifetime of the program.  We focus on streaming
-applications such as video, audio, and digital signal processing,
-which are often described by a block diagram with a fixed flow of
-data.  No matter how obfuscated the C implementation appears, the
-heart of the algorithm is following a regular communication pattern.
-For this reason, it is unnecessary to undertake a heroic static
-analysis; we need only observe the communication pattern at the
-beginning of execution, and then ``safely'' infer that it will remain
-constant throughout the rest of execution (and perhaps other
-executions).
+program transformation.  Our key insight is that, for stream programs,
+the data communicated across pipeline-parallel stages is stable
+throughout the lifetime of the program.  No matter how obfuscated the
+C implementation appears, the heart of the algorithm is following a
+regular communication pattern.  For this reason, it is unnecessary to
+undertake a heroic static analysis; we need only observe the
+communication pattern at the beginning of execution, and then
+``safely'' infer that it will remain constant throughout the rest of
+execution (and perhaps other executions).
 
 %then apply that pattern as the basis for
 %parallelism in the remainder of the execution (and perhaps other
 %executions).
+
+As depicted in Figure~\ref{fig:overview}, our analysis does exactly
+that.  We allow the programmer to naturally specify the boundaries of
+pipeline partitions, and then we record all communication across those
+boundaries during a training run.  The communication trace is emitted
+as a stream graph that reflects the high-level structure of the
+algorithm (aiding a possible translation to StreamIt), as well as a
+list of producer/consumer statements that can be used to trace down
+problematic dependences.  The programmer never needs to worry about
+providing a ``correct'' partitioning; if there is no parallelism
+between the suggested partitions, it will result in cycles in the
+stream graph.  If the programmer is satisfied with the parallelism in
+the graph, he recompiles the annotated program against a set of macros
+that are emitted by our analysis tool.  These macros serve to fork
+each partition into its own process and to communicate the recorded
+locations using pipes between processes.
 
 \begin{figure}[t]
 %% \newlength{\myoffset}
@@ -82,22 +115,6 @@ executions).
 \hspace{-0.25in}\psfig{file=profiling/intro-overview.eps,width=7in}
 \caption{Overview of our approach.\protect\label{fig:overview}}
 \end{figure}
-
-As depicted in Figure~\ref{fig:overview}, our analysis does exactly
-that.  We allow the programmer to naturally specify the boundaries of
-pipeline partitions, and then we record all communication across those
-boundaries during a training run.  The communication trace is emitted
-as a stream graph that reflects the high-level structure of the
-algorithm (aiding program understanding), as well as a list of
-producer/consumer statements that can be used to trace down
-problematic dependences.  The programmer never needs to worry about
-providing a ``correct'' partitioning; if there is no parallelism
-between the suggested partitions, it will result in cycles in the
-stream graph.  If the programmer is satisfied with the parallelism in
-the graph, he recompiles the annotated program against a set of macros
-that are emitted by our analysis tool.  These macros serve to fork
-each partition into its own process and to communicate the recorded
-locations using pipes between processes.
 
 Though our transformation is grossly unsound, we argue that it is
 quite practical within the domain of streaming applications.  Because
@@ -123,36 +140,40 @@ and testing data (for MP3) that lead to erroneous results.  Thus, it
 is important to maximize the coverage of the training set and to apply
 the technique in concert with a rigorous testing framework.
 
-To summarize, this paper makes the following contributions:
-\begin{itemize}
+The remainder of this chapter is organized as follows.  In
+Section~\ref{sec:stability}, we show that stream programs have a
+stable communication pattern.  Communication observed at the start of
+execution is often preserved throughout the program lifetime, as well
+as other executions.  Section~\ref{sec:workflow} describes our dynamic
+analysis tool and programmer methodology to iteratively extract stream
+parallelism from C programs.  Section~\ref{sec:parallelization}
+describes the implementation of the tool using the Valgrind
+infrastructure.  Section~\ref{sec:results} is devoted to our case
+studies, including performance results and the experience gained
+during parallelization.  The remaining sections present related work,
+future work, and a chapter summary.
 
-\item We show that for the class of streaming applications, pipeline
-  parallelism is very stable.  Communication observed at the start of
-  execution is often preserved throughout the program lifetime, as
-  well as other executions (Section~\ref{sec:stability}).
-
-\item We define a simple API for indicating potential pipeline
-  parallelism in the program.  Comparable to threads for task
-  parallelism or OpenMP for data parallelism, this API serves as a
-  fundamental abstraction for pipeline parallelism (Section~\ref{sec:workflow}).
-
-\item We present a dynamic analysis tool, built on top of Valgrind,
-  for tracking producer/consumer relationships between coarse-grained
-  program partitions.  The tool outputs a stream graph of the
-  application, which validates or refutes the parallelism suggested by
-  the programmer.  It also provides a detailed statement-level trace
-  and a set of macros for automatic parallelization (Sections~\ref{sec:workflow}-\ref{sec:parallelization}).
-
-\item We apply our methodology to six case studies, encompassing
-  MPEG-2 decoding, MP3 decoding, GMTI radar processing, and three SPEC
-  benchmarks.  We extract meaningful stream graphs of each
-  application, and achieve a {\meanspeedup} mean speedup on a 4-core
-  architecture (Section~\ref{sec:results}).
-
-\end{itemize}
-
-% - show how simple process can be extended to complex scenarios,
-%   including nested loops and early loop exits
+%% CONTRIBUTIONS
+%%
+%% \item We define a simple API for indicating potential pipeline
+%%   parallelism in the program.  Comparable to threads for task
+%%   parallelism or OpenMP for data parallelism, this API serves as a
+%%   fundamental abstraction for pipeline parallelism
+%%   (Section~\ref{sec:workflow}).
+%%
+%% \item We present a dynamic analysis tool, built on top of Valgrind,
+%%   for tracking producer/consumer relationships between coarse-grained
+%%   program partitions.  The tool outputs a stream graph of the
+%%   application, which validates or refutes the parallelism suggested by
+%%   the programmer.  It also provides a detailed statement-level trace
+%%   and a set of macros for automatic parallelization
+%%   (Sections~\ref{sec:workflow}-\ref{sec:parallelization}).
+%%
+%% \item We apply our methodology to six case studies, encompassing
+%%   MPEG-2 decoding, MP3 decoding, GMTI radar processing, and three SPEC
+%%   benchmarks.  We extract meaningful stream graphs of each
+%%   application, and achieve a {\meanspeedup} mean speedup on a 4-core
+%%   architecture (Section~\ref{sec:results}).
 
 %% \begin{figure*}[t]
 %% \begin{center}
@@ -197,8 +218,7 @@ To summarize, this paper makes the following contributions:
 A dynamic analysis is most useful when the observed behavior is likely
 to continue, both throughout the remainder of the current execution as
 well as other executions (with other inputs).  Our hypothesis is that
-streaming applications~--~such as audio, video, and digital signal
-processing codes~--~exhibit very stable flows of data, enhancing the
+stream programs exhibit very stable flows of data, enhancing the
 reliability of dynamic analyses toward the point where they can be
 trusted to validate otherwise-unsafe program transformations.  For the
 purpose of our analysis, we consider a program to be {\it stable} if
@@ -208,7 +228,7 @@ using a simple set of annotations; the boundaries used for the
 experiments in this section are illustrated by the stream graphs that
 appear later (Figure~\ref{fig:mpeg2-mp3-graphs}).
 
-\subsection{Stability Within a Single Execution}
+\subsection*{Stability Within a Single Execution}
 
 Our first experiment explores the stability of memory dependences
 within a single program execution.  We profiled MPEG-2 and MP3
@@ -249,7 +269,8 @@ iteration 17,900 (not illustrated).
 \begin{minipage}{3.075in}
 \hspace{-0.05in}\psfig{file=profiling/mpeg2-addresses.eps,width=3.125in}
 \vspace{-12pt}
-\caption{Stability of streaming communication patterns for MPEG-2
+\caption[Stability of streaming communication patterns for MPEG-2
+  decoding]{Stability of streaming communication patterns for MPEG-2
   decoding.  The decoder was monitored while processing the top 10
   short videos
 % (25-35 seconds) 
@@ -260,7 +281,8 @@ graph of the application.\protect\label{fig:mpeg2-addresses}}
 \begin{minipage}{3.02in}
 \hspace{-0.05in}\psfig{file=profiling/mp3-addresses.eps,width=3.125in}
 \vspace{-12pt}
-\caption{Stability of streaming communication patterns for MP3
+\caption[Stability of streaming communication patterns for MP3
+  decoding]{Stability of streaming communication patterns for MP3
   decoding.  The decoder was monitored while processing the top 10
   tracks from MP3.com.  See Figure~\ref{fig:mpeg2-mp3-graphs}b for a
   stream graph of the application.  \protect\label{fig:mp3-addresses}}
@@ -271,16 +293,18 @@ graph of the application.\protect\label{fig:mpeg2-addresses}}
 \begin{minipage}{3.075in}
 \psfig{file=profiling/mpeg2-matrix.eps,width=3.07in}
 \vspace{-12pt}
-\caption{Minimum number of training iterations (frames) needed on each
-  video in order to correctly decode the other videos.
+\caption[Training needed for correct parallelization of
+  MPEG-2]{Minimum number of training iterations (frames) needed on
+  each video in order to correctly decode the other videos.
   \protect\label{tab:mpeg2-matrix}}
 \end{minipage}
 \hspace{0.3in}
 \begin{minipage}{3.02in}
 \psfig{file=profiling/mp3-matrix.eps,width=3.07in}
 \vspace{-12pt}
-\caption{Minimum number of training iterations (frames) needed on each
-  track in order to correctly decode the other tracks.
+\caption[Training needed for correct parallelization of MP3]{Minimum
+  number of training iterations (frames) needed on each track in order
+  to correctly decode the other tracks.
   \protect\label{tab:mp3-matrix}}
 \end{minipage}
 \end{figure}
@@ -317,7 +341,7 @@ and extracting the regular patterns that exist between partitions.
 %addresses may be important to catch, they may also be expendable, as
 %we describe next.
 
-\subsection{Stability Across Different Executions}
+\subsection*{Stability Across Different Executions}
 
 The communication patterns observed while decoding one input file can
 often extend to other inputs as well.  Tables \ref{tab:mpeg2-matrix}
@@ -377,34 +401,27 @@ intervention) apply the trace to correctly execute a test file.
 \centering
 % 338 pix wide
 \hspace{0in}\psfig{file=profiling/gmti-opt.eps,width=2.9in}
-\caption{Stream graph for GMTI, as extracted using our tool.  Nodes
-  are annotated with their computation requirements, and edges are
-  labeled with the number of bytes transferred per steady-state
+\caption[Stream graph for GMTI, as extracted using our tool]{Stream
+  graph for GMTI, as extracted using our tool.  Nodes are annotated
+  with their computation requirements, and edges are labeled with the
+  number of bytes transferred per steady-state
   iteration.\protect\label{fig:gmti-graph-tool}}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \hspace{0in}\psfig{file=profiling/gmti-spec.eps,width=3.3in}
-\caption{Stream graph for GMTI, as it appears in the GMTI
+\caption[Stream graph for GMTI, as it appears in the GMTI
+  specification]{Stream graph for GMTI, as it appears in the GMTI
   specification~\protect\cite{reuther03gmti}.\protect\label{fig:gmti-graph-spec}}
 \vspace{-6pt}
 \end{figure}
 
-\section{Programmer Workflow}
+\section{Migration Methodology}
 \label{sec:workflow}
 
-Typically, the process of parallelizing a legacy C application is an
-arduous and time-consuming process.  The most important resources that
-could help with parallelization -- such as the original author of the
-code, or the high-level design documents that guided its
-implementation -- are often unavailable.  Thus, a fresh programmer is
-left with the daunting task of obtaining an in-depth understanding of
-all the program modules, the dependences between them, and the
-possibilities for safely extracting parallelism.
-
 We introduce a dynamic analysis tool that empowers the programmer in
-migrating legacy C applications to a parallel representation.  Using
+migrating legacy C applications to a streaming representation.  Using
 this tool, the programmer follows the workflow illustrated in
 Figure~\ref{fig:overview}.  The first step is to identify the main
 loop in the application, which is typically iterating over frames,
@@ -493,10 +510,10 @@ certain storage locations (see Section~\ref{sec:results} for details).
 \centering
 \psfig{file=profiling/data-parallelism.eps,width=3.5in}
 \vspace{-6pt}
-\caption{Programmers can specify data parallelism by passing an extra
-  argument to the pipeline annotation.  In this case, the runtime
-  system executes W parallel copies of stage 2.
-  \protect\label{fig:data-parallelism}}
+\caption[Specifying data parallelism]{Programmers can specify data
+  parallelism by passing an extra argument to the pipeline annotation.
+  In this case, the runtime system executes W parallel copies of stage
+  2.  \protect\label{fig:data-parallelism}}
 \vspace{-6pt}
 \end{figure}
 
@@ -529,7 +546,7 @@ communicate dynamically-allocated data across partition boundaries.
 \section{Implementation}
 \label{sec:parallelization}
 
-\subsection{Dynamic Analysis Tool}
+\subsection*{Dynamic Analysis Tool}
 
 Our tool is built on top of Valgrind, a robust framework for dynamic
 binary instrumentation~\cite{nethercote07valgrind}.  Our analysis
@@ -580,7 +597,7 @@ In the case of dynamically-allocated data, the mapping from memory
 location to variable name is not yet automated and requires programmer
 assistance (as described in the previous section).
 
-\subsection{Parallel Runtime System}
+\subsection*{Parallel Runtime System}
 
 The primary challenge in implementing pipeline parallelism is the need
 to buffer data between execution stages.  In the sequential version of
@@ -635,7 +652,7 @@ GMTI  & Ground Moving Target Indicator & MIT Lincoln Laboratory~\cite{reuther03g
 256.bzip2 & bzip2 compression and decompression & SPECINT 2000 & 5,000 \\ \hline
 456.hmmer & Calibrating HMMs for biosequence analysis & SPECCPU 2006 & 36,000 \\ \hline
 \end{tabular}}
-\caption{Benchmark characteristics.\protect\label{tab:benchmarks}}
+\caption{Benchmark characteristics.\protect\label{tab:prof-benchmarks}}
 \end{center}
 \end{table*}
 
@@ -650,7 +667,7 @@ To evaluate our approach, we applied our tool and methodology to six
 realistic programs.  Three of these are traditional stream programs
 (MPEG-2 decoding, MP3 decoding, GMTI radar processing) while three are
 SPEC benchmarks (parser, bzip2, hmmer) that also exhibit regular flows
-of data.  As illustrated in Table~\ref{tab:benchmarks}, the size of
+of data.  As illustrated in Table~\ref{tab:prof-benchmarks}, the size of
 these benchmarks ranges from 5 KLOC to 37 KLOC.  Each program
 processes a conceptually-unbounded stream of input data; our technique
 adds pipeline parallelism to the toplevel loop of each application,
@@ -661,7 +678,7 @@ decompression.)
 In the rest of this section, we first describe our experience in
 parallelizing the benchmarks before presenting performance results.
 
-\subsection{Parallelization Experience}
+\subsection*{Parallelization Experience}
 
 During the parallelization process, the programmer relied heavily on
 the stream graphs extracted by our tool.  The final graphs for each
@@ -695,8 +712,6 @@ sections.
 %% communication pattern, our analysis aids new programmers in
 %% understanding and parallelizing the application.
 
-\subsubsection*{MPEG-2 Decoding}
-
 %% \begin{figure}[t]
 %% \vspace{-12pt}
 %% \centering
@@ -712,7 +727,7 @@ sections.
 %% \vspace{-12pt}
 %% \end{figure}
 
-To obtain the stream graph for MPEG-2
+\paragraph*{MPEG-2 Decoding} To obtain the stream graph for MPEG-2
 (Figure~\ref{fig:mpeg2-mp3-graphs}a), the programmer iteratively
 refined the program with the help of the dynamic analysis tool.
 Because the desired partition boundaries fell in distinct functions,
@@ -739,13 +754,11 @@ place them in the same pipeline stage that the counters were utilized.
 \end{figure}
 
 \begin{figure*}[t]
-\vspace{6pt}
 \centering
 \psfig{file=profiling/spec-graphs.eps,width=\textwidth}
-\vspace{6pt}
-\caption{Extracted stream graphs for parser, bzip2 (compression and
+\caption[Extracted stream graphs for parser, bzip2, and
+  hmmer]{Extracted stream graphs for parser, bzip2 (compression and
   decompression) and hmmer.  \protect\label{fig:spec-graphs}}
-\vspace{6pt}
 \end{figure*}
 
 In generating the parallel version, our tool required two
@@ -757,16 +770,15 @@ described in Section~\ref{sec:workflow}, the programmer supplied the
 name and size of dynamically-allocated variables (in this case, frame
 buffers) that were sent between partitions.
 
-\subsubsection*{MP3 Decoding}
-
-The extracted stream graph for MP3 decoding appears in
-Figure~\ref{fig:mpeg2-mp3-graphs}b.  In the process of placing the
-pipeline boundaries, the programmer inlined functions, unrolled two
-loops, and distributed a loop.  Four dynamically-allocated arrays (of
-fixed size) were changed to use static allocation, so that our tool
-could manage the communication automatically.  As profiling indicated
-that the dequantization and inverse MDCT stages were consuming most of
-the runtime, they were each data-parallelized two ways.
+\paragraph*{MP3 Decoding} The extracted stream graph for MP3 decoding
+appears in Figure~\ref{fig:mpeg2-mp3-graphs}b.  In the process of
+placing the pipeline boundaries, the programmer inlined functions,
+unrolled two loops, and distributed a loop.  Four
+dynamically-allocated arrays (of fixed size) were changed to use
+static allocation, so that our tool could manage the communication
+automatically.  As profiling indicated that the dequantization and
+inverse MDCT stages were consuming most of the runtime, they were each
+data-parallelized two ways.
 
 In analyzing the parallelism of MP3, the programmer made three
 deductions.  First, the initial iteration of the loop was found to
@@ -786,10 +798,8 @@ stage.)
 As in the case of MPEG-2, the programmer also patched the generated
 communication code to handle nested loops.
 
-\subsubsection*{GMTI Radar Processing}
-
-The Ground Moving Target Indicator (GMTI) is a radar processing
-application that extracts targets from raw radar
+\paragraph*{GMTI Radar Processing} The Ground Moving Target Indicator (GMTI)
+is a radar processing application that extracts targets from raw radar
 data~\cite{reuther03gmti}.  The stream graph extracted by our tool
 (Figure~\ref{fig:gmti-graph-tool}) is very similar to the one that
 appears in the GMTI specification (Figure~\ref{fig:gmti-graph-spec}).
@@ -819,16 +829,15 @@ the entire array was communicated at once.
 
 \begin{figure*}[t]
 \hspace{-0.25in}\psfig{file=profiling/program-changes.eps,width=7in}
-\caption{Steps taken by the programmer to assist in parallelizing each
-  benchmark.  Assistance may be needed to expose parallelism in the
-  original code, to verify parallelism using the tool, or to handle
-  special cases in the parallelized code.  Steps annotated with an
-  asterisk (*) may change the observable behavior of the
-  program\protect\footnotemark[1].
+\caption[Steps taken by programmer to assist with
+  parallelization]{Steps taken by the programmer to assist in
+  parallelizing each benchmark.  Assistance may be needed to expose
+  parallelism in the original code, to verify parallelism using the
+  tool, or to handle special cases in the parallelized code.  Steps
+  annotated with an asterisk (*) may change the observable behavior of
+  the program\protect\footnotemark[1].
   \protect\label{fig:program-changes}}
 \end{figure*}
-
-\subsubsection*{Parser}
 
 %% \begin{figure}[t]
 %% \centering
@@ -840,7 +849,7 @@ the entire array was communicated at once.
 %%   times.\protect\label{fig:parser-graph}}
 %% \end{figure}
 
-The stream graph for 197.parser appears in
+\paragraph*{Parser} The stream graph for 197.parser appears in
 Figure~\ref{fig:spec-graphs}a.  Each steady-state iteration of the
 graph parses a single sentence; the benchmark runs in batch mode,
 repeatedly parsing all of the sentences in a file.  As indicated in
@@ -880,8 +889,6 @@ Our data-parallel version of the program may reorder the program's
 print statements.  If desired, the print statements can be serialized
 by moving them to the output stage.
 
-\subsubsection*{Bzip2}
-
 %% \begin{figure}[t]
 %% \centering
 %% % seem to need the hspace command just to get it to center correctly
@@ -899,7 +906,7 @@ by moving them to the output stage.
 %% \vspace{-10pt}
 %% \end{figure}
 
-The stream graphs for 256.bzip2 appear in
+\paragraph*{Bzip2} The stream graphs for 256.bzip2 appear in
 Figures~\ref{fig:spec-graphs}b and~\ref{fig:spec-graphs}c.  The
 benchmark includes both a compression and decompression stage, which
 were parallelized separately.
@@ -930,8 +937,6 @@ also supplied the name and size of two dynamically-allocated arrays.
 %exhibits a speedup of 3.07x; there is a 1.78x speedup for the
 %decompression stage, and a 2.66x speedup for both stages combined.
 
-\subsubsection*{Hmmer}
-
 %% \begin{figure}[t]
 %% \centering
 %% % seem to need the hspace command just to get it to center correctly
@@ -942,13 +947,15 @@ also supplied the name and size of two dynamically-allocated arrays.
 %%   times.\protect\label{fig:hmmer-graph}}
 %% \vspace{-10pt}
 %% \end{figure}
-In 456.hmmer, a Hidden Markov Model is loaded at initialization time,
-and then a series of random sequences are used to calibrate the model.
-Figure~\ref{fig:spec-graphs}d shows the extracted stream graph for
-this benchmark.  The calibration is completely data-parallel except
-for a histogram at the end of the loop, which must be handled with
-pipeline parallelism.  In our experiments, the programmer replicated
-the data-parallel stage four ways to utilize the four-core machine.
+
+\paragraph*{Hmmer} In 456.hmmer, a Hidden Markov Model is loaded at
+initialization time, and then a series of random sequences are used to
+calibrate the model.  Figure~\ref{fig:spec-graphs}d shows the
+extracted stream graph for this benchmark.  The calibration is
+completely data-parallel except for a histogram at the end of the
+loop, which must be handled with pipeline parallelism.  In our
+experiments, the programmer replicated the data-parallel stage four
+ways to utilize the four-core machine.
 
 Our tool reports three parallelism-limiting dependences for hmmer.
 The first is due to random number generation: each iteration generates
@@ -968,8 +975,7 @@ partition can expand its own private array, this dependence is safely
 ignored.  Finally, as in the case of GMTI, dependences between memory
 allocation functions were relaxed for the sake of the parallelization.
 
-
-\subsection{Performance Results}
+\subsection*{Performance Results}
 \label{sec:performance}
 
 Following parallelization with our tool, all of the benchmarks obtain
@@ -1022,9 +1028,9 @@ MP3 & 6 & 2,2 & 2.48x \\ \hline
 456.hmmer & 2 & 4 & 3.89x \\ \hline
 {\bf GeoMean} & & & {\bf {\meanspeedup}} \\ \hline 
 \end{tabular}}
-\caption{Characteristics of the parallel stream graphs and performance
-  results on a 4-core machine.  Data-parallel width refers to the
-  number of ways any data-parallel stage was
+\caption[Performance results]{Characteristics of the parallel stream
+  graphs and performance results on a 4-core machine.  Data-parallel
+  width refers to the number of ways any data-parallel stage was
   replicated.\protect\label{tab:results}}
 \end{center}
 \vspace{-10pt}
@@ -1032,7 +1038,7 @@ MP3 & 6 & 2,2 & 2.48x \\ \hline
 
 \section{Related Work}
 
-\subsection{Static Analysis}
+\subsection*{Static Analysis}
 
 The work most closely related to ours is that of Bridges et
 al.~\cite{bridges07revisiting}, which was developed concurrently.
@@ -1083,7 +1089,7 @@ places pipeline boundaries and infers the communicated variables using
 an inter-procedural static analysis.  Unlike our system, the compiler
 does not check if the declared regions are actually parallel.
 
-\subsection{Dynamic Analysis}
+\subsection*{Dynamic Analysis}
 
 The dynamic analysis most similar to ours is that of Rul et
 al.~\cite{rul06functionlevel}, which also tracks producer/consumer
@@ -1132,14 +1138,12 @@ debugging~\cite{nethercote03redux}.
 %comprehension, debugging, and other
 %applications~\cite{nethercote03redux}.  
 Unlike our tool, Redux tracks dataflow through registers in addition
-to memory locations.
-%(We avoid the need for
-%such tracking by profiling an unoptimized binary, generated with gcc
-%-O0, that stores all intermediate values to memory.)  
-Because it generates a distinct graph node for every value produced,
-the authors note that the visualization becomes unwieldy and does not
-scale to realistic programs.  We address this issue by coarsening the
-program partitions.
+to memory locations.  (We avoid the need for such tracking by
+profiling an unoptimized binary, generated with gcc -O0, that stores
+all intermediate values to memory.)  Because it generates a distinct
+graph node for every value produced, the authors note that the
+visualization becomes unwieldy and does not scale to realistic
+programs.  We address this issue by coarsening the program partitions.
 %We also apply the analysis to the
 %domain of parallelization.
 
@@ -1162,22 +1166,21 @@ Giacomoni et al. describe a toolchain for pipeline-parallel
 programming~\cite{giacomoni07toolchain}, including BDD-based
 compression of dependence traces~\cite{price06bdds}.  Such techniques
 could extend our stream graph visualization to a much finer
-granularity. There are additional dynamic analyses that offer
-visualizations to aid program
-understanding~\cite{balmas05ddgraph,malton05recovery}, though they do
-not focus on extracting streams of data flow.
-
-%DDgraph is a dynamic analysis for Lisp that offers a visualization of
-%call graphs and data dependence graphs for the sake of program
-%understanding and correctness checking~\cite{balmas05ddgraph}.  
-%It is
-%implemented as part of a Lisp interpreter and has been applied to an
-%AI Blocks World program, which exhibits less regular streams of data
-%than our target applications.  
-%Malton and Pahelvan also use a dynamic analysis (built on gdb) to
-%identify control flow between ``pivotal functions'' that are likely to
-%aid in program understanding~\cite{malton05recovery}.  They do not
-%extract streams of data flow.
+granularity. 
+%There are additional dynamic analyses that offer
+%visualizations to aid program
+%understanding~\cite{balmas05ddgraph,malton05recovery}, though they do
+%not focus on extracting streams of data flow.
+DDgraph is a dynamic analysis for Lisp that offers a visualization of
+call graphs and data dependence graphs for the sake of program
+understanding and correctness checking~\cite{balmas05ddgraph}.  It is
+implemented as part of a Lisp interpreter and has been applied to an
+AI Blocks World program, which exhibits less regular streams of data
+than our target applications.  Malton and Pahelvan also use a dynamic
+analysis (built on gdb) to identify control flow between ``pivotal
+functions'' that are likely to aid in program
+understanding~\cite{malton05recovery}.  They do not extract streams of
+data flow.
 
 Program slicing is a technique that aims to identify the set of
 program statements that may influence a given statement in the
@@ -1190,20 +1193,6 @@ are sufficient to convey all the information needed between
 partitions.  Finally, we are interested only in direct dependences
 between partitions, rather than the transitive dependences reported by
 slicing tools.
-
-\subsection{Stream Programming}
-
-An alternate approach to extracting a streaming representation from
-legacy C programs is to re-write the application in a programming
-language that has built-in support for streams.  For example, the
-StreamC/KernelC language has been compiled~\cite{das06compiling} to
-stream processors such as Imagine~\cite{imagine03ieee} and
-Merrimac~\cite{merrimac03}; Brook~\cite{brook04} has been mapped to
-graphics processors~\cite{brook04} and multicores~\cite{liao06brook};
-and StreamIt~\cite{streamitcc} has targeted the Raw
-architecture~\cite{gordon06asplos}.  We anticipate that many of the
-techniques developed in these efforts will be directly applicable to
-the streaming representation extracted by our analysis.
 
 %% object oriented:
 %% \cite{leinhard06objflow}
@@ -1233,18 +1222,49 @@ the streaming representation extracted by our analysis.
 %% DON'T CITE:
 %% \cite{choi91flowback}
 
-\section{Conclusions}
+\section{Future Work}
+
+There are rich opportunities for future work in enhancing the
+soundness and automation of our tool.  If the runtime system
+encounters code that was not visited during training, it could execute
+the corresponding loop iteration in a sequential manner (such a policy
+would have fixed the only unsoundness we observed).  A static analysis
+could also lessen the programmer's involvement, e.g., by automatically
+handling nested loops or automatically placing the pipeline
+partitions.  Many of the optimizations implemented in StreamIt could
+be targeted to the extracted stream graphs, as they follow the
+synchronous dataflow model.  It could also be interesting to develop
+systematic testing techniques to exhibit control flow paths that were
+not covered during training.
+
+More broadly, the observations in Section~\ref{sec:results} suggest
+that many of the memory dependences that constrain automatic
+parallelizers can be safely ignored without affecting the ultimate
+program outcome.  It would be interesting to build a testing tool that
+explores this opportunity more deeply, perhaps by systematically
+violating each individual memory dependence in the program and
+reporting those that do not affect the program outcome.  While such an
+analysis would be very slow if only one dependence is broken per run,
+perhaps an optimized version can be built by speculatively ``pooling''
+many tests into a single run, or by detecting that an intermediate
+program state is correct without finishing the complete execution.
+Testing tools could also be useful for inferring likely high-level
+properties, such as commutativity between methods in a library.  This
+would save the user the trouble of indicating the potential for such
+reordering to our tool.
+
+\section{Chapter Summary}
 \label{sec:conclusions}
 
-This work represents one of the first systematic techniques to exploit
-coarse-grained pipeline parallelism in C programs.  Rather than
-pipelining small instruction sequences or inner loops, we pipeline the
-outermost toplevel loop of a streaming application, which encapsulates
-100\% of the steady-state runtime.  Our approach is applicable both to
-legacy codes, in which the user has little or no knowledge about the
-structure of the program, as well as new applications, in which
-programmers can utilize our annotations to easily express the desired
-pipelining.
+This work represents one of the first systematic techniques to extract
+a coarse-grained streaming representation from C programs.  Rather
+than extracting streams from small instruction sequences or inner
+loops, we extract pipeline stages from the outermost toplevel loop of
+a streaming application, which encapsulates 100\% of the steady-state
+runtime.  Our approach is applicable both to legacy codes, in which
+the user has little or no knowledge about the structure of the
+program, as well as new applications, in which programmers can utilize
+our annotations to easily express the desired pipelining.
 
 The key observation underlying our technique is that for the domain of
 streaming applications, the steady-state communication pattern is
@@ -1270,18 +1290,7 @@ produced the correct output and offered a mean speedup of
 %proved to be safe for a number of inputs unrelated to our training
 %runs; we successfully decoded the top videos from YouTube and the top
 %audio tracks from MP3.com.
-
-There are rich opportunities for future work in enhancing the
-soundness and automation of our tool.  If the runtime system
-encounters code that was not visited during training, it could execute
-the corresponding loop iteration in a sequential manner (such a policy
-would have fixed the only unsoundness we observed).  A static analysis
-could also lessen the programmer's involvement, e.g., by automatically
-handling nested loops or automatically placing the pipeline
-partitions.  However, fully-automatic solutions for such large-scale
-program transformations are not only unnecessary but often distrusted
-in an industrial setting.  By leveraging a pragmatic combination of
-programmer annotations, dynamic analysis, visualization tools, and
-parallelization macros, our approach immediately eases the burden of
-migrating C applications to multicores.
-
+By leveraging a pragmatic combination of programmer annotations,
+dynamic analysis, visualization tools, and parallelization macros, our
+approach immediately eases the burden of migrating C applications to a
+streaming representation that is suitable for multicore execution.

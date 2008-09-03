@@ -564,8 +564,9 @@
                {\@dblfloat{figure}}
                {\end@dblfloat}
 \newcounter{table}[chapter]
+% BILL - change . to -
 \renewcommand \thetable
-     {\ifnum \c@chapter>\z@ \thechapter.\fi \@arabic\c@table}
+     {\ifnum \c@chapter>\z@ \thechapter-\fi \@arabic\c@table}
 \def\fps@table{tbp}
 \def\ftype@table{2}
 %\def\ext@table{lot}
@@ -732,8 +733,8 @@
     \hb@xt@1.8em{\hss\@makefnmark}#1}
 \newcommand\contentsname{Contents}
 % BY BILL
-%\newcommand\listfigurename{List of Figures}
-\newcommand\listfigurename{List of Figures and Tables}
+\newcommand\listfigurename{List of Figures}
+%\newcommand\listfigurename{List of Figures and Tables}
 \newcommand\listtablename{List of Tables}
 \newcommand\bibname{Bibliography}
 \newcommand\indexname{Index}
