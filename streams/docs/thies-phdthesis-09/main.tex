@@ -7,6 +7,9 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{subfigure}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 % replace courier with beramono, a fixed-width font that is more condensed
 % see more fonts here:  http://www.tug.dk/FontCatalogue/
@@ -66,21 +69,22 @@
 % for my thesis only:  need sdep as early as intro an dtable of contents
 \newcommand{\sdep}[0]{\textsc{sdep}}
 \newcommand{\sdepf}[2]{\sdep_{#1 \small{\leftarrow} #2}}
+\newcommand{\mt}[1]{\mbox{\it #1}}
 \newcommand{\figsdep}[0]{\mt{SDEP}}
 \newcommand{\figsdepf}[2]{\mt{SDEP}_{#1 \small{\leftarrow} #2}}
 
 \begin{document}
 
-\include{cover}
+%\include{cover}
 \include{contents}
 
-\include{intro}
-\include{language}
-\include{messaging}
+%\include{intro}
+%\include{language}
+%\include{messaging}
 \include{optimizing}
-\include{compression}
-\include{profiling}
-\include{conclusion}
+%\include{compression}
+%\include{profiling}
+%\include{conclusion}
 
 %\clearpage
 %\addcontentsline{toc}{chapter}{Bibliography}

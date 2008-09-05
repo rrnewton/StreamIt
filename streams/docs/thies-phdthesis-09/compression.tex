@@ -1226,19 +1226,21 @@ addition to compressing the locations of the zero elements, LZ77 would
 also compress repetitive patterns in the non-zero elements.
 
 Research is also underway to apply a similar technique to lossy,
-DCT-based compression formats.  The streaming model of computation
-also offers key advantages in this domain, as neighboring actors that
-compute linear functions can be algebraically simplified at compile
-time~\cite{aalamb}.  For example, a JPEG transcoder typically performs
-an iDCT (during decompression), followed by the user's transformation,
-followed by a DCT (during compression).  If the user's transformation
-is also linear (e.g., color inversion) then all three stages can be
-automatically collapsed, thereby eliminating the decompression and
-re-compression steps.  Preliminary experiments in this direction
-indicate speedups upwards of 10x.  By extending the framework to
-multiple compression formats, users will be able to write their
-transformations once, in a high-level language, and rely on the
-compiler to map the computations to each of the compressed domains.
+DCT-based compression formats.  Because these formats represent a
+linear encoding, they are subject to the linear optimizations
+described in the previous chapter.  That is, a JPEG transcoder
+typically performs an iDCT (during decompression), followed by the
+user's transformation, followed by a DCT (during compression).  If the
+user's transformation is also linear (e.g., color inversion) then all
+three stages can be automatically collapsed, thereby eliminating the
+decompression and re-compression steps.  Preliminary experiments in
+this direction indicate speedups upwards of 10x.  Additional research
+will be needed to support piecewise linear transformations, such as
+brightness adjustment with saturation at the maximum brightness level.
+By extending the framework to multiple compression formats, users will
+be able to write their transformations once, in a high-level language,
+and rely on the compiler to map the computations to each of the
+compressed domains.
 
 While we formulated our transformation in terms of a streaming model,
 the techniques can be applied within other functional and
