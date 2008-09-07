@@ -1,26 +1,52 @@
-%% - mention standard transformation?
-%%   - fission / fusion
-%%   - sync removal
-%%
-%% - leaving out?
-%%   - third-party uses?
-%%     - bit-streaming / sketching
-%%     - mani / VIRAM
-%%   - debugging / gui's
-
-\startchapter{Optimizing StreamIt}
+\startchapter{Optimizing Stream Programs}
 \label{chap:optimizing}
 
-* cite papers for more details
-* acknowledge top contributors
+This chapter validates the premise that stream programming enables new
+and powerful optimiations that are outside the reach of a traditional
+compiler.  We highlight three projects in the StreamIt group:
 
-We demonstrate an end-to-end stream compiler that attains robust
-multicore performance in the face of varying application
-characteristics.  As benchmarks exhibit different amounts of task,
-data, and pipeline parallelism, we exploit all types of parallelism in
-a unified manner in order to achieve this generality.  Our compiler,
-which maps from the StreamIt language to the 16-core Raw architecture,
-attains a 11.2x mean speedup over a single-core baseline.
+\begin{enumerate}
+
+\item {\it Parallelization.}  We demonstrate an end-to-end stream 
+compiler that attains robust multicore performance in the face of
+varying application characteristics.  As benchmarks exhibit different
+amounts of task, data, and pipeline parallelism, we exploit all types
+of parallelism in a unified manner in order to achieve this
+generality.  Our compiler, which maps from the StreamIt language to
+the 16-core Raw architecture, attains an 11x mean speedup and an 18x
+maximum speedup over a single-core baseline.  {\it Project leader:}
+Michael Gordon~\cite{gordon06asplos}.
+
+\item {\it Optimizing Linear Computations}.  We demonstrate that 
+several algorithmic transformations, traditionally hand-tuned by DSP
+experts, can be completely automated by the compiler.  We focus on
+linear filters, where each output is an affine combination of the
+inputs.  We present several optimizations of linear filters, including
+algebraic simplification of adjacent filters and automatic translation
+to the frequency domain.  These transformations offer an average
+speedup of 5.5x and a maximum speedup of 8.0x over unoptimized
+StreamIt on a Pentium~4.  {\it Project leaders:} Andrew
+Lamb~\cite{lamb:pldi:2003,lamb-thesis} and Sitij
+Agrawal~\cite{agrawal:cases:2005,agrawal-thesis}.
+
+\item {\it Cache Optimizations}.   We formulate a set of cache aware 
+optimizations that automatically improve instruction and data
+locality.  We highlight two techniques: 1) cache aware fusion, which
+combines adjacent filters while respecting instruction cache
+constraints, and 2) cache aware scaling, which improves instruction
+locality while respecting data cache constraints.  Our implementation
+of cache aware optimizations in the StreamIt compiler yields a 3.49x
+average speedup and an 88x maximum speedup over unoptimized StreamIt
+on a StrongARM 1110 processor.  {\it Project leader:} Janis
+Sermulins~\cite{sermulins:lctes:2005,sermulins-thesis}.
+
+\end{enumerate}
+
+While the author contributed to each of these projects, they are the
+full-time focus of other individuals and also appear (or will appear)
+in their theses.  Unlike the other chapters in this thesis, our
+treatment does not aim to be comprehensive.  For more details, please
+consult the papers referenced above.
 
 \section{Parallelization}
 
@@ -370,33 +396,6 @@ benefits the stateful benchmarks, Vocoder and Radar.  There is a
 super-linear speedup in Radar because reordering operations were moved
 from the compute core to the network.
 
-\subsection*{Limitations}
-
-Our current parallelization algorithm does not support the full
-generality of the StreamIt language; it omits support for teleport
-messages and dynamic rates.  Messaging may constrain the latency of
-certain parts of the stream graph, preventing the compiler from
-exploiting data parallelism.  Also, static rates are important for
-estimating the work performed by pipeline-parallel filters.  In the
-software pipelining stage, static load balancing would be difficult in
-the presence of dynamic rates.  Incorporating these language features
-into the parallelization process is fertile grounds for future
-research.
-
-While our implementation targets Raw, the techniques developed should
-be applicable to other multicore architectures.  As Raw has a
-relatively high communication bandwidth, coarsening the granularity of
-data parallelism may benefit commodity multicores even more.  In
-porting this transformation to a new architecture, one may need to
-adjust the threshold computation-to-communication ratio that justifies
-data parallelism.  As for coarse-grained software pipelining, the
-scheduling freedom afforded should benefit many multicore systems.
-One should consider the most efficient location for intermediate
-buffers (local memory, shared memory, FIFOs, etc.) as well as the best
-mechanism for shuffling data (DMA, on-chip network, etc.).  The basic
-algorithms for coarsening granularity, introducing data parallelism,
-and software pipelining are largely architecture-independent.
-
 %% \begin{figure}[t]
 %% \centering
 %% \psfig{figure=asplos06/benchchar.eps, width=6.15in}
@@ -698,7 +697,7 @@ An example of state removal appears in Figure~\ref{fig:states}.  The
 analysis detects that the two states {\tt x1} and {\tt x2} were always
 scaled proportionately, so they can be combined into a single state
 {\tt x}.  This reduced the computational requirements of the filter
-from 9 FLOPs per execution to 5 FLOPs per execution.x
+from 9 FLOPs per execution to 5 FLOPs per execution.
 
 \paragraph*{Reducing the Number of Parameters}  After removing as 
 many states as possible, additional computations can be eliminated by
@@ -834,13 +833,14 @@ http://cag.lcs.mit.edu/linear/} or see the accompanying
 thesis~\cite{lamb-thesis}.
 
 We evaluate linear optimizations on a uniprocessor.  Our measurement
-platform is a Dual Intel P4 Xeon system with 2GB of memory running
-GNU/Linux.  To measure the number of floating point operations, we use
-an instruction counting DynamoRIO~\cite{dynamo99} client.
+platform is a Dual Intel Pentium 4 Xeon system with 2GB of memory
+running GNU/Linux.  To measure the number of floating point
+operations, we use an instruction counting DynamoRIO~\cite{dynamo99}
+client.
 
 \begin{figure}[t]
 \psfig{figure=linear-flops.eps,width=\textwidth}
-\caption{Elimination of floating point operations by maximal linear 
+\caption[Elimination of floating point operations due to linear optimizations]{Elimination of floating point operations by maximal linear 
 replacement, maximal frequency replacement, and automatic optimization
 selection.}
 \label{fig:flops}
@@ -850,7 +850,7 @@ selection.}
 \centering
 \psfig{figure=linear-speedup.eps,width=\textwidth}
 %\vspace{-16pt}
-\caption{Execution speedup for maximal linear replacement, maximal frequency 
+\caption[Speedup due to linear optimizations]{Execution speedup for maximal linear replacement, maximal frequency 
 replacement, and automatic optimization selection.}
 \label{fig:execution-speedup}
 \end{figure}
@@ -988,7 +988,7 @@ represents a tradeoff between the filter's static footprint
 (instructions and local data) and its dynamic footprint (input and
 output items).
 
-We have developed a cache-aware scaling heuristic that is effective in
+We have developed a cache aware scaling heuristic that is effective in
 addressing this problem.  The heuristic scales the execution of every
 filter in the graph by the same amount.  The scaling factor is set as
 high as possible so long as 90\% of the filters can fit both their
@@ -1021,30 +1021,88 @@ Pentium~3 and with \texttt{ecc} (v7.0, -O3) for the Itanium~2.
 
 \begin{figure}[t]
 \centering
-\psfig{figure=arm1.eps,width=\textwidth}
-\caption{Performance of cache optimizations on the StrongARM processor.\protect\label{fig:arm}}
+\psfig{figure=arm.eps,width=\textwidth}
+\caption[Performance of cache optimizations on the StrongARM]{Performance 
+of cache optimizations on the StrongARM processor (CAF stands for
+cache aware fusion).\protect\label{fig:arm}}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\psfig{figure=cache-results.eps,width=5.5in}
+\caption[Summary of cache optimizations on the StrongARM, Pentium 3 and 
+Itanium 2]{Summary of cache optimizations on the StrongARM, Pentium 3
+and Itanium 2 processors (CAF stands for cache aware
+fusion).\protect\label{fig:p3}}
 \end{figure}
 
 The performance of our techniques on the StrongARM processor is
-illustrated in Figure~\ref{fig:arm}.
+illustrated in Figure~\ref{fig:arm}.  The graph illustrates the
+performance of full fusion, cache aware fusion, and cache aware fusion
+with cache aware scaling.  Performance is normalized to unoptimized
+StreamIt, in which no actors are fused (but there is still unrolling
+by 128).  On average, our cache optimizations offer a 3.49x speedup
+over the baseline and a 2.62x average speedup over full fusion.  Cache
+optimizations always perform better than the baseline, and they
+perform better than full fusion in all cases except for \texttt{3gpp},
+where they yield a 45\% slowdown.  This slowdown is due to
+conservative code size estimation: the compiler predicts that the
+fused version of \texttt{3gpp} will not fit into the instruction
+cache, thereby preventing fusion.  However, due to optimizations by
+{\tt gcc}, the final code size is smaller than expected and does fit
+within the cache.  While such inaccuracies could be improved by adding
+feedback between the output of {\tt gcc} and our code estimation, each
+fusion possibility would need to be evaluated separately as the fusion
+boundary affects the impact of low-level optimizations (and thus the
+final code size).
 
-- results show cumulative graph on strongarm show summary graph on
- - different architectures
+The speedups offered by cache optimizations over a full fusion
+strategy are more modest for the desktop processors: 1.34x average
+speedup on Pentium~3 and essentially zero speedup (6\% by the
+arithmetic mean, -8\% by the geometric mean) on Itanium~2
+(Figure~\ref{fig:p3}).  
+%Out of the 11 benchmarks, cache optimizations perform as well or
+%better than full fusion for 7 benchmarks on the Pentium~3 and 5
+%benchmarks on the Itanium~2.
+Performance on any architecture is a tradeoff between two factors: 1)
+the benefit of data and instruction locality, and 2) the benefit of
+fusion, which reduces memory accesses due to improved register
+allocation across actor boundaries.  Compared to the StrongARM, the
+Pentium~3 and Itanium~2 offer an L2 cache (as well as a larger L1 data
+cache), thereby lessening the impact of locality-enhancing cache
+optimizations.  However, the fusion benefit remains a significant
+factor; for example, using Intel VTune on the Pentium~3, we measured
+that full fusion offers a 50\% reduction in memory accesses over the
+cache-optimized version.  This effect may be pronounced on the
+Itanium~2 due to the larger number of registers on that architecture
+(128 general, 128 floating point).  While fusion benefits are also
+present on the StrongARM, cache optimizations are more important on
+that processor due to the large penalty for cache misses.
+
+In summary, cache optimizations prove to be a valuable asset to the
+compiler, especially when targeting embedded processors.  Via simple
+scheduling heuristics, they improve performance by 3.49x.  These gains
+are out of the reach of compilers for traditional languages such as C,
+in which it is intractable to infer the buffers between filters and to
+grow or shrink them to match the schedule.  The stream programming
+model exposes the information needed to transform the program and
+attain the desired performance.
 
 \section{Related Work}
 
 % parallelism
 
-Liao et al. map Brook to multicore processors by leveraging the affine
-partitioning model~\cite{liao06brook}.  While affine partitioning is a
-powerful technique for parameterized loop-based programs, in StreamIt we
-simplify the problem by fully resolving the program structure at
-compile time.  This allows us to schedule a single steady state using
-flexible, non-affine techniques (e.g., simulated annealing) and to
-repeat the found schedule for an indefinite period at runtime.
-Gummaraju and Rosenblum map stream programs to a general-purpose
-hyperthreaded processor~\cite{gummaraju05micro}.  Such techniques
-could be integrated with our spatial partitioning to optimize per-core
+\paragraph*{Parallelization}  Liao et al. map Brook to multicore processors 
+by leveraging the affine partitioning model~\cite{liao06brook}.  While
+affine partitioning is a powerful technique for parameterized
+loop-based programs, in StreamIt we simplify the problem by fully
+resolving the program structure at compile time.  This allows us to
+schedule a single steady state using flexible, non-affine techniques
+(e.g., simulated annealing) and to repeat the found schedule for an
+indefinite period at runtime.  Gummaraju and Rosenblum map stream
+programs to a general-purpose hyperthreaded
+processor~\cite{gummaraju05micro}.  Such techniques could be
+integrated with our spatial partitioning to optimize per-core
 performance.  Gu et al. expose data and pipeline parallelism in a
 Java-like language and use a compiler analysis to efficiently extract
 coarse-grained filter boundaries~\cite{du03sc}.  Ottoni et al. also
@@ -1070,15 +1128,13 @@ of task, data, and pipeline parallelism.  Furthermore, these systems
 do not provide a robust end-to-end path for application
 parallelization from a high-level, portable programming language.
 
-% linear
-
-Several groups are researching strategies for efficient code
-generation for DSP applications.  SPIRAL is a system that generates
-libraries for signal processing
-algorithms\cite{spiral,johnson01searching,egner01automatic}.  Using a
+\paragraph*{Optimizing Linear Computations}  Several other groups 
+have developed automated frameworks for optimizing linear signal
+processing kernels.  SPIRAL is a system that generates libraries for
+signal processing algorithms~\cite{Spiral-SI}.  Using a
 feedback-directed search process, DSP transforms are optimized for the
 underlying architecture.  The input language to SPIRAL is
-SPL\cite{xiong01spl,xiong-thesis}, which provides a parameterizable
+SPL~\cite{xiong01spl,xiong-thesis}, which provides a parameterizable
 way of expressing matrix computations.  Given a matrix representation
 in SPL, SPIRAL generates formulas that correspond to different
 factorizations of the matrix.  It searches for the most efficient
@@ -1090,114 +1146,20 @@ starts with a matrix representation in SPL, we start with general
 StreamIt code and use linear dataflow analysis to extract a matrix
 representation where possible.  Our linear combination rules are
 distinct from the factorizations of SPIRAL, as StreamIt nodes can peek
-at items that they do not consume.  In the future, SPIRAL could be
-integrated with StreamIt to optimize a matrix factorization for a
-given architecture.
+at items that they do not consume.  We also support optimizations on
+linear statespace filters, which are not handled in SPIRAL.  In the
+future, SPIRAL could be integrated with StreamIt to optimize a matrix
+factorization for a given architecture.
 
-The ATLAS project \cite{whaley01automated} also aims to produce fast
-libraries for linear algebra manipulations, focusing on adaptive
-library generation for varying architectures.  FFTW~\cite{frigo99fast}
-is a runtime library of highly optimized FFT's that dynamically adapt
-to architectural variations.  StreamIt is again complementary to these
-packages: it allows programmers to interface with them using general
-user-level code.
-
-ADE (A Design Environment) is a system for specifying, analyzing, and
-manipulating DSP algorithms~\cite{covell-ade}.  ADE includes a
-rule-based system that can search for improved arrangements of stream
-algorithms using extensible transformation rules.  However, the system
-uses predefined signal processing blocks that are specified in
-mathematical terms, rather than the user-specified imperative code
-that appears in a StreamIt filter.  Moreover, ADE is intended for
-algorithm exploration, while StreamIt includes support for code
-generation and whole-program development.  In addition to ADE, other
-work on DSP algorithm development is surveyed
-in~\cite{oppenheim-symbolic}.
-
-Karr~\cite{karr76} and Cousot and Halbwachs~\cite{cousot78} describe
-general methods for detecting linear relationships among program
-variables.  Karr maintains an affine representation (similar to ours)
-for each program variable, while Cousot and Halbwachs use a polyhedral
-model in which each dimension corresponds to a program variable.  For
-general programs, the analyses described by these authors is more
-general than ours.  In fact, the novelty of our linear dataflow
-analysis is in its specialization for the streaming domain.  Rather
-than tracking general relationships, we only track relationships to
-items on the input tape.  This restriction---in combination with the
-atomic, fine-grained nature of filter work functions---makes it
-feasible to symbolically execute all loops, thereby obtaining more
-precise linearity information.
-
-Also note that the ``linear data flow analysis'' of Ryan~\cite{ryan92}
-is completely unrelated to our work; it aims to do program analysis in
-linear time.
-
-% statespace
-
-This paper builds directly on the work done to analyze and optimize
-linear components in StreamIt graphs \cite{Lamb}. We extend the
-theoretical framework for linear analysis to state space analysis in
-order to apply our optimizations to a wider class of applications.
-Specifically, state space analysis applies to filters with persistent
-state, and feedback loops can be combined into a single state space
-representation; neither of these cases is handled by linear analysis.
-The extension from linear analysis to state space analysis required a
-fundamental change to the underlying representation, as well as a
-complete reformulation of the rules for combination and expansion.
-Moreover, this paper introduces novel optimizations of state removal
-and parameter reduction, both of which operate on the state space
-representation.
-
-Potkonjak and Rabaey describe optimized hardware synthesis for linear
-and ``feedback linear'' computations~\cite{Potkonjak00}.  Linear state
-space systems correspond to ``constant feedback linear computations''
-in the authors' terminology.  For linear and linear feedback systems,
-their technique offers 1) a maximally fast implementation under
-latency constraints, 2) an arbitrarily fast implementation, and 3) an
-implementation reducing the number of arithmetic operations.  In
-reducing arithmetic operations, they perform common subexpression
-elimination (CSE) in a manner that resembles our state removal
-optimization.
-
-However, the benefits of state removal cannot be achieved by CSE alone
-(or by the Potkonjak and Rabaey algorithm).  For example, in
-Figure~\ref{fig:opt-seq}, state removal replaces references to
-$\mt{x1} + \mt{x2}$ by a single variable $x$.  While CSE can also
-perform this substitution, it cannot independently maintain the value
-of $x$ across iterations of the filter.  That is, state removal
-replaces the assignments to $\mt{x1}$, $\mt{x2}$,
-$\mt{x1}\_{\mt{temp}}$, and $\mt{x2}\_{\mt{temp}}$ with a single
-assignment to $x$.  This transformation decreases the number of
-arithmetic operations due to algebraic simplification in the update of
-$x$.  Further, state removal completely removes the variables
-$\mt{x1}$, $\mt{x2}$, $\mt{x1}\_{\mt{temp}}$, and
-$\mt{x2}\_{\mt{temp}}$ from the program.  We are unaware of any
-sequence of traditional compiler optimizations that achieves the same
-effect as state removal (and likewise for parameter reduction).
-
-Several other groups have developed automated frameworks for
-optimizing linear signal processing kernels.  The SPIRAL
-project~\cite{Spiral-SI} uses a formal mathematical language to
-describe linear DSP operations.  Using search and machine learning
-techniques, SPIRAL evaluates alternate versions of a formula on a
-given platform and optimized code is generated.  The FFTW
-system~\cite{FFTW-SI} generates platform-optimized FFT libraries using
-a dynamic programming algorithm and profile feedback to match the
-recursive FFT formulation to a given memory hierarchy.
+The FFTW system~\cite{FFTW-SI} generates platform-optimized FFT
+libraries using a dynamic programming algorithm and profile feedback
+to match the recursive FFT formulation to a given memory hierarchy.
 ATLAS~\cite{ATLAS,ATLAS-Sparsity-SI} produces platform-specific linear
 algebra routines by searching over blocking strategies and other
 parameters; Sparsity~\cite{ATLAS-Sparsity-SI,Sparsity} applies a
-similar approach to sparse matrices.
-
-While these approaches offer a rich set of optimizations, they are
-limited to linear systems.  The transformations described in this
-paper apply not only to linear systems, but also to linear systems
-with state.  In particular, the state removal and parameter reduction
-optimizations apply specifically to linear state space systems.  In
-addition, our focus is on the application of linear state space
-optimizations in the context of a general-purpose stream language,
-optimizing across application components rather than within a single
-library function.
+similar approach to sparse matrices.  StreamIt is again complementary
+to these packages: it allows programmers to interface with them using
+general user-level code.  It also supports linear statespace filters.
 
 A variety of tools have been developed for specifying and deriving DSP
 algorithms~\cite{oppenheim-symbolic}.  The SMART project aims to
@@ -1214,10 +1176,41 @@ deriving optimized algorithms from a high-level description, though we
 start from a general-purpose, imperative stream language rather than a
 mathematical formalism.
 
-% cache
+Karr~\cite{karr76} and Cousot and Halbwachs~\cite{cousot78} describe
+general methods for detecting linear relationships among program
+variables.  Karr maintains an affine representation (similar to ours)
+for each program variable, while Cousot and Halbwachs use a polyhedral
+model in which each dimension corresponds to a program variable.  For
+general programs, the analyses described by these authors is more
+general than ours.  In fact, the novelty of our linear dataflow
+analysis is in its specialization for the streaming domain.  Rather
+than tracking general relationships, we only track relationships to
+items on the input tape.  This restriction---in combination with the
+atomic, fine-grained nature of filter work functions---makes it
+feasible to symbolically execute all loops, thereby obtaining more
+precise linearity information.
 
-There is a large body of literature on scheduling synchronous dataflow
-(SDF) graphs to optimize various
+Potkonjak and Rabaey describe optimized hardware synthesis for linear
+and ``feedback linear'' computations~\cite{Potkonjak00}.  Linear state
+space systems correspond to ``constant feedback linear computations''
+in the authors' terminology.  For linear and linear feedback systems,
+their technique offers 1) a maximally fast implementation under
+latency constraints, 2) an arbitrarily fast implementation, and 3) an
+implementation reducing the number of arithmetic operations.  In
+reducing arithmetic operations, they perform common subexpression
+elimination (CSE) in a manner that resembles our state removal
+optimization.  However, the general state removal transformation
+cannot be achieved by CSE alone (or by the Potkonjak and Rabaey
+algorithm).  We are unaware of any sequence of traditional compiler
+optimizations that achieves the same effect as state removal (and
+likewise for parameter reduction).
+
+Also note that the ``linear data flow analysis'' of Ryan~\cite{ryan92}
+is completely unrelated to our work; it aims to do program analysis in
+linear time.
+
+\paragraph*{Cache Optimizations}  There is a large body of literature 
+on scheduling synchronous dataflow (SDF) graphs to optimize various
 metrics~\cite{bhattacharyya99synthesis,leesdf}.  The work most closely
 related to ours is a recent study by Kohli~\cite{kohli04} on cache
 aware scheduling of SDF graphs, implemented as part of the Ptolemy
@@ -1230,7 +1223,7 @@ the data cache and instruction cache penalties associated with
 switching to the next actor.  In contrast, our algorithm considers the
 buffering requirements of all filters in a given container and
 increases the multiplicity so long as 90\% of buffers are contained
-within the data cache.  
+within the data cache.
 %Kohli does not consider buffer management
 %strategies, and 
 The evaluation is limited to one 6-filter pipeline and an assortment
@@ -1245,12 +1238,12 @@ appears at only one position in the loop nest denoting the schedule.
 Such schedules guarantee minimal code size and facilitate the inlining
 of filters.  There are a number of approaches to minimizing the buffer
 requirements for single-appearance schedules (see
-\cite{bhattacharyya99synthesis} for a review).  While it has been
-shown that obtaining the minimal memory requirements for general
-graphs is NP-complete~\cite{Bhatta97}, there are two complimentary
-heuristics, APGAN (Pairwise Grouping of Adjacent Nodes) and RPMC
-(Recursive Partitioning by Minimum Cuts), that have been shown to be
-effective when applied together~\cite{Bhatta97}.  Buffer
+Bhattacharyya~\cite{bhattacharyya99synthesis} for a review).  While it
+has been shown that obtaining the minimal memory requirements for
+general graphs is NP-complete~\cite{Bhatta97}, there are two
+complimentary heuristics, APGAN (Pairwise Grouping of Adjacent Nodes)
+and RPMC (Recursive Partitioning by Minimum Cuts), that have been
+shown to be effective when applied together~\cite{Bhatta97}.  Buffer
 merging\cite{murt1999x3,murt2000x2} represents another technique for
 decreasing buffer sizes, which could be integrated with our approach
 in the future.
@@ -1281,66 +1274,99 @@ management between filters.
 
 \section{Future Work}
 
+Our current parallelization algorithm does not support the full
+generality of the StreamIt language; it omits support for teleport
+messages and dynamic rates.  Messaging may constrain the latency of
+certain parts of the stream graph, preventing the compiler from
+exploiting data parallelism.  Also, static rates are important for
+estimating the work performed by pipeline-parallel filters.  In the
+software pipelining stage, static load balancing would be difficult in
+the presence of dynamic rates.  Incorporating these language features
+into the parallelization process is fertile grounds for future
+research.
+
+While our implementation targets Raw, the techniques developed should
+be applicable to other multicore architectures.  As Raw has a
+relatively high communication bandwidth, coarsening the granularity of
+data parallelism may benefit commodity multicores even more.  In
+porting this transformation to a new architecture, one may need to
+adjust the threshold computation-to-communication ratio that justifies
+data parallelism.  As for coarse-grained software pipelining, the
+scheduling freedom afforded should benefit many multicore systems.
+One should consider the most efficient location for intermediate
+buffers (local memory, shared memory, FIFOs, etc.) as well as the best
+mechanism for shuffling data (DMA, on-chip network, etc.).  The basic
+algorithms for coarsening granularity, introducing data parallelism,
+and software pipelining are largely architecture-independent.
+
+The cache aware scaling heuristic applies the same scaling factor to
+all parts of the stream graph.  We have been working (with Fabrice
+Rastello) on generalizing this approach to use different scaling
+factors for different sections of the stream graph.  This approach has
+the potential to strike a more flexible tradeoff between the static
+data footprint and the dynamic data footprint in the cache.
+
 \section{Chapter Summary}
 
-% asplos
+This chapter presents three aggressive transformations that utilize
+the abundant parallelism and regular communication patterns of stream
+programs to achieve automatic performance improvements that are beyond
+the reach of traditional compilers.
 
-As multicore architectures become ubiquitous, it will be critical to
-develop a high-level programming model that can automatically exploit
-the coarse-grained parallelism of the underlying machine without
-requiring heroic efforts on the part of the programmer.  Stream
-programming represents a promising approach to this problem, as
-high-level descriptions of streaming applications naturally expose
-task, data, and pipeline parallelism.  
+In parallelizing stream programs, we leverage the task, data, and
+pipeline parallelism that is exposed in the programming model to
+attain robust performance on a multicore architecture.  The key aspect
+of our work is in exploiting parallelism at a coarse level of
+granularity.  To bolster the benefits of data parallelism on a
+multicore architecture, we build coarse-grained data-parallel units
+that are duplicated as few times as needed.  And to leverage the
+benefits of pipeline parallelism, we employ software pipelining
+techniques---traditionally applied at the instruction level---to
+coarse-grained filters in the program.  The combination of these
+techniques achieves an 11.2x mean speedup on the 16-core Raw machine.
 
-In this chapter, we develop general techniques for automatically
-bridging the gap between the original granularity of the program and
-the underlying granularity of the architecture.  To bolster the
-benefits of data parallelism on a multicore architecture, we build
-coarse-grained data-parallel units that are duplicated as few times as
-needed.  And to leverage the benefits of pipeline parallelism, we
-employ software pipelining techniques---traditionally applied at the
-instruction level---to coarse-grained filters in the program.
+In optimizing linear computations, we demonstrate how the compiler can
+mirror the actions of a DSP expert in performing algorithmic
+transformations on the stream graph.  We automatically extract a
+linear representation from the code in a filter's work function, and
+manipulate that representation to perform algebraic simplification of
+adjacent filters, translation of filters into the frequency domain,
+removal of redundant states, and reduction of the number of
+parameters.  We develop an optimization selection algorithm that uses
+dynamic programming to choose the most profitable transformations out
+of a large array of possibilities.  The combination of these
+techniques eliminates an average of 87\% of the FLOPs and offers an
+average speedup of 5.5x for our benchmark suite.
 
-A detailed evaluation in the context of the StreamIt language and the
-16-core Raw microprocessor offers very favorable results that are also
-quite consistent across diverse applications.  Coarse-grained data
-parallelism offers a 4.4x speedup over a task-parallel baseline and a
-9.9x speedup over a sequential code.  Without our granularity
-coarsening pass, these reduce to 0.7x and 1.4x, respectively.
-Coarse-grained software pipelining improves the generality of the
-compiler, as it is able to parallelize stateful filters with
-dependences from one iteration to the next.  Our two techniques are
-complementary and offer a combined speedup of 11.2x over the baseline
-(and 1.84x over our previous work).
+In performing cache optimizations, ...
 
-As our techniques rely on specific features of the StreamIt
-programming model, the results suggest that these features are a good
-match for multicore architectures.  Of particular importance are the
-following two language features:
-\begin{enumerate}
-\item Exposing producer-consumer relationships between filters.  This
-enables us to coarsen the computation to communication ratio via
-filter fusion, and also enables pipeline parallelism.
+What was useful in compiler?
+- peeking was useful for compiler
+- data reordering was useful for compiler
+- structure was less useful for compiler
+  - mostly just dynamic programming solution
+  - phased scheduling was easier to formulate
+  - COULD have been useful for parameterized IR
 
-\item Exposing the outer loop around the entire stream graph.  This is
-central to the formulation of software pipelining; it also enables
-data parallelism, as the products of filter fission may span multiple
-steady-state iterations.
-\end{enumerate}
+%% As our techniques rely on specific features of the StreamIt
+%% programming model, the results suggest that these features are a good
+%% match for multicore architectures.  Of particular importance are the
+%% following two language features:
+%% \begin{enumerate}
+%% \item Exposing producer-consumer relationships between filters.  This
+%% enables us to coarsen the computation to communication ratio via
+%% filter fusion, and also enables pipeline parallelism.
+
+%% \item Exposing the outer loop around the entire stream graph.  This is
+%% central to the formulation of software pipelining; it also enables
+%% data parallelism, as the products of filter fission may span multiple
+%% steady-state iterations.
+%% \end{enumerate}
 
 % what did linear rely on from streamit?
-- separation of states and inputs
-- quick exection step suitable to symbolic execution
+% - separation of states and inputs
+% - quick exection step suitable to symbolic execution
 
-%% - lessons learned
+%% not mentioning:
 %%   - fine-grained communication on Raw not worth it
 %%   - greedy is good?  dynamic programming solution
-%%   - what was useful in language for compiler's sake?
-%%    - peeking was useful for compiler
-%%    - data reordering was useful for compiler
-%%    - structure was less useful for compiler
-%%      - mostly just dynamic programming solution
-%%      - phased scheduling was easier to formulate
-%%      - COULD have been useful for parameterized IR
-
