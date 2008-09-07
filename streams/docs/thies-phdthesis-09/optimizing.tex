@@ -15,7 +15,7 @@ of parallelism in a unified manner in order to achieve this
 generality.  Our compiler, which maps from the StreamIt language to
 the 16-core Raw architecture, attains an 11x mean speedup and an 18x
 maximum speedup over a single-core baseline.  {\it Project leader:}
-Michael Gordon~\cite{gordon06asplos}.
+Michael Gordon~\cite{gordon-asplos06}.
 
 \item {\it Optimizing Linear Computations}.  We demonstrate that 
 several algorithmic transformations, traditionally hand-tuned by DSP
@@ -26,8 +26,8 @@ algebraic simplification of adjacent filters and automatic translation
 to the frequency domain.  These transformations offer an average
 speedup of 5.5x and a maximum speedup of 8.0x over unoptimized
 StreamIt on a Pentium~4.  {\it Project leaders:} Andrew
-Lamb~\cite{lamb:pldi:2003,lamb-thesis} and Sitij
-Agrawal~\cite{agrawal:cases:2005,agrawal-thesis}.
+Lamb~\cite{lamb-pldi03,lamb-thesis} and Sitij
+Agrawal~\cite{agrawal-cases05,agrawal-thesis}.
 
 \item {\it Cache Optimizations}.   We formulate a set of cache aware 
 optimizations that automatically improve instruction and data
@@ -213,7 +213,7 @@ We illustrate our technique by way of an example: we discuss how to
 map a simplified version of our FilterBank benchmark (see
 Figure~\ref{fig:filterbank}a) to a four-core machine.  The complete
 details of our algorithm are available
-elsewhere~\cite{gordon06asplos}.
+elsewhere~\cite{gordon-asplos06}.
 
 \paragraph*{Previous Practice: Fine-Grained Data Parallelism}  Perhaps 
 the most common approach to parallelization is to identify loops that
@@ -544,7 +544,7 @@ affine function of the free variables, then linear analysis has
 succeeeded and the linear representation is built.  A more precise
 description of this analysis, including support for innocuous branches
 that do not affect the linear representation, is described
-elsewhere~\cite{streamit-linear}.
+elsewhere~\cite{lamb-pldi03}.
 
 Of course, it would also be possible for programmers to specify the
 linear representation directly rather than relying on the compiler to
@@ -596,7 +596,7 @@ combining filers wherever possible (even when detrimental) leads to a
 
 We have extended the simple idea of algebraic simplification to handle
 the general case, hiding many complexities from the
-user~\cite{agrawal:cases:2005}.  To perform the matrix multiplication
+user~\cite{agrawal-cases05}.  To perform the matrix multiplication
 in Figure~\ref{fig:combination}, the output rate of the first filter
 must match the input rate of the second filter.  In cases where this
 is not true in the program, the analysis expands each linear
@@ -713,7 +713,7 @@ context of StreamIt.  As with the state removal algorithm, the number
 of parameters in a linear statespace filter can be reduced using a
 systematic sequence of matrix operations.  However, compared to state
 removal, there are looser guarantees on the optimality of the final
-system~\cite{agrawal:cases:2005}.
+system~\cite{agrawal-cases05}.
 
 An example of parameter reduction is illustrated in
 Figure~\ref{fig:states}.  Following the transformation, the state
@@ -827,7 +827,7 @@ addressed independently (each filter is very coarse-grained).
 We have implemented linear optimizations in the StreamIt compiler.
 Here we present results for stateless linear nodes, though we have
 also shown that linear statespace analysis offers improved
-generality~\cite{agrawal:cases:2005}.  For more detailed results,
+generality~\cite{agrawal-cases05}.  For more detailed results,
 stream graphs, and source code, please visit {\tt
 http://cag.lcs.mit.edu/linear/} or see the accompanying
 thesis~\cite{lamb-thesis}.
@@ -1211,7 +1211,7 @@ linear time.
 
 \paragraph*{Cache Optimizations}  There is a large body of literature 
 on scheduling synchronous dataflow (SDF) graphs to optimize various
-metrics~\cite{bhattacharyya99synthesis,leesdf}.  The work most closely
+metrics~\cite{bhattacharyya99synthesis,bhattacharyya_software_1996}.  The work most closely
 related to ours is a recent study by Kohli~\cite{kohli04} on cache
 aware scheduling of SDF graphs, implemented as part of the Ptolemy
 framework for simulating heterogeneous embedded
@@ -1409,7 +1409,7 @@ also facilitated the detection of task-parallel components during the
 introduction of data parallelism.  Though we did not discuss it here,
 the single-input, single-output property of structured streams was
 integral to the development of phased
-scheduling~\cite{karczmarek:lctes:2003,karczma-thesis}.  Finally,
+scheduling~\cite{karczmarek-lctes03,karczma-thesis}.  Finally,
 though the StreamIt compiler completely unrolls the stream graph,
 structure may prove useful in facilitating a parameterized graph
 representation in future work.

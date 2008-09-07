@@ -122,7 +122,7 @@ time.
 
 Our formulation of teleport messaging relies on the static input and
 outuput rates inherent in the synchronous dataflow
-model~\cite{LM87-i}.  Because the rates are statically known, we can
+model~\cite{lee_static_1987}.  Because the rates are statically known, we can
 compute the dependences between actors and automatically calculate
 when a message should be delivered.  We develop a stream dependence
 function, $\sdep$, that provides an exact, complete, and compact
@@ -153,7 +153,7 @@ improvement due to communication benefits of teleport messaging.
 %% slice~\cite{tip95slice,hrb88pdg} in procedural programs and carries
 %% with it many of the applications of slicing, including debugging and
 %% program analysis.  However, unlike slicing, we restrict our input
-%% domain to a Synchronous Dataflow (SDF) ~\cite{LM87-i} graph, which is
+%% domain to a Synchronous Dataflow (SDF) ~\cite{lee_static_1987} graph, which is
 %% a natural representation for many signal processing applications.  We
 %% leverage the static properties of SDF to compute $\sdep$ exactly at
 %% compile time and to store the dependence information compactly.
@@ -671,7 +671,7 @@ periodicity as the steady state of the stream graph.  A steady state
 ${\cal S} \in \Phi$ is an execution that does not change the buffering
 in the channels---that is, the number of items on each channel after
 the execution is the same as it was before the execution.  Calculating
-a steady state is well-understood~\cite{LM87-i}.  The execution
+a steady state is well-understood~\cite{lee_static_1987}.  The execution
 simulated in Figure~\ref{fig:sdep1} is a steady state, meaning that
 additional entries of the pull schedule will repeat the pattern given
 in the figure.  Thus, $\sdep$ will also grow in the same pattern, and
@@ -1038,7 +1038,7 @@ schedule.
 
 Teleport messaging is a language construct that makes use of $\sdep$
 to achieve precise timing of control messages.  It is included as part
-of the StreamIt language~\cite{streamitcc}.  Teleport messaging
+of the StreamIt language~\cite{thies-cc02}.  Teleport messaging
 represents out-of-band communication between two actors, distinct from
 the high-bandwidth dataflow in the stream graph.  Messages are
 currently supported between any pair of actors with a meaningful
