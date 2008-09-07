@@ -2,7 +2,7 @@
 \label{chap:optimizing}
 
 This chapter validates the premise that stream programming enables new
-and powerful optimiations that are outside the reach of a traditional
+and powerful optimizations that are outside the reach of a traditional
 compiler.  We highlight three projects in the StreamIt group:
 
 \begin{enumerate}
@@ -325,7 +325,7 @@ stream programming model to make these transformations tractable.
 coarse-grained data parallelism is effective for parallelizing
 stateless computations, it does nothing to help with computations that
 retain state, either within filters or within feedbackloops.  For
-example, the Vocoder benchmark (simplified subet shown in
+example, the Vocoder benchmark (simplified subset shown in
 Figure~\ref{fig:vocoder}) contains a significant fraction of stateful
 filters.  While two of the filters can be data-parallelized, there
 remain large gaps in the execution schedule (see
@@ -494,7 +494,7 @@ but inefficient manner.  Each frequency band is processed in a
 separate branch of a splitjoin, and each branch contains a successive
 high-pass and low-pass filter to accomplish a band-pass functionality.
 While this representation of the algorithm allows it to be easily
-understood and maintained, it perfoms many redundant computations.  In
+understood and maintained, it performs many redundant computations.  In
 practice, because all of the components of the equalizer are linear,
 they can be collapsed into a single filter that performs far fewer
 computations.  Furthermore, as that filter is performing a sliding
@@ -541,7 +541,7 @@ non-linear.  Otherwise, when execution completes, a symbolic
 expression has been established for every state variable and every
 value pushed to the output tape.  If all of these expressions are an
 affine function of the free variables, then linear analysis has
-succeeeded and the linear representation is built.  A more precise
+succeeded and the linear representation is built.  A more precise
 description of this analysis, including support for innocuous branches
 that do not affect the linear representation, is described
 elsewhere~\cite{lamb-pldi03}.
@@ -555,7 +555,7 @@ automatic recognition of optimization targets, as otherwise the
 programmer needs to be knowledgeable of every potential optimization
 and annotate the code accordingly.
 
-\subsection*{Alebraic Simplification of Adjacent Linear Filters}
+\subsection*{Algebraic Simplification of Adjacent Linear Filters}
 
 \begin{figure}[t]
 % TODO: simple combination picture
@@ -622,7 +622,7 @@ combination of an IIR filter with a decimator, reducing the total
 number of operations by 25\%.  This optimization opportunity is not
 obvious to non-experts due to the state retained by the IIR filter.
 Also, even when the programmer understands that linear combination is
-possible, it may be untractable to manage of all of the details and to
+possible, it may be intractable to manage of all of the details and to
 maintain the code following the transformation.  This effect is
 especially important in the context of software libraries, where the
 final application may contain filters that were authored by many
@@ -924,7 +924,7 @@ between actors.
 Our optimized scheduling strategy, illustrated on the right of
 Figure~\ref{fig:cacheopt}, can be considered as a tradeoff between
 these two extremes.  First, we employ a heuristic called {\it cache
-aware fusion} that fuses exections of the inner loop as much as
+aware fusion} that fuses executions of the inner loop as much as
 possible without overflowing the instruction cache.  In this case,
 filters A and B can be fused, but filter C remains separate.  Then, we
 employ a technique called {\it cache aware scaling} that sets the
@@ -997,13 +997,13 @@ the filters may overflow the cache with their dynamic data, but these
 overflows are compensated by improved reuse of static data in other
 filters.  In the case of FFT (characterized in
 Figure~\ref{fig:scaling}, the heuristic arrives at a scaling factor of
-5, which yiels performance that is within 5\% of the optimum.  For our
+5, which yields performance that is within 5\% of the optimum.  For our
 benchmark suite, cache aware scaling gives a further improvement of
 1.9x over cache aware fusion alone.
 
 \subsection*{Experimental Evaluation}
 
-We implemented chace aware fusion and cache aware scaling in the
+We implemented cache aware fusion and cache aware scaling in the
 StreamIt compiler, and evaluate its performance on three different
 architectures: a 137~MHz StrongARM~1110, a 600~MHz Pentium~3 and a
 1.3~GHz Itanium~2. The StrongARM results reflect performance for an
@@ -1303,7 +1303,7 @@ A limitation of the linear optimizations is that they currently do not
 support linear filters that send or receive teleport messages.  This
 scenario is meaningful because messages are often sent to adjust
 filtering coefficients in linear nodes.  Supporting messages in tandem
-with linear optimizations represents an interesting reseach
+with linear optimizations represents an interesting research
 opportunity.  If messages update the state of a linear filter, than
 that state update should be propagated through any combined or
 optimized nodes.  Alternately, it may be simpler to maintain two
@@ -1315,7 +1315,7 @@ unoptimized node.
 
 Our experience with linear optimizations also revealed an opportunity
 to develop an interesting and useful optimization which we term {\it
-decimiation propagation}.  Our current analysis will automatically
+decimation propagation}.  Our current analysis will automatically
 propagate any decimation of the output through the linear portions of
 the stream graph, eliminating any computations that do not effect the
 final output.  However, it would be possible to generalize and extend
@@ -1336,7 +1336,7 @@ data footprint and the dynamic data footprint in the cache.
 Finally, a broad limitation of the current StreamIt compiler is that
 it performs all of its optimizations at compile time.  To embed
 streaming concepts in a general-purpose programming language, it will
-likely be desirable to provide API support for consructing and
+likely be desirable to provide API support for constructing and
 initializing the stream graph at runtime.  In this context, all of the
 optimizations described should be migrated to a Just-In-Time (JIT)
 compiler, where they can be invoked once at the start of steady-state
@@ -1393,7 +1393,7 @@ the optimizations described in this chapter.  The properties of the
 synchronous dataflow model -- that is, the separation of filters into
 independent units with atomic execution steps and known communication
 rates -- was essential for almost all of the analyses described.  In
-addition, the StreamIt consruct of peeking was uniformly useful for
+addition, the StreamIt construct of peeking was uniformly useful for
 facilitating analysis of sliding window operations.
 
 Structured streams also found some applications within the compiler,
@@ -1401,7 +1401,7 @@ though fewer than we had originally anticipated.  The presence of
 structure was essential for formulating the optimization selection
 algorithm for linear filters; without the regular structure, there
 would have been no prescription for finding overlapping subproblems in
-the strema graph.  We believe that structure also simplified the
+the stream graph.  We believe that structure also simplified the
 development and presentation of the linear optimizations, as they only
 have to handle a fixed number of cases rather than dealing with the
 full generality of an arbitrary stream graph.  The splitjoin construct
