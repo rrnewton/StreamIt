@@ -208,7 +208,7 @@ sliding-window computations such as FIR filters.  Also, due to a lack
 of pointers in the language, values can easily be traced through
 arrays from their initialization to their use.  This allows the
 compiler to infer that the FIR filter computes a linear function,
-subject to aggressive optimization~\cite{streamit-linear}.  Also,
+subject to aggressive optimization~\cite{lamb-pldi03}.  Also,
 using a transformation called scalar
 replacement~\cite{sermulins:lctes:2005}, the {\it weights} array can
 be eliminated completely by unrolling loops and propagating constants
@@ -388,9 +388,9 @@ representations.
 Enforcing structure in the language can also benefit the compiler.
 Rather than dealing with the complexity of full graphs, the compiler
 can focus on a few simple cases.  This property helped us to formulate
-phased scheduling~\cite{karczmarek:lctes:2003,karczmarek-thesis} and
+phased scheduling~\cite{karczmarek-lctes03,karczma-thesis} and
 linear
-optimizations~\cite{lamb:pldi:2003,lamb-thesis,agrawal:cases:2005,agrawal-thesis}.
+optimizations~\cite{lamb-pldi03,lamb-thesis,agrawal-cases05,agrawal-thesis}.
 % TODO: revisit later.  Did structure help other things?
 
 We give more details on our experience with structure in Section~\ref{sec:lang-experience}.
@@ -461,7 +461,7 @@ aggressive optimizations.  For example, standardized splitters and
 joiners have enabled us to map reordering operations to a programmable
 on-chip network~\cite{streamit-asplos} and have enabled certain
 domain-specific
-optimizations~\cite{lamb:pldi:2003,agrawal:cases:2005,techreport}.
+optimizations~\cite{lamb-pldi03,agrawal-cases05,techreport}.
 Other researchers have also leveraged this representation to
 automatically generate vector permutation
 instructions~\cite{mani-permutations} and to facilitate program
@@ -601,7 +601,7 @@ they might nonetheless be informative for other researchers:
 
   The most quantitative evidence that we have to this effect is
   detailed in our paper on phased
-  scheduling~\cite{karczmarek:lctes:2003}.  The paper develops a new
+  scheduling~\cite{karczmarek-lctes03}.  The paper develops a new
   scheduling algorithm that reduces the buffer requirements needed to
   execute a synchronous dataflow graph.  The space saved on CD-DAT is
   over 14x.  However, the median savings across our entire benchmark
@@ -884,7 +884,7 @@ void->int filter SquareWave() {
 \section{Related Work}
 \label{sec:lang-related}
 
-As described in Chapter 1 and elsewhere~\cite{survey97}, there is a
+As described in Chapter 1 and elsewhere~\cite{stephens_survey_1997}, there is a
 long history of programming language support for streams in the
 dataflow, functional, and synchronous language domains.  Here we
 compare to StreamIt's more immediate contemporaries.
