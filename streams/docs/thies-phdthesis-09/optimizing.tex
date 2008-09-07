@@ -1299,12 +1299,49 @@ mechanism for shuffling data (DMA, on-chip network, etc.).  The basic
 algorithms for coarsening granularity, introducing data parallelism,
 and software pipelining are largely architecture-independent.
 
+A limitation of the linear optimizations is that they currently do not
+support linear filters that send or receive teleport messages.  This
+scenario is meaningful because messages are often sent to adjust
+filtering coefficients in linear nodes.  Supporting messages in tandem
+with linear optimizations represents an interesting reseach
+opportunity.  If messages update the state of a linear filter, than
+that state update should be propagated through any combined or
+optimized nodes.  Alternately, it may be simpler to maintain two
+versions of the filter at runtime: one which is optimized (and
+potentially combined with other filters), and one which is unoptimized
+(and stands alone).  The runtime system could speculatively execute
+the optimized node until messages demand a temporary switch to the
+unoptimized node.
+
+Our experience with linear optimizations also revealed an opportunity
+to develop an interesting and useful optimization which we term {\it
+decimiation propagation}.  Our current analysis will automatically
+propagate any decimation of the output through the linear portions of
+the stream graph, eliminating any computations that do not effect the
+final output.  However, it would be possible to generalize and extend
+this analysis to handle non-linear filters as well.  By performing a
+dependence analysis within each filter, one can trace which input
+items are decimated due to decimations on the output.  Comparable to
+an inter-procedural version of dead code elimination, this
+optimization could prune unnecessary operations far more effectively
+than traditional compilers.
+
 The cache aware scaling heuristic applies the same scaling factor to
 all parts of the stream graph.  We have been working (with Fabrice
 Rastello) on generalizing this approach to use different scaling
 factors for different sections of the stream graph.  This approach has
 the potential to strike a more flexible tradeoff between the static
 data footprint and the dynamic data footprint in the cache.
+
+Finally, a broad limitation of the current StreamIt compiler is that
+it performs all of its optimizations at compile time.  To embed
+streaming concepts in a general-purpose programming language, it will
+likely be desirable to provide API support for consructing and
+initializing the stream graph at runtime.  In this context, all of the
+optimizations described should be migrated to a Just-In-Time (JIT)
+compiler, where they can be invoked once at the start of steady-state
+execution.  As part of this change, it will be important to evaluate
+and improve the execution time of all of the compiler analyses.
 
 \section{Chapter Summary}
 
@@ -1336,17 +1373,46 @@ parameters.  We develop an optimization selection algorithm that uses
 dynamic programming to choose the most profitable transformations out
 of a large array of possibilities.  The combination of these
 techniques eliminates an average of 87\% of the FLOPs and offers an
-average speedup of 5.5x for our benchmark suite.
+average speedup of 5.5x across our benchmark suite.
 
-In performing cache optimizations, ...
+In performing cache optimizations, we derive a schedule of filter
+executions that improves the instruction and data locality.  In order
+to gain the benefits of fusing nodes together without the hazard of
+exceeding the instruction cache, a cache aware fusion algorithm fuses
+only so long as the cache limit is respected.  And to amortize the
+cost of cold misses upon loading a filter's instructions and data into
+the cache, a cache aware scaling algorithm repeatedly executes each
+filter many times -- but only so long as the resulting communication
+buffers are unlikely to exceed the cache.  The combination of these
+techniques is especially useful in the context of embedded processors;
+we achieve a 3.49x average improvement over unoptimized StreamIt on a
+StrongARM 1100 processor.
 
-What was useful in compiler?
-- peeking was useful for compiler
-- data reordering was useful for compiler
-- structure was less useful for compiler
-  - mostly just dynamic programming solution
-  - phased scheduling was easier to formulate
-  - COULD have been useful for parameterized IR
+There were many aspects of the stream programming model that enabled
+the optimizations described in this chapter.  The properties of the
+synchronous dataflow model -- that is, the separation of filters into
+independent units with atomic execution steps and known communication
+rates -- was essential for almost all of the analyses described.  In
+addition, the StreamIt consruct of peeking was uniformly useful for
+facilitating analysis of sliding window operations.
+
+Structured streams also found some applications within the compiler,
+though fewer than we had originally anticipated.  The presence of
+structure was essential for formulating the optimization selection
+algorithm for linear filters; without the regular structure, there
+would have been no prescription for finding overlapping subproblems in
+the strema graph.  We believe that structure also simplified the
+development and presentation of the linear optimizations, as they only
+have to handle a fixed number of cases rather than dealing with the
+full generality of an arbitrary stream graph.  The splitjoin construct
+also facilitated the detection of task-parallel components during the
+introduction of data parallelism.  Though we did not discuss it here,
+the single-input, single-output property of structured streams was
+integral to the development of phased
+scheduling~\cite{karczmarek:lctes:2003,karczma-thesis}.  Finally,
+though the StreamIt compiler completely unrolls the stream graph,
+structure may prove useful in facilitating a parameterized graph
+representation in future work.
 
 %% As our techniques rely on specific features of the StreamIt
 %% programming model, the results suggest that these features are a good
