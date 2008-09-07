@@ -59,7 +59,7 @@
 % do not list sub-sub sections in table of contents
 \setcounter{tocdepth}{1}
 
-% for adding chapter titles to list of figures
+% use this instead of \chapter to add chapter titles to list of figures
 \newcommand{\startchapter}[1]{\chapter{#1}\addcontentsline{lof}{figure}{\hspace{-18pt}{\bf \thechapter \hspace{9.5pt} #1}}}
 
 \pagestyle{plain}
@@ -89,7 +89,7 @@
 %\clearpage
 %\addcontentsline{toc}{chapter}{Bibliography}
 {\tenpoint
-\bibliography{references,faculty-app,messaging,zotero}
+\bibliography{references,faculty-app,messaging,zotero,statespace,linear,cache}
 \bibliographystyle{amsalpha}
 \end{document}
 }

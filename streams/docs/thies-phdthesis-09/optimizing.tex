@@ -8,8 +8,11 @@
 %%     - mani / VIRAM
 %%   - debugging / gui's
 
-\chapter{Optimizing StreamIt}
+\startchapter{Optimizing StreamIt}
 \label{chap:optimizing}
+
+* cite papers for more details
+* acknowledge top contributors
 
 We demonstrate an end-to-end stream compiler that attains robust
 multicore performance in the face of varying application
@@ -171,8 +174,8 @@ our original approach~\cite{streamit-asplos}.
 \end{minipage}
 
 \centering
-\caption[Mapping the FilterBank benchmark for multicore
-  execution]{Mapping a simplified version of the FilterBank benchmark
+\caption[Exploiting data parallelism in the FilterBank
+  benchmark]{Mapping a simplified version of the FilterBank benchmark
   for execution on four cores.  The original stream graph is shown in
   (a), while a conventional mapping is shown in (b).  Our technique
   coarsens the graph and introduces the minimal parallelism needed, as
@@ -252,7 +255,7 @@ stream programming model to make these transformations tractable.
 
 \begin{figure}[t]
 \centering
-\psfig{file=vocoder.eps,width=2.25in}
+\psfig{file=vocoder.eps,width=2in}
 \caption[Simplified subset of the Vocoder benchmark]{Simplified subset
   of the Vocoder benchmark.  Nodes are annotated with the amount of
   work that they perform per steady state.\protect\label{fig:vocoder}}
@@ -301,7 +304,6 @@ Figure~\ref{fig:vocoder}) contains a significant fraction of stateful
 filters.  While two of the filters can be data-parallelized, there
 remain large gaps in the execution schedule (see
 Figure~\ref{fig:vocoder-data}).
-% TODO: show the real benchmark?
 
 To run stateful computations in parallel with each other, we exploit
 pipeline parallelism.  We take the concept of software pipelining,
@@ -433,9 +435,605 @@ and software pipelining are largely architecture-independent.
 
 \section{Optimizing Linear Computations}
 
+The design flow for digital signal processing applications typically
+contains three steps.  First, application designers specify a block
+diagram of the computation, drawing on rich software libraries to
+prototype its behavior in an environment such as MATLAB.  Once the the
+functionality has been fixed, the second step is performed by digital
+signal processing (DSP) experts, who inspect the global structure of
+application and perform many domain-specific optimizations to reduce
+the overall processing requirements while preserving the basic
+input/output relationship.  Finally, once the mathematical algorithms
+have been determined, a software engineer implements those algorithms
+in a low-level language such as C to obtain the final product.
+
+In order to reduce the cost of this development process, a long-term
+goal of the computer science community has been to generate efficient
+and deployable code from a high-level, functional specification of the
+program.  In order to achieve this goal, the expertise of DSP experts
+must be encapsulated into the tool.  While library generators such as
+Spiral~\cite{Spiral-SI}, FFTW~\cite{FFTW-SI}, and
+ATLAS~\cite{ATLAS,ATLAS-Sparsity-SI} can automatically derive and
+optimize specific classes of DSP kernels, programmers must integrate
+these libraries into their development process rather than having the
+compiler automatically recognize and transform the original code.  Our
+goal is to invent and adapt domain-specific optimizations in the
+context of the StreamIt language, so as to provide a unified
+development environment that can express the full functionality of the
+application while automatically applying deep optimizations to the
+specific code sections where they apply.
+
+\begin{figure}[t]
+% TODO: 
+%(a) Software FM radio with Equalizer
+%(b) After linear combination
+%(c) After translation to the frequency domain
+\caption[Example optimization of linear filters]{Example optimization
+  of linear filters.  Our software FM radio benchmark contains an
+  equalizer in which all filters are linear.  These filters can be
+  algebraically simplified into a single filter and then translated
+  into the frequency domain. \protect\label{fig:equalizer}}
+\end{figure}
+
+Our focus in the current work is the optimization of {\it linear}
+computations, which are the most common target of DSP experts.  Linear
+filters are those in which each output is an affine combination of the
+inputs.  Examples include finite impulse response (FIR) filters,
+compressors, expanders and signal processing transforms such as the
+discrete Fourier transform (DFT) and discrete cosine transformation
+(DCT).  We also describe the optimization of linear statespace
+filters, a generalization of linear filters that maintain internal
+states.  In a linear statespace filter, each each output is an affine
+combination of the states and the inputs, and each state is also
+updated in an affine fashion.  An infinite impulse response (IIR)
+filter is an example of a linear statespace filter.
+
+Figure~\ref{fig:equalizer} illustrates an example of linear
+optimizations as applied to our software radio benchmark.  The radio
+contains an equalizer, which was specified by the designer in a simple
+but inefficient manner.  Each frequency band is processed in a
+separate branch of a splitjoin, and each branch contains a successive
+high-pass and low-pass filter to accomplish a band-pass functionality.
+While this representation of the algorithm allows it to be easily
+understood and maintained, it perfoms many redundant computations.  In
+practice, because all of the components of the equalizer are linear,
+they can be collapsed into a single filter that performs far fewer
+computations.  Furthermore, as that filter is performing a sliding
+window computation, it can be converted into the frequency domain to
+reduce the asymptotic processing requirements from $O(n^2)$ to $O(n
+\log n)$.  Both of these transformations require deep inter-procedural
+analysis and are far beyond the reach of traditional compilers.
+However, using a stream programming model, we can robustly automate
+both steps of the optimization process.
+
+In the rest of this section, we provide an overview of our linear
+optimization techniques.  We describe how to extract a linear
+representation from the code in a StreamIt filter, how to
+algebraically simplify adjacent linear filters, and how to translate
+linear filters into the frequency domain.  We also describe
+optimizations for linear statespace filters, including removal of
+redundant states and reduction of the number of parameters.  We give a
+procedure for determining which optimizations to apply to a given
+program, and we evaluate the optimizations in the StreamIt compiler.
+The average speedup obtained is 4.5x, with a maximum of 8.0x.
+
+\subsection*{Extracting a Linear Representation}
+
+\begin{figure}[t]
+% TODO: linear extraction from statespace talk
+\caption[Extracting a linear representation]{Extracting a linear
+  representation from the code inside a filter's work
+  function.\protect\label{fig:extraction}}
+\end{figure}
+
+Rather than directly manipulating the code inside a filter's work
+function, our linear optimizations rely on an abstract representation
+in which linear filters are represented by a set of matrices.
+Figure~\ref{fig:extraction} gives an example of this representation
+for an IIR filter.  The StreamIt compiler automatically extracts this
+representation using a symbolic execution of the filter's work
+function.  The basic idea is to execute a complete invocation of the
+function just like a normal interpreter, except that instead of
+assigning values to the states and input items, these quantities are
+left as free variables and tracked throughout the execution.  If the
+interpreter encounters any branches or conditionals that depend on
+free variables, then the analysis is aborted and the node is deemed
+non-linear.  Otherwise, when execution completes, a symbolic
+expression has been established for every state variable and every
+value pushed to the output tape.  If all of these expressions are an
+affine function of the free variables, then linear analysis has
+succeeeded and the linear representation is built.  A more precise
+description of this analysis, including support for innocuous branches
+that do not affect the linear representation, is described
+elsewhere~\cite{streamit-linear}.
+
+Of course, it would also be possible for programmers to specify the
+linear representation directly rather than relying on the compiler to
+extract it from the code.  If programmers prefer this approach, then
+they could develop a generic linear filter in StreamIt and call it as
+a library.  However, we believe that it is valuable to support
+automatic recognition of optimization targets, as otherwise the
+programmer needs to be knowledgeable of every potential optimization
+and annotate the code accordingly.
+
+\subsection*{Alebraic Simplification of Adjacent Linear Filters}
+
+\begin{figure}[t]
+% TODO: simple combination picture
+\caption{Algebraic simplification of adjacent linear filters.\protect\label{fig:combination}}
+\end{figure}
+
+\begin{figure}[t]
+% TODO: IIR + decimator with flops reducation
+\caption{Example simplification of an IIR filter and a decimator.\protect\label{fig:combination-example}}
+\end{figure}
+
+If neighboring filters in the stream graph both perform a linear
+computation, then that section of the stream graph can be collapsed
+into a single linear filter.  The most simple case of this
+transformation is illustrated in Figure~\ref{fig:combination}, where
+two stateless filters are communicating in a pipeline.  Given the
+computation matrix for each filter, the output of the entire pipeline
+can be represented as a matrix product.  Because each of the matrices
+is known at compile time, the matrix product can also be evaluated at
+compile time.  This offers the potential for large performance gains.
+For example, if both matrices are square (representing filters that
+read the same number of items as they write) and there is no peeking
+involved, then the output matrix will be the same size as each of the
+input matrices, reducing the computation by a factor of two.  Larger
+gains are possible if the communication rate between the filters is
+larger than that of the end-to-end pipeline.  Conversely, if the
+communication rate between the filters is lower than the overall
+pipeline, it is possible for this transformation to to increase the
+computation requirements; as described later, this hazard is avoided
+by our automatic selection algorithm.  In our experimental evaluation,
+combining filers wherever possible (even when detrimental) leads to a
+2.1x average performance improvement, with a maximum improvement of
+5.0x.
+% note: if peeking involved, we currently do some re-computation in
+% the linear formulation, losing some gains.  this should be re-gained
+% in the linear statespace formulation, though not evaluated
+% completely.
+
+We have extended the simple idea of algebraic simplification to handle
+the general case, hiding many complexities from the
+user~\cite{agrawal:cases:2005}.  To perform the matrix multiplication
+in Figure~\ref{fig:combination}, the output rate of the first filter
+must match the input rate of the second filter.  In cases where this
+is not true in the program, the analysis expands each linear
+representation to encompass multiple executions of the original
+filter.  In addition to collapsing pipelines, we have also developed
+complete combination rules to handle the other StreamIt language
+constructs: splitjoins and feedbackloops.  Splitjoins introduce
+complexity due to the reordering in the splitters and joiners, as well
+as implicit buffering that may be involved due to mis-matched I/O
+rates along alternate branches.  Feedbackloops introduce complexity
+because of the initial items enqueued on the backward path of the
+feedback loop; in addition, the periodicity of the entire feedbackloop
+may be coarser than the periodicity of its components, requiring
+further expansion and analysis by the compiler.  The presence of
+sliding window operations (or peeking) also adds complexity to all of
+the combination rules; in our general formulation, the peeked data
+items are converted into states in the filter.
+
+By automating the combination of linear filters, we allow the
+programmer to maintain a natural expression of the algorithm.
+Figure~\ref{fig:combination-example} illustrates an example
+combination of an IIR filter with a decimator, reducing the total
+number of operations by 25\%.  This optimization opportunity is not
+obvious to non-experts due to the state retained by the IIR filter.
+Also, even when the programmer understands that linear combination is
+possible, it may be untractable to manage of all of the details and to
+maintain the code following the transformation.  This effect is
+especially important in the context of software libraries, where the
+final application may contain filters that were authored by many
+different developers.  The compiler can perform this analysis across
+module boundaries, synthesizing an efficient implementation while
+preserving a modular development style.
+
+\subsection*{Optimization of a Single Linear Filter}
+
+In addition to optimizing groups of linear filters, it is possible to
+improve the execution of a single linear filter at a time.  Stateless
+filters can be mapped into the frequency domain, while stateful
+filters are subject to state removal and parameter reduction.  These
+transformations are generally applied after algebraic simplification.
+
+\begin{figure}[t]
+% todo: mapping to frequency
+\caption{Mapping linear filters into the frequency domain.\protect\label{fig:freq}}
+\end{figure}
+
+\paragraph*{Mapping into the Frequency Domain}  Filters that perform a 
+sliding window computation, such as FIR filters, are equivalent to a
+convolution of the filter coefficients with the input tape.  This
+means that they are amenable to a classic transformation in single
+processing, whereby the computation is mapped from the time domain
+into the frequency domain.  As illustrated in Figure~\ref{fig:freq},
+this consists of wrapping the filter in an FFT and inverse FFT, and
+changing the convolution into a vector-vector multiply.
+Asymptotically, this reduces the computation requirements from
+$O(n^2)$ to $O(n \log n)$, where $n$ is the size of FFT (which can be
+set by the compiler).  In our experiments, translating each filter
+into the frequency domain (even when detrimental) leads to an average
+speedup of 3.8x and a maximum speedup of 8.0x.
+% note: the 3.8x speedup is either with or without doing linear
+% combination first (they both round to 3.8x)
+
+While this transformation is well-understood and can also be done by
+hand, there are benefits to automating it in the compiler.  The size
+of the FFT can be automatically selected and complex startup
+conditions can be handled automatically.  Also, there are cases where
+it is not profitable to translate to the frequency domain (for
+example, if the peek window is too small, or if the filter decimates
+items in addition to peeking), or where conversion is profitable only
+following linear combination.  By coupling the translation algorithm
+with our optimization selection algorithm (described later), the
+programmer does not need to worry about when to apply the
+transformation.
+
+\paragraph*{Removing States}  Linear statespace filters maintain and
+update a set of internal states on each time step.  However,
+especially following combination with adjacent nodes, it is possible
+that some of these states could be redundant; that is, their values
+could be fully derived from other states in the filter.  It is
+beneficial to remove any redundant states, both for memory savings and
+to eliminate redundant computations that update the states.
+
+We have adapted a simple algorithm that guarantees to identify and
+remove all of the redundant states in a filter~\cite{Mayne}.  While
+this algorithm was previously known by the signal processing
+community, to our knowledge this is its first application in an
+optimizing compiler.  The algorithm works by constructing augmented
+matrices from the filter's representation
+(Figure~\ref{fig:extraction}), and by reducing these matrices to a
+special row-echelon form.
+
+\begin{figure}[t]
+% TODO: figure of state removal and parameter reduction from CASES
+\caption{Example of state removal and parameter reduction.\protect\label{fig:states}}
+\end{figure}
+
+An example of state removal appears in Figure~\ref{fig:states}.  The
+analysis detects that the two states {\tt x1} and {\tt x2} were always
+scaled proportionately, so they can be combined into a single state
+{\tt x}.  This reduced the computational requirements of the filter
+from 9 FLOPs per execution to 5 FLOPs per execution.x
+
+\paragraph*{Reducing the Number of Parameters}  After removing as 
+many states as possible, additional computations can be eliminated by
+transforming the filter's linear representation into one with fewer
+non-zero, non-one entries (termed parameters).  Each coefficient that
+is converted to a zero serves to eliminate a multiplication and
+addition operation per execution of the filter, while each coefficient
+that is converted to a one serves to eliminate a multiplication.  
+
+We automated parameter reduction by starting with a known signal
+processing technique~\cite{Ackermann/Bucy} and reformulating it in the
+context of StreamIt.  As with the state removal algorithm, the number
+of parameters in a linear statespace filter can be reduced using a
+systematic sequence of matrix operations.  However, compared to state
+removal, there are looser guarantees on the optimality of the final
+system~\cite{agrawal:cases:2005}.
+
+An example of parameter reduction is illustrated in
+Figure~\ref{fig:states}.  Following the transformation, the state
+variable $x$ assumes a value that is twice as large as the original
+(at any given point of execution).  However, this change does not
+affect the output of the filter, as the other coefficients are
+compensated accordingly.  The transformation enables two coefficients
+two change to a value of 1, thereby eliminating two multiplication
+operations and reducing the total cost to 4 FLOPs per execution.
+
+\subsection*{Optimization Selection}
+
+As mentioned previously, many of the described transformations have
+the potential to decrease the performance of the program.  Linear
+combination can bloat the processing requirements depending on the
+communication rates of the filters, and translation to the frequency
+domain can introduce overhead for filters with high pop rates or low
+peek rates.  Instead of applying the transformations blindly, they
+should be guided by a selection algorithm that matches the behavior of
+DSP experts.
+
+We have developed a general and robust optimization selection
+algorithm that considers a large space of candidate transformations.
+To prevent an exponential explosion of candidate transformations on
+different parts of the stream graph, the algorithm leverages
+overlapping sub-problems and uses dynamic programming to arrive at an
+efficient solution.
+
+The algorithm works by estimating the minimum cost for each structure
+(filter, pipeline, splitjoin, and feedbackloop) in the stream
+graph. The minimum cost represents the best of three configurations:
+1) collapsed and implemented in the time domain, 2) collapsed and
+implemented in the frequency domain, and 3) uncollapsed and
+implemented as a hierarchical unit.  (This algorithm does not consider
+state removal and parameter reduction, which were invented
+subsequently.)  The cost functions for the collapsed cases are guided
+by profiler feedback, performed once during the development of the
+compiler.  For the uncollapsed case, the cost is the sum of each
+child's minimum cost.
+
+A key aspect of the algorithm is that it considers many possible
+boundaries for the structures in the stream graph.  For example, while
+the programmer might have constructed the graph as a specific
+hierarchy of pipelines, the compiler flattens the hierarchy into a
+single pipeline and then considers linear optimizations for each
+contiguous region within that pipeline.  A similar decomposition
+applies to splitjoins, where any number of adjacent branches and any
+contiguous sequence of streams in those branches is considered for
+transformation.  In this sense, the algorithm determines not only the
+best transformations to apply, but also the best way to refactor the
+stream graph into a form that is amenable to optimization.
+
+%% A programmer may write a splitjoin in an arbitrary hierarchy; the
+%% compiler flattens the hierarchy and then considers linear
+%% optimizations for each {\it rectangular} subset of the resulting
+%% splitjoin.  The width of the rectangle represents the number of
+%% splitjoin branches considered for a linear optimization, and the
+%% height of the rectangle represents the number of streams considered
+%% on each branch.  The position of the rectangle is also varied
+%% across the full extent of the splitjoin.  Considering rectangular
+%% regions allows the formulation of a dynamic programming solution,
+%% as there are $O(n^4)$ rectangular subsets of a splitjoin with $n$
+%% branches and $n$ streams on each branch.
+
+\begin{figure}[t]
+% todo: optimization selection algorithm
+\caption{Optimization selection for the Radar benchmark.\protect\label{fig:radar}}
+\end{figure}
+
+An example of optimization selection for the Radar benchmark is shown
+in Figure~\ref{fig:radar}.  Radar~\footnote{This version of the Radar
+benchmark is different from the one used in the parallelization
+section.  It is rewritten to be extremely coarse-grained, eliminating
+the internal state and exposing the linear relationships.} contains
+many linear filters.  However, performing maximal linear combination
+results in a 3.2x slowdown, and translating to the frequency domain
+worsens performance by an additional 12x.  The problem with linear
+combination is due to a vector-vector multiply filter named
+``Beamform'' at the top of a pipeline construct.  The Beamform filter
+pushes 2 items, but pops and peeks 24; thus, when the replacement
+algorithms combine it with a downstream FIR filter, much of its work
+is duplicated.  Moreover, the frequency replacement option suffers
+from the large pop rates in the application (as high as 128 for some
+filters).  The optimization selection algorithm avoids combining
+BeamForm with its successor, and avoids the costly frequency
+translation.  Applying only selective transformations causes 55\% of
+the FLOPs to be eliminated.  However, the final speedup is only 5\%,
+mostly due to unrelated data and code size issues that could be
+addressed independently (each filter is very coarse-grained).
+% cite source of Radar?
+
+\subsection*{Experimental Evaluation}
+
+%% We have assembled the following set of representative streaming
+%% components and have rewritten them in StreamIt: 1) {\bf FIR}, a
+%% single 256 point low pass FIR filter; 2) {\bf RateConvert}, an
+%% audio down sampler that converts the sampling rate by a
+%% non-integral factor ($\frac{2}{3}$); 3) {\bf TargetDetect}, four
+%% matched filters in parallel with threshold target detection; 4)
+%% {\bf FMRadio}, an FM software radio with equalizer; 5) {\bf Radar},
+%% the core functionality in modern radar signal processors, based on
+%% a system from the Polymorphic Computing Architecture~\cite{pca}; 6)
+%% {\bf FilterBank}, a multi-rate signal decomposition processing
+%% block common in communications and image processing; 7) {\bf
+%% Vocoder}, a channel voice coder, commonly used for speech analysis
+%% and compression; 8) {\bf Oversampler}, a $16x$ oversampler, a
+%% function found in many CD players, 9) {\bf DToA}, an audio
+%% post-processing stage prior to a 1-bit D/A converter with an
+%% oversampler and a first order noise shaper.
+
+We have implemented linear optimizations in the StreamIt compiler.
+Here we present results for stateless linear nodes, though we have
+also shown that linear statespace analysis offers improved
+generality~\cite{agrawal:cases:2005}.  For more detailed results,
+stream graphs, and source code, please visit {\tt
+http://cag.lcs.mit.edu/linear/} or see the accompanying
+thesis~\cite{lamb-thesis}.
+
+We evaluate linear optimizations on a uniprocessor.  Our measurement
+platform is a Dual Intel P4 Xeon system with 2GB of memory running
+GNU/Linux.  To measure the number of floating point operations, we use
+an instruction counting DynamoRIO~\cite{dynamo99} client.
+
+\begin{figure}[t]
+\psfig{figure=linear-flops.eps,width=\textwidth}
+\caption{Elimination of floating point operations by maximal linear 
+replacement, maximal frequency replacement, and automatic optimization
+selection.}
+\label{fig:flops}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\psfig{figure=linear-speedup.eps,width=\textwidth}
+%\vspace{-16pt}
+\caption{Execution speedup for maximal linear replacement, maximal frequency 
+replacement, and automatic optimization selection.}
+\label{fig:execution-speedup}
+\end{figure}
+
+Figure~\ref{fig:flops} indicates the number of floating point
+operations (FLOPs) removed from the program.  The removal of FLOPs
+represents fundamental computation savings that is independent of the
+streaming runtime system and other (FLOPs-preserving) optimizations in
+the compiler.  We evaluate three strategies: maximal combination of
+linear nodes, maximal translation to the frequency domain, and
+automatic optimization selection.  The automatic selection routing
+removes an average of 87\% of the FLOPs from our benchmarks, with a
+maximum of 96\% (Vocoder).  The automatic selection option eliminates
+more FLOPS than either of the other options for TargetDetect, FMRadio,
+Radar, and Vocoder.  Automatic selection always performs at least as
+well as the other two options.
+
+Execution speedups are shown in Figure~\ref{fig:execution-speedup}.
+With automatic selection, our benchmarks speed up an average factor of
+5.5x and by a factor of 8.0x in the best case (FilterBank).  While the
+graph suggests that frequency replacement almost always performs
+better than linear replacement, this is not strictly the case; in
+FMRadio, Radar, and Vocoder, the automatic selection algorithm obtains
+its speedup by using linear replacement instead of frequency
+replacement for part of the stream graph.  However, linear replacement
+does reduce performance for FIR, TargetDetect, and DToA despite
+reducing the number of FLOPS.  We believe that this is due to
+inefficiencies in our implementation of the matrix multiplication
+routine, as well as auxiliary effects on the runtime overhead in the
+StreamIt library.
+
+While these results represent radical improvements relative to most
+compiler optimizations, we emphasize that the same transformations
+would likely be done by hand in a production system.  Our contribution
+is to enable a modular programming environment by automatically
+performing the transformations from a high-level description.
+
 \section{Cache Optimizations}
 
+An important part of achieving high performance is to maximize the
+utilization of the cache.  This is especially important on embedded
+processors, which often lack an L2 cache.  In tandem with this need
+for high cache utilization, there is also a unique opportunity in the
+streaming domain to reorder filter executions so as to improve the
+cache behavior.  Memory accesses are extremely regular due to the
+explicit producer-consumer relationships between filters, allowing the
+compiler to anticipate and optimize the cache usage.
+
+\begin{figure}[t]
+% todo: overview graph for caching
+\caption{Overview of cache optimizations.\protect\label{fig:cacheopt}}
+\end{figure}
+
+We have developed a set of cache optimizations that simultaneously
+consider data and instruction locality while scheduling stream
+programs.  An overview of our optimizations are illustrated in
+Figure~\ref{fig:cacheopt}.  In scheduling a pipeline of filters, the
+executions can be interleaved in any order so long as data is produced
+before it is consumed.  In the baseline configuration, there is a
+fine-grained interleaving of filters; each filter fires once per
+execution of the outer loop.  While this results in a very small data
+working set (data is consumed immediately following its production),
+the instruction working set is large because all filters are accessed
+frequently.  The opposite of this scheduling strategy, termed ``full
+scaling'', wraps each filter in its own loop, buffering all of the
+data before the next filter executes.  While this shrinks the
+instruction working set size (since only one actor is accessed at a
+time), the data working set could grow very large due to the buffering
+between actors.
+
+Our optimized scheduling strategy, illustrated on the right of
+Figure~\ref{fig:cacheopt}, can be considered as a tradeoff between
+these two extremes.  First, we employ a heuristic called {\it cache
+aware fusion} that fuses exections of the inner loop as much as
+possible without overflowing the instruction cache.  In this case,
+filters A and B can be fused, but filter C remains separate.  Then, we
+employ a technique called {\it cache aware scaling} that sets the
+inner loop bounds as high as possible without overflowing the data
+cache.  In this case, a bound of 64 ensures that the communication
+between B and C stays within the cache.  This technique offers joint
+improvement of instruction and data locality without risking the
+penalty of cache overflow.
+
+In the rest of this section, we provide more details on cache aware
+fusion, cache aware scaling, and present an experimental evaluation.
+Our full report on this subject contains further details, including
+optimized buffer management
+strategies~\cite{sermulins:lctes:2005,sermulins-thesis}.
+
+\subsection*{Cache Aware Fusion}
+
+As mentioned previously, filter fusion is a transformation in which
+two filters are tightly scheduled and inlined into the same filter.
+Fusion offers many benefits, including reduced method call overhead
+and improved producer-consumer locality.  It also allows traditional
+compiler optimizations to span across filter boundaries; in
+particular, results that were previously buffered in memory can now be
+allocated to registers in an optimization known as scalar replacement.
+For our benchmark suite, fusing all of the filters in the program
+improves performance by an average of 1.3x on an embedded processor.
+% and over 2.1x on a desktop machine.
+
+However, the hazard of excessive fusion is that the combined
+instruction and data footprint of the filters will overflow the
+caches, thereby hampering performance.  The scalar replacement
+optimization also benefits from aggressive loop unrolling, which
+causes code bloat and increases the risk of cache overflow.  To
+address this hazard, our cache aware fusion algorithm greedily fuses
+neighboring filters so long as the instruction and data working sets
+fit within the respective caches.  In addition, a fraction of the data
+cache is reserved for input and output items.  Compared to a full
+fusion strategy, cache aware fusion improves performance by an
+additional 1.4x on an embedded processor.
+%though gains are negligible on desktop machines (which contain large
+%L2 caches).
+
+\subsection*{Cache Aware Scaling}
+
+\begin{figure}[t]
+% todo: scaling figure
+\caption{Effect of execution scaling on performance.\protect\label{fig:scaling}}
+\end{figure}
+
+It is advantageous to execute a filter multiple times at once, because
+the first execution will incur cache misses that can be amortized over
+subsequent executions.  We user the term {\it scaling} to refer to the
+process of increasing a filter's execution multiplicity.  While
+scaling can improve performance by amortizing cold misses of the
+filter's instructions and state, excessive scaling will worsen
+performance because the filter's input and output buffers will
+eventually overflow the cache.  This effect is illustrated empirically
+in Figure~\ref{fig:scaling}.  To achieve the highest performance, the
+compiler needs to select an intermediate scaling factor that
+represents a tradeoff between the filter's static footprint
+(instructions and local data) and its dynamic footprint (input and
+output items).
+
+We have developed a cache-aware scaling heuristic that is effective in
+addressing this problem.  The heuristic scales the execution of every
+filter in the graph by the same amount.  The scaling factor is set as
+high as possible so long as 90\% of the filters can fit both their
+static and dynamic footprints in the cache.  This means that 10\% of
+the filters may overflow the cache with their dynamic data, but these
+overflows are compensated by improved reuse of static data in other
+filters.  In the case of FFT (characterized in
+Figure~\ref{fig:scaling}, the heuristic arrives at a scaling factor of
+5, which yiels performance that is within 5\% of the optimum.  For our
+benchmark suite, cache aware scaling gives a further improvement of
+1.9x over cache aware fusion alone.
+
+\subsection*{Experimental Evaluation}
+
+We implemented chace aware fusion and cache aware scaling in the
+StreamIt compiler, and evaluate its performance on three different
+architectures: a 137~MHz StrongARM~1110, a 600~MHz Pentium~3 and a
+1.3~GHz Itanium~2. The StrongARM results reflect performance for an
+embedded target; it has a 16~Kb L1 instruction cache, an 8~Kb L1 data
+cache, and no L2 cache.  The StrongARM also has a separate 512-byte
+minicache (not targeted by our optimizations).  The Pentium~3 and
+Itanium~2 reflect desktop performance; they have a 16~Kb L1
+instruction cache, 16~Kb L1 data cache, and 256~Kb shared L2 cache.
+
+In addition to cache optimizations, we enable aggressive loop
+unrolling (by a factor of 128) to facilitate scalar replacement.  The
+StreamIt compiler outputs a functionally equivalent C program that is
+compiled with \texttt{gcc} (v3.4, -O3) for the StrongARM and for the
+Pentium~3 and with \texttt{ecc} (v7.0, -O3) for the Itanium~2.
+
+\begin{figure}[t]
+\centering
+\psfig{figure=arm1.eps,width=\textwidth}
+\caption{Performance of cache optimizations on the StrongARM processor.\protect\label{fig:arm}}
+\end{figure}
+
+The performance of our techniques on the StrongARM processor is
+illustrated in Figure~\ref{fig:arm}.
+
+- results show cumulative graph on strongarm show summary graph on
+ - different architectures
+
 \section{Related Work}
+
+% parallelism
 
 Liao et al. map Brook to multicore processors by leveraging the affine
 partitioning model~\cite{liao06brook}.  While affine partitioning is a
@@ -472,9 +1070,220 @@ of task, data, and pipeline parallelism.  Furthermore, these systems
 do not provide a robust end-to-end path for application
 parallelization from a high-level, portable programming language.
 
+% linear
+
+Several groups are researching strategies for efficient code
+generation for DSP applications.  SPIRAL is a system that generates
+libraries for signal processing
+algorithms\cite{spiral,johnson01searching,egner01automatic}.  Using a
+feedback-directed search process, DSP transforms are optimized for the
+underlying architecture.  The input language to SPIRAL is
+SPL\cite{xiong01spl,xiong-thesis}, which provides a parameterizable
+way of expressing matrix computations.  Given a matrix representation
+in SPL, SPIRAL generates formulas that correspond to different
+factorizations of the matrix.  It searches for the most efficient
+formula using several techniques, including dynamic programming and
+stochastic evolutionary search.
+
+We consider our work to be complementary to SPIRAL.  While SPIRAL
+starts with a matrix representation in SPL, we start with general
+StreamIt code and use linear dataflow analysis to extract a matrix
+representation where possible.  Our linear combination rules are
+distinct from the factorizations of SPIRAL, as StreamIt nodes can peek
+at items that they do not consume.  In the future, SPIRAL could be
+integrated with StreamIt to optimize a matrix factorization for a
+given architecture.
+
+The ATLAS project \cite{whaley01automated} also aims to produce fast
+libraries for linear algebra manipulations, focusing on adaptive
+library generation for varying architectures.  FFTW~\cite{frigo99fast}
+is a runtime library of highly optimized FFT's that dynamically adapt
+to architectural variations.  StreamIt is again complementary to these
+packages: it allows programmers to interface with them using general
+user-level code.
+
+ADE (A Design Environment) is a system for specifying, analyzing, and
+manipulating DSP algorithms~\cite{covell-ade}.  ADE includes a
+rule-based system that can search for improved arrangements of stream
+algorithms using extensible transformation rules.  However, the system
+uses predefined signal processing blocks that are specified in
+mathematical terms, rather than the user-specified imperative code
+that appears in a StreamIt filter.  Moreover, ADE is intended for
+algorithm exploration, while StreamIt includes support for code
+generation and whole-program development.  In addition to ADE, other
+work on DSP algorithm development is surveyed
+in~\cite{oppenheim-symbolic}.
+
+Karr~\cite{karr76} and Cousot and Halbwachs~\cite{cousot78} describe
+general methods for detecting linear relationships among program
+variables.  Karr maintains an affine representation (similar to ours)
+for each program variable, while Cousot and Halbwachs use a polyhedral
+model in which each dimension corresponds to a program variable.  For
+general programs, the analyses described by these authors is more
+general than ours.  In fact, the novelty of our linear dataflow
+analysis is in its specialization for the streaming domain.  Rather
+than tracking general relationships, we only track relationships to
+items on the input tape.  This restriction---in combination with the
+atomic, fine-grained nature of filter work functions---makes it
+feasible to symbolically execute all loops, thereby obtaining more
+precise linearity information.
+
+Also note that the ``linear data flow analysis'' of Ryan~\cite{ryan92}
+is completely unrelated to our work; it aims to do program analysis in
+linear time.
+
+% statespace
+
+This paper builds directly on the work done to analyze and optimize
+linear components in StreamIt graphs \cite{Lamb}. We extend the
+theoretical framework for linear analysis to state space analysis in
+order to apply our optimizations to a wider class of applications.
+Specifically, state space analysis applies to filters with persistent
+state, and feedback loops can be combined into a single state space
+representation; neither of these cases is handled by linear analysis.
+The extension from linear analysis to state space analysis required a
+fundamental change to the underlying representation, as well as a
+complete reformulation of the rules for combination and expansion.
+Moreover, this paper introduces novel optimizations of state removal
+and parameter reduction, both of which operate on the state space
+representation.
+
+Potkonjak and Rabaey describe optimized hardware synthesis for linear
+and ``feedback linear'' computations~\cite{Potkonjak00}.  Linear state
+space systems correspond to ``constant feedback linear computations''
+in the authors' terminology.  For linear and linear feedback systems,
+their technique offers 1) a maximally fast implementation under
+latency constraints, 2) an arbitrarily fast implementation, and 3) an
+implementation reducing the number of arithmetic operations.  In
+reducing arithmetic operations, they perform common subexpression
+elimination (CSE) in a manner that resembles our state removal
+optimization.
+
+However, the benefits of state removal cannot be achieved by CSE alone
+(or by the Potkonjak and Rabaey algorithm).  For example, in
+Figure~\ref{fig:opt-seq}, state removal replaces references to
+$\mt{x1} + \mt{x2}$ by a single variable $x$.  While CSE can also
+perform this substitution, it cannot independently maintain the value
+of $x$ across iterations of the filter.  That is, state removal
+replaces the assignments to $\mt{x1}$, $\mt{x2}$,
+$\mt{x1}\_{\mt{temp}}$, and $\mt{x2}\_{\mt{temp}}$ with a single
+assignment to $x$.  This transformation decreases the number of
+arithmetic operations due to algebraic simplification in the update of
+$x$.  Further, state removal completely removes the variables
+$\mt{x1}$, $\mt{x2}$, $\mt{x1}\_{\mt{temp}}$, and
+$\mt{x2}\_{\mt{temp}}$ from the program.  We are unaware of any
+sequence of traditional compiler optimizations that achieves the same
+effect as state removal (and likewise for parameter reduction).
+
+Several other groups have developed automated frameworks for
+optimizing linear signal processing kernels.  The SPIRAL
+project~\cite{Spiral-SI} uses a formal mathematical language to
+describe linear DSP operations.  Using search and machine learning
+techniques, SPIRAL evaluates alternate versions of a formula on a
+given platform and optimized code is generated.  The FFTW
+system~\cite{FFTW-SI} generates platform-optimized FFT libraries using
+a dynamic programming algorithm and profile feedback to match the
+recursive FFT formulation to a given memory hierarchy.
+ATLAS~\cite{ATLAS,ATLAS-Sparsity-SI} produces platform-specific linear
+algebra routines by searching over blocking strategies and other
+parameters; Sparsity~\cite{ATLAS-Sparsity-SI,Sparsity} applies a
+similar approach to sparse matrices.
+
+While these approaches offer a rich set of optimizations, they are
+limited to linear systems.  The transformations described in this
+paper apply not only to linear systems, but also to linear systems
+with state.  In particular, the state removal and parameter reduction
+optimizations apply specifically to linear state space systems.  In
+addition, our focus is on the application of linear state space
+optimizations in the context of a general-purpose stream language,
+optimizing across application components rather than within a single
+library function.
+
+A variety of tools have been developed for specifying and deriving DSP
+algorithms~\cite{oppenheim-symbolic}.  The SMART project aims to
+develop an algebraic theory of signal processing, providing a unified
+framework for deriving, explaining, and classifying fast transform
+algorithms~\cite{SMART03}.  ADE (A Design Environment) provides a
+predefined set of composable signal transforms, as well as a
+rule-based system that searches for improved algorithms using
+extensible rewriting rules~\cite{covell-ade}.  Janssen et al.
+automatically derive low-cost hardware implementations of signal flow
+graphs using algebraic transformations and hill-climbing
+search~\cite{Janssen94}.  Our work shares the vision of automatically
+deriving optimized algorithms from a high-level description, though we
+start from a general-purpose, imperative stream language rather than a
+mathematical formalism.
+
+% cache
+
+There is a large body of literature on scheduling synchronous dataflow
+(SDF) graphs to optimize various
+metrics~\cite{bhattacharyya99synthesis,leesdf}.  The work most closely
+related to ours is a recent study by Kohli~\cite{kohli04} on cache
+aware scheduling of SDF graphs, implemented as part of the Ptolemy
+framework for simulating heterogeneous embedded
+systems~\cite{ptolemy03overview}.  Kohli develops a Cache Aware
+Scheduling (CAS) heuristic for an embedded target with a
+software-managed scratchpad instruction cache.  His algorithm greedily
+decides how many times to execute a given actor based on estimates of
+the data cache and instruction cache penalties associated with
+switching to the next actor.  In contrast, our algorithm considers the
+buffering requirements of all filters in a given container and
+increases the multiplicity so long as 90\% of buffers are contained
+within the data cache.  
+%Kohli does not consider buffer management
+%strategies, and 
+The evaluation is limited to one 6-filter pipeline and an assortment
+of random SDF graphs.  An empirical comparison of our heuristics on a
+common architectural target would be an interesting direction for
+future work.
+
+It is recognized that there is a tradeoff between code size and buffer
+size when determining an SDF schedule.  Most techniques to date have
+focused on ``single appearance schedules'' in which each filter
+appears at only one position in the loop nest denoting the schedule.
+Such schedules guarantee minimal code size and facilitate the inlining
+of filters.  There are a number of approaches to minimizing the buffer
+requirements for single-appearance schedules (see
+\cite{bhattacharyya99synthesis} for a review).  While it has been
+shown that obtaining the minimal memory requirements for general
+graphs is NP-complete~\cite{Bhatta97}, there are two complimentary
+heuristics, APGAN (Pairwise Grouping of Adjacent Nodes) and RPMC
+(Recursive Partitioning by Minimum Cuts), that have been shown to be
+effective when applied together~\cite{Bhatta97}.  Buffer
+merging\cite{murt1999x3,murt2000x2} represents another technique for
+decreasing buffer sizes, which could be integrated with our approach
+in the future.
+
+Govindarajan et al. develop a linear programming framework for
+determining the ``rate-optimal schedule'' with the minimal memory
+requirement~\cite{GGD94}.  A rate-optimal schedule is one that takes
+advantage of parallel resources to execute the graph with the maximal
+throughput.  However, the technique is specific to rate-optimal
+schedules and can result in a code size explosion, as the same node
+is potentially executed in many different contexts.
+
+The work described above is related to ours in that minimizing buffer
+requirements can also improve caching behavior.  However, our goal is
+different in that we aim to improve spatial and temporal locality
+instead of simply decreasing the size of the live data set.  In fact,
+our scaling transformation actually {\it increases} the size of the
+data buffers, leading to higher performance across our benchmark
+suite.  Our transformations also take into account the size of the
+instruction and data caches to select an appropriate scaling and
+partitioning for the stream graph.
+
+Proebsting and Watterson \cite{pro96} give a fusion algorithm that
+interleaves the control flow graphs of adjacent filters.  However,
+their algorithm only supports synchronous {\tt get} and {\tt put}
+operations; StreamIt's {\tt peek} operation necessitates buffer
+management between filters.
+
 \section{Future Work}
 
 \section{Chapter Summary}
+
+% asplos
 
 As multicore architectures become ubiquitous, it will be critical to
 develop a high-level programming model that can automatically exploit
@@ -519,6 +1328,10 @@ central to the formulation of software pipelining; it also enables
 data parallelism, as the products of filter fission may span multiple
 steady-state iterations.
 \end{enumerate}
+
+% what did linear rely on from streamit?
+- separation of states and inputs
+- quick exection step suitable to symbolic execution
 
 %% - lessons learned
 %%   - fine-grained communication on Raw not worth it
