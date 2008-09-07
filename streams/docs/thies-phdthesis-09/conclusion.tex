@@ -1,19 +1,98 @@
 \startchapter{Conclusions}
 \label{chap:conclusions}
 
-%% Future Work
-%% -----------
-%% - zeroing out arrays is expensive, should optimize away (move to lessons learned?)
+My thesis is that non-expert programmers can accelerate certain
+classes of applications by an order of magnitude by adopting a stream
+programming model.  This dissertation supports this thesis with the
+following contributions:
+
+\begin{enumerate}
+
+\item We define the StreamIt language, one of the first programming 
+languages to embrace synchronous dataflow as a model of computation.
+StreamIt contains novel language constructs, including structued
+streams, peeking filters, parameterized data reordering, and teleport
+messaging, that improve both the programmability and the analyzability
+of stream programs.  By providing a modular and composable syntax, the
+language becomes accesible to non-expert programmers.  Simultaneously,
+the language preserves the rich static properties of the streaming
+domain, exposing them to the compiler for the sake of optimization.
+
+\item We demonstrate that it is tractable to develop large-scale 
+applications in a stream programming model.  Our experience comes on
+two fronts.  First, we describe the development of the 60,000-line
+StreamIt benchmark suite, consisting of large applications (such as
+MPEG-2 encoding/decoding and GMTI radar processing) that were written
+by programmers who were previously unfamiliar with StreamIt.  Second,
+we develop a tool for migrating legacy C programs into a streaming
+representation.  It is the first tool to use a dynamic analysis to
+expose coarse-grained parallelism in C programs.  We show that this
+tool is effective at extracting a synchronous dataflow graph from
+large C applications, spanning MPEG-2, GMTI, MP3, and others.
+
+\item We develop a new optimization for the streaming domain, allowing 
+programmers to accelerate common video editing operations by a median
+of 15x and a maximum of 471x.  This transformation maps stream
+programs into the compressed domain, allowing them to operate directly
+on compressed data formats rather than requiring a costly
+decompression and re-compression on either side of processing.  Our
+technique is the first to support compressed-domain processing of
+LZ77-compressed data.  We apply our technique to accelerate
+transformations such as color adjustment and video compositing on the
+Apple Animation format.  Performance gains are proportional to the
+compression factor.
+
+\item We review the key optimization results in the StreamIt project, 
+enabling programmers to obtain large speedups on many tasks.
+Targeting a 16-core architecture, our compiler leverages a novel
+combination of task, data, and pipeline parallelism to obtain a robust
+speedup of over 11x (relative to a single core).  In optimizing linear
+computations, our compiler mirrors the behavior of a DSP expert,
+automatically combining linear nodes, translating them to the
+frequency domain, and selecting the most profitable series of
+transformations.  Linear optimizations yield an average performance
+improvement of 5.5x, and a maximum improvement of 8.0x.  Finally, we
+offer a set of cache optimizations that adjusts the schedule of filter
+executions so as to improve the data and instruction locality.  It
+offers an average benefit of 3.5x when targeting an embedded
+processor.
+
+\end{enumerate}
+
+Several of the transformations that are automated in the StreamIt
+compiler are already accessible to expert programmers.  For example,
+the optimization of linear nodes is a standard part of the DSP design
+flow.  Cache optimizations similar to ours are routinely perfomed
+during the manual tuning of an embedded system.  Streaming
+applications can be parallelized in other languages with significant
+help from the programmer.  However, the key benefit of StreamIt is
+that all of these transformations become accessible to non-experts.
+Using a stream programming model, the compiler can leverage new
+information to automate transformations that were previously reserved
+for technology wizards.
+
+What is the future of stream programming?  Well, the goal of academic
+programming language research is frequently misunderstood.  While it
+would not be objectionable to have a language like StreamIt take over
+the world, this goal is rarely realistic or sustainable.  Rather, the
+primary goal of our research is to influence the direction of future
+languages.  There is broad precedent for such influence; for example,
+Bjarne Stroustrup traces the detailed evolution of the C++ language,
+tracing the impact of many previous languages on its structure and
+feature set~\cite{stroustrup_design_1994}.  While many of these
+languages are also well known (Fortran, C, Ada, Simula), there are
+also important influences from lesser-known languages, many of which
+are of academic origin (CPL, BCPL, ML, Clu).  Given the trend towards
+multicore processors, and the increasing prevalence of streaming
+applications, we anticipate the emergence of languages and libraries
+with integrated support for efficient stream processing.  It is our
+hope that the abstractions, optimizations, and lessons learned as part
+of this dissertation will serve to inform and inspire this upcoming
+generation of programmable systems.
+
+%% don't mention:
+%% - zeroing out arrays is expensive, should optimize away (move to
+%%   lessons learned?)
 %% - buffer reuse
-%% - interesting messaging optimization:
-%%   - speculatively fuse or linearly-collapse sections that have messages
-%%   - if message observed, rollback and deliver on slow path afterwards
-%% - decimation propagation
+%% - fusion strategies (contradicts other lctes research?)
 
-%% Conclusions
-%% -----------
-%% - show evolution of c++ graph?
-
-%% Where to fit in?
-%% ----------------
-%% - different fusion strategies?  (contradicts other research)

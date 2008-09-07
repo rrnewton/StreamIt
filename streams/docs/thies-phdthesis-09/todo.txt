@@ -1,6 +1,3 @@
-- abstract
-- conclusions
-
 Borderline:
 * do benchmark characteristics (and add stream graphs for all benchmarks?)
 
@@ -8,6 +5,9 @@ After defense:
 * note that SDEP assumes no initialization schedule (thu no prework, no peeking)
 * possibly revise writeup of constrained scheduling
 * check that messaging speedup makes any sense?
++ big thing missing: some review of the basic compiler?  stages, flow, etc.
++ add section on embedding streamit in a general purpose language? mention java lib 
++ touch on uniprocessor performance relative to C
 - look for bogus vspace and remove it (e.g., next to figures)
 - make pullSchedule font same as repeat_lengths font, etc.
 - mention StreaMIT pronunciation?

@@ -1,16 +1,42 @@
-%% We characterize high-performance streaming applications as a new and
-%% distinct domain of programs that is becoming increasingly prevalent.
-%% The StreamIt language provides novel high-level representations to
-%% improve programmer productivity and program robustness within the
-%% streaming domain.  At the same time, the StreamIt compiler aims to
-%% improve the performance of streaming applications via stream-specific
-%% analyses and optimizations.
+This dissertation defines the domain of stream programs, develops a
+new programming language to support that domain, and formulates new
+optimizations that enable non-expert progammers to obtain
+order-of-magnitude speedups.
 
-%% In the context of StreamIt, this thesis will demonstrate the benefits
-%% of providing language and compiler support specifically for stream
-%% programming.  We will discuss the design rationale for StreamIt,
-%% including our experience in leveraging StreamIt's properties for novel
-%% optimizations.  We will also present two novel analyses for stream
-%% programs: one that translates programs to operate directly on
-%% compressed data streams, and one that extracts a streaming
-%% representation from an ordinary C program.
+Stream programs represent long-running and repetitive computations.
+They appear most commonly in the context of audio, video, and digital
+signal processing, though also in networking, encryption, and other
+areas.  Because they are organized around sequences of data, stream
+programs can be naturally represented as a graph of independent actors
+that communicate explicitly over data channels.  In this work we focus
+on programs where the input and output rates of actors are known at
+compile time, enabling aggressive transformations by the compiler;
+this model is known as synchronous dataflow.
+
+We develop a new programming language, StreamIt, that empowers both
+programmers and compiler writers to leverage the unique properties of
+the streaming domain.  StreamIt offers several new abstractions,
+including hierarchical single-input single-output streams, built-in
+support for data reordering, and a mechanism called {\it teleport
+  messaging} that enables precise event handling in a distributed
+environment.  We demonstrate the feasibility of developing
+applications in StreamIt by reflecting on our 60,000-line benchmark
+suite, which spans from MPEG-2 encoding/decoding to GMTI radar
+processing.  We also present a novel dynamic analysis for migrating
+legacy C programs into a streaming representation.
+
+The central premise of stream programming is that it enables powerful
+optimizations by the compiler.  We support this premise by presenting
+a suite of new transformations.  We describe the first translation of
+stream programs into the compressed domain, enabling compressed data
+formats (based on LZ77) to be processed with without decompression and
+re-compression.  This technique offers a median speedup of 15x on
+common video editing operations.  We also review key results
+established by the StreamIt group, including automatic parallelization
+(offering an 11x mean speedup on the 16-core Raw machine),
+optimization of linear computations (offering a 5.5x average speedup
+on a Pentium~4), and cache-aware scheduling (offering a 3.5x mean
+speedup on a StrongARM 1100).  While these transformations are beyond
+the reach of compilers for traditional languages such as C, they
+become tractable given the abundant parallelism and regular
+communication patterns exposed by the stream programming model.
