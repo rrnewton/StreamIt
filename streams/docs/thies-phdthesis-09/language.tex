@@ -84,6 +84,17 @@ space; all communication between filters is via the input and output
 channels (and teleport messaging).  Filters are also granted read-only
 access to global constants.
 
+An example filter appears in Figure~\ref{fig:fir-streamit}.  It
+performs an FIR filter, which is parameterized by a length {\it N}.
+Each filter has two stages of execution: initialization and steady
+state.  During initialization, the parameters to a filter are resolved
+to constants and the {\it init} function is called.  In the case of
+FIR, the init function initializes an array of weights, which is
+maintained as state within the filter.  During steady state execution,
+the {\it work} function is called repeatedly.  Inside of work, filters
+can {\it push} items to the output channel, {\it pop} items from the
+input channel, or {\it peek} at a given position on the input channel.
+
 \begin{figure}[t]
 
 \begin{minipage}{0.45\textwidth}
@@ -174,17 +185,6 @@ void do_FIR(float* weights, int N,
 \caption{FIR filter in C.\protect\label{fig:fir-c}}
 \end{minipage}
 \end{figure}
-
-An example filter appears in Figure~\ref{fig:fir-streamit}.  It
-performs an FIR filter, which is parameterized by a length {\it N}.
-Each filter has two stages of execution: initialization and steady
-state.  During initialization, the parameters to a filter are resolved
-to constants and the {\it init} function is called.  In the case of
-FIR, the init function initializes an array of weights, which is
-maintained as state within the filter.  During steady state execution,
-the {\it work} function is called repeatedly.  Inside of work, filters
-can {\it push} items to the output channel, {\it pop} items from the
-input channel, or {\it peek} at a given position on the input channel.
 
 The work function declares how many items it will push and pop, and
 the maximum number of items it might peek, as part of its declaration.
@@ -713,10 +713,14 @@ language designers.  We summarize their experience as follows:
   stream multiplexing rather than to fall back on an unstructured
   programming model.  However, it may be valuable to consider a
   natural syntax for unstructured components of the stream graph --
-  the 
-%
-\begin{figure}[t]
-\vspace{-0.96in}
+  the analog of break and continue statements (or even a rare GOTO
+  statement) in structured control flow. It is important to note,
+  however, that there is no overhead introduced by adding splitters
+  and joiners to the stream graph; the StreamIt compiler analyzes the
+  communication (via an analysis known as {\it synchronization
+  removal}) to recover the original unstructured communication.
+
+\begin{figure}[t!]
 \psfig{file=3gpp.eps,height=\textheight}
 \vspace{-1.25in} ~ \\
 \begin{minipage}{4in}
@@ -727,14 +731,6 @@ language designers.  We summarize their experience as follows:
   reordering.\protect\label{fig:3gpp}}
 \end{minipage}
 \end{figure}
-\clearpage
-%
-\noindent analog of break and continue statements (or even a rare GOTO
-statement) in structured control flow. It is important to note,
-however, that there is no overhead introduced by adding splitters and
-joiners to the stream graph; the StreamIt compiler analyzes the
-communication (via an analysis known as {\it synchronization removal})
-to recover the original unstructured communication.
 
 \begin{figure}[t]
 \centering

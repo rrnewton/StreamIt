@@ -278,6 +278,133 @@ report~\cite{techreport}.
 \protect\label{fig:translate-filter}}
 \end{figure}
 
+\subsection*{Filters}
+
+The procedure for translating a filter into the compressed domain is
+given in Figure~\ref{fig:translate-filter}, and an example appears in
+Figure~\ref{fig:filter-example}.  The behavior of the
+compressed-domain filter can be considered in two pieces.  The first
+piece consists of the simple case (annotated {\it pass-uncompressed}
+in the code) in which the upcoming inputs to the filter are
+uncompressed values.  In this case, the original filter is called with
+those inputs, transforming $n$ input items to $m$ output items.  The
+rest of the code deals with repeat tokens, attempting to translate
+them across the filter with the minimum decompression needed.
+
+The {\bf key idea behind our technique} is encapsulated in the {\it
+  pass-compressed} case in Figure~\ref{fig:translate-filter}.  This
+rule specifies how to translate a repeat token directly from a
+filter's input tape to a filter's output tape without invoking the
+filter's computation.  This translation is possible whenever the
+repeat distance $d$ is a multiple of the filter's input rate $n$.  In
+other words, the repeat is aligned with the execution boundaries of
+the actor, so invoking the actor would produce the same results as
+before.  In transferring the repeat token to the output tape, two
+adjustments are made: 1) the distance and count are scaled by a factor
+of $m/n$ to reflect possible differences between the output ($m$) and
+input ($n$) rates of the actor, and 2) if the count is not an even
+multiple of the input rate, then some leftover items ($c\%n$, where
+$\%$ represents the modulo operation) are left on the input tape.
+
+In cases where the repeat distance does not match the granularity of
+the actor, the distance can sometimes be adjusted to allow
+compressed-domain processing.  The {\it coarsen-repeat} rule
+represents such an adjustment.  Consider that a filter inputs two
+items at a time, but encounters a long repeat with distance three and
+count 100.  That is, the input stream contains a regular pattern of
+values with periodicity three.  Though consecutive executions of the
+filter are aligned at different offsets in this pattern, every third
+filter execution (spanning six values) falls at the same alignment.
+In general, a repeat with distance $d$ can be exploited by a filter
+with input rate $n$ by expanding the distance to $\mbox{LCM}(d, n)$.
+In order to perform this expansion, the count must be greater than the
+distance, as otherwise the repeat references old data that may have no
+periodicity.  Also, the stream needs to be padded with $\mbox{LCM}-d$
+values before the coarsened repeat can begin; this padding takes the
+form of a shorter repeat using the original distance.
+
+\begin{figure}[t!]
+\psfig{file=compression/compressed-filters-in-streamit.eps,width=\textwidth}
+\caption[Example StreamIt code to be mapped into the compressed
+  domain]{Example filter, splitter, and joiner in StreamIt.  The
+  splitter and joiner combine to form a Transpose. Translation to the
+  compressed domain is illustrated in Figures~\ref{fig:filter-example}
+  and~\ref{fig:sj-example}.\protect\label{fig:streamit-example}}
+\end{figure}
+
+\begin{figure}[t!]
+\psfig{file=compression/compressed-filter-example.eps,width=\textwidth}
+\caption[Example execution of a filter in the uncompressed and
+  compressed domains]{Example execution of a filter in the
+  uncompressed and compressed domains.  See
+  Figure~\ref{fig:streamit-example}(a) for the source
+  filter.\protect\label{fig:filter-example}}
+\end{figure}
+
+A second way to adjust a repeat token for compressed-domain processing
+is by changing its count rather than its distance (rule {\it expand}).
+The expand rule is invoked if a repeat has a count less than $n$, if
+it is unaligned with the boundaries of an actor's execution, or if its
+distance is not a multiple of $n$ (and cannot be coarsened
+appropriately).  The expand rule decodes a single value from a repeat
+token, thereby decreasing its count by one; the rest of the repeat may
+become aligned later.  If the count of a repeat reaches zero, it is
+eliminated.
+
+Note that the {\it expand} rule requires partial decompression of the
+data stream.  In order to perform this decompression, it may be
+necessary to maintain an auxiliary data structure--separate from the
+filter's input stream--that holds a complete window of decompressed
+data.  This auxiliary structure is needed because the sliding-window
+dictionary of LZ77 makes it difficult to decode one element without
+decoding others.  However, even if the stream is fully decompressed in
+parallel with the main computation, our technique retains many
+benefits because the filters still operate on the compressed stream;
+the volume of data processed is reduced, and the cost of
+re-compression is averted.  For general algorithms such as gzip,
+compression can be up to 10x slower than
+decompression~\cite{ziviani00compression}.
+
+%% The alignment stage sometimes needs to partially decompress the
+%% data in the stream.  Due to the sliding-window dictionary in LZ77,
+%% in general it is difficult to decode only a few items without
+%% decompressing others.  Thus, our formulation assumes that a fully
+%% decompressed version of the stream is available; the transition
+%% rules access the decompressed data using the \mbox{\it decode}
+%% function, which returns the sequence of values represented by a
+%% repeat token at its current position in the stream.  However, in
+%% practice, this decompression can be avoided whenever the repeat
+%% distance is the same as the window size, as this simply causes a
+%% value in the window to be overwritten by itself.  This case is very
+%% common in several practical compression formats; for example, in
+%% Apple Animation, the vast majority of repeats reference the same
+%% pixel in the previous frame (which is also the window size), and
+%% thus most decompression is avoided.  In run-length encoding, the
+%% repeat distance and the window size are always equal to one, so no
+%% decompression is needed.  While general LZ77 does require a
+%% decompressed window to be maintained, our technique still offers
+%% significant benefits by computing on a smaller volume of data and
+%% avoiding the cost of re-compression.  For general algorithms such
+%% as gzip, compression can be up to 10x slower than
+%% decompression~\cite{ziviani00compression}.
+
+\subsection*{Joiners}
+
+%% It is necessary to consider splitters and joiners separately from
+%% general-purpose actors because of their pass-through semantics: the
+%% inputs are distributed to the outputs without performing any
+%% computation.  Our translation to the compressed domain leverages this
+%% fact to preserve considerably more compression than would be possible
+%% if splitters and joiners were viewed as opaque computational nodes
+%% with multiple inputs and multiple outputs.
+
+The procedure for executing a joiner in the compressed domain appears
+in Figure~\ref{fig:translate-joiner}, while an example appears in
+Figure~\ref{fig:sj-example}.  To simplify the presentation, we
+consider a joiner with only two input streams.  This captures all of
+the fundamental ideas; extension to additional streams is
+straightforward.  In addition, we use the following notations:
+
 \begin{figure}[t]
 \centering
 \vspace{-6pt}
@@ -331,133 +458,6 @@ from input1\mynewline \mbox{~~~~}\}\mynewline
 %Helper functions appear in Figure~\ref{fig:helpers}.
 \protect\label{fig:translate-joiner}}
 \end{figure}
-
-\subsection*{Filters}
-
-The procedure for translating a filter into the compressed domain is
-given in Figure~\ref{fig:translate-filter}, and an example appears in
-Figure~\ref{fig:filter-example}.  The behavior of the
-compressed-domain filter can be considered in two pieces.  The first
-piece consists of the simple case (annotated {\it pass-uncompressed}
-in the code) in which the upcoming inputs to the filter are
-uncompressed values.  In this case, the original filter is called with
-those inputs, transforming $n$ input items to $m$ output items.  The
-rest of the code deals with repeat tokens, attempting to translate
-them across the filter with the minimum decompression needed.
-
-The {\bf key idea behind our technique} is encapsulated in the {\it
-  pass-compressed} case in Figure~\ref{fig:translate-filter}.  This
-rule specifies how to translate a repeat token directly from a
-filter's input tape to a filter's output tape without invoking the
-filter's computation.  This translation is possible whenever the
-repeat distance $d$ is a multiple of the filter's input rate $n$.  In
-other words, the repeat is aligned with the execution boundaries of
-the actor, so invoking the actor would produce the same results as
-before.  In transferring the repeat token to the output tape, two
-adjustments are made: 1) the distance and count are scaled by a factor
-of $m/n$ to reflect possible differences between the output ($m$) and
-input ($n$) rates of the actor, and 2) if the count is not an even
-multiple of the input rate, then some leftover items ($c\%n$, where
-$\%$ represents the modulo operation) are left on the input tape.
-
-In cases where the repeat distance does not match the granularity of
-the actor, the distance can sometimes be adjusted to allow
-compressed-domain processing.  The {\it coarsen-repeat} rule
-represents such an adjustment.  Consider that a filter inputs two
-items at a time, but encounters a long repeat with distance three and
-count 100.  That is, the input stream contains a regular pattern of
-values with periodicity three.  Though consecutive executions of the
-filter are aligned at different offsets in this pattern, every third
-filter execution (spanning six values) falls at the same alignment.
-In general, a repeat with distance $d$ can be exploited by a filter
-with input rate $n$ by expanding the distance to $\mbox{LCM}(d, n)$.
-In order to perform this expansion, the count must be greater than the
-distance, as otherwise the repeat references old data that may have no
-periodicity.  Also, the stream needs to be padded with $\mbox{LCM}-d$
-values before the coarsened repeat can begin; this padding takes the
-form of a shorter repeat using the original distance.
-
-A second way to adjust a repeat token for compressed-domain processing
-is by changing its count rather than its distance (rule {\it expand}).
-The expand rule is invoked if a repeat has a count less than $n$, if
-it is unaligned with the boundaries of an actor's execution, or if its
-distance is not a multiple of $n$ (and cannot be coarsened
-appropriately).  The expand rule decodes a single value from a repeat
-token, thereby decreasing its count by one; the rest of the repeat may
-become aligned later.  If the count of a repeat reaches zero, it is
-eliminated.
-
-Note that the {\it expand} rule requires partial decompression of the
-data stream.  In order to perform this decompression, it may be
-necessary to maintain an auxiliary data structure--separate from the
-filter's input stream--that holds a complete window of decompressed
-data.  This auxiliary structure is needed because the sliding-window
-dictionary of LZ77 makes it difficult to decode one element without
-decoding others.  However, even if the stream is fully decompressed in
-parallel with the main computation, our technique retains many
-benefits because the filters still operate on the compressed stream;
-the volume of data processed is reduced, and the cost of
-re-compression is averted.  For general algorithms such as gzip,
-compression can be up to 10x slower than
-decompression~\cite{ziviani00compression}.
-
-%% The alignment stage sometimes needs to partially decompress the
-%% data in the stream.  Due to the sliding-window dictionary in LZ77,
-%% in general it is difficult to decode only a few items without
-%% decompressing others.  Thus, our formulation assumes that a fully
-%% decompressed version of the stream is available; the transition
-%% rules access the decompressed data using the \mbox{\it decode}
-%% function, which returns the sequence of values represented by a
-%% repeat token at its current position in the stream.  However, in
-%% practice, this decompression can be avoided whenever the repeat
-%% distance is the same as the window size, as this simply causes a
-%% value in the window to be overwritten by itself.  This case is very
-%% common in several practical compression formats; for example, in
-%% Apple Animation, the vast majority of repeats reference the same
-%% pixel in the previous frame (which is also the window size), and
-%% thus most decompression is avoided.  In run-length encoding, the
-%% repeat distance and the window size are always equal to one, so no
-%% decompression is needed.  While general LZ77 does require a
-%% decompressed window to be maintained, our technique still offers
-%% significant benefits by computing on a smaller volume of data and
-%% avoiding the cost of re-compression.  For general algorithms such
-%% as gzip, compression can be up to 10x slower than
-%% decompression~\cite{ziviani00compression}.
-
-\begin{figure*}[t]
-\psfig{file=compression/compressed-filters-in-streamit.eps,width=\textwidth}
-\caption[Example StreamIt code to be mapped into the compressed
-  domain]{Example filter, splitter, and joiner in StreamIt.  The
-  splitter and joiner combine to form a Transpose. Translation to the
-  compressed domain is illustrated in Figures~\ref{fig:filter-example}
-  and~\ref{fig:sj-example}.\protect\label{fig:streamit-example}}
-\end{figure*}
-
-\begin{figure*}[t]
-\psfig{file=compression/compressed-filter-example.eps,width=\textwidth}
-\caption[Example execution of a filter in the uncompressed and
-  compressed domains]{Example execution of a filter in the
-  uncompressed and compressed domains.  See
-  Figure~\ref{fig:streamit-example}(a) for the source
-  filter.\protect\label{fig:filter-example}}
-\end{figure*}
-
-\subsection*{Joiners}
-
-%% It is necessary to consider splitters and joiners separately from
-%% general-purpose actors because of their pass-through semantics: the
-%% inputs are distributed to the outputs without performing any
-%% computation.  Our translation to the compressed domain leverages this
-%% fact to preserve considerably more compression than would be possible
-%% if splitters and joiners were viewed as opaque computational nodes
-%% with multiple inputs and multiple outputs.
-
-The procedure for executing a joiner in the compressed domain appears
-in Figure~\ref{fig:translate-joiner}, while an example appears in
-Figure~\ref{fig:sj-example}.  To simplify the presentation, we
-consider a joiner with only two input streams.  This captures all of
-the fundamental ideas; extension to additional streams is
-straightforward.  In addition, we use the following notations:
 
 \begin{figure*}[t]
 \psfig{file=compression/compressed-splitjoin-example.eps,width=\textwidth}
@@ -719,12 +719,6 @@ LZ77.
 
 \end{enumerate}
 
-\begin{table*}[t]
-\hspace{-0.26in}\psfig{file=compression/table-benchmarks.eps,width=7.02in}
-\caption{Characteristics of the video workloads.
-\protect\label{tab:videos}}
-\end{table*}
-
 \section{Experimental Evaluation}
 
 To demonstrate the potential benefits of mapping into the compressed
@@ -772,6 +766,12 @@ the evaluation of pixel transformations, and the evaluation of video
 compositing.
 
 \subsection*{Video Workloads}
+
+\begin{table*}[t]
+\hspace{-0.26in}\psfig{file=compression/table-benchmarks.eps,width=7.02in}
+\caption{Characteristics of the video workloads.
+\protect\label{tab:videos}}
+\end{table*}
 
 Our evaluation utilizes a suite of 12 video workloads that are
 described in Table~\ref{tab:videos}; some of the videos are also
@@ -871,16 +871,24 @@ configuration performs pixel transformations directly on the
 compressed data, avoiding data expansion implied by decompression and
 multiple frame buffers, before copying the data to the output file.
 
-\begin{table*}[t]
-\hspace{-0.26in}\psfig{file=compression/table-pixel-speedup.eps,width=7.02in}
-\caption[Table of results for pixel transformations]{Results for pixel transformations.
-\protect\label{tab:pixel-speedup}}
-\end{table*}
-
 Our evaluation platform is a dual-processor Intel Xeon (2.2 GHz) with
 2 GB of RAM.  As all of our applications are single-threaded, the
 second processor is not utilized.  For the timing measurements, we
 execute each program five times and report the median user time.
+
+\begin{table*}[t!]
+\hspace{-0.26in}\psfig{file=compression/table-pixel-speedup.eps,width=7.02in}
+\vspace{-12pt}
+\caption[Table of results for pixel transformations]{Results for pixel transformations.
+\protect\label{tab:pixel-speedup}}
+\end{table*}
+
+\begin{figure}[t!]
+\centering
+\psfig{file=compression/graph-speedup-pixel.eps,width=4.355in}
+\caption[Speedup graph for pixel transformations]{Speedup on pixel transformations.
+\protect\label{fig:pixel-speedup}}
+\end{figure}
 
 \paragraph*{Results}  Detailed results for the pixel transformations appear
 in Table~\ref{tab:pixel-speedup}.  Figure~\ref{fig:pixel-speedup}
@@ -926,6 +934,13 @@ decompression stage of the baseline configuration.
 %inversion on {\tt screencast1-demo} spends only 5\% of its time in the
 %encoder (and 65\% of the time doing the transformation itself).
 
+\begin{figure}[t]
+\centering
+\psfig{file=compression/graph-speedup-scatter.eps,width=4.511in}
+\caption{Speedup vs. compression factor for all transformations.
+\protect\label{fig:speedup-scatter}}
+\end{figure}
+
 Another important aspect of the results is the size of the output
 files produced.  Apart from the first frame of a video\footnote{In the
 Apple Animation format, the first frame is encoded as if the previous
@@ -939,13 +954,6 @@ decimal places).  The only exception is contrast adjustment on {\tt
 anim-scene1}, in which the output is 2\% smaller than the input due to
 variations in the first frame; for the same reason, some cases
 experience a 0.1\% increase in size (not visisble in the table).
-
-\begin{figure}[t]
-\centering
-\psfig{file=compression/graph-speedup-pixel.eps,width=4.355in}
-\caption[Speedup graph for pixel transformations]{Speedup on pixel transformations.
-\protect\label{fig:pixel-speedup}}
-\end{figure}
 
 Though computing on compressed data has virtually no effect on the
 file size, there are some cases in which the pixel transformation
@@ -983,54 +991,6 @@ regions can be extended without being rediscovered).
 % re-compression cost.
 
 \subsection*{Video Compositing}
-
-In video compositing, two videos are combined using a specific
-function to derive each output pixel from a pair of input pixels (see
-Figure~\ref{fig:videos}).  In the case of subtitling, animated logos,
-and computer graphics, an alpha-under transformation is common; it
-overlays one video on top of another using the transparency
-information in the alpha channel.  In applying an animated matte, the
-videos are combined with a multiply operation, thereby masking the
-output according to the brightness of the matte.  For our experiments,
-we generated composites using each foreground/background pair within a
-given application area, yielding a total of 12 composites.
-
-In StreamIt, we implemented each compositing operation as a
-roundrobin(1,1) joiner (to interleave the streams) followed by a
-filter (to combine the pixel values).  The intuition of the
-compressed-domain execution is that if both streams have the same kind
-of repeat (inter-frame or intra-frame), then the repeat is copied
-directly to the output.  If they have different kinds of repeats, or
-if one stream is uncompressed, then both streams are uncompressed.
-
-\paragraph*{Setup} The compositing operations were compiled into plugins for
-Blender, a popular tool for modeling, rendering, and post-processing
-3-D animations.  Blender has logged 1.8 million downloads in the last
-year~\cite{blender-stats} and was used in the production of Spiderman
-2~\cite{blender-wikipedia}.  Like MEncoder, Blender relies on the
-FFMPEG library for video coding, so we utilize the same Apple
-Animation decoder/encoder as in the pixel transformations.
-
-As Blender already includes support for video compositing, we use its
-implementation as our baseline.  The compositing operations have
-already been hand-tuned for performance; the implementation of
-alpha-under includes multiple shortcuts, unrolled loops, and the
-following comment: ``this complex optimalisation is because the
-'skybuf' can be crossed in''.  We further improved the baseline
-performance by patching other parts of the Blender source base, which
-were designed around 3-D rendering and are more general than needed
-for video editing.  We removed two redundant vertical flips for each
-frame, two redundant BGRA-RGBA conversions, and redundant memory
-allocation/deallocation for each frame.
-% did not mention removal of O(frames^2) linked list search, although 
-% this fell out of removing the redundant memory deallocation
-
-\begin{figure}[t]
-\centering
-\psfig{file=compression/graph-speedup-scatter.eps,width=4.511in}
-\caption{Speedup vs. compression factor for all transformations.
-\protect\label{fig:speedup-scatter}}
-\end{figure}
 
 \begin{figure}[t]
 \centering
@@ -1082,6 +1042,47 @@ allocation/deallocation for each frame.
 \vspace{-3pt}
 \caption{Examples of video compositing operations.\protect\label{fig:videos}}
 \end{figure}
+
+In video compositing, two videos are combined using a specific
+function to derive each output pixel from a pair of input pixels (see
+Figure~\ref{fig:videos}).  In the case of subtitling, animated logos,
+and computer graphics, an alpha-under transformation is common; it
+overlays one video on top of another using the transparency
+information in the alpha channel.  In applying an animated matte, the
+videos are combined with a multiply operation, thereby masking the
+output according to the brightness of the matte.  For our experiments,
+we generated composites using each foreground/background pair within a
+given application area, yielding a total of 12 composites.
+
+In StreamIt, we implemented each compositing operation as a
+roundrobin(1,1) joiner (to interleave the streams) followed by a
+filter (to combine the pixel values).  The intuition of the
+compressed-domain execution is that if both streams have the same kind
+of repeat (inter-frame or intra-frame), then the repeat is copied
+directly to the output.  If they have different kinds of repeats, or
+if one stream is uncompressed, then both streams are uncompressed.
+
+\paragraph*{Setup} The compositing operations were compiled into plugins for
+Blender, a popular tool for modeling, rendering, and post-processing
+3-D animations.  Blender has logged 1.8 million downloads in the last
+year~\cite{blender-stats} and was used in the production of Spiderman
+2~\cite{blender-wikipedia}.  Like MEncoder, Blender relies on the
+FFMPEG library for video coding, so we utilize the same Apple
+Animation decoder/encoder as in the pixel transformations.
+
+As Blender already includes support for video compositing, we use its
+implementation as our baseline.  The compositing operations have
+already been hand-tuned for performance; the implementation of
+alpha-under includes multiple shortcuts, unrolled loops, and the
+following comment: ``this complex optimalisation is because the
+'skybuf' can be crossed in''.  We further improved the baseline
+performance by patching other parts of the Blender source base, which
+were designed around 3-D rendering and are more general than needed
+for video editing.  We removed two redundant vertical flips for each
+frame, two redundant BGRA-RGBA conversions, and redundant memory
+allocation/deallocation for each frame.
+% did not mention removal of O(frames^2) linked list search, although 
+% this fell out of removing the redundant memory deallocation
 
 \begin{table*}[t]
 \centering

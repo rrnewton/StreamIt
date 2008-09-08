@@ -287,7 +287,7 @@ stream programming model to make these transformations tractable.
   work that they perform per steady state.\protect\label{fig:vocoder}}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \centering
 \psfig{file=vocoder-data.eps,width=4.5in}
 \caption[Coarse-grained data parallelism applied to
@@ -295,10 +295,8 @@ stream programming model to make these transformations tractable.
   stream graph (left), stateless nodes are replicated but stateful
   nodes remain untouched.  An execution trace (right) requires 21
   units per steady state.\protect\label{fig:vocoder-data}}
-\end{figure}
 
-\begin{figure}[t]
-\centering
+~ \\ \vspace{6pt}
 \psfig{file=vocoder-swpipe.eps,width=6in}
 \caption[Coarse-grained software pipelining applied to
   Vocoder]{Simplified vocoder mapped with coarse-grained software
@@ -393,7 +391,7 @@ well (attaining a mean speedup of 9.9x), the most robust performance
 comes by adding coarse-grained software pipelining (which attains a
 mean speedup of 11.2x).  As expected, software pipelining mostly
 benefits the stateful benchmarks, Vocoder and Radar.  There is a
-super-linear speedup in Radar because reordering operations were moved
+super-linear speedup in Radar because reordering operations are moved
 from the compute core to the network.
 
 %% \begin{figure}[t]
@@ -463,10 +461,13 @@ application while automatically applying deep optimizations to the
 specific code sections where they apply.
 
 \begin{figure}[t]
-% TODO: 
-%(a) Software FM radio with Equalizer
-%(b) After linear combination
-%(c) After translation to the frequency domain
+\psfig{figure=equalizer.eps,width=5.7in}
+
+\mbox{~}{\small (a) Software FM radio with Equalizer}
+\mbox{~}\hspace{0.35in}{\small (b) After linear combination}
+\mbox{~}\hspace{0.15in}{\small (c) After translation to} \vspace{-0.2\baselineskip}
+
+\mbox{~}\hspace{4.87in}{\small the frequency domain}
 \caption[Example optimization of linear filters]{Example optimization
   of linear filters.  Our software FM radio benchmark contains an
   equalizer in which all filters are linear.  These filters can be
@@ -519,7 +520,8 @@ The average speedup obtained is 4.5x, with a maximum of 8.0x.
 \subsection*{Extracting a Linear Representation}
 
 \begin{figure}[t]
-% TODO: linear extraction from statespace talk
+\centering
+\psfig{figure=extraction.eps,width=5.25in}
 \caption[Extracting a linear representation]{Extracting a linear
   representation from the code inside a filter's work
   function.\protect\label{fig:extraction}}
@@ -558,13 +560,11 @@ and annotate the code accordingly.
 \subsection*{Algebraic Simplification of Adjacent Linear Filters}
 
 \begin{figure}[t]
-% TODO: simple combination picture
-\caption{Algebraic simplification of adjacent linear filters.\protect\label{fig:combination}}
-\end{figure}
-
-\begin{figure}[t]
-% TODO: IIR + decimator with flops reducation
-\caption{Example simplification of an IIR filter and a decimator.\protect\label{fig:combination-example}}
+\centering
+\psfig{figure=combination.eps,width=5in}
+\caption[Algebraic simplification of adjacent linear filters]{Algebraic 
+simplification of adjacent linear filters.  For simplicity, we omit
+filter states from this diagram.\protect\label{fig:combination}}
 \end{figure}
 
 If neighboring filters in the stream graph both perform a linear
@@ -615,6 +615,15 @@ sliding window operations (or peeking) also adds complexity to all of
 the combination rules; in our general formulation, the peeked data
 items are converted into states in the filter.
 
+\begin{figure}[t]
+\centering
+\psfig{figure=iir.eps,width=4in}
+\caption[Example simplification of an IIR filter and a decimator]{Example 
+simplification of an IIR filter and a decimator.  The original pair of
+filters requires 6 FLOPs per output, while the combined version
+requires only 4 FLOPs per output.\protect\label{fig:combination-example}}
+\end{figure}
+
 By automating the combination of linear filters, we allow the
 programmer to maintain a natural expression of the algorithm.
 Figure~\ref{fig:combination-example} illustrates an example
@@ -639,7 +648,8 @@ filters are subject to state removal and parameter reduction.  These
 transformations are generally applied after algebraic simplification.
 
 \begin{figure}[t]
-% todo: mapping to frequency
+\centering
+\psfig{figure=freq.eps,width=4in}
 \caption{Mapping linear filters into the frequency domain.\protect\label{fig:freq}}
 \end{figure}
 
@@ -689,12 +699,13 @@ matrices from the filter's representation
 special row-echelon form.
 
 \begin{figure}[t]
-% TODO: figure of state removal and parameter reduction from CASES
+\centering
+\psfig{figure=stateremoval.eps,width=\textwidth}
 \caption{Example of state removal and parameter reduction.\protect\label{fig:states}}
 \end{figure}
 
 An example of state removal appears in Figure~\ref{fig:states}.  The
-analysis detects that the two states {\tt x1} and {\tt x2} were always
+analysis detects that the two states {\tt x1} and {\tt x2} are always
 scaled proportionately, so they can be combined into a single state
 {\tt x}.  This reduced the computational requirements of the filter
 from 9 FLOPs per execution to 5 FLOPs per execution.
@@ -778,9 +789,16 @@ stream graph into a form that is amenable to optimization.
 %% as there are $O(n^4)$ rectangular subsets of a splitjoin with $n$
 %% branches and $n$ streams on each branch.
 
-\begin{figure}[t]
-% todo: optimization selection algorithm
-\caption{Optimization selection for the Radar benchmark.\protect\label{fig:radar}}
+\begin{figure}[t!]
+\vspace{-0.07in}
+\centering
+\psfig{figure=selection.eps,width=\textwidth}
+\caption[Optimization selection for the Radar benchmark]{Optimization
+selection for the Radar benchmark.  Performing maximal linear
+combination and translation to the frequency domain results in a large
+slowdown.  The selection procedure avoids this hazard by blocking the
+vertical combination of the BeamForm filter and by preventing
+translation to the frequency domain.\protect\label{fig:radar}}
 \end{figure}
 
 An example of optimization selection for the Radar benchmark is shown
@@ -838,17 +856,18 @@ running GNU/Linux.  To measure the number of floating point
 operations, we use an instruction counting DynamoRIO~\cite{dynamo99}
 client.
 
-\begin{figure}[t]
-\psfig{figure=linear-flops.eps,width=\textwidth}
+\begin{figure}[t!]
+\centering
+\psfig{figure=linear-flops.eps,width=5in}
 \caption[Elimination of floating point operations due to linear optimizations]{Elimination of floating point operations by maximal linear 
 replacement, maximal frequency replacement, and automatic optimization
 selection.}
 \label{fig:flops}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \centering
-\psfig{figure=linear-speedup.eps,width=\textwidth}
+\psfig{figure=linear-speedup.eps,width=5in}
 %\vspace{-16pt}
 \caption[Speedup due to linear optimizations]{Execution speedup for maximal linear replacement, maximal frequency 
 replacement, and automatic optimization selection.}
@@ -860,13 +879,13 @@ operations (FLOPs) removed from the program.  The removal of FLOPs
 represents fundamental computation savings that is independent of the
 streaming runtime system and other (FLOPs-preserving) optimizations in
 the compiler.  We evaluate three strategies: maximal combination of
-linear nodes, maximal translation to the frequency domain, and
-automatic optimization selection.  The automatic selection routing
-removes an average of 87\% of the FLOPs from our benchmarks, with a
-maximum of 96\% (Vocoder).  The automatic selection option eliminates
-more FLOPS than either of the other options for TargetDetect, FMRadio,
-Radar, and Vocoder.  Automatic selection always performs at least as
-well as the other two options.
+linear nodes, maximal translation to the frequency domain (following
+maximal combination), and automatic optimization selection.  The
+automatic selection routing removes an average of 87\% of the FLOPs
+from our benchmarks, with a maximum of 96\% (Vocoder).  The automatic
+selection option eliminates more FLOPS than either of the other
+options for TargetDetect, FMRadio, Radar, and Vocoder.  Automatic
+selection always performs at least as well as the other two options.
 
 Execution speedups are shown in Figure~\ref{fig:execution-speedup}.
 With automatic selection, our benchmarks speed up an average factor of
@@ -900,8 +919,15 @@ explicit producer-consumer relationships between filters, allowing the
 compiler to anticipate and optimize the cache usage.
 
 \begin{figure}[t]
-% todo: overview graph for caching
-\caption{Overview of cache optimizations.\protect\label{fig:cacheopt}}
+\centering
+\psfig{figure=cache-overview.eps,width=4.25in}
+\caption[Overview of cache optimizations]{Overview of cache 
+optimizations.  While execution scaling can improve instruction
+locality relative to the baseline, it loses the benefits of filter
+fusion and has the hazard of overflowing the data cache.  Our cache
+optimizations fuse filters as much as possible without exceeding the
+instruction cache, then scale as much as possible without exceeding
+the data cache.\protect\label{fig:cacheopt}}
 \end{figure}
 
 We have developed a set of cache optimizations that simultaneously
@@ -969,11 +995,6 @@ additional 1.4x on an embedded processor.
 
 \subsection*{Cache Aware Scaling}
 
-\begin{figure}[t]
-% todo: scaling figure
-\caption{Effect of execution scaling on performance.\protect\label{fig:scaling}}
-\end{figure}
-
 It is advantageous to execute a filter multiple times at once, because
 the first execution will incur cache misses that can be amortized over
 subsequent executions.  We user the term {\it scaling} to refer to the
@@ -987,6 +1008,16 @@ compiler needs to select an intermediate scaling factor that
 represents a tradeoff between the filter's static footprint
 (instructions and local data) and its dynamic footprint (input and
 output items).
+
+\begin{figure}[t]
+\centering
+\psfig{file=cache-scaling.eps,width=4.5in}
+\caption[Effect of execution scaling on performance]{Effect of execution 
+scaling on performance.  Moderate scaling improves performance by
+improving the locality of instructions and local filter data.
+However, excessive scaling worsens performance as the input and output
+buffers overflow the cache.\protect\label{fig:scaling}}
+\end{figure}
 
 We have developed a cache aware scaling heuristic that is effective in
 addressing this problem.  The heuristic scales the execution of every

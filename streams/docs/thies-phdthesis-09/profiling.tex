@@ -399,26 +399,6 @@ and hmmer).  As described in Section~\ref{sec:results}, we profile
 five iterations of a training file and (with minimal programmer
 intervention) apply the trace to correctly execute a test file.
 
-\begin{figure}[t]
-\centering
-% 338 pix wide
-\hspace{0in}\psfig{file=profiling/gmti-opt.eps,width=2.9in}
-\caption[Stream graph for GMTI, as extracted using our tool]{Stream
-  graph for GMTI, as extracted using our tool.  Nodes are annotated
-  with their computation requirements, and edges are labeled with the
-  number of bytes transferred per steady-state
-  iteration.\protect\label{fig:gmti-graph-tool}}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\hspace{0in}\psfig{file=profiling/gmti-spec.eps,width=3.3in}
-\caption[Stream graph for GMTI, as it appears in the GMTI
-  specification]{Stream graph for GMTI, as it appears in the GMTI
-  specification~\protect\cite{reuther03gmti}.\protect\label{fig:gmti-graph-spec}}
-\vspace{-6pt}
-\end{figure}
-
 \section{Migration Methodology}
 \label{sec:workflow}
 
@@ -453,6 +433,26 @@ programmer selects a set of training inputs and runs our dynamic
 analysis to trace the communication pattern.  The tool outputs a
 stream graph, a list of producer/consumer statements, and a set of
 communication macros for automatically running the code in parallel.
+
+\begin{figure}[t!]
+\centering
+% 338 pix wide
+\hspace{0in}\psfig{file=profiling/gmti-opt.eps,width=2.9in}
+\caption[Stream graph for GMTI, as extracted using our tool]{Stream
+  graph for GMTI, as extracted using our tool.  Nodes are annotated
+  with their computation requirements, and edges are labeled with the
+  number of bytes transferred per steady-state
+  iteration.\protect\label{fig:gmti-graph-tool}}
+\end{figure}
+
+\begin{figure}[t!]
+\centering
+\hspace{0in}\psfig{file=profiling/gmti-spec.eps,width=3.3in}
+\caption[Stream graph for GMTI, as it appears in the GMTI
+  specification]{Stream graph for GMTI, as it appears in the GMTI
+  specification~\protect\cite{reuther03gmti}.\protect\label{fig:gmti-graph-spec}}
+\vspace{-6pt}
+\end{figure}
 
 An example stream graph for GMTI radar processing appears in
 Figure~\ref{fig:gmti-graph-tool}.  The graph extracted by our tool is
