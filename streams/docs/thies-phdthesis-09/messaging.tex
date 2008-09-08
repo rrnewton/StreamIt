@@ -567,9 +567,20 @@ $|\phi \wedge A|$ that is selected in Definition~\ref{eq:sdepdef}.  We
 construct $\phi$ by simulating the stream graph's execution of a
 ``pull schedule'' with respect to actor $B$ (see Figure~\ref{fig:pull-scheduling}).
 
-\begin{figure*}[t]
+\begin{figure}[t!]
 \begin{center}
 \vspace{-12pt}
+\psfig{figure=messaging/sdep-example-rates3.eps,height=1.75in}
+\vspace{-6pt}
+\caption[Example stream graph for calculation of stream dependence
+  function]{Example stream graph.  Nodes are annotated with their I/O
+  rates.  For example, node C consumes 3 items and produces 2 items on
+  each execution.  Node A is a round-robin splitter that produces one
+  item on its left channel during the first phase, and one item on its
+  right channel during the second phase (similarly for Node E).
+  \protect\label{fig:sdep-rates}}
+
+~ \\ \vspace{6pt}
 \psfig{figure=messaging/sdep-example3.eps,width=\textwidth}
 \vspace{-4pt}
 \caption[Example calculation of stream dependence function]{Example \figsdep\ calculation
@@ -583,20 +594,6 @@ construct $\phi$ by simulating the stream graph's execution of a
   times that $A$ executes before the $n$th execution of $E$.  The last
   two lines illustrate the computation of $\figsdepf{B}{E}$.
   \protect\label{fig:sdep1}}
-\end{center}
-\vspace{-12pt}
-\end{figure*}
-
-\begin{figure}[t]
-\begin{center}
-\psfig{figure=messaging/sdep-example-rates3.eps,height=1.75in}
-\caption[Example stream graph for calculation of stream dependence
-  function]{Example stream graph.  Nodes are annotated with their I/O
-  rates.  For example, node C consumes 3 items and produces 2 items on
-  each execution.  Node A is a round-robin splitter that produces one
-  item on its left channel during the first phase, and one item on its
-  right channel during the second phase (similarly for Node E).
-  \protect\label{fig:sdep-rates}}
 \end{center}
 \vspace{-26pt}
 \end{figure}
