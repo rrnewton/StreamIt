@@ -25,18 +25,18 @@ suite, which spans from MPEG-2 encoding/decoding to GMTI radar
 processing.  We also present a novel dynamic analysis for migrating
 legacy C programs into a streaming representation.
 
-The central premise of stream programming is that it enables powerful
-optimizations by the compiler.  We support this premise by presenting
-a suite of new transformations.  We describe the first translation of
-stream programs into the compressed domain, enabling compressed data
-formats (based on LZ77) to be processed with without decompression and
-re-compression.  This technique offers a median speedup of 15x on
-common video editing operations.  We also review key results
-established by the StreamIt group, including automatic parallelization
-(offering an 11x mean speedup on the 16-core Raw machine),
-optimization of linear computations (offering a 5.5x average speedup
-on a Pentium~4), and cache-aware scheduling (offering a 3.5x mean
-speedup on a StrongARM 1100).  While these transformations are beyond
-the reach of compilers for traditional languages such as C, they
-become tractable given the abundant parallelism and regular
+The central premise of stream programming is that it enables the
+compiler to perform powerful optimizations.  We support this premise
+by presenting a suite of new transformations.  We describe the first
+translation of stream programs into the compressed domain, enabling
+compressed data formats (based on LZ77) to be processed with without
+decompression and re-compression.  This technique offers a median
+speedup of 15x on common video editing operations.  We also review key
+results established by the StreamIt group, including automatic
+parallelization (offering an 11x mean speedup on the 16-core Raw
+machine), optimization of linear computations (offering a 5.5x average
+speedup on a Pentium~4), and cache-aware scheduling (offering a 3.5x
+mean speedup on a StrongARM 1100).  While these transformations are
+beyond the reach of compilers for traditional languages such as C,
+they become tractable given the abundant parallelism and regular
 communication patterns exposed by the stream programming model.
