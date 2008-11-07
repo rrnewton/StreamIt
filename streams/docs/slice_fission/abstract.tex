@@ -1,4 +1,32 @@
-Intro paragraph, general problem intro
+The adoption of multicore architectures has shifted to software the
+burden of maintaining increases in single-program performance. As
+returns diminish for single-core performance improvements between
+generations of these architectures, effectively parallelizing a
+program at a coarse granularity across multiple cores becomes
+paramount. Stream programming offers an attractive way to exploit
+coarse-grained parallelism, as the filters that comprise an
+application are independent, and communication between filters is
+regular and repeating. Data-parallelization of appropriate filters has
+the potential to offer computational scalability with increases in the
+number of cores, but the global communication and synchronization
+requirements of such techniques must be carefully considered.
 
+In this paper we present a new technique for data-parallelizing a
+filter that performs a sliding-window computation. Traditionally,
+input data remaining in the sliding window between iterations cause a
+loop-carried dependence, preventing automatic
+data-parallelization. Our technique intelligently converts this
+loop-carried state into inter-core communication of duplicated input
+data to parallelized constituent filters. The percentage of input data
+duplicated (and thus communicated between cores) is parameterized.
+Inter-core communication can be reduced if added latency and buffering
+can be tolerated by the requirements of the application. We evaluate
+the technique in the context of our stream compiler which targets
+Tilera's 64-core Tile64 architecture.  We show that our new
+technique offers significant performance improvement when compared to
+a previously published approach that also duplicates input data.
+Furthermore, we demonstrate that our compiler achieves near-linear
+scalability across our benchmark suite as we increase the number of
+cores.
 
 
