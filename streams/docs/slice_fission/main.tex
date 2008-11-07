@@ -1,0 +1,68 @@
+%-----------------------------------------------------------------------------
+%
+%               Template for LaTeX Class/Style File
+%
+% Name:         sigplanconf-template.tex
+% Purpose:      A template for sigplanconf.cls, which is a LaTeX 2e class
+%               file for SIGPLAN conference proceedings.
+%
+% Author:       Paul C. Anagnostopoulos
+%               Windfall Software
+%               978 371-2316
+%               paul@windfall.com
+%
+% Created:      15 February 2005
+%
+%-----------------------------------------------------------------------------
+
+
+\documentclass[preprint,natbib]{sigplanconf}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+\conferenceinfo{PLDI '09}{June 2009, Dublin, Ireland.} 
+\copyrightyear{2009} 
+\copyrightdata{[to be supplied]} 
+
+\titlebanner{Submitted for confidential review to: ACM SIGPLAN 2009 Conference on 
+Programming Language Design and Implementation (PLDI)}
+
+\title{Data-Parallelization of Sliding-Window Computations\\in Stream Programs}
+
+\authorinfo{Anonymous}
+           {}
+           {}
+%\authorinfo{Name2\and Name3}
+%           {Affiliation2/3}
+%           {Email2/3}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+%\category{CR-number}{subcategory}{third-level}
+
+%\terms
+%term1, term2
+
+%\keywords
+%keyword1, keyword2
+
+\input{intro}
+
+%\appendix
+%\section{Appendix Title}
+
+%\acks
+
+{
+{\bibliographystyle{plainnat}
+\bibliography{references}
+}
+}
+\end{document}
+
