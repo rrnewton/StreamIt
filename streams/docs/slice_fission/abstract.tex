@@ -1,15 +1,16 @@
-The adoption of multicore architectures has shifted to software the
-burden of maintaining increases in single-program performance. As
-returns diminish for single-core performance improvements between
-generations of these architectures, effectively parallelizing a
-program at a coarse granularity across multiple cores becomes
-paramount. Stream programming offers an attractive way to exploit
-coarse-grained parallelism, as the filters that comprise an
-application are independent, and communication between filters is
-regular and repeating. Data-parallelization of appropriate filters has
-the potential to offer computational scalability with increases in the
-number of cores, but the global communication and synchronization
-requirements of such techniques must be carefully considered.
+Stream programming offers an attractive way to exploit coarse-grained
+parallelism, as the filters that comprise an application are
+independent, and communication between filters is regular and
+repeating. Data-parallelization of appropriate filters has the
+potential for computational scalability, but the global communication
+and synchronization requirements of such techniques must be carefully
+considered.  It is important that the language exposes as many
+opportunities for data-parallelization as possible. For instance, the
+peek idiom found in many streaming languages allows the compiler to
+data-parallelize sliding-window computations that would otherwise have
+loop-carried dependencies.  However, doing so is difficult because of
+the complex communication and synchronization patterns that are
+required.
 
 In this paper we present a new technique for data-parallelizing a
 filter that performs a sliding-window computation. Traditionally,
