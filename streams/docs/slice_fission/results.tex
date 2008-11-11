@@ -1,0 +1,8 @@
+\section{Results}
+
+We are not going to get perfect linear scaling for each benchmark
+because of symmetries between the application and the
+architecture. For example, FilterBank ?? X ?? has a task-parallel
+level with 8 filters, targeting a 36-core machine configuration, we
+cannot do better than to parallelize these each filter of the level 4
+ways, for a total of 32 filters....
