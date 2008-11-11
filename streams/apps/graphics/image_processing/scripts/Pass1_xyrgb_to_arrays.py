@@ -15,10 +15,16 @@ height = int( g[1] )
 
 print( 'size: ' + str( width ) + 'x' + str( height ) )
 
+output_prefix = sys.argv[3]
+
+red = []
+green = []
+blue = []
+
 print( 'Allocating array...' )
-red = [0.0] * ( width * height )
-green = [0.0] * ( width * height )
-blue = [0.0] * ( width * height )
+red = [0] * ( width * height )
+green = [0] * ( width * height )
+blue = [0] * ( width * height )
 print( 'Done!' )
 
 print( 'Populating arrays...' )
@@ -37,9 +43,9 @@ while i < len( lines ):
     try:
         x = int( l0[2] )
         y = int( l1[2] )
-        r = float( l2[2] )
-        g = float( l3[2] )
-        b = float( l4[2] )
+        r = int( 255.0 * float( l2[2] ) )
+        g = int( 255.0 * float( l3[2] ) )
+        b = int( 255.0 * float( l4[2] ) )
         red[ y * width + x ] = r
         green[ y * width + x ] = g
         blue[ y * width + x ] = b
@@ -55,26 +61,32 @@ while i < len( lines ):
     
 print( 'Done!' )
 
-output_filename = sys.argv[1] + '.ppm'
-#f = open( sys.argv[1] + '.ppm', 'w' )
-f = open( output_filename, 'w' )
-f.write( 'P3\n' )
-f.write( str( width ) + ' ' + str( height ) + '\n' )
-f.write( '255\n' )
+output_red_filename = output_prefix + '_red.arr'
+output_green_filename = output_prefix + '_green.arr'
+output_blue_filename = output_prefix + '_blue.arr'
 
-print( 'Writing PPM: ' + output_filename )
-i = 0.0;
+print( 'Writing output arrays for pass 2' )
+print( output_red_filename )
+print( output_green_filename )
+print( output_blue_filename )
+
+red_file = open( output_red_filename, 'w' )
+green_file = open( output_green_filename, 'w' )
+blue_file = open( output_blue_filename, 'w' )
+
+i = 0.0
 milestone = 10.0
 for y in range( 0, height ):
     for x in range( 0, width ):
-        percent = ( 100 * i ) / ( width * height )
+        percent = ( 100.0 * i ) / ( width * height )
         if percent > milestone:
             print( str( percent ) + "%" )
             milestone = milestone + 10
-        f.write( str( int( 255.0 * red[ ( height - y - 1 ) * width + x ] ) ) + ' ' )
-        f.write( str( int( 255.0 * green[ ( height - y - 1 ) * width + x ] ) ) + ' ' )
-        f.write( str( int( 255.0 * blue[ ( height - y - 1 ) * width + x ] ) ) + ' ' )
+        red_file.write( str( red[ y * width + x ] / 255.0 ) + '\n' )
+        green_file.write( str( green[ y * width + x ] / 255.0 ) + '\n' )
+        blue_file.write( str( blue[ y * width + x ] / 255.0 ) + '\n' )
         i = i + 1
-    f.write( '\n' )
 
-f.close()
+blue_file.close()
+green_file.close()
+red_file.close()
