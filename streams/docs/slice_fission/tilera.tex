@@ -1,0 +1,14 @@
+\section{Tilera Tile64}
+
+The TILE64 Processor, produced by Tilera Corporation, is a 64 core
+system on a chip~\cite{Tilera08}.  Each core is an identical
+three-wide VLIW capable of running SMP Linux.  In addition to standard
+RISC instructions, all cores support a SIMD instruction set designed
+to accelerate video, image and digital signal processing applications.
+Each core has 64KB L2 cache, and L2 caches can be shared among cores
+to provide an effective 4MB of shared L3 cache.  Cores are connected
+through five low-latency, two-dimensional mesh interconnects.  Two of
+these networks carry user data, while the other three handle memory
+and I/O. The combination of mechanisms allows the TILE64 Processor to
+support both the shared memory and message passing programming
+paradigms.
