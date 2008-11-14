@@ -1,6 +1,29 @@
-Title:
+*Intro
+** Multicore
+Moore's law exposed to software
+Burden to software layer for single-program performance gains
+** Stream Programming
+Good solution: regular and repeating comm, with independent filters
+Global transformations possible
+Data parallelism is a good technique because it offers computational
+scalability but could introduce lots of communication, have to be careful
+Many filters in streaming domain are stateless but the language should
+all the 
 
 
 
-Intro
+** Sliding window computation
+Hank's blurb
+What happens when we parallelize with communication patterns
+
+
+*Stream Programming
+** Overview of stream programming
+
+** Overview of peeking
+Example peeking filter
+ 
+
+***Static rates
+
 

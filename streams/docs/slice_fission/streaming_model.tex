@@ -1,0 +1,90 @@
+\section{Streaming Execution Model}
+
+In order to rigorously describe our techniques it is necessary to
+define an execution model for streaming computation. The model we use
+for this paper is a general model that is agnostic of input language.
+
+Consider a directed acyclic graph $G = (V, E)$ corresponding to a
+streaming application. $F \in V$ is a filter in the application and
+$(f, g) \in E$ is an edge in the graph that denotes communication from
+$f$ to $g$ using a FIFO channel.  A filter may have multiple incoming
+edges and multiple outgoing edges.  Filter inputs are organized into a
+single FIFO buffer for the filter to read according to an {\it input
+distribution pattern}, and filter outputs are distributed from an
+output FIFO buffer according to a {\it output distribution pattern}.  Both
+are described below.
+
+One execution of a filter is termed a filter {\it firing}. For each
+filter $F \in V$ a {\it prework} function, $W_p(F)$, and a {\it work},
+$W(F)$ function is defined.  The prework function is executed on the
+first firing of the filter and the work function is executed on all
+subsequent firings of the filter.  These work functions are the atomic
+unit of computation for a filter and denote a function with the
+variable $\mathcal{F} \in \{W_p, W\}$.  In the work and prework
+functions, a filter accesses its input tape via the expressions {\tt
+pop()}, which dequeues and item, and {\tt peek(i)}, which inspects but
+does not dequeue the item at index {\tt i} from the beginning of the
+buffer (beginning at 0).  {\tt push(val)} enqueues an item onto the
+output buffer.
+
+For each filter $F \in V$ we define the following:
+\begin{itemize}
+
+\item $o(\mathcal{F}, F)$, the number of items dequeued from $F$'s
+input buffer per firing of $\mathcal{F}$,
+
+\item $e(\mathcal{F}, F)$, the number of items read (but not dequeued)
+from $F$'s input buffer per firing of $\mathcal{F}$,
+
+\item $u(\mathcal{F}, F)$, the number of items enqueued to $F$'s
+output buffer per firing of $\mathcal{F}$,
+
+\end{itemize}
+
+For all $F \in V$, we require that the above quantities be statically
+determinable.  Also, we require that the input and output distribution
+patterns be statically determinable.  This special case of streaming
+computation is termed synchronous dataflow (SDF) and it is natural and
+expressive for many domains including DSP, network, image, voice, and
+multimedia~\cite{leeSDF}.  Furthermore, applications with dynamic
+I/O rates can often be cut into static rate region for which the
+techniques in this paper are applicable~\cite{chen:graphics-hardware:2005}.
+
+A schedule of a graph $G$ gives a multiplicity for each filter $F \in
+V$ that denotes how many times to fire filter $F$. In the SDF domain,
+a {\it steady-state} schedule, $S$, of a graph can be calculated such
+that the quantity of items on each of the filter's input buffer and
+output buffer remains unchanged by the complete execution of the
+schedule~\cite{lee87}.  Thus this schedule can be repeated
+indefinitely because buffers to not grow or shrink in size.
+Furthermore, because of the {\tt peek} construct, a separate {\it
+initialization} schedule, $I$, is required. After the initialization
+schedule executes, each filter is guaranteed to have at least $e(W,
+F)$ items in its input buffer. The initialization schedule is required
+to calculate a steady-state schedule for a graph with an $F$ such that
+$e(W, F) > 0$~\cite{karczmarek:lctes:2003}.  During application
+execution, The initialization schedule is executed once followed by an
+infinite repetition of the steady-state schedule. 
+
+The number of items remaining on a $F$'s input buffer after execution
+of the initialization schedule is given by $C(F)$. A schedule of
+execution is denoted by the variable $\Sigma$, where $\Sigma \in
+\{I, S\}$.  The multiplicity of filter $F$ in schedule $\Sigma$ is
+denoted by $M(\Sigma, F)$.
+
+The input distribution pattern for filter $F$ for schedule $\Sigma$ is
+a weighted round-robin described by a vector $\mt{IW}(\Sigma, F) \in
+(\mathbb{N}^{*})^n$, and a vector $\mt{IE}(\Sigma, F) \in E^n$, where
+$|\mt{IE}(\Sigma, F)| = |\mt{IW}(\Sigma, F)|$. To gather the items on
+the multiple input edges for $F$ into $F$'s input buffer we cycle
+through the vectors, weight $w_i \in \mt{IW}(\Sigma, F)$ determines
+how many items to copy from edge $e_i \in \mt{IE}(\Sigma, F)$ to the
+current position in the input buffer.
+
+The output distribution pattern describes both duplication and
+distribution in the same structures. For filter $F$ and for schedule
+$\Sigma$, the distribution is given by a vector $\mt{OW}(\Sigma, F) \in
+(\mathbb{N}^{*})^n$, and a two-dimensional vector $\mt{IE}(\Sigma, F)
+\in E^{n,m}$.  
+
+
