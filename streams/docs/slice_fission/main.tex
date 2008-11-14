@@ -21,6 +21,10 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \newcommand{\mt}[1]{\mbox{\it #1}}
+\newcommand{\todo}[1]{
+    \addcontentsline{tdo}{todo}{\protect{#1}}
+    \marginpar{#1}
+}
 
 \begin{document}
 

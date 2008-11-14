@@ -101,3 +101,9 @@ to each of the edges $e \in D_i$. Each $D_i$ duplicates $w_i \in
 \mt{OW}(\Sigma, F)$ output items from $F$ before moving on to
 $D_{i+1}$.
 
+Finally, a filter can define field variables whose values are
+persistent across firings of the filter.  A filter $F$ is {\it
+stateless} if $F$ does not write to (and later read from) a field
+variable during firing.  Writing to a field variable will create a
+loop-carried dependence and prevent data-parallelization.
+
