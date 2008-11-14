@@ -73,18 +73,30 @@ execution is denoted by the variable $\Sigma$, where $\Sigma \in
 denoted by $M(\Sigma, F)$.
 
 The input distribution pattern for filter $F$ for schedule $\Sigma$ is
-a weighted round-robin described by a vector $\mt{IW}(\Sigma, F) \in
-(\mathbb{N}^{*})^n$, and a vector $\mt{IE}(\Sigma, F) \in E^n$, where
-$|\mt{IE}(\Sigma, F)| = |\mt{IW}(\Sigma, F)|$. To gather the items on
-the multiple input edges for $F$ into $F$'s input buffer we cycle
-through the vectors, weight $w_i \in \mt{IW}(\Sigma, F)$ determines
-how many items to copy from edge $e_i \in \mt{IE}(\Sigma, F)$ to the
+a weighted round-robin described by two sequences:
+
+\[ \mt{IW}(\Sigma, F) \in (\mathbb{N}^{*})^n \]
+
+\[ \mt{IE}(\Sigma, F) \in E^n \]
+ 
+Conceptually, to gather the items on the multiple input edges for $F$
+into $F$'s input buffer we cycle through the edges $e_i \in
+\mt{IE}(\Sigma, F)$ and copy $w_i \in \mt{IW}(\Sigma, F)$ items to the
 current position in the input buffer.
 
 The output distribution pattern describes both duplication and
 distribution in the same structures. For filter $F$ and for schedule
-$\Sigma$, the distribution is given by a vector $\mt{OW}(\Sigma, F) \in
-(\mathbb{N}^{*})^n$, and a two-dimensional vector $\mt{IE}(\Sigma, F)
-\in E^{n,m}$.  
+$\Sigma$, the distribution is given by a sequence of weights and
+sequence of set of edges:
+
+\[ \mt{OW}(\Sigma, F)  \in (\mathbb{N}^{*})^m \]
+
+\[ \mt{OE}(\Sigma, F) \in (D_1, D_2, ..., D_m)  \mbox{ where }  D_i \subset
+E \]
+
+
+
+Each set $D_i$ of the outgoing edges sequence denotes a
+duplication sec
 
 
