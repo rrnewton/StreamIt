@@ -66,12 +66,12 @@ u(W_p,F_1) & \equiv & u(W_P,F) + [M(I,F - 1) \times u(W_P,F)]
 
 \begin{eqnarray*}
 \mt{IW}(I,F_1) & \equiv & (1) \\
-\mt{IE}(I,F_1) & \equiv & (\{U,F_1\}) 
+\mt{IE}(I,F_1) & \equiv & ((U,F_1)) 
 \end{eqnarray*}
 
 \begin{eqnarray*} 
 \mt{OW}(I,F_1) & \equiv & (1) \\
-\mt{OE}(I,F_1) & \equiv & ((\{F_1, D\})) 
+\mt{OE}(I,F_1) & \equiv & ((\{(F_1, D)\})) 
 \end{eqnarray*} 
 
 \subsection{Steady-State Construction}
@@ -97,15 +97,41 @@ $W(F_i)$:
 
 \begin{eqnarray*}
 \mt{IW}(S,F_i) & \equiv & (1) \\
-\mt{IE}(S,F_i) & \equiv & (\{U,F_i\}) 
+\mt{IE}(S,F_i) & \equiv & ((U,F_i)) 
 \end{eqnarray*}
 
 \begin{eqnarray*} 
 \mt{OW}(S,F_i) & \equiv & (1) \\
-\mt{OE}(S,F_i) & \equiv & ((\{F_i, D\})) 
+\mt{OE}(S,F_i) & \equiv & (\{(F_i, D)\}) 
 \end{eqnarray*} 
 
-\begin{eqnarray*}
+\begin{eqnarray*} 
 \mt{IW}(S,D) & \equiv & (u(W,F_1),\ldots,u(W, F_P)) \\
-\mt{IE}(S,D) & \equiv & (\{F_1, D\},\dots,\{F_P, D\}) 
+\mt{IE}(S,D) & \equiv & ((F_1, D),\dots,(F_P, D)) 
 \end{eqnarray*}
+
+\begin{eqnarray*} 
+\mt{OW}(S,U) & \equiv & \left( \begin{array}{ccccccc} 
+o(W,F_1) - (e(W,F) + C(F)), & e(W,F), & o(W,F_2) - 2 \times e(W,F), &
+e(W,F), & \ldots, & e(W,F), & C(F) - e(W,F) \end{array} \right) \\
+\mt{OE}(S,U) & \equiv  & 
+\left( 
+\begin{array}{ccccccc} 
+	\left\{ (U,F_1) \right\}, & 
+	\left\{	
+		\begin{array}{c} (U,F_1) \\ (U,F_2) 
+		\end{array} 
+	\right\}, &
+	\left\{ (U,F_2) \right\}, & 
+	\left\{	
+		\begin{array}{c} (U,F_2) \\ (U,F_3) 
+		\end{array} 
+	\right\}, &
+	\ldots, & 	
+	\left\{	
+		\begin{array}{c} (U,F_P) \\ (U,F_1) 
+		\end{array} 
+	\right\}, &
+	\left\{ (U,F_1) \right\} 
+\end{array} \right)
+\end{eqnarray*} 
