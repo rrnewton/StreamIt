@@ -8,7 +8,7 @@ techniques discussed in Section~\ref{sec:general}.
 
 Given a stateless filter $F \in V$ and a fission factor $P$, we will
 data-parallelize $F$ by creating $P$ modified copies of the filter
-$F_1, ..., F_P$.  Each copy is constructed to execute an equal
+$F_1, \ldots, F_P$.  Each copy is constructed to execute an equal
 percentage firings of $F$ in $S$.  The initialization stage is handled
 in a special manner.  If $F$ executes in $I$ (i.e., $M(I,F) > 0$),
 then our transformation constructs $F_1$ such that it performs all the
@@ -95,3 +95,17 @@ $W(F_i)$:
 \end{algorithmic}
 \end{algorithm}
 
+\begin{eqnarray*}
+\mt{IW}(S,F_i) & \equiv & (1) \\
+\mt{IE}(S,F_i) & \equiv & (\{U,F_i\}) 
+\end{eqnarray*}
+
+\begin{eqnarray*} 
+\mt{OW}(S,F_i) & \equiv & (1) \\
+\mt{OE}(S,F_i) & \equiv & ((\{F_i, D\})) 
+\end{eqnarray*} 
+
+\begin{eqnarray*}
+\mt{IW}(S,D) & \equiv & (u(W,F_1),\ldots,u(W, F_P)) \\
+\mt{IE}(S,D) & \equiv & (\{F_1, D\},\dots,\{F_P, D\}) 
+\end{eqnarray*}

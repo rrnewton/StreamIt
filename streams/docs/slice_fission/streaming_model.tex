@@ -22,8 +22,9 @@ $\mathcal{F} \in \{W_p, W\}$.  In the work and prework functions, a
 filter accesses its input tape via the expressions {\tt pop()}, which
 dequeues and item, and {\tt peek(i)}, which inspects but does not
 dequeue the item at index {\tt i} from the beginning of the buffer
-(beginning at 0).  {\tt push(val)} enqueues an item onto the output
-buffer.
+(beginning at 0).  The statement {\tt pop(n)} dequeues {\tt n} items
+from the input queue and disregards the values.  {\tt push(val)}
+enqueues an item onto the output buffer.
 
 For each filter $F \in V$ we define the following:
 \begin{itemize}
