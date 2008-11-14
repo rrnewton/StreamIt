@@ -31,8 +31,6 @@ We make the following assertions on $F$:
 
 \todo{Discuss these more!}
 
-\subsection{Initialization Stage Construction}
-
 For the initialization stage the transformation defines the following,
 where $1 < x \le P$. First, the initialization
 schedule multiplicity and rates of filter $F_x$ are set to zero
@@ -56,13 +54,36 @@ $W_P(F_1)$:
 \end{algorithmic}
 \end{algorithm}
 
-The rates in $I$ of $F_1$ are as follows:
+For each of the work function of the $F_i$'s we execute the portion of
+$F$'s steady-state multiplicity and then we dequeue from the input
+tape the items we will not need for the next execution.  
+
+\begin{algorithm}
+$W(F_i)$:
+\begin{algorithmic}[1]
+\For{$M(S,F)/P$}
+\State $W(F)$
+\EndFor
+\State {\tt pop(}$e(W,F)${\tt)}
+\end{algorithmic}
+\end{algorithm}
+
+The rates of $F_1$ for $W_P$ and $W$ are as follows:
  
 \begin{eqnarray*} 
 o(W_p,F_1) & \equiv & o(W_p,F) + [(M(I,F) - 1) \times o(W,F)] \\
 e(W_p,F_1) & \equiv & \max(e(W_p,F), o(W_p,F_1) + e(W,F)) \\
 u(W_p,F_1) & \equiv & u(W_P,F) + [M(I,F - 1) \times u(W_P,F)]
 \end{eqnarray*} 
+
+\begin{eqnarray*} 
+o(W,F_i) & \equiv & \frac{M(S,F)}{P} \times o(W,F) + e(W,F)\\
+e(W,F_i) & \equiv & 0 \\
+u(W,F_i) & \equiv & \frac{M(S,F)}{P} \times u(W,F)
+\end{eqnarray*} 
+
+The distribution patterns for $F_x$ in $I$ are empty.  The
+distribution patterns of $F_1$ in $I$ are as follows:
 
 \begin{eqnarray*}
 \mt{IW}(I,F_1) & \equiv & (1) \\
@@ -74,26 +95,10 @@ u(W_p,F_1) & \equiv & u(W_P,F) + [M(I,F - 1) \times u(W_P,F)]
 \mt{OE}(I,F_1) & \equiv & ((\{(F_1, D)\})) 
 \end{eqnarray*} 
 
-\subsection{Steady-State Construction}
-Define the following: $1 \le i \le P$.
+Now we will concern ourselves with $S$, the steady-state.  Define the
+following: $1 \le i \le P$.
  
 $$ M(S,F_i) \equiv 1 $$
-
-\begin{eqnarray*} 
-o(W,F_i) & \equiv & \frac{M(S,F)}{P} \times o(W,F) + e(W,F)\\
-e(W,F_i) & \equiv & 0 \\
-u(W,F_i) & \equiv & \frac{M(S,F)}{P} \times u(W,F)
-\end{eqnarray*} 
-
-\begin{algorithm}
-$W(F_i)$:
-\begin{algorithmic}[1]
-\For{$M(S,F)/P$}
-\State $W(F)$
-\EndFor
-\State {\tt pop(}$e(W,F)${\tt)}
-\end{algorithmic}
-\end{algorithm}
 
 \begin{eqnarray*}
 \mt{IW}(S,F_i) & \equiv & (1) \\
