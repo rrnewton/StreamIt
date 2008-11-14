@@ -80,23 +80,24 @@ a weighted round-robin described by two sequences:
 \[ \mt{IE}(\Sigma, F) \in E^n \]
  
 Conceptually, to gather the items on the multiple input edges for $F$
-into $F$'s input buffer we cycle through the edges $e_i \in
-\mt{IE}(\Sigma, F)$ and copy $w_i \in \mt{IW}(\Sigma, F)$ items to the
-current position in the input buffer.
+into $F$'s input buffer, we cycle through the edges $e_i \in
+\mt{IE}(\Sigma, F)$ and wait for $w_i \in \mt{IW}(\Sigma, F)$ items
+from $e_i$ to arrive on the edge, enqueuing each onto the input buffer.
 
 The output distribution pattern describes both duplication and
 distribution in the same structures. For filter $F$ and for schedule
 $\Sigma$, the distribution is given by a sequence of weights and
-sequence of set of edges:
+sequence of sets of edges:
 
 \[ \mt{OW}(\Sigma, F)  \in (\mathbb{N}^{*})^m \]
 
 \[ \mt{OE}(\Sigma, F) \in (D_1, D_2, ..., D_m)  \mbox{ where }  D_i \subset
 E \]
 
-
-
-Each set $D_i$ of the outgoing edges sequence denotes a
-duplication sec
-
+Each set $D_i$ of the outgoing edges denotes a duplication set of
+edges. To scatter the items produced by a filter, we cycle through the
+sets $D_i \in \mt{OE}(\Sigma, F)$ duplicating the item produced by $F$
+to each of the edges $e \in D_i$. Each $D_i$ duplicates $w_i \in
+\mt{OW}(\Sigma, F)$ output items from $F$ before moving on to
+$D_{i+1}$.
 
