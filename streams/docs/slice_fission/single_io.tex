@@ -31,12 +31,38 @@ We make the following assertions on $F$:
 
 \todo{Discuss these more!}
 
-For the initialization stage the transformation defines the following,
-where $1 < x \le P$ and $1 \le i \le P$.
+\subsection{Initialization Stage Construction}
 
+For the initialization stage the transformation defines the following,
+where $1 < x \le P$. First, the initialization
+schedule multiplicity and rates of filter $F_x$ are set to zero
+because they are not involved in this stage:
 $$ M(I,F_x) \equiv o(W_p,F_x) \equiv u(W_p,F_x) \equiv e(W_p,F_x)
 \equiv 0 $$
 $$ M(I,F_1) \equiv 1 $$
+
+Next we define the properties of $F_1$ in the initialization stage. In
+the transformation, $W_P(F_1)$ is constructed to execute all of the
+firings of $F_1$ from $I$ in a single firing.  First $W_P(F)$ is
+called once, and $W(F)$ is executed $M(I,F) - 1$ times:
+
+\begin{algorithm}
+$W_P(F_1)$:
+\begin{algorithmic}[1]
+\State $W_P(F)$
+\For{$M(I,F) - 1$}
+\State $W(F)$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The rates in $I$ of $F_1$ are as follows:
+ 
+\begin{eqnarray*} 
+o(W_p,F_1) & \equiv & o(W_p,F) + [(M(I,F) - 1) \times o(W,F)] \\
+e(W_p,F_1) & \equiv & \max(e(W_p,F), o(W_p,F_1) + e(W,F)) \\
+u(W_p,F_1) & \equiv & u(W_P,F) + [M(I,F - 1) \times u(W_P,F)]
+\end{eqnarray*} 
 
 \begin{eqnarray*}
 \mt{IW}(I,F_1) & \equiv & (1) \\
@@ -48,8 +74,24 @@ $$ M(I,F_1) \equiv 1 $$
 \mt{OE}(I,F_1) & \equiv & ((\{F_1, D\})) 
 \end{eqnarray*} 
 
+\subsection{Steady-State Construction}
+Define the following: $1 \le i \le P$.
+ 
+$$ M(S,F_i) \equiv 1 $$
+
 \begin{eqnarray*} 
-o(W_p,F_1) & \equiv & o(W_p,F) + [(M(I,F) - 1) \times o(W,F)] \\
-e(W_p,F_1) & \equiv & \max(e(W_p,F), o(W_p,F_1) + e(W,F)) \\
-u(W_p,F_1) & \equiv & u(W_P,F) + [M(I,F - 1) \times u(W_P,F)]
+o(W,F_i) & \equiv & \frac{M(S,F)}{P} \times o(W,F) + e(W,F)\\
+e(W,F_i) & \equiv & 0 \\
+u(W,F_i) & \equiv & \frac{M(S,F)}{P} \times u(W,F)
 \end{eqnarray*} 
+
+\begin{algorithm}
+$W(F_i)$:
+\begin{algorithmic}[1]
+\For{$M(S,F)/P$}
+\State $W(F)$
+\EndFor
+\State {\tt pop(}$e(W,F)${\tt)}
+\end{algorithmic}
+\end{algorithm}
+
