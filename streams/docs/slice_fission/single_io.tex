@@ -1,5 +1,55 @@
 \section{Fission of a Single Input / Single Output Filter}
 \label{sec:single}
+
 In this section we introduce our techniques by defining the
 process of fission on a filter with a single input and a single
-output.  
+output. Portions of this process will be used for the more general
+techniques discussed in Section~\ref{sec:general}. 
+
+Given a stateless filter $F \in V$ and a fission factor $P$, we will
+data-parallelize $F$ by creating $P$ modified copies of the filter
+$F_1, ..., F_P$.  Each copy is constructed to execute an equal
+percentage firings of $F$ in $S$.  The initialization stage is handled
+in a special manner.  If $F$ executes in $I$ (i.e., $M(I,F) > 0$),
+then our transformation constructs $F_1$ such that it performs all the
+computation and data distribution of $F$ in $I$. $F$ has a single
+incoming edge ${U,F}$ and a single outgoing edge ${F, D}$.
+
+\todo{Figure showing the transformation}
+
+We make the following assertions on $F$:
+
+\begin{enumerate}
+
+\item $M(S,F) \mod  P = 0$
+
+\item $C(F) < O(S,F) \times M(S,F)$
+
+\item $M(S,F) \times O(S,F) \ge 2(e(S,F) - o(S,F))$
+
+\end{enumerate}
+
+\todo{Discuss these more!}
+
+For the initialization stage the transformation defines the following,
+where $1 < x \le P$ and $1 \le i \le P$.
+
+$$ M(I,F_x) \equiv o(W_p,F_x) \equiv u(W_p,F_x) \equiv e(W_p,F_x)
+\equiv 0 $$
+$$ M(I,F_1) \equiv 1 $$
+
+\begin{eqnarray*}
+\mt{IW}(I,F_1) & \equiv & (1) \\
+\mt{IE}(I,F_1) & \equiv & (\{U,F_1\}) 
+\end{eqnarray*}
+
+\begin{eqnarray*} 
+\mt{OW}(I,F_1) & \equiv & (1) \\
+\mt{OE}(I,F_1) & \equiv & ((\{F_1, D\})) 
+\end{eqnarray*} 
+
+\begin{eqnarray*} 
+o(W_p,F_1) & \equiv & o(W_p,F) + [(M(I,F) - 1) \times o(W,F)] \\
+e(W_p,F_1) & \equiv & \max(e(W_p,F), o(W_p,F_1) + e(W,F)) \\
+u(W_p,F_1) & \equiv & u(W_P,F) + [M(I,F - 1) \times u(W_P,F)]
+\end{eqnarray*} 
