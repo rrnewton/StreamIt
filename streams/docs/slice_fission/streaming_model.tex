@@ -16,16 +16,14 @@ are described below.
 
 One execution of a filter is termed a filter {\it firing}. For each
 filter $F \in V$ a {\it prework} function, $W_p(F)$, and a {\it work},
-$W(F)$ function is defined.  The prework function is executed on the
-first firing of the filter and the work function is executed on all
-subsequent firings of the filter.  These work functions are the atomic
-unit of computation for a filter and denote a function with the
-variable $\mathcal{F} \in \{W_p, W\}$.  In the work and prework
-functions, a filter accesses its input tape via the expressions {\tt
-pop()}, which dequeues and item, and {\tt peek(i)}, which inspects but
-does not dequeue the item at index {\tt i} from the beginning of the
-buffer (beginning at 0).  {\tt push(val)} enqueues an item onto the
-output buffer.
+$W(F)$ function is defined.  These work functions are the atomic unit
+of computation for a filter and denote a function with the variable
+$\mathcal{F} \in \{W_p, W\}$.  In the work and prework functions, a
+filter accesses its input tape via the expressions {\tt pop()}, which
+dequeues and item, and {\tt peek(i)}, which inspects but does not
+dequeue the item at index {\tt i} from the beginning of the buffer
+(beginning at 0).  {\tt push(val)} enqueues an item onto the output
+buffer.
 
 For each filter $F \in V$ we define the following:
 \begin{itemize}
@@ -64,7 +62,10 @@ F)$ items in its input buffer. The initialization schedule is required
 to calculate a steady-state schedule for a graph with an $F$ such that
 $e(W, F) > 0$~\cite{karczmarek:lctes:2003}.  During application
 execution, The initialization schedule is executed once followed by an
-infinite repetition of the steady-state schedule. 
+infinite repetition of the steady-state schedule.  The prework
+function is executed on the first firing of the filter in the
+initialization scheduler, and the work function is executed on all
+subsequent firings of the filter in both schedules.
 
 The number of items remaining on a $F$'s input buffer after execution
 of the initialization schedule is given by $C(F)$. A schedule of
