@@ -1,0 +1,187 @@
+======= Review 1 =======
+
+> *** Overall: Overall Recommendation
+Borderline (3)
+
+> *** Interest Factor: How interesting is the paper's topic or approach?
+Somewhat interesting. (4)
+
+> *** Technical Strength: Is the paper technically sound and correct?
+Minor flaws but conclusions still believable. (3)
+
+> *** Presentation: How well written is the paper?
+Very well written. A pleasure to read. (5)
+
+> *** Comments: Please provide comments summarizing the paper,
+      highlighting the paper's strengths and weaknesses, and
+      explaining your rating. Constructive feedback to the authors for
+      improving the paper is appreciated.
+
+This a paper on the compressed domain processing of losslessly
+compressed streams. The goal of the presented system is to provide
+significant processing speed-ups while preserving the compression
+efficiency as much as possible. The presented algorithm is claimed to
+be applicable to various LZ77 compressed video formats, unfortunately
+the results are only presented for a single format. Although, the
+speed-up and compression preservation performance is very good for the
+test videos (animations, ppt presentations, computer rendered
+graphics), these cover a relatively small subset of possible input
+videos. It is an open question for the reviewer if these compression
+and processing techniques could also be applied to real-world camera
+shots. Moreover the paper lacks any comparisons with the state of the
+art, and in Section 6 the authors claim lack of any comparable
+methods, however this reviewer is not an expert on this field and
+cannot judge the work in question in relation with related work.
+
+this paper appears to have been submitted to the wrong track. it does
+not deal with content processing or analysis in anyway and presents a
+framework/tool for compressed domain compositing and filtering. It
+could have been a better fit, if it were submitted to applications
+track.
+
+======= Review 2 =======
+
+> *** Overall: Overall Recommendation
+Borderline (3)
+
+> *** Interest Factor: How interesting is the paper's topic or approach?
+Somewhat interesting. (4)
+
+> *** Technical Strength: Is the paper technically sound and correct?
+Technically solid (4)
+
+> *** Presentation: How well written is the paper?
+Very well written. A pleasure to read. (5)
+
+> *** Comments: Please provide comments summarizing the paper,
+highlighting the paper's strengths and weaknesses, and explaining your
+rating. Constructive feedback to the authors for improving the paper
+is appreciated.
+
+This paper is not about mulitmedia content: by its own admission and
+design, it does not attempt to examine content at all.  It is about a
+tool, and has been submitted to the wrong track of ACM MM.  So this
+referee is not well-equipped to evaluate it with respect to the state
+of the art of streaming.
+
+Fundamentally, this is a paper about exploiting LZ encoding to
+minimize transformations, by preserving repeat codes.  This seems like
+a very straightforward idea, leading to simple code.  The value of the
+paper is its empirical investigation of its effect.  Or, in other
+words, the paper surveys how much compression can typically be
+conserved in practice, depending on genre.  In this regard it does
+reasonably well in theory, although it is disappointing, given the
+simplicity of the component parts, to read in Section 5 that it has
+only been partially implemented and tested on a single (though
+popular) format.
+
+Generally, the paper seems well written, although it is a bit wordy
+given its content.  The algorithms that have been implemented are
+well-tested (in one popular format).  The performance certainly shows
+speed-ups, although whether these are substantial enough improvements
+over the state of the art to merit publication is difficult for this
+reviewer to judge (hence the "borderline").  In particular, the most
+impressive speedups come with screenshots.  So, these claims seem to
+be a bit of a cheat, since particularly with ppt slides, the more
+trivial operations like intensity alteration can be done even faster
+by simply altering the redisplay parameters of the ppt source itself.
+
+Some details:
+
+The abstract claims speedups (1.1 to 471, median 15) that do not
+correspond to the claims in the paper (2.5 to 471, median 17).
+
+The introduction is well-written and clearly lays out the
+contributions (and the rest of the paper does make good on these
+promises).  Section 2 gives a good compact review of LZ and StreamIt.
+Section 3 cheats a bit by not describing splitters; a paragraph on it
+would help the reader.  However, section 3.1 summarizes the heart of
+the method clearly, which is basically a close tracking of integer
+arithmetic and modular residues, and Section 3.2 details concerns
+similarly.  Section 4 is a catalog that adds little technically, but
+supports the sales value of the product by its inclusivity; it can be
+shortened or even omitted for this conference.  (Unfortunately, this
+section appears later to be more theoretical than applied.)  Section 5
+shows that the implementation is only partial and that experimentation
+has been done on only one format (Apple Animation).  Nevertheless,
+this section appears to be much longer than necessary; most of the
+content is in Tables 1 and 2.  Section 6 would be better moved
+upfront, as part of the introduction, to better alert the reader of
+what novelties to expect.
+
+======= Review 3 =======
+
+> *** Overall: Overall Recommendation
+Borderline (3)
+
+> *** Interest Factor: How interesting is the paper's topic or approach?
+Somewhat interesting. (4)
+
+> *** Technical Strength: Is the paper technically sound and correct?
+Technically solid (4)
+
+> *** Presentation: How well written is the paper?
+Well written. Small errors that are correctable. (4)
+
+> *** Comments: Please provide comments summarizing the paper,
+highlighting the paper's strengths and weaknesses, and explaining your
+rating. Constructive feedback to the authors for improving the paper
+is appreciated.
+
+This paper describes a technique for performing a class of
+transformations on LZ77 compressed video while remaining entirely in
+the compressed domain.  Speedup and compression figures for simple
+operations on many different types of video are presented.
+
+Strong points:
+- The technique described in the paper achieves a very large speedup
+for single-pixel and compositing operations on many different types of
+video data -- most notably so on animations and presentations.
+- The problem of lossless video manipulation in the compressed domain
+appears to be one that has not been explored in the past.
+- The technique may generalize to many different types of data
+compressed using some form of RLE compression.
+- The technique is simple, clearly explained, and easy to understand.
+
+Weak points:
+- The practical relevance of the technique is not strongly
+established.  Only one of the formats that it applies to (Apple
+Animation) appears to be in widespread use, and this format has
+significant limitations in the types of video it can effectively be
+used for.  (Full-motion video is pretty much right out.)
+- Experiments are very limited and do not come close to exploring the
+advertised scope of the technique.  The authors frequently point out
+that the technique can be used for any transformation implemented in a
+particular dataflow language.  However, the only operations that are
+considered experimentally operate on just one pixel at a time -- or,
+in the compositing case, two pixels from different movies.  These are
+precisely the types of transformations in which this technique is most
+efficient.  It would be nice to see some comparisons based on
+multi-pixel filters, although the fact that the domain of each
+operation would span rows would likely significantly reduce the
+improvements provided by this algorithm.
+
+Comments to the authors:
+- The authors suggest many different extensions to their technique in
+the paper:  processing video in formats other than Apple Animation,
+working with compressed JPEG data, gracefully handling situations in
+which one form of redundancy (e.g., pixel-to-pixel consistency) is
+substituted for another (frame-to-frame consistency).  Exploring one
+or more of these extensions, even briefly, would help to allay fears
+about the relevance and generalizability of this algorithm.
+- p. 3 l. 20, "scaled by a factor m/n to reflect possible differences
+between the output":  "to reflect possible differences" is a very
+vague phrase.  Consider making it clearer that the uncompressed
+transformation would adjust the length by m/n, and this is just the
+same adjustment.
+- p. 3 r. 30, "For general algorithms such as gzip...":  are there any
+figures for Apple Animation or similarly restricted versions of LZ77?
+- p. 4, Figure 5.  Shouldn't "<3, 6> L A ~" be "<3, 9> L A ~"?
+- p. 4, Figure 7.  In the line "total_cycles = floor(c /(n_1 + n_2))",
+what is c?
+- p. 6, r. 30, "authentication generator for rails": "Rails"?  "Ruby
+  on Rails"?
+- p. 8, r. 16:  Is the comment about "skybuf" supposed to illustrate
+something in particular, or is it just there for color?  I can't tell.
+- p. 8, r. 16, "We further improved ...":  How much improvement did
+that net, even roughly?
