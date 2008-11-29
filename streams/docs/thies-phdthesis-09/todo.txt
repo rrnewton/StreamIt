@@ -1,33 +1,29 @@
-- fix first sentence of abstract to not define the domain of stream
-  programs
-- add sliding window to stream program characteristics
+- apps (1)
+- related work (2)
+- my comments (1)
+- saman comments (1)
+- acknowledgments / formatting (1)
+- final saman comments: (2)
 
-After defense:
-* do benchmark characteristics (and add stream graphs for all benchmarks?)
+---------------
+
+* put a whole benchmark in an appendix
+
+"this chapter is a large project, many people have worked on it"
+"primary description of this work is somewhere else, go look at it"
+remove "project leader part"
+say that it is described in other people's theses
+summary will show that language is amenable to optimization
+
+--------------------------
+
+Big things:
 * more honest communication of uniprocessor performance relative to C
   - and more clear about baselines in abstract, conclusions, etc.
 * SDEP calculation does not work for actors that need to fire a full
   steady state during the initialization schedule
   - replace right and wrong one with a single correct one
-* possibly revise writeup of constrained scheduling
-* check that messaging speedup makes any sense?
-+ big thing missing: some review of the basic compiler?  stages, flow, etc.
-+ add section on embedding streamit in a general purpose language? mention java lib 
-+ it looks like the filterbank linear flops removed doesn't match pldi (but does
-  match aalamb thesis).  check numbers are sound.
-- look for bogus vspace and remove it (e.g., next to figures)
-- make pullSchedule font same as repeat_lengths font, etc.
-- mention StreaMIT pronunciation?
-- consider finding good bold-italic font for my numbered titles
-- copyright infringement on numerical recipes?
-- improve formatting of code (bold the keywords)
-- get grant numbers for acknowledgements
-  - ask mary to get grants I'm funded from while here
-- check latest download numbers
-- mildly bothersome: the cache section is somewhat inconsistent about
-  referring to static state of a filter as only instructions
-  vs. instructions+data
-- SDEP not surjective, what do you do? 
+* SDEP not surjective, what do you do? 
   - SOLUTION:
    - current downstream constraints are:
      SDEP_A<-B (M(A,B,k1,k2,n)) >= n + k_1
@@ -35,6 +31,61 @@ After defense:
    - want to change them: 
      SDEP_A<-B (M(A,B,k1,k2,n)) >= n + k_1
      SDEP_A<-B (M(A,B,k1,k2,n)-1) < n + k_2
+* possibly revise writeup of constrained scheduling
+* check that messaging speedup makes any sense?
+* address arvind/srini comments in conclusion:  does this extend to dynamism?
+* acknowledgments
+* Saman comments (including pending comments)
+* make compression complete
+
+Little things:
+* say that adding an iter() keyword would remove additional state
+  - where?
+  - AssignPictureType in MPEGencoder.str
+* reconcile 3GPP in language section with the benchmark section
+* fix first sentence of abstract to not define the domain of stream
+  programs
+* add sliding window to stream program characteristics
+* somewhere say that two-stage filters also important for eliminating state
+  - e.g., delay, integerdifferenceencoder/decoder (jpeg.str)
+  - look at prework
+* acknowledge Amy as authoring raytracer
+* explain that in stream graphs, nodes annotated with "work=unknown"
+  represent cases where our work estimation algorithm was known to do
+  poorly, so we did not include it in the report
+- mention StreaMIT pronunciation?
+- note from rodric (same with FFT1Dshift)
+  // 2D FFT shift: criss-cross swap of the four matrix quadrants
+  // NOTE: if there were a reverse roundrobin joiner, it would be
+  // trivial to do this data reorganization
+  complex->complex filter FFT2Dshift(int rows, int cols)
+- mention diffs of apps between apps table and other sections
+
+Mindless:
+- cite seneff vocoder article (from asplos'02) so it appears in appendix
+- cite Tennenhouse, D., Bose, V.: The SpectrumWare Approach to Wireless Signal Processing. Wireless Networks (1999))
+  for OFDM
+- indicate messaging pairs on mpeg encode, mpeg decode, mosaic stream graph
+  - and check MPEG2 encoder portals (done haphazardly while tired)
+- fix bibliography
+- fix vspace between figures, and between figures and text (Saman)
+- make pullSchedule font same as repeat_lengths font, etc.
+- consider finding good bold-italic font for my numbered titles
+- improve formatting of code (bold the keywords)
+- get grant numbers for acknowledgements
+  - ask mary to get grants I'm funded from while here
+- check latest download numbers
+
+Probably not fixing:
+. mildly bothersome: the cache section is somewhat inconsistent about
+  referring to static state of a filter as only instructions
+  vs. instructions+data
+. big thing missing: some review of the basic compiler?  stages, flow, etc.
+. add section on embedding streamit in a general purpose language? mention java lib 
+. it looks like the filterbank linear flops removed doesn't match pldi (but does
+  match aalamb thesis).  check numbers are sound.
+. copyright infringement on numerical recipes?
+. redo graphs of sorts, a few dcts (missing hierarchy)?
 
 Related work:
 - Automatic generation of systolic programs from nested loops (CMU)
@@ -48,11 +99,40 @@ Related work:
 - everything from Ed Lee's emails
 - lucid synchrone?
 - improve comparison to brook
+- onanian, j.s. a signal processing language for coase grain dataflow
+  multiprocessors'', mit-lcs-tr-449, 1989
+  http://library.mit.edu/F/U5BDSQEUGUH54XNE5XNDF2NCSGNXS6FI1VPIX9GH7UFG84HF8F-03143?func=item-global&doc_library=MIT01&doc_number=000399046&year=&volume=&sub_library=ARC
+- papers to cite
+  - Structuring Protocols with Data Streams
+  - Protocol implementation using integrated layer processing
+  - generating efficient protocol code from an abstract specification
+  - structuring and destructuring protocols (thesis + paper)
+  - a data-stream language for protocols
+  - distributed stream control for self-managing media processing graphs
+  - stream computations organized for reconfigurable execution (score):
+  - introduction and tutorial
+  - parallel signal processing for everyone
+  - compile-time scheduling of dyanmic constructs in dataflow program graphs
+  - ecos graphs: a dataflow programming language
+  - static mapping of functional programs an example in signal processing
+  - stream data types for signal processing
+  - domain flow and streaming architectures
+  - a constraint optimization framework for mapping a digital signal
+  - processing application onto a parallel architecfture
+  - filter fusion
+  - partial evaluation for media processing
+  - design of the promis compiler - towards multi-level parallelization
+  - an esterel compiler for large control-dominated systems
+  - mibench: a free, commercially representative embedded benchmark suite
+  - piperench: a receonfigurable architecture and compiler
+  - cheops: a reconfigurable data-flow system for video processing
+  - PCI-PipeRench and the SwordAPI:  a system for stream-based
+  - reconfigurable computing
+  - piperench: a coprocessor for streaming multimedia acceleration
 
 Submitting: 
-- if Arvind/Srini want to be on cover page, uncomment in cover.tex
 - in 38-444:
   - 2 copies on acid-free paper
-  - an extra copy of your abstract>
-  - complete UMI form (University Microfilms Inc.)
-  - complete SED form (Survey of Earned Doctorates)
+  - an extra copy of your abstract
+  x complete UMI form (University Microfilms Inc.)
+  x complete SED form (Survey of Earned Doctorates)
