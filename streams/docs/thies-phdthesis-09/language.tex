@@ -470,7 +470,7 @@ sketching~\cite{bit-streaming}.
 While the reordering primitives we have defined are quite expressive,
 it should be noted that they are not complete.  Because splitters
 always distribute their first input item to the first output channel
-(and likewise with joiners), it is impossible to express a pure
+(and likewise with joiners), it is impossible to express a general
 permutation in which the first item is reordered to a different
 position of the stream.  However, this behavior can be emulated by
 introducing simple computational nodes, such as a filter that
@@ -493,16 +493,26 @@ our application set.
 %%   - table:
 %%     - benchmark name
 %%     - benchmark description / reference
-%%     - number of static / dynamic streams
+%%     - author(s)
+%%     - lines of code
+%%     - number of static splitjoins, feedbackloops, filters, pipelines
+%%
+%%     automation:
 %%     - number peeking
 %%     - number stateless?
 %%       - better: fraction of stateful work, largest work in stateful filter
+%%     - number of dynamic filters, splitjoins, feedback loops (following collapse)
+%%
+%%     after:
+%%     - stream graph
 %%     - number of messaging pairs
-%%     - parameterized by -- how the benchmark can grow
-%%     - number of splitjoins, feedback loops
-%%     - author(s)
-%%     - lines of code
+%%     - parameterization (and default values of those parameters)
+%%
+%%     not doing:
 %%     - dynamic control flow?
+%%     - computation to communication ratio (do I trust work estimate?)
+%%     - extent of peeking
+%%     - extent of roundrobin weights
 {\small
 \begin{verbatim}
 Ground Moving Target Indicator (GMTI)      GSM decoder                       

@@ -199,17 +199,6 @@ References
       prove execution times and show that this scheduler is within some
       constant factor of optimal.
 
-TO READ
--------
-
-onanian, j.s. a signal processing language for coase grain dataflow
-multiprocessors'', mit-lcs-tr-449, 1989
-http://library.mit.edu/F/U5BDSQEUGUH54XNE5XNDF2NCSGNXS6FI1VPIX9GH7UFG84HF8F-03143?func=item-global&doc_library=MIT01&doc_number=000399046&year=&volume=&sub_library=ARC
-
-
-OUTLINE
--------
-
 Intro
 -----
 
@@ -363,6 +352,7 @@ J.P. Urbanski
 jonathan birnbaum
 Jonathan Ledlie
 Luis F. G. Sarmenta
+Zain-ul abdin and company
 
 Mary McDavitt
 Michael Vezza
@@ -404,3 +394,123 @@ Mark Stephenson
 
 ----------------
 
+grep filter transmit.str | grep "\->" | wc -l
+
+-----------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------
+
+apps section:
+
+- expand on conversion of stateful to stateless
+  - talk about remaining stateful cases?
+  - that iter() can be resolved with special keyword, or induction
+    variable analysis
+
+- new language characteristic: 
+  peeking and prework were important for exposing state
+
+- more quantitative evaluation of matched I/O rates
+
+- example application in back
+
+------------
+
+Things not included:
+  - prework filters (static / dynamic / percent work (total) / percent work (max) )
+  - comp/comm ratio (forget it because it's misleading (fusion/fission))
+
+Summary graphs:
+  - histogram: size by lines of code
+  - histogram: size by number of filters in expanded graph
+  - histogram: median mult, or percentage of mult-one filters
+
+-----------
+
+* see what stateful cases remaining
+
+- where is prework used?
+ - OneBitDToA - Delay
+ - Vocoder - Delay, FirstDifference
+ - MPEG2 decode - PictureReorder (initialize picture buffering)
+ - MPEG2 encode - ReorderPictures (pushes first frame through)
+ - JPEGdecoder, Transcoder - IntegerDifferenceEncoder, IntegerDifferenceDecoder
+ - MPD - SingleMultiply, FIRCleanup (deal with startup conditions?), Delay
+ - Lattice - Delay
+ - 802.11a - in conv_code_pipeline, initialize pipeline with items
+ - HDTV - delay, Predecoder with sliding xor with first time set to 0
+ - CRC - ShiftRegisterFilter (analogous to delay?)
+ - Nokia - delay
+ - Filterbank - delay
+ - Gsm - AdditionUpdateFilter, AdditionUpdateDuplication -- looks analogous to delays
+ - SampleTrellis - delay
+
+   float->float filter FirstDifference() {
+
+       prework push 1 peek 1 {
+           push(peek(0));
+       }
+
+       work push 1 pop 1 peek 2 {
+           push(peek(1) - peek(0));
+           pop();
+     }
+   } 
+
+  int->int filter IntegerDifferenceEncoder {
+      prework push 1 peek 1 {
+          push(peek(0));
+      }
+      work pop 1 peek 2 push 1 {
+          push(peek(1)-peek(0));
+          pop();
+      }
+  }
+
+  /* Performs the reverse operation as BlockDCDifferenceEncoder */
+  int->int filter IntegerDifferenceDecoder {
+      prework push 1 peek 1 {
+          push(peek(0));
+      }
+      work pop 1 peek 2 push 1 {
+          push(peek(1)+peek(0));
+          pop();
+      }
+  } 
+
+- where is peeking used?
+  - do breakdown of FIR versus other uses
+
+- where are stateful filters used? (and why can't state be eliminated?)
+
+- where are feedback loops used? (and why can't feedback loops be eliminated?)
+
+- possibly show MPD example re: state
