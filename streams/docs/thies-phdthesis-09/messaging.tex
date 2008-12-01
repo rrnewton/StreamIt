@@ -1136,7 +1136,7 @@ $S$.  There are two cases\footnote{In a feedback path, both cases
   might apply.  In this event, we assume the message is being sent
   upstream.}:
 
-\begin{enumerate}
+\mybegin
 
 \item If $R$ is downstream of $S$, then the message handler must be
 invoked in $R$ immediately before its $m$th execution, where $m$
@@ -1159,7 +1159,7 @@ constrained as follows:
 \sdepf{R}{S}(n + k_1) \le m \le \sdepf{R}{S}(n + k_2)
 \end{array}
 \]
-\end{enumerate}
+\myend
 \end{definition}
 
 For example, consider the FIR code in

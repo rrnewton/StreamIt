@@ -5,9 +5,9 @@ This chapter validates the premise that stream programming enables new
 and powerful optimizations that are outside the reach of a traditional
 compiler.  We highlight three projects in the StreamIt group:
 
-\begin{enumerate}
+\mybegin
 
-\item {\it Parallelization.}  We demonstrate an end-to-end stream 
+\myitem {Parallelization.}  We demonstrate an end-to-end stream 
 compiler that attains robust multicore performance in the face of
 varying application characteristics.  As benchmarks exhibit different
 amounts of task, data, and pipeline parallelism, we exploit all types
@@ -17,7 +17,7 @@ the 16-core Raw architecture, attains an 11x mean speedup and an 18x
 maximum speedup over a single-core baseline.  {\it Project leader:}
 Michael Gordon~\cite{gordon-asplos06}.
 
-\item {\it Optimizing Linear Computations}.  We demonstrate that 
+\myitem {Optimizing Linear Computations}.  We demonstrate that 
 several algorithmic transformations, traditionally hand-tuned by DSP
 experts, can be completely automated by the compiler.  We focus on
 linear filters, where each output is an affine combination of the
@@ -29,7 +29,7 @@ StreamIt on a Pentium~4.  {\it Project leaders:} Andrew
 Lamb~\cite{lamb-pldi03,lamb-thesis} and Sitij
 Agrawal~\cite{agrawal-cases05,agrawal-thesis}.
 
-\item {\it Cache Optimizations}.   We formulate a set of cache aware 
+\myitem {Cache Optimizations}.   We formulate a set of cache aware 
 optimizations that automatically improve instruction and data
 locality.  We highlight two techniques: 1) cache aware fusion, which
 combines adjacent filters while respecting instruction cache
@@ -40,7 +40,7 @@ average speedup and an 88x maximum speedup over unoptimized StreamIt
 on a StrongARM 1110 processor.  {\it Project leader:} Janis
 Sermulins~\cite{sermulins:lctes:2005,sermulins-thesis}.
 
-\end{enumerate}
+\myend
 
 While the author contributed to each of these projects, they are the
 full-time focus of other individuals and also appear (or will appear)
@@ -1449,7 +1449,7 @@ representation in future work.
 %% programming model, the results suggest that these features are a good
 %% match for multicore architectures.  Of particular importance are the
 %% following two language features:
-%% \begin{enumerate}
+%% \mybegin
 %% \item Exposing producer-consumer relationships between filters.  This
 %% enables us to coarsen the computation to communication ratio via
 %% filter fusion, and also enables pipeline parallelism.
@@ -1458,7 +1458,7 @@ representation in future work.
 %% central to the formulation of software pipelining; it also enables
 %% data parallelism, as the products of filter fission may span multiple
 %% steady-state iterations.
-%% \end{enumerate}
+%% \myend
 
 % what did linear rely on from streamit?
 % - separation of states and inputs

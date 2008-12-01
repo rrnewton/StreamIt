@@ -24,10 +24,10 @@ fixed and known at compile-time.  This allows the compiler to perform
 static scheduling and optimization of the stream graph.
 
 StreamIt differs from synchronous dataflow in five respects:
-\begin{enumerate}
+\mybegin
 
-\item {\it Multiple execution steps.}  Certain pre-defined actors have
-  more than one execution step; they are called repeatedly, in a
+\myitem {Multiple execution steps.}  Certain pre-defined actors have
+  more than one execution step; the steps are called repeatedly, in a
   cyclic fashion, by the runtime system.  This execution model mirrors
   cyclo-static
   dataflow~\cite{bilsen_cyclo-static_1995,parks_comparison_1995}.  The
@@ -37,7 +37,7 @@ StreamIt differs from synchronous dataflow in five respects:
   user-programmable actors as well, the benefits did not merit the
   corresponding confusion experienced by programmers.)
 
-\item {\it Dynamic rates.}  The input and output rates of actors may
+\myitem {Dynamic rates.}  The input and output rates of actors may
   optionally be declared to be dynamic.  A dynamic rate represents
   that the actor will produce or consume an unpredictable number of
   data items that is known only at runtime.  Dynamic rates are
@@ -47,15 +47,16 @@ StreamIt differs from synchronous dataflow in five respects:
   actors, we have runtime support for dynamic rates (as demanded by
   applications such as MPEG-2~\cite{drake-ipdps06}).
 
-\item {\it Teleport messaging.}  Our support for irregular,
+\myitem {Teleport messaging.}  Our support for irregular,
   out-of-band control messaging falls outside of the traditional
   synchronous dataflow model.  However, it does not impede static
   scheduling.  See Chapter~\ref{chap:messaging} for details.
 
-\item {\it Peeking.}  StreamIt allows actors to ``peek'' at data items
+\myitem {Peeking.}  StreamIt allows actors to ``peek'' at data items 
   on their input tapes, reading a value without dequeuing it from the
-  channel.  This feature implies that there are two stages to
-  scheduling: an initialization schedule that grows buffers until they
+  channel.  Peeking is important for expressing sliding window
+  computations.  To support peeking, two stages of scheduling are
+  required: an initialization schedule that grows buffers until they
   accumulate a threshold number of peeked items, and a steady-state
   schedule that preserves the size of the buffers over time.  While
   peeking can be represented as edge-wise ``delays'' in the original
@@ -63,12 +64,12 @@ StreamIt differs from synchronous dataflow in five respects:
   the scheduling and optimization research on synchronous dataflow
   does not consider the implications of these delays.
 
-\item {\it Communication during initialization.}  StreamIt allows
+\myitem {Communication during initialization.}  StreamIt allows
   actors to input and output a known number of data items during their
-  initialization.  This communication is also incorporated into the
-  initialization schedule.
+  initialization (as part of the {\it prework} function).  This
+  communication is also incorporated into the initialization schedule.
 
-\end{enumerate}
+\myend
 
 With the basic computational model in hand, the rest of this section
 describes how StreamIt specifies the computation within actors as well
@@ -94,6 +95,9 @@ maintained as state within the filter.  During steady state execution,
 the {\it work} function is called repeatedly.  Inside of work, filters
 can {\it push} items to the output channel, {\it pop} items from the
 input channel, or {\it peek} at a given position on the input channel.
+Filters requiring different behavior on their first execution can
+declare a {\it prework} function, which is called once between {\it
+init} and {\it work}.
 
 \begin{figure}[t]
 
@@ -186,16 +190,17 @@ void do_FIR(float* weights, int N,
 \end{minipage}
 \end{figure}
 
-The work function declares how many items it will push and pop, and
-the maximum number of items it might peek, as part of its declaration.
-To benefit from static scheduling, these expressions must be
-resolvable to constants at compile time (dynamic rates are declared
-using a different syntax~\cite{streamit-lang-spec}). While a static
-analysis can infer the input and output rates in most cases, in
-general the problem is undecidable.  Our experience has been that rate
-declarations provide valuable documentation on the behavior of the
-filter.  In cases where the rates can be inferred, the declarations
-can be checked by the compiler.
+The work and prework functions declare how many items they will push
+and pop, and the maximum number of items they might peek, as part of
+their declarations.  To benefit from static scheduling, these
+expressions must be resolvable to constants at compile time (dynamic
+rates are declared using a different
+syntax~\cite{streamit-lang-spec}). While a static analysis can infer
+the input and output rates in most cases, in general the problem is
+undecidable.  Our experience has been that rate declarations provide
+valuable documentation on the behavior of the filter.  In cases where
+the rates can be inferred, the declarations can be checked by the
+compiler.
 
 The StreamIt version of the FIR filter is easy to parallelize and
 optimize.  Because there is no mutable state within the filter (that
@@ -242,32 +247,32 @@ situation for both man and machine.
 
 \begin{figure}[t]
 \centering
-\begin{minipage}{0.46in}
+\begin{minipage}{0.598in}
 {\centering
-\psfig{figure=pipeline.eps,width=0.46in} \\
+\psfig{figure=pipeline.eps,width=0.598in} \\
 }
 \end{minipage} 
-\hspace{0.15in}
-\begin{minipage}{1.3in}
+\hspace{0.45in}
+\begin{minipage}{1.69in}
 {\centering
-\psfig{figure=splitjoin.eps,width=1.3in} \\
+\psfig{figure=splitjoin.eps,width=1.69in} \\
 }
 \end{minipage}
-\hspace{0.15in}
-\begin{minipage}{1.02in}
+\hspace{0.45in}
+\begin{minipage}{1.326in}
 {\centering
-\psfig{figure=feedback.eps,width=1.02in} \\
+\psfig{figure=feedback.eps,width=1.326in} \\
 }
 \end{minipage}
-\\ ~ \\ {\mbox{~}\protect\small \mbox{~}(a) A pipeline. ~~~~~(b) A splitjoin. ~~~~~~~~(c) A feedbackloop.~~~~~}
+\\ ~ \\ {\mbox{~}\protect\small \mbox{~}(a) A pipeline. ~~~~~~~~~~~~~~~~~~~~(b) A splitjoin. ~~~~~~~~~~~~~~~~~~~~~~~(c) A feedbackloop.~~~~~~~~}
 \caption{Hierarchical stream structures in StreamIt.\protect\label{fig:structures}}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\psfig{figure=fir-pipeline.eps,width=2.33in}
+\psfig{figure=fir-pipeline.eps,width=2.8in}
 \hspace{0.15in}
-\psfig{figure=fir-pipeline2.eps,width=0.46in}
+\psfig{figure=fir-pipeline2.eps,width=0.598in}
 \caption{Example pipeline with FIR filter.\protect\label{fig:pipeline}}
 \end{figure}
 
@@ -336,12 +341,13 @@ Figure~\ref{fig:pipeline} illustrates the syntax for pipelines; the
 and appended to the current pipeline.  A splitjoin represents a set of
 parallel and independent streams; a {\it splitter} distributes data
 from the input channel to the parallel components, while a {\it
-  joiner} interleaves the streams' results onto the output channel.
-In this case, each call to {\it add} specifies a separate parallel
-stream (see Figure~\ref{fig:fm-radio}).  The language provides a fixed
-set of pre-defined splitters and joiners, encompassing duplication and
-round-robin behavior (more details below).  Finally, the feedbackloop
-structure provides a way to induce cycles in the stream graph.
+joiner} interleaves the streams' results onto the output channel.  In
+this case, each call to {\it add} specifies a separate parallel stream
+(see Figure~\ref{fig:fm-radio}).  The language provides a fixed set of
+pre-defined splitters and joiners, encompassing duplication and
+round-robin behavior (detailed in the next section).  Finally, the
+feedbackloop structure provides a way to induce cycles in the stream
+graph.
 
 %% The primary motivation for introducing structure in the language is to
 %% ensure a disciplined and readable programming style.  There is an
@@ -359,12 +365,13 @@ forces a canonical and hierarchical expression of the control.  While
 skeptics once argued that certain patterns would be more naturally
 expressed using GOTO statements, over time there emerged structured
 idioms that were equally recognizable.  For example, while a state
-machine can be written with GOTO statements for each state transition,
-it can also be written as a dispatch loop.  Structured control flow
-also benefited compilers, because non-sensical control flow graphs
-could be ruled out in favor of the common case.  The entire field of
-loop optimizations would have been much more difficult if it had to
-address the full complexity of an unstructured programming model.
+machine can be written using a GOTO statement for each state
+transition, it can also be written as a dispatch loop.  Structured
+control flow also benefited compilers, because non-sensical control
+flow graphs could be ruled out in favor of the common case.  The field
+of loop optimizations would have been much more difficult to develop
+if researchers had to cope with the full complexity of an unstructured
+programming model.
 
 We believe that imposing structure on a stream graph can offer similar
 benefits.  From the programmer's perspective, structured streams offer
@@ -470,14 +477,16 @@ sketching~\cite{bit-streaming}.
 While the reordering primitives we have defined are quite expressive,
 it should be noted that they are not complete.  Because splitters
 always distribute their first input item to the first output channel
-(and likewise with joiners), it is impossible to express a pure
+(and likewise with joiners), it is impossible to express a general
 permutation in which the first item is reordered to a different
 position of the stream.  However, this behavior can be emulated by
 introducing simple computational nodes, such as a filter that
 decimates some of its inputs.  Of course, it could also be rectified
 by adding programming language support for adjusting the order of
-items output.  We have not found this functionality to be needed in
-our application set.
+items output.  To our knowledge, the only benchmark in our suite that
+could leverage such a primitive is synthetic aperture radar (SAR), in
+which four matrix quadrants are re-shuffled in preparation for an FFT.
+We have not found this functionality to be broadly needed.
 
 %% Some programs are elegant, some are exquisite, some are sparkling.
 %% My claim is that it is possible to write grand programs, noble
@@ -487,104 +496,436 @@ our application set.
 \section{Experience Report}
 \label{sec:lang-experience}
 
-\begin{table}[t]
-\centering
-%% - streamit benchmark suite
-%%   - table:
-%%     - benchmark name
-%%     - benchmark description / reference
-%%     - author(s)
-%%     - lines of code
-%%     - number of static splitjoins, feedbackloops, filters, pipelines
-%%
-%%     automation:
-%%     - number peeking
-%%     - number stateless?
-%%       - better: fraction of stateful work, largest work in stateful filter
-%%     - number of dynamic filters, splitjoins, feedback loops (following collapse)
-%%
-%%     after:
-%%     - stream graph
-%%     - number of messaging pairs
-%%     - parameterization (and default values of those parameters)
-%%
-%%     not doing:
-%%     - dynamic control flow?
-%%     - computation to communication ratio (do I trust work estimate?)
-%%     - extent of peeking
-%%     - extent of roundrobin weights
-{\small
-\begin{verbatim}
-Ground Moving Target Indicator (GMTI)      GSM decoder                       
-Feature-Aided Tracker (FAT)                FM software radio                 
-Synthetic Aperture Radar (SAR)             DES and serpent encryption        
-Radar array front-end                      Matrix multiplication             
-3GPP physical layer subset                 Graphics shading and rendering    
-Vocoder with speech transformation         Sample rate converter             
-MP3 decoder subset                         Target detector                   
-MPEG-2 encoder and decoder                 Channel vocoder                   
-MPEG-4 decoder subset                      Library of DCTs, FFTs, Filterbanks
-JPEG encoder and decoder                   Library of sorting algorithms     
-\end{verbatim}}
-%TODO: include detailed application characteristics, possibly stream graphs
-\caption{StreamIt benchmark suite.\protect\label{tab:lang-benchmarks}}
+\begin{table}[t!]
+\vspace{-1\baselineskip}
+\psfig{file=benchmarks,width=\textwidth}
+\vspace{-1.5\baselineskip}
+\caption{Overview of the StreamIt benchmark suite.\protect\label{tab:lang-benchmarks}}
+\vspace{-0.5in}
 \end{table}
 
-%% TODO: add all the stream graphs?
-%% could be annotated with:
-%% - amount of work
-%% - stateful / stateless
-%% - dynamic control flow
-%% - peeking
-%% - I/O rates
+\begin{table}[t!]
+\vspace{-1.5\baselineskip}
+\psfig{file=benchmarks-params,width=\textwidth}
+\vspace{-1.5\baselineskip}
+\caption{Parameterization and scheduling statistics for StreamIt 
+benchmarks.\protect\label{tab:lang-benchmarks-params}}
+\vspace{-0.5in}
+\end{table}
 
-The StreamIt benchmark suite is detailed in
-Table~\ref{tab:lang-benchmarks}.  In addition to our own benchmarks,
-researchers at Halmstad University have used StreamIt to develop a
-medium pulse repetition frequency doppler radar
-(MPD)~\cite{ola-techrep}.  The largest benchmarks are GMTI, MPEG-2,
-FAT, and SAR.  At the time of this writing, shortcomings in the
-compiler have prevented us from obtaining performance numbers for
-these complete applications.  However, their functional correctness
-has been verified in the Java runtime for the StreamIt language.
+\begin{table}[t!]
+\vspace{-2\baselineskip}
+\psfig{file=benchmarks-filters,width=\textwidth}
+\vspace{-1.5\baselineskip}
+\caption{Properties of filters and other constructs in StreamIt 
+benchmarks.\protect\label{tab:lang-benchmarks-filters}}
+\vspace{-0.5in}
+\end{table}
 
-While our initial conception of stream programs proved to be generally
-accurate, in developing the benchmark suite we encountered a few
-surprises regarding the benchmarks' common-case behavior.  The
-following observations should be taken in the context of our own
-benchmark suite, which is necessarily limited and biased.  However,
-they might nonetheless be informative for other researchers:
+Over the past eight years, we have gained considerable experience in
+developing applications in StreamIt.  We reflect on this experience
+first via a quantitative analysis of our benchmark suite, and then via
+qualitative impressions from StreamIt programmers.
 
-\begin{enumerate}
+An overview of the StreamIt benchmark suite appears in
+Table~\ref{tab:lang-benchmarks}.  At the time of this writing, the
+suite consists of 67 programs, including 29 realistic applications, 4
+graphics rendering pipelines, 19 libraries and kernels, 8 sorting
+routines, and 7 toy examples.  Benchmarks range in size from 21 lines
+(Fibonacci) to over 4,000 lines (MPEG2 encoder), with a total of
+33,800 non-comment, non-blank lines in the suite\footnote{Counting
+commented lines (8,000) and blank lines (7,300), the benchmark suite
+comes to 49,300 lines.}.  Over 20 people contributed to the suite,
+including 6 from outside our group; median-pulse compression doppler
+radar was developed at Halmstad University~\cite{ola-techrep}, TDE was
+developed at ISI, an FFT and bitonic sort were developed at UC
+Berkeley~\cite{mani-permutations}, and the graphics pipelines were
+implemented primarily by the graphics group at
+MIT~\cite{chen-graphics05}.  Benchmarks were often adapted from a
+reference implementation in C, Java, or MATLAB.
 
-\item {\it Filters rarely contain mutable state.}  While other
-  researchers have noted that stream programs are rich in data
-  parallelism~\cite{imagine03ieee}, we nonetheless expected to see a
-  greater proportion of filters that retained mutable state between
-  execution steps.  Without mutable state, filters can be split into
-  multiple instances that operate on separate sections of the input
-  stream; this is perhaps the most straightforward parallelism to
-  exploit.  However, with mutable state, only one instance of the
-  filter is possible, and the compiler must exploit task- and
-  pipeline-parallelism between the filter and others in the graph.
+Graphical depictions of the stream graphs for each benchmark can be
+found in Appendix~\ref{chap:stream-graphs}, while the complete source
+code for a small benchmark (ChannelVocoder) can be found in
+Appendix~\ref{chap:example-program}.  A subset of the benchmarks have
+also been prepared for public release on the StreamIt
+website~\cite{streamitweb}.  At the time of this writing, some of the
+larger benchmarks (MPEG2, GMTI, Mosaic, FAT, HDTV) are not fully
+supported by the compiler.  However, their functional correctness has
+been verified in the Java runtime for the StreamIt language.
 
-  The state observed can be explained as follows.  Vocoder performs an
-  adaptive DFT that uses a stateful decay to ensure stability; it also
-  needs to retain the previous output across one iteration within a
-  phase transformation.  MPEGDecoder maintains significant state in
-  the parser, and also has negligible state in retaining predicted
-  motion vectors across one iteration of work.  Radar repeatedly
-  operates on long columns of an array requiring special behavior at
-  the boundaries; thus, the state tracks the position in the column
-  and does some internal buffering.  Radar can be rewritten at a
-  coarse level of granularity to eliminate this state.
+It is important to recognize that most of the benchmarks are
+parameterized, and we study only one assignment of those parameters in
+our quantitative evaluation.  Table~\ref{tab:lang-benchmarks-params}
+details the parameterization of the StreamIt benchmarks (in addition
+to scheduling statistics, which are discussed later).  In two-thirds
+(44) of the benchmarks, the parameters affect the structure of the
+stream graph, often by influencing the length of pipelines, the width
+of splitjoins, the depth of recursion hierarchies, or the absence or
+presence of given filters.  The same number of benchmarks contain
+parameters that affect the I/O rates of filters (e.g., the length of
+an FIR filter), but do not necessarily affect the structure of the
+graph.  Changes to the I/O rates also imply changes to the schedule
+and possibly the balance of work across filters.  In selecting values
+for these parameters, our primary goal was to faithfully represent a
+real-life application of the algorithm.  In some cases we also
+decreased the sizes of the parameters (e.g., sorting 16 elements at a
+time) to improve the comprehensibility of the stream graph.  For
+benchmarking purposes, researchers may wish to scale up the parameters
+to yield larger graphs, or to vary the ratio between parameters to
+attain graphs of varying shapes and work distributions.
 
-  We are currently expanding our benchmark suite to explore more
-  stateful applications, including intelligent network routing (which
-  maintains per-flow state) as well as cache simulation (in which the
-  simulated memories represent state).
+More detailed properties of the filters and streams within each
+benchmark are given in Table~\ref{tab:lang-benchmarks-filters}.  In
+terms of size, benchmarks declare (on average) 11 filter types and
+instantiate them 63 times in the stream graph.  GMTI contains the most
+filters, with 95 static types and 1,111 dynamic instances; it also
+contains 1,757 instances of the Identity filter, to assist with data
+reordering.
 
-\item {\it Neighboring filters often have matched I/O rates.}  Many of
+We organize further discussion of the benchmark suite according to the
+key outcomes of our survey.  We use the term ``stateful'' to refer to
+filters that retain mutable state from one execution to the next;
+filters containing only read-only state are classified as
+``stateless''.  Stateless filters are amenable to data parallelism, as
+they can be replicated any number of times to work on different parts
+of the input stream.  However, stateful filters must be run in a
+serial fashion, as there is a dependence from one iteration to the
+next.  While separate stateful filters can be run in a task-parallel
+or pipeline-parallel mode, the serial nature of each individual filter
+represents an eventual bottleneck to the parallel computation.
+
+\mybegin
+
+\myitem {Peeking is widely used for a variety of sliding 
+window computations.  Without peeking, such computations would often
+introduce a stateful bottleneck in the program.}  Twenty two
+benchmarks -- and more than half of the realistic applications --
+contain at least one filter that peeks.  (That is, these filters
+declare a peek rate larger than their pop rate, examining some items
+that are not dequeued from the input channel until a later execution.
+We do not count filters that merely call the peek primitive, as those
+items may be popped during the same execution.)  Benchmarks contain up
+to 4 filter types that peek; in programs with any peeking, an average
+of 10 peeking filters are instantiated.
+
+While peeking is used for many purposes, there are a few common
+patterns.  The most common is that of an FIR filter, where a filter
+peeks at N items, pops one item from the input, and pushes a weighted
+sum to the output.  FIR filters account for slightly less than half
+(15 out of 35) of the peeking filter declarations.  They are
+responsible for all of the peeking in 7 benchmarks (3GPP, OFDM,
+Filterbank, TargetDetect, DtoA, Oversampler, RateConvert) and some of
+the peeking in 3 others (Vocoder, ChannelVocoder, FMRadio).
+
+\begin{figure}[t]
+
+\begin{minipage}{0.5\textwidth}
+\centering
+\ninepoint
+\begin{verbatim}
+int->int filter DifferenceEncoder_Stateless {
+
+    prework push 1 peek 1 {
+        push(peek(0));
+    }
+
+    work pop 1 peek 2 push 1 {
+        push(peek(1)-peek(0));
+        pop();
+    }
+}
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\centering
+\ninepoint
+\begin{verbatim}
+int->int filter DifferenceEncoder_Stateful {
+    int state = 0;
+
+    work pop 1 push 1 {
+        push(peek(0)-state);
+        state = pop();
+    }
+}
+\end{verbatim}
+\end{minipage}
+
+\begin{minipage}{0.45\textwidth}
+\centering
+\caption{Stateless version of a difference encoder, using peeking
+and prework.\protect\label{fig:diff-stateless}}
+\end{minipage}
+\begin{minipage}{0.05\textwidth}
+~
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\caption{Stateful version of a difference encoder, using 
+internal state.\protect\label{fig:diff-stateful}}
+\end{minipage}
+\end{figure}
+
+A second pattern of peeking is when a filter peeks at exactly one item
+beyond its pop window.  An example of this filter is a difference
+encoder, as used in the JPEG transcoder and Vocoder benchmarks.  On
+its first execution, this filter's output is the same as its first
+input; on subsequent executions, it is the difference between
+neighboring inputs.  As illustrated in
+Figure~\ref{fig:diff-stateless}, a difference encoder can be written
+as a stateless filter using peeking (and prework, as described later).
+Otherwise, the filter is forced to maintain internal state, as
+illustrated in Figure~\ref{fig:diff-stateful}.  Across our benchmark
+suite, this pattern accounts for more than one quarter (10 out of 35)
+of the peeking filter declarations.  It accounts for all of the
+peeking in 4 benchmarks (Mosaic, JPEG decode, JPEG transcode, HDTV,
+BubbleSort) and some of the peeking in 2 others (Vocoder, FMRadio).
+It should be noted that the operation performed on the two items is
+sometimes non-linear; for example, Mosaic determines the correlation
+between successive frames; FMRadio performs an FM demodulation and
+HDTV performs an XOR.
+
+The remaining peeking filters (10 out of 35) perform various
+sliding-window functions.  For example, MP3 reorders and adds data
+across large (>1000 item) sliding windows;
+%GSM performs a coarse-grained (pop 40, peek 80, pop 160) sliding
+%duplication in preparation for other steps;
+802.11 and SampleTrellis do short (3-7 item) bit-wise operations as
+part of an error-correcting code; Vocoder and Audiobeam use peeking to
+skip N items (by default 1-14), analogous to an inverse delay;
+ChannelVocoder performs a sliding autocorrelation and threshold across
+N items (by default 100).
+
+Without peeking, the filters described above would have to be written
+in a stateful manner, as the locations peeked would be converted to
+internal states of the filter.  This inhibits parallelization, as
+there is a dependence between successive filter executions.  To
+estimate the resulting performance impact,
+Table~\ref{tab:lang-benchmarks-filters} lists the approximate amount
+of work in the most computationally-heavy peeking filter in each
+benchmark.  For 11 benchmarks, this work represents a significant
+fraction of the program load (minimum 3.1\%, median 8\%, maximum
+97.6\%) and would represent a new bottleneck in a parallel
+computation.  For 8 benchmarks, the state that would be introduced by
+peeking is dwarfed by state already present for other reasons.  For
+the remaining 3 benchmarks, the peeking filters represent a negligible
+(0.1\%) fraction of work.
+
+\myitem {Prework functions are useful for expressing startup 
+conditions, and for eliminating associated state.}  The prework
+function allows a filter to have different behavior on its first
+invocation.  This capability is utilized by 15 benchmarks, in 20
+distinct filter declarations (results not shown in table).
+
+The most common use of prework is for implementing a delay; on the
+first execution, the filter pushes N placeholder items, while on
+subsequent executions it acts like an Identity filter.  A delay is
+used in 8 benchmarks (MPD, HDTV, Vocoder, 3GPP, Filterbank, DToA,
+Lattice, and SampleTrellis).  Without prework, the delayed items would
+need to be buffered internally to the filter, introducing state into
+the computation.
+
+Other benchmarks use prework for miscellaneous startup conditions.  As
+mentioned previously, the difference encoder in
+Figure~\ref{fig:diff-stateless} relies on prework (used in JPEG
+transcoder and Vocoder), as does the analogous difference decoder
+(used in JPEG decoder).  The MPEG2 encoder and decoder use prework in
+filters relating to picture reordering, while GSM and CRC use prework
+for functions analogous to delays.  Prework is also used for
+initialization in MPD, HDTV, and 802.11.
+
+\myitem {Stateful filters are less common than we expected, though 
+are nonetheless required for complete expression of many algorithms.
+Further state could be eliminated via new language constructs,
+compiler analyses, or programmer interventions.}  After effective use
+of peeking and prework primitives, one quarter (17 out of 67) of the
+benchmarks still contain one or more filters with mutable state.
+There are 49 stateful filter types in the StreamIt benchmark suite,
+representing approximately 6\% of the total filters.  While other
+researchers have noted that stream programs are rich in data
+parallelism~\cite{imagine03ieee}, we nonetheless expected to see a
+greater proportion of filters that retained mutable state between
+execution steps.  The heaviest stateful filter in each benchmark
+ranges from 0.3\% to 42.4\% (median 4.7\%) of the overall work,
+representing an eventual bottleneck to parallelization.
+
+Of the stateful filters, at least 22 (about 45\%) represent
+fundamental feedback loops that are an intrinsic part of the
+underlying algorithm.  Filters in this category include the
+bit-alignment stage of MPEG encoding, which performs data-dependent
+updates to the current position; reference frame encoding in MPEG
+encoder, which sometimes stores information about a previous frame;
+the parser in MPEG decoder, which suspends and restores its current
+control flow position in order to maintain a constant output rate; the
+motion prediction, motion vector decode, and picture reordering stages
+of MPEG decoder, which contain data-dependent updates of various
+buffers; the pre-coding and Ungerboeck encoding stages of HDTV, which
+are simple feedback loops; the Ungerboeck decoding stage of HDTV (and
+analogously in SampleTrellis) which mutates a persistent lookup table;
+multiple feedback loops in GSM; an accumulator, adaptive filter, and
+feedback loop in Vocoder; incremental phase correction in OFDM; and
+persistent screen buffers in the graphics pipelines.
+
+The remaining filters classified as stateful may be amenable to
+additional analyses that either eliminate the state, or allow
+restricted parallelism even in the presence of state.  The largest
+category of such filters are those in which the state variables are
+modified only by message handlers (messaging is described in the next
+chapter).  Whether such messages represent a genuine feedback loop
+depends on whether the filter sending the message is data-dependent on
+the outcome of the filter receiving the message.  Even if a feedback
+loop does exist, it may be possible to exploit bounded parallelism due
+to the intrinsic delay in that loop, or speculative parallelism due to
+the infrequent arrival of most teleport messages.  In our benchmarks,
+there are 16 filters in which the state is mutated only by message
+handlers; they originate from MPEG encoder, MPEG decoder, Mosaic, and
+both versions of FHR.  There are also 4 additional filters (drawn from
+MPEG encoder, MPEG decoder, and Mosaic) in which message handlers
+account for some, but not all, of the state.
+
+A second category of state which could potentially be removed is that
+of induction variables.  Several filters keep track of how many times
+they have been invoked, in order to perform a special action every N
+iterations.  For example, MPEG encoder counts the frame number in
+assigning the picture type; MPD and Radar (fine grained version) count
+the position within a logical vector while performing FIR filtering;
+and SampleTrellis includes a noise source that flips a bit every N
+items.  Other filters keep track of a logical two-dimensional
+position, incrementing a column counter on every iteration and only
+incrementing the row counter when a column is complete.  Filters in
+this category include motion estimation from MPEG encoder, and two
+filters from MPD.  Other filters in MPD contain more complex induction
+variables; an accumulator is reset when a different counter
+wraps-around to zero.  Taken together, there are a total of 9 filters
+that could become stateless if all induction variables could be
+converted to a closed form.
+
+There are two approaches for eliminating induction variables from
+filter state.  The first approach is to recognize them automatically
+in the compiler.  While this is straightforward for simple counters,
+it may prove difficult for nested counters (tracking both row and
+column) or co-induction variables (periodically reseting one variable
+based on the value of another).  The second approach is to provide a
+new language primitive that automatically returns the current
+iteration number of a given filter.  This information can easily be
+maintained by the runtime system without inhibiting parallelization;
+shifting the burden from the programmer to the compiler would improve
+both programmability and performance.
+
+The third and final category of state that could potentially be
+removed is that which results from writing a logically coarse-grained
+filter at a fine level of granularity.  This can result in a filter in
+which state variables are reset every N executions, corresponding to
+one coarse-grained execution boundaries.  Such filters can be
+re-written in a stateless manner by moving state variables to local
+variables in the work function, and scaling up the execution of the
+work function to represent N fine-grained iterations.  Such coarsening
+would eliminate the state in bubble sort, which is reset at boundaries
+between data sets, as well as a complex periodic filter (LMaxCalc) in
+MPD.  It would also eliminate many of the induction variables
+described previously, as they are also periodic.  This approach
+provides a practical solution for eliminating state, and was employed
+in translating Radar from the original fine-grained version to a
+coarse-grained alternative (both of which appear in our benchmark
+suite).  The drawbacks of this transformation are the effort required
+from the programmer and also the increased size of the resulting
+filter.  Coarse-grained filters often incur a larger code footprint, a
+longer compile time, and a less natural mapping to fine-grained
+architectures such as FPGAs.  While the StreamIt language aims to be
+agnostic with respect to the granularity of filters, in some cases the
+tradeoff between writing stateless filters and writing fine-grained
+filters may need to be iteratively explored to achieve the best
+performance.
+
+\myitem {Feedback loops are uncommon in our benchmarks, but represent 
+significant bottlenecks when present.}  While our discussion thus far
+has focused on stateful filters, seven benchmarks also contain
+explicit feedback loops in the graph structure.  Four of these loops
+(Fib, FHR feedback, H264 subset, CRC) represent significant
+bottlenecks to parallelization, with workloads ranging from 73\% to
+99\% of the overall execution.  The loop in GSM is shadowed by a
+stateful filter; the loop in DToA represents only 0.7\% of the
+runtime; and the loop in Mosaic, while likely a bottleneck, is
+difficult to quantify due to dynamic rates.  Unlike some of the
+stateful filters, these feedback loops are all intrinsic to the
+algorithm and are not subject to automatic removal.  However, feedback
+loops can nonetheless afford opportunities for parallelism due to the
+delay in the loop -- that is, if items are enqueued along the feedback
+path at the start of execution, then they can be processed in
+parallel.  Further analysis of these delays is needed to assess the
+potential parallelism of feedback loops in our benchmark suite.
+
+% The state observed can be explained as follows.  Vocoder performs an
+% adaptive DFT that uses a stateful decay to ensure stability; it also
+% needs to retain the previous output across one iteration within a
+% phase transformation.  MPEGDecoder maintains significant state in
+% the parser, and also has negligible state in retaining predicted
+% motion vectors across one iteration of work.  Radar repeatedly
+% operates on long columns of an array requiring special behavior at
+% the boundaries; thus, the state tracks the position in the column
+% and does some internal buffering.  Radar can be rewritten at a
+% coarse level of granularity to eliminate this state.
+
+\item {\boldit Splitjoins and Identity filters are very common in the 
+benchmarks.}  These two language constructs found broad application
+across our benchmark suite.  Splitjoins appear in over three quarters
+(53 out of 67) of the benchmarks, with a median of 8 instantiations
+per benchmark.  Roundrobin splitters accounted for 65\% of the
+instantiations, while the other splitters are of duplicate type.  (All
+joiners are of roundrobin type.)  Identity filters were used in half
+(33 of 67) of the benchmarks, with a median of 13 instantiations per
+benchmark.  Identity filters are recognized by the compiler as a
+pass-through operation, allowing it to map communication instructions
+directly to a network fabric.
+
+\begin{table}[t!]
+\psfig{file=messaging-table,width=\textwidth}
+\caption{Use of teleport messaging in StreamIt 
+benchmarks.\protect\label{tab:lang-messaging}}
+\end{table}
+
+\item {\boldit Teleport messaging and dynamic rates are uncommon in 
+the benchmarks, but provide critical functionality when utilized.}  As
+detailed in Table~\ref{tab:lang-messaging}, teleport messages are
+utilized by only four of the benchmarks (MPEG2 encoder, MPEG2 decoder,
+Mosaic, and FHR).  There are a total of 8 logical messages, often
+between multiple senders or multiple receivers.  Both upstream and
+downstream messages are utilized; all messages are sent with a latency
+of zero.  While relatively few of the benchmarks use teleport
+messaging, the functionality provided is essential.  As described in
+the next chapter for the case of FHR, and elsewhere for
+MPEG2~\cite{drake-thesis} and Mosaic~\cite{aziz-thesis}, messaging
+greatly simplifies and improves the expression of these algorithms in
+a streaming context.
+
+Similarly, as illustrated in Table~\ref{tab:lang-benchmarks-params},
+dynamic rates are utilized by only 9 benchmarks, but are absolutely
+necessary to express these benchmarks in StreamIt.  Though there are a
+total of 76 dynamic-rate filters instantiated across the benchmarks,
+these instantiations correspond to only 14 filter types that perform a
+set of related functions.  In JPEG and MPEG2, dynamic-rate filters are
+needed to parse and also create both the BMP and MPEG formats.  MPEG2
+encoder also requires a dynamic-rate filter to reorder pictures
+(putting B frames in the appropriate place).  All of these filters
+have unbounded push, pop, and peek rates, though in JPEG and MPEG2
+decoder there is a minimum rate specified.
+
+In Mosaic, dynamic rates are used to implement a feedback loop (in the
+RANSAC algorithm) that iterates an unpredictable number of times; the
+signal to stop iteration is driven by a teleport message.  The entry
+to the loop pops either 0 or 1 items, while the exit from the loop
+pushes either zero or one items.  Mosaic also contains three
+parameterized filters, in which the input and output rates are
+governed by the number of points of interest as determined by the
+algorithm.  The count is established via a teleport message, thus
+fixing the input and output rates prior to a given iteration.
+
+In the graphics pipelines, the only dynamic-rate filter is the
+rasterizer, which expands each triangle into an unknown number of
+pixels.
+
+\myitem {Neighboring filters often have matched I/O rates.}  Many of
   the advanced scheduling strategies for synchronous dataflow graphs
   have the highest payoff when the input and output rates of
   neighboring filters are mismatched.  For example, the CD-DAT
@@ -599,30 +940,79 @@ they might nonetheless be informative for other researchers:
   no common factors, resulting in a large steady-state schedule.
 
   In our benchmark suite, mismatched communication rates as seen in
-  CD-DAT are very rare.  The common case is that the entire benchmark
-  is operating on a logical frame of data which is passed through the
-  entire application (such as in FFT, see Figure~\ref{fig:fft}).
-  Sometimes there are difference in the input and output rates for
-  filters that operate at different levels of granularity; for
-  example, processing one frame at a time, one macroblock at a time,
-  or one pixel at a time.  However, these rates have a small common
-  multiple (i.e., the frame size) and can be accommodated without
-  growing the steady state schedule.
+  CD-DAT are rare.  The common case is that the entire benchmark is
+  operating on a logical frame of data which is passed through the
+  entire application.  Sometimes there are difference in the input and
+  output rates for filters that operate at different levels of
+  granularity; for example, processing one frame at a time, one
+  macroblock at a time, or one pixel at a time.  However, these rates
+  have a small common multiple (i.e., the frame size) and can be
+  accommodated without growing the steady state schedule.  The JPEG
+  transcoder provides an example of this; Figure~\ref{fig:jpeg}
+  illustrates part of the stream graph that operates on a single 8x8
+  macroblock.
 
-  The most quantitative evidence that we have to this effect is
-  detailed in our paper on phased
-  scheduling~\cite{karczmarek-lctes03}.  The paper develops a new
-  scheduling algorithm that reduces the buffer requirements needed to
-  execute a synchronous dataflow graph.  The space saved on CD-DAT is
-  over 14x.  However, the median savings across our entire benchmark
-  suite is less than 1.2x.  The reason is that the potential savings
-  on most benchmarks was extremely small due to matched input and
-  output rates; simply executing each node once would often give the
-  minimal possible buffering.
+  To provide a quantitative assessment of the number of matched rates
+  in our benchmark suite, Table~\ref{tab:lang-benchmarks-params}
+  summarizes the key properties of the steady state schedule derived
+  for each program.  We consider the minimal steady state schedule,
+  which executes each filter the minimum number of times so as to
+  consume all of the items produced by other filters in the graph.  We
+  count the number of times that each filter executes in this
+  schedule, which we refer to as the {\it multiplicity} for the
+  filter.  The table illustrates, for each benchmark, the minimum
+  multiplicity, the mode multiplicity, and the percentage of filters
+  that have the mode multiplicity (the mode frequency).
 
-\begin{figure}[t]
+%% RESTORE IF TALKING ABOUT MEDIAN, MAX:
+%% The table illustrates, for each benchmark, the minimum, median, and
+%% maximum multiplicity across all filter instances in that benchmark.
+%% It also illustrates the most common multiplicity (the mode) as well as
+%% the percentage of filters that have that multiplicity (the mode
+%% frequency).
+
+  The most striking result from the table is that 90\% (60 out of 67)
+  of the benchmarks have a minimum filter multiplicity of 1.  That is,
+  there exists at least one filter in the program that executes only
+  once in the steady state schedule.  This filter defines the logical
+  frame size for the execution; all other filters are simple scaled up
+  to satisfy the input or output requirements of the filter.  
+
+%% RESTORE IF TALKING ABOUT MEDIAN, MAX:
+%% Further, more than half of the benchmarks (55 out of 67) exhibit a
+%% median filter multiplicity of 1.  This means that more than half of
+%% the filters in these programs execute only once in the steady state.
+%% For 7 benchmarks, the maximum multiplicity is also 1, implying that
+%% all of the filters execute exactly once, with perfectly matched rates.
+
+  The second highlight from the table is that, on average, 66\% of the
+  filters in a program share the same multiplicity.  For over
+  two-thirds of the benchmarks (46 out of 67), the most common
+  multiplicity is 1; in these benchmarks, an average of 75\% of the
+  filters also have a multiplicity of 1.  The mode multiplicity can
+  grow higher than 1 in cases where one filter operates at a coarse
+  granularity (e.g., a frame), but the majority of filters operate at
+  a fine granularity (e.g., a pixel).  In these benchmarks, 46\% of
+  the filters still share the same multiplicity.
+
+  The prevalance of matched rates in our benchmark suite also led to
+  unexpected results in some of our papers.  For example, in our work
+  on phased scheduling, we developed a new scheduling algorithm that
+  reduces the buffer requirements needed to execute a synchronous
+  dataflow graph~\cite{karczmarek-lctes03}.  The space saved on CD-DAT
+  is over 14x.  However, the median savings across our benchmark suite
+  at the time (a subset of the suite presented here) is less than
+  1.2x.  The reason is that the potential savings on most benchmarks
+  was extremely small due to matched input and output rates; simply
+  executing each node once would often give the minimal possible
+  buffering.  This result emphasizes the importance of optimizing the
+  common case in realistic programs, rather than restricting attention
+  to small examples.
+
+\begin{figure}[t!]
 \centering
 \psfig{file=cd-dat,width=4.5in}
+\vspace{-6pt}
 \caption[CD-DAT, an example of mismatched I/O rates]{The CD-DAT
   benchmark~\cite{murthy_buffer_2004} exhibits unusually mis-matched
   I/O rates.  Nodes are annotated with the number of items pushed and
@@ -631,41 +1021,38 @@ they might nonetheless be informative for other researchers:
   items, each filter has a large multiplicity in the steady state.
   This demands clever scheduling strategies to avoid extremely large
   buffer sizes.\protect\label{fig:cd-dat}}
-
-\psfig{file=fft.eps,width=4in}
-\caption[FFT, an example of matched I/O rates]{The FFT benchmark, like
-  many benchmarks, exhibits matched I/O rates.  Nodes are annotated
-  with the number of items pushed and popped per execution, as well as
-  their execution multiplicity in the steady state.  Since neighboring
-  filters produce the same number of items on each execution, each
-  filter executes only once in the steady state.  This provides less
-  flexibility and benefit for optimizing the
-  schedule.\protect\label{fig:fft}}
-
+~ \\
+\psfig{file=jpeg.eps,width=5.8in}
+\vspace{-6pt}
+\caption[JPEG transcoder excerpt, an example of matched I/O rates]{This 
+excerpt from the JPEG transcoder illustrates matched I/O rates, as
+found in many benchmarks.  The graph is transforming pixels from an
+8x8 macroblock.  Nodes are annotated with the number of items pushed
+and popped per execution, as well as their execution multiplicity in
+the steady state.  Since neighboring filters often produce the same
+number of items on each execution, all filters except for Identity and
+Adder execute exactly once in the steady state.  This offers less
+flexibility and benefit for optimizing the
+schedule.\protect\label{fig:fft}}
+\vspace{-24pt}
 \end{figure}
 
-\item {\it There are few feedback loops in our benchmarks.}  While we
-  did not intend to focus on acyclic programs, the benchmarks we
-  encountered were often free of feedback loops.  Notable exceptions
-  are MPEG-2 encoding and mosaic imaging, which both contain irregular
-  feedback loops that are implemented using teleport messaging.
-  messaging.
-
-\end{enumerate}
+\myend
 
 In addition to our observations about the benchmark characteristics,
 we also offer some lessons learned from developers' experiences in
 implementing stream programs.  As noted in
 Table~\ref{tab:lang-benchmarks}, the StreamIt benchmarks were
-developed by many different people, mostly undergraduates at MIT.  As
-the developers were newcomers to the StreamIt language, we expect that
+developed by 22 different people; all but one of them were students,
+and half of them were undergraduates or M.Eng students at MIT.  As the
+developers were newcomers to the StreamIt language, we expect that
 their experience would reflect that of a broader user population;
 their coding style was not influenced by the intent of the original
 language designers.  We summarize their experience as follows:
 
-\begin{enumerate}
+\mybegin
 
-\item {\it Structured streams are a useful and tractable means of
+\myitem {Structured streams are a useful and tractable means of
   writing programs.  However, they are occasionally unnatural and, in
   rare cases, insufficient.}  Overall, we found structured streams --
   the hierarchical composition of pipelines, splitjoins, and
@@ -732,13 +1119,14 @@ language designers.  We summarize their experience as follows:
 
 \begin{figure}[t!]
 \psfig{file=3gpp.eps,height=\textheight}
-\vspace{-1.25in} ~ \\
-\begin{minipage}{4in}
+\vspace{-0.9in} ~ \\
+\mbox{~}\hspace{2.03in}\begin{minipage}{4in}
 \caption[Stream graph for 3GPP]{Stream graph a 3GPP Radio Access
   Protocol application.  Shaded filters indicate Identity nodes that
   are used to bypass data items around intermediate filters.  They are
   also used in splitjoins for data duplication and
   reordering.\protect\label{fig:3gpp}}
+\vspace{-0.5in}
 \end{minipage}
 \end{figure}
 
@@ -765,21 +1153,22 @@ language designers.  We summarize their experience as follows:
   shortcoming, discussed below, that StreamIt is not designed for
   multidimensional data processing.
 
-\item {\it Programmers can accidentally introduce unnecessary mutable
+\myitem {Programmers can accidentally introduce unnecessary mutable
   state in filters.}  Filters that have no mutable state are
   attractive because they can be run in a data-parallel fashion.
   Unfortunately, the performance cost of introducing state is not
   exposed in the current StreamIt language.  Thus, we found that
   several programmers, when faced with two alternative implementations
   of an algorithm, would sometimes choose the one that included
-  mutable state (see Figure~\ref{fig:state} for an example).  Prior to
-  conducting our performance evaluations, we examined all stateful
-  filters in the benchmarks and rewrote them as stateless filters when
-  it was natural to do so.  In a future stream languages, it may be
-  desirable to require an extra type modifier on stateful filters,
-  such as a {\it stateful} keyword in their declaration, to force
-  programmers to be cognizant of any added state and to avoid it when
-  possible.
+  mutable state.  Figure~\ref{fig:state} gives a pedantic example of
+  this problem, while Figure~\ref{fig:state2} illustrates a realistic
+  case from MPD.  Prior to conducting our performance evaluations, we
+  examined all stateful filters in the benchmarks and rewrote them as
+  stateless filters when it was natural to do so.  In future stream
+  languages, it may be desirable to require an extra type modifier on
+  stateful filters, such as a {\it stateful} keyword in their
+  declaration, to force programmers to be cognizant of any added state
+  and to avoid it when possible.
 
 \begin{figure}[t]
 \hspace{0.1\textwidth}
@@ -811,18 +1200,16 @@ void->int filter SquareWave() {
 \end{verbatim}
 \end{minipage}
 
-\hspace{0.1\textwidth}
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.5\textwidth}
 \centering
 (a) Stateless
 \end{minipage}
-\hspace{0.1\textwidth}
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.5\textwidth}
 \centering
 (b) Stateful
 \end{minipage}
-\caption[Accidental introduction of filter state]{Programmers can
-  accidentally introduce unnecessary filter state when writing
+\caption[Accidental introduction of filter state (pedantic example)]{Programmers 
+  can accidentally introduce unnecessary filter state when writing
   programs.  In this example, the intended output is a square wave,
   emitting alternate values of 0 and 1.  Both implementations shown
   are functionally equivalent.  However, the stateless version (a)
@@ -830,7 +1217,92 @@ void->int filter SquareWave() {
   (b) appears sequential.\protect\label{fig:state}}
 \end{figure}
 
-\item {\it Multi-phase filters confuse programmers and are not
+\begin{figure}[t]
+\begin{minipage}{0.5\textwidth}
+\centering
+\ninepoint
+\begin{verbatim}
+float->float splitjoin 
+CFARDelayToLMax_Stateless(int rows) {
+    split roundrobin;
+    add Delay(rows-1);
+    add Delay(rows-1);
+    add Identity<float>();
+    add Delay(rows-1);
+    add Delay(rows-1);
+    join roundrobin;
+}
+
+float->float filter Delay(int N) {
+    prework push N {
+        for (int i=0; i<N; i++) {
+            push(0.0);
+        }
+    }
+
+    work push 1 pop 1 {
+        push(pop());
+    }
+}
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\centering
+\ninepoint
+\begin{verbatim}
+float->float filter
+CFARDelayToLMax_Stateful(int rows) {
+    float[rows] guardNoise;
+    float[rows] thresh;
+    float[rows] sumDb;
+    float[rows] guardDb;
+    int popPos = 0;
+    int pushPos = 1;
+
+    work pop 5 push 5 {
+        guardNoise[popPos] = pop();
+        push(guardNoise[pushPos]);
+        thresh[popPos] = pop();
+        push(thresh[pushPos]);
+        push(pop());
+        sumDb[popPos] = pop();
+        push(sumDb[pushPos]);
+        guardDb[popPos] = pop();
+        push(guardDb[pushPos]);
+
+        popPos++;
+        pushPos++;
+
+        if(popPos >= rows) {
+            popPos = 0;
+        }
+        if(pushPos >= rows) {
+            pushPos = 0;
+        }
+    }
+}
+\end{verbatim}
+\end{minipage}
+~ \\
+\begin{minipage}{0.5\textwidth}
+\centering
+(a) Stateless
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\centering
+(b) Stateful
+\end{minipage}
+\caption[Accidental introduction of filter state (real example)]{A 
+  second example, drawn from MPD, in which a stateless computation was
+  written in a stateful style in the original implementation.  The
+  original version (b) performs a complex delay and reordering of
+  interleaved vectors on the input stream, and appears stateful to the
+  compiler.  It can be rewritten as a stateless construct (a), which
+  separates the logical streams using a splitjoin and applies a
+  stateless delay to each one.\protect\label{fig:state2}}
+\end{figure}
+
+\myitem {Multi-phase filters confuse programmers and are not
   necessary.}  At one point in the StreamIt project, we embraced the
   cyclo-static dataflow
   model~\cite{bilsen_cyclo-static_1995,parks_comparison_1995} for all
@@ -861,7 +1333,7 @@ void->int filter SquareWave() {
   eventually changed course and removed the capability from the
   language.
 
-\item {\it Input and output rates can typically be inferred from the
+\myitem {Input and output rates can typically be inferred from the
   code inside a filter.  However, it is still worthwhile for the
   programmer to declare them.}  We were surprised how many StreamIt
   benchmarks contained completely static control flow inside the body
@@ -885,7 +1357,7 @@ void->int filter SquareWave() {
   could check the consistency between the declared rates and the
   actual implementation.
 
-\end{enumerate}
+\myend
 
 \section{Related Work}
 \label{sec:lang-related}
@@ -931,9 +1403,9 @@ recommendations and also highlight the following research directions:
 % cite written proposal to move programmable splitters and joiners
 % into the language?
 
-\begin{enumerate}
+\mybegin
 
-\item {\it Dynamic changes to stream structure.}  A long-time goal of
+\myitem {Dynamic changes to stream structure.}  A long-time goal of
   the StreamIt group has been to define and implement support for
   dynamic changes to the stream graph.  For example, an adaptive
   channel decoder may decide to add or remove filtering stages; an FIR
@@ -946,13 +1418,18 @@ recommendations and also highlight the following research directions:
   stream graphs.  As described in the next chapter, our basic model
   for runtime adaptation is to re-evaluate the initialization code for
   stream structures by sending a teleport message to that stream.  The
-  difficulty comes in timing the re-initialization, defining the
-  transition between graphs, and maintaining as much static
-  information as possible about the possible configurations of graphs
-  that will be adopted at runtime.  While we have developed extensive
-  internal notes and proposals on language support for dynamism, we
-  omit them from this dissertation because we have yet to reach
-  consensus on many aspects of the design.
+  difficulty comes in timing the re-initialization, migrating filter
+  state and buffered data items to the new graph, and maintaining as
+  much static information as possible about the possible
+  configurations of graphs that will be adopted at runtime.  Many of
+  these issues arise not from dynamism, but from incorporating a
+  notion of finite streams into the language; as the current language
+  views all streams are conceptually infinite, it does not have to
+  deal with boundary conditions or termination procedures, both of
+  which are prerequisites for dynamic reconfiguration.  While we have
+  developed extensive internal notes and proposals on language support
+  for dynamism, we omit them from this dissertation because we have
+  yet to reach consensus on many aspects of the design.
 
   As an intermediate step towards supporting a fully-reconfigurable
   stream graph, it would also be interesting to introduce primitives
@@ -975,7 +1452,7 @@ recommendations and also highlight the following research directions:
   declared dynamic.  This would allow the compiler to maximally
   evaluate other sections of the stream graph at compile time.
 
-\item {\it Multidimensional data.}  The current version of StreamIt is
+\myitem {Multidimensional data.}  The current version of StreamIt is
   a natural fit for handling one-dimensional sequences of data, but
   falls short in exposing the dependences and flexibility inherent in
   manipulating multi-dimensional data.  When handling sequences of
@@ -1005,9 +1482,11 @@ recommendations and also highlight the following research directions:
   challenges arise in the specification of boundary conditions on the
   sides of an array, the dependences and reuse between different parts
   of an array, and the possibility for carried state across separate
-  arrays.
+  arrays.  Many of these issues are again rooted in StreamIt's ties to
+  an infinite stream abstraction.  Integrated support for finite
+  streams will be needed to effectively handle multidimensional data.
 
-\item {\it External interfaces.}  In practice, it is important for any
+\myitem {External interfaces.}  In practice, it is important for any
   domain-specific language to have well-defined interfaces for
   interacting with languages and systems that fall outside of the
   domain.  In the case of streaming, this encompasses interfaces for
@@ -1034,7 +1513,7 @@ recommendations and also highlight the following research directions:
   shared memory so long as they are committed according to a
   deterministic static schedule.
 
-\end{enumerate}
+\myend
 
 \section{Chapter Summary}
 
@@ -1045,26 +1524,30 @@ StreamIt is rooted in the synchronous dataflow model, with added
 support for multiple execution steps, dynamic communication rates,
 teleport messaging, peeking, and communication during initialization.
 Key novelties of the language are the notion of structured streams,
-akin to structured control flow in an imperative language, as well as
-hierarchical and parameterized splitjoins for data reordering.  The
-design of the basic computational node in StreamIt, the filter, also
-exposes inherent parallelism that is masked by pointer manipulation
-and modulo operations in a traditional C implementation.
+akin to structured control flow in an imperative language;
+hierarchical and parameterized splitjoins for data reordering; and
+language support for sliding window operations.  The design of the
+basic computational node in StreamIt, the filter, also exposes
+inherent parallelism that is masked by pointer manipulation and modulo
+operations in a traditional C implementation.
 
 The development of a large-scale benchmark suite in StreamIt led to
-several insights and surprises.  In our benchmarks, we were surprised
-how few filters contained mutable state; this suggests that many
-programs can leverage data parallelism, rather than relying on task
-and pipeline parallelism, to achieve parallel performance.  Our
-benchmarks often contain matched input and output rates, where filters
-need to execute only a small number of times before satisfying the
-steady-state data requirements of their neighbors.  This property
-reduces the space of scheduling alternatives as well as the benefit
-derived (e.g., in buffer space) from complex filter interleavings.
-Our benchmark suite also contained few feedback loops.  Of course,
-these observations are valid only insofar as our choice of benchmarks;
-we are actively expanding our coverage to include other styles of
-programs that may lead to different conclusions.
+several insights and surprises.  Language support for sliding windows
+and communication during the initialization stage enabled many filters
+to be written in a stateless manner, exposing parallelism that would
+have been masked without these features.  We were surprised how few
+filters contained mutable state; this suggests that many programs can
+leverage data parallelism, rather than relying on task and pipeline
+parallelism, to achieve parallel performance.  Our benchmarks often
+contain matched input and output rates, where filters need to execute
+only a small number of times before satisfying the steady-state data
+requirements of their neighbors.  This property reduces the space of
+scheduling alternatives as well as the benefit derived (e.g., in
+buffer space) from complex filter interleavings.
+%% Our benchmark suite also contained few feedback loops.  Of course,
+%% these observations are valid only insofar as our choice of
+%% benchmarks; we are actively expanding our coverage to include other
+%% styles of programs that may lead to different conclusions.
 
 Continuous feedback from StreamIt developers also provided a valuable
 critique of the StreamIt language.  While structured streams were a
