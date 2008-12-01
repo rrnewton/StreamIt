@@ -25,6 +25,15 @@ ps: main.ps
 
 pdf: main.pdf
 
+diff:
+	latexdiff --flatten old/main.tex main.tex > diff.tex
+	latex diff.tex
+	latex diff.tex
+	bibtex diff
+	latex diff.tex
+	dvips -t letter -P cmz diff.dvi -o diff.ps
+	ps2pdf diff.ps
+
 rmdone:
 	rm -f done.flag
 
@@ -62,7 +71,7 @@ main.bbl: references.bib zotero.bib messaging.bib faculty-app.bib $(TEXFILES) Ma
 	rm -f $*.dvi
 	bibtex -terse $*
 
-main.dvi: preprocess $(TEXFILES) $(EPSFIGFILES) main.bbl $(EPSFIGURES) Makefile done.flag
+main.dvi: preprocess $(TEXFILES) $(EPSFIGFILES) main.bbl $(EPSFIGURES) Makefile done.flag example-program.tex
 	@echo Running latex once.; \
 	while ( latex -interaction=nonstopmode main.tex; grep Rerun main.log ) ; do \
           echo; \
@@ -78,6 +87,9 @@ main.dvi: preprocess $(TEXFILES) $(EPSFIGFILES) main.bbl $(EPSFIGURES) Makefile 
 	echo ; \
 	make printerrors 
 
+example-program.tex: example-program.tex.in
+	lgrind -d lgrindef -lstreamit -e example-program.tex.in > example-program.tex
+
 .dvi.pdf: Makefile
 	dvips -q -t letter -P cmz -f $< | ps2pdf - $*.pdf
 
@@ -91,4 +103,4 @@ main.dvi: preprocess $(TEXFILES) $(EPSFIGFILES) main.bbl $(EPSFIGURES) Makefile 
 	epstopdf $<
 
 clean:
-	rm -f *.lof *.lot *.pfg *~ *.aux *.dvi *.blg *.log *.bbl $(EPSFIGFILES) *.bak main.ps main.pdf *.toc *.swp done.flag
+	rm -f *.lof *.lot *.pfg *~ *.aux *.dvi *.blg *.log *.bbl $(EPSFIGFILES) *.bak main.ps main.pdf *.toc *.swp done.flag diff.tex example-program.tex

@@ -97,9 +97,9 @@ what domain should we focus on to have a long-term impact?  We
 approached this question by considering two prominent trends in
 computer architectures and applications:
 
-\begin{enumerate}
+\mybegin
 
-\item {\it Computer architectures are becoming multicore.}  Because
+\myitem {Computer architectures are becoming multicore.}  Because
   single-threaded performance has finally plateaued, computer vendors
   are investing excess transistors in building more cores on a single
   chip rather than increasing the performance of a single core.  While
@@ -110,7 +110,7 @@ computer architectures and applications:
   parallelism in the application, supporting explicit communication
   between potentially-distributed memories.
 
-\item {\it Computer applications are becoming embedded and
+\myitem {Computer applications are becoming embedded and
   data-centric.}  While desktop computers have been a traditional
   focus of the software industry, the explosion of cell phones is
   shifting this focus to the embedded space.  There are almost four
@@ -125,7 +125,7 @@ computer architectures and applications:
   enhancement~\cite{asanovic_landscape_2006,chen_convergence_2008}.
 % TODO: are these accurate citations?  are there others?
 
-\end{enumerate}
+\myend
 
 %% As illustrated in Figure~\ref{fig:intersection}, we consider stream
 %% programs to represent a broad an interesting class of programs at
@@ -158,7 +158,7 @@ domain-specific optimizations.
 {\mbox{~}\hfill \it \scriptsize Figure inspired by Mattson \& Lethin~\cite{mattson_streaming_2003}}
 \vspace{4pt}
 \caption[Stream programming is motivated by architecture and
-  application trends]{Stream programming is motivated by two prominent
+  application trends.]{Stream programming is motivated by two prominent
   trends: the trend towards parallel computer architectures, and the
   trend towards embedded, data-centric
   computations.\protect\label{fig:intersection}}
@@ -198,9 +198,9 @@ Based on the examples cited previously, we have observed that stream
 programs share a number of characteristics.  Taken together, they
 define our conception of the streaming application domain:
 
-\begin{enumerate}
+\mybegin
 
-\item {\it Large streams of data.}  Perhaps the most fundamental
+\myitem {Large streams of data.}  Perhaps the most fundamental
   aspect of a stream program is that it operates on a large (or
   virtually infinite) sequence of data items, hereafter referred to as
   a {\it data stream}.  Data streams generally enter the program from
@@ -209,7 +209,7 @@ define our conception of the streaming application domain:
   codes, which manipulate a fixed input set with a large degree of
   data reuse.
 
-\item {\it Independent stream filters.}  Conceptually, a streaming
+\myitem {Independent stream filters.}  Conceptually, a streaming
   computation represents a sequence of transformations on the data
   streams in the program.  We will refer to the basic unit of this
   transformation as a {\it filter}: an operation that--on each
@@ -221,13 +221,13 @@ define our conception of the streaming application domain:
   which the outputs of some filters are connected to the inputs of
   others.
 
-\item {\it A stable computation pattern.}  The structure of the stream
+\myitem {A stable computation pattern.}  The structure of the stream
   graph is generally constant during the steady-state operation of a
   stream program.  That is, a certain set of filters are repeatedly
   applied in a regular, predictable order to produce an output stream
   that is a given function of the input stream.
 
-\item {\it Occasional modification of stream structure.}  Even though
+\myitem {Occasional modification of stream structure.}  Even though
   each arrangement of filters is executed for a long time, there are
   still dynamic modifications to the stream graph that occur on
   occasion.  For instance, if a wireless network interface is
@@ -243,7 +243,7 @@ define our conception of the streaming application domain:
 %% stream graph can adopt in any one program, such that all of the
 %% possible arrangements of filters are known at compile time.
 
-\item {\it Occasional out-of-stream communication.}  In addition to
+\myitem {Occasional out-of-stream communication.}  In addition to
   the high-volume data streams passing from one filter to another,
   filters also communicate small amounts of control information on an
   infrequent and irregular basis.  Examples include changing the
@@ -253,14 +253,14 @@ define our conception of the streaming application domain:
   when a frequency-hopping radio changes frequencies at a specific
   point of the transmission.
 
-\item {\it High performance expectations.}  Often there are real-time
+\myitem {High performance expectations.}  Often there are real-time
   constraints that must be satisfied by stream programs; thus,
   efficiency (in terms of both latency and throughput) is of primary
   concern.  Additionally, many embedded applications are intended for
   mobile environments where power consumption, memory requirements,
   and code size are also important.
 
-\end{enumerate}
+\myend
 
 While our discussion thus far has emphasized the embedded context for
 streaming applications, the stream abstraction is equally important in
@@ -302,9 +302,9 @@ Sequential Processes~\cite{hoare_communicating_1978}.  They are
 compared in Figure~\ref{fig:models-of-computation} and
 Table~\ref{tab:model-table} and detailed below:
 
-\begin{enumerate}
+\mybegin
 
-\item {\it Kahn Process Networks}, also known as {\it process
+\myitem {Kahn Process Networks}, also known as {\it process
   networks}, are a simple model in which nodes can always enqueue
   items onto their output channels, but attempts to read from an input
   channel will block until data is ready (it is not possible to test
@@ -318,7 +318,7 @@ Table~\ref{tab:model-table} and detailed below:
   computation might deadlock.  Process networks is the model of
   computation adopted by UNIX pipes.
 
-\item {\it Synchronous Dataflow (SDF)} is a restricted form of process
+\myitem {Synchronous Dataflow (SDF)} is a restricted form of process
   network in which nodes execute atomic steps, and the number of data
   items produced and consumed during each step are constant and known
   at compile time.  Because the input and output rates are known, the
@@ -336,7 +336,7 @@ Table~\ref{tab:model-table} and detailed below:
 \begin{figure}[t]
 \centering\psfig{file=models-of-computation.eps,width=\myfigwidth}
 \caption[Space of behaviors allowable by different models of
-  computation]{Space of behaviors allowed by Kahn process networks,
+  computation.]{Space of behaviors allowed by Kahn process networks,
   synchronous dataflow (SDF), and communicating sequential processes
   (CSP).  The set of behaviors considered are: buffering data items on
   a communication channel, making a non-deterministic choice, and
@@ -352,7 +352,7 @@ Table~\ref{tab:model-table} and detailed below:
   computation.\protect\label{tab:model-table}}
 \end{table}
 
-\item {\it Communicating Sequential Processes (CSP)} is in some ways
+\myitem {Communicating Sequential Processes (CSP)} is in some ways
   more restrictive, and in others more flexible than process networks.
   The restriction is rendezvous communication: there is no buffering
   on the communication channels, which means that each send statement
@@ -366,7 +366,7 @@ Table~\ref{tab:model-table} and detailed below:
   interpretation of its capabilities applies to many of its practical
   instantiations, including the Occam programming language.
 
-\end{enumerate}
+\myend
 
 While long-running (or infinite) computations are often described
 using one of the models above, the descriptions of finite systems also
@@ -516,7 +516,7 @@ in the StreamIt project.
 StreamIt is a language and compiler for high-performance stream
 programs.  The principal goals of the StreamIt project are three-fold:
 
-\begin{enumerate}
+\mybegin
 
 \item To expose and exploit the inherent parallelism in stream
   programs on multicore architectures.
@@ -526,7 +526,7 @@ programs.  The principal goals of the StreamIt project are three-fold:
 
 \item To improve programmer productivity in the streaming domain.
 
-\end{enumerate}
+\myend
 
 While the first two goals are related to performance improvements, the
 third relates to improving programmability.  We contend that these
@@ -694,9 +694,9 @@ others' experience in optimizing the language.
 
 The specific contributions of this dissertation are as follows:
 
-\begin{enumerate}
+\mybegin
 
-\item {\it A design rationale and experience report for the StreamIt
+\myitem {A design rationale and experience report for the StreamIt
   language, which contains novel constructs to simultaneously improve
   the programmability and analyzability of stream programs
   (Chapter~2).}  StreamIt is the first language to introduce
@@ -704,7 +704,7 @@ The specific contributions of this dissertation are as follows:
   reordering.  We also describe the lessons learned in developing the
   60,000-line StreamIt benchmark suite.
 
-\item {\it A new language construct, termed teleport messaging, that
+\myitem {A new language construct, termed teleport messaging, that
   enables precise event handling in a distributed environment
   (Chapter~3).}  Teleport messaging is a general approach that uses
   the flow of data in the stream to provide a deterministic and
@@ -715,7 +715,7 @@ The specific contributions of this dissertation are as follows:
   integrated into a synchronous dataflow program while preserving
   static scheduling.
 
-\item {\it A review of the key results in optimizing StreamIt,
+\myitem {A review of the key results in optimizing StreamIt,
   spanning parallelization and domain-specific optimization
   (Chapter~4)}.  This chapter validates key concepts of the StreamIt
   language by highlighting the gains in performance and
@@ -726,7 +726,7 @@ The specific contributions of this dissertation are as follows:
   5.5x average speedup on a uniprocessor), and cache optimizations
   (providing a 3.5x average speedup on an embedded processor).
 
-\item {\it The first translation of stream programs into the
+\myitem {The first translation of stream programs into the
   lossless-compressed domain (Chapter~5)}.  This domain-specific
   optimization allows stream programs to operate directly on
   compressed data formats, rather than requiring conversion to an
@@ -738,7 +738,7 @@ The specific contributions of this dissertation are as follows:
   Apple Animation format (a variant of LZ77).  Speedups are roughly
   proportional to the compression factor, with a median of 15x.
 
-\item {\it The first dynamic analysis tool that detects and exploits
+\myitem {The first dynamic analysis tool that detects and exploits
   likely coarse-grained parallelism in C programs (Chapter~6).}  To
   assist programmers in migrating legacy C code into a streaming
   representation, this tool generates a stream graph depicting dynamic
@@ -749,7 +749,7 @@ The specific contributions of this dissertation are as follows:
   useful and the parallelized versions offer a 2.78x speedup on a
   4-core machine.
 
-\end{enumerate}
+\myend
 
 % support claim of order-of-magnitude
 

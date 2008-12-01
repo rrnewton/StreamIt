@@ -10,8 +10,8 @@
 \usepackage{subfigure}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage[usenames]{color}
-
+\usepackage{appendix}
+\usepackage[nolineno]{lgrind}
 % replace courier with beramono, a fixed-width font that is more condensed
 % see more fonts here:  http://www.tug.dk/FontCatalogue/
 \usepackage[T1]{fontenc}
@@ -20,8 +20,18 @@
 \usepackage[scaled=0.88]{beramono}
 
 % bold italic font
-\newfont{\boldit}{cmbxti10}
-\newfont{\boldslant}{cmbxsl10}
+\newfont{\boldit}{cmbxti11}
+\newfont{\boldslant}{cmbxsl11}
+
+% figure spacing...
+% space between floats
+\setlength{\floatsep}{36pt}
+% space between last top float or first bottom float and the text
+%\setlength{\textfloatsep}{}
+% space above caption
+%\setlength{\abovecaptionskip}{}
+% space below caption
+%\setlength{\belowcaptionskip}{}
 
 % some handy font sizes
 \newcommand{\sevenpoint}{\fontsize{7pt}{9pt}\selectfont}
@@ -33,6 +43,12 @@
 \newcommand{\thirteenpoint}{\fontsize{13pt}{15pt}\selectfont}
 \newcommand{\fourteenpoint}{\fontsize{14pt}{16pt}\selectfont}
 \newcommand{\fifteenpoint}{\fontsize{15pt}{17pt}\selectfont}
+
+% do not indent paragraphs of enumerated lists (my lists go on for pages...)
+% numbers flush left to paragraph text: \leftmargin=17pt
+\newcommand{\mybegin}{\begin{list}{\labelenumi}{\leftmargin=\parindent}\usecounter{enumi}}
+\newcommand{\myitem}[1]{\item {\boldslant #1}}
+\newcommand{\myend}{\end{list}}
 
 % shrink section titles
 \makeatletter
@@ -92,5 +108,10 @@
 {\tenpoint
 \bibliography{references,faculty-app,messaging,zotero,statespace,linear,cache}
 \bibliographystyle{amsalpha}
-\end{document}
 }
+
+\appendix
+\include{example-program}
+\include{stream-graphs}
+
+\end{document}

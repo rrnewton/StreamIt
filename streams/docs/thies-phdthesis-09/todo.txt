@@ -1,13 +1,18 @@
-- apps (1)
-- related work (2)
-- my comments (1)
-- saman comments (1)
-- acknowledgments / formatting (1)
-- final saman comments: (2)
+Saman comments not addressed:
+
+"How about the clear separation of graph initialization time vs steady
+state execution."  Synchronous dataflow also has this separation.
 
 ---------------
 
-* put a whole benchmark in an appendix
+Tue - compression
+Wed - my comments (including messaging), saman comments
+Thu - related
+Fri - acknoweldgments
+Sat - related
+Sun - polishing
+
+---------------
 
 "this chapter is a large project, many people have worked on it"
 "primary description of this work is somewhere else, go look at it"
@@ -18,6 +23,7 @@ summary will show that language is amenable to optimization
 --------------------------
 
 Big things:
+* make compression complete
 * more honest communication of uniprocessor performance relative to C
   - and more clear about baselines in abstract, conclusions, etc.
 * SDEP calculation does not work for actors that need to fire a full
@@ -36,32 +42,25 @@ Big things:
 * address arvind/srini comments in conclusion:  does this extend to dynamism?
 * acknowledgments
 * Saman comments (including pending comments)
-* make compression complete
+* related work
 
 Little things:
-* say that adding an iter() keyword would remove additional state
-  - where?
-  - AssignPictureType in MPEGencoder.str
-* reconcile 3GPP in language section with the benchmark section
+* stream graphs
+* put whole benchmark in appendix
 * fix first sentence of abstract to not define the domain of stream
   programs
 * add sliding window to stream program characteristics
-* somewhere say that two-stage filters also important for eliminating state
-  - e.g., delay, integerdifferenceencoder/decoder (jpeg.str)
-  - look at prework
-* acknowledge Amy as authoring raytracer
+* acknowledge Amy as authoring raytracer (and make sure other authors acknowledged)
 * explain that in stream graphs, nodes annotated with "work=unknown"
   represent cases where our work estimation algorithm was known to do
   poorly, so we did not include it in the report
+- in language section, propagate benchmark numbers to summary
 - mention StreaMIT pronunciation?
-- note from rodric (same with FFT1Dshift)
-  // 2D FFT shift: criss-cross swap of the four matrix quadrants
-  // NOTE: if there were a reverse roundrobin joiner, it would be
-  // trivial to do this data reorganization
-  complex->complex filter FFT2Dshift(int rows, int cols)
 - mention diffs of apps between apps table and other sections
 
 Mindless:
+- Mosaic might have a [1,*,1] rate lingering
+- be consistent about whether short captions end with a period
 - cite seneff vocoder article (from asplos'02) so it appears in appendix
 - cite Tennenhouse, D., Bose, V.: The SpectrumWare Approach to Wireless Signal Processing. Wireless Networks (1999))
   for OFDM
@@ -75,6 +74,7 @@ Mindless:
 - get grant numbers for acknowledgements
   - ask mary to get grants I'm funded from while here
 - check latest download numbers
+- make cd-dat and jpeg look exactly the same in language section
 
 Probably not fixing:
 . mildly bothersome: the cache section is somewhat inconsistent about
