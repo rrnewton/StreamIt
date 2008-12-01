@@ -87,8 +87,8 @@ main.dvi: preprocess $(TEXFILES) $(EPSFIGFILES) main.bbl $(EPSFIGURES) Makefile 
 	echo ; \
 	make printerrors 
 
-example-program.tex: example-program.tex.in
-	lgrind -d lgrindef -lstreamit -e example-program.tex.in > example-program.tex
+example-program.tex: example-program.in.tex
+	lgrind -d lgrindef -lstreamit -e example-program.in.tex > example-program.tex
 
 .dvi.pdf: Makefile
 	dvips -q -t letter -P cmz -f $< | ps2pdf - $*.pdf
