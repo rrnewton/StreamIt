@@ -1,16 +1,8 @@
-Saman comments not addressed:
-
-"How about the clear separation of graph initialization time vs steady
-state execution."  Synchronous dataflow also has this separation.
-
----------------
-
-Tue - compression
-Wed - my comments (including messaging), saman comments
+Wed - done my content
 Thu - related
-Fri - acknoweldgments
-Sat - related
-Sun - polishing
+Fri - related
+Sat - acks
+Sun - bib, stream graphs, layout, polishing
 
 ---------------
 
@@ -23,7 +15,6 @@ summary will show that language is amenable to optimization
 --------------------------
 
 Big things:
-* make compression complete
 * more honest communication of uniprocessor performance relative to C
   - and more clear about baselines in abstract, conclusions, etc.
 * SDEP calculation does not work for actors that need to fire a full
@@ -40,13 +31,15 @@ Big things:
 * possibly revise writeup of constrained scheduling
 * check that messaging speedup makes any sense?
 * address arvind/srini comments in conclusion:  does this extend to dynamism?
+  - see feedback.txt
 * acknowledgments
 * Saman comments (including pending comments)
+  - on language
+  - on other sections
 * related work
 
 Little things:
 * stream graphs
-* put whole benchmark in appendix
 * fix first sentence of abstract to not define the domain of stream
   programs
 * add sliding window to stream program characteristics
@@ -57,6 +50,7 @@ Little things:
 - in language section, propagate benchmark numbers to summary
 - mention StreaMIT pronunciation?
 - mention diffs of apps between apps table and other sections
+- check correctness of compression section
 
 Mindless:
 - Mosaic might have a [1,*,1] rate lingering
@@ -67,9 +61,7 @@ Mindless:
 - indicate messaging pairs on mpeg encode, mpeg decode, mosaic stream graph
   - and check MPEG2 encoder portals (done haphazardly while tired)
 - fix bibliography
-- fix vspace between figures, and between figures and text (Saman)
 - make pullSchedule font same as repeat_lengths font, etc.
-- consider finding good bold-italic font for my numbered titles
 - improve formatting of code (bold the keywords)
 - get grant numbers for acknowledgements
   - ask mary to get grants I'm funded from while here
