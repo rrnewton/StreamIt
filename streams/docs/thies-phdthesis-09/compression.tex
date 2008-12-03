@@ -1,6 +1,6 @@
 % TODO:
-% - integrate description of splitters
 % - possibly show screenshots from all videos?
+\newcommand{\x}{\hspace{1.3pt}} % arithmetic multiplication symbol
 
 \startchapter{Translating Stream Programs into the Compressed Domain}
 \label{chap:compression}
@@ -205,14 +205,14 @@ copied by that operation.  For example, a value A followed by a repeat
 $\tupp{1}{3}$ results in an output of ``A A A''.  An additional example
 is given in Figure~\ref{fig:lz77}.
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \centering
 \psfig{file=compression/lz77-figure.eps,width=2.6in}
 \caption{Example of LZ77 decompression.
 \protect\label{fig:lz77}}
 \end{figure}
 
-%% \begin{figure}[t]
+%% \begin{figure}[t!]
 %% \psfig{file=compression/streamit-figure.eps,width=3.408in}
 %% \caption{Example StreamIt program.
 %% \protect\label{fig:streamit}}
@@ -231,46 +231,44 @@ conditions the output is guaranteed to be fully compressed (relative
 to the compression of the input).  We quantify this issue later.
 
 To describe the mapping into the compressed domain, we consider each
-StreamIt construct in turn.  Filters and joiners are described here,
-while splitters are described in our technical
-report~\cite{techreport}.
+StreamIt construct in turn.  An alternate formulation of our
+technique, in terms of an operational semantics, is available in a
+technical report~\cite{techreport}.
 
-\newcommand{\mynewline}[0]{\\}
-\begin{figure}[t]
-\vspace{-6pt}
+\begin{figure}[t!]
 \centering
-\begin{minipage}{0.62\textwidth}
+\begin{minipage}{0.7\textwidth}
 {\it Execute a filter in the compressed domain, given that it consumes
-  $n$ items and produces $m$ items on each execution.}\mynewline
-\textsc{Execute-Compressed-Filter}~(int $n$, int $m$) \{\mynewline
-\mbox{~~~~}{\bf while true} \{\mynewline
-\mbox{~~~~}\mbox{~~~~}{\it /* pass-uncompressed */} \mynewline
-\mbox{~~~~}\mbox{~~~~}{\bf if} input {\bf endswith} $n$ values {\bf then}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf execute} one call to uncompressed filter\mynewline
-\mbox{~~~~}\mbox{~~~~}~\mynewline
-\mbox{~~~~}\mbox{~~~~}{\it /* pass-compressed */} \mynewline
-\mbox{~~~~}\mbox{~~~~}{\bf else if} input {\bf endswith} $\langle d,c \rangle$\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~~~~}{\bf and} $d\%n = 0$ {\bf and} $c \geq n$ {\bf then}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf replace} $\langle d,c \rangle$ with $\langle d, c\%n\rangle$ on input\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf push} $\langle m~d/n, m~(c-c\%n)/n \rangle$ to output\mynewline
-\mbox{~~~~}\mbox{~~~~}~\mynewline
-\mbox{~~~~}\mbox{~~~~}{\bf else}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf let} $\langle d,c \rangle = $ last repeat on input\mynewline
-\mbox{~~~~}\mbox{~~~~}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\it /* coarsen-repeat */}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf let} $L = \mbox{LCM}(d, n)$\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf if} $d < L < c$ {\bf then} {\bf replace} $\langle d,c \rangle$\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}\mbox{~~~~~}with $\langle c - (L - d) \rangle, \langle d, L - d\rangle$ on input\mynewline
-\mbox{~~~~}\mbox{~~~~}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\it /* expand */}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf else if} $c > 0$ {\bf then}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf decode} $\langle d,c \rangle$ into $\langle d,c-1\rangle,V$ on input\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf else}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf remove} $\langle d,c \rangle$ from input\mynewline
-\mbox{~~~~}\}\mynewline
-\}\mynewline
+  $n$ items and produces $m$ items on each execution.}\\
+\textsc{Execute-Compressed-Filter}~(int $n$, int $m$) \{\\
+\tab{\bf while true} \{\\
+\tab\tab{\it /* pass-uncompressed */} \\
+\tab\tab{\bf if} input {\bf endswith} $n$ values {\bf then}\\
+\tab\tab\tab{\bf execute} one call to uncompressed filter\\
+\tab\tab~\\
+\tab\tab{\it /* pass-compressed */} \\
+\tab\tab{\bf else if} input {\bf endswith} $\langle d,c \rangle$ {\bf and} $d\%n = 0$ {\bf and} $c \geq n$ {\bf then}\\
+\tab\tab\tab{\bf replace} $\langle d,c \rangle$ with $\langle d, c\%n\rangle$ on input\\
+\tab\tab\tab{\bf push} $\langle m~d/n, m~(c-c\%n)/n \rangle$ to output\\
+\tab\tab~\\
+\tab\tab{\bf else}\\
+\tab\tab\tab{\bf let} $\langle d,c \rangle = $ last repeat on input\\
+\tab\tab\\
+\tab\tab\tab{\it /* coarsen-repeat */}\\
+\tab\tab\tab{\bf let} $L = \mbox{LCM}(d, n)$\\
+\tab\tab\tab{\bf if} $d < L < c$ {\bf then}\\
+\tab\tab\tab\tab{\bf replace} $\langle d,c \rangle$ with $\langle c - (L - d) \rangle, \langle d, L - d\rangle$ on input\\
+\tab\tab\\
+\tab\tab\tab{\it /* expand */}\\
+\tab\tab\tab{\bf else if} $c > 0$ {\bf then}\\
+\tab\tab\tab\tab{\bf decode} $\langle d,c \rangle$ into $\langle d,c-1\rangle,V$ on input\\
+\tab\tab\tab\tab\\
+\tab\tab\tab{\it /* prune */}\\
+\tab\tab\tab{\bf else} {\it /* c = 0 */}\\
+\tab\tab\tab\tab {\bf remove} $\tupp{d}{c}$ from input\\
+\tab\}\\
+\}
 \end{minipage}
-\vspace{-6pt}
 \caption[Translation of filters into the compressed
   domain]{Translation of filters into the compressed domain.  We use
   $\%$ to denote a modulo operation.
@@ -293,7 +291,7 @@ them across the filter with the minimum decompression needed.
 
 The {\bf key idea behind our technique} is encapsulated in the {\it
   pass-compressed} case in Figure~\ref{fig:translate-filter}.  This
-rule specifies how to translate a repeat token directly from a
+case specifies how to translate a repeat token directly from a
 filter's input tape to a filter's output tape without invoking the
 filter's computation.  This translation is possible whenever the
 repeat distance $d$ is a multiple of the filter's input rate $n$.  In
@@ -306,23 +304,6 @@ input ($n$) rates of the actor, and 2) if the count is not an even
 multiple of the input rate, then some leftover items ($c\%n$, where
 $\%$ represents the modulo operation) are left on the input tape.
 
-In cases where the repeat distance does not match the granularity of
-the actor, the distance can sometimes be adjusted to allow
-compressed-domain processing.  The {\it coarsen-repeat} rule
-represents such an adjustment.  Consider that a filter inputs two
-items at a time, but encounters a long repeat with distance three and
-count 100.  That is, the input stream contains a regular pattern of
-values with periodicity three.  Though consecutive executions of the
-filter are aligned at different offsets in this pattern, every third
-filter execution (spanning six values) falls at the same alignment.
-In general, a repeat with distance $d$ can be exploited by a filter
-with input rate $n$ by expanding the distance to $\mbox{LCM}(d, n)$.
-In order to perform this expansion, the count must be greater than the
-distance, as otherwise the repeat references old data that may have no
-periodicity.  Also, the stream needs to be padded with $\mbox{LCM}-d$
-values before the coarsened repeat can begin; this padding takes the
-form of a shorter repeat using the original distance.
-
 \begin{figure}[t!]
 \psfig{file=compression/compressed-filters-in-streamit.eps,width=\textwidth}
 \caption[Example StreamIt code to be mapped into the compressed
@@ -333,25 +314,46 @@ form of a shorter repeat using the original distance.
 \end{figure}
 
 \begin{figure}[t!]
+\vspace{-18pt}
 \psfig{file=compression/compressed-filter-example.eps,width=\textwidth}
+\vspace{-30pt} % otherwise huge spacing for some reason...
 \caption[Example execution of a filter in the uncompressed and
   compressed domains]{Example execution of a filter in the
   uncompressed and compressed domains.  See
   Figure~\ref{fig:streamit-example}(a) for the source
   filter.\protect\label{fig:filter-example}}
+\vspace{12pt}
 \end{figure}
 
-A second way to adjust a repeat token for compressed-domain processing
-is by changing its count rather than its distance (rule {\it expand}).
-The expand rule is invoked if a repeat has a count less than $n$, if
-it is unaligned with the boundaries of an actor's execution, or if its
-distance is not a multiple of $n$ (and cannot be coarsened
-appropriately).  The expand rule decodes a single value from a repeat
-token, thereby decreasing its count by one; the rest of the repeat may
-become aligned later.  If the count of a repeat reaches zero, it is
-eliminated.
+In cases where the repeat distance does not match the granularity of
+the actor, the distance can sometimes be adjusted to allow
+compressed-domain processing.  The {\it coarsen-repeat} logic in
+Figure~\ref{fig:translate-filter} represents such an adjustment.
+Consider that a filter inputs two items at a time, but encounters a
+long repeat with distance three and count 100.  That is, the input
+stream contains a regular pattern of values with periodicity three.
+Though consecutive executions of the filter are aligned at different
+offsets in this pattern, every third filter execution (spanning six
+values) falls at the same alignment.  In general, a repeat with
+distance $d$ can be exploited by a filter with input rate $n$ by
+expanding the distance to $\mbox{LCM}(d, n)$.  In order to perform
+this expansion, the count must be greater than the distance, as
+otherwise the repeat references old data that may have no periodicity.
+Also, the stream needs to be padded with $\mbox{LCM}-d$ values before
+the coarsened repeat can begin; this padding takes the form of a
+shorter repeat using the original distance.
 
-Note that the {\it expand} rule requires partial decompression of the
+A second way to adjust a repeat token for compressed-domain processing
+is by changing its count rather than its distance (case {\it expand}
+in Figure~\ref{fig:translate-filter}).  This case applies if a repeat has
+a count less than $n$, if it is unaligned with the boundaries of an
+actor's execution, or if its distance is not a multiple of $n$ (and
+cannot be coarsened appropriately).  The expand logic decodes a single
+value from a repeat token, thereby decreasing its count by one; the
+rest of the repeat may become aligned later.  If the count of a repeat
+reaches zero, it is eliminated in the {\it prune} case.
+
+Note that the {\it expand} logic requires partial decompression of the
 data stream.  In order to perform this decompression, it may be
 necessary to maintain an auxiliary data structure--separate from the
 filter's input stream--that holds a complete window of decompressed
@@ -388,6 +390,222 @@ decompression~\cite{ziviani00compression}.
 %% as gzip, compression can be up to 10x slower than
 %% decompression~\cite{ziviani00compression}.
 
+\subsection*{Splitters}
+
+Duplicate splitters are trivial to transform to the compressed domain,
+as all input tokens (both values and repeats) are copied directly to
+the output streams.  For roundrobin splitters, the central concern is
+that a repeat token can only be transferred to a given output tape if
+the items referenced are also on that tape.  If the items referenced
+by the repeat token were distributed to another tape, then the repeat
+must be decompressed.
+
+The rest of this section focuses on roundrobin splitters.  To simplify
+the presentation, we consider a splitter with only two output streams,
+distributing $m_1$ and $m_2$ items to each respective stream.  This
+case captures all of the fundamental ideas; extension to additional
+streams is straightforward.  In addition, we use the following
+notations:
+
+\begin{itemize}
+
+\item Splitters adopt a fine-grained cyclo-static
+  execution model, in which each execution step transfers only one
+  item from an input tape to an output tape.  That is, a
+  roundrobin$(m_1, m_2)$ splitter has $m_1 + m_2$ distinct execution
+  steps.  We refer to every group of $m_1 + m_2$ steps as an {\it
+  execution cycle}.
+
+\item The pseudocode for our algorithm assumes, without loss of 
+  generality, that the next execution step of the splitter will 
+  write to the first output stream (output1).
+
+\item We use $\pos$ to denote the number of items (in terms of the
+  uncompressed domain) that have already been written to the current
+  output stream (output1) in the current execution cycle.  For brevity,
+  the pseudocode does not maintain the value of $\pos$, though it is
+  straightforward to do so.
+
+\end{itemize}
+
+The procedure for executing a roundrobin splitter in the compressed
+domain appears in Figure~\ref{fig:translate-splitter}, while an
+example appears in Figure~\ref{fig:sj-example}.  As mentioned
+previously, a repeat token can be transferred to an output tape so
+long as the items referenced also appear on that tape.  However, the
+repeat may need to be fragmented (into several repeats of a lesser
+count), depending on the repeat distance.  There are two cases to
+consider.
+
+\begin{figure}[t!]
+\centering
+\begin{minipage}{0.78\textwidth}
+{\it Execute a roundrobin splitter in the compressed domain, given that
+  it outputs $m_1$ items to output1 and $m_2$ items to output2 on
+  each execution cycle.}\\
+\textsc{Execute-Compressed-Splitter}~(int $m_1$, int $m_2$) \{\\
+\tab{\bf while true} \{\\
+\tab\tab{\it /* pass-uncompressed */}\\
+\tab\tab{\bf if} input {\bf endswith} value {\bf then}\\
+\tab\tab\tab{\bf transfer} value from input to output1\\
+\tab\tab\\
+\tab\tab{\bf else}\\
+\tab\tab\tab{\bf let} $\langle d,c \rangle = $ end of input\\
+\tab\tab\tab{\bf let} offset = $d\%(m_1+m_2)$\\
+\tab\tab\tab\\
+\tab\tab\tab{\it /* pass-compressed-long */}\\
+\tab\tab\tab{\bf if} $\mbox{offset} = 0$ {\bf then}\\ 
+\tab\tab\tab\tab{\bf let} $(L_1, L_2)$ = \textsc{Split-To-Both-Streams}($c$)\\
+\tab\tab\tab\tab{\bf pop} $\tupp{d}{c}$ from input\\
+\tab\tab\tab\tab{\bf push} $\tupp{d{\x}m_1/(m_1+m_2)}{L_1}$ to output1\\
+\tab\tab\tab\tab{\bf push} $\tupp{d{\x}m_2/(m_1+m_2)}{L_2}$ to output2\\
+\tab\tab\tab\\
+\tab\tab\tab{\it /* pass-compressed-short */}\\
+\tab\tab\tab{\bf else if} \textsc{Split-To-One-Stream}($d, c$) $> 0$ {\bf then}\\
+\tab\tab\tab\tab{\bf let} offset' = {\bf if} $\mbox{offset} \leq pos$ {\bf then} offset {\bf else} $\mbox{offset} - m_2$\\
+\tab\tab\tab\tab{\bf let} $L = \textsc{Split-To-One-Stream}(d, c)$\\
+\tab\tab\tab\tab{\bf replace} $\tupp{d}{c}$ with $\tupp{d}{c-L}$ on input\\
+\tab\tab\tab\tab{\bf push} $\langle m_1{\x}\mbox{floor}(d / (m_1 + m_2)) + \mbox{offset'},L\rangle$ to output1\\
+\tab\tab\tab\\
+\tab\tab\tab{\it /* expand */}\\
+\tab\tab\tab{\bf else} {\it /*} \textsc{Split-To-One-Stream}($d, c$) {\it = 0 */} \\
+\tab\tab\tab\tab{\bf decode} $\langle d,c \rangle$ into $\langle d,c-1\rangle,V$ on input\\
+\tab\tab\tab\\
+\tab\tab\tab{\it /* prune */}\\
+\tab\tab\tab{\bf if} input {\bf endswith} $\tupp{d}{0}$ {\bf then}\\
+\tab\tab\tab\tab{\bf pop} $\tupp{d}{0}$ from input\\
+\tab\}\\
+\}
+\end{minipage}
+\caption[Translation of splitters into the compressed
+  domain]{Translation of splitters into the compressed domain.
+\protect\label{fig:translate-splitter}}
+\end{figure}
+
+\begin{figure}[t!]
+\centering
+\begin{minipage}{0.75\textwidth}
+{\it Given that $c$ items are available on input stream of a splitter,
+  returns the number of items that can be written to each output
+  stream before the input is exhausted.  Assumes that the splitter is
+  currently writing to the first output stream, to which pos items
+  have previously been written in the current execution cycle.}\\
+\textsc{Split-To-Both-Streams}~(int $c$)~returns~(int,~int)~\{\\
+\tab{\it // the number of complete splitter cycles, and the leftover}\\
+\tab{\bf let} $\mbox{total\_cycles} = \mbox{floor}(c/(m_1 + m_2))$\\
+\tab{\bf let} $\mbox{total\_leftover} = c$\%$(m_1 + m_2)$\\
+~\\
+\tab{\it // the last partial cycle may end in three regions:}\\
+\tab$\mbox{\bf if~} \mbox{total\_leftover} \leq m_1 - \pos$ {\bf then}\\
+\tab\tab{\it // 1. in writing to the first output stream}\\
+\tab\tab$L_1 = \mbox{total\_leftover}$\\
+\tab\tab$L_2 = 0$\\
+\tab$\mbox{\bf~else if~} \mbox{total\_leftover} \leq m_1-\pos + m_2$ {\bf then}\\
+\tab\tab{\it // 2. in subsequent writing to the second output stream}\\
+\tab\tab$L_1 = m_1-\pos$\\
+\tab\tab$L_2 = \mbox{total\_leftover} - m_1-\pos$\\
+\tab\mbox{\bf else}\\
+\tab\tab{\it // 3. in wrap-around writing to the first output stream}\\
+\tab\tab$L_1 = \mbox{total\_leftover} - m_2$\\
+\tab\tab$L_2 = m_2$\\
+~ \\
+\tab$\mbox{\bf return~}(m_1*\mbox{total\_cycles} + L_1, m_2*\mbox{total\_cycles} + L_2)$\\
+\}
+\end{minipage}
+\caption[\textsc{Split-To-Both-Streams} function for compressed splitter
+  execution]{The \textsc{Split-To-Both-Streams} function is called during
+  compressed splitter execution.  In the case where an input token can
+  be split across both output streams, it calculates the maximum
+  numbers of items that can be written to the outputs before the input
+  is exhausted.\protect\label{fig:split-to-both-streams}}
+\end{figure}
+
+\begin{figure}[t!]
+\centering
+\begin{minipage}{0.76\textwidth}
+{\it Given a repeat token with distance $d$ and count $c$ that is
+  input to a splitter, and that is not possible to divide across both
+  output streams of the splitter, returns the maximum count of a
+  repeat token that could safely be emitted to the current output
+  stream of the splitter.}\\
+%Assumes that only a single repeat token can be emitted
+%  (i.e., the {\it pass-compressed-long} case does not apply).}\\
+\textsc{Split-To-One-Stream}~(int $d$, int $c$)~returns~int~\{\\
+\tab{\bf let} $\mbox{offset} = d$\%$(m_1 + m_2)$\\
+\tab$\mbox{{\bf if~}} \mbox{offset} \leq \pos$ {\bf then}\\
+\tab\tab{\it // repeat for remainder of this execution cycle}\\
+\tab\tab$\mbox{\bf return~} \mbox{min}(c, m_1 - \pos)$\\
+\tab$\mbox{\bf ~else if~} \mbox{offset} > m_2 + \pos$ {\bf then}\\
+\tab\tab{\it // repeat until referenced data goes out of range}\\
+\tab\tab$\mbox{\bf return~} \mbox{min}(c, \mbox{offset} - (m_2 + \pos))$\\
+\tab$\mbox{\bf ~else}$\\
+\tab\tab{\it // referenced data is on the other output stream}\\
+\tab\tab$\mbox{\bf return~} 0$\\
+\}
+\end{minipage}
+\caption[\textsc{Split-To-One-Stream} function for compressed splitter
+  execution]{The \textsc{Split-To-One-Stream} function is called during
+  compressed splitter execution.  In the case where an input token
+  cannot be split across both output streams, it calculates the
+  maximum number of items that can be passed to a single output
+  stream.\protect\label{fig:split-to-one-stream}}
+\end{figure}
+
+\begin{figure}[t!]
+\psfig{file=compression/compressed-splitjoin-example.eps,width=\textwidth}
+\caption[Example execution of splitters and joiners in the compressed
+  domain]{Example execution of splitters and joiners in the compressed
+  domain.  As illustrated by the input/output pairs in
+  Figure~\ref{fig:streamit-example}(b), the example performs a
+  transpose of a 2x5 matrix.  When the matrix is linearized as shown
+  here, the input stream traverses the elements row-wise while the
+  output stream traverses column-wise.  Due to redundancy in the
+  matrix, this reordering can be done largely in the compressed
+  domain.  \protect\label{fig:sj-example}}
+\end{figure}
+
+% improve this explanation
+The first case, called {\it pass-compressed-long} in
+Figure~\ref{fig:translate-splitter}, distributes an entire repeat
+token to both output tapes without any fragmentation.  This is only
+possible when the repeat can be cleanly separated into two independent
+sequences, one offset by $m_1$ and the next offset by $m_2$.  In other
+words, the repeat distance must be a multiple of $m_1+m_2$.  In this
+case, the repeat token is moved to the output streams.  The repeat
+distance is scaled down to match the weight of each stream, and the
+count is divided according to the current position of the splitter (a
+simple but tedious calculation implemented
+by \textsc{Split-To-Both-Streams} in Figure~\ref{fig:split-to-both-streams}).
+
+The second case, called {\it pass-compressed-short}, is when the
+repeat distance is mis-aligned with the splitter's execution cycle,
+and thus the repeat (if it is long enough) eventually references items
+that are distributed to a different output tape.  Nonetheless, part of
+the repeat may be eligible to pass through, so long as the items
+referenced refer to the current output tape.  This judgment is
+performed by \textsc{Split-To-One-Stream}
+(Figure~\ref{fig:split-to-one-stream}) by comparing the repeat distance to
+the current position in the output stream.  If one or more of the
+repeated values are in range, the valid segment of the repeat (of
+length {\it actual\_repeat}) is moved to the output tape.  As before,
+the repeat distance needs to be scaled according to the weights of the
+splitter, and an extra offset is needed if the repeat distance wraps
+around to reference the end of a previous cycle.
+
+If neither of the above transfers apply, then the input stream needs
+to be partially decompressed (according to the {\it expand} case)
+because the current repeat token references items that will be sent to
+the wrong output tape.  The {\it prune} case is also needed to clear
+empty repeats generated by {\it expand}.
+
+As future work, it would also be desirable to derive an analog of the
+{\it coarsen-repeat} logic (Figure~\ref{fig:translate-filter}) to
+preserve even more compression across a splitter.  The intuition is
+that, by increasing certain repeat distances, the splitter's output
+tapes can become more independent (referencing themselves rather than
+each other).  This would enable a compressed rule to fire in place of
+an expansion step.
+
 \subsection*{Joiners}
 
 %% It is necessary to consider splitters and joiners separately from
@@ -400,86 +618,61 @@ decompression~\cite{ziviani00compression}.
 
 The procedure for executing a joiner in the compressed domain appears
 in Figure~\ref{fig:translate-joiner}, while an example appears in
-Figure~\ref{fig:sj-example}.  To simplify the presentation, we
-consider a joiner with only two input streams.  This captures all of
-the fundamental ideas; extension to additional streams is
-straightforward.  In addition, we use the following notations:
+Figure~\ref{fig:sj-example}.  Analogously to splitters, we consider a
+roundrobin joiner with only two input streams, collecting $n_1$ and
+$n_2$ items from each respective stream.  We also use the following
+notations:
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \centering
-\vspace{-6pt}
 \begin{minipage}{0.75\textwidth}
 {\it Execute a roundrobin joiner in the compressed domain, given that
   it inputs $n_1$ items from input1 and $n_2$ items from input2 on
-  each execution.}\mynewline
-\textsc{Execute-Compressed-Joiner}~(int $n_1$, int $n_2$) \{\mynewline
-\mbox{~~~~}{\bf while true} \{\mynewline \mbox{~~~~}\mbox{~~~~}{\it /*
-  pass-uncompressed */}\mynewline \mbox{~~~~}\mbox{~~~~}{\bf if}
-input1 {\bf endswith} value\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf transfer} value from input1 to
-output\mynewline \mbox{~~~~}\mbox{~~~~}\mynewline
-\mbox{~~~~}\mbox{~~~~}{\it /* pass-compressed-long */}\mynewline
-\mbox{~~~~}\mbox{~~~~}{\bf else if} input1 {\bf endswith} $\langle
-d_1,c_1 \rangle$ {\bf and} $d_1\%n_1 = 0$\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~~~~}{\bf and} input2 {\bf endswith}
-$\langle d_2,c_2 \rangle$ {\bf and} $d_2\%n_2 = 0$\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~~~~}{\bf and} $d_1/n_1 = d_2/n_2$ {\bf
-  then}\mynewline \mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf let} $(L_1,
-L_2)$ = \textsc{Repeat\_Lengths}($c_1$, $c_2$, {\it pos})\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf replace} $\langle d_1, c_1
-\rangle$ with $\langle d_1, c_1-L_1\rangle$ on input1\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf replace} $\langle d_1, c_2
-\rangle$ with $\langle d_2, c_2-L_2\rangle$ on input2\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf push} $\langle d_1(n_1+n_2)/n_1,
-L_1+L_2 \rangle$ to output\mynewline \mbox{~~~~}\mbox{~~~~}\mynewline
-\mbox{~~~~}\mbox{~~~~}{\it /* pass-compressed-short */}\mynewline
-\mbox{~~~~}\mbox{~~~~}{\bf else if} input1 {\bf endswith} $\langle
-d_1,c_1 \rangle$ {\bf and} $c_1>0$\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf let} offset = {\bf if} $d\%n_1
-\leq \mbox{\it pos}$ {\bf then} {\it pos} {\bf else} $d\%n_1 +
-n_2$\mynewline \mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf let} L = {\bf
-  min}($c$, \textsc{Join\_Potential}($d$))\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf replace} $\langle d, c\rangle$
-with $\langle d, c - L\rangle$ on input1\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf push} $\langle
-(n_1+n_2)~\mbox{\bf floor}(d/n_1) + \mbox{offset}, L \rangle$ to
-output\mynewline \mbox{~~~~}\mbox{~~~~}\mynewline
-\mbox{~~~~}\mbox{~~~~}{\it /* prune */}\mynewline
-\mbox{~~~~}\mbox{~~~~}{\bf else~} {\it /* input1 endswith}~$\langle
-d_1, 0 \rangle$~{\it */}\mynewline
-\mbox{~~~~}\mbox{~~~~}\mbox{~~~~}{\bf remove} $\langle d_1,0 \rangle$
-from input1\mynewline \mbox{~~~~}\}\mynewline
-\}\mynewline
+  each execution cycle.}\\
+\textsc{Execute-Compressed-Joiner}~(int $n_1$, int $n_2$) \{\\
+\tab{\bf while true} \{\\
+\tab\tab{\it /* pass-uncompressed */}\\
+\tab\tab{\bf if} input1 {\bf endswith} value {\bf then}\\
+\tab\tab\tab{\bf transfer} value from input1 to output\\
+\tab\tab\\
+\tab\tab{\it /* pass-compressed-long */}\\
+\tab\tab{\bf else if} input1 {\bf endswith} $\langle d_1,c_1 \rangle$ {\bf and} $d_1\%n_1 = 0$\\
+\tab\tab\mbox{~~~~~~~}{\bf and} input2 {\bf endswith} $\langle d_2,c_2 \rangle$ {\bf and} $d_2\%n_2 = 0$\\
+\tab\tab\mbox{~~~~~~~}{\bf and} $d_1/n_1 = d_2/n_2$ {\bf then}\\
+\tab\tab\tab{\bf let} $(L_1,L_2)$ = \textsc{Join-From-Both-Streams}($c_1$, $c_2$)\\
+\tab\tab\tab{\bf replace} $\langle d_1, c_1 \rangle$ with $\langle d_1, c_1-L_1\rangle$ on input1\\
+\tab\tab\tab{\bf replace} $\langle d_1, c_2 \rangle$ with $\langle d_2, c_2-L_2\rangle$ on input2\\
+\tab\tab\tab{\bf push} $\langle d_1(n_1+n_2)/n_1,L_1+L_2 \rangle$ to output\\
+\tab\tab\\
+\tab\tab{\it /* pass-compressed-short */}\\
+\tab\tab{\bf else} {\it /* input1 endswith} $\langle d,c \rangle$ {\it and} $c>0$ {\it */}\\
+\tab\tab\tab{\bf let} offset = {\bf if} $d\%n_1 \leq \mbox{\it pos}$ {\bf then} {\it pos} {\bf else} $d\%n_1 + n_2$\\
+\tab\tab\tab{\bf let} L = {Join-From-One-Stream}($d$, $c$))\\
+\tab\tab\tab{\bf replace} $\langle d, c\rangle$ with $\langle d, c - L\rangle$ on input1\\
+\tab\tab\tab{\bf push} $\langle (n_1+n_2)~\mbox{floor}(d/n_1) + \mbox{offset}, L \rangle$ to output\\
+\tab\tab\\
+\tab\tab{\it /* prune */}\\
+\tab\tab{\bf if} input1 {\bf endswith} $\langle d, 0 \rangle$ {\bf then}\\
+\tab\tab\tab{\bf pop} $\langle d,0 \rangle$ from input1\\
+\tab\tab{\bf if} input2 {\bf endswith} $\langle d, 0 \rangle$ {\bf then}\\
+\tab\tab\tab{\bf pop} $\langle d,0 \rangle$ from input2\\
+\tab\}\\
+\}
 \end{minipage}
-\vspace{-6pt}
 \caption[Translation of joiners into the compressed
-  domain]{Translation of joiners into the compressed domain.  We use
-  $\%$ to denote a modulo operation.
+  domain]{Translation of joiners into the compressed domain.
 %Helper functions appear in Figure~\ref{fig:helpers}.
 \protect\label{fig:translate-joiner}}
 \end{figure}
 
-\begin{figure*}[t]
-\psfig{file=compression/compressed-splitjoin-example.eps,width=\textwidth}
-\caption[Example execution of splitters and joiners in the compressed
-  domain]{Example execution of splitters and joiners in the compressed
-  domain.  As illustrated by the input/output pairs in
-  Figure~\ref{fig:streamit-example}(b), the example performs a
-  transpose of a 2x5 matrix.  When the matrix is linearized as shown
-  here, the input stream traverses the elements row-wise while the
-  output stream traverses column-wise.  Due to redundancy in the
-  matrix, this reordering can be done largely in the compressed
-  domain.  \protect\label{fig:sj-example}}
-\end{figure*}
-
 \begin{itemize}
 
-\item Splitters and joiners adopt a fine-grained cyclo-static
+\item Joiners adopt a fine-grained cyclo-static
   execution model, in which each execution step transfers only one
   item from an input tape to an output tape.  That is, a
   roundrobin$(n_1, n_2)$ joiner has $n_1 + n_2$ distinct execution
   steps.  We refer to every group of $n_1 + n_2$ steps as an {\it
-    execution cycle}.
+  execution cycle}.
 
 \item The pseudocode in Figure~\ref{fig:translate-joiner} assumes,
   without loss of generality, that the next execution step of the
@@ -493,7 +686,7 @@ from input1\mynewline \mbox{~~~~}\}\mynewline
 
 \end{itemize}
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \centering
 \begin{minipage}{0.75\textwidth}
 {\it Given that $c_1$ and $c_2$ compressed items are available on the
@@ -502,36 +695,35 @@ from input1\mynewline \mbox{~~~~}\}\mynewline
   exhausted.  Assumes that the joiner is currently reading from the
   first input stream, from which \mbox{pos} items have previously been
   consumed in the current execution cycle.}\\
-\textsc{Repeat\_Lengths}$(c_1, c_2, \pos )$~returns~(int,~int)~\{\\
+\textsc{Join-From-Both-Streams}~(int $c_1$, int $c_2$)~returns~(int,~int)~\{\\
 \tab{\it // the number of complete joiner cycles, and the leftovers}\\
-\tab$\mbox{total\_cycles} = \mbox{floor}(c/(n_1 + n_2))$\\
-\tab$\mbox{leftover}_1 = c_1 - \mbox{total\_cycles} * n_1$\\
-\tab$\mbox{leftover}_2 = c_2 - \mbox{total\_cycles} * n_2$\\
-~ \vspace{-6pt}\\
+\tab{\bf let} $\mbox{total\_cycles} = \mbox{floor}(c/(n_1 + n_2))$\\
+\tab{\bf let} $\mbox{leftover}_1 = c_1 - \mbox{total\_cycles} * n_1$\\
+\tab{\bf let} $\mbox{leftover}_2 = c_2 - \mbox{total\_cycles} * n_2$\\
+~ \\
 \tab{\it // the last partial cycle may end in three regions:}\\
-\tab$\mbox{\bf if~} \mbox{leftover}_1 \leq n_1 - \pos$~\{\\
+\tab$\mbox{\bf if~} \mbox{leftover}_1 \leq n_1 - \pos$ {\bf then}\\
 \tab\tab{\it // 1. in reading from the first input stream}\\
 \tab\tab$L_1 = \mbox{leftover}_1$\\
 \tab\tab$L_2 = 0$\\
-\tab$\} \mbox{\bf~else if~} \mbox{leftover}_2 \leq n_2~\{$\\
+\tab$\mbox{\bf~else if~} \mbox{leftover}_2 \leq n_2$ {\bf then}\\
 \tab\tab{\it // 2. in subsequent reading from the second input stream}\\
 \tab\tab$L_1 = n_1-\pos$\\
 \tab\tab$L_2 = \mbox{leftover}_2$\\
-\tab\} \mbox{\bf ~else} \{\\
+\tab\mbox{\bf ~else}\\
 \tab\tab{\it // 3. in wrap-around reading from the first input stream}\\
 \tab\tab$L_1 = \mbox{leftover}_1$\\
 \tab\tab$L_2 = n_2$\\
-\tab\}\\
-~ \vspace{-6pt}\\ 
-\tab$\mbox{\bf return~}(n_1*\mbox{total\_cycles} + L_1, n_2*\mbox{total\_cycles} + L_2)$
+~ \\
+\tab$\mbox{\bf return~}(n_1*\mbox{total\_cycles} + L_1, n_2*\mbox{total\_cycles} + L_2)$\\
 \}
 \end{minipage}
-\caption[\textsc{Repeat\_Lengths} function for compressed joiner
-  execution]{The \textsc{Repeat\_Lengths} function is called during
+\caption[\textsc{Join-From-Both-Streams} function for compressed joiner
+  execution]{The \textsc{Join-From-Both-Streams} function is called during
   compressed joiner execution.  In the case where the input tokens to
   the joiner have compatible repeat distances, it calculates the
   maximum repeat lengths that can be passed to the
-  output.\protect\label{fig:repeat-lengths}}
+  output.\protect\label{fig:join-from-both-streams}}
 \end{figure}
 
 There are two ways to pass repeat tokens through a joiner.  If the
@@ -545,18 +737,46 @@ domain is to combine repeat tokens from both input streams (case {\it
 be possible, both repeat distances must be the same multiple of their
 respective joiner weight ($n_1$ or $n_2$); the combined token has a
 repeat distance that is a multiple of $n_1 + n_2$.  The
-\textsc{Repeat\_Lengths} routine (detailed in
-Figure~\ref{fig:repeat-lengths}) calculates the maximum repeat length
+\textsc{Join-From-Both-Streams} routine (detailed in
+Figure~\ref{fig:join-from-both-streams}) calculates the maximum repeat length
 depending on the current position of the joiner and the repeat lengths
 of the inputs.
 
+\begin{figure}[t!]
+\centering
+\begin{minipage}{0.75\textwidth}
+{\it Given a repeat token with distance $d$ and count $c$ on the
+  current input stream of a joiner, and that cannot be combined with a
+  token on the other input of the joiner, returns the maximum count of
+  a repeat token that could safely be emitted to the output stream.}\\
+\textsc{Join-From-One-Stream}~(int $d$, int $c$)~returns~int~\{\\ \tab{\bf let} $\mbox{offset} =
+d$\%$n_1$\\ \tab$\mbox{{\bf if~}} \mbox{offset} \leq \pos$ {\bf then}\\
+\tab\tab{\it // repeat for remainder of this execution
+  cycle}\\ \tab\tab$\mbox{\bf return~} \mbox{min}(c, n_1 - \pos)$\\ \tab$\mbox{\bf
+  ~else}$\\ \tab\tab{\it // repeat until referenced data goes out
+  of range}\\ \tab\tab$\mbox{\bf return~} \mbox{min}(c, \mbox{offset} - \pos)$\\
+\}
+\end{minipage}
+\caption[\textsc{Join-From-One-Stream} function for compressed joiner
+  execution]{The \textsc{Join-From-One-Stream} function is called during
+  compressed joiner execution.  In the case where the input tokens to
+  the joiner have incompatible repeat distances, it calculates the
+  maximum length of the current token that may be passable to the
+  output. \protect\label{fig:join-from-one-stream}}
+\end{figure}
+
 The second mode of compressed joiner execution ({\it
-  pass-compressed-short}) inputs only a single repeat token,
-extracting the maximum length that can safely move to the output.  The
-\textsc{Join\_Potential} routine (detailed in
-Figure~\ref{fig:join-potential}) determines how much of the repeat can
+  pass-compressed-short} in Figure~\ref{fig:translate-joiner}) inputs
+  only a single repeat token, extracting the maximum length that can
+  safely move to the output.  The
+\textsc{Join-From-One-Stream} routine (detailed in
+Figure~\ref{fig:join-from-one-stream}) determines how much of the repeat can
 be moved to the output before the data referenced would have
 originated from a different input stream.
+
+As in the case of splitters, further compression gains are possible by
+adding rules to coarsen the repeat distance or shift the distance to
+align with other streams.  We leave this for future work.
 
 \section{Supported File Formats}
 \label{sec:formats}
@@ -601,30 +821,6 @@ Flic Video files (FLI/FLC) were originally produced by Autodesk
 Animator and are still supported by many animation packages today.
 Their compression of frame data is almost identical to Apple
 Animation.
-
-\begin{figure}[t]
-\centering
-\begin{minipage}{0.75\textwidth}
-{\it Given a repeat token with distance $d$ on the current input
-  stream of a joiner, returns the maximum count of a repeat token that
-  could safely be emitted to the output stream.  Assumes that only a
-  single repeat token is available (i.e., the {\tt
-    pass-compressed-long} rule does not apply).}
-\textsc{Join\_Potential}$(d)$~returns~int~\{\\ \tab$\mbox{offset} =
-d$\%$n_1$\\ \tab$\mbox{{\bf if~}} \mbox{offset} \leq \pos
-~\{$\\ \tab\tab{\it // repeat for remainder of this execution
-  cycle}\\ \tab\tab$\mbox{\bf return~} n_1 - \pos$\\ \tab$\} \mbox{\bf
-  ~else} ~\{$\\ \tab\tab{\it // repeat until referenced data goes out
-  of range}\\ \tab\tab$\mbox{\bf return~} \mbox{offset} -
-\pos$\\ \tab$\}$\\ \}
-\end{minipage}
-\caption[\textsc{Join\_Potential} function for compressed joiner
-  execution]{The \textsc{Join\_Potential} function is called during
-  compressed joiner execution.  In the case where the input tokens to
-  the joiner have incompatible repeat distances, it calculates the
-  maximum length of the current token that may be passable to the
-  output. \protect\label{fig:join-potential}}
-\end{figure}
 
 \myitem {Microsoft RLE.}  Microsoft RLE compression can appear in
   both BMP images and AVI animations.  Apart from bit-depth and
@@ -721,17 +917,18 @@ LZ77.
 
 \section{Experimental Evaluation}
 
-To demonstrate the potential benefits of mapping into the compressed
-domain, we implemented a few of our transformations as part of the
-StreamIt compiler.  Our current implementation supports two
-computational patterns: 1) transforming each individual element of a
-stream (via a pop-1, push-1 filter), and 2) combining the elements of
-two streams (via a roundrobin(1,1) joiner and a pop-2, push-1 filter).
-The program can contain any number of filters that perform arbitrary
-computations, so long as the I/O rates match these patterns.  While we
-look forward to performing a broader implementation in future work,
-these two building blocks are sufficient to express a number of useful
-programs and to characterize the performance of the technique.
+As an initial demonstration of the potential benefits of mapping into
+the compressed domain, we implemented a core subset of our
+transformations as part of the StreamIt compiler.  Our current
+implementation supports two computational patterns: 1) transforming
+each individual element of a stream (via a pop-1, push-1 filter), and
+2) combining the elements of two streams (via a roundrobin(1,1) joiner
+and a pop-2, push-1 filter).  The program can contain any number of
+filters that perform arbitrary computations, so long as the I/O rates
+match these patterns.  While we look forward to performing a broader
+implementation in future work, these two building blocks are
+sufficient to express a number of useful programs and to characterize
+the performance of the technique.
 
 Our evaluation focuses on applications in digital video editing.
 Given StreamIt source code that operates on pixels from each frame of
@@ -745,6 +942,7 @@ such as brightness, contrast, and color inversion, which adjust pixels
 within a single video, and 2) video compositing, in which one video is
 combined with another as an overlay or mask.
 
+\newpage\noindent
 The main results of our evaluation are:
 \begin{itemize}
 
@@ -767,7 +965,7 @@ compositing.
 
 \subsection*{Video Workloads}
 
-\begin{table*}[t]
+\begin{table*}[t!]
 \hspace{-0.26in}\psfig{file=compression/table-benchmarks.eps,width=7.02in}
 \caption{Characteristics of the video workloads.
 \protect\label{tab:videos}}
@@ -876,20 +1074,6 @@ Our evaluation platform is a dual-processor Intel Xeon (2.2 GHz) with
 second processor is not utilized.  For the timing measurements, we
 execute each program five times and report the median user time.
 
-\begin{table*}[t!]
-\hspace{-0.26in}\psfig{file=compression/table-pixel-speedup.eps,width=7.02in}
-\vspace{-12pt}
-\caption[Table of results for pixel transformations]{Results for pixel transformations.
-\protect\label{tab:pixel-speedup}}
-\end{table*}
-
-\begin{figure}[t!]
-\centering
-\psfig{file=compression/graph-speedup-pixel.eps,width=4.355in}
-\caption[Speedup graph for pixel transformations]{Speedup on pixel transformations.
-\protect\label{fig:pixel-speedup}}
-\end{figure}
-
 \paragraph*{Results}  Detailed results for the pixel transformations appear
 in Table~\ref{tab:pixel-speedup}.  Figure~\ref{fig:pixel-speedup}
 illustrates the speedups, which range from 2.5x to 471x.  As
@@ -900,6 +1084,21 @@ range from 58x to 471x.  For the medium-compression computer
 animations (including the animated logos), speedups range from 11x to
 46x.  And for the low-compression digital television content, speedups
 range from 2.5x to 8.9x.
+
+\begin{table*}[t!]
+\vspace{-6pt}
+\hspace{-0.26in}\psfig{file=compression/table-pixel-speedup.eps,width=7.02in}
+\vspace{-12pt} % otherwise huge space?
+\caption[Table of results for pixel transformations]{Results for pixel transformations.
+\protect\label{tab:pixel-speedup}}
+\end{table*}
+
+\begin{figure}[t!]
+\centering
+\psfig{file=compression/graph-speedup-pixel.eps,width=5.226in}
+\caption[Speedup graph for pixel transformations]{Speedup on pixel transformations.
+\protect\label{fig:pixel-speedup}}
+\end{figure}
 
 There are two distinct reasons for the speedups observed.  First, by
 avoiding the decompression stage, computing on compressed data reduces
@@ -934,13 +1133,6 @@ decompression stage of the baseline configuration.
 %inversion on {\tt screencast1-demo} spends only 5\% of its time in the
 %encoder (and 65\% of the time doing the transformation itself).
 
-\begin{figure}[t]
-\centering
-\psfig{file=compression/graph-speedup-scatter.eps,width=4.511in}
-\caption{Speedup vs. compression factor for all transformations.
-\protect\label{fig:speedup-scatter}}
-\end{figure}
-
 Another important aspect of the results is the size of the output
 files produced.  Apart from the first frame of a video\footnote{In the
 Apple Animation format, the first frame is encoded as if the previous
@@ -974,6 +1166,13 @@ extreme cases in which many pixels are close to the saturating point;
 the median re-compression (across brightness and contrast) is only
 10\%.
 
+\begin{figure}[t!]
+\centering
+\psfig{file=compression/graph-speedup-scatter.eps,width=4.9in}
+\caption{Speedup vs. compression factor for all transformations.
+\protect\label{fig:speedup-scatter}}
+\end{figure}
+
 To achieve the minimal file size whenever possible, future work will
 explore integrating a lightweight re-compression stage into the
 compressed processing technique.  Because most of the compression is
@@ -992,7 +1191,7 @@ regions can be extended without being rediscovered).
 
 \subsection*{Video Compositing}
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \centering
 \begin{minipage}{0.3\textwidth}
 \centering
@@ -1084,13 +1283,6 @@ allocation/deallocation for each frame.
 % did not mention removal of O(frames^2) linked list search, although 
 % this fell out of removing the redundant memory deallocation
 
-\begin{table*}[t]
-\centering
-\psfig{file=compression/table-composite-speedup.eps,width=5.8in}
-\caption[Table of results for composite transformations]{Results for composite transformations.
-\protect\label{tab:composite-speedup}}
-\end{table*}
-
 Our optimized configuration operates in the compressed domain.
 Outside of the auto-generated plugin, we patched three frame-copy
 operations in
@@ -1112,9 +1304,16 @@ transformations (median = 17x); this is because the compression
 achieved on composite videos is roughly proportional to the minimum
 compression across the two input files.
 
-\begin{figure}[t]
+\begin{table*}[t!]
 \centering
-\psfig{file=compression/graph-speedup-composite.eps,width=4.355in}
+\psfig{file=compression/table-composite-speedup.eps,width=5.8in}
+\caption[Table of results for composite transformations]{Results for composite transformations.
+\protect\label{tab:composite-speedup}}
+\end{table*}
+
+\begin{figure}[t!]
+\centering
+\psfig{file=compression/graph-speedup-composite.eps,width=5.226in}
 \caption[Speedup graph for composite transformations]{Speedup on composite transformations.
 \protect\label{fig:composite-speedup}}
 \end{figure}

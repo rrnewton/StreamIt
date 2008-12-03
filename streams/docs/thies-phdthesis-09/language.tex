@@ -279,7 +279,7 @@ situation for both man and machine.
 \begin{figure}[t]
 \centering
 \psfig{figure=fm-radio-with-code.eps,width=0.9\textwidth}
-\caption[Example of a software radio with equalizer]{Example of a
+\caption[Example of a software radio with equalizer.]{Example of a
   software radio with equalizer.  There is a natural correspondence
   between the structure of the code and the structure of the graph.
   In the code, stream structures can be lexically nested to provide a
@@ -1013,7 +1013,7 @@ pixels.
 \centering
 \psfig{file=cd-dat,width=4.5in}
 \vspace{-6pt}
-\caption[CD-DAT, an example of mismatched I/O rates]{The CD-DAT
+\caption[CD-DAT, an example of mismatched I/O rates.]{The CD-DAT
   benchmark~\cite{murthy_buffer_2004} exhibits unusually mis-matched
   I/O rates.  Nodes are annotated with the number of items pushed and
   popped per execution, as well as their execution multiplicity in the
@@ -1024,7 +1024,7 @@ pixels.
 ~ \\
 \psfig{file=jpeg.eps,width=5.8in}
 \vspace{-6pt}
-\caption[JPEG transcoder excerpt, an example of matched I/O rates]{This 
+\caption[JPEG transcoder excerpt, an example of matched I/O rates.]{This 
 excerpt from the JPEG transcoder illustrates matched I/O rates, as
 found in many benchmarks.  The graph is transforming pixels from an
 8x8 macroblock.  Nodes are annotated with the number of items pushed
@@ -1033,7 +1033,7 @@ the steady state.  Since neighboring filters often produce the same
 number of items on each execution, all filters except for Identity and
 Adder execute exactly once in the steady state.  This offers less
 flexibility and benefit for optimizing the
-schedule.\protect\label{fig:fft}}
+schedule.\protect\label{fig:jpeg}}
 \vspace{-24pt}
 \end{figure}
 
@@ -1067,7 +1067,7 @@ language designers.  We summarize their experience as follows:
 
 (a) Unstructured ~~~~~~~~~~~~~~~~~~~~~~~~~ (b) Structured~~~~~~
 \caption[Refactoring a stream graph to fit a structured programming
-  model]{Example of refactoring a stream graph to fit a structured
+  model.]{Example of refactoring a stream graph to fit a structured
   programming model.  Both graphs achieve equivalent communication
   between filters.
 \protect\label{fig:interleaving}}
@@ -1121,7 +1121,7 @@ language designers.  We summarize their experience as follows:
 \psfig{file=3gpp.eps,height=\textheight}
 \vspace{-0.9in} ~ \\
 \mbox{~}\hspace{2.03in}\begin{minipage}{4in}
-\caption[Stream graph for 3GPP]{Stream graph a 3GPP Radio Access
+\caption[Use of Identity filters is illustrated by the 3GPP benchmark.]{Stream graph a 3GPP Radio Access
   Protocol application.  Shaded filters indicate Identity nodes that
   are used to bypass data items around intermediate filters.  They are
   also used in splitjoins for data duplication and
@@ -1208,7 +1208,7 @@ void->int filter SquareWave() {
 \centering
 (b) Stateful
 \end{minipage}
-\caption[Accidental introduction of filter state (pedantic example)]{Programmers 
+\caption[Accidental introduction of filter state (pedantic example).]{Programmers 
   can accidentally introduce unnecessary filter state when writing
   programs.  In this example, the intended output is a square wave,
   emitting alternate values of 0 and 1.  Both implementations shown
@@ -1292,7 +1292,7 @@ CFARDelayToLMax_Stateful(int rows) {
 \centering
 (b) Stateful
 \end{minipage}
-\caption[Accidental introduction of filter state (real example)]{A 
+\caption[Accidental introduction of filter state (real example).]{A 
   second example, drawn from MPD, in which a stateless computation was
   written in a stateful style in the original implementation.  The
   original version (b) performs a complex delay and reordering of
