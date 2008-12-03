@@ -15,27 +15,14 @@ summary will show that language is amenable to optimization
 --------------------------
 
 Big things:
+* Saman comments (including pending comments)
+  - on other sections
+  - on language
 * more honest communication of uniprocessor performance relative to C
   - and more clear about baselines in abstract, conclusions, etc.
-* SDEP calculation does not work for actors that need to fire a full
-  steady state during the initialization schedule
-  - replace right and wrong one with a single correct one
-* SDEP not surjective, what do you do? 
-  - SOLUTION:
-   - current downstream constraints are:
-     SDEP_A<-B (M(A,B,k1,k2,n)) >= n + k_1
-     SDEP_A<-B (M(A,B,k1,k2,n)) <= n + k_2
-   - want to change them: 
-     SDEP_A<-B (M(A,B,k1,k2,n)) >= n + k_1
-     SDEP_A<-B (M(A,B,k1,k2,n)-1) < n + k_2
-* possibly revise writeup of constrained scheduling
-* check that messaging speedup makes any sense?
 * address arvind/srini comments in conclusion:  does this extend to dynamism?
   - see feedback.txt
 * acknowledgments
-* Saman comments (including pending comments)
-  - on language
-  - on other sections
 * related work
 
 Little things:
@@ -69,6 +56,7 @@ Mindless:
 - make cd-dat and jpeg look exactly the same in language section
 
 Probably not fixing:
+. check if messaging speedup makes any sense?
 . mildly bothersome: the cache section is somewhat inconsistent about
   referring to static state of a filter as only instructions
   vs. instructions+data
