@@ -1,4 +1,70 @@
-\section{Fission of a Single Input / Single Output Filter}
+\section{Fission of a Single Input / Single Output Filter Without a
+Sliding Window}
+\label{sec:single_nopeek}
+
+\begin{enumerate}
+
+\item $M(S,F) \mod  P = 0$
+
+\item $M(I,F) = 0$
+
+\item $o(W_p,F) = e(W_p,F) = u(W_p,F) = 0$
+
+\item $W_p(F)$ does nothing.
+
+\item $C(F) = 0$
+
+\item $e(W,F) = 0$
+
+\end{enumerate}
+
+\begin{algorithm}
+$W(F_i)$:
+\begin{algorithmic}[1]
+\For{$M(S,F)/P$}
+\State $W(F)$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+Define $1 \le i \le P$:
+
+$$ M(I,F_i) \equiv o(W_p,F_i) \equiv u(W_p,F_i) \equiv e(W_p,F_i)
+\equiv 0 $$
+
+\begin{eqnarray*} 
+o(W,F_i) & \equiv & \frac{M(S,F)}{P} \times o(W,F) \\
+e(W,F_i) & \equiv & 0 \\
+u(W,F_i) & \equiv & \frac{M(S,F)}{P} \times u(W,F)
+\end{eqnarray*} 
+
+Now we will concern ourselves with $S$, the steady-state.  Define the
+following: $1 \le i \le P$.
+ 
+$$ M(S,F_i) \equiv 1 $$
+
+\begin{eqnarray*}
+\mt{IW}(S,F_i) & \equiv & (1) \\
+\mt{IE}(S,F_i) & \equiv & ((U,F_i)) 
+\end{eqnarray*}
+
+\begin{eqnarray*} 
+\mt{OW}(S,F_i) & \equiv & (1) \\
+\mt{OE}(S,F_i) & \equiv & (\{(F_i, D)\}) 
+\end{eqnarray*} 
+
+\begin{eqnarray*} 
+\mt{OW}(U,D) & \equiv & (o(W,F_1),\ldots,o(W, F_P)) \\
+\mt{OE}(U,D) & \equiv & (\{(U,F_1)\},\dots,\{(U,F_P)\}) 
+\end{eqnarray*}
+
+\begin{eqnarray*} 
+\mt{IW}(S,D) & \equiv & (u(W,F_1),\ldots,u(W, F_P)) \\
+\mt{IE}(S,D) & \equiv & ((F_1, D),\dots,(F_P, D)) 
+\end{eqnarray*}
+
+\section{Fission of a Single Input / Single Output Filter With a
+Sliding Window}
 \label{sec:single}
 
 In this section we introduce our techniques by defining the
@@ -92,7 +158,7 @@ distribution patterns of $F_1$ in $I$ are as follows:
 
 \begin{eqnarray*} 
 \mt{OW}(I,F_1) & \equiv & (1) \\
-\mt{OE}(I,F_1) & \equiv & ((\{(F_1, D)\})) 
+\mt{OE}(I,F_1) & \equiv & (\{(F_1, D)\}))
 \end{eqnarray*} 
 
 Now we will concern ourselves with $S$, the steady-state.  Define the
