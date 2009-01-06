@@ -120,7 +120,7 @@ connected to the input of the next.  An example of a pipeline appears
 in Figure~\ref{fig:decoder-sj}. The {\it splitjoin} construct
 distributes data to a set of parallel streams, which are then joined
 together in a roundrobin fashion.  StreamIt also provides a {\it
-feedback} loop construct for introducing cycles in the graph.
+feedback loop} construct for introducing cycles in the graph.
 
 The {\tt add} keyword in StreamIt constructs the specified stream
 using the input arguments. The {\tt add} statement may only appear in
@@ -144,10 +144,10 @@ joiner.  It gathers data from its predecessors in a roundrobin manner
 to produce a single output stream.
 
 The stream constructs provide a convenient and natural way to expose
-pipeline parallelism, as well as data parallel streams. The languages
+pipeline parallelism, as well as data parallel streams. The language
 also naturally exposes data distribution and communication between
 streams. An example is shown in Figure~\ref{fig:decoder-sj}. It
-illustrates a parallel implementation of a 2D inverse discreet cosine
+illustrates a parallel implementation of a 2D inverse discrete cosine
 transform (DCT) using 1D inverse DCTs. This implementation is both
 data parallel (within the rows and columns) and pipeline parallel
 (between the rows and columns).  A straightforward C implementation of
@@ -170,14 +170,14 @@ expressions.
 \label{sec:messaging}
 \vspace{-11pt}
 
-A notoriously difficult aspect of stream programming, from both a
-performance and programmability standpoint, is reconciling regular
-streaming dataflow with irregular control messages.  While the
-high-bandwidth flow of data is very predictable, realistic
-applications also include unpredictable, low-bandwidth control
-messages for adjusting computation parameters (e.g., coefficients used
-for quantization during MPEG encoding and decoding).  In StreamIt,
-such communication is conveniently accomplished with teleport
+A difficult aspect of stream programming, from both a performance and
+programmability standpoint, is reconciling regular streaming dataflow
+with irregular control messages.  While the high-bandwidth flow of
+data is very predictable, realistic applications also include
+unpredictable, low-bandwidth control messages for adjusting
+computation parameters (e.g., coefficients used for quantization
+during MPEG encoding and decoding).  In StreamIt, such communication
+is conveniently accomplished with teleport
 messaging~\cite{thies05ppopp}.  The idea behind teleport messaging is
 for a message sender to communicate information via asynchronous
 method calls to the intended receivers. The method invocations in the
