@@ -6,3 +6,6 @@ all:
 #	dvips -P cmz main.dvi -o main.ps
 #	ps2pdf main.ps
 
+clean:
+	rm -f *~ *.aux *.log *.bbl *.blg *.toc *.haux *.htoc *.png main.pdf main.ps
+
