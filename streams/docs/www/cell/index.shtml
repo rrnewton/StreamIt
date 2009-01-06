@@ -11,7 +11,44 @@
 
 This page is the home of StreamIt on Cell, including the StreamIt backend
 for Cell, a lightweight streaming runtime library, and a dynamic scheduler.
-More information and resources will be added soon.
+Here is what we've designed and implemented:
+
+<ul>
+<li align="justify"> A runtime framework that implements a schedule and maps
+computation to SPEs and coordinate data transfers between SPEs as
+necessary. This component consists of a runtime library with a
+streaming intermediate format (to describe the filters and data
+channels) and a dynamic scheduler which dynamically determines a
+mapping of filters to SPEs. The library admits statically defined
+schedules as well.</li>
+
+<li align="justify"> A compiler backend that performs code generation
+for the runtime library: it provisions the StreamIt stream graph for
+the intermediate representation used by the runtime library, and
+optionally outputs a schedule for the runtime to implement.</li>
+</ul>
+
+<p align="justify">
+Some details of this work appear in <a
+href="http://cag.lcs.mit.edu/commit/papers/07/zhang-dascmp07.pdf">our
+dasCMP 2007 paper</a>. More details can be found in David
+Zhang's <a
+href="http://cag.lcs.mit.edu/commit/papers/07/zhang-meng-thesis.pdf">MEng thesis</a>.<br>
+<br>
+We have a pre-release package of the runtime system available for 
+<a href="http://cag.csail.mit.edu/streamit/cell/srl_ds.tar.gz">download</a>.
+
+<p align="justify">
+The distribution includes the runtime library, the scheduler, and some
+examples. Since this is a pre-release (but in documented and
+reasonably good standing) you may have some questions that are faster
+for us to answer than for you to dig around and uncover on your
+own. Feel free to contact us if you run into problems.<br>
+<br> 
+The library was developed and tested with Cell SDK 2.0, although it will
+compile with SDK 3.0 or later (we have not tried the latest SDK release). It
+was tested on both Yellow Dog and Fedora Core Linux distributions
+running on a PS3 and an IBM QS21 Cell blade center.
 
       </p>
     </td>
