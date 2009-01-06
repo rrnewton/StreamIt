@@ -11,7 +11,8 @@ main.dvi: *.tex main.bib figs/*.eps *.cls *.sty
 	echo all | latex main.tex
 
 main.pdf: main.dvi
-	dvipdf main.dvi
+	dvips -Pdownload35 main.dvi  -t letter -P cmz -o main.ps
+	ps2pdf main.ps
 
 once:
 	echo all | latex main.tex
