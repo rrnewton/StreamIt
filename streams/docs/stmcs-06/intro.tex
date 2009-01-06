@@ -10,8 +10,8 @@ processors. Multimedia applications are especially challenging because
 they require stream abstractions that are not easily represented using
 current programming paradigms, and general purpose compilers eschew
 stream-aware optimizations. As a result, applications are hand-coded
-for performance, and this practice precludes portability, and
-obfuscates readability. 
+for performance, and this practice precludes portability and
+obfuscates readability.
 
 %% Application developers face new challenges as they port and redesign
 %% their codes to run on multicore architectures. Multicore processors
@@ -60,10 +60,10 @@ communicated over well structured topologies that interconnect the
 filters. The StreamIt programming model allows the programmer to build
 an application by connecting components together into a stream
 graph. The programmer is relieved of the burden of explicit buffer
-management and complex index expressions for multi-dimensional data,
-and naturally exposes the parallelism and communication patterns
-inherent to their codes.  The end result is clean, malleable, and
-portable code~\cite{drake06ipdps}.
+management and complex modulo index expressions, and naturally exposes
+the parallelism and communication patterns inherent to their codes.
+The end result is clean, malleable, and portable
+code~\cite{drake06ipdps}.
 
 The StreamIt project is also concerned with providing seamless
 integration between streaming codes and other programming
