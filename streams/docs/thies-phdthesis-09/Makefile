@@ -31,7 +31,7 @@ diff:
 	latex diff.tex
 	bibtex diff
 	latex diff.tex
-	dvips -t letter -P cmz diff.dvi -o diff.ps
+	dvips -z -t letter -P cmz diff.dvi -o diff.ps
 	ps2pdf diff.ps
 
 rmdone:
@@ -91,13 +91,13 @@ example-program.tex: example-program.in.tex
 	lgrind -d lgrindef -lstreamit -e example-program.in.tex > example-program.tex
 
 .dvi.pdf: Makefile
-	dvips -q -t letter -P cmz -f $< | ps2pdf - $*.pdf
+	dvips -z -q -t letter -P cmz -f $< | ps2pdf - $*.pdf
 
 .fig.eps: Makefile
 	fig2dev -L pstex $< $*.eps
 
 .dvi.ps: Makefile
-	dvips -q -t letter $< -o $*.ps
+	dvips -z -q -t letter $< -o $*.ps
 
 .eps.pdf: Makefile
 	epstopdf $<

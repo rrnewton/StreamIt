@@ -255,16 +255,16 @@ Multiply} actor declares a message handler that adjusts its own weight
 \end{minipage}
 
 \begin{minipage}{150pt}
-  \caption[Example code without event handling]{\protect\small FIR code.
+  \caption[Example code without event handling.]{\protect\small FIR code.
     \protect\label{fig:fir-orig-code}}
 ~\\
 \end{minipage}~~
 \begin{minipage}{153pt}
-  \caption[Example code with manual event handling]{\protect\small FIR code with manual event handling.  Modified lines are marked with an asterisk.
+  \caption[Example code with manual event handling.]{\protect\small FIR code with manual event handling.  Modified lines are marked with an asterisk.
     \protect\label{fig:fir-manual-code}}
 \end{minipage}~~~~~
 \begin{minipage}{145pt}
-  \caption[Example code with teleport messaging]{\protect\small FIR code with teleport messaging.  Modified lines are marked with an asterisk.
+  \caption[Example code with teleport messaging.]{\protect\small FIR code with teleport messaging.  Modified lines are marked with an asterisk.
     \protect\label{fig:fir-message-code}}
 \end{minipage} \vspace{2\baselineskip}
 
@@ -288,7 +288,7 @@ Multiply} actor declares a message handler that adjusts its own weight
 
 \begin{minipage}[t]{0.74in}
 \mbox{~}
-\caption[Stream graph for example code]{\protect\small FIR stream graph.\protect\label{fig:fir-orig-diagram}}
+\caption[Stream graph for example code.]{\protect\small FIR stream graph.\protect\label{fig:fir-orig-diagram}}
 \end{minipage}
 \hspace{0.2in}
 \begin{minipage}[t]{2.9in}
@@ -298,7 +298,7 @@ Multiply} actor declares a message handler that adjusts its own weight
 ~\hspace{0.345in}{\bf (d)}
 ~\hspace{0.345in}{\bf (e)}
 \caption[Execution snapshots illustrating manual embedding of control
-  messages]{\protect\small Execution snapshots illustrating manual
+  messages.]{\protect\small Execution snapshots illustrating manual
   embedding of control messages in FIR.  Channels are annotated with
   data items present on one possible execution; items are numbered in
   order of production.  {\bf (a)} Source initiates change of weights,
@@ -315,7 +315,7 @@ Multiply} actor declares a message handler that adjusts its own weight
 ~\hspace{0.325in}{\bf (d)}
 ~\hspace{0.325in}{\bf (e)}
 \caption[Execution snapshots illustrating teleport
-  messaging]{\protect\small Execution snapshots illustrating teleport
+  messaging.]{\protect\small Execution snapshots illustrating teleport
   messaging in FIR.  Channels are annotated with data items present on
   one possible execution; items are numbered in order of production.
   {\bf (a)} Source calls a message handler, passing new weights as
@@ -488,15 +488,11 @@ Multiply} actor declares a message handler that adjusts its own weight
 %% \end{verbatim}}
 %% \end{minipage}
 %% \end{figure*}
+%
+\addtocounter{page}{-3}
 \clearpage
- \addtocounter{page}{-2} 
-\noindent 
 % SNAPSHOT FROM PPOPP PAPER
-\clearpage
-\begin{figure}[t]
-\vspace{-1in}
-\hspace{-1in}\psfig{file=messaging-example.eps,width=8.5in}
-\end{figure}
+\noindent\mbox{~}\hspace{-1.05in}\parbox{8.5in}{\vspace{-0.9in}\psfig{file=messaging-example.eps,width=8.5in}}
 \clearpage
 %
 \noindent The {\tt Source} actor calls this handler through a
@@ -582,7 +578,7 @@ pull schedule} with respect to actor $B$.
 \psfig{figure=messaging/sdep-example-rates3.eps,height=1.75in}
 \vspace{-6pt}
 \caption[Example stream graph for calculation of stream dependence
-  function]{Example stream graph.  Nodes are annotated with their I/O
+  function.]{Example stream graph.  Nodes are annotated with their I/O
   rates.  For example, node C consumes 3 items and produces 2 items on
   each execution.  Node A is a round-robin splitter that produces one
   item on its left channel during the first phase, and one item on its
@@ -592,7 +588,7 @@ pull schedule} with respect to actor $B$.
 ~ \\ \vspace{6pt}
 \psfig{figure=messaging/sdep-example3.eps,width=\textwidth}
 \vspace{-4pt}
-\caption[Example calculation of stream dependence function]{Example \figsdep\ calculation
+\caption[Example calculation of stream dependence function.]{Example \figsdep\ calculation
   for stream graph in Figure~\ref{fig:sdep-rates}.  The stream graphs
   illustrate a steady state cycle of a ``pull schedule''; execution
   proceeds from left to right, and channels are annotated with the
@@ -1277,7 +1273,7 @@ to be empty.
 \begin{center}
 \psfig{figure=messaging/infeasible-messaging.eps,height=1.64in}
 \vspace{-8pt}
-\caption[Example of unsatisfiable message constraints]{Example of
+\caption[Example of unsatisfiable message constraints.]{Example of
   unsatisfiable message constraints.  Each node is annotated with its
   input and output rate.  Messages are shown by dotted arrows, drawn
   from sender to receiver with a given latency.  The constraints are
@@ -1451,7 +1447,7 @@ separate frequencies.
 \centering
 \psfig{figure=messaging/fhr-feedback.eps,width=4.23in}
 \caption[Stream graph of frequency hopping radio with manual control
-  messages]{Stream graph of frequency hopping radio with control
+  messages.]{Stream graph of frequency hopping radio with control
   messages implemented manually.  A feedback loop connects the
   detectors with the RFtoIF stage, and an item is sent on every
   invocation to indicate whether or not a message is present.  The
@@ -1524,8 +1520,6 @@ Finally, portals are useful as an external programming interface; an
 application can export a portal based on an interface type without
 exposing the underlying actor implementation.
 
-One aspect of teleport messaging might be considered unusual: the
-granularity of message
 %
 \begin{figure}[t]
 \centering
@@ -1533,14 +1527,15 @@ granularity of message
 \hspace{-0.2in}\psfig{figure=messaging/code-freq2.eps,width=3.5in}
 \vspace{-10pt}
 \caption[Code for frequency hopping radio with manual control
-  messages]{Frequency hopping radio with manual feedback loop
+  messages.]{Frequency hopping radio with manual feedback loop
   for event handling.  Lines that differ from Figure~\ref{fig:freq1}
   are marked with an asterisk. \protect\label{fig:freq2}}
 \vspace{-12pt}
 \end{figure}
 \clearpage
 %
-\noindent delivery can be affected by changes in
+One aspect of teleport messaging might be considered unusual: the
+granularity of message delivery can be affected by changes in
 granularity elsewhere in the stream graph.  This is evident in the
 frequency hopping radio, as the I/O rate of 512 on the FFT implies
 that the RFToIF stage will receive messages from CheckFreqHop at most

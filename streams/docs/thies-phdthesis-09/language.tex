@@ -395,10 +395,9 @@ representations.
 Enforcing structure in the language can also benefit the compiler.
 Rather than dealing with the complexity of full graphs, the compiler
 can focus on a few simple cases.  This property helped us to formulate
-phased scheduling~\cite{karczmarek-lctes03,karczma-thesis} and
-linear
-optimizations~\cite{lamb-pldi03,lamb-thesis,agrawal-cases05,agrawal-thesis}.
-% TODO: revisit later.  Did structure help other things?
+phased scheduling~\cite{karczmarek-lctes03,karczma-thesis}, linear
+optimizations~\cite{lamb-pldi03,lamb-thesis,agrawal-cases05,agrawal-thesis},
+and mapping to the compressed domain~\cite{techreport}.
 
 We give more details on our experience with structure in Section~\ref{sec:lang-experience}.
 
@@ -505,7 +504,7 @@ We have not found this functionality to be broadly needed.
 \end{table}
 
 \begin{table}[t!]
-\vspace{-1.5\baselineskip}
+\vspace{-2\baselineskip}
 \psfig{file=benchmarks-params,width=\textwidth}
 \vspace{-1.5\baselineskip}
 \caption{Parameterization and scheduling statistics for StreamIt 
@@ -514,7 +513,7 @@ benchmarks.\protect\label{tab:lang-benchmarks-params}}
 \end{table}
 
 \begin{table}[t!]
-\vspace{-2\baselineskip}
+\vspace{-2.5\baselineskip}
 \psfig{file=benchmarks-filters,width=\textwidth}
 \vspace{-1.5\baselineskip}
 \caption{Properties of filters and other constructs in StreamIt 
@@ -573,7 +572,7 @@ decreased the sizes of the parameters (e.g., sorting 16 elements at a
 time) to improve the comprehensibility of the stream graph.  For
 benchmarking purposes, researchers may wish to scale up the parameters
 to yield larger graphs, or to vary the ratio between parameters to
-attain graphs of varying shapes and work distributions.
+obtain graphs of varying shapes and work distributions.
 
 More detailed properties of the filters and streams within each
 benchmark are given in Table~\ref{tab:lang-benchmarks-filters}.  In
@@ -886,9 +885,13 @@ benchmarks.\protect\label{tab:lang-messaging}}
 \end{table}
 
 \item {\boldit Teleport messaging and dynamic rates are uncommon in 
-the benchmarks, but provide critical functionality when utilized.}  As
-detailed in Table~\ref{tab:lang-messaging}, teleport messages are
-utilized by only four of the benchmarks (MPEG2 encoder, MPEG2 decoder,
+the benchmarks, but provide critical functionality when utilized.}
+These language features were not fully specified until years after the
+initial release of the compiler, which contributes to their smaller
+representation in the benchmark suite.
+
+As detailed in Table~\ref{tab:lang-messaging}, teleport messages are
+utilized by four of the benchmarks (MPEG2 encoder, MPEG2 decoder,
 Mosaic, and FHR).  There are a total of 8 logical messages, often
 between multiple senders or multiple receivers.  Both upstream and
 downstream messages are utilized; all messages are sent with a latency
@@ -1084,7 +1087,20 @@ language designers.  We summarize their experience as follows:
   output of B.  An extra splitjoin (at the top of
   Figure~\ref{fig:interleaving}b) is needed to perform this
   interleaving.  A more realistic example of the same hazard is shown
-  in Figure~\ref{fig:3gpp}, which is taken from our 3GPP benchmark.
+  in Figure~\ref{fig:3gpp}, which corresponds to our 3GPP benchmark.
+
+\begin{figure}[t!]
+\psfig{file=3gpp.eps,height=\textheight}
+\vspace{-0.9in} ~ \\
+\mbox{~}\hspace{2.03in}\begin{minipage}{4in}
+\caption[Use of Identity filters is illustrated by the 3GPP benchmark.]{Stream graph of a 3GPP Radio Access
+  Protocol application.  Shaded filters indicate Identity nodes that
+  are used to bypass data items around intermediate filters.  They are
+  also used in splitjoins for data duplication and
+  reordering.\protect\label{fig:3gpp}}
+\vspace{-0.5in}
+\end{minipage}
+\end{figure}
 
   Needless to say, this pattern of multiplexing and demultiplexing
   adds considerable complexity to the development process.  It
@@ -1117,19 +1133,6 @@ language designers.  We summarize their experience as follows:
   communication (via an analysis known as {\it synchronization
   removal}) to recover the original unstructured communication.
 
-\begin{figure}[t!]
-\psfig{file=3gpp.eps,height=\textheight}
-\vspace{-0.9in} ~ \\
-\mbox{~}\hspace{2.03in}\begin{minipage}{4in}
-\caption[Use of Identity filters is illustrated by the 3GPP benchmark.]{Stream graph a 3GPP Radio Access
-  Protocol application.  Shaded filters indicate Identity nodes that
-  are used to bypass data items around intermediate filters.  They are
-  also used in splitjoins for data duplication and
-  reordering.\protect\label{fig:3gpp}}
-\vspace{-0.5in}
-\end{minipage}
-\end{figure}
-
 \begin{figure}[t]
 \centering
 \psfig{file=inadequate.eps,width=2in}
@@ -1150,8 +1153,8 @@ language designers.  We summarize their experience as follows:
   neighbors on either side.  While this could be represented with a
   feedback loop around the entire computation, there would be
   complicated interleaving involved.  This case reflects a broader
-  shortcoming, discussed below, that StreamIt is not designed for
-  multidimensional data processing.
+  shortcoming, discussed in Section~\ref{sec:lang-future-work}, that
+  StreamIt is not designed for multidimensional data processing.
 
 \myitem {Programmers can accidentally introduce unnecessary mutable
   state in filters.}  Filters that have no mutable state are
@@ -1391,6 +1394,7 @@ Spidle~\cite{spidle03} is also a recent stream language that was
 influenced by StreamIt.
 
 \section{Future Work}
+\label{sec:lang-future-work}
 
 There are many directions in which to expand and refine the StreamIt
 language.  Based on his study of MPEG-2 in StreamIt, Matthew Drake
