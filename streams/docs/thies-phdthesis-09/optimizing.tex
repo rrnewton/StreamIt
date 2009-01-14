@@ -3,7 +3,14 @@
 
 This chapter validates the premise that stream programming enables new
 and powerful optimizations that are outside the reach of a traditional
-compiler.  We highlight three projects in the StreamIt group:
+compiler.  To do so, we summarize three optimization projects
+conducted in collaboration with many others in the StreamIt group.
+Unlike the other chapters in this thesis, the primary description of
+each of these projects appears in a different
+thesis~\cite{lamb-thesis,agrawal-thesis,sermulins-thesis} or
+paper~\cite{gordon-asplos06}.
+
+The key results are as follows:
 
 \mybegin
 
@@ -14,8 +21,9 @@ amounts of task, data, and pipeline parallelism, we exploit all types
 of parallelism in a unified manner in order to achieve this
 generality.  Our compiler, which maps from the StreamIt language to
 the 16-core Raw architecture, attains an 11x mean speedup and an 18x
-maximum speedup over a single-core baseline.  {\it Project leader:}
-Michael Gordon~\cite{gordon-asplos06}.
+maximum speedup over a single-core baseline.  
+%{\it Project leader:}
+%Michael Gordon~\cite{gordon-asplos06}.
 
 \myitem {Optimizing Linear Computations}.  We demonstrate that 
 several algorithmic transformations, traditionally hand-tuned by DSP
@@ -25,9 +33,10 @@ inputs.  We present several optimizations of linear filters, including
 algebraic simplification of adjacent filters and automatic translation
 to the frequency domain.  These transformations offer an average
 speedup of 5.5x and a maximum speedup of 8.0x over unoptimized
-StreamIt on a Pentium~4.  {\it Project leaders:} Andrew
-Lamb~\cite{lamb-pldi03,lamb-thesis} and Sitij
-Agrawal~\cite{agrawal-cases05,agrawal-thesis}.
+StreamIt on a Pentium~4.  
+%{\it Project leaders:} Andrew
+%Lamb~\cite{lamb-pldi03,lamb-thesis} and Sitij
+%Agrawal~\cite{agrawal-cases05,agrawal-thesis}.
 
 \myitem {Cache Optimizations}.   We formulate a set of cache aware 
 optimizations that automatically improve instruction and data
@@ -37,16 +46,14 @@ constraints, and 2) cache aware scaling, which improves instruction
 locality while respecting data cache constraints.  Our implementation
 of cache aware optimizations in the StreamIt compiler yields a 3.49x
 average speedup and an 88x maximum speedup over unoptimized StreamIt
-on a StrongARM 1110 processor.  {\it Project leader:} Janis
-Sermulins~\cite{sermulins:lctes:2005,sermulins-thesis}.
+on a StrongARM 1110 processor.  
+%{\it Project leader:} Janis
+%Sermulins~\cite{sermulins:lctes:2005,sermulins-thesis}.
 
 \myend
 
-While the author contributed to each of these projects, they are the
-full-time focus of other individuals and also appear (or will appear)
-in their theses.  Unlike the other chapters in this thesis, our
-treatment does not aim to be comprehensive.  For more details, please
-consult the papers referenced above.
+These projects are described in more detail in each of the following
+sections.
 
 \section{Parallelization}
 
@@ -108,7 +115,7 @@ avoiding the hazards associated with each.
 \begin{figure}[t]
 \centering
 \psfig{figure=parallelism.eps,width=2.1in}
-\caption[Types of parallelism in stream programs]{Types of parallelism
+\caption[Types of parallelism in stream programs.]{Types of parallelism
   in stream programs.  Task parallelism exists between filters in a
   common splitjoin; pipeline parallelism exists between filters in a
   producer/consumer relationship; and data parallelism exists between
@@ -168,47 +175,6 @@ our original approach~\cite{streamit-asplos}.
 
 \subsection*{Parallelization Algorithm}
 
-\begin{figure}[t]
-
-\begin{minipage}{0.3\textwidth}
-\centering
-\psfig{figure=filterbank.eps,width=1.6in}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{0.3\textwidth}
-\centering
-\psfig{figure=filterbank-fine.eps,width=2.2in}
-\end{minipage}
-\hspace{0.4in}
-\begin{minipage}{0.3\textwidth}
-\centering
-\psfig{figure=filterbank-coarse.eps,width=1.6in}
-\end{minipage}
-
-~ \\
-\begin{minipage}{0.3\textwidth}
-\centering
-\mbox{{\small (a) Original}}
-\end{minipage}
-\hspace{0.1in}
-\begin{minipage}{0.3\textwidth}
-\mbox{{\small (b) Fine-grained data parallelism}}
-\end{minipage}
-\hspace{0.4in}
-\begin{minipage}{0.3\textwidth}
-\hspace{-14pt}\mbox{{\small (c) Coarse-grained data parallelism}}
-\end{minipage}
-
-\centering
-\caption[Exploiting data parallelism in the FilterBank
-  benchmark]{Mapping a simplified version of the FilterBank benchmark
-  for execution on four cores.  The original stream graph is shown in
-  (a), while a conventional mapping is shown in (b).  Our technique
-  coarsens the graph and introduces the minimal parallelism needed, as
-  shown in (c).\protect\label{fig:filterbank}}
-
-\end{figure}
-
 We illustrate our technique by way of an example: we discuss how to
 map a simplified version of our FilterBank benchmark (see
 Figure~\ref{fig:filterbank}a) to a four-core machine.  The complete
@@ -247,6 +213,47 @@ neighboring stateless filters as much as possible so long as the
 resulting filter remains stateless, ensuring that it is still amenable
 to data parallelism.
 
+\begin{figure}[t]
+
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{figure=filterbank.eps,width=1.6in}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{figure=filterbank-fine.eps,width=2.2in}
+\end{minipage}
+\hspace{0.4in}
+\begin{minipage}{0.3\textwidth}
+\centering
+\psfig{figure=filterbank-coarse.eps,width=1.6in}
+\end{minipage}
+
+~ \\
+\begin{minipage}{0.3\textwidth}
+\centering
+\mbox{{\small (a) Original}}
+\end{minipage}
+\hspace{0.1in}
+\begin{minipage}{0.3\textwidth}
+\mbox{{\small (b) Fine-grained data parallelism}}
+\end{minipage}
+\hspace{0.4in}
+\begin{minipage}{0.3\textwidth}
+\hspace{-14pt}\mbox{{\small (c) Coarse-grained data parallelism}}
+\end{minipage}
+
+\centering
+\caption[Exploiting data parallelism in the FilterBank
+  benchmark.]{Mapping a simplified version of the FilterBank benchmark
+  for execution on four cores.  The original stream graph is shown in
+  (a), while a conventional mapping is shown in (b).  Our technique
+  coarsens the graph and introduces the minimal parallelism needed, as
+  shown in (c).\protect\label{fig:filterbank}}
+
+\end{figure}
+
 Second, we data-parallelize the coarsened filters, but only by the
 amount necessary to complement existing task parallelism in the stream
 graph.  That is, for filters that are already embedded in a splitjoin,
@@ -282,7 +289,7 @@ stream programming model to make these transformations tractable.
 \begin{figure}[t]
 \centering
 \psfig{file=vocoder.eps,width=2in}
-\caption[Simplified subset of the Vocoder benchmark]{Simplified subset
+\caption[Simplified subset of the Vocoder benchmark.]{Simplified subset
   of the Vocoder benchmark.  Nodes are annotated with the amount of
   work that they perform per steady state.\protect\label{fig:vocoder}}
 \end{figure}
@@ -291,7 +298,7 @@ stream programming model to make these transformations tractable.
 \centering
 \psfig{file=vocoder-data.eps,width=4.5in}
 \caption[Coarse-grained data parallelism applied to
-  Vocoder]{Simplified vocoder mapped with data parallelism.  In the
+  Vocoder.]{Simplified vocoder mapped with data parallelism.  In the
   stream graph (left), stateless nodes are replicated but stateful
   nodes remain untouched.  An execution trace (right) requires 21
   units per steady state.\protect\label{fig:vocoder-data}}
@@ -299,7 +306,7 @@ stream programming model to make these transformations tractable.
 ~ \\ \vspace{6pt}
 \psfig{file=vocoder-swpipe.eps,width=6in}
 \caption[Coarse-grained software pipelining applied to
-  Vocoder]{Simplified vocoder mapped with coarse-grained software
+  Vocoder.]{Simplified vocoder mapped with coarse-grained software
   pipelining.  By unrolling multiple executions of the stream graph
   (left), stateful nodes can run in parallel with other nodes during
   the steady state.  An execution trace (right) requires 16 units per
@@ -374,7 +381,7 @@ memory.
 \begin{figure}[t]
 \centering
 \psfig{file=par-results.eps,width=\textwidth}
-\caption[Parallelization results]{Parallelization results on the
+\caption[Parallelization results.]{Parallelization results on the
   16-core Raw processor.\protect\label{fig:par-results}}
 \end{figure}
 
@@ -468,7 +475,7 @@ specific code sections where they apply.
 \mbox{~}\hspace{0.15in}{\small (c) After translation to} \vspace{-0.2\baselineskip}
 
 \mbox{~}\hspace{4.87in}{\small the frequency domain}
-\caption[Example optimization of linear filters]{Example optimization
+\caption[Example optimization of linear filters.]{Example optimization
   of linear filters.  Our software FM radio benchmark contains an
   equalizer in which all filters are linear.  These filters can be
   algebraically simplified into a single filter and then translated
@@ -522,7 +529,7 @@ The average speedup obtained is 4.5x, with a maximum of 8.0x.
 \begin{figure}[t]
 \centering
 \psfig{figure=extraction.eps,width=5.25in}
-\caption[Extracting a linear representation]{Extracting a linear
+\caption[Extracting a linear representation.]{Extracting a linear
   representation from the code inside a filter's work
   function.\protect\label{fig:extraction}}
 \end{figure}
@@ -562,7 +569,7 @@ and annotate the code accordingly.
 \begin{figure}[t]
 \centering
 \psfig{figure=combination.eps,width=5in}
-\caption[Algebraic simplification of adjacent linear filters]{Algebraic 
+\caption[Algebraic simplification of adjacent linear filters.]{Algebraic 
 simplification of adjacent linear filters.  For simplicity, we omit
 filter states from this diagram.\protect\label{fig:combination}}
 \end{figure}
@@ -618,7 +625,7 @@ items are converted into states in the filter.
 \begin{figure}[t]
 \centering
 \psfig{figure=iir.eps,width=4in}
-\caption[Example simplification of an IIR filter and a decimator]{Example 
+\caption[Example simplification of an IIR filter and a decimator.]{Example 
 simplification of an IIR filter and a decimator.  The original pair of
 filters requires 6 FLOPs per output, while the combined version
 requires only 4 FLOPs per output.\protect\label{fig:combination-example}}
@@ -790,10 +797,11 @@ stream graph into a form that is amenable to optimization.
 %% branches and $n$ streams on each branch.
 
 \begin{figure}[t!]
+\vspace{-12pt} % due to bad pagebreak
 \vspace{-0.07in}
 \centering
 \psfig{figure=selection.eps,width=\textwidth}
-\caption[Optimization selection for the Radar benchmark]{Optimization
+\caption[Optimization selection for the Radar benchmark.]{Optimization
 selection for the Radar benchmark.  Performing maximal linear
 combination and translation to the frequency domain results in a large
 slowdown.  The selection procedure avoids this hazard by blocking the
@@ -857,9 +865,10 @@ operations, we use an instruction counting DynamoRIO~\cite{dynamo99}
 client.
 
 \begin{figure}[t!]
+\vspace{-12pt} % due to bad pagebreak
 \centering
 \psfig{figure=linear-flops.eps,width=5in}
-\caption[Elimination of floating point operations due to linear optimizations]{Elimination of floating point operations by maximal linear 
+\caption[Elimination of floating point operations due to linear optimizations.]{Elimination of floating point operations by maximal linear 
 replacement, maximal frequency replacement, and automatic optimization
 selection.}
 \label{fig:flops}
@@ -868,8 +877,7 @@ selection.}
 \begin{figure}[t!]
 \centering
 \psfig{figure=linear-speedup.eps,width=5in}
-%\vspace{-16pt}
-\caption[Speedup due to linear optimizations]{Execution speedup for maximal linear replacement, maximal frequency 
+\caption[Speedup due to linear optimizations.]{Execution speedup for maximal linear replacement, maximal frequency 
 replacement, and automatic optimization selection.}
 \label{fig:execution-speedup}
 \end{figure}
@@ -1012,7 +1020,7 @@ output items).
 \begin{figure}[t]
 \centering
 \psfig{file=cache-scaling.eps,width=4.5in}
-\caption[Effect of execution scaling on performance]{Effect of execution 
+\caption[Effect of execution scaling on performance.]{Effect of execution 
 scaling on performance.  Moderate scaling improves performance by
 improving the locality of instructions and local filter data.
 However, excessive scaling worsens performance as the input and output
@@ -1053,7 +1061,7 @@ Pentium~3 and with \texttt{ecc} (v7.0, -O3) for the Itanium~2.
 \begin{figure}[t]
 \centering
 \psfig{figure=arm.eps,width=\textwidth}
-\caption[Performance of cache optimizations on the StrongARM]{Performance 
+\caption[Performance of cache optimizations on the StrongARM.]{Performance 
 of cache optimizations on the StrongARM processor (CAF stands for
 cache aware fusion).\protect\label{fig:arm}}
 \end{figure}
@@ -1062,7 +1070,7 @@ cache aware fusion).\protect\label{fig:arm}}
 \centering
 \psfig{figure=cache-results.eps,width=5.5in}
 \caption[Summary of cache optimizations on the StrongARM, Pentium 3 and 
-Itanium 2]{Summary of cache optimizations on the StrongARM, Pentium 3
+Itanium 2.]{Summary of cache optimizations on the StrongARM, Pentium 3
 and Itanium 2 processors (CAF stands for cache aware
 fusion).\protect\label{fig:p3}}
 \end{figure}
@@ -1319,16 +1327,19 @@ research.
 While our implementation targets Raw, the techniques developed should
 be applicable to other multicore architectures.  As Raw has a
 relatively high communication bandwidth, coarsening the granularity of
-data parallelism may benefit commodity multicores even more.  In
-porting this transformation to a new architecture, one may need to
-adjust the threshold computation-to-communication ratio that justifies
-data parallelism.  As for coarse-grained software pipelining, the
+data parallelism may benefit other multicores even more.  In porting
+this transformation to a new architecture, one may need to adjust the
+threshold computation-to-communication ratio that justifies data
+parallelism.  As for coarse-grained software pipelining, the
 scheduling freedom afforded should benefit many multicore systems.
 One should consider the most efficient location for intermediate
 buffers (local memory, shared memory, FIFOs, etc.) as well as the best
 mechanism for shuffling data (DMA, on-chip network, etc.).  The basic
 algorithms for coarsening granularity, introducing data parallelism,
-and software pipelining are largely architecture-independent.
+and software pipelining are largely architecture-independent.  At the
+time of this writing, others in the StreamIt group are porting the
+algorithm to target the Tilera TILE64 chip, the Cell processor,
+commodity multicores, and a cluster of workstations.
 
 A limitation of the linear optimizations is that they currently do not
 support linear filters that send or receive teleport messages.  This

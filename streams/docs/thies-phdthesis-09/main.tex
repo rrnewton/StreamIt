@@ -3,7 +3,6 @@
 \usepackage{epsfig}
 \usepackage{reader}
 \usepackage{times}
-\usepackage{hyperref}
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -11,11 +10,14 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{appendix}
+\usepackage{color}
 \usepackage[nolineno]{lgrind}
+\usepackage{hyperref}
+\usepackage[all]{hypcap}
 % replace courier with beramono, a fixed-width font that is more condensed
 % see more fonts here:  http://www.tug.dk/FontCatalogue/
 \usepackage[T1]{fontenc}
-%\renewcommand*\ttdefault{lcmtt}     % Computer Modern Teletype L
+%\renewcommand*\ttdefault{lcmtt}    % Computer Modern Teletype L
 %\renewcommand*\ttdefault{cmvtt}    % Computer Modern Teletype Proportional
 \usepackage[scaled=0.88]{beramono}
 
@@ -79,9 +81,22 @@
 % use this instead of \chapter to add chapter titles to list of figures
 \newcommand{\startchapter}[1]{\chapter{#1}\addcontentsline{lof}{figure}{\hspace{-18pt}{\bf \thechapter \hspace{9.5pt} #1}}}
 
+% fix marginpar so text stays on the page
+\setlength{\marginparwidth}{0.8in}
+\let\oldmarginpar\marginpar
+\renewcommand\marginpar[1]{\-\oldmarginpar[\raggedleft\footnotesize #1]%
+{\raggedright\footnotesize #1}}
+
+% used to write notes to advisor.  convert to blank command for final copy.
+%\newcommand{\note}[1]{\marginpar{\color{red} #1}}
+\newcommand{\note}[1]{}
+
 \pagestyle{plain}
 
 % ----------------------------------------------------------------------
+
+% date I'm handing in
+\newcommand{\mydate}[0]{December 8, 2008}
 
 % for my thesis only:  need sdep as early as intro an dtable of contents
 \newcommand{\sdep}[0]{\textsc{sdep}}
@@ -92,16 +107,16 @@
 
 \begin{document}
 
-%\include{cover}
-%\include{contents}
+\include{cover}
+\include{contents}
 
-%\include{intro}
-%\include{language}
+\include{intro}
+\include{language}
 \include{messaging}
-%\include{optimizing}
-%\include{compression}
-%\include{profiling}
-%\include{conclusion}
+\include{optimizing}
+\include{compression}
+\include{profiling}
+\include{conclusion}
 
 \clearpage
 \addcontentsline{toc}{chapter}{Bibliography}
@@ -110,8 +125,10 @@
 \bibliographystyle{amsalpha}
 }
 
-%\appendix
-%\include{example-program}
-%\include{stream-graphs}
+\appendix
+% appears on wrong page
+%\addcontentsline{toc}{chapter}{Appendices}
+\include{example-program}
+\include{stream-graphs}
 
 \end{document}

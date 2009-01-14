@@ -5,23 +5,11 @@
 %% architecture called VLIW (Very Long Instruction Word), yielding
 %% order-of-magnitude speedups over scalar architectures.
 
-%% By adopting a new programming model known as stream programming,
-%% non-expert programmers can accelerate certain applications by an
-%% order of magnitude on parallel and sequential machines.
-
-% 
-% domain-specific
-% parallelism
-
-By adopting a stream programming model, non-expert programmers can
-obtain order-of-magnitude speedups on certain classes of applications.
-
-%% \footnote{Alternative: 
-%% Adopting a stream programming model enables non-expert programmers to
-%% accelerate certain applications by an order of magnitude, as the
-%% compiler can automate parallelization and optimization tasks that were
-%% previously performed by hand.
-%% }
+Incorporating streaming abstractions into the programming language can
+simultaneously improve both programmability and performance.
+Programmers are unburdened from providing low-level implementation
+details, while compilers can perform parallelization and optimization
+tasks that were previously beyond the reach of automation.
 
 \section{Introduction}
 
@@ -81,16 +69,16 @@ compilers have achieved broad success in the past.  Examples include
 Lex for generating scanners; YACC for generating parsers; SQL for
 database queries; Verilog and VHDL for hardware design; MATLAB for
 scientific codes and signal processing; GraphViz for generating graph
-layouts; and PADS for processing ad-hoc
+layouts~\cite{ellson_graphviz_2002}; and PADS for processing ad-hoc
 data~\cite{fisher_pads:domain-specific_2005}.
 
-%% Our focus in the current work is on a new domain of programs which we
-%% define as {\it stream programs}.  A stream program is one that is
-%% organized around a regular flow of data, as in image, video, or
+%% Our focus in the current work is on a new domain of programs which
+%% we define as {\it stream programs}.  A stream program is one that
+%% is organized around a regular flow of data, as in image, video, or
 %% digital signal processing applications (see
-%% Figure~\ref{fig:stream-graph}).  Examples include [TODO]. Our
-%% interest in stream programs is motivated by two prominent trends in
-%% computer architectures and applications:
+%% Figure~\ref{fig:stream-graph}).  Examples include.... Our interest
+%% in stream programs is motivated by two prominent trends in computer
+%% architectures and applications:
 
 If we are taking a domain-specific approach to program optimization,
 what domain should we focus on to have a long-term impact?  We
@@ -226,6 +214,14 @@ define our conception of the streaming application domain:
   stream program.  That is, a certain set of filters are repeatedly
   applied in a regular, predictable order to produce an output stream
   that is a given function of the input stream.
+
+\myitem {Sliding window computations.}  Each value in a data stream
+is often inpsected by consecutive execution steps of the same filter,
+a pattern refered to as a {\it sliding window}.  Examples of sliding
+windows include FIR and IIR filters; moving averages and differences;
+error correcting codes; biosequence analysis; natural language
+processing; image processing (sharpen, blur, etc.); motion estimation;
+and network packet inspection.
 
 \myitem {Occasional modification of stream structure.}  Even though
   each arrangement of filters is executed for a long time, there are
@@ -579,8 +575,8 @@ approach~\cite{gordon-asplos02,gordon-thesis}, the performance of
 which had been modeled by Jeremy Wong~\cite{wong-thesis}.  Also on the
 Raw machine, Jiawen Chen led the development of a flexible graphics
 rendering pipeline in StreamIt, demonstrating that a reconfigurable
-pipeline can achieve up to twice the throughput of a
-static~\cite{chen-graphics05,chen_load-balanced_2005}.  Moving beyond
+pipeline can achieve up to twice the throughput of a static
+one~\cite{chen-graphics05,chen_load-balanced_2005}.  Moving beyond
 Raw, Janis Sermulins ported StreamIt to multicores and clusters of
 workstations, and also led the development of cache optimizations that
 offer a 3.5x improvement over unoptimized StreamIt on embedded
@@ -591,9 +587,8 @@ processor~\cite{zhang_lightweight_2007,zhang-thesis}.  Michal
 Karczmarek led the development of phased scheduling, the first
 hierarchical scheduler for cyclo-static dataflow that also enables a
 flexible tradeoff between latency, code size and buffer
-size~\cite{karczmarek-lctes03,karczma-thesis}.  Phil Sung and
-Weng-Fai wong explored the execution of StreamIt on graphics
-processors.
+size~\cite{karczmarek-lctes03,karczma-thesis}.  Phil Sung and Weng-Fai
+wong explored the execution of StreamIt on graphics processors.
 
 %- appears in the evaluation of the Raw architecture~\cite{taylor2004}
 
@@ -613,7 +608,7 @@ compressed data without requiring decompression and
 re-compression~\cite{techreport}.  This transformation
 accelerates lossless video editing operations by a median of 15x.
 
-In the area of programmability, we as a group defined the StreamIt
+In the area of programmability, I led the definition of the StreamIt
 language, incorporating the first notions of structured, hierarchical
 streams as well as language support for reordering and sliding-window
 operations~\cite{thies-cc02,thies-can02,amarasinghe-ijpp05}.  With
@@ -623,8 +618,8 @@ data in the stream to provide a deterministic and meaningful timeframe
 for delivering events between decoupled nodes~\cite{thies-ppopp05}.
 Kimberly Kuo developed an Eclipse development environment and debugger
 for StreamIt and, with Rodric Rabbah, demonstrated improved
-programming outcomes in a user study~\cite{kuo05,kuo-thesis}.
-Juan Reyes also developed a graphical editor for
+programming outcomes in a user study~\cite{kuo05,kuo-thesis}.  Juan
+Reyes also developed a graphical editor for
 StreamIt~\cite{reyes-thesis}.  Matthew Drake evaluated StreamIt's
 suitability for video codecs by implementing an MPEG-2 encoder and
 decoder~\cite{drake-ipdps06,drake-thesis}.  Basier Aziz evaluated
@@ -637,7 +632,7 @@ The StreamIt benchmark suite has been used by outside
 researchers~\cite{kudlur_orchestratingexecution_2008}.
 % TODO: add more users of benchmarks?
 In addition to MPEG-2 and image-based motion estimation, the
-60,000-line suite includes a ground moving target indicator (GMTI), a
+38,000-line suite includes a ground moving target indicator (GMTI), a
 feature-aided tracker (FAT), synthetic aperture radar (SAR), a radar
 array front-end, part of the 3GPP physical layer, a vocoder with
 speech transformation, a subset of an MP3 decoder, a subset of MPEG-4
@@ -649,9 +644,10 @@ internal use.
 % TODO: Fix order?
 Contributors to the benchmark suite include Sitij Agrawal, Saman
 Amarasinghe, Basier Aziz, Matt Brown, Jiawen Chen, Matthew Drake,
-Shirley Fung, Michael Gordon, Hank Hoffmann, Michal Karczmarek, Andrew
-Lamb, Chris Leger, Ali Meli, Mani Narayanan, Rodric Rabbah, Satish
-Ramaswamy, and Jeremy Wong.
+Shirley Fung, Michael Gordon, Hank Hoffmann, Ola Johnsson, Michal
+Karczmarek, Andrew Lamb, Chris Leger, David Maze, Ali Meli, Mani
+Narayanan, Rodric Rabbah, Satish Ramaswamy, Janis Sermulins, Magnus
+Stenemo, Jinwoo Suh, Zain ul-Abdin, Amy Williams, and Jeremy Wong.
 
 %% includes GMTI radar processing (by Sitij Agrawal), part of the 3GPP
 %% physical layer (by Ali Meli), a vocoder (by Chris Leger), a subset
@@ -673,9 +669,10 @@ backend).
 
 The StreamIt compiler (targeting shared-memory multicores, clusters of
 workstations, and the MIT Raw machine) is publicly
-available~\cite{streamitweb} and has logged over 700 unique,
-registered downloads from 225 institutions.  Researchers at other
-universities have used StreamIt as a basis for their own
+available~\cite{streamitweb} and has logged over 850 unique,
+registered downloads from 300 institutions (as of December 2008).
+Researchers at other universities have used StreamIt as a basis for
+their own
 work~\cite{mani-permutations,bit-streaming,ola-techrep,duca-thesis,won-thesis}.
 
 This dissertation does not mark the culmination of the StreamIt
@@ -702,7 +699,7 @@ The specific contributions of this dissertation are as follows:
   (Chapter~2).}  StreamIt is the first language to introduce
   structured streams, as well as hierarchical, parameterized data
   reordering.  We also describe the lessons learned in developing the
-  60,000-line StreamIt benchmark suite.
+  38,000-line StreamIt benchmark suite.
 
 \myitem {A new language construct, termed teleport messaging, that
   enables precise event handling in a distributed environment
@@ -719,7 +716,7 @@ The specific contributions of this dissertation are as follows:
   spanning parallelization and domain-specific optimization
   (Chapter~4)}.  This chapter validates key concepts of the StreamIt
   language by highlighting the gains in performance and
-  programmability that have been achieved, largely due to the work of
+  programmability that have been achieved, including the work of
   others in the StreamIt group.  We focus on automatic parallelization
   (providing an 11x mean speedup on a 16-core machine),
   domain-specific optimization of linear computations (providing a
@@ -736,7 +733,8 @@ The specific contributions of this dissertation are as follows:
   on applications in video editing, where our technique supports color
   adjustment, video compositing, and other operations directly on the
   Apple Animation format (a variant of LZ77).  Speedups are roughly
-  proportional to the compression factor, with a median of 15x.
+  proportional to the compression factor, with a median of 15x and a
+  maximum of 471x.
 
 \myitem {The first dynamic analysis tool that detects and exploits
   likely coarse-grained parallelism in C programs (Chapter~6).}  To

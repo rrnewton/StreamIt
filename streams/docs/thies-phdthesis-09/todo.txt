@@ -1,61 +1,51 @@
-Wed - done my content
-Thu - related
-Fri - related
-Sat - acks
-Sun - bib, stream graphs, layout, polishing
-
----------------
-
-"this chapter is a large project, many people have worked on it"
-"primary description of this work is somewhere else, go look at it"
-remove "project leader part"
-say that it is described in other people's theses
-summary will show that language is amenable to optimization
-
---------------------------
-
 Big things:
-* Saman comments (including pending comments)
-  - on other sections
-  - on language
-* more honest communication of uniprocessor performance relative to C
-  - and more clear about baselines in abstract, conclusions, etc.
+* first sentence of abstract
 * address arvind/srini comments in conclusion:  does this extend to dynamism?
   - see feedback.txt
+* 88% utilization on cell -- one simd lane
+
 * acknowledgments
+  - including grant numbers
+  - check acks (including first page of opt section) w/ karcmza, gordo, rodric
 * related work
+  - general diff to brook 
+  - peeking has been done before
+    - sliding windows were in Signal (1986)
+    - looks like SA-C has sliding windows (1999) yup.
+      http://www.cs.colostate.edu/cameron/SACoverview.html#Anchor-Th-17671
+    - blocking them (paper sent to mike)
+  - diff to sh (they coarsen granularity)
+* fix bibliography
+  - cite seneff vocoder article (from asplos'02) so it appears in appendix
+  - cite Tennenhouse, D., Bose, V.: The SpectrumWare Approach to Wireless Signal Processing. Wireless Networks (1999)) for OFDM
+* check layout
+* proofread
 
 Little things:
-* stream graphs
-* fix first sentence of abstract to not define the domain of stream
-  programs
-* add sliding window to stream program characteristics
-* acknowledge Amy as authoring raytracer (and make sure other authors acknowledged)
-* explain that in stream graphs, nodes annotated with "work=unknown"
-  represent cases where our work estimation algorithm was known to do
-  poorly, so we did not include it in the report
+- mention diffs of apps between apps table and other sections?
 - in language section, propagate benchmark numbers to summary
-- mention StreaMIT pronunciation?
-- mention diffs of apps between apps table and other sections
 - check correctness of compression section
 
 Mindless:
-- Mosaic might have a [1,*,1] rate lingering
-- be consistent about whether short captions end with a period
-- cite seneff vocoder article (from asplos'02) so it appears in appendix
-- cite Tennenhouse, D., Bose, V.: The SpectrumWare Approach to Wireless Signal Processing. Wireless Networks (1999))
-  for OFDM
+- improve link coloration to be more subtle (just colored font, no outlines)
+- adjust lists in intro (stream benchmarks, SDF analyses, etc.)
+- more CD-DAT references
 - indicate messaging pairs on mpeg encode, mpeg decode, mosaic stream graph
-  - and check MPEG2 encoder portals (done haphazardly while tired)
-- fix bibliography
+- make cd-dat and jpeg look exactly the same in language section
 - make pullSchedule font same as repeat_lengths font, etc.
 - improve formatting of code (bold the keywords)
-- get grant numbers for acknowledgements
-  - ask mary to get grants I'm funded from while here
-- check latest download numbers
-- make cd-dat and jpeg look exactly the same in language section
 
 Probably not fixing:
+. mention StreaMIT pronunciation?
+. Mosaic might have a [1,*,1] rate lingering
+. explain that in stream graphs, nodes annotated with "work=unknown"
+  represent cases where our work estimation algorithm was known to do
+  poorly, so we did not include it in the report
+. continue app evaluatoin
+  - more detailed characterization of splitjoins?  + identity filters.
+  - explain filter / graph reuse across the suite (will require refactoring)
+  - were built-in splitter joiner types sufficient?  what would have benefitted more?
+. compare streamit GMTI to dynamically-extracted GMTI (or MP3, MPEG-2)
 . check if messaging speedup makes any sense?
 . mildly bothersome: the cache section is somewhat inconsistent about
   referring to static state of a filter as only instructions

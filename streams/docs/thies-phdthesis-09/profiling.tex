@@ -12,13 +12,19 @@ programmer with a simple set of annotations (indicating possible
 filter boundaries) and a dynamic analysis that tracks all
 communication across those boundaries.  Our analysis outputs a stream
 graph of the application as well as a set of macros for (unsoundly)
-parallelizing the program and communicating the data needed.  We apply
-our methodology to six case studies, including MPEG-2 decoding, MP3
-decoding, GMTI radar processing, and three SPEC benchmarks.  Our
-analysis extracts a useful block diagram for each application,
-facilitating a translation to StreamIt and other stream languages.  In
-addition, the parallelized versions offer a {\meanspeedup} mean
-speedup on a 4-core machine.
+parallelizing the program and communicating the data needed.
+
+Our analysis is unsound because it is based on a fixed set of dynamic
+traces, rather than a conservative static analysis.  However, we argue
+that this unsoundness enables us to provide programmers with more
+information, that is ultimately more useful, than can be expected from
+a static analysis.  We apply our methodology to six case studies,
+including MPEG-2 decoding, MP3 decoding, GMTI radar processing, and
+three SPEC benchmarks.  Our analysis extracts a useful block diagram
+for each application, facilitating a translation to StreamIt and other
+stream languages.  In addition, the parallelized versions run
+correctly (given appropriate training inputs) and offer a
+{\meanspeedup} mean speedup on a 4-core machine.
 
 \section{Introduction}
 
@@ -27,17 +33,16 @@ for improving the performance of future applications, one of the
 drawbacks of relying on a new programming model is that it does not
 immediately address the vast quantities of legacy code that have
 already been written in other languages.  There are 310 billion lines
-of legacy code in industry today, and 60-80\% of the typical IT budget
-is spent re-engineering legacy code (Source: Gartner Group).  While
-much of this code is amenable to streaming, the process of migrating
-the code to a streaming representation is an arduous and
-time-consuming process.  The most important resources that could help
-with the translation -- such as the original author of the code, or
-the high-level design documents that guided its implementation -- are
-often unavailable.  Thus, a fresh programmer is left with the daunting
-task of obtaining an in-depth understanding of all the program
-modules, the dependences between them, and the possibilities for
-safely extracting parallelism.
+of legacy code in industry today, and 75-80\% of the typical IT budget
+is spent maintaining legacy systems~\cite{legacy}.  While much of this
+code is amenable to streaming, the process of migrating the code to a
+streaming representation is an arduous and time-consuming process.
+The most important resources that could help with the translation --
+such as the original author of the code, or the high-level design
+documents that guided its implementation -- are often unavailable.
+Thus, a fresh programmer is left with the daunting task of obtaining
+an in-depth understanding of all the program modules, the dependences
+between them, and the possibilities for safely extracting parallelism.
 
 While there have been many efforts to automatically parallelize legacy
 codes, few of them have focused on the pipeline parallelism that is
@@ -75,7 +80,7 @@ coarse-grained parallelism from realistic C programs.
 %% in a deterministic producer/consumer style, eliminating the
 %% possibility of data races.
 
-In this work, we overcome the traditional barriers in exploiting
+In this chapter, we overcome the traditional barriers in exploiting
 coarse-grained pipeline parallelism by embracing an {\it unsound}
 program transformation.  Our key insight is that, for stream programs,
 the data communicated across pipeline-parallel stages is stable
@@ -272,7 +277,7 @@ iteration 17,900 (not illustrated).
 \hspace{-0.05in}\psfig{file=profiling/mpeg2-addresses.eps,width=3.125in}
 \vspace{-12pt}
 \caption[Stability of streaming communication patterns for MPEG-2
-  decoding]{Stability of streaming communication patterns for MPEG-2
+  decoding.]{Stability of streaming communication patterns for MPEG-2
   decoding.  The decoder was monitored while processing the top 10
   short videos
 % (25-35 seconds) 
@@ -284,7 +289,7 @@ graph of the application.\protect\label{fig:mpeg2-addresses}}
 \hspace{-0.05in}\psfig{file=profiling/mp3-addresses.eps,width=3.125in}
 \vspace{-12pt}
 \caption[Stability of streaming communication patterns for MP3
-  decoding]{Stability of streaming communication patterns for MP3
+  decoding.]{Stability of streaming communication patterns for MP3
   decoding.  The decoder was monitored while processing the top 10
   tracks from MP3.com.  See Figure~\ref{fig:mpeg2-mp3-graphs}b for a
   stream graph of the application.  \protect\label{fig:mp3-addresses}}
@@ -296,7 +301,7 @@ graph of the application.\protect\label{fig:mpeg2-addresses}}
 \psfig{file=profiling/mpeg2-matrix.eps,width=3.07in}
 \vspace{-12pt}
 \caption[Training needed for correct parallelization of
-  MPEG-2]{Minimum number of training iterations (frames) needed on
+  MPEG-2.]{Minimum number of training iterations (frames) needed on
   each video in order to correctly decode the other videos.
   \protect\label{tab:mpeg2-matrix}}
 \end{minipage}
@@ -304,7 +309,7 @@ graph of the application.\protect\label{fig:mpeg2-addresses}}
 \begin{minipage}{3.02in}
 \psfig{file=profiling/mp3-matrix.eps,width=3.07in}
 \vspace{-12pt}
-\caption[Training needed for correct parallelization of MP3]{Minimum
+\caption[Training needed for correct parallelization of MP3.]{Minimum
   number of training iterations (frames) needed on each track in order
   to correctly decode the other tracks.
   \protect\label{tab:mp3-matrix}}
@@ -438,7 +443,7 @@ communication macros for automatically running the code in parallel.
 \centering
 % 338 pix wide
 \hspace{0in}\psfig{file=profiling/gmti-opt.eps,width=2.9in}
-\caption[Stream graph for GMTI, as extracted using our tool]{Stream
+\caption[Stream graph for GMTI, as extracted using our tool.]{Stream
   graph for GMTI, as extracted using our tool.  Nodes are annotated
   with their computation requirements, and edges are labeled with the
   number of bytes transferred per steady-state
@@ -446,10 +451,12 @@ communication macros for automatically running the code in parallel.
 \end{figure}
 
 \begin{figure}[t!]
+% to fill up this page
+\vspace{6pt}
 \centering
 \hspace{0in}\psfig{file=profiling/gmti-spec.eps,width=3.3in}
 \caption[Stream graph for GMTI, as it appears in the GMTI
-  specification]{Stream graph for GMTI, as it appears in the GMTI
+  specification.]{Stream graph for GMTI, as it appears in the GMTI
   specification~\protect\cite{reuther03gmti}.\protect\label{fig:gmti-graph-spec}}
 \vspace{-6pt}
 \end{figure}
@@ -512,7 +519,7 @@ certain storage locations (see Section~\ref{sec:results} for details).
 \centering
 \psfig{file=profiling/data-parallelism.eps,width=3.5in}
 \vspace{-6pt}
-\caption[Specifying data parallelism]{Programmers can specify data
+\caption[Specifying data parallelism.]{Programmers can specify data
   parallelism by passing an extra argument to the pipeline annotation.
   In this case, the runtime system executes W parallel copies of stage
   2.  \protect\label{fig:data-parallelism}}
@@ -759,7 +766,7 @@ place them in the same pipeline stage that the counters were utilized.
 \centering
 \psfig{file=profiling/spec-graphs.eps,width=\textwidth}
 \caption[Extracted stream graphs for parser, bzip2, and
-  hmmer]{Extracted stream graphs for parser, bzip2 (compression and
+  hmmer.]{Extracted stream graphs for parser, bzip2 (compression and
   decompression) and hmmer.  \protect\label{fig:spec-graphs}}
 \end{figure*}
 
@@ -832,7 +839,7 @@ the entire array was communicated at once.
 \begin{figure*}[t]
 \hspace{-0.25in}\psfig{file=profiling/program-changes.eps,width=7in}
 \caption[Steps taken by programmer to assist with
-  parallelization]{Steps taken by the programmer to assist in
+  parallelization.]{Steps taken by the programmer to assist in
   parallelizing each benchmark.  Assistance may be needed to expose
   parallelism in the original code, to verify parallelism using the
   tool, or to handle special cases in the parallelized code.  Steps
@@ -1030,7 +1037,7 @@ MP3 & 6 & 2,2 & 2.48x \\ \hline
 456.hmmer & 2 & 4 & 3.89x \\ \hline
 {\bf GeoMean} & & & {\bf {\meanspeedup}} \\ \hline 
 \end{tabular}}
-\caption[Performance results]{Characteristics of the parallel stream
+\caption[Performance results.]{Characteristics of the parallel stream
   graphs and performance results on a 4-core machine.  Data-parallel
   width refers to the number of ways any data-parallel stage was
   replicated.\protect\label{tab:results}}
@@ -1043,8 +1050,9 @@ MP3 & 6 & 2,2 & 2.48x \\ \hline
 \subsection*{Static Analysis}
 
 The work most closely related to ours is that of Bridges et
-al.~\cite{bridges07revisiting}, which was developed concurrently.
-They exploit pipeline parallelism using the techniques of Decoupled
+al.~\cite{bridges07revisiting}, which was developed concurrently to
+our first publication of this research~\cite{thies-micro07}.  They
+exploit pipeline parallelism using the techniques of Decoupled
 Software Pipelining~\cite{ottoni05decoupled,rangan04array}.  In
 addition, they employ thread-level speculation to speculatively
 execute multiple loop iterations in parallel.  Both of our systems
@@ -1296,3 +1304,4 @@ By leveraging a pragmatic combination of programmer annotations,
 dynamic analysis, visualization tools, and parallelization macros, our
 approach immediately eases the burden of migrating C applications to a
 streaming representation that is suitable for multicore execution.
+
