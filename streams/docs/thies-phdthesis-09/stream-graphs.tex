@@ -1,6 +1,7 @@
 \startchapter{Graphs of StreamIt Benchmarks}
 \label{chap:stream-graphs}
 
+\vspace{-\baselineskip}
 This appendix contains stream graphs for the StreamIt benchmark suite
 (detailed in Table~\ref{tab:lang-benchmarks}).  As described in
 Table~\ref{tab:lang-benchmarks-params}, many of the graphs are
@@ -22,15 +23,20 @@ programmer's original intent.
 In the stream graphs, each filter is annotated with the following
 information:
 \begin{itemize}
-\item The filter name.
+
+\item The filter name.\vspace{-3pt}
 
 \item The number of items\footnote{Some items may contain multiple
   values.  For example, if a data channel carries items of array type,
   then the graphs illustrate the number of arrays pushed and popped
-  per execution.} pushed and popped per execution of the filter.
-\item The estimated work (number of cycles) per execution of the filter.
-\item Peeking filters are annotated with the number of items peeked (but not popped) per exection.
+  per execution.} pushed and popped per execution of the filter.\vspace{-3pt}
+
+\item The estimated work (number of cycles) per execution of the filter.\vspace{-3pt}
+
+\item Peeking filters are annotated with the number of items peeked (but not popped) per exection.\vspace{-3pt}
+
 \item Stateful filters are annotated as such.
+
 \end{itemize}
 
 Filters are also colored to indicate their approximate amount of work
@@ -44,7 +50,12 @@ intermediate filters are colored on a linear scale between the two:
 
 \noindent Work estimates are gathered statically and may differ by 2x 
 or more from actual runtime values.  Work estimates are not available
-in some programs due to dynamic rates or Java subroutines.
+in some programs due to dynamic rates or Java subroutines.  Also, some
+individual filters are marked as having ``unknown'' work in cases
+where the work estimator is known to perform poorly (while loops,
+recursive functions, etc.)
+
+\enlargethispage{0.25\baselineskip}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

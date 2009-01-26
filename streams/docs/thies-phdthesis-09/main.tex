@@ -12,7 +12,8 @@
 \usepackage{appendix}
 \usepackage{color}
 \usepackage[nolineno]{lgrind}
-\usepackage{hyperref}
+\usepackage[colorlinks=true,pdfstartview=FitV,
+            linkcolor=linkcolor,citecolor=linkcolor,urlcolor=linkcolor]{hyperref}
 \usepackage[all]{hypcap}
 % replace courier with beramono, a fixed-width font that is more condensed
 % see more fonts here:  http://www.tug.dk/FontCatalogue/
@@ -24,6 +25,11 @@
 % bold italic font
 \newfont{\boldit}{cmbxti11}
 \newfont{\boldslant}{cmbxsl11}
+
+% the color of all my links
+%\definecolor{linkcolor}{rgb}{0,0,0}  % FOR PRINTING
+\definecolor{linkcolor}{rgb}{0,0,1}  % FOR WEB
+%\definecolor{linkcolor}{rgb}{0.149019,0,0.439215}  % FOR WEB
 
 % figure spacing...
 % space between floats
@@ -128,7 +134,7 @@
 \appendix
 % appears on wrong page
 %\addcontentsline{toc}{chapter}{Appendices}
-\include{example-program}
+\include{example-program} % have to remove this line during diff
 \include{stream-graphs}
 
 \end{document}

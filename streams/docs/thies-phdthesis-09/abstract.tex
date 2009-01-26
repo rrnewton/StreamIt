@@ -1,12 +1,13 @@
-Stream programs represent long-running and repetitive computations.
-They appear most commonly in the context of audio, video, and digital
-signal processing, though also in networking, encryption, and other
-areas.  Because they are organized around sequences of data, stream
-programs can be naturally represented as a graph of independent actors
-that communicate explicitly over data channels.  In this work we focus
-on programs where the input and output rates of actors are known at
-compile time, enabling aggressive transformations by the compiler;
-this model is known as synchronous dataflow.
+Stream programs represent an important class of high-performance
+computations.  Defined by their regular processing of sequences of
+data, stream programs appear most commonly in the context of audio,
+video, and digital signal processing, though also in networking,
+encryption, and other areas.  Stream programs can be naturally
+represented as a graph of independent actors that communicate
+explicitly over data channels.  In this work we focus on programs
+where the input and output rates of actors are known at compile time,
+enabling aggressive transformations by the compiler; this model is
+known as synchronous dataflow.
 
 We develop a new programming language, StreamIt, that empowers both
 programmers and compiler writers to leverage the unique properties of

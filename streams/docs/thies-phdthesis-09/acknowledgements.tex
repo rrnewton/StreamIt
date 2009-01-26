@@ -1,10 +1,356 @@
+\newpage
+~ \vspace{-3.7\baselineskip}\\
+\enlargethispage{0.3\baselineskip}
 \section*{Acknowledgments}
-%% Messaging:
-%% - Janis Sermulins identified that a greedy algorithm can be used
 
-%% Profiling:
-%% - Stephen McCamant
-%% - Jason Ansel
-%% - Chen Ding
-%% - NSF ITR-ACI-0325297
-%% - Gigascale Systems Research Center
+I would like to start by expressing my deepest gratitude to my
+advisor, colleague and friend, Saman Amarasinghe.  Simply put, Saman
+has been the mentor of a lifetime.  Since I stumbled into his office
+almost ten years ago, Saman has invested {\it immense} time and energy
+into my development as a researcher and as a person.  His extreme
+creativity, energy, and optimism (not to mention mad PowerPoint
+skills!) have been a constant source of inspiration, and whenever I am
+at my best, it is usually because I am asking myself: {\it What would
+  Saman do}?  Saman also provided unprecedented freedom and support
+for me to pursue diverse interests in graduate school, and served as
+an aggressive champion on my behalf in every possible way.  I will
+forever treasure our deep sense of shared purpose and can only aspire
+to impact others as much as he has impacted me.
+
+%Of the many things we shared, from home-cooked food in Sri Lanka to
+%20-degree drives with the top down, one thing was altogether
+%different: we had a deep sense of shared purpose, which is a rare and
+%precious thing to find in this world.
+
+\vspace{-8pt}\paragraph*{Contributors to this dissertation} Many
+people made direct contributions to the content of this
+dissertation.  The StreamIt project was a fundamentally
+collaborative effort, involving the extended efforts of over 27
+people.  I feel very lucky to have been part of such an insightful,
+dedicated, and fun team.  Section~\ref{sec:streamit-project}
+provides a technical overview of the entire project, including the
+division of labor.  In what follows I am listing only a subset of
+each person's actual contributions.  Michael Gordon, my kindred
+Ph.D. student throughout the entire StreamIt project, led the
+development of the Raw backend (summarized in Chapter 4) and
+countless other aspects of the compiler.  Rodric Rabbah championed
+the project in many capacities, including contributions to cache
+optimizations (summarized in Chapter 4), teleport messaging (Chapter
+3), the MPEG2 benchmarks, an Eclipse interface, and the Cell
+backend.  Michal Karczmarek was instrumental in the original
+langauge design (Chapter 2) and teleport messaging, and also
+implemented the StreamIt scheduler and runtime library.  David Maze,
+Jasper Lin, and Allyn Dimock made sweeping contributions to the
+compiler infrastructure; I will forever admire their skills and
+tenacity in making everything work.
+
+Central to the StreamIt project is an exceptional array of
+M.Eng. students, who I feel very priveleged to have interacted with
+over the years.  Andrew Lamb, Sitij Agrawal, and Janis Sermulins led
+the respective development of linear optimizations, linear statespace
+optimizations, and cache optimizations (all summarized in Chapter 4).
+Janis also implemented the cluster backend, with support for teleport
+messaging (providing results for Chapter 3).  Matthew Drake
+implemented the MPEG2 codec in StreamIt, while Jiawen Chen implemented
+a flexible graphics pipeline and Basier Aziz implemented mosaic
+imaging.  Daviz Zhang developed a lightweight streaming layer for the
+Cell processor; Kimberly Kuo developed an Eclipse user interface for
+StreamIt; Juan Reyes developed a graphical editor for stream graphs;
+and Jeremy Wong modeled the scalability of stream programs.  Kunal
+Agrawal investigated bit-level optimizations in StreamIt.  Ceryen Tan
+is improving StreamIt's multicore backend.
+
+The StreamIt project also benefited from an outstanding set of
+undergraduate researchers, who taught me many things.  Ali Meli, Chris
+Leger, Satish Ramaswamy, Matt Brown, and Shirley Fung made important
+contributions to the StreamIt benchmark suite (detailed in Chapter 2).
+Steve Hall implemented compressed-domain processing in the StreamIt
+compiler (providing results for Chapter 5).  Qiuyuan Li worked on a
+StreamIt backend for the Cell processor, while Phil Sung worked on a
+backend for graphics processors.
+
+Individuals from other research groups also impacted the StreamIt
+project.  Members of the Raw group offered incredible support for our
+experiments, including Anant Agarwal, Michael Taylor, Walter Lee,
+Jason Miller, Ian Bratt, Jonathan Eastep, David Wentzlaff, Ben
+Greenwald, Hank Hoffmann, Paul Johnson, Jason Kim, Jim Psota, Nathan
+Schnidman, and Matthew Frank.
+%
+\newpage
+\enlargethispage{0.3\baselineskip}
+%
+~ \vspace{-1.3\baselineskip}\\
+\noindent Hank Hoffmann, Nathan Schnidman, and Stephanie Seneff also
+provided valuable expertise on designing and parallelizing signal
+processing applications.  External contributors to the StreamIt
+benchmark suite include Ola Johnsson, Mani Narayanan, Magnus
+Stenemo, Jinwoo Suh, Zain ul-Abdin, and Amy Williams.  Fabrice
+Rastello offered key insights for improving our cache optimizations.
+Weng-Fai Wong offered guidance on several projects during his visit
+to the group.  StreamIt also benefitted immensley from regular and
+insightful conversations with stakeholders from industry, including
+Peter Mattson, Richard Lethin, John Chapin, Vanu Bose, and Andy Ong.
+
+Outside of the StreamIt project, additional individuals made direct
+contributions to this dissertation.  In developing our tool for
+extracting stream parallelism (Chapter 6), I am indebted to Vikram
+Chandrasekhar for months of tenacious hacking and to Stephen McCamant
+for help with Valgrind.  I thank Jason Ansel, Chen Ding, Ronny
+Krashinsky, Viktor Kuncak, and Alex Salcianu, who provided valuable
+feedback on manuscripts that were incorprated into this dissertation.
+I am also grateful to Arvind and Srini Devadas for serving on my
+committee on very short notice, and to Marek Olszewski for serving as
+my remote agent of thesis submission!
+
+\vspace{-8pt}\paragraph*{The rest of the story} Throughout my life,
+I have been extremely fortunate to have had an amazing set of
+mentors who invested a lot of themselves in my personal growth.  I
+thank Thomas ``Doc'' Arnold for taking an interest in a nerdy high
+school kid, and for setting him loose with chemistry equipment in a
+Norwegian glacier valley -- a tactic which ignited not only my
+interest in science, but also in girls.  I thank Scott Camazine
+taking a chance on a high school programmer in my first taste of
+academic research, an experience which was not only enriching and
+fun, but also opened up many doors for me in the future.  I thank
+Vanessa Colella and Mitchel Resnick for making my first UROP
+experience a very special one, as evidenced by my subsequent
+addiction to the UROP program.  I thank Andrew Begel for teaching me
+many things, not least of which is by demonstration of his
+staggering committment, capacity, and all-around coolness in
+mentoring undergraduates.  I'm especially grateful to Brian
+Silverman, a mentor and valued friend whose unique perspectives on
+everything from Life in StarLogo to life on Mars have impacted me
+more than he might know.  I thank Markus Zahn for excellent advice
+and guidance, both as my undergraduate advisor and UROP supervisor.
+Finally, I'm very grateful to Kath Knobe, who provided unparalleled
+mentorship during my summers at Compaq and stimulated my first
+interest in compilers research.
+
+Graduate school brought a new set of mentors.  I learned a great
+deal from authoring papers or proposals with Anant Agarwal, Srini
+Devadas, Fredo Durand, Michael Ernst, Todd Thorsen, and
+Fr\'{e}d\'{e}ric Vivien, each of whom exemplifies the role of a
+faculty member in nurturing student talent.  I am also very grateful
+to Srini Devadas, Michael Ernst, and Martin Rinard for being
+especially accessible as counselors, showing interest in my work and
+well-being even in spite of very busy schedules.  I could not have
+imagined a more supportive environment for graduate study.
+
+% Arvind?
+
+I thank Charles Leiserson and Piotr Indyk for teaching me about
+teaching itself.  I will always remember riding the T with Charles
+when a car full of Red Sox fans asked him what he does for a living.
+Imagining the impressive spectrum of possible replies, I should not
+have been surprised when Charles said simply, ``I teach''.  Nothing
+could be more true, and I feel very priveleged to have been a TA in
+his class.
+
+I'd like to thank my collaborators on projects other than StreamIt,
+for enabling fulfilling and fun pursuits outside 
+% the work described in 
+of this dissertation.  In the microfluidics lab, I thank
+J.P. Urbanski for many late nights ``chilling at the lab'', his
+euphemism for a recurring process whereby he manufactures chips and
+I destroy them.  His knowledge, determination, and overall good
+nature are truly inspiring.  I also learned a great deal from David
+Craig, Mats Cooper, Todd Thorsen, and Jeremy Gunawardena, who were
+extremely supportive of our foray into microfluidics.  I thank Nada
+Amin for her insights, skills, and drive in developing our CAD tool,
+and for being an absolute pleasure to work with.
+
+%In the microfluidics lab, I learned an immense amount from
+%J.P. Urbanski, microfluidic wizard extraordinaire whose work ethic
+%is as intense as it is understated -- never again will I think
+%lightly of a late night ``chilling at the lab''.
+
+I'm very thankful to my collaborators in applying technology towards
+problems in socio-economic development, from whom I've drawn much
+support.  First and foremost is Manish Bhardwaj, whose rare
+combination of brilliance, determination, and selflessness has been
+a deep inspiration to me.  I also thank Emma Brunskill, who has been
+a tremendous collaborator on many fronts, as well as
+%whose independence and resourcefulness are always humbling.  
+%I'm very grateful to Emma Brunskill, Somani Patnaik, 
+Sara Cinnamon, Goutam Reddy, Somani Patnaik and Pallavi Kaushik for
+being incredibly talented, dedicated, and fun collaborators.
+%I thank the Venerable Tenzin Priyadarshi and Scott Kennedy for
+%valuable support and guidance.
+%
+%Further in the past, 
+I am very grateful to Libby Levison for involving me in my first
+project at the intersection of technology and development, without
+which I might have went down a very different path.  I also thank
+Samidh Chakrabarti for being a wonderful officemate and friend, and
+my first peer with whom I could investigate this space together.
+
+I am also indebted to the many students and staff who worked with me
+on the TEK project, including Libby Levison, Marjorie Cheng, Tazeen
+Mahtab, Genevieve Cuevas, Damon Berry, Janelle Prevost, Saad
+Shakhshir, Hongfei Tian and Mark Halsey.  I also thank Pratik Kotkar
+and Jonathan Birnbaum for their work on the Audio Wiki project.  I
+would not have been able to accomplish nearly as much without the
+continuous insights, dedication, and hard work of all these
+individuals.
+
+% leaving out sri lanka guys, since it's not released:
+% - Thayaparan Kailainathan
+% - Mahendrakumar Senthivel
+% - Thayarupan Rajendram
+%
+% leaving out some TEK authors who I don't even know:
+% - Alexandro Artola
+% - Binh D. Vo
+% - Yuliya Litvak
+% - Sheldon Chan
+% - Sid Henderson
+
+Graduate school would be nothing if not for paper deadlines, and I
+feel very lucky to have been down in the trenches with such bright,
+dependable, and entertaining co-authors.  Of people not already
+mentioned above, I thank Marten van Dijk, Blaise Gassend, Andrew
+Lee, Charles W. O'Donnell, Kari Pulli, Christopher Rhodes, Jeffrey
+Sheldon, David Wentzlaff, Amy Williams, and Matthias Zwicker for
+some of the best end-to-end research experiences I could imagine.
+
+Many people made the office a very special place to be.  Mary
+McDavitt is an amazing force for good, serving as my rock and
+foundation throughout many administrative hurricanes; I can't thank
+her enough for all of her help, advice, and good cheer over the
+years.  I'm also very grateful to Shireen Yadollahpour, Cornelia
+Colyer, and Jennifer Tucker, whose helpfulness I will never forget.
+Special thanks to Michael Vezza, system administrator
+extraordinaire, for his extreme patience and helpfulness in tending
+to my every question, and fixing everything that I broke.
+
+The Commit group provided an incredible environment to do research
+over the years.  I thank in particular my fellow Ph.D. students and
+staff -- Derek Bruening, Allyn Dimock, David Maze, Michael Gordon,
+Sam Larsen, Rodric Rabbah, Mark Stephenson, and recently Jason
+Ansel, Marek Olszewski, and Jean Yang -- for tolerating {\it way}
+more than their fair share of StreamIt talks, and moreover, for
+offering the best meeting, eating, and traveling company ever.  You
+all are the best.
+
+I'd like to extend special thanks to those who supported me in my
+job search last spring.  I feel very grateful for the thoughtful
+counsel of dozens of people on the interview trail, and especially
+to a few individuals (you know who you are) who spent many hours
+talking to me and advocating on my behalf.  
+%This meant a great deal
+%to me.  
+I also thank Kentaro Toyama and others at Microsoft Research India
+for being very flexible with my start date, as the submission date
+of this document was gradually pushed back!
+
+I am extremely fortunate to have had a wonderful support network of
+friends to sustain me throughout graduate school.  To the handful of
+close friends who joined me for food, walks around town, or kept in
+touch from high school or college: thank you for keeing me going
+through the thick and thin.  I'd like to especially call out to
+David Wentzlaff, Michael Gordon, Kunal Agrawal and Cat Biddle, who
+held front-row season tickets to my little world and made it so much
+better by virtue of being there.
+
+Finally, I would like to thank my amazingly loving and supportive
+parents, who have always been 100\% behind me no matter where I am
+in life.  I dedicate this thesis to them.
+
+%% FUNDING:
+%% - siebel scholarship
+%% - NSF ITR-ACI-0325297 (profiling)
+%% - Gigascale Systems Research Center (profiling)
+
+% NOT ACKNOWLEDGING:
+%
+% StreamIt:
+% - Vijay Saraswat
+% - Ryan Newton
+% - Ken Steele provided an IPAQ for some of the experiments in Chapter 4.
+%
+% Teaching:
+% - David Liben Nowell
+% 
+% Microfluidics:
+% - natalie andrew
+%
+% IIH:
+% - Pallavi Kaushik
+% - Seema Kacker
+% - Sourav Dey
+% - Ajit Dash
+% - Alex Krull
+% - Oliver Venn
+% - Jessica Leon
+% - Nikhil Nadkarni
+% - Catherine Dunn
+%
+% Job search:
+% - christos kozyrakis
+% - ras bodik
+% - monica lam
+% - stuart russel
+% - krste asanovic
+% - martin rinard
+% - mark horowitz
+%
+% - arvind
+% - eric grimson
+%
+% FRIENDS
+% Grad school:
+% - Gleb Chuvpilo
+% - Satvika Chalasani
+% - Gireeja Ranade
+% - Jamie Stevenson
+%
+% - Maya Shivakumar
+% - J.P. Urbanski
+% - Amy Williams
+% - Peter Mattson
+% - Maya Rao
+%
+% Roommates:
+% - Johnny Chen
+% - Jacob Myerson
+% - Cody Nave
+% - Kenneth Lu
+% - Rachel West
+%
+% College:
+% - Minhaj Siddiqui
+% - Xuemin Chi
+% - Alice Tsay
+% - Elaine Wan 
+% - Manu Sridharan
+% - Josh Sussan
+% - Julie Hong
+% - Robyn Treadwell
+%
+% High-school:
+% - Austin Mandryk
+% - Ankit Chander
+% - Jerusha Achterberg
+%
+% All these details:
+%
+% I am indebted to many additional students and collaborators who
+% helped to pursue goals at the intersection of technology and
+% development in my graduate school career.
+%
+% For external contributions to TEK, from Elsevier I thank Ammy
+% Votglander, Craig Scott, Jeremy Alder, Spencer de Groot, and
+% Christian Pruvost; from First Mile Solutions, I thank Rich
+% Fletcher, Amir Alexander Hasson, and Olufemi Omojola; from the
+% People's First Network, I thank David Leeming.  
+%
+% At Innovators In Health, I thank Manish Bhardwaj, Sara Cinnamon,
+% Goutam Reddy, Emma Brunskill, Somani Patnaik, Pallavi Kaushik,
+% Seema Kacker, Sourav Dey, Ajit Dash, Alex Krull, Oliver Venn,
+% Jessica Leon, Nikhil Nadkarni, and Catherine Dunn.  
+%
+% I also thank Rich Fletcher, Michael Gordon, Jonathan Jackson,
+% Jhonatan Rotenberg, Luis Sarmenta, Ammy Votglander for many
+% conversations benefitting this research.  I would not have been
+% able to accomplish nearly as much without the steadfast
+% dedication and help of all of these individuals.

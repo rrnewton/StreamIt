@@ -1287,21 +1287,41 @@ be iteratively refined to improve the parallelism and load balance.
 Our tool uses the communication trace to construct a stream graph for
 the application as well as a detailed list of producer-consumer
 instruction pairs, both of which aid program understanding and help to
-track down any problematic dependences.
+track down any problematic dependences.  Our dynamic analysis tool
+also outputs a set of macros to automatically parallelize the program
+and communicate the needed data between partitions.  We applied our
+tool to six realistic case studies; the parallel programs produced the
+correct output and offered a mean speedup of {\meanspeedup} on a
+4-core machine.
 
-Our dynamic analysis tool also outputs a set of macros to
-automatically parallelize the program and communicate the needed data
-between partitions.  While this transformation is unsound, it is
-deterministic and suitable to rigorous testing.  Applying the
-transformation to six realistic case studies, the parallel programs
-produced the correct output and offered a mean speedup of
-{\meanspeedup} on a 4-core machine.
-%In addition, the transformation
-%proved to be safe for a number of inputs unrelated to our training
-%runs; we successfully decoded the top videos from YouTube and the top
-%audio tracks from MP3.com.
-By leveraging a pragmatic combination of programmer annotations,
-dynamic analysis, visualization tools, and parallelization macros, our
-approach immediately eases the burden of migrating C applications to a
-streaming representation that is suitable for multicore execution.
+Our technique gains both its leverage and its liabilities from the
+fact that it is unsound.  By tracing the dynamic flow of data, it can
+detect communication patterns that are beyond the reach of static
+analyses.  However, because the analysis samples only a fraction of
+program executions, the observed communication may offer an incomplete
+picture of the behavior of other runs.  The unsound data remains
+useful for program understanding, as it helps programmers understand
+the common-case behavior of the application.  In the context of
+automatic parallelization, the unsoundness is more problematic because
+untested executions may lead to incorrect results when parallelized.
 
+This risk can be minimized by employing a rigorous quality assurance
+(QA) policy, in which the tool observes all distinct modes of
+execution prior to parallelization.  Such QA practices are already
+deeply ingrained in the industry, especially for embedded or
+mission-critical software that is difficult to patch following
+deployment.  Given that industrial testing strategies have proven
+effective for eliminating a myriad of human-induced bugs, it does not
+seem implausible that they could be applied to eliminate potential
+bugs introduced by our tool.  Unlike a programmer, our analysis can
+immediately fix any bugs found by including the buggy input in its
+training set.  Perhaps by treating tools more like programmers -- as
+intelligent but unsound beings whose output must be subjected to
+rigorous testing -- we can overcome some of the traditional
+limitations of automatic parallelization.
+
+%By leveraging a pragmatic combination of programmer annotations,
+%dynamic analysis, visualization tools, and parallelization macros,
+%our approach immediately eases the burden of migrating C applications
+%to a streaming representation that is suitable for multicore
+%execution.

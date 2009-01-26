@@ -382,8 +382,13 @@ memory.
 \centering
 \psfig{file=par-results.eps,width=\textwidth}
 \caption[Parallelization results.]{Parallelization results on the
-  16-core Raw processor.\protect\label{fig:par-results}}
+  16-core Raw processor\protect\footnotemark[1].\protect\label{fig:par-results}}
 \end{figure}
+
+\footnotetext[1]{The benchmarks used here were
+  sometimes parameterized differently than the ones described in
+  Chapter~\ref{chap:language}.  Details on the benchmark
+  configurations are available elsewhere~\cite{gordon06asplos}.}
 
 A summary of our results appears in Figure~\ref{fig:par-results}.  We
 show the speedup offered by the three techniques mentioned:
@@ -868,17 +873,19 @@ client.
 \vspace{-12pt} % due to bad pagebreak
 \centering
 \psfig{figure=linear-flops.eps,width=5in}
-\caption[Elimination of floating point operations due to linear optimizations.]{Elimination of floating point operations by maximal linear 
-replacement, maximal frequency replacement, and automatic optimization
-selection.}
+\caption[Elimination of floating point operations due to linear 
+optimizations.]{Elimination of floating point operations by maximal
+linear replacement, maximal frequency replacement, and automatic
+optimization selection\protect\footnotemark[1].}
 \label{fig:flops}
 \end{figure}
 
 \begin{figure}[t!]
 \centering
 \psfig{figure=linear-speedup.eps,width=5in}
-\caption[Speedup due to linear optimizations.]{Execution speedup for maximal linear replacement, maximal frequency 
-replacement, and automatic optimization selection.}
+\caption[Speedup due to linear optimizations.]{Execution speedup 
+for maximal linear replacement, maximal frequency replacement, and
+automatic optimization selection\protect\footnotemark[1].}
 \label{fig:execution-speedup}
 \end{figure}
 
@@ -900,6 +907,12 @@ With automatic selection, our benchmarks speed up an average factor of
 5.5x and by a factor of 8.0x in the best case (FilterBank).  While the
 graph suggests that frequency replacement almost always performs
 better than linear replacement, this is not strictly the case; in
+%
+\footnotetext[1]{The benchmarks used here were
+  sometimes parameterized differently than the ones described in
+  Chapter~\ref{chap:language}.  Details on the benchmark
+  configurations are available elsewhere~\cite{lamb-thesis}.}
+%
 FMRadio, Radar, and Vocoder, the automatic selection algorithm obtains
 its speedup by using linear replacement instead of frequency
 replacement for part of the stream graph.  However, linear replacement
@@ -1063,7 +1076,7 @@ Pentium~3 and with \texttt{ecc} (v7.0, -O3) for the Itanium~2.
 \psfig{figure=arm.eps,width=\textwidth}
 \caption[Performance of cache optimizations on the StrongARM.]{Performance 
 of cache optimizations on the StrongARM processor (CAF stands for
-cache aware fusion).\protect\label{fig:arm}}
+cache aware fusion)\protect\footnotemark[1].\protect\label{fig:arm}}
 \end{figure}
 
 \begin{figure}[t]
@@ -1094,6 +1107,12 @@ feedback between the output of {\tt gcc} and our code estimation, each
 fusion possibility would need to be evaluated separately as the fusion
 boundary affects the impact of low-level optimizations (and thus the
 final code size).
+
+\footnotetext[1]{The benchmarks used here were
+  sometimes parameterized differently than the ones described in
+  Chapter~\ref{chap:language}.  Details on the benchmark
+  configurations are available elsewhere~\cite{sermulins-thesis}.
+}
 
 The speedups offered by cache optimizations over a full fusion
 strategy are more modest for the desktop processors: 1.34x average

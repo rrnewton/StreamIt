@@ -1,26 +1,33 @@
 \startchapter{Conclusions}
 \label{chap:conclusions}
 
-My thesis is that non-expert programmers can accelerate certain
-classes of applications by an order of magnitude by adopting a stream
-programming model.  This dissertation supports this thesis with the
-following contributions:
+My thesis is that incorporating streaming abstractions into the
+programming language can simultaneously improve both programmability
+and performance.  Programmers are unburdened from providing low-level
+implementation details, while compilers can perform parallelization
+and optimization tasks that were previously beyond the reach of
+automation.  This dissertation supports this thesis with the following
+contributions:
 
 \mybegin
 
 \item We define the StreamIt language, one of the first programming 
 languages to embrace synchronous dataflow as a model of computation.
 StreamIt contains novel language constructs, including structured
-streams, peeking filters, parameterized data reordering, and teleport
-messaging, that improve both the programmability and the analyzability
-of stream programs.  By providing a modular and composable syntax, the
-language becomes accessible to non-expert programmers.  Simultaneously,
-the language preserves the rich static properties of the streaming
-domain, exposing them to the compiler for the sake of optimization.
+streams, parameterized data reordering, and teleport messaging, that
+improve both the programmability and the analyzability of stream
+programs.  Teleport messaging addresses a long-standing problem in
+synchronizing events across decoupled modules, and represents the
+first general framework for delivering messages with respect to the
+regular dataflow in the stream.  By providing a modular and composable
+syntax, the StreamIt language becomes accessible to non-expert
+programmers.  Simultaneously, the language preserves the rich static
+properties of the streaming domain, exposing them to the compiler for
+the sake of optimization.
 
 \item We demonstrate that it is tractable to develop large-scale 
 applications in a stream programming model.  Our experience comes on
-two fronts.  First, we describe the development of the 60,000-line
+two fronts.  First, we describe the development of the 38,000-line
 StreamIt benchmark suite, consisting of large applications (such as
 MPEG-2 encoding/decoding and GMTI radar processing) that were written
 by programmers who were previously unfamiliar with StreamIt.  Second,
@@ -71,6 +78,47 @@ Using a stream programming model, the compiler can leverage new
 information to automate transformations that were previously reserved
 for technology wizards.
 
+%While stream programming is a powerful tool, it is not a silver
+%bullet to all parallel programming problems.
+Perhaps the biggest limitation of the techniques described in this
+dissertation is that they apply primarily to static-rate programs, in
+which the input and output rates of actors are known at compile time.
+The compiler depends on static rates for load-balancing task- and
+pipeline-parallel actors; for optimizing linear filters (which are
+implicitly static-rate); for cache optimizations; and for teleport
+messaging (though Section~\ref{sec:messaging-future} describes how to
+extend messaging to handle dynamism).  Some of the techniques
+described do extend to dynamic rates, including the language's support
+for hierarchical streams and parameterized data reordering, as well as
+the compiler's support for coarse-grained data parallelism,
+translation to the compressed domain (with minor modifications), and
+our dynamic analysis for extracting parallelism from C programs.
+
+In the long term, we envision that our optimizations of static-rate
+graphs would have maximum impact when those graphs are embedded in a
+more flexible and hybrid programming model.  By analogy to insruction
+scheduling, one could consider our optimizations as focusing on the
+basic block: a simple yet pervasive construct that can be stitched
+together to perform a broad array of tasks.  While support for complex
+control flow is important for functionality, aggressive optimization
+within the basic block is essential for high performance.  Our
+benchmark suite supports the premise that dynamic rates often occur at
+only a few points in an application; out of our 29 most realistic
+applications, 24 are completely static-rate, and out of those with any
+% dynamic rates in user-defined filters: 17 / 530
+dynamic rates, only 3\% of the user-defined filters have a dynamic
+rate.  Thus, the compiler can focus on optimizing each static-rate
+subgraph, while relying on the runtime system to orchestrate the
+dynamic-rate boundaries.  In addition to supporting dynamism, we
+envision that a hybrid programming model would provide support for
+many models of computation (transactions, event-driven programs,
+scientific codes, etc.) with high-performance streaming playing only
+one part.  These models could likely be embedded in a general-purpose
+programming language, using a separate library and runtime system for
+each one.  Integrating such models of computation into a unified
+authoring environment is an interesting direction for further
+research.
+
 What is the future of stream programming?  Well, the goal of academic
 programming language research is frequently misunderstood.  While it
 would not be objectionable to have a language like StreamIt take over
@@ -85,10 +133,18 @@ also important influences from lesser-known languages, many of which
 are of academic origin (CPL, BCPL, ML, Clu).  Given the trend towards
 multicore processors, and the increasing prevalence of streaming
 applications, we anticipate the emergence of languages and libraries
-with integrated support for efficient stream processing.  It is our
-hope that the abstractions, optimizations, and lessons learned as part
-of this dissertation will serve to inform and inspire this upcoming
-generation of programmable systems.
+with integrated support for efficient stream processing.  Already the
+StreamIt system (which is open-source and available
+online~\cite{streamitweb}) has been reused and extended by multiple
+research groups, including UC
+Berkeley~\cite{mani-permutations,bit-streaming}, IBM Research~\cite{},
+University of Michigan~\cite{??}, Halmstad
+University~\cite{ola-techrep}, Johns Hopkins
+University~\cite{duca-thesis}, and North Carolina State
+University~\cite{won-thesis}.  It is our hope that the abstractions,
+optimizations, and lessons learned as part of this dissertation will
+serve to inform and inspire this research as well as the upcoming
+generation of industrial-strength parallel programming langauges.
 
 %% don't mention:
 %% - zeroing out arrays is expensive, should optimize away (move to

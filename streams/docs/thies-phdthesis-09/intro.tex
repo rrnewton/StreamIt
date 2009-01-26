@@ -508,6 +508,7 @@ in the StreamIt project.
 %% one of the early efforts in this space.
 
 \section{The StreamIt Project}
+\label{sec:streamit-project}
 
 StreamIt is a language and compiler for high-performance stream
 programs.  The principal goals of the StreamIt project are three-fold:
@@ -581,14 +582,14 @@ Raw, Janis Sermulins ported StreamIt to multicores and clusters of
 workstations, and also led the development of cache optimizations that
 offer a 3.5x improvement over unoptimized StreamIt on embedded
 processors~\cite{sermulins-lctes05,sermulins-thesis}.  David Zhang and
-Qiuyuan Li led the development of a flexible streaming execution layer
-that achieves over 88\% utilization on the Cell
-processor~\cite{zhang_lightweight_2007,zhang-thesis}.  Michal
+Qiuyuan Li led the development of a lightweight streaming execution
+layer that achieves over 88\% utilization (ignoring SIMD potential) on
+the Cell processor~\cite{zhang_lightweight_2007,zhang-thesis}.  Michal
 Karczmarek led the development of phased scheduling, the first
 hierarchical scheduler for cyclo-static dataflow that also enables a
 flexible tradeoff between latency, code size and buffer
 size~\cite{karczmarek-lctes03,karczma-thesis}.  Phil Sung and Weng-Fai
-wong explored the execution of StreamIt on graphics processors.
+Wong explored the execution of StreamIt on graphics processors.
 
 %- appears in the evaluation of the Raw architecture~\cite{taylor2004}
 
@@ -642,12 +643,13 @@ shaders and rendering algorithms, and various DCTs, FFTs, filterbanks,
 and sorting algorithms.  Some programs are currently restricted for
 internal use.
 % TODO: Fix order?
-Contributors to the benchmark suite include Sitij Agrawal, Saman
-Amarasinghe, Basier Aziz, Matt Brown, Jiawen Chen, Matthew Drake,
-Shirley Fung, Michael Gordon, Hank Hoffmann, Ola Johnsson, Michal
-Karczmarek, Andrew Lamb, Chris Leger, David Maze, Ali Meli, Mani
-Narayanan, Rodric Rabbah, Satish Ramaswamy, Janis Sermulins, Magnus
-Stenemo, Jinwoo Suh, Zain ul-Abdin, Amy Williams, and Jeremy Wong.
+Contributors to the benchmark suite include Sitij Agrawal, Basier
+Aziz, Matt Brown, Jiawen Chen, Matthew Drake, Shirley Fung, Michael
+Gordon, Hank Hoffmann, Ola Johnsson, Michal Karczmarek, Andrew Lamb,
+Chris Leger, David Maze, Ali Meli, Mani Narayanan, Rodric Rabbah,
+Satish Ramaswamy, Janis Sermulins, Magnus Stenemo, Jinwoo Suh, Zain
+ul-Abdin, Amy Williams, Jeremy Wong, and myself.  Individual
+contributions are detailed in Table~\ref{tab:lang-benchmarks}.
 
 %% includes GMTI radar processing (by Sitij Agrawal), part of the 3GPP
 %% physical layer (by Ali Meli), a vocoder (by Chris Leger), a subset
