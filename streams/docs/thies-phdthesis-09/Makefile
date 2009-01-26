@@ -25,7 +25,7 @@ ps: main.ps
 
 pdf: main.pdf
 
-diff:
+dif:
 	latexdiff --flatten old/main.tex main.tex > diff.tex
 	latex diff.tex
 	latex diff.tex
