@@ -48,7 +48,7 @@ of cache aware optimizations in the StreamIt compiler yields a 3.49x
 average speedup and an 88x maximum speedup over unoptimized StreamIt
 on a StrongARM 1110 processor.  
 %{\it Project leader:} Janis
-%Sermulins~\cite{sermulins:lctes:2005,sermulins-thesis}.
+%Sermulins~\cite{sermulins-lctes05,sermulins-thesis}.
 
 \myend
 
@@ -151,7 +151,7 @@ being unable to parallelize actors with state.
 
 Pipeline parallelism applies to chains of producers and consumers that
 are directly connected in the stream graph.  In our previous
-work~\cite{streamit-asplos}, we exploited pipeline parallelism by
+work~\cite{gordon-asplos02}, we exploited pipeline parallelism by
 mapping clusters of producers and consumers to different cores and
 using an on-chip network for direct communication between actors.
 Compared to data parallelism, this approach offers reduced latency,
@@ -171,7 +171,7 @@ all situations, a unified approach is needed to obtain consistent
 results.  Using StreamIt as our input and targeting the 16-core Raw
 architecture, our compiler demonstrates a mean speedup of 11.2x over a
 single-core baseline.  This also represents a 1.84x improvement over
-our original approach~\cite{streamit-asplos}.
+our original approach~\cite{gordon-asplos02}.
 
 \subsection*{Parallelization Algorithm}
 
@@ -208,7 +208,7 @@ by performing two novel transformations.  First, the granularity of
 the stream graph is coarsened via filter {\it fusion}, a
 transformation in which two neighboring filters are statically
 scheduled and inlined into a single
-filter~\cite{streamit-asplos,sermulins:lctes:2005}.  We fuse
+filter~\cite{gordon-asplos02,sermulins-lctes05}.  We fuse
 neighboring stateless filters as much as possible so long as the
 resulting filter remains stateless, ensuring that it is still amenable
 to data parallelism.
@@ -388,7 +388,7 @@ memory.
 \footnotetext[1]{The benchmarks used here were
   sometimes parameterized differently than the ones described in
   Chapter~\ref{chap:language}.  Details on the benchmark
-  configurations are available elsewhere~\cite{gordon06asplos}.}
+  configurations are available elsewhere~\cite{gordon-asplos06}.}
 
 A summary of our results appears in Figure~\ref{fig:par-results}.  We
 show the speedup offered by the three techniques mentioned:
@@ -398,7 +398,7 @@ in the stream graph; and coarse-grained software pipelining, which
 runs as a post-pass to coarse-grained data parallelism.  Our baseline
 is StreamIt executing on a single core, which (in the case of Raw) has
 been shown to outperform hand-written C implementations on a single
-core~\cite{raw_isca}.  While coarse-grained data parallelism performs
+core~\cite{taylor2004}.  While coarse-grained data parallelism performs
 well (attaining a mean speedup of 9.9x), the most robust performance
 comes by adding coarse-grained software pipelining (which attains a
 mean speedup of 11.2x).  As expected, software pipelining mostly
@@ -985,7 +985,7 @@ In the rest of this section, we provide more details on cache aware
 fusion, cache aware scaling, and present an experimental evaluation.
 Our full report on this subject contains further details, including
 optimized buffer management
-strategies~\cite{sermulins:lctes:2005,sermulins-thesis}.
+strategies~\cite{sermulins-lctes05,sermulins-thesis}.
 
 \subsection*{Cache Aware Fusion}
 
@@ -1171,7 +1171,7 @@ filters in the programming model, we focus on the mapping step.
 
 Previous work in scheduling computation graphs to parallel targets has
 focused on partitioning and scheduling techniques that exploit task
-and pipeline parallelism~\cite{SDFSched, SDFSched2,may87communicating,
+and pipeline parallelism~\cite{SDFSched,SDFSched2,may87communicating,
 DAGSched, pipeline-sdf}.  Application of loop-conscious
 transformations to coarse-grained dataflow graphs has been
 investigated.  Unrolling (or ``unfolding'' in this domain) is employed
@@ -1302,9 +1302,9 @@ general graphs is NP-complete~\cite{Bhatta97}, there are two
 complimentary heuristics, APGAN (Pairwise Grouping of Adjacent Nodes)
 and RPMC (Recursive Partitioning by Minimum Cuts), that have been
 shown to be effective when applied together~\cite{Bhatta97}.  Buffer
-merging\cite{murt1999x3,murt2000x2} represents another technique for
-decreasing buffer sizes, which could be integrated with our approach
-in the future.
+merging\cite{murt1999x3,murthy_buffer_2004} represents another
+technique for decreasing buffer sizes, which could be integrated with
+our approach in the future.
 
 Govindarajan et al. develop a linear programming framework for
 determining the ``rate-optimal schedule'' with the minimal memory
@@ -1492,7 +1492,7 @@ representation in future work.
 
 % what did linear rely on from streamit?
 % - separation of states and inputs
-% - quick exection step suitable to symbolic execution
+% - quick execution step suitable to symbolic execution
 
 %% not mentioning:
 %%   - fine-grained communication on Raw not worth it

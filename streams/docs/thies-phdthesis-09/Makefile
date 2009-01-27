@@ -66,7 +66,7 @@ printerrors:
         echo "*************************"; \
 	echo
 
-main.bbl: references.bib zotero.bib messaging.bib faculty-app.bib $(TEXFILES) Makefile done.flag
+main.bbl: references.bib $(TEXFILES) Makefile done.flag
 	latex -interaction=batchmode main.tex || true
 	rm -f $*.dvi
 	bibtex -terse $*
@@ -90,8 +90,12 @@ main.dvi: preprocess $(TEXFILES) $(EPSFIGFILES) main.bbl $(EPSFIGURES) Makefile 
 example-program.tex: example-program.in.tex
 	lgrind -d lgrindef -lstreamit -e example-program.in.tex > example-program.tex
 
+# need to clip out dummy pages in the middle;
+# may need to adjust psselect args
 .dvi.pdf: Makefile
-	dvips -z -q -t letter -P cmz -f $< | ps2pdf - $*.pdf
+	dvips -z -q -t letter -P cmz -f $< -o _main.ps
+	psselect -p-59,63- _main.ps main.ps
+	ps2pdf main.ps
 
 .fig.eps: Makefile
 	fig2dev -L pstex $< $*.eps

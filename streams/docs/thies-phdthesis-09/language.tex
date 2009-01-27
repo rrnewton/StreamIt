@@ -215,7 +215,7 @@ arrays from their initialization to their use.  This allows the
 compiler to infer that the FIR filter computes a linear function,
 subject to aggressive optimization~\cite{lamb-pldi03}.  Also,
 using a transformation called scalar
-replacement~\cite{sermulins:lctes:2005}, the {\it weights} array can
+replacement~\cite{sermulins-lctes05}, the {\it weights} array can
 be eliminated completely by unrolling loops and propagating constants
 from the init function to the work function.
 
@@ -465,7 +465,7 @@ centers on data movement, and preserving information about exactly
 where each data item is going enables the compiler to perform more
 aggressive optimizations.  For example, standardized splitters and
 joiners have enabled us to map reordering operations to a programmable
-on-chip network~\cite{streamit-asplos} and have enabled certain
+on-chip network~\cite{gordon-asplos02} and have enabled certain
 domain-specific
 optimizations~\cite{lamb-pldi03,agrawal-cases05,techreport}.
 Other researchers have also leveraged this representation to
