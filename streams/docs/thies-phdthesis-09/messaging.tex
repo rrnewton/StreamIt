@@ -489,8 +489,8 @@ Multiply} actor declares a message handler that adjusts its own weight
 %% \end{minipage}
 %% \end{figure*}
 %
-\addtocounter{page}{-3}
 \clearpage
+\addtocounter{page}{-3}
 % SNAPSHOT FROM PPOPP PAPER
 \noindent\mbox{~}\hspace{-1.05in}\parbox{8.5in}{\vspace{-0.9in}\psfig{file=messaging-example.eps,width=8.5in}}
 \clearpage
@@ -1410,14 +1410,14 @@ To illustrate the pros and cons of teleport messaging, we implemented
 a spread-spectrum frequency hopping radio frontend~\cite{harada02} as
 shown in Figure~\ref{fig:fhr-streamit}.  (Matthew Drake also describes
 the implications of messaging in a case study of
-MPEG-2~\cite{ipdps2006,drake-thesis}.)  A frequency hopping radio is
-one in which the receiver switches between a set of known frequencies
-whenever it detects certain tones from the transmitter.  The frequency
-hopping is a good match for control messages because the hopping
-interval is dynamic (based on data in the stream); it spans a large
-section of the stream graph (there is a Fast Fourier Transform (FFT)
-with 15 child actors, not shown, between the demodulator and the hop
-detector); and it requires precise message delivery.  The delivery
+MPEG-2~\cite{drake-ipdps06,drake-thesis}.)  A frequency hopping radio
+is one in which the receiver switches between a set of known
+frequencies whenever it detects certain tones from the transmitter.
+The frequency hopping is a good match for control messages because the
+hopping interval is dynamic (based on data in the stream); it spans a
+large section of the stream graph (there is a Fast Fourier Transform
+(FFT) with 15 child actors, not shown, between the demodulator and the
+hop detector); and it requires precise message delivery.  The delivery
 must be precise both to meet real-time requirements (as the
 transmitter will leave the current frequency soon), and to ensure that
 the message falls at a logical frame boundary; if the frequency change

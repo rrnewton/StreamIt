@@ -38,7 +38,7 @@ the project in many capacities, including contributions to cache
 optimizations (summarized in Chapter 4), teleport messaging (Chapter
 3), the MPEG2 benchmarks, an Eclipse interface, and the Cell
 backend.  Michal Karczmarek was instrumental in the original
-langauge design (Chapter 2) and teleport messaging, and also
+language design (Chapter 2) and teleport messaging, and also
 implemented the StreamIt scheduler and runtime library.  David Maze,
 Jasper Lin, and Allyn Dimock made sweeping contributions to the
 compiler infrastructure; I will forever admire their skills and
@@ -87,7 +87,7 @@ benchmark suite include Ola Johnsson, Mani Narayanan, Magnus
 Stenemo, Jinwoo Suh, Zain ul-Abdin, and Amy Williams.  Fabrice
 Rastello offered key insights for improving our cache optimizations.
 Weng-Fai Wong offered guidance on several projects during his visit
-to the group.  StreamIt also benefitted immensley from regular and
+to the group.  StreamIt also benefited immensely from regular and
 insightful conversations with stakeholders from industry, including
 Peter Mattson, Richard Lethin, John Chapin, Vanu Bose, and Andy Ong.
 
@@ -97,7 +97,7 @@ extracting stream parallelism (Chapter 6), I am indebted to Vikram
 Chandrasekhar for months of tenacious hacking and to Stephen McCamant
 for help with Valgrind.  I thank Jason Ansel, Chen Ding, Ronny
 Krashinsky, Viktor Kuncak, and Alex Salcianu, who provided valuable
-feedback on manuscripts that were incorprated into this dissertation.
+feedback on manuscripts that were incorporated into this dissertation.
 I am also grateful to Arvind and Srini Devadas for serving on my
 committee on very short notice, and to Marek Olszewski for serving as
 my remote agent of thesis submission!
@@ -107,31 +107,35 @@ I have been extremely fortunate to have had an amazing set of
 mentors who invested a lot of themselves in my personal growth.  I
 thank Thomas ``Doc'' Arnold for taking an interest in a nerdy high
 school kid, and for setting him loose with chemistry equipment in a
-Norwegian glacier valley -- a tactic which ignited not only my
-interest in science, but also in girls.  I thank Scott Camazine
-taking a chance on a high school programmer in my first taste of
-academic research, an experience which was not only enriching and
-fun, but also opened up many doors for me in the future.  I thank
-Vanessa Colella and Mitchel Resnick for making my first UROP
-experience a very special one, as evidenced by my subsequent
-addiction to the UROP program.  I thank Andrew Begel for teaching me
-many things, not least of which is by demonstration of his
-staggering committment, capacity, and all-around coolness in
-mentoring undergraduates.  I'm especially grateful to Brian
-Silverman, a mentor and valued friend whose unique perspectives on
-everything from Life in StarLogo to life on Mars have impacted me
-more than he might know.  I thank Markus Zahn for excellent advice
-and guidance, both as my undergraduate advisor and UROP supervisor.
-Finally, I'm very grateful to Kath Knobe, who provided unparalleled
-mentorship during my summers at Compaq and stimulated my first
-interest in compilers research.
+Norwegian glacier valley -- a tactic which cemented my interest in
+science, especially the kind you can do while remaining dry.
+%a tactic which ignited not only my interest in science, but also in
+%girls.
+I thank Scott Camazine taking a chance on a high school programmer
+in my first taste of academic research, an enriching experience
+which
+%was not only enriching and fun, but also 
+opened up many doors for me in the future.  I thank Vanessa Colella
+and Mitchel Resnick for making my first UROP experience a very
+special one, as evidenced by my subsequent addiction to the UROP
+program.  I thank Andrew Begel for teaching me many things, not
+least of which is by demonstration of his staggering commitment,
+capacity, and all-around coolness in mentoring undergraduates.  I'm
+especially grateful to Brian Silverman, a mentor and valued friend
+whose unique perspectives on everything from Life in StarLogo to
+life on Mars have impacted me more than he might know.  I thank
+Markus Zahn for excellent advice and guidance, both as my
+undergraduate advisor and UROP supervisor.  Finally, I'm very
+grateful to Kath Knobe, who provided unparalleled mentorship during
+my summers at Compaq and stimulated my first interest in compilers
+research.
 
 Graduate school brought a new set of mentors.  I learned a great
 deal from authoring papers or proposals with Anant Agarwal, Srini
 Devadas, Fredo Durand, Michael Ernst, Todd Thorsen, and
 Fr\'{e}d\'{e}ric Vivien, each of whom exemplifies the role of a
 faculty member in nurturing student talent.  I am also very grateful
-to Srini Devadas, Michael Ernst, and Martin Rinard for being
+to Srini Devadas, Martin Rinard, Michael Ernst, and Arvind for being
 especially accessible as counselors, showing interest in my work and
 well-being even in spite of very busy schedules.  I could not have
 imagined a more supportive environment for graduate study.
@@ -154,10 +158,16 @@ J.P. Urbanski for many late nights ``chilling at the lab'', his
 euphemism for a recurring process whereby he manufactures chips and
 I destroy them.  His knowledge, determination, and overall good
 nature are truly inspiring.  I also learned a great deal from David
-Craig, Mats Cooper, Todd Thorsen, and Jeremy Gunawardena, who were
-extremely supportive of our foray into microfluidics.  I thank Nada
-Amin for her insights, skills, and drive in developing our CAD tool,
-and for being an absolute pleasure to work with.
+Craig, Mats Cooper, Todd Thorsen, and Jeremy Gunawardena, 
+%
+\newpage
+\enlargethispage{0.5\baselineskip}
+%
+~ \vspace{-1.5\baselineskip}\\
+\noindent who were extremely supportive of our foray into
+microfluidics.  I thank Nada Amin for her insights, skills, and
+drive in developing our CAD tool, and for being an absolute pleasure
+to work with.
 
 %In the microfluidics lab, I learned an immense amount from
 %J.P. Urbanski, microfluidic wizard extraordinaire whose work ethic
@@ -173,7 +183,7 @@ a tremendous collaborator on many fronts, as well as
 %whose independence and resourcefulness are always humbling.  
 %I'm very grateful to Emma Brunskill, Somani Patnaik, 
 Sara Cinnamon, Goutam Reddy, Somani Patnaik and Pallavi Kaushik for
-being incredibly talented, dedicated, and fun collaborators.
+being incredibly talented, dedicated, and fun teammates.
 %I thank the Venerable Tenzin Priyadarshi and Scott Kennedy for
 %valuable support and guidance.
 %
@@ -181,17 +191,17 @@ being incredibly talented, dedicated, and fun collaborators.
 I am very grateful to Libby Levison for involving me in my first
 project at the intersection of technology and development, without
 which I might have went down a very different path.  I also thank
-Samidh Chakrabarti for being a wonderful officemate and friend, and
-my first peer with whom I could investigate this space together.
+Samidh Chakrabarti for being a great officemate and friend, and my
+first peer with whom I could investigate this space together.
 
-I am also indebted to the many students and staff who worked with me
-on the TEK project, including Libby Levison, Marjorie Cheng, Tazeen
-Mahtab, Genevieve Cuevas, Damon Berry, Janelle Prevost, Saad
-Shakhshir, Hongfei Tian and Mark Halsey.  I also thank Pratik Kotkar
-and Jonathan Birnbaum for their work on the Audio Wiki project.  I
-would not have been able to accomplish nearly as much without the
-continuous insights, dedication, and hard work of all these
-individuals.
+I am indebted to the many students and staff who worked with me on
+the TEK project, including Marjorie Cheng, Tazeen Mahtab, Genevieve
+Cuevas, Damon Berry, Saad Shakhshir, Janelle Prevost, Hongfei Tian,
+Mark Halsey, and Libby Levison.  I also thank Pratik Kotkar,
+Jonathan Birnbaum, and Matt Aasted for their work on the Audio Wiki.
+I would not have been able to accomplish nearly as much without the
+%continuous 
+insights, dedication, and hard work of all these individuals.
 
 % leaving out sri lanka guys, since it's not released:
 % - Thayaparan Kailainathan
@@ -208,7 +218,7 @@ individuals.
 Graduate school would be nothing if not for paper deadlines, and I
 feel very lucky to have been down in the trenches with such bright,
 dependable, and entertaining co-authors.  Of people not already
-mentioned above, I thank Marten van Dijk, Blaise Gassend, Andrew
+cited previously, I thank Marten van Dijk, Blaise Gassend, Andrew
 Lee, Charles W. O'Donnell, Kari Pulli, Christopher Rhodes, Jeffrey
 Sheldon, David Wentzlaff, Amy Williams, and Matthias Zwicker for
 some of the best end-to-end research experiences I could imagine.
@@ -223,14 +233,16 @@ Special thanks to Michael Vezza, system administrator
 extraordinaire, for his extreme patience and helpfulness in tending
 to my every question, and fixing everything that I broke.
 
-The Commit group provided an incredible environment to do research
-over the years.  I thank in particular my fellow Ph.D. students and
-staff -- Derek Bruening, Allyn Dimock, David Maze, Michael Gordon,
-Sam Larsen, Rodric Rabbah, Mark Stephenson, and recently Jason
-Ansel, Marek Olszewski, and Jean Yang -- for tolerating {\it way}
-more than their fair share of StreamIt talks, and moreover, for
-offering the best meeting, eating, and traveling company ever.  You
-all are the best.
+My thanks go out to all the talented members of the Commit group,
+and especially the Ph.D. students and staff -- Jason Ansel, Derek
+Bruening, Vikram Chandrasekhar, Gleb Chuvpilo, Allyn Dimock, David
+Maze, Michael Gordon, Michal Karczmarek, Sam Larsen, Marek
+Olszewski, Diego Puppin, Rodric Rabbah, Mark Stephenson, Jean Yang,
+and Qin Zhao.  On top of tolerating {\it way} more than their fair
+share of StreamIt talks, they offered the best meeting, eating, and
+traveling company ever.  I thank Michael Gordon, my officemate and
+trusted friend, for making 32-G890 one of my favorite places -- I'm
+really going to miss our conversations (and productive silences!)
 
 I'd like to extend special thanks to those who supported me in my
 job search last spring.  I feel very grateful for the thoughtful
@@ -240,21 +252,30 @@ talking to me and advocating on my behalf.
 %This meant a great deal
 %to me.  
 I also thank Kentaro Toyama and others at Microsoft Research India
-for being very flexible with my start date, as the submission date
-of this document was gradually pushed back!
+for being very flexible with my start date, as the submission of
+this document was gradually pushed back!
 
-I am extremely fortunate to have had a wonderful support network of
-friends to sustain me throughout graduate school.  To the handful of
-close friends who joined me for food, walks around town, or kept in
-touch from high school or college: thank you for keeing me going
-through the thick and thin.  I'd like to especially call out to
-David Wentzlaff, Michael Gordon, Kunal Agrawal and Cat Biddle, who
-held front-row season tickets to my little world and made it so much
-better by virtue of being there.
+I am extremely fortunate to have had a wonderful support network to
+sustain me throughout graduate school.  To the handful of close
+friends who joined me for food, walks around town, or kept in touch
+from a distance: thank you for seeing me through the thick and thin.
+I'd like to especially call out to Kunal Agrawal, David Wentzlaff,
+Michael Gordon and Cat Biddle, who held front-row season tickets to
+my little world and made it so much better by virtue of being there.
 
 Finally, I would like to thank my amazingly loving and supportive
 parents, who have always been 100\% behind me no matter where I am
 in life.  I dedicate this thesis to them.
+
+\clearpage
+~ \\ \vspace{3.69in} ~ \\
+\noindent This work was funded in part by the National Science 
+Foundation (Grants EIA-0071841, CNS-0305453, ACI-0325297), DARPA
+(Grants F29601-01-2-0166, F29601-03-2-0065), the DARPA HPCS program,
+the MIT Oxygen Alliance, the Gigascale Systems Research Center, Nokia,
+and a Siebel Scholarship.
+\vspace{-0.2in}
+\clearpage
 
 %% FUNDING:
 %% - siebel scholarship
@@ -262,6 +283,8 @@ in life.  I dedicate this thesis to them.
 %% - Gigascale Systems Research Center (profiling)
 
 % NOT ACKNOWLEDGING:
+%
+% - Meha Senthil?
 %
 % StreamIt:
 % - Vijay Saraswat
@@ -351,6 +374,6 @@ in life.  I dedicate this thesis to them.
 %
 % I also thank Rich Fletcher, Michael Gordon, Jonathan Jackson,
 % Jhonatan Rotenberg, Luis Sarmenta, Ammy Votglander for many
-% conversations benefitting this research.  I would not have been
+% conversations benefiting this research.  I would not have been
 % able to accomplish nearly as much without the steadfast
 % dedication and help of all of these individuals.

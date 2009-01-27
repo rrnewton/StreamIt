@@ -1308,12 +1308,14 @@ untested executions may lead to incorrect results when parallelized.
 This risk can be minimized by employing a rigorous quality assurance
 (QA) policy, in which the tool observes all distinct modes of
 execution prior to parallelization.  Such QA practices are already
-deeply ingrained in the industry, especially for embedded or
-mission-critical software that is difficult to patch following
-deployment.  Given that industrial testing strategies have proven
-effective for eliminating a myriad of human-induced bugs, it does not
-seem implausible that they could be applied to eliminate potential
-bugs introduced by our tool.  Unlike a programmer, our analysis can
+deeply ingrained in the industry.
+%, especially for embedded or
+%mission-critical software that is difficult to patch following
+%deployment.  
+Given that industrial testing strategies have proven effective for
+eliminating a myriad of human-induced bugs, it does not seem
+implausible that they could be applied to eliminate potential bugs
+introduced by our tool.  Unlike a programmer, our analysis can
 immediately fix any bugs found by including the buggy input in its
 training set.  Perhaps by treating tools more like programmers -- as
 intelligent but unsound beings whose output must be subjected to

@@ -216,8 +216,8 @@ define our conception of the streaming application domain:
   that is a given function of the input stream.
 
 \myitem {Sliding window computations.}  Each value in a data stream
-is often inpsected by consecutive execution steps of the same filter,
-a pattern refered to as a {\it sliding window}.  Examples of sliding
+is often inspected by consecutive execution steps of the same filter,
+a pattern referred to as a {\it sliding window}.  Examples of sliding
 windows include FIR and IIR filters; moving averages and differences;
 error correcting codes; biosequence analysis; natural language
 processing; image processing (sharpen, blur, etc.); motion estimation;
@@ -322,7 +322,7 @@ Table~\ref{tab:model-table} and detailed below:
   exists and, if so, can derive a valid schedule of node executions.
   The amount of buffering needed can also be determined statically.
   Many variations of synchronous dataflow have been defined, including
-  cyco-static
+  cyclo-static
   dataflow~\cite{bilsen_cyclo-static_1995,parks_comparison_1995} and
   multidimensional synchronous
   dataflow~\cite{murthy_multidimensional_2002}.  Due to its potential
@@ -414,7 +414,7 @@ The notion of streams has also permeated several programming paradigms
 over the past half-century.  Dataflow languages such as
 Lucid~\cite{ashcroft_lucidnonprocedural_1977},
 Id~\cite{arvind_asynchronous_1978,nikhil_id_1991}, and
-VAL~\cite{ackerman_VAL--value-oriented_1979} aim to eliminate
+VAL~\cite{ackerman_val_value_oriented_1979} aim to eliminate
 traditional control flow in favor of a scheduler that is driven only
 by data dependences.  To expose these dependences, each variable is
 assigned only once, and each statement is devoid of non-local side
@@ -502,9 +502,9 @@ in the StreamIt project.
 
 %% This idea is at the core of the movement known as {\it stream
 %%   programming}, which encompasses related efforts such as
-%% Cg~\cite{mark_cg:system_2003},
+%% Cg~\cite{cg03},
 %% StreamC~\cite{TODO-might-have-to-change-date-in-figure}, and
-%% Brook~\cite{buck_brook_2004}.  Our work on the StreamIt project was
+%% Brook~\cite{brook04}.  Our work on the StreamIt project was
 %% one of the early efforts in this space.
 
 \section{The StreamIt Project}
