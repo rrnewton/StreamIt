@@ -1,18 +1,14 @@
-- paper deadlines paraphgraph mentions few people for the second time
-
-* grant numbers
 * related work
-  - cite seneff vocoder article (from asplos'02) so it appears in appendix
-  - cite Tennenhouse, D., Bose, V.: The SpectrumWare Approach to
-    Wireless Signal Processing. Wireless Networks (1999)) for OFDM
-  - general diff to brook 
-  - peeking has been done before
-    - sliding windows were in Signal (1986)
-    - looks like SA-C has sliding windows (1999) yup.
-      http://www.cs.colostate.edu/cameron/SACoverview.html#Anchor-Th-17671
-    - blocking them (paper sent to mike)
-    - check language in intro, summary, conclusions, etc.
-  - diff to sh (they coarsen granularity)
+  - Z language (Warp, compiled in lam's thesis) had sliding windows
+  + Automatic generation of systolic programs from nested loops (CMU)
+  + Automatic mapping of large signal processing systems to a parallel machine (CMU)
+  - in my "related" folder (and elsewhere)
+    - silage language
+    - harmony language
+    - database languages (ryan newton, etc)
+    - mibench: a free, commercially representative embedded benchmark suite
+    - other benchmark suites?
+
 * proofread
   - check correctness of compression section
   - check that messaging speedup makes sense?
@@ -49,21 +45,17 @@ n copyright infringement on numerical recipes?
 n redo graphs of sorts, a few dcts (missing hierarchy)?
 
 Related work:
-- Automatic generation of systolic programs from nested loops (CMU)
-- Automatic mapping of large signal processing systems to a parallel machine (CMU)
-- other things in research/streams/notes/reading/notes
-- everything in my phdthesis/related folder
-- everything on my desktop
-- everything in my streams filing folder
-- everything in my streams directory
 - everything from my job talk notes
-- everything from Ed Lee's emails
-- lucid synchrone?
-- improve comparison to brook
 - onanian, j.s. a signal processing language for coase grain dataflow
   multiprocessors'', mit-lcs-tr-449, 1989
   http://library.mit.edu/F/U5BDSQEUGUH54XNE5XNDF2NCSGNXS6FI1VPIX9GH7UFG84HF8F-03143?func=item-global&doc_library=MIT01&doc_number=000399046&year=&volume=&sub_library=ARC
-- papers to cite
+  --> does not seem to be available online
+- lucid synchrone?
+- other things in research/streams/notes/reading/notes (on CAG)
+- everything in my research/streams/papers directory (on laptop)
+- other papers to cite
+  - a constraint optimization framework for mapping a digital signal
+    processing application onto a parallel architecfture
   - Structuring Protocols with Data Streams
   - Protocol implementation using integrated layer processing
   - generating efficient protocol code from an abstract specification
@@ -71,20 +63,15 @@ Related work:
   - a data-stream language for protocols
   - distributed stream control for self-managing media processing graphs
   - stream computations organized for reconfigurable execution (score):
-  - introduction and tutorial
+    introduction and tutorial
   - parallel signal processing for everyone
   - compile-time scheduling of dyanmic constructs in dataflow program graphs
-  - ecos graphs: a dataflow programming language
   - static mapping of functional programs an example in signal processing
   - stream data types for signal processing
   - domain flow and streaming architectures
-  - a constraint optimization framework for mapping a digital signal
-  - processing application onto a parallel architecfture
-  - filter fusion
   - partial evaluation for media processing
   - design of the promis compiler - towards multi-level parallelization
   - an esterel compiler for large control-dominated systems
-  - mibench: a free, commercially representative embedded benchmark suite
   - piperench: a receonfigurable architecture and compiler
   - cheops: a reconfigurable data-flow system for video processing
   - PCI-PipeRench and the SwordAPI:  a system for stream-based

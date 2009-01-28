@@ -1,3 +1,52 @@
+************************************************************************
+\cite{printz91}
+
+  Printz considers compiling signal processing systems to iWarp in his
+  thesis~\cite{Printz91}.
+
+    - input is SDF graph:
+      - parameters:  I/O rates, ``period'' of each source,
+        execution-time bound (plus others, more advanced)
+      - contents of each node are in AL or W2 code, for iWarp
+          - AL is Tseng's; more of a high-level language.  It compiles
+            into W2 (of Lam) which has communication primitives in the
+            code and actually compiles into machine code
+        plus annotations in his new ``Z'' language to show connections
+          and properties, etc.
+      - each node has input/output data ports, control ports (for
+        read-only constants; sounds similar to streamit init function,
+        for specializing each instance without duplicating code), and
+        history ports, where all state is explicitly stored between
+        invocations
+    - apps:  NARROW (narrowband spectral detection system, 112 nodes)
+    - each node written in one of three styles:
+      1. data-parallel - inputs distributed across machines
+         - might specify ``execution width'' as to how many processors are
+           engaged
+      2. systolic - computation divided into ``stages'' and then pipelined
+      3. serial
+    - argue for most implementations being in data parallel
+      - in narrow, 68% were data parallel, 31% systolic, 1% serial
+    - compilation target is a linear processing array, (``such as Warp
+      or iWarp?) with FIFO queues (block on full send, block on empty
+      receive)
+    - supports the equivalent of peeking in terms of ``windowing''
+      operations -- keeps track of the history of values
+    - big focus on alignment problem of how to re-arrange data between
+      task schedulings so that each stage can use it properly
+      (including duplicating for overlapping windowed cells, etc.) -
+      skimming this
+    - scheduling takes advantage of data parallel / systolic / serial,
+      scheduling things that are ready to fire from each set in turn.
+      so first the DP stuff is spread as wide as possible, then
+      systolic is pipelined across processors, then serial things are
+      run independently
+    - since they don't have architecture for testing, goes to some
+      length to prove execution times and show that this scheduler is
+      within some constant factor of optimal.
+
+************************************************************************
+
 RELATED
 -------
 
@@ -155,49 +204,6 @@ References
 [5] Richard Hughey, Programming Systolic Arrays, Proceedings of the
     International Conference on Application-Specific Array Processors,
     IEEE Computer Society, Aug. 4-7, 1992.
-
-************************************************************************
-
-  Printz considers compiling signal processing systems to iWarp in his
-  thesis~\cite{Printz91}.
-
-    - input is SDF graph:
-      - parameters:  I/O rates, ``period'' of each source,
-        execution-time bound (plus others, more advanced)
-      - contents of each node are in AL or W2 code, for iWarp
-          - AL is Tseng's; more of a high-level language.  It compiles
-            into W2 (of Lam) which has communication primitives in the
-            code and actually compiles into machine code
-        plus annotations in his new ``Z'' language to show connections
-          and properties, etc.
-      - each node has input/output data ports, control ports (for
-        read-only constants; sounds similar to streamit init function,
-        for specializing each instance without duplicating code), and
-        history ports, where all state is explicitly stored between
-        invocations
-    - apps:  NARROW (narrowband spectral detection system, 112 nodes)
-    - each node written in one of three styles:
-      1. data-parallel - inputs distributed across machines
-         - might specify ``execution width'' as to how many processors are
-           engaged
-      2. systolic - computation divided into ``stages'' and then pipelined
-      3. serial
-    - argue for most implementations being in data parallel
-      - in narrow, 68% were data parallel, 31% systolic, 1% serial
-    - compilation target is a linear processing array, (``such as Warp or
-      iWarp?) with FIFO queues (block on full send, block on empty receive)
-    - supports the equivalent of peeking in terms of ``windowing''
-      operations -- keeps track of the history of values
-    - big focus on alignment problem of how to re-arrange data between
-      task schedulings so that each stage can use it properly (including
-      duplicating for overlapping windowed cells, etc.) - skimming this
-    - scheduling takes advantage of data parallel / systolic / serial,
-      scheduling things that are ready to fire from each set in turn.
-      so first the DP stuff is spread as wide as possible, then systolic
-      is pipelined across processors, then serial things are run independently
-    - since they don't have architecture for testing, goes to some length to
-      prove execution times and show that this scheduler is within some
-      constant factor of optimal.
 
 Intro
 -----
