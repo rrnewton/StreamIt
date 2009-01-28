@@ -359,19 +359,19 @@ flow in an imperative language.  While there was once a debate between
 unstructured control flow (using GOTO statements) and structured
 control flow (using if/then/else and for loops), in the end structured
 control flow came to dominate because it allows the programmer to
-reason locally.  Rather than being lost in a sea of ``spaghetti
-code'', programmers can recognize common patterns because the language
-forces a canonical and hierarchical expression of the control.  While
-skeptics once argued that certain patterns would be more naturally
-expressed using GOTO statements, over time there emerged structured
-idioms that were equally recognizable.  For example, while a state
-machine can be written using a GOTO statement for each state
-transition, it can also be written as a dispatch loop.  Structured
-control flow also benefited compilers, because non-sensical control
-flow graphs could be ruled out in favor of the common case.  The field
-of loop optimizations would have been much more difficult to develop
-if researchers had to cope with the full complexity of an unstructured
-programming model.
+reason locally~\cite{dijkstra_go_1968}.  Rather than being lost in a
+sea of ``spaghetti code'', programmers can recognize common patterns
+because the language forces a canonical and hierarchical expression of
+the control.  While skeptics once argued that certain patterns would
+be more naturally expressed using GOTO statements, over time there
+emerged structured idioms that were equally recognizable.  For
+example, while a state machine can be written using a GOTO statement
+for each state transition, it can also be written as a dispatch loop.
+Structured control flow also benefited compilers, because non-sensical
+control flow graphs could be ruled out in favor of the common case.
+The field of loop optimizations would have been much more difficult to
+develop if researchers had to cope with the full complexity of an
+unstructured programming model.
 
 We believe that imposing structure on a stream graph can offer similar
 benefits.  From the programmer's perspective, structured streams offer
@@ -537,11 +537,14 @@ commented lines (8,000) and blank lines (7,300), the benchmark suite
 comes to 49,300 lines.}.  Over 20 people contributed to the suite,
 including 6 from outside our group; median-pulse compression doppler
 radar was developed at Halmstad University~\cite{ola-techrep}, TDE was
-developed at ISI, an FFT and bitonic sort were developed at UC
-Berkeley~\cite{mani-permutations}, and the graphics pipelines were
-implemented primarily by the graphics group at
-MIT~\cite{chen-graphics05}.  Benchmarks were often adapted from a
-reference implementation in C, Java, or MATLAB.
+developed at the Information Sciences Insittute, an FFT and bitonic
+sort were developed at UC Berkeley~\cite{mani-permutations}, and the
+graphics pipelines were implemented primarily by the graphics group at
+MIT~\cite{chen-graphics05}.  OFDM was adapted from an internal
+performance test of Spectrumware~\cite{tennenhouse_spectrumware_1996},
+while Vocoder was implemented with support from
+Seneff~\cite{seneff80thesis}.  Other benchmarks were often adapted
+from a reference implementation in C, Java, or MATLAB.
 
 Graphical depictions of the stream graphs for each benchmark can be
 found in Appendix~\ref{chap:stream-graphs}, while the complete source
@@ -1365,24 +1368,69 @@ CFARDelayToLMax_Stateful(int rows) {
 \section{Related Work}
 \label{sec:lang-related}
 
-As described in Chapter 1 and elsewhere~\cite{stephens_survey_1997}, there is a
-long history of programming language support for streams in the
-dataflow, functional, and synchronous language domains.  Here we
+As described in Chapter 1 and elsewhere~\cite{stephens_survey_1997},
+there is a long history of programming language support for streams in
+the dataflow, functional, and synchronous language domains.  Here we
 compare to StreamIt's more immediate contemporaries.
 
 The Brook language is architecture-independent and focuses on data
 parallelism~\cite{brook04}.  Stream kernels are required to be
 stateless, though there is special support for reducing streams to a
-single value.  Stream\-C/Ker\-nel\-C is lower level than Brook;
-kernels written in KernelC are stitched together in StreamC and mapped
-to the data-parallel Imagine processor~\cite{imagine03ieee}.  SPUR
-adopts a similar decomposition between ``microcode'' stream kernels
-and skeleton programs to expose data parallelism~\cite{spur05samos}.
-Cg exploits pipeline parallelism and data parallelism, though the
-programmer must write algorithms to exactly match the two pipeline
-stages of a graphics processor~\cite{cg03}.  Compared to these
-languages, StreamIt places more emphasis on exposing task and pipeline
-parallelism (all the languages expose data parallelism).
+single value.  Sliding windows are supported via stencils, which
+indicate how data elements should be replicated across multiple
+processing instances.  While StreamIt supports a single stream graph
+operating a conceptually infinite stream, Brook supports multiple
+graphs, embedded in a C program, that operate on finite-length
+streams.  An independent comparison of the two languages by Mattson
+and Lethin~\cite{mattson_streaming_2003} aptly summarizes the
+philosophical difference, in that StreamIt was designed by compiler
+writers (it is ``clean but more constrained'') while Brook was driven
+by application developers and architects, and is ``rough but more
+expressive''.
+
+Brook is one of several stream-oriented languages that evolved out of
+the graphics community. Cg exploits pipeline parallelism and data
+parallelism, though the programmer must write algorithms to exactly
+match the two pipeline stages of a graphics processor~\cite{cg03}.
+The sH~\cite{mccool_shader_2004,mccool_shader_2002} language,
+subsequently commercialized by RapidMind, is embedded within C++ as a
+set of macros.  Like StreamIt, sH specializes stream kernels to their
+constant arguments, and fuses pipelined kernels (a process called
+``bundling'') in order to increase their granularity.  Unlike
+StreamIt, sH performs these optimizations dynamically in a
+Just-In-Time (JIT) compiler, offering increased flexibility.  However,
+StreamIt offers increased expressiveness in that 1) StreamIt can
+express arbitrary stream graphs, while sH appears to be limited to
+pipelines, and 2) StreamIt can express kernels with state, while sH
+kernels must be stateless.
+% true but minor:
+% sH supports data-parallel procedures with control flow
+%  (SPMD, not just SIMD)
+Accelerator~\cite{tarditi_accelerator_2006} also employs a
+Just-In-Time strategy to target GPUs from C\#, though starts from
+data-parallel array types rather than explicit stream kernels.
+
+Stream\-C/Ker\-nel\-C preceded Brook and operates at a lower level of
+abstraction; kernels written in KernelC are stitched together in
+StreamC and mapped to the data-parallel Imagine
+processor~\cite{imagine03ieee}.  SPUR adopts a similar decomposition
+between ``microcode'' stream kernels and skeleton programs to expose
+data parallelism~\cite{spur05samos}.
+
+StreamIt is not the first language to incorporate the notion of a
+sliding window.  The ECOS graphs language allows actors to specify how
+many items are read but not consumed~\cite{huang_ecos_1992}; the
+Signal language allows access to the window of values that a variable
+assumed in the past~\cite{le_guernic_signal--data_1986}; and the SA-C
+language contains a two-dimensional windowing
+operation~\cite{draper_compiling_2001}.  However, to the best of our
+knowledge, we are the first to demonstrate the utility of sliding
+windows in improving parallelism and programmability across a large
+benchmark suite.
+
+To summarize the differences to other stream languages, StreamIt
+places more emphasis on exposing task and pipeline parallelism (all
+the languages expose data parallelism).
 %and on sliding window operations (filters that peek).  
 By adopting the synchronous dataflow model of execution, StreamIt
 focuses on well-structured and long-running programs that can be
@@ -1527,13 +1575,12 @@ that exposes and exploits the inherent regularity of stream programs.
 StreamIt is rooted in the synchronous dataflow model, with added
 support for multiple execution steps, dynamic communication rates,
 teleport messaging, peeking, and communication during initialization.
-Key novelties of the language are the notion of structured streams,
-akin to structured control flow in an imperative language;
-hierarchical and parameterized splitjoins for data reordering; and
-language support for sliding window operations.  The design of the
-basic computational node in StreamIt, the filter, also exposes
-inherent parallelism that is masked by pointer manipulation and modulo
-operations in a traditional C implementation.
+Key novelties of the language are the notion of structured streams --
+akin to structured control flow in an imperative language -- as well
+as hierarchical and parameterized splitjoins for data reordering.  The
+design of the basic computational node in StreamIt, the filter, also
+exposes inherent parallelism that is masked by pointer manipulation
+and modulo operations in a traditional C implementation.
 
 The development of a large-scale benchmark suite in StreamIt led to
 several insights and surprises.  Language support for sliding windows
