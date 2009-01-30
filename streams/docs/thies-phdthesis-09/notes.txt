@@ -1,3 +1,5 @@
+
+
 ************************************************************************
 \cite{printz91}
 
@@ -44,6 +46,50 @@
     - since they don't have architecture for testing, goes to some
       length to prove execution times and show that this scheduler is
       within some constant factor of optimal.
+
+re-reading printz in 2009:
+- also focuses on SDF
+  - also with peeking
+  - also with minimum items to start (analogous to prework)
+  --> but do not seem to recognize or optimize the init schedule?
+- coarse grained -- hundreds or thousands of outputs
+- three modes of execution
+  - data-parallel
+  - stateful
+  - systolic:  can break up single node into pipelined execution
+    - each time it fires, there will be pipeline fill and drain
+- "geometric scheduling"
+  - actual alg on 139
+  - how does it work?
+    1. starts with acyclic dependence graph, with one node per actor FIRING
+    2. first schedules all data-parallel actors, spreading them across
+       entire machine.  (No notions of fusing or ordering them to 
+       decrease communic -- er, wait.  see below.)
+    3. then looks at ready pipeline-parallel actors, schedules them
+    4. then schedules serial actors
+    5. repeats entire process until entire graph is scheduled
+- skimming: alignments, asymptotic analysis, etc.
+- provides asymptotic analysis of the runtime, but not the latency!!
+  - and this whole thing seems to be latency-constrained
+  - basically, this algorithm is stupid
+- analog of fusion?
+  - the algorithm splits all data-parallel actors across the whole
+    machine.  so if they were blocked correctly, they would have the
+    analog of fusion by avoiding global scatter/gather.  are they
+    blocked this way?
+  --> NO, THEY ARE NOT
+  - and they say on 155 EXACTLY what their limitation is, and how you
+    could do better, which we DO
+- one rather confusing aspect of the whole writeup:
+  - the scheduling is done on the acyclic graph of node INSTANCES
+  - however, individual instances here are still data-parallelized
+    to a "maximum width" on the machine.  it is unclear how they
+    choose the granularity (I/O rates) of each task in the original 
+    program.  at the finest level of granularity, wouldn't a 
+    data-parallel instance just be able to be split 1 way?  confusing.
+  - also, they say that they only schedule the MINIMUM blocked 
+    schedule (min muliptlicity of each node in the steady state) in
+    order to respect real-time. 
 
 ************************************************************************
 
