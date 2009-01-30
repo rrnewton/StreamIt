@@ -94,7 +94,7 @@ example-program.tex: example-program.in.tex
 # may need to adjust psselect args
 .dvi.pdf: Makefile
 	dvips -z -q -t letter -P cmz -f $< -o _main.ps
-	psselect -p-57,61- _main.ps main.ps
+	psselect -p-59,63- _main.ps main.ps
 	ps2pdf main.ps
 
 .fig.eps: Makefile

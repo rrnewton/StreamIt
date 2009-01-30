@@ -504,7 +504,7 @@ We have not found this functionality to be broadly needed.
 \label{sec:lang-experience}
 
 \begin{table}[t!]
-\vspace{-1\baselineskip}
+\vspace{-2\baselineskip}
 \psfig{file=benchmarks,width=\textwidth}
 \vspace{-1.5\baselineskip}
 \caption{Overview of the StreamIt benchmark suite.\protect\label{tab:lang-benchmarks}}
@@ -629,6 +629,7 @@ Filterbank, TargetDetect, DtoA, Oversampler, RateConvert) and some of
 the peeking in 3 others (Vocoder, ChannelVocoder, FMRadio).
 
 \begin{figure}[t]
+\vspace{1.5\baselineskip}
 
 \begin{minipage}{0.5\textwidth}
 \centering
@@ -745,6 +746,7 @@ filters relating to picture reordering, while GSM and CRC use prework
 for functions analogous to delays.  Prework is also used for
 initialization in MPD, HDTV, and 802.11.
 
+\newpage
 \myitem {Stateful filters are less common than we expected, though 
 are nonetheless required for complete expression of many algorithms.
 Further state could be eliminated via new language constructs,
@@ -939,6 +941,7 @@ In the graphics pipelines, the only dynamic-rate filters are the
 rasterizers, which expand each triangle into an unknown number of
 pixels.
 
+\newpage
 \myitem {Neighboring filters often have matched I/O rates.}  Many of
   the advanced scheduling strategies for synchronous dataflow graphs
   have the highest payoff when the input and output rates of
@@ -1054,6 +1057,7 @@ doing so.
 
 \myend
 
+\enlargethispage{0.3\baselineskip}
 In addition to our observations about the benchmark characteristics,
 we also offer some lessons learned from developers' experiences in
 implementing stream programs.  As noted in
@@ -1077,6 +1081,7 @@ language designers.  We summarize their experience as follows:
   was nonetheless a viable way to represent the application.
 
 \begin{figure}[t]
+\vspace{-0.2\baselineskip}
 \centering
 \psfig{file=interleaving.eps,width=3.5in}
 
@@ -1154,7 +1159,9 @@ language designers.  We summarize their experience as follows:
   pattern can arise in video compression, where each block informs its
   neighbors of its motion prediction before the next processing
   step.\protect\label{fig:inadequate}}.
+\vspace{-12pt}
 \end{figure}
+\enlargethispage{0.3\baselineskip}
 
   Finally, there are rare cases in which the structured primitives in
   StreamIt have been inadequate for representing a streaming
@@ -1428,11 +1435,15 @@ between ``microcode'' stream kernels and skeleton programs to expose
 data parallelism~\cite{spur05samos}.
 
 StreamIt is not the first language to incorporate the notion of a
-sliding window.  The ECOS graphs language allows actors to specify how
-many items are read but not consumed~\cite{huang_ecos_1992}; the
-Signal language allows access to the window of values that a variable
-assumed in the past~\cite{le_guernic_signal--data_1986}; and the SA-C
-language contains a two-dimensional windowing
+sliding window.  In the Warp project, the AL
+language~\cite{tseng89thesis} had a window operation for use with
+arrays, and Printz's ``signal flow graphs'' included nodes that
+performed a sliding window~\cite{printz91thesis}.  The ECOS graphs
+language allows actors to specify how many items are read but not
+consumed~\cite{huang_ecos_1992}; the Signal language allows access to
+the window of values that a variable assumed in the
+past~\cite{le_guernic_signal--data_1986}; and the SA-C language
+contains a two-dimensional windowing
 operation~\cite{draper_compiling_2001}.  However, to the best of our
 knowledge, we are the first to demonstrate the utility of sliding
 windows in improving parallelism and programmability across a large

@@ -297,6 +297,7 @@ stream programming model to make these transformations tractable.
 \end{figure}
 
 \begin{figure}[t!]
+\vspace{-12pt}
 \centering
 \psfig{file=vocoder-data.eps,width=4.5in}
 \caption[Coarse-grained data parallelism applied to
@@ -1156,17 +1157,50 @@ attain the desired performance.
 
 % parallelism
 
-\paragraph*{Parallelization}  Liao et al. map Brook to multicore processors 
-by leveraging the affine partitioning model~\cite{liao06brook}.  While
-affine partitioning is a powerful technique for parameterized
-loop-based programs, in StreamIt we simplify the problem by fully
-resolving the program structure at compile time.  This allows us to
-schedule a single steady state using flexible, non-affine techniques
-(e.g., simulated annealing) and to repeat the found schedule for an
-indefinite period at runtime.  Gummaraju and Rosenblum map stream
-programs to a general-purpose hyperthreaded
-processor~\cite{gummaraju05micro}.  Such techniques could be
-integrated with our spatial partitioning to optimize per-core
+\paragraph*{Parallelization}  Printz also compiles synchronous 
+dataflow graphs (including support for sliding window operations and
+stateful filters) to the distributed-memory Warp
+machine~\cite{printz91thesis}.  In order to support applications with
+hard real-time constraints, he minimizes the latency of a single
+steady state rather than maximizing the overall throughput.  Both
+coarse-grained data parallelism and coarse-grained software pipelining
+have the potential to increase the latency of the program, and thus
+fall outside the scope of his model.  Also, Printz does not attempt to
+minimize communication when assigning tasks to processors;
+data-parallel actors are assigned to processors in any topological
+order and are always spread across as many processors as possible.  As
+he acknowledges, this sometimes introduces unnecessary
+communication~\cite[p.155]{printz91thesis}.  Our technique exploits
+only as much data parallelism as is needed to complement existing task
+parallelism in the program.  It also matches producers and consumers
+prior to data parallelization by fusing stateless actors as much as
+possible.  Still, it is difficult to compare our techniques directly
+because they focus on different things.  Our focus is on stateless
+actors with limitless data parallelism, while Printz focuses on actors
+with a fixed amount of internal data parallelism.  He also has
+built-in support for systolic computations (pipelines of balanced
+filters) which we do not model explicitly.
+
+The \textsc{Assign} parallel program generator also maps
+coarse-grained stream graphs to Warp~\cite{ohallaron91assign}.
+However, it relies solely on task and pipeline parallelism; the stream
+graph is partitioned into contiguous groups for execution on the
+processors.  While we previously adopted a similar
+approach~\cite{gordon-asplos02}, it proved difficult to balance the
+load and to utilize all of the processors without exploiting data
+parallelism.  The approach described in this chapter offers a 1.84x
+improvement over our previous work.
+
+Liao et al. map Brook to multicore processors by leveraging the affine
+partitioning model~\cite{liao06brook}.  While affine partitioning is a
+powerful technique for parameterized loop-based programs, in StreamIt
+we simplify the problem by fully resolving the program structure at
+compile time.  This allows us to schedule a single steady state using
+flexible, non-affine techniques (e.g., simulated annealing) and to
+repeat the found schedule for an indefinite period at runtime.
+Gummaraju and Rosenblum map stream programs to a general-purpose
+hyperthreaded processor~\cite{gummaraju05micro}.  Such techniques
+could be integrated with our spatial partitioning to optimize per-core
 performance.  Gu et al. expose data and pipeline parallelism in a
 Java-like language and use a compiler analysis to efficiently extract
 coarse-grained filter boundaries~\cite{du03sc}.  Ottoni et al. also
@@ -1177,13 +1211,13 @@ filters in the programming model, we focus on the mapping step.
 
 Previous work in scheduling computation graphs to parallel targets has
 focused on partitioning and scheduling techniques that exploit task
-and pipeline parallelism~\cite{SDFSched,SDFSched2,may87communicating,
-DAGSched, pipeline-sdf}.  Application of loop-conscious
-transformations to coarse-grained dataflow graphs has been
-investigated.  Unrolling (or ``unfolding'' in this domain) is employed
-for synchronous dataflow (SDF) graphs to reduce the initiation
-interval but they do not evaluate mappings to actual
-architectures~\cite{unfolding,unfolding2}. Software pipelining
+and pipeline
+parallelism~\cite{pipeline-sdf,may87communicating,SDFSched,SDFSched2,DAGSched}.
+Application of loop-conscious transformations to coarse-grained
+dataflow graphs has been investigated.  Unrolling (or ``unfolding'' in
+this domain) is employed for synchronous dataflow (SDF) graphs to
+reduce the initiation interval but they do not evaluate mappings to
+actual architectures~\cite{unfolding2,unfolding}. Software pipelining
 techniques have been applied to SDF graphs onto various embedded and
 DSP targets~\cite{bakshi99,chatha-02}, but has required programmer
 knowledge of both the application and the architecture. To our
@@ -1209,8 +1243,8 @@ We consider our work to be complementary to SPIRAL.  While SPIRAL
 starts with a matrix representation in SPL, we start with general
 StreamIt code and use linear dataflow analysis to extract a matrix
 representation where possible.  Our linear combination rules are
-distinct from the factorizations of SPIRAL, as StreamIt nodes can peek
-at items that they do not consume.  We also support optimizations on
+distinct from the factorizations of SPIRAL, due to StreamIt's support
+for sliding windows.  We also support optimizations on
 linear statespace filters, which are not handled in SPIRAL.  In the
 future, SPIRAL could be integrated with StreamIt to optimize a matrix
 factorization for a given architecture.
