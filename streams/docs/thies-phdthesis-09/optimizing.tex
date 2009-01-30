@@ -33,7 +33,7 @@ inputs.  We present several optimizations of linear filters, including
 algebraic simplification of adjacent filters and automatic translation
 to the frequency domain.  These transformations offer an average
 speedup of 5.5x and a maximum speedup of 8.0x over unoptimized
-StreamIt on a Pentium~4.  
+StreamIt on a Pentium~4.
 %{\it Project leaders:} Andrew
 %Lamb~\cite{lamb-pldi03,lamb-thesis} and Sitij
 %Agrawal~\cite{agrawal-cases05,agrawal-thesis}.
@@ -114,6 +114,7 @@ avoiding the hazards associated with each.
 
 \begin{figure}[t]
 \centering
+\vspace{-4pt}
 \psfig{figure=parallelism.eps,width=2.1in}
 \caption[Types of parallelism in stream programs.]{Types of parallelism
   in stream programs.  Task parallelism exists between filters in a
@@ -122,6 +123,7 @@ avoiding the hazards associated with each.
   separate instances of a stateless
   filter.\protect\label{fig:parallelism}}
 \end{figure}
+\enlargethispage{0.3\baselineskip}
 
 Task parallelism refers to pairs of actors that are on different
 parallel branches of the original stream graph, as written by the
@@ -303,7 +305,7 @@ stream programming model to make these transformations tractable.
   nodes remain untouched.  An execution trace (right) requires 21
   units per steady state.\protect\label{fig:vocoder-data}}
 
-~ \\ \vspace{6pt}
+~ \\ \vspace{36pt}
 \psfig{file=vocoder-swpipe.eps,width=6in}
 \caption[Coarse-grained software pipelining applied to
   Vocoder.]{Simplified vocoder mapped with coarse-grained software
@@ -369,14 +371,14 @@ stable flows of data between long-running actors.
 We target the Raw microprocessor~\cite{raw10,raw}, a tiled array of 16
 cores with a programmable mesh interconnect.  Though Raw has been
 implemented in silicon, we generate results with the btl simulator,
-augmented with 16 streaming DRAM controllers (providing enough
-bandwidth to saturate both directions of a Raw port).  In this
-configuration, one can obtain higher throughput in streaming data from
-the off-chip memory than from a core's local data cache.  Thus, our
-implementation elects to buffer all streaming data off-chip.  However,
-when targeting an architecture with more modest off-chip memory
-bandwidth, the stream buffers could reside completely in on-chip
-memory.
+augmented with 16 streaming DRAM controllers (providing enough band-
+\clearpage \noindent width to saturate both directions of a
+Raw port).  In this configuration, one can obtain higher throughput in
+streaming data from the off-chip memory than from a core's local data
+cache.  Thus, our implementation elects to buffer all streaming data
+off-chip.  However, when targeting an architecture with more modest
+off-chip memory bandwidth, the stream buffers could reside completely
+in on-chip memory.
 
 \begin{figure}[t]
 \centering
@@ -472,21 +474,6 @@ development environment that can express the full functionality of the
 application while automatically applying deep optimizations to the
 specific code sections where they apply.
 
-\begin{figure}[t]
-\psfig{figure=equalizer.eps,width=5.7in}
-
-\mbox{~}{\small (a) Software FM radio with Equalizer}
-\mbox{~}\hspace{0.35in}{\small (b) After linear combination}
-\mbox{~}\hspace{0.15in}{\small (c) After translation to} \vspace{-0.2\baselineskip}
-
-\mbox{~}\hspace{4.87in}{\small the frequency domain}
-\caption[Example optimization of linear filters.]{Example optimization
-  of linear filters.  Our software FM radio benchmark contains an
-  equalizer in which all filters are linear.  These filters can be
-  algebraically simplified into a single filter and then translated
-  into the frequency domain. \protect\label{fig:equalizer}}
-\end{figure}
-
 Our focus in the current work is the optimization of {\it linear}
 computations, which are the most common target of DSP experts.  Linear
 filters are those in which each output is an affine combination of the
@@ -530,6 +517,21 @@ program, and we evaluate the optimizations in the StreamIt compiler.
 The average speedup obtained is 4.5x, with a maximum of 8.0x.
 
 \subsection*{Extracting a Linear Representation}
+
+\begin{figure}[t]
+\psfig{figure=equalizer.eps,width=5.7in}
+
+\mbox{~}{\small (a) Software FM radio with Equalizer}
+\mbox{~}\hspace{0.35in}{\small (b) After linear combination}
+\mbox{~}\hspace{0.15in}{\small (c) After translation to} \vspace{-0.2\baselineskip}
+
+\mbox{~}\hspace{4.87in}{\small the frequency domain}
+\caption[Example optimization of linear filters.]{Example optimization
+  of linear filters.  Our software FM radio benchmark contains an
+  equalizer in which all filters are linear.  These filters can be
+  algebraically simplified into a single filter and then translated
+  into the frequency domain. \protect\label{fig:equalizer}}
+\end{figure}
 
 \begin{figure}[t]
 \centering
@@ -711,6 +713,7 @@ matrices from the filter's representation
 special row-echelon form.
 
 \begin{figure}[t]
+\vspace{-8pt}
 \centering
 \psfig{figure=stateremoval.eps,width=\textwidth}
 \caption{Example of state removal and parameter reduction.\protect\label{fig:states}}
@@ -802,9 +805,8 @@ stream graph into a form that is amenable to optimization.
 %% branches and $n$ streams on each branch.
 
 \begin{figure}[t!]
-\vspace{-12pt} % due to bad pagebreak
-\vspace{-0.07in}
 \centering
+\vspace{1.5\baselineskip}
 \psfig{figure=selection.eps,width=\textwidth}
 \caption[Optimization selection for the Radar benchmark.]{Optimization
 selection for the Radar benchmark.  Performing maximal linear
@@ -812,10 +814,11 @@ combination and translation to the frequency domain results in a large
 slowdown.  The selection procedure avoids this hazard by blocking the
 vertical combination of the BeamForm filter and by preventing
 translation to the frequency domain.\protect\label{fig:radar}}
+\vspace{1.5\baselineskip}
 \end{figure}
 
 An example of optimization selection for the Radar benchmark is shown
-in Figure~\ref{fig:radar}.  Radar~\footnote{This version of the Radar
+in Figure~\ref{fig:radar}.  Radar\footnote{This version of the Radar
 benchmark is different from the one used in the parallelization
 section.  It is rewritten to be extremely coarse-grained, eliminating
 the internal state and exposing the linear relationships.} contains
@@ -858,8 +861,8 @@ addressed independently (each filter is very coarse-grained).
 We have implemented linear optimizations in the StreamIt compiler.
 Here we present results for stateless linear nodes, though we have
 also shown that linear statespace analysis offers improved
-generality~\cite{agrawal-cases05}.  For more detailed results,
-stream graphs, and source code, please visit {\tt
+generality~\cite{agrawal-cases05}.  For more detailed results, stream
+graphs, and source code, please visit {\url
 http://cag.lcs.mit.edu/linear/} or see the accompanying
 thesis~\cite{lamb-thesis}.
 
@@ -870,7 +873,7 @@ operations, we use an instruction counting DynamoRIO~\cite{dynamo99}
 client.
 
 \begin{figure}[t!]
-\vspace{-12pt} % due to bad pagebreak
+\vspace{-6pt}
 \centering
 \psfig{figure=linear-flops.eps,width=5in}
 \caption[Elimination of floating point operations due to linear 
@@ -881,19 +884,28 @@ optimization selection\protect\footnotemark[1].}
 \end{figure}
 
 \begin{figure}[t!]
+\vspace{-3pt}
 \centering
 \psfig{figure=linear-speedup.eps,width=5in}
 \caption[Speedup due to linear optimizations.]{Execution speedup 
 for maximal linear replacement, maximal frequency replacement, and
 automatic optimization selection\protect\footnotemark[1].}
 \label{fig:execution-speedup}
+\vspace{-3pt}
 \end{figure}
 
+\enlargethispage{0.5\baselineskip}
 Figure~\ref{fig:flops} indicates the number of floating point
 operations (FLOPs) removed from the program.  The removal of FLOPs
 represents fundamental computation savings that is independent of the
 streaming runtime system and other (FLOPs-preserving) optimizations in
 the compiler.  We evaluate three strategies: maximal combination of
+%
+\footnotetext[1]{The benchmarks used here were
+  sometimes parameterized differently than the ones described in
+  Chapter~\ref{chap:language}.  Details on the benchmark
+  configurations are available elsewhere~\cite{lamb-thesis}.}
+%
 linear nodes, maximal translation to the frequency domain (following
 maximal combination), and automatic optimization selection.  The
 automatic selection routing removes an average of 87\% of the FLOPs
@@ -907,12 +919,6 @@ With automatic selection, our benchmarks speed up an average factor of
 5.5x and by a factor of 8.0x in the best case (FilterBank).  While the
 graph suggests that frequency replacement almost always performs
 better than linear replacement, this is not strictly the case; in
-%
-\footnotetext[1]{The benchmarks used here were
-  sometimes parameterized differently than the ones described in
-  Chapter~\ref{chap:language}.  Details on the benchmark
-  configurations are available elsewhere~\cite{lamb-thesis}.}
-%
 FMRadio, Radar, and Vocoder, the automatic selection algorithm obtains
 its speedup by using linear replacement instead of frequency
 replacement for part of the stream graph.  However, linear replacement
@@ -938,18 +944,6 @@ streaming domain to reorder filter executions so as to improve the
 cache behavior.  Memory accesses are extremely regular due to the
 explicit producer-consumer relationships between filters, allowing the
 compiler to anticipate and optimize the cache usage.
-
-\begin{figure}[t]
-\centering
-\psfig{figure=cache-overview.eps,width=4.25in}
-\caption[Overview of cache optimizations]{Overview of cache 
-optimizations.  While execution scaling can improve instruction
-locality relative to the baseline, it loses the benefits of filter
-fusion and has the hazard of overflowing the data cache.  Our cache
-optimizations fuse filters as much as possible without exceeding the
-instruction cache, then scale as much as possible without exceeding
-the data cache.\protect\label{fig:cacheopt}}
-\end{figure}
 
 We have developed a set of cache optimizations that simultaneously
 consider data and instruction locality while scheduling stream
@@ -980,6 +974,18 @@ cache.  In this case, a bound of 64 ensures that the communication
 between B and C stays within the cache.  This technique offers joint
 improvement of instruction and data locality without risking the
 penalty of cache overflow.
+
+\begin{figure}[t]
+\centering
+\psfig{figure=cache-overview.eps,width=4.25in}
+\caption[Overview of cache optimizations]{Overview of cache 
+optimizations.  While execution scaling can improve instruction
+locality relative to the baseline, it loses the benefits of filter
+fusion and has the hazard of overflowing the data cache.  Our cache
+optimizations fuse filters as much as possible without exceeding the
+instruction cache, then scale as much as possible without exceeding
+the data cache.\protect\label{fig:cacheopt}}
+\end{figure}
 
 In the rest of this section, we provide more details on cache aware
 fusion, cache aware scaling, and present an experimental evaluation.
@@ -1269,19 +1275,19 @@ linear time.
 
 \paragraph*{Cache Optimizations}  There is a large body of literature 
 on scheduling synchronous dataflow (SDF) graphs to optimize various
-metrics~\cite{bhattacharyya99synthesis,bhattacharyya_software_1996}.  The work most closely
-related to ours is a recent study by Kohli~\cite{kohli04} on cache
-aware scheduling of SDF graphs, implemented as part of the Ptolemy
-framework for simulating heterogeneous embedded
-systems~\cite{ptolemy03overview}.  Kohli develops a Cache Aware
-Scheduling (CAS) heuristic for an embedded target with a
-software-managed scratchpad instruction cache.  His algorithm greedily
-decides how many times to execute a given actor based on estimates of
-the data cache and instruction cache penalties associated with
-switching to the next actor.  In contrast, our algorithm considers the
-buffering requirements of all filters in a given container and
-increases the multiplicity so long as 90\% of buffers are contained
-within the data cache.
+metrics~\cite{bhattacharyya_software_1996,bhattacharyya99synthesis}.
+The work most closely related to ours is a recent study by
+Kohli~\cite{kohli04} on cache aware scheduling of SDF graphs,
+implemented as part of the Ptolemy framework for simulating
+heterogeneous embedded systems~\cite{ptolemy03overview}.  Kohli
+develops a Cache Aware Scheduling (CAS) heuristic for an embedded
+target with a software-managed scratchpad instruction cache.  His
+algorithm greedily decides how many times to execute a given actor
+based on estimates of the data cache and instruction cache penalties
+associated with switching to the next actor.  In contrast, our
+algorithm considers the buffering requirements of all filters in a
+given container and increases the multiplicity so long as 90\% of
+buffers are contained within the data cache.
 %Kohli does not consider buffer management
 %strategies, and 
 The evaluation is limited to one 6-filter pipeline and an assortment
@@ -1325,10 +1331,10 @@ instruction and data caches to select an appropriate scaling and
 partitioning for the stream graph.
 
 Proebsting and Watterson \cite{pro96} give a fusion algorithm that
-interleaves the control flow graphs of adjacent filters.  However,
-their algorithm only supports synchronous {\tt get} and {\tt put}
-operations; StreamIt's {\tt peek} operation necessitates buffer
-management between filters.
+interleaves the control flow graphs of adjacent filters.  Their
+algorithm supports synchronous {\tt put} and {\tt get} operations
+(analogous to {\tt push} and {\tt pop}), but would have to be extended
+to deal with peeking.
 
 \section{Future Work}
 
@@ -1366,7 +1372,7 @@ scenario is meaningful because messages are often sent to adjust
 filtering coefficients in linear nodes.  Supporting messages in tandem
 with linear optimizations represents an interesting research
 opportunity.  If messages update the state of a linear filter, than
-that state update should be propagated through any combined or
+those state updates should be propagated through any combined or
 optimized nodes.  Alternately, it may be simpler to maintain two
 versions of the filter at runtime: one which is optimized (and
 potentially combined with other filters), and one which is unoptimized
@@ -1378,7 +1384,7 @@ Our experience with linear optimizations also revealed an opportunity
 to develop an interesting and useful optimization which we term {\it
 decimation propagation}.  Our current analysis will automatically
 propagate any decimation of the output through the linear portions of
-the stream graph, eliminating any computations that do not effect the
+the stream graph, eliminating any computations that do not affect the
 final output.  However, it would be possible to generalize and extend
 this analysis to handle non-linear filters as well.  By performing a
 dependence analysis within each filter, one can trace which input

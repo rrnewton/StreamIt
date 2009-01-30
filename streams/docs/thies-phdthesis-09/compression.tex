@@ -15,7 +15,7 @@ common video editing operations by a median of 15x.  Unlike the
 optimization of linear nodes in StreamIt, this represents a
 domain-specific optimization that was previously unknown (it was not
 performed even by experts).  We define the transformation in general
-terms and also evaluates it experimentally in the context of StreamIt.
+terms and also evaluate it experimentally in the context of StreamIt.
 
 \section{Introduction}
 
@@ -38,17 +38,17 @@ re-compress the data whenever it needs to be modified.
 
 In order to accelerate the process of editing compressed data,
 researchers have identified specific transformations that can be
-mapped into the compressed domain---that is, they can operate directly
+mapped into the compressed domain -- that is, they can operate directly
 on the compressed data format rather than on the uncompressed
-format~\cite{chang95survey,mandal95survey,smith95survey,wee02survey}.
+format~\cite{chang95survey,smith95survey,mandal99survey,wee02survey}.
 In addition to avoiding the cost of the decompression and
 re-compression, such techniques greatly reduce the total volume of
 data processed, thereby offering large savings in both execution time
 and memory footprint.  However, existing techniques for operating
 directly on compressed data are largely limited to lossy compression
 formats such as
-JPEG~\cite{dugad01,feng03,mukherjee02,shen96b,shen96,shen98,smith96b}
-and MPEG~\cite{smith98,dorai00,nang00,vasudev98,wee02survey}.  While
+JPEG~\cite{shen96,shen96b,smith96b,shen98,dugad01,mukherjee02,feng03}
+and MPEG~\cite{smith98,vasudev98,dorai00,nang00,wee02survey}.  While
 these formats are used pervasively in the distribution of image and
 video content, they are rarely used during the production of such
 content.  Instead, professional artists and filmmakers rely on
@@ -231,7 +231,7 @@ to the compression of the input).  We quantify this issue later.
 To describe the mapping into the compressed domain, we consider each
 StreamIt construct in turn.  An alternate formulation of our
 technique, in terms of an operational semantics, is available in a
-technical report~\cite{techreport}.
+technical report~\cite{thies07compression}.
 
 \begin{figure}[t!]
 \centering
@@ -1316,6 +1316,7 @@ compression across the two input files.
 \protect\label{fig:composite-speedup}}
 \end{figure}
 
+\enlargethispage{0.5\baselineskip}
 As for the pixel transformations, the composite videos produced by the
 compressed processing technique would sometimes benefit from an
 additional re-compression stage.  The last three columns in
@@ -1329,7 +1330,7 @@ the matting operations introduce a large amount of redundancy (black
 regions), thereby enabling the re-compression stage to shrink the file
 by 1.8x to 5.4x over the compressed processing technique.
 
-Even if the composite transformation does not introduce any new
+Even if a composite transformation does not introduce any new
 redundancy in the video, the compressed processing technique may
 increase file sizes by ignoring a specific kind of redundancy in the
 inputs.  Suppose that in the first frame, both inputs are 100\% black,
@@ -1358,7 +1359,7 @@ predefined operation, into the compressed domain.
 Most of the previous work on mapping algorithms into the compressed
 domain has focused on formats such as JPEG that utilize a Discrete
 Cosine Transform (DCT) to achieve spatial
-compression~\cite{smith98,dorai00,dugad01,feng03,mukherjee02,nang00,shen96,shen96b,shen98,smith96b,vasudev98}.
+compression~\cite{shen96,shen96b,smith96b,smith98,shen98,vasudev98,nang00,dorai00,dugad01,mukherjee02,feng03}.
 This task requires a different analysis, with particular attention
 given to details such as the blocked decomposition of the image,
 quantization of DCT coefficients, zig-zag ordering, and so-on.
@@ -1417,7 +1418,7 @@ reduction, sepia toning, saturation adjustment, and color replacement.
 With minor extensions, the technique can support video operations such
 as cropping, padding, histograms, image flipping, sharpening, and
 blurring.  The technique may also have applications in an embedded
-setting, where it could offer power savings---for example, in
+setting, where it could offer power savings -- for example, in
 processing the RAW data format within digital cameras.  It may even be
 possible to do sparse matrix operations using the technique; in
 addition to compressing the locations of the zero elements, LZ77 would
@@ -1457,8 +1458,8 @@ languages in the form of a runtime library with a restricted API.
 \section{Chapter Summary}
 
 %% Many of the applications that will drive the next generation of
-%% computing systems---digital video editing, computer vision, computer
-%% graphics and animation---operate on image and video formats that are
+%% computing systems -- digital video editing, computer vision, computer
+%% graphics and animation -- operate on image and video formats that are
 %% universally stored in compressed data formats.  
 
 In order to accelerate operations on compressible data, this chapter

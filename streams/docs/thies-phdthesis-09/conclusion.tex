@@ -27,11 +27,14 @@ the sake of optimization.
 
 \item We demonstrate that it is tractable to develop large-scale 
 applications in a stream programming model.  Our experience comes on
-two fronts.  First, we describe the development of the 38,000-line
+two fronts.  First, we describe the development of the 34,000-line
 StreamIt benchmark suite, consisting of large applications (such as
 MPEG-2 encoding/decoding and GMTI radar processing) that were written
-by programmers who were previously unfamiliar with StreamIt.  Second,
-we develop a tool for migrating legacy C programs into a streaming
+by programmers who were previously unfamiliar with StreamIt.  Our
+survey of these benchmarks provides the first rigorous
+characterization of the streaming domain, as well as new insights into
+the utility and usability of various language features.  Second, we
+develop a tool for migrating legacy C programs into a streaming
 representation.  It is the first tool to use a dynamic analysis to
 expose coarse-grained parallelism in C programs.  We show that this
 tool is effective at extracting a synchronous dataflow graph from
@@ -145,7 +148,7 @@ Hopkins University~\cite{duca-thesis}, and North Carolina State
 University~\cite{won-thesis}.  It is our hope that the abstractions,
 optimizations, and lessons learned as part of this dissertation will
 serve to inform and inspire this research as well as the upcoming
-generation of industrial-strength parallel programming langauges.
+generation of mainstream programming langauges.
 
 %% don't mention:
 %% - zeroing out arrays is expensive, should optimize away (move to

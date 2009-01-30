@@ -101,7 +101,7 @@ For example, if the compiler understands the latency of messages
 between pipelined components, then it can derive the maximal buffering
 between those components that nonetheless respects the message
 delivery constraints.  This buffering enables aggressive execution
-reordering, decreased synchronization, and amortize communication
+reordering, decreased synchronization, and amortized communication
 overhead.  However, with opaque message timing, the runtime must
 eliminate buffering to maintain a consistent view for all possible
 schedule of messages, eliminating the optimization potential.
@@ -190,15 +190,16 @@ computations in which a set of coefficients is convolved with the
 input data.  This FIR implementation is very fine-grained; as depicted
 in Figure~\ref{fig:fir-orig-diagram}, the stream graph consists of a
 single pipeline with a {\tt Source}, a {\tt Printer}, and 64 {\tt
-Multiply} stages---each of which contains a single coefficient (or
+Multiply} stages -- each of which contains a single coefficient (or
 {\it weight}) of the FIR filter.  Each {\tt Multiply} actor inputs a
 {\tt Packet} consisting of an input item and a partial sum; the actor
 increments the sum by the product of a weight and the {\it previous}
 input to the actor.  Delaying the inputs by one step ensures that each
 actor adds a different input to the sum.  While we typically advocate
 a more coarse-grained implementation of FIR filters, this formulation
-is simple to parallelize (each actor is mapped to a separate
-processor) and provides a simple illustration of our analysis.
+%is simple to parallelize (each actor is mapped to a separate
+%processor) and 
+provides a simple illustration of our analysis.
 
 The problem addressed in this chapter is as follows.  Suppose that the
 actors in FIR are running in parallel and the {\tt Source} detects
@@ -218,8 +219,8 @@ transition to a new set of weights.  If it does, then the new set of
 weights is included with the item itself.  While this strategy (shown
 in Figures~\ref{fig:fir-manual-code} and~\ref{fig:fir-manual-diagram})
 is functional, it complicates the {\tt Packet} structure with two
-additional fields---a {\tt newWeights} flag and a {\tt weights}
-array---the latter of which is meaningful only when {\tt newWeights}
+additional fields -- a {\tt newWeights} flag and a {\tt weights}
+array -- the latter of which is meaningful only when {\tt newWeights}
 is true.  This scheme muddles steady-state dataflow with event
 handling by checking the flag on every invocation of {\tt Multiply}
 (line 41 of Figure~\ref{fig:fir-manual-code}).  It is also very
@@ -235,7 +236,8 @@ weights via an asynchronous method call, where method invocations in
 the target actors are timed relative to the flow of data in the
 stream.  As shown in Figure~\ref{fig:fir-message-code}, the {\tt
 Multiply} actor declares a message handler that adjusts its own weight
-(lines 40-42).
+(lines 40-42).  The {\tt Source} actor calls this handler through a
+{\it portal} (line 25), which provides a clean interface for
 %
 \newcommand{\la}{$\leftarrow$}
 \newcommand{\IND}{\begin{ALC@g}}
@@ -495,9 +497,7 @@ Multiply} actor declares a message handler that adjusts its own weight
 \noindent\mbox{~}\hspace{-1.05in}\parbox{8.5in}{\vspace{-0.9in}\psfig{file=messaging-example.eps,width=8.5in}}
 \clearpage
 %
-\noindent The {\tt Source} actor calls this handler through a
-{\it portal} (line 25), which provides a clean interface for messaging
-(see Section~\ref{sec:teleport}).  As depicted in
+\noindent messaging (see Section~\ref{sec:teleport}).  As depicted in
 Figure~\ref{fig:fir-message-diagram}, teleport messaging gives the
 same result as the manual version, but without corrupting the data
 structures or control flow used in the steady-state.  It also exposes
@@ -508,8 +508,8 @@ beyond what is utilized in this example.
 
 The rest of this chapter is devoted to making the above notions more
 general and more precise.  In particular, it is natural to use
-teleport messaging to send messages upstream---against the flow of
-data---which is hard to achieve manually.  We start by describing a
+teleport messaging to send messages upstream -- against the flow of
+data -- which is hard to achieve manually.  We start by describing a
 stream dependence function which provides a common timeframe for pairs
 of dependent actors in the stream graph.
 
@@ -551,6 +551,7 @@ A formal definition of $\sdep$ using the notations introduced above is
 as follows:
 \begin{definition}(SDEP)
 \begin{center}
+\vspace{-14pt}
 $\sdepf{A}{B}(n)~~ = ~~\min~|\phi \wedge A|$ \\
 ~~~~~~~~~~~~~~~~~{\tiny ~}\raisebox{5pt}[0pt]{$~_{\phi \in \Phi,}$} \\
 ~~~~~~~~~~~~~~~~~~~{\tiny ~}\hspace{-1.3pt}\raisebox{8pt}[0pt]{$~_{|\phi \wedge B| = n}$}
@@ -574,7 +575,6 @@ pull schedule} with respect to actor $B$.
 
 \begin{figure}[t!]
 \begin{center}
-\vspace{-12pt}
 \psfig{figure=messaging/sdep-example-rates3.eps,height=1.75in}
 \vspace{-6pt}
 \caption[Example stream graph for calculation of stream dependence
@@ -585,9 +585,8 @@ pull schedule} with respect to actor $B$.
   right channel during the second phase (similarly for Node E).
   \protect\label{fig:sdep-rates}}
 
-~ \\ \vspace{6pt}
+~ \\ \vspace{24pt}
 \psfig{figure=messaging/sdep-example3.eps,width=\textwidth}
-\vspace{-4pt}
 \caption[Example calculation of stream dependence function.]{Example \figsdep\ calculation
   for stream graph in Figure~\ref{fig:sdep-rates}.  The stream graphs
   illustrate a steady state cycle of a ``pull schedule''; execution
@@ -600,8 +599,9 @@ pull schedule} with respect to actor $B$.
   two lines illustrate the computation of $\figsdepf{B}{E}$.
   \protect\label{fig:sdep1}}
 \end{center}
-\vspace{-26pt}
 \end{figure}
+
+\clearpage
 
 \begin{figure}[t]
 \begin{center}
@@ -625,6 +625,7 @@ pull schedule} with respect to actor $B$.
 \mbox{} ~~~~\}
 }
 \end{center}
+\vspace{-14pt}
 \caption{Pull scheduling algorithm.\protect\label{fig:pull-scheduling}}
 \end{figure}
 
@@ -672,7 +673,7 @@ pattern in the marginal growth of $\sdep$ (i.e., in $\sdep(n) -
 \sdep(n-1)$); this quantity follows a cyclic pattern and has the same
 periodicity as the steady state of the stream graph.  A steady state
 ${\cal S} \in \Phi$ is an execution that does not change the buffering
-in the channels---that is, the number of items on each channel after
+in the channels -- that is, the number of items on each channel after
 the execution is the same as it was before the execution.  Calculating
 a steady state is well-understood~\cite{lee_static_1987}.  The
 execution simulated in Figure~\ref{fig:sdep1} is a steady state, and
@@ -704,7 +705,7 @@ However, as shown in Figure~\ref{fig:sdep1}, the last firing of
 $C$ requires only $5$ executions of $A$.  $C$ is unusual in that it
 finishes its steady state before the upstream actor $A$.
 
-To handle the general case, two need to change the base case in two
+To handle the general case, we need to change the base case in two
 ways.  First, we include the initialization schedule ${\cal I}$, which
 fires prework functions and fills buffers needed by peeking filters;
 $\sdep$ during initialization is different than $\sdep$ in the steady
@@ -1034,15 +1035,16 @@ schedule.
 %% to improve performance as well as programmer productivity.\newline
 
 Teleport messaging is a language construct that makes use of $\sdep$
-to achieve precise timing of control messages.  It is included as part
-of the StreamIt language~\cite{thies-cc02}.  Teleport messaging
-represents out-of-band communication between two actors, distinct from
-the high-bandwidth dataflow in the stream graph.  Messages are
-currently supported between any pair of actors with a meaningful
-$\sdep$ relationship, i.e., wherever there is a directed path in the
-stream graph from one actor to the other.  We say that a {\it
-downstream} message travels in the same direction as the steady-state
-data flow, whereas an {\it upstream} message travels against it.
+to achieve precise timing of control messages.  
+%It is included as part of the StreamIt language~\cite{thies-cc02}.  
+Teleport messaging represents out-of-band communication between two
+actors, distinct from the high-bandwidth dataflow in the stream graph.
+Messages are currently supported between any pair of actors with a
+meaningful $\sdep$ relationship, i.e., wherever there is a directed
+path in the stream graph from one actor to the other.  We say that a
+{\it downstream} message travels in the same direction as the
+steady-state data flow, whereas an {\it upstream} message travels
+against it.
 
 \subsubsection*{Syntax}
 
@@ -1253,7 +1255,7 @@ latency imposes no constraint on the schedule, as the sender has not
 yet produced the data that is synchronized with the message.
 
 \subsubsection*{Unsatisfiable Constraints}  
-Messaging constraints can be unsatisfiable---that is, assuming a
+Messaging constraints can be unsatisfiable -- that is, assuming a
 message is sent on every iteration of the sender's work function,
 there does not exist a schedule that delivers all of the messages
 within the desired latency range.  Such constraints should result in a
@@ -1433,9 +1435,9 @@ detect a hop in the frequency they are monitoring (lines 32-35).  The
 messages are sent with a latency of 6 to ensure a timely transition.
 To make sense of the latency, note that $\sdepf{RFtoIF}{D}(n) = 512*n$
 for each of the detector actors $D$.  This comes about because the FFT
-stage consumes and produces 512 items~\footnote{Though the FFT is
-  256-way, the real and imaginary parts are interleaved on the tape,
-  leading to an I/O rate of 512.}; each detector fires once per set of
+stage consumes and produces 512 items\footnote{Though the FFT is
+256-way, the real and imaginary parts are interleaved on the tape,
+leading to an I/O rate of 512.}; each detector fires once per set of
 outputs from the FFT, but RFtoIF fires 512 times to fill the FFT
 input.  Because of this $\sdep$ relationship, messages sent from the
 detectors to RFtoIF are guaranteed to arrive only at iterations that
@@ -1613,8 +1615,8 @@ We chose a cluster-based evaluation for two reasons.  First, many
 streaming applications run on the server side (e.g., cell phone base
 stations, radar processing, HDTV editing) and require large
 computational resources. Second, clusters provide a simple abstraction
-for distributed and parallel computing---multiple program counters,
-and distributed memories---which is at the heart of emerging
+for distributed and parallel computing -- multiple program counters,
+and distributed memories -- which is at the heart of emerging
 multicore architectures for embedded, desktop, and server computing.
 
 The teleport implementation of the frequency hopping radio was
