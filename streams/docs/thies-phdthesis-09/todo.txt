@@ -1,22 +1,12 @@
 * related work
   - Z language (Warp, compiled in lam's thesis) had sliding windows
-  + Automatic generation of systolic programs from nested loops (CMU)
-  + Automatic mapping of large signal processing systems to a parallel machine (CMU)
-  - in my "related" folder (and elsewhere)
-    - silage language
-    - harmony language
-    - database languages (ryan newton, etc)
-    - mibench: a free, commercially representative embedded benchmark suite
-    - other benchmark suites?
-
-* proofread
-  - check correctness of compression section
-  - check that messaging speedup makes sense?
-  - check layout
+  - Automatic generation of systolic programs from nested loops (CMU)
+  - Automatic mapping of large signal processing systems to a parallel machine (CMU)
 
 ----------------------------------------------------------------------------
 
 Mindless:
+. fix aligment of appendix chapters in TOC, list of figures
 . indicate messaging pairs on mpeg encode, mpeg decode, mosaic stream graph
 . adjust lists in intro (stream benchmarks, SDF analyses, etc.)
 . more CD-DAT references
@@ -25,6 +15,7 @@ n make pullSchedule font same as repeat_lengths font, etc.
 n improve formatting of code (bold the keywords)
 
 Probably not fixing:
+n possibly fix cache section (static vs. dynamic)
 n in language section, propagate benchmark numbers to summary
 n mention StreaMIT pronunciation?
 n Mosaic might have a [1,*,1] rate lingering
@@ -45,6 +36,13 @@ n copyright infringement on numerical recipes?
 n redo graphs of sorts, a few dcts (missing hierarchy)?
 
 Related work:
+- in my "related" folder (and elsewhere)
+  - silage language
+  - harmony language
+  - database languages (ryan newton, etc)
+  - mibench: a free, commercially representative embedded benchmark suite
+  - other ways of reordering data?
+  - other benchmark suites?
 - everything from my job talk notes
 - onanian, j.s. a signal processing language for coase grain dataflow
   multiprocessors'', mit-lcs-tr-449, 1989

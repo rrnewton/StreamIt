@@ -178,7 +178,7 @@ high-performance stream programming.
 In the rest of this chapter, we describe the detailed properties of
 stream programs, provide a brief history of streaming, give an
 overview of the StreamIt project, and state the contributions of this
-thesis.
+dissertation.
 
 \section{Streaming Application Domain}
 
@@ -200,8 +200,8 @@ define our conception of the streaming application domain:
 \myitem {Independent stream filters.}  Conceptually, a streaming
   computation represents a sequence of transformations on the data
   streams in the program.  We will refer to the basic unit of this
-  transformation as a {\it filter}: an operation that--on each
-  execution step--reads one or more items from an input stream,
+  transformation as a {\it filter}: an operation that -- on each
+  execution step -- reads one or more items from an input stream,
   performs some computation, and writes one or more items to an output
   stream.  Filters are generally independent and self-contained,
   without references to global variables or other filters.  A stream
@@ -210,10 +210,10 @@ define our conception of the streaming application domain:
   others.
 
 \myitem {A stable computation pattern.}  The structure of the stream
-  graph is generally constant during the steady-state operation of a
-  stream program.  That is, a certain set of filters are repeatedly
-  applied in a regular, predictable order to produce an output stream
-  that is a given function of the input stream.
+  graph is generally constant during the steady-state operation of the
+  program.  That is, a certain set of filters are repeatedly applied
+  in a regular, predictable order to produce an output stream that is
+  a given function of the input stream.
 
 \myitem {Sliding window computations.}  Each value in a data stream
 is often inspected by consecutive execution steps of the same filter,
@@ -296,7 +296,7 @@ prevalent models are Kahn Process Networks~\cite{kahn_semantics_1974},
 Synchronous Dataflow~\cite{lee_static_1987}, and Communicating
 Sequential Processes~\cite{hoare_communicating_1978}.  They are
 compared in Figure~\ref{fig:models-of-computation} and
-Table~\ref{tab:model-table} and detailed below:
+Table~\ref{tab:model-table} and are detailed below:
 
 \mybegin
 
@@ -315,7 +315,7 @@ Table~\ref{tab:model-table} and detailed below:
   computation adopted by UNIX pipes.
 
 \myitem {Synchronous Dataflow (SDF)} is a restricted form of process
-  network in which nodes execute atomic steps, and the number of data
+  network in which nodes execute atomic steps, and the numbers of data
   items produced and consumed during each step are constant and known
   at compile time.  Because the input and output rates are known, the
   compiler can statically check whether a deadlock-free execution
@@ -432,16 +432,16 @@ and iteration in a single assignment language'')
 and pH~\cite{nikhil_implicit_2001}.
 % True but who cares:
 %, which grew out of  grew out of Id and Sisal.
-More details on dataflow languages available in review
-articles~\cite{johnston_advances_2004,stephens_survey_1997}.
+More details on dataflow languages are available in review
+articles~\cite{stephens_survey_1997,johnston_advances_2004}.
 
 Functional languages also have notions of streams, for example, as
 part of the lazy evaluation of lists~\cite{henderson_lazy_1976}.  It
-bears noting that seems to be no fundamental difference between a
-``functional language'' and a ``dataflow language''.  The terminology
-indicates mainly a difference of community, as dataflow languages were
-mapped to dataflow machines.  In addition, dataflow languages may be
-more inclined toward an imperative
+bears noting that there seems to be no fundamental difference between
+a ``functional language'' and a ``dataflow language''.  The
+terminology indicates mainly a difference of community, as dataflow
+languages were mapped to dataflow machines.  In addition, dataflow
+languages may be more inclined toward an imperative
 syntax~\cite{johnston_advances_2004}.  We do not survey functional
 languages further in their own right.
 
@@ -460,17 +460,18 @@ processing, synchronous programs process irregular events and demand
 complex control flow.  Key synchronous languages include
 Signal~\cite{le_guernic_signal--data_1986},
 LUSTRE~\cite{caspi_lustre:declarative_1987,halbwachs_synchronous_1991},
-Esterel~\cite{berry_esterel_1992}, and
-Argos~\cite{maraninchi_argos:automaton-based_2001}.  These languages offer
-determinism and safety properties, spurring their adoption in
-industry; Esterel Technologies offers SCADE (based on LUSTRE) as well
-as Esterel Studio.
+Esterel~\cite{berry_esterel_1992},
+Argos~\cite{maraninchi_argos:automaton-based_2001}, and Lucid
+Synchrone~\cite{caspi95lucidsynchrone,caspi07lucidsynchrone}.  These
+languages offer determinism and safety properties, spurring their
+adoption in industry; Esterel Technologies offers SCADE (based on
+LUSTRE) as well as Esterel Studio.
 
 There have also been general-purpose languages with built-in support
 for streams, including Occam~\cite{occammanual} and
 Erlang~\cite{armstrong_concurrent_1993,armstrong_history_2007}.  Occam
 is an imperative procedural language that is based on communicating
-sequential processes; it was originally developed to for the INMOS
+sequential processes; it was originally developed for the INMOS
 transputer, an early multiprocessor.  Erlang is a functional language
 that is based on the actors model; originally developed by Ericsson
 for distributed applications, it supports very lightweight processes
@@ -606,13 +607,13 @@ parameters~\cite{agrawal-cases05,agrawal-thesis}.  I led the
 development of domain-specific optimizations for compressed data
 formats, allowing certain computations to operate in place on the
 compressed data without requiring decompression and
-re-compression~\cite{techreport}.  This transformation
+re-compression~\cite{thies07compression}.  This transformation
 accelerates lossless video editing operations by a median of 15x.
 
 In the area of programmability, I led the definition of the StreamIt
-language, incorporating the first notions of structured, hierarchical
-streams as well as language support for reordering and sliding-window
-operations~\cite{thies-cc02,thies-can02,amarasinghe-ijpp05}.  With
+language, incorporating the first notions of structured streams as
+well as language support for hierarchical data
+reordering~\cite{thies-cc02,thies-can02,amarasinghe-ijpp05}.  With
 Michal Karczmarek and Janis Sermulins, I led the development of
 teleport messaging, a new language construct that uses the flow of
 data in the stream to provide a deterministic and meaningful timeframe
@@ -629,20 +630,23 @@ RANSAC algorithm~\cite{aziz-thesis}.  I also led the development of
 dynamic analysis tools to ease the translation of legacy C code into a
 streaming representation~\cite{thies-micro07}.
 
-The StreamIt benchmark suite has been used by outside
-researchers~\cite{kudlur_orchestratingexecution_2008}.
+The StreamIt benchmark suite consists of 67 programs and 34,000
+(non-comment, non-blank) lines of code.  I provide the first rigorous
+characterization of the benchmarks as part of this dissertation.
 % TODO: add more users of benchmarks?
-In addition to MPEG-2 and image-based motion estimation, the
-38,000-line suite includes a ground moving target indicator (GMTI), a
-feature-aided tracker (FAT), synthetic aperture radar (SAR), a radar
-array front-end, part of the 3GPP physical layer, a vocoder with
-speech transformation, a subset of an MP3 decoder, a subset of MPEG-4
+In addition to MPEG-2 and image-based motion estimation, the suite
+includes a ground moving target indicator (GMTI), a feature-aided
+tracker (FAT), synthetic aperture radar (SAR), a radar array
+front-end, part of the 3GPP physical layer, a vocoder with speech
+transformation, a subset of an MP3 decoder, a subset of MPEG-4
 decoder, a JPEG encoder and decoder, a GSM decoder, an FM software
 radio, DES and serpent encryption, matrix multiplication, graphics
 shaders and rendering algorithms, and various DCTs, FFTs, filterbanks,
-and sorting algorithms.  Some programs are currently restricted for
-internal use.
+and sorting algorithms.  The StreamIt benchmark suite has been used by
+outside researchers~\cite{kudlur_orchestratingexecution_2008}. Some
+programs are currently restricted for internal use.
 % TODO: Fix order?
+
 Contributors to the benchmark suite include Sitij Agrawal, Basier
 Aziz, Matt Brown, Jiawen Chen, Matthew Drake, Shirley Fung, Michael
 Gordon, Hank Hoffmann, Ola Johnsson, Michal Karczmarek, Andrew Lamb,
@@ -672,10 +676,10 @@ backend).
 The StreamIt compiler (targeting shared-memory multicores, clusters of
 workstations, and the MIT Raw machine) is publicly
 available~\cite{streamitweb} and has logged over 850 unique,
-registered downloads from 300 institutions (as of December 2008).
+registered downloads from 300 institutions (as of December, 2008).
 Researchers at other universities have used StreamIt as a basis for
 their own
-work~\cite{mani-permutations,bit-streaming,ola-techrep,andersson_model_07,duca-thesis,won-thesis}.
+work~\cite{mani-permutations,duca-thesis,bit-streaming,ola-techrep,andersson_model_07,won-thesis}.
 
 This dissertation does not mark the culmination of the StreamIt
 project; please consult the StreamIt website~\cite{streamitweb} for
@@ -700,8 +704,10 @@ The specific contributions of this dissertation are as follows:
   the programmability and analyzability of stream programs
   (Chapter~2).}  StreamIt is the first language to introduce
   structured streams, as well as hierarchical, parameterized data
-  reordering.  We also describe the lessons learned in developing the
-  38,000-line StreamIt benchmark suite.
+  reordering.  We evaluate the language via a detailed
+  characterization of our 34,000-line benchmark suite, illustrating
+  the impact of each language feature as well as opportunities for
+  improvement.
 
 \myitem {A new language construct, termed teleport messaging, that
   enables precise event handling in a distributed environment

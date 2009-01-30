@@ -37,12 +37,13 @@ of legacy code in industry today, and 75-80\% of the typical IT budget
 is spent maintaining legacy systems~\cite{legacy}.  While much of this
 code is amenable to streaming, the process of migrating the code to a
 streaming representation is an arduous and time-consuming process.
-The most important resources that could help with the translation --
-such as the original author of the code, or the high-level design
-documents that guided its implementation -- are often unavailable.
-Thus, a fresh programmer is left with the daunting task of obtaining
-an in-depth understanding of all the program modules, the dependences
-between them, and the possibilities for safely extracting parallelism.
+The most important resources that could help with the
+translation~--~such as the original author of the code, or the
+high-level design documents that guided its implementation~--~are
+often unavailable.  Thus, a fresh programmer is left with the daunting
+task of obtaining an in-depth understanding of all the program
+modules, the dependences between them, and the possibilities for
+safely extracting parallelism.
 
 While there have been many efforts to automatically parallelize legacy
 codes, few of them have focused on the pipeline parallelism that is
@@ -55,7 +56,7 @@ parallelism in C programs have been very fine-grained, partitioning
 individual instructions across processing
 cores~\cite{ottoni05decoupled}.  Such fine-grained communication is
 inefficient on commodity machines and demands new hardware
-support~\cite{ottoni05decoupled,rangan04array}.  While a
+support~\cite{rangan04array,ottoni05decoupled}.  While a
 coarse-grained partitioning is more desirable, it is difficult to
 achieve at compile time due to the obscured data dependences in C;
 constructs such as pointer arithmetic, function pointers, and circular
@@ -407,6 +408,7 @@ intervention) apply the trace to correctly execute a test file.
 \section{Migration Methodology}
 \label{sec:workflow}
 
+\enlargethispage{0.5\baselineskip}
 We introduce a dynamic analysis tool that empowers the programmer in
 migrating legacy C applications to a streaming representation.  Using
 this tool, the programmer follows the workflow illustrated in
@@ -920,10 +922,6 @@ Figures~\ref{fig:spec-graphs}b and~\ref{fig:spec-graphs}c.  The
 benchmark includes both a compression and decompression stage, which
 were parallelized separately.
 
-\footnotetext[1]{Reordering calls to malloc (or reordering calls to
-  free) will only change the program's behavior if one of the calls
-  fails.}
-
 Because bzip2 compresses blocks of fixed size, the main compression
 routine is completely data-parallel.  The only cyclic dependences in
 the compressor are at the input stage (file reading, CRC calculation)
@@ -956,6 +954,10 @@ also supplied the name and size of two dynamically-allocated arrays.
 %%   times.\protect\label{fig:hmmer-graph}}
 %% \vspace{-10pt}
 %% \end{figure}
+
+\footnotetext[1]{Reordering calls to malloc (or reordering calls to
+  free) will only change the program's behavior if one of the calls
+  fails.}
 
 \paragraph*{Hmmer} In 456.hmmer, a Hidden Markov Model is loaded at
 initialization time, and then a series of random sequences are used to
@@ -1053,7 +1055,7 @@ The work most closely related to ours is that of Bridges et
 al.~\cite{bridges07revisiting}, which was developed concurrently to
 our first publication of this research~\cite{thies-micro07}.  They
 exploit pipeline parallelism using the techniques of Decoupled
-Software Pipelining~\cite{ottoni05decoupled,rangan04array}.  In
+Software Pipelining~\cite{rangan04array,ottoni05decoupled}.  In
 addition, they employ thread-level speculation to speculatively
 execute multiple loop iterations in parallel.  Both of our systems
 require some assistance from the programmer in parallelizing legacy
@@ -1101,6 +1103,7 @@ does not check if the declared regions are actually parallel.
 
 \subsection*{Dynamic Analysis}
 
+\enlargethispage{0.7\baselineskip}
 The dynamic analysis most similar to ours is that of Rul et
 al.~\cite{rul06functionlevel}, which also tracks producer/consumer
 relationships between functions and uses the information gleaned to
@@ -1158,7 +1161,7 @@ programs.  We address this issue by coarsening the program partitions.
 %domain of parallelization.
 
 A style of parallelism that is closely related to pipeline parallelism
-is DOACROSS parallelism~\cite{cytron86doacross,padua80highspeed}.
+is DOACROSS parallelism~\cite{padua80highspeed,cytron86doacross}.
 Rather than devoting a processor to a single pipeline stage, DOACROSS
 parallelism assigns a processor to execute complete loop iterations,
 spanning all of the stages.  In order to support dependences between
@@ -1316,7 +1319,7 @@ Given that industrial testing strategies have proven effective for
 eliminating a myriad of human-induced bugs, it does not seem
 implausible that they could be applied to eliminate potential bugs
 introduced by our tool.  Unlike a programmer, our analysis can
-immediately fix any bugs found by including the buggy input in its
+automatically fix any bugs found by including the buggy input in its
 training set.  Perhaps by treating tools more like programmers -- as
 intelligent but unsound beings whose output must be subjected to
 rigorous testing -- we can overcome some of the traditional

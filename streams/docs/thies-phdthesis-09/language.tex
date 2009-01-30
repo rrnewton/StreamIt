@@ -38,7 +38,7 @@ StreamIt differs from synchronous dataflow in five respects:
   corresponding confusion experienced by programmers.)
 
 \myitem {Dynamic rates.}  The input and output rates of actors may
-  optionally be declared to be dynamic.  A dynamic rate represents
+  optionally be declared to be dynamic.  A dynamic rate indicates
   that the actor will produce or consume an unpredictable number of
   data items that is known only at runtime.  Dynamic rates are
   declared as a range (min, max, and a hint at the average), with any
@@ -77,6 +77,7 @@ as the connectivity of the stream graph.
 
 \section{Filters}
 \label{sec:filters}
+\enlargethispage{0.3\baselineskip}
 
 The basic programmable unit in StreamIt is called a {\it filter}.  It
 represents a user-defined actor with a single input channel and single
@@ -207,16 +208,17 @@ optimize.  Because there is no mutable state within the filter (that
 is, the {\it weights} array is modified only during initialization),
 the compiler can exploit data parallelism and instantiate many copies
 of the FIR filter, each operating on different sections of the input
-tape.  To the best of our knowledge, StreamIt is the first language
-that allows tractable parallelization of general-purpose
-sliding-window computations such as FIR filters.  Also, due to a lack
-of pointers in the language, values can easily be traced through
-arrays from their initialization to their use.  This allows the
-compiler to infer that the FIR filter computes a linear function,
-subject to aggressive optimization~\cite{lamb-pldi03}.  Also,
-using a transformation called scalar
-replacement~\cite{sermulins-lctes05}, the {\it weights} array can
-be eliminated completely by unrolling loops and propagating constants
+tape.
+%To the best of our knowledge, StreamIt is the first language
+%that allows tractable parallelization of general-purpose
+%sliding-window computations such as FIR filters.  
+Also, due to a lack of pointers in the language, values can easily be
+traced through arrays from their initialization to their use.  This
+allows the compiler to infer that the FIR filter computes a linear
+function, subject to aggressive optimization~\cite{lamb-pldi03}.
+Also, using a transformation called scalar
+replacement~\cite{sermulins-lctes05}, the {\it weights} array can be
+eliminated completely by unrolling loops and propagating constants
 from the init function to the work function.
 
 A traditional C implementation of an FIR filter (shown in
@@ -231,7 +233,7 @@ calls to do\_FIR, compilers would need to prove that the {\it weights}
 and {\it src} arrays did not overlap with {\it dest}, {\it srcIndex},
 or {\it destIndex}.  Similar analysis would be needed to track the
 values of {\it weights} from their initialization to their use (in two
-different procedures).  Such precise alias analyses are often beyond
+different procedures).  Such precise alias analyses are usually beyond
 reach.  Worse still, it might not even be legal to call {\it do\_FIR}
 in parallel, depending on the buffer sizes chosen by the programmer.
 The underlying cause of all these obstacles is that the programmer has
@@ -246,6 +248,7 @@ is also shorter and easier to maintain, representing a win/win
 situation for both man and machine.
 
 \begin{figure}[t]
+\vspace{0.4\baselineskip}
 \centering
 \begin{minipage}{0.598in}
 {\centering
@@ -274,6 +277,7 @@ situation for both man and machine.
 \hspace{0.15in}
 \psfig{figure=fir-pipeline2.eps,width=0.598in}
 \caption{Example pipeline with FIR filter.\protect\label{fig:pipeline}}
+\vspace{0.4\baselineskip}
 \end{figure}
 
 \begin{figure}[t]
@@ -293,6 +297,7 @@ situation for both man and machine.
 \end{figure}
 
 \begin{figure}[t]
+\vspace{0.3\baselineskip}
 \centering
 \begin{minipage}{2.5in}
 \centering
@@ -322,6 +327,7 @@ situation for both man and machine.
 \end{figure}
 
 \section{Stream Graphs}
+\enlargethispage{\baselineskip}
 
 One of the new and experimental ideas in StreamIt is to enforce a {\it
   structured} programming model when building stream graphs.  Rather
@@ -355,23 +361,23 @@ graph.
 
 The motivations for introducing structured dataflow in a stream
 language are analogous to those for introducing structured control
-flow in an imperative language.  While there was once a debate between
-unstructured control flow (using GOTO statements) and structured
-control flow (using if/then/else and for loops), in the end structured
-control flow came to dominate because it allows the programmer to
-reason locally~\cite{dijkstra_go_1968}.  Rather than being lost in a
-sea of ``spaghetti code'', programmers can recognize common patterns
-because the language forces a canonical and hierarchical expression of
-the control.  While skeptics once argued that certain patterns would
-be more naturally expressed using GOTO statements, over time there
-emerged structured idioms that were equally recognizable.  For
-example, while a state machine can be written using a GOTO statement
-for each state transition, it can also be written as a dispatch loop.
-Structured control flow also benefited compilers, because non-sensical
-control flow graphs could be ruled out in favor of the common case.
-The field of loop optimizations would have been much more difficult to
-develop if researchers had to cope with the full complexity of an
-unstructured programming model.
+flow in an imperative language.  While there was once a
+debate~\cite{dijkstra_go_1968} between unstructured control flow
+(using GOTO statements) and structured control flow (using
+if/then/else and for loops), in the end structured control flow came
+to dominate because it allows the programmer to reason locally.
+Rather than being lost in a sea of ``spaghetti code'', programmers can
+recognize common patterns because the language enforces a canonical
+and hierarchical expression of the control.  While skeptics once
+argued that certain patterns would be more naturally expressed using
+GOTO statements, over time there emerged structured idioms that were
+equally recognizable.  For example, while a state machine can be
+written using a GOTO statement for each state transition, it can also
+be written as a dispatch loop.  Structured control flow also benefited
+compilers, because non-sensical control flow graphs could be ruled out
+in favor of the common case.  The field of loop optimizations would
+have been much more difficult to develop if researchers had to cope
+with the full complexity of an unstructured programming model.
 
 We believe that imposing structure on a stream graph can offer similar
 benefits.  From the programmer's perspective, structured streams offer
@@ -383,24 +389,25 @@ correspondence between the structure of the code and the structure of
 the stream graph.  Rather than reasoning about an ad-hoc set of nodes
 and edges, the programmer can visualize the graph while reading the
 code.  Second, the graph description is parameterized.  The number of
-parallel streams in the equalizer is dictated by a parameter N.  Thus,
-the programmer can easily describe a broad family of stream graphs;
-the compiler evaluates the values of the parameters to spatially
-unroll the actual stream structure.  Finally, imposing a single-input,
-single-output discipline on stream programs enables modularity and
-compositionality.  The LowPassFilter and HighPassFilter can be drawn
-from a common library, without knowing the details of their internal
-representations.
+parallel streams in the equalizer is dictated by a parameter {\it N}.
+Thus, the programmer can easily describe a broad family of stream
+graphs; the compiler evaluates the values of the parameters to
+spatially unroll the actual stream structure.  Finally, imposing a
+single-input, single-output discipline on stream programs enables
+modularity and compositionality.  The LowPassFilter and HighPassFilter
+can be drawn from a common library, without knowing the details of
+their internal representations.
 
 Enforcing structure in the language can also benefit the compiler.
 Rather than dealing with the complexity of full graphs, the compiler
 can focus on a few simple cases.  This property helped us to formulate
-phased scheduling~\cite{karczmarek-lctes03,karczma-thesis}, linear
-optimizations~\cite{lamb-pldi03,lamb-thesis,agrawal-cases05,agrawal-thesis},
-and mapping to the compressed domain~\cite{techreport}.
+phased scheduling~\cite{karczma-thesis,karczmarek-lctes03}, linear
+optimizations~\cite{lamb-pldi03,lamb-thesis,agrawal-thesis,agrawal-cases05},
+and mapping to the compressed domain~\cite{thies07compression}.
 
 We give more details on our experience with structure in Section~\ref{sec:lang-experience}.
 
+\enlargethispage{0.3\baselineskip}
 \section{Data Reordering}
 
 Another novelty of the StreamIt language is the provision of flexible,
@@ -425,18 +432,19 @@ roundrobin joiners, and duplicate splitters -- a large number of data
 distribution and reordering patterns can be elegantly expressed.  For
 example, Figure~\ref{fig:transpose} illustrates StreamIt code for a
 matrix transpose.  The reordering needed can be expressed by a single
-splitjoin.  The splitjoin has an empty stream for every column in the
-matrix; a roundrobin(1) splitter moves the columns into the splitjoin,
-while a roundrobin(M) joiner moves the rows to the output channel.
+splitjoin.  The splitjoin has an empty stream (called an {\it
+Identity}) for every column in the matrix; a roundrobin(1) splitter
+moves the columns into the splitjoin, while a roundrobin(M) joiner
+moves the rows to the output channel.
 
 Another example is bit-reversed ordering.  As illustrated in
-Figure~\ref{fig:bitreverse-pattern}, a bit-reversed ordering is a
-permutation in which the element at index $n$, where $n$ has binary
-digits $b_0b_1 \dots b_k$, is reordered to appear at index $b_kb_{k-1}
-\dots b_0$.  For example, in a 3-digit bit reversal, the item at index
-one (001) is reordered to index four (100).  In a traditional language
-such as C, the code to perform bit-reversal is very complex; see
-Figure~\ref{fig:bitreverse-c} for a standard
+Figure~\ref{fig:bitreverse-pattern}, a $k$-digit bit-reversed ordering
+is a permutation in which the element at index $n$ (where $n$ has
+binary digits $b_0b_1 \dots b_k$) is reordered to appear at index
+$b_kb_{k-1} \dots b_0$.  For example, in a 3-digit bit reversal, the
+item at index one (001) is reordered to index four (100).  In a
+traditional language such as C, the code to perform bit-reversal is
+very complex; see Figure~\ref{fig:bitreverse-c} for a standard
 algorithm~\cite{press_numerical_1992}.  Given the doubly-nested loops,
 conditionals, shift expressions, and swap operations, it is unlikely
 that any compiler will arrive at a sensical representation for the
@@ -444,8 +452,8 @@ logical reordering performed by this computation.  It is equally
 difficult for humans to comprehend the code.
 
 However, the StreamIt version (Figure~\ref{fig:bitreverse-streamit})
-of bit reversal is far simpler~\footnote{Satish Ramaswamy in our group
-  discovered this representation of bit-reversal.}.  It represents bit
+of bit reversal is far simpler\footnote{Satish Ramaswamy in our group
+discovered this representation of bit-reversal.}.  It represents bit
 reversal as a recursive reordering.  In the base case, there are only
 two elements and no reordering is needed (a 1-digit bit reversal is
 the identity operation).  Otherwise, the reordering consists of
@@ -456,7 +464,7 @@ position.  This pattern can be expressed with a roundrobin(1)
 splitter, a recursive call to BitReverse(N/2), and a roundrobin(N/2)
 joiner.  The intuition is: bit reversal is equivalent to a tree of
 fine-grained splitting and coarse-grained joining.  A graphical
-depiction of this tree also appears in
+depiction of this tree appears in
 Figure~\ref{fig:bitreverse-streamit}.
 
 Why bother to represent distribution and reordering operations in an
@@ -467,7 +475,7 @@ aggressive optimizations.  For example, standardized splitters and
 joiners have enabled us to map reordering operations to a programmable
 on-chip network~\cite{gordon-asplos02} and have enabled certain
 domain-specific
-optimizations~\cite{lamb-pldi03,agrawal-cases05,techreport}.
+optimizations~\cite{lamb-pldi03,agrawal-cases05,thies07compression}.
 Other researchers have also leveraged this representation to
 automatically generate vector permutation
 instructions~\cite{mani-permutations} and to facilitate program
@@ -927,8 +935,8 @@ governed by the number of points of interest as determined by the
 algorithm.  The count is established via a teleport message, thus
 fixing the input and output rates prior to a given iteration.
 
-In the graphics pipelines, the only dynamic-rate filter is the
-rasterizer, which expands each triangle into an unknown number of
+In the graphics pipelines, the only dynamic-rate filters are the
+rasterizers, which expand each triangle into an unknown number of
 pixels.
 
 \myitem {Neighboring filters often have matched I/O rates.}  Many of
@@ -981,7 +989,7 @@ pixels.
   of the benchmarks have a minimum filter multiplicity of 1.  That is,
   there exists at least one filter in the program that executes only
   once in the steady state schedule.  This filter defines the logical
-  frame size for the execution; all other filters are simple scaled up
+  frame size for the execution; all other filters are simply scaled up
   to satisfy the input or output requirements of the filter.  
 
 %% RESTORE IF TALKING ABOUT MEDIAN, MAX:
@@ -1038,8 +1046,9 @@ and popped per execution, as well as their execution multiplicity in
 the steady state.  Since neighboring filters often produce the same
 number of items on each execution, all filters except for Identity and
 Adder execute exactly once in the steady state.  This offers less
-flexibility and benefit for optimizing the
-schedule.\protect\label{fig:jpeg}}
+flexibility to optimize the schedule, and affords less benefit from
+doing so.
+\protect\label{fig:jpeg}}
 \vspace{-24pt}
 \end{figure}
 
@@ -1165,7 +1174,7 @@ language designers.  We summarize their experience as follows:
   Unfortunately, the performance cost of introducing state is not
   exposed in the current StreamIt language.  Thus, we found that
   several programmers, when faced with two alternative implementations
-  of an algorithm, would sometimes choose the one that included
+  of an algorithm, would sometimes choose the one that includes
   mutable state.  Figure~\ref{fig:state} gives a pedantic example of
   this problem, while Figure~\ref{fig:state2} illustrates a realistic
   case from MPD.  Prior to conducting our performance evaluations, we
@@ -1392,11 +1401,11 @@ Brook is one of several stream-oriented languages that evolved out of
 the graphics community. Cg exploits pipeline parallelism and data
 parallelism, though the programmer must write algorithms to exactly
 match the two pipeline stages of a graphics processor~\cite{cg03}.
-The sH~\cite{mccool_shader_2004,mccool_shader_2002} language,
-subsequently commercialized by RapidMind, is embedded within C++ as a
-set of macros.  Like StreamIt, sH specializes stream kernels to their
-constant arguments, and fuses pipelined kernels (a process called
-``bundling'') in order to increase their granularity.  Unlike
+The sH language, subsequently commercialized by RapidMind, is embedded
+within C++ as a set of
+macros~\cite{mccool_shader_2002,mccool_shader_2004}.  Like StreamIt,
+sH specializes stream kernels to their constant arguments, and fuses
+pipelined kernels in order to increase their granularity.  Unlike
 StreamIt, sH performs these optimizations dynamically in a
 Just-In-Time (JIT) compiler, offering increased flexibility.  However,
 StreamIt offers increased expressiveness in that 1) StreamIt can
@@ -1407,8 +1416,9 @@ kernels must be stateless.
 % sH supports data-parallel procedures with control flow
 %  (SPMD, not just SIMD)
 Accelerator~\cite{tarditi_accelerator_2006} also employs a
-Just-In-Time strategy to target GPUs from C\#, though starts from
-data-parallel array types rather than explicit stream kernels.
+Just-In-Time strategy to target GPUs from C\#; the system derives
+parallelism from data-parallel array types rather than explicit stream
+kernels.
 
 Stream\-C/Ker\-nel\-C preceded Brook and operates at a lower level of
 abstraction; kernels written in KernelC are stitched together in
@@ -1444,12 +1454,14 @@ influenced by StreamIt.
 \section{Future Work}
 \label{sec:lang-future-work}
 
+\vspace{12pt}
+
 There are many directions in which to expand and refine the StreamIt
 language.  Based on his study of MPEG-2 in StreamIt, Matthew Drake
 makes a sound case for adding support for programmable splitters and
 joiners, re-initialization of streams, draining of streams, and
 dispatch splitjoins~\cite{drake-thesis}.  He also discusses extensions
-to messaging, discussed in the next chapter.  We endorse his
+to teleport messaging, described in the next chapter.  We endorse his
 recommendations and also highlight the following research directions:
 
 % cite written proposal to move programmable splitters and joiners
@@ -1504,6 +1516,7 @@ recommendations and also highlight the following research directions:
   declared dynamic.  This would allow the compiler to maximally
   evaluate other sections of the stream graph at compile time.
 
+\newpage
 \myitem {Multidimensional data.}  The current version of StreamIt is
   a natural fit for handling one-dimensional sequences of data, but
   falls short in exposing the dependences and flexibility inherent in

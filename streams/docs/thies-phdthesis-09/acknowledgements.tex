@@ -25,34 +25,33 @@ has impacted me.
 %completely dwarfed by the fierce battles he would wage on my behalf.
 
 \vspace{-8pt}\paragraph*{Contributors to this dissertation} Many
-people made direct contributions to the content of this
-dissertation.  The StreamIt project was a fundamentally
-collaborative effort, involving the extended efforts of over 27
-people.  I feel very lucky to have been part of such an insightful,
-dedicated, and fun team.  Section~\ref{sec:streamit-project}
-provides a technical overview of the entire project, including the
-division of labor.  In what follows I am listing only a subset of
-each person's actual contributions.  Michael Gordon, my kindred
-Ph.D. student throughout the entire StreamIt project, led the
-development of the Raw backend (summarized in Chapter 4) and
-countless other aspects of the compiler.  Rodric Rabbah championed
-the project in many capacities, including contributions to cache
-optimizations (summarized in Chapter 4), teleport messaging (Chapter
-3), the MPEG2 benchmarks, an Eclipse interface, and the Cell
-backend.  Michal Karczmarek was instrumental in the original
-language design (Chapter 2) and teleport messaging, and also
-implemented the StreamIt scheduler and runtime library.  David Maze,
-Jasper Lin, and Allyn Dimock made sweeping contributions to the
-compiler infrastructure; I will forever admire their skills and
-tenacity in making everything work.
+people made direct contributions to the content of this dissertation.
+The StreamIt project was a fundamentally collaborative undertaking,
+involving the extended efforts of over 27 people.  I feel very lucky
+to have been part of such an insightful, dedicated, and fun team.
+Section~\ref{sec:streamit-project} provides a technical overview of
+the entire project, including the division of labor.  In what follows
+I am listing only a subset of each person's actual contributions.
+Michael Gordon, my kindred Ph.D. student throughout the entire
+StreamIt project, led the development of the parallelization
+algorithms (summarized in Chapter~4), the Raw backend and countless
+other aspects of the compiler.  Rodric Rabbah championed the project
+in many capacities, including contributions to cache optimizations
+(summarized in Chapter~4), teleport messaging (Chapter~3), the MPEG2
+benchmarks, an Eclipse interface, and the Cell backend.  Michal
+Karczmarek was instrumental in the original language design (Chapter
+2) and teleport messaging, and also implemented the StreamIt scheduler
+and runtime library.  David Maze, Jasper Lin, and Allyn Dimock made
+sweeping contributions to the compiler infrastructure; I will forever
+admire their skills and tenacity in making everything work.
 
 Central to the StreamIt project is an exceptional array of
 M.Eng. students, who I feel very privileged to have interacted with
 over the years.  Andrew Lamb, Sitij Agrawal, and Janis Sermulins led
 the respective development of linear optimizations, linear statespace
-optimizations, and cache optimizations (all summarized in Chapter 4).
+optimizations, and cache optimizations (all summarized in Chapter~4).
 Janis also implemented the cluster backend, with support for teleport
-messaging (providing results for Chapter 3).  Matthew Drake
+messaging (providing results for Chapter~3).  Matthew Drake
 implemented the MPEG2 codec in StreamIt, while Jiawen Chen implemented
 a flexible graphics pipeline and Basier Aziz implemented mosaic
 imaging.  Daviz Zhang developed a lightweight streaming layer for the
@@ -65,11 +64,14 @@ is improving StreamIt's multicore backend.
 The StreamIt project also benefited from an outstanding set of
 undergraduate researchers, who taught me many things.  Ali Meli, Chris
 Leger, Satish Ramaswamy, Matt Brown, and Shirley Fung made important
-contributions to the StreamIt benchmark suite (detailed in Chapter 2).
-Steve Hall implemented compressed-domain processing in the StreamIt
-compiler (providing results for Chapter 5).  Qiuyuan Li worked on a
-StreamIt backend for the Cell processor, while Phil Sung worked on a
-backend for graphics processors.
+contributions to the StreamIt benchmark suite (detailed in Chapter~2).
+Steve Hall integrated compressed-domain transformations into the
+StreamIt compiler (providing results for Chapter~5).  Qiuyuan Li
+worked on a StreamIt backends for Cell, while Phil Sung targeted a
+GPU.
+
+%Qiuyuan Li worked on a StreamIt backend for the Cell processor, while
+%Phil Sung worked on a backend for graphics processors.
 
 Individuals from other research groups also impacted the StreamIt
 project.  Members of the Raw group offered incredible support for our
@@ -95,7 +97,7 @@ Peter Mattson, Richard Lethin, John Chapin, Vanu Bose, and Andy Ong.
 
 Outside of the StreamIt project, additional individuals made direct
 contributions to this dissertation.  In developing our tool for
-extracting stream parallelism (Chapter 6), I am indebted to Vikram
+extracting stream parallelism (Chapter~6), I am indebted to Vikram
 Chandrasekhar for months of tenacious hacking and to Stephen McCamant
 for help with Valgrind.  I thank Jason Ansel, Chen Ding, Ronny
 Krashinsky, Viktor Kuncak, and Alex Salcianu, who provided valuable
@@ -222,15 +224,15 @@ W. O'Donnell, Kari Pulli, Christopher Rhodes, Jeffrey Sheldon, David
 Wentzlaff, Amy Williams, and Matthias Zwicker for some of the best
 end-to-end research experiences I could imagine.
 
-Many people made the office a very special place to be.  Mary
-McDavitt is an amazing force for good, serving as my rock and
-foundation throughout many administrative hurricanes; I can't thank
-her enough for all of her help, advice, and good cheer over the
-years.  I'm also very grateful to Shireen Yadollahpour, Cornelia
-Colyer, and Jennifer Tucker, whose helpfulness I will never forget.
-Special thanks to Michael Vezza, system administrator
-extraordinaire, for his extreme patience and helpfulness in tending
-to my every question, and fixing everything that I broke.
+Many people made the office a very special place to be.  Mary McDavitt
+is an amazing force for good, serving as my rock and foundation
+throughout many administrative hurricanes; I can't thank her enough
+for all of her help, advice, and good cheer over the years.  I'm also
+very grateful to Shireen Yadollahpour, Cornelia Colyer, and Jennifer
+Tucker, whose helpfulness I will never forget.  Special thanks to
+Michael Vezza, system administrator extraordinaire, for his extreme
+patience and helpfulness in tending to my every question, and fixing
+everything that I broke.
 
 I thank all the talented members of the Commit group, and especially
 the Ph.D. students and staff -- Jason Ansel, Derek Bruening, Vikram
@@ -264,15 +266,47 @@ Finally, I would like to thank my amazingly loving and supportive
 parents, who have always been 100\% behind me no matter where I am
 in life.  I dedicate this thesis to them.
 
-\clearpage
-%~ \\ \vspace{3.69in} ~ \\
-~ \\ \vspace{3.49in} ~ \\
-\noindent This work was funded in part by the National Science 
-Foundation (Grants EIA-0071841, CNS-0305453, ACI-0325297), DARPA
-(Grants F29601-01-2-0166, F29601-03-2-0065), the DARPA HPCS program,
-the MIT Oxygen Alliance, the Gigascale Systems Research Center, Nokia,
-and a Siebel Scholarship.
-\vspace{-0.2in}
+%% \clearpage
+%% ~ \\ \vspace{1.1in} ~ \\
+%% \begin{center}
+%% {\bf \large Relation to Prior Publications}
+%% \end{center}
+\section*{Relation to Prior Publications}
+This dissertation alternately extends and summarizes prior
+publications by the author.  Chapters 1 and 2 are significantly more
+detailed than prior descriptions of the StreamIt
+language~\cite{thies-cc02,thies-can02,amarasinghe-ijpp05} and include
+an in-depth study of the StreamIt benchmark suite that has yet to be
+published elsewhere.  Chapter~3 subsumes the prior description of
+teleport messaging~\cite{thies-ppopp05}, including key changes to the
+semantics and the first uniprocessor scheduling algorithm.  Chapter~4
+is a condensed summary of prior
+publications~\cite{gordon-asplos02,lamb-pldi03,agrawal-cases05,sermulins-lctes05,gordon-asplos06},
+though with new text that often improves the exposition.  Chapter~5
+subsumes the prior report on compressed-domain
+processing~\cite{thies07compression}, offering enhanced functionality,
+performance, and readability.  Chapter~6 is very similar to a recent
+publication~\cite{thies-micro07}.  Some aspects of the author's work
+on StreamIt are not discussed in this
+dissertation~\cite{karczmarek-lctes03,chen-graphics05}.
+
+Independent publications by other members of the StreamIt group are
+not covered in this
+dissertation~\cite{kuo05,drake-ipdps06,zhang_lightweight_2007}.  In
+particular, the case study of implementing MPEG2 in StreamIt provides
+a nice example-driven exposition of the entire
+language~\cite{drake-ipdps06}.
+
+%\vspace{1in}
+%\begin{center}
+%{\bf \large Funding Acknowledgment}
+%\end{center}
+\section*{Funding Acknowledgment}
+This work was funded in part by the National Science Foundation
+(grants EIA-0071841, CNS-0305453, ACI-0325297), DARPA (grants
+F29601-01-2-0166, F29601-03-2-0065), the DARPA HPCS program, the MIT
+Oxygen Alliance, the Gigascale Systems Research Center, Nokia, and a
+Siebel Scholarship.
 \clearpage
 
 % NOT ACKNOWLEDGING:
@@ -282,7 +316,7 @@ and a Siebel Scholarship.
 % StreamIt:
 % - Vijay Saraswat
 % - Ryan Newton
-% - Ken Steele provided an IPAQ for some of the experiments in Chapter 4.
+% - Ken Steele provided an IPAQ for some of the experiments in Chapter~4.
 %
 % Teaching:
 % - David Liben Nowell
@@ -291,7 +325,6 @@ and a Siebel Scholarship.
 % - natalie andrew
 %
 % IIH:
-% - Pallavi Kaushik
 % - Seema Kacker
 % - Sourav Dey
 % - Ajit Dash
