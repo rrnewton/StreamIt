@@ -750,14 +750,15 @@ initialization in MPD, HDTV, and 802.11.
 \myitem {Stateful filters are less common than we expected, though 
 are nonetheless required for complete expression of many algorithms.
 Further state could be eliminated via new language constructs,
-compiler analyses, or programmer interventions.}  After effective use
-of peeking and prework primitives, one quarter (17 out of 67) of the
-benchmarks still contain one or more filters with mutable state.
-There are 49 stateful filter types in the StreamIt benchmark suite,
-representing approximately 6\% of the total filters.  While other
-researchers have noted that stream programs are rich in data
-parallelism~\cite{imagine03ieee}, we nonetheless expected to see a
-greater proportion of filters that retained mutable state between
+compiler analyses, or programmer interventions.}  
+
+After effective use of peeking and prework primitives, one quarter (17
+out of 67) of the benchmarks still contain one or more filters with
+mutable state.  There are 49 stateful filter types in the StreamIt
+benchmark suite, representing approximately 6\% of the total filters.
+While other researchers have noted that stream programs are rich in
+data parallelism~\cite{imagine03ieee}, we nonetheless expected to see
+a greater proportion of filters that retained mutable state between
 execution steps.  The heaviest stateful filter in each benchmark
 ranges from 0.3\% to 42.4\% (median 4.7\%) of the overall work,
 representing an eventual bottleneck to parallelization.
@@ -879,7 +880,7 @@ potential parallelism of feedback loops in our benchmark suite.
 % and does some internal buffering.  Radar can be rewritten at a
 % coarse level of granularity to eliminate this state.
 
-\item {\boldit Splitjoins and Identity filters are very common in the 
+\myitem {Splitjoins and Identity filters are very common in the 
 benchmarks.}  These two language constructs found broad application
 across our benchmark suite.  Splitjoins appear in over three quarters
 (53 out of 67) of the benchmarks, with a median of 8 instantiations
@@ -897,7 +898,7 @@ directly to a network fabric.
 benchmarks.\protect\label{tab:lang-messaging}}
 \end{table}
 
-\item {\boldit Teleport messaging and dynamic rates are uncommon in 
+\myitem {Teleport messaging and dynamic rates are uncommon in 
 the benchmarks, but provide critical functionality when utilized.}
 These language features were not fully specified until years after the
 initial release of the compiler, which contributes to their smaller

@@ -54,7 +54,8 @@
 % do not indent paragraphs of enumerated lists (my lists go on for pages...)
 % numbers flush left to paragraph text: \leftmargin=17pt
 \newcommand{\mybegin}{\begin{list}{\labelenumi}{\leftmargin=\parindent}\usecounter{enumi}}
-\newcommand{\myitem}[1]{\item {\boldslant #1}}
+%\newcommand{\myitem}[1]{\item {\textit{\textbf{#1}}}}
+\newcommand{\myitem}[1]{\item {\bf #1}}
 \newcommand{\myend}{\end{list}}
 
 % shrink section titles
@@ -134,6 +135,6 @@
 % appears on wrong page
 %\addcontentsline{toc}{chapter}{Appendices}
 \include{example-program} % have to remove this line during diff
-\include{stream-graphs}
+%\include{stream-graphs}
 
 \end{document}
