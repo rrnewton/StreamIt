@@ -1,0 +1,120 @@
+\section{Introduction}
+
+The domain of stream programs has attracted interest because it stands
+at the intersection of recent application and architectural trends.
+By encompassing applications such as audio, video, and digital signal
+processing, stream programs are following the expansion of desktop
+computing to the mobile and embedded space.  And by virtue of their
+structure -- a set of independent processing stages that operate on
+regular sequences of data -- stream programs are a natural fit for
+multicore architectures.  The interest in streaming applications has
+spawned a number of programming languages that target the streaming
+domain, including StreamIt~\cite{thies-cc02}, Brook~\cite{brook04},
+StreamC/KernelC~\cite{imagine03ieee}, cG~\cite{cg03},
+Baker~\cite{Baker}, SPUR~\cite{spur05samos} and
+Spidle~\cite{spidle03}.
+
+In the case of streaming as well as other domains, the design of a
+programming language is deeply influenced by one's understanding of
+the application space.  Only by characterizing the common-case
+behaviors can one provide the functionality and performance that is
+important in practice.  Typically this understanding is gleaned via
+inspection of benchmarks that are representative of the domain.
+However, in the case of stream programs, existing benchmarks are
+implemented in von-Neumann languages that often obscure the underlying
+parallelism and communication patterns.  While collections such as
+ALPBench, HandBench, Mediabench, MiBench, and NetBench (and to a
+lesser extent SPEC, Splash-2, and PARSEC) include several examples of
+stream programs, they are all written in C, C++, or FORTRAN.  Any
+characterization of these benchmarks thus conflates the issue of
+understanding the streaming patterns with the more difficult question
+of extracting those patterns from a low-level description of the
+algorithm.
+
+In this paper, we present the first characterization of a streaming
+benchmark suite that was developed directly in a stream programming
+language.  This enables a new understanding of the fundamental
+properties of stream programs, without struggling to extract those
+properties from a general-purpose programming model.  We utilize the
+StreamIt language~\cite{thies-cc02}, a mature system that is rooted in
+the synchronous dataflow model~\cite{lee87}.  Our benchmark suite
+consists of 67 programs and 33,8000 lines of code, which were
+developed by over 20 programmers during the last 8 years.  To isolate
+the study from any performance artifacts of the StreamIt compiler, we
+limit our attention to architecture-independent program
+characteristics.  We assess the characteristics along three axes, in
+each case summarizing the impact of our observations on the design of
+future programming languages.
+
+Our first axis of inquiry aims to identify the potential barriers to
+parallelizing stream programs.  While stream programs are understood
+to be rich in data parallelism, there also exist sequential
+bottlenecks, some of which can be averted via appropriate language
+design.  Our results (each described in a distinct section of the
+paper) are as follows:
+\begin{enumerate}
+\item {\slidingwindows}.
+\item {\startup}.
+\item {\stateful}.
+\item {\feedback}.
+\end{enumerate}
+
+The second axis concerns the scheduling characteristics of stream
+programs.  Because stream programs execute in parallel, constrained
+only by the availability of data items on communication channels, all
+scheduling decisions are made by the compiler and runtime system.  Our
+observations are:
+\begin{enumerate}
+\item {\matchedrates}.
+\item {\dynamicrates}.
+\item {\cyclostatic}.
+%4) {\inferrates}.
+\end{enumerate}
+
+The third axis of characterization examines the programming style of
+the benchmarks.  These results reflect our experience in observing and
+coaching over 20 programmers as they developed large benchmarks within
+the stream programming model:
+\begin{enumerate}
+\item {\structuredstreams}.
+\item {\accidentalstate}.
+\item {\teleportmessaging}.
+\end{enumerate}
+
+The lists above also serve as a detailed outline for the paper.  After
+describing the StreamIt language (Section 2) and the benchmark suite
+(Section 3), we present each axis of characterization (Sections 4, 5,
+and 6).  We conclude (Section 7) by reflecting on the impact that this
+characterization would have had on our own direction, if it were
+available at the start of the StreamIt project.  We hope that this
+paper has similar relevance for future design and evaluation of
+architectures, languages, and compilers for the streaming domain.
+
+%% The principal results of our characterization are as follows:
+
+%% \noindent {1.~~Computational Bottlenecks} (Section III)
+%% \begin{enumerate}
+%% \item {\slidingwindows}
+%% \item {\startup}
+%% \item {\stateful}
+%% \item {\feedback}
+%% \end{enumerate}
+%% \noindent {2.~~Scheduling Characteristics} (Section IV)
+%% \begin{enumerate}
+%% \item {\matchedrates}
+%% \item {\dynamicrates}
+%% \item {\cyclostatic}
+%% \item {\inferrates}
+%% \end{enumerate}
+%% \noindent {3.~~Programming Style}
+%% \begin{enumerate}
+%% \item {\structuredstreams}
+%% \item {\accidentalstate}
+%% \item {\teleportmessaging}
+%% \end{enumerate}
+
+%% In the remainder of this paper, we give an overview of the StreamIt
+%% language (Section~II) as well as our benchmark suite (Section~III).
+%% We then characterize the benchmarks according to computational
+%% bottlenecks (Section~IV), scheduling characteristics (Section~V), and
+%% programming style (Section~VI).  We conclude in Section~VII.
