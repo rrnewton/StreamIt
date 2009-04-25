@@ -1,0 +1,72 @@
+\section{Conclusions}
+
+To the best of our knowledge, this paper represents the first
+characterization of a benchmark suite that was authored in a stream
+programming language.  By starting from a streaming representation, we
+can focus on the underlying properties of the streaming algorithms,
+rather than fighting to extract those algorithms from a
+general-purpose programming language.
+
+While the selection of benchmarks for our suite was undoubtedly
+influenced to some degree by the original capabilities of the StreamIt
+language, the observed characteristics of the benchmarks had an equal
+(if not greater) impact on the direction of the project.  Lessons
+learned from the benchmark suite caused us to do the following:
+\begin{enumerate}
+
+\item Optimize parallelization of sliding windows~\cite{thies-thesis},
+  based on their prevalence in our suite (Section~\ref{sec:peeking}).
+
+\item Introduce prework functions to support observed startup
+  behaviors (Section~\ref{sec:startup}).
+
+\item Migrate our parallelization algorithm from one that favors
+  pipeline parallelism~\cite{gordon-asplos02} to one that favors data
+  parallelism~\cite{gordon-asplos06}, based on the observed scarcity
+  of stateful filters (Section~\ref{sec:stateful}).
+
+\item Curtail pursuit of sophisticated scheduling optimizations that
+  apply to large steady-state schedules~\cite{karczmarek-lctes03},
+  given that most programs have small steady states in practice
+  (Section~\ref{sec:matched}).
+
+\item Add functional but unoptimized support for dynamic
+  rates~\cite{chen-graphics05}, given that they are critical for
+  expressing certain applications but nonetheless appear rarely in
+  those applications (Section~\ref{sec:dynamic}).
+
+\item Remove support for multi-phase filters from the language and
+  compiler, given that they were unnecessary and confusing
+  (Section~\ref{sec:cyclostatic}).
+
+\item Change the default latency of teleport messaging from best
+  effort to zero, based on common usage in the benchmarks
+  (Section~\ref{sec:messaging}).
+
+\end{enumerate}
+
+In addition, the characterization highlights several opportunities for
+further improving the StreamIt language.  Based on lessons learned in
+this paper, in the future we hope to:
+
+\begin{enumerate}
+
+\item Exploit parallelism that is hidden behind benign stateful
+  dependences, including message handlers, induction variables, and
+  artifacts of filter granularity (Section~\ref{sec:stateful}).
+
+\item Provide constructs for programmers to simplify expression of
+  unstructured data flows in a structured programming model
+  (Section~\ref{sec:structure}).
+
+\item Introduce mechanisms (such as a {\it stateful} annotation) to
+  prevent programmers from accidentally introducing mutable state
+  (Section~\ref{sec:accidentalstate}).
+
+\end{enumerate}
+
+If the characterization presented herein had been available at the
+start of the StreamIt project, we would have incorporated the above
+lessons into our original design.  We hope that others can leverage
+the results of this study to better inform their own designs of
+programming languages and compilers for the streaming domain.

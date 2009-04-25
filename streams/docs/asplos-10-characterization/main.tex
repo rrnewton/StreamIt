@@ -1,0 +1,111 @@
+\documentclass{sig-alternate}
+\usepackage{url}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage[T1]{fontenc}
+\usepackage[scaled=0.88]{beramono}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\slidingwindows}{Sliding windows are common.  The language
+  must expose the parallelism in sliding windows to avoid a
+  computational bottleneck}
+
+\newcommand{\startup}{Startup behaviors often differ from steady-state
+  behaviors.  The compiler must recognize such behaviors to avoid a
+  parallel bottleneck}
+
+\newcommand{\stateful}{Sequential (stateful) filters are required in
+  one quarter of our benchmarks.  Further state could be eliminated
+  via new language constructs, compiler analyses, or programmer
+  interventions}
+
+\newcommand{\feedback}{Feedback loops are uncommon in our benchmarks,
+  but represent significant bottlenecks when present}
+
+\newcommand{\matchedrates}{Neighboring filters often have matched I/O
+  rates.  This reduces the opportunity and impact of advanced
+  scheduling strategies proposed in the literature}
+
+\newcommand{\dynamicrates}{Dynamic rates are uncommon in our
+  benchmarks, but implement critical functionality when utilized}
+
+\newcommand{\cyclostatic}{It is not useful for filters to divide their
+  atomic execution step into a cycle of smaller steps.  However,
+  multiple execution steps are important for scatter/gather stages}
+
+\newcommand{\inferrates}{The I/O rates of a filter can typically be
+  inferred automatically (the general case is undecidable)}
+
+\newcommand{\structuredstreams}{It is useful and tractable to write
+  programs using structured streams, in which all modules have a
+  single input and a single output.  However, structured streams are
+  occasionally unnatural and, in rare cases, insufficient}
+
+\newcommand{\accidentalstate}{Programmers can accidentally introduce
+  unnecessary sequential bottlenecks (mutable state) in filters}
+
+\newcommand{\teleportmessaging}{Stream programs benefit from a
+  separation of high-bandwidth data flow and irregular control
+  signals.  This is evidenced by modest usage of teleport messaging in
+  our applications}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength{\columnsep}{0.2in}
+\setlength{\textwidth}{7.0in}
+\setlength{\textheight}{9.375in}
+
+\newcommand{\eightpoint}{\fontsize{8pt}{10pt}\selectfont}
+\newcommand{\ninepoint}{\fontsize{9pt}{11pt}\selectfont}
+\newcommand{\sixteenpoint}{\fontsize{16pt}{18pt}\selectfont}
+%\newcommand{\myitem}[1]{\medskip \noindent {\bf 1. #1}\smallskip\\}
+\newcommand{\myitem}[1]{\subsection{#1}\smallskip}
+
+\title{The StreamIt Benchmark Suite: Characterization and Implications
+  for Programming Language Design}
+
+% Implementation, Characterization, and Lessons Learned from a
+% Streaming Benchmark Suite
+
+% The StreamIt Benchmark Suite:
+% Implementation, Characterization, and Lessons Learned
+
+\numberofauthors{2}
+
+%% \author{
+%% \alignauthor
+%% William Thies\\
+%%        \affaddr{Microsoft Research India}\\
+%%        \email{thies@microsoft.com}
+%% \alignauthor
+%% Saman Amarasinghe\\
+%%        \affaddr{Massachuestts Institute of Technology}\\
+%%        \email{saman@mit.edu}
+%% }
+
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+%% \terms{Terms}
+%%
+%% \keywords{Keywords}
+
+\input{intro}
+\input{streamit}
+\input{benchmarks}
+\input{characterization}
+%\input{related}
+\input{conclusions}
+
+{\small
+\bibliographystyle{abbrv}
+\bibliography{references}
+}
+
+\end{document}

@@ -1,0 +1,27 @@
+Stream programs represent an important class of high-performance
+computations.  Defined by their regular processing of sequences of
+data, stream programs appear most commonly in the context of audio,
+video, and digital signal processing, though also in networking,
+encryption, and other areas.  Stream programs can be naturally
+represented as a graph of independent actors that communicate
+explicitly over data channels.
+
+In this work, we provide the most comprehensive characterization of
+stream programs that has been published to date.  We focus on the
+StreamIt benchmark suite, a set of 67 programs that have been
+implemented in the StreamIt programming language.  The suite consists
+of 33,800 lines of code, written by over 20 developers during the last
+8 years.
+
+We characterize stream programs along several axes, including their
+patterns of data flow (sliding windows, stateful actors, feedback
+loops, etc.), their scheduling characteristics (input/output rates,
+dynamic vs. static rates, actor multiplicity, etc.), and their
+utilization of StreamIt language constructs (structured streams,
+teleport messaging, etc.).  The lessons learned have implications for
+the design of future architectures, languages and compilers for the
+streaming domain.
+
+%The suite spans 29 realistic applications, 4 graphics rendering
+%pipelines, 19 libraries and kernels, 8 sorting routines, and 7 toy
+%examples.
