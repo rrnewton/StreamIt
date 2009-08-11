@@ -30,12 +30,29 @@
 </tr>
 </table>
 
+<p><b>Important note:</b> unfortunately this release has yet to incorporate our
+latest parallelization algorithm.  The release uses the algorithm from
+our <a
+href="http://groups.csail.mit.edu/commit/papers/02/streamit-asplos.pdf">ASPLOS'02
+paper</a> rather than our <a
+href="http://groups.csail.mit.edu/commit/papers/06/gordon-asplos06.pdf">ASPLOS'06
+paper</a>.  Our latest algorithm performed 1.83x better (on the
+16-core Raw architecture), though we are still porting it to commodity
+multicores.
+
+<p>If you are planning to do a critical evaluation of StreamIt's
+performance, we request that you <b><i>please inform us prior to
+publishing your results</i></b>.  We are more than happy to help you to
+make sure that you are using the system correctly and obtaining the
+best performance possible.  You can reach us at <a
+href="mailto:streamit@lists.csail.mit.edu">streamit@lists.csail.mit.edu</a>.
+
+	<h2><hr>Release Notes<hr></h2>
+
        <!-- Keep in synch with ../../release/news.tex.in -->
-	<p>This release (January, 2007) offers new features and
+	<p>The 2.1.1 release (January, 2007) offers new features and
 	improved robustness over the initial public release.  Major
-	features are as follows, please <a
-	href="mailto:streamit@cag.csail.mit.edu">contact us</a> if you
-	have any questions:
+	features are as follows:
 
 	<ul>
 	<p><li> Multi-threaded backend for multicores and clusters of workstations. <font color=darkred>(<i>Performance fix in 2.1.1</i>)</font>
@@ -51,7 +68,7 @@
         prefer to download a pre-installed version of StreamIt 2.1 for
         VMWare or Moka5.  See links at the bottom of this page.
 
-	<h2><hr>Release Notes<hr></h2>
+	<h2><hr>Installation<hr></h2>
 
 	<p>You may need to install some <a href="../shtml/download-reqs.shtml">prerequisite</a> 
 	tools or packages: C++ and C compilers, GNU utilities, Java 1.5, 
