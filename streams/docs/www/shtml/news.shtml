@@ -54,7 +54,7 @@ Paper on <a href="http://research.microsoft.com/en-us/um/people/thies/thies-mm09
 	     <td width="1%"></td>
 	     <td align=left valign=top>
 	       <p align=justify>
-MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming features StreamIt <a href="http://cag.csail.mit.edu/ps3/lectures/6.189-lecture8-streamit.pdf">language</a> and <a href="http://cag.csail.mit.edu/ps3/lectures/6.189-lecture12-streaming.pdf">compiler</a>.
+MIT <a href="http://groups.csail.mit.edu/cag/ps3/">class</a> on multicore programming features StreamIt <a href="http://groups.csail.mit.edu/cag/ps3/lectures/6.189-lecture8-streamit.pdf">language</a> and <a href="http://groups.csail.mit.edu/cag/ps3/lectures/6.189-lecture12-streaming.pdf">compiler</a>.
 	       </p>  
 	     </td>
 	   </tr>
@@ -102,7 +102,7 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td align=left valign=top>
 	       <p align=justify>
                  Our paper on <a
-	         href="http://cag.csail.mit.edu/commit/papers/06/gordon-asplos06.pdf">exploiting
+	         href="http://groups.csail.mit.edu/commit/papers/06/gordon-asplos06.pdf">exploiting
 	         coarse-grained parallelism</a> in stream programs
 	         will appear at ASPLOS in October 2006.  This paper
 	         maps StreamIt to Raw, a 16-core architecture,
@@ -120,7 +120,7 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td align=left valign=top>
 	       <p align=justify>
              Our paper on <a
-	         href="http://cag.csail.mit.edu/commit/papers/06/drake-ipdps06.pdf">MPEG-2
+	         href="http://groups.csail.mit.edu/commit/papers/06/drake-ipdps06.pdf">MPEG-2
 	         decoding in StreamIt</a> appears at IPDPS. The paper shows that MPEG decoding is a good match for
              StreamIt, leading to clean, reusable, and portable code. The
              source code and related resources are <a
@@ -138,10 +138,10 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td align=left valign=top>
 	       <p align=justify>
 	         Our paper on <a
-	         href="http://cag.csail.mit.edu/commit/papers//05/agrawal-cases05.pdf">linear
+	         href="http://groups.csail.mit.edu/commit/papers//05/agrawal-cases05.pdf">linear
 	         state space analysis</a> appears in CASES
 	         2005.  This paper extends our <a
-	         href="http://cag.csail.mit.edu/linear">previous work</a>
+	         href="http://groups.csail.mit.edu/cag/linear">previous work</a>
 	         on optimizing linear filters to encompass linear
 	         filters with state, including new optimizations for
 	         reducing the number of states and non-zero system
@@ -158,7 +158,7 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td align=left valign=top>
 	       <p align=justify>
 	         A paper on <a
-	         href="http://cag.csail.mit.edu/commit/papers//05/streamit-graphics-gh.pdf">
+	         href="http://groups.csail.mit.edu/commit/papers//05/streamit-graphics-gh.pdf">
 	         flexible graphics pipelines</a>, in collaboration with
 	         Jiawen Chen, <a
 	         href="http://people.csail.mit.edu/matthias/">Matthias
@@ -181,11 +181,11 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td align=left valign=top>
 	       <p align=justify>
 	         Our paper on <a
-	         href="http://cag.csail.mit.edu/commit/papers/05/sermulins-lctes05.pdf">cache
+	         href="http://groups.csail.mit.edu/commit/papers/05/sermulins-lctes05.pdf">cache
 	         optimizations</a> for embedded and general-purpose
 	         processors appears in LCTES 2005.  Also, our paper on
 	         <a
-	         href="http://cag.csail.mit.edu/commit/papers/05/thies-ppopp05.pdf">teleport
+	         href="http://groups.csail.mit.edu/commit/papers/05/thies-ppopp05.pdf">teleport
 	         messaging</a>, a new language construct for out-of-band
 	         communication, appears in PPoPP 2005.
 	       </p>
@@ -200,7 +200,7 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td align=left valign=top>
 	       <p align=justify>
 	         A paper on <a
-	         href="http://web.mit.edu/rabbah/www/docs/solar-pldi-2005.pdf">programming
+	         href="http://people.csail.mit.edu/rabbah/docs/solar-pldi-2005.pdf">programming
 	         by sketching</a> for bit-streaming programs, a
 	         collaborative effort with <a
 	         href="http://www.cs.berkeley.edu/~asolar/">Armando
@@ -220,7 +220,7 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td align=left valign=top>
 	       <p align=justify>
 	         Our paper on the <a
-	         href="http://cag.csail.mit.edu/commit/papers/05/kkuo-sdt.pdf">
+	         href="http://groups.csail.mit.edu/commit/papers/05/kkuo-sdt.pdf">
 	         StreamIt Development Tool</a> for high-productivity
 	         stream programming, including a user study that
 	         demonstrates improved debugging of stream programs,
@@ -239,11 +239,9 @@ MIT <a href="http://cag.csail.mit.edu/ps3/">class</a> on multicore programming f
 	     <td width="1%"></td>
 	     <td align=left valign=top>
 	       <p align=justify>
-	         <a href="http://www.cs.berkeley.edu/~nmani/">Mani
-	         Narayanan</a> and <a
+		   Mani Narayanan and <a
 	         href="http://www.cs.berkeley.edu/~yelick/">Kathy
-	         Yelick</a> of UC Berkeley publish a <a
-	         href="http://www.cs.berkeley.edu/~nmani/ms/msp6.ps">paper</a>
+	         Yelick</a> of UC Berkeley publish a paper
 	         in the 4th Workshop on Media and Streaming Processors,
 	         describing automatic generation of permutation
 	         instructions for VIRAM using StreamIt as a high-level
