@@ -1,0 +1,12 @@
+Introduction
+* multicores require parallelization
+* data parallelization is great
+* want to expose as much data parallelism as possible
+* sliding windows is an important class of computation in certain domains
+* show what sliding window looks like in C, ugly hard to parallelize
+* contrast with explicit support in StreamIt and Brook
+* motivational numbers: don't parallelize peeking filters
+* motivation for optimization of parallelization of sliding window computations
+
+Model of Computation
+
