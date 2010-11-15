@@ -1,19 +1,17 @@
-\begin{abstract}  
-
 Stream programs represent an important class of high-performance
-computations, and are expressed as graphs of independent filters
-connected by data channels.  Filters execute repeatedly and
+computations. They are expressed as graphs of independent filters
+connected by data channels; filters execute repeatedly and
 communication between filters is regular and repeating.  Many stream
 programs include significant amounts of sliding window computation in
-which each item in a data stream is inspected by multiple execution
-steps of a filter.  Examples of sliding window computations include
-FIR and IIR filters; moving averages and differences; error correcting
+which consecutive iterations of a filter inspect overlapping portions
+of the input channel.  Examples of sliding window computations include
+FIR filters; moving averages and differences; error correcting
 codes; motion estimation; and network packet inspection.  Some popular
-stream programming languages (e.g., Brook, Lime, StreamIt, and IBM SPL) go
-so far as to include idioms that directly represent sliding window
-computation, asking the programmer to specify, for each filter, the
-size of the window and the number of items discarded after an
-execution of the filter.
+stream programming languages (e.g., Brook, Lime, StreamIt, and IBM
+SPL) go so far as to include idioms that directly represent sliding
+window computation, allowing the programmer to specify, for each
+filter, the size of the window and the number of items discarded after
+an execution of the filter.
 
 In this work we demonstrate that directly representing sliding window
 computation in a stream language is essential to achieving robust
@@ -22,13 +20,11 @@ general framework for the data-parallelization of sliding window
 filters that do not include other forms of stateful computation.  The
 techniques precisely route items across parallel copies, and allow the
 compiler to parameterize inter-core communication (at the expense of
-latency), This reduces the amount of inter-core communication compared
+latency), We reduce the amount of inter-core communication compared
 with previous techniques that blindly duplicate all input data.  We
 evaluate our framework in the context of the StreamIt programming
 language on 4 real-world applications.  Targeting a 16 core shared
 memory multicore and a 64 core distributed memory multicore, our
 techniques achieve a 5.5x speedup and a 1.8x speedup, respectively,
 over previously published techniques.
-
-\end{abstract}
 
