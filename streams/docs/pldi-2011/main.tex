@@ -26,6 +26,24 @@
 % authoryear    To obtain author/year citation style instead of numeric.
 
 \usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amssymb}
+\usepackage{subfigure}
+\usepackage{algorithm} 
+\usepackage{algpseudocode}
+
+
+% do not indent paragraphs of enumerated lists (my lists go on for pages...)
+% numbers flush left to paragraph text: \leftmargin=17pt
+\newcommand{\mybegin}{\begin{list}{\labelenumi}{\leftmargin=\parindent}\usecounter{enumi}}
+%\newcommand{\myitem}[1]{\item {\textit{\textbf{#1}}}}
+\newcommand{\myitem}[1]{\item {\bf #1}}
+\newcommand{\myend}{\end{list}}
+\newcommand{\mt}[1]{\mbox{\it #1}}
+\newcommand{\todo}[1]{\framebox {\bf #1}}
+
+
 
 \begin{document}
 
@@ -64,8 +82,13 @@
 % data parallelism / state is bad / fusing 
 % technical
 % numbers
+\input{model}
+\input{fission}
+\input{common}
+\input{sharing-red}
+\input{data-par}
+\input{results}
 \input{related}
-
 \input{conclusion}
 
 % \acks
