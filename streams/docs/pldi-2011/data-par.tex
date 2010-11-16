@@ -1,0 +1,156 @@
+\section{Data Parallelization of Stream Graph}
+
+
+General fission and sharing reduction are employed after
+\textsc{JudiciousFission} (see Algorithm~\ref{alg:jd}) calculates a
+fission width for each filter of the graph.  The formulation of
+general fission in Section~\ref{sec:general-fission} includes two
+preconditions for filter $g$:
+
+\begin{equation}
+\label{eq:fiss-precond1}
+C(g) < (M(S,g) / P) \cdot o(W, g) 
+\end{equation}
+\begin{equation}
+\label{eq:mod-fiss}
+M(S,g) \mod P = 0
+\end{equation}
+
+\noindent The compiler is required to calculate a multiplication
+factor $c$ for the entire graph that satisfies the preconditions for
+every filter.  At the same time, $c$ applies sharing
+reduction to the graph by increasing the graph such that
+Equation~\ref{eq:sr-mult} is satisfied by the constant.
+
+\textsc{DataParallelize} of Algorithm~\ref{alg:data-parallelize}
+highlights the steps for data parallelizing the general graph
+representation of the application.  This sequence is applied after the
+StreamIt graph has been coarsened and converted to a general graph.
+The algorithm first calculates the judicious fission widths for each
+filter of the general graph.  For each peeking filter $g$ that will be
+fissed, line~\ref{ln:dp1} finds the producer of $g$ that minimizes
+Equation~\ref{eq:apply-sharing}.  If this value is below
+$T_{\mt{apply}}$, $g$ is added to the sharing reduction calculation by
+adding $g$'s shared items and $g$'s total items to the running totals
+of each quantity.  Sharing reduction is incorporated into the
+steady-state multiplier $\mt{minMult}$ in line~\ref{ln:dp2} employing
+Equation~\ref{eq:sr-mult}.  The algorithm applies
+Equation~\ref{eq:fiss-precond1} to each peeking filter that will be
+fissed by maintain a running value of the minimum multiplier that
+enforce the precondition (line~\ref{ln:dp3}).  The sharing reduction
+multiplicity ($\mt{minMult}$) is required to be greater than the
+precondition multiplier.  Because of the precondition of
+Equation~\ref{eq:mod-fiss}, the final multiplication factor for
+increasing the steady-state must be a multiple of all the fission
+widths calculated by \textsc{JudiciousFission}.  The algorithm assures
+this by finding the least common multiple of all the $P_f$'s greater
+than $\mt{minMult}$ (line~\ref{ln:dp4}).  The steady-state
+multiplicity of the graph is then increased by multiplying all of the
+multiplicities by $c$.  Finally, each filter $f$ can be fissed by $P_f$ using
+general fission.
+
+\begin{algorithm}[th!]
+\caption{Exploit Data Parallelism in the General Graph for $N$ Cores} \label {alg:data-parallelize}
+\textsc{DataParallelize}($G = (V, E), N, T_{\mt{sharing}}, T_{\mt{apply}} $)
+\begin{algorithmic}[1]
+\State $\mt{preCondMult} \gets 1$, $\mt{sharingItems} \gets 0$, $\mt{totalItems} \gets 0$
+\State $\triangleright$ For each filter in the graph find the fiss factor
+\ForAll {$g \in V$}
+\State $P_g \gets $ \Call{JudiciousFission}{$g$, $N$} 
+\EndFor
+\Statex
+\State $\triangleright$ Calculate multiplier for fission preconditions and for sharing reduction
+\ForAll {$g \in V$}
+\State $\triangleright$ If this is a peeking filter we are fissing:
+\If {$P_g > 1 \wedge C(g) > 0$}
+\State $\triangleright$ Find the producer of $g$ with the lowest
+value for Eq.~\ref{eq:apply-sharing}
+\State $f \gets \min_{f \in \mt{In}(g)} (1 -\mt{RI}(f,g, S) \cdot
+\min(\frac{P_g}{P_f},\frac{P_f}{P_g} )) $
+\label{ln:dp1}
+\State $\triangleright$ If the min value is below $T_{\mt{apply}}$,
+then record the sharing and total communication
+\If {$T_{\mt{apply}} \ge  (1 -\mt{RI}(f,g, S) \cdot
+\min(\frac{P_g}{P_f},\frac{P_f}{P_g} ))$}
+\State $\mt{sharingItems} \gets \mt{sharingItems} + P_g \cdot C(g)$
+\State $\mt{totalItems} \gets \mt{totalItems} + M(S,g) \cdot o(W, g)$
+\EndIf 
+\State $\triangleright$ Assure that fissing peeking filters adhere to Eq.~\ref{eq:fiss-precond1}
+\State $\mt{preCondMult} \gets \max(\mt{preContMult}, \frac{C(g) \cdot P_g}{M(S,g)
+ \cdot o(W,g)})$  
+\label{ln:dp3}
+\EndIf
+\EndFor
+\Statex
+\State $\triangleright$ Find the multiplier for sharing reduction
+\State $\mt{minMult} \gets T_{\mt{sharing}} \cdot \frac{\mt{sharingItems}
+}{\mt{totalItems}}$
+\label{ln:dp2}
+\State $\triangleright$ Make sure that multiplier assures all fissing peeking filters
+adhere to  Eq.~\ref{eq:fiss-precond1}
+\State $\mt{minMult} \gets \max(\mt{minMult}, \mt{preCondMult})$
+\State $\triangleright$ Find the least common multiple of the $P_f$'s
+greater than $\mt{minMult}$ to adhere to Eq.~\ref{eq:mod-fiss}
+\State $c \gets $\Call{LCM}{$\forall P_f | f \in V$} $ >
+\mt{minMult}$
+\Statex
+\label{ln:dp4}
+\State $\triangleright$ Increase the steady-state by $c$
+\ForAll {$f \in V$}
+\State $M(S,f) \gets c \cdot M(S, f)$
+\EndFor
+\Statex
+\State $\triangleright$ Apply general fission to all nodes in the graph
+\ForAll {$f \in V$}
+\State \Call{GeneralFiss}{$f$, $P_f$}
+\EndFor
+\end{algorithmic}
+\vspace{10pt}
+\end{algorithm}
+
+
+Through empirical experimentation on FMRadio, Filterbank, and
+ChannelVocoder, we have settled on $T_{\mt{sharing}} =.10$ and
+$T_{\mt{apply}} = 0.05$. These constants are the sweet stop for the two
+architectures employed in the experimentation, being a good compromise
+between buffer size and inter-core communication.
+Figure~\ref{fig:fm-gen-comm} demonstrates the efficiency of general
+fission for the FMRadio benchmark when judiciously fissed to 4 cores.
+In the example, the coarsened version of FMRadio is given on the left.
+The steady-state of FMRadio is increased by 2560 so that the total
+sharing is under 10\%.  The last filter in the graph, the
+$\mt{Equalizer}$ has a large $\mt{dup}$, and this had to be overcome
+for each core.
+
+Figure~\ref{fig:fission-table}(a) gives the constant $c$
+calculated for ChannelVocoder, Filterbank, and FMRadio for 4, 16, 36,
+and 64 cores with: $T_{\mt{sharing}} = 0.10$ and $T_{\mt{apply}} =
+0.05$.  The factor is larger for FMRadio because one filter
+has $C(f) \gg o(S, f)$.  The multiplication factor affects both
+latency and buffer sizes adversely.  The application designer will
+have to decide if the latency of these techniques can be borne given
+the application criteria.  The total buffering requirement is
+increased when the steady-state is increased.  However, since we are
+then fissing, the buffer is divided amongst the fission products, and
+the {\it per-core} buffering requirement is unaffected by the
+increase.  For example, FMRadio, has a per-core 18 KB buffering
+requirement across all configurations (4, 16, 36, and 64 cores).  This
+requirement fits in the per-core L2 size of 64 KB for the Tile64.
+
+Figure~\ref{fig:fission-table}(b) compares the steady-state with and
+without sharing reduction for a 64-core mapping.  For ChannelVocoder,
+sharing reduction has no effect because most of the peeking filters do
+not satisfy $T_{\mt{apply}} = 0.05$.  For the peeking filters that do,
+the steady-state multiplier required for legal general fission for the
+graph is enough to assure $T_{\mt{sharing}}$ is met.  Even though
+sharing reduction has no effect for ChannelVocoder, general fission
+avoids the 38\% of total items that were unnecessary duplicated by
+dupdec.
+
+For FMRadio and Filterbank, sharing reduction leads to significant
+decreases in the percentage of total items communicated inter-core for
+each steady-state.  The buffer requirement is increased an average of
+5.2x for these benchmarks.  The total number of words communicated
+inter-core during each steady-state is the same, with and without
+sharing reduction.  However, the steady-state is greater in the
+sharing reduction case, thus producing more outputs.
