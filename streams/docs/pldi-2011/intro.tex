@@ -1,3 +1,115 @@
 \section{Introduction}
 
+The domain of stream programs is important because it stands at the
+intersection of trends in applications and architectures.  Stream
+programming naturally represents applications such as audio, video,
+digital signal processing, and data analysis; applications that are
+increasing prevalent as computing moves towards data-centric
+applications and to the mobile and embedded space.  Also, by virtue of
+their structure -- a graph of independent computational nodes (termed
+{\it filters} with explicit and regular communication -- stream
+programs are a natural fit for exploiting coarse-grained parallelism
+suitable for multicore architectures.  The interest in streaming
+applications has spawned a number of streaming languages that target
+the streaming domain, including StreamIt~\cite{streamitcc},
+Brook~\cite{brook04}, Cg~\cite{cg03}, Baker~\cite{Baker},
+SPUR~\cite{spur05samos}, Spidle~\cite{spidle03}, Lime~\cite{lime10},
+and SPL~\cite{spl09}.
+
+In a stream program, filters define an atomic execution step that
+repeats for many iterations (because data is continuously feed into
+the application); each execution step discards a number of data items
+from filter's input edge.  Often, a filter does not discard all the
+data items that it read for the current execution step, requiring
+these inspected (but not discarded) items for a future iteration (or
+iterations) of the filter.  This type of filter is described as
+performing a sliding window computation on its input. Sliding window
+computations are prevalent in stream programs.  Examples of sliding
+window computations include FIR filters; moving averages and
+differences; error correcting codes; motion estimation; and network
+packet inspection.  Some programming languages (e.g., Brook, Lime,
+StreamIt, and IBM SPL) go so far as to include idioms that directly
+represent sliding window computation, allowing the programmer to
+specify, for each filter, the size of the window and the number of
+items discarded after an execution of the filter.  Furthermore, a
+recent study of a large streaming benchmark suite written in the
+StreamIt programming language finds that 17 of the 30 real-world
+benchmarks include at least one filter that performs a sliding window
+computation~\cite{streamit-suite}.
+
+A goal of stream programming is to directly expose to the software
+layer the necessary information to enable automatic management of
+coarse-grained parallelism.  Stream programs expose multiple forms of
+parallelism: pipeline parallelism that exists between producers and
+consumers; task parallelism that exists between pairs of filters on
+parallel branches of the stream graph; and data parallelism that
+exists when a filter is stateless and can thus be replicated in a SPMD
+fashion.  Data parallelism is the most attractive, as it provides
+load-balanced and limitless parallelism (as long as input data is
+available).  A filter that is stateful, and cannot be
+data-parallelized, becomes a limit to parallelization scalability, as
+the work of that filter cannot be divided; the most load-intensive
+stateful filter becomes the bottleneck for steady-state execution.
+
+This paper presents a compiler framework for data-parallelizing
+filters that perform sliding window computations when the properties
+of the sliding window can be calculated statically.   Without explicitly
+representing sliding windows in the language, a sliding window would
+have to be expressed as state retained between iterations of a
+filter.  If sliding window filters required state, this state would
+represent a new parallelization bottleneck in 11 of the
+17 real-world benchmarks in the StreamIt Benchmark
+Suite~\cite{streamit-suite} that contain sliding windows.  Focusing
+on the Channelvocoder benchmark, this state would limit scalability to
+18 cores, whereas our techniques scale to at least 64 cores.
+
+how data parallelization is accomplished (sharing)
+previous approaches
+
+fission paragraph
+
+sharing reduction paragraph
+
+
+multicores and parallelization
+* managing parallelization is possible in the compiler
+* Static rates
+* data parallelization very effective
+* what if we did not parallelize peeking filters
+
+parallelization of sliding window computation
+* sharing input items / communication
+* figure
+* previous work shares all items 
+
+Stream programming discourages the programming from manually
+data-parallel\-izing filters. Thus, it is necessary for
+the compiler to introduce data-parallelism.  {\it Fission} (verb form
+{\it fiss}) is the process of data-parallelizing a stateless filter by
+duplicating the filter a certain number of ways, and wrapping the
+duplicates in a round-robin splitter and joiner to distribute the
+input data and collect the output data (SPMD).  The duplicated filters
+are referred to as {\it products}. 
+
+\subsection{Contributions}
+This paper makes the following contributions:
+\mybegin
+\myitem{Fission}
+\myitem{Sharing Reduction}
+\myitem{Data parallelization}
+\myend
+
+
+* streaming, important class of applications
+* multicores require parallelization
+* data parallelization is great
+* want to expose as much data parallelism as possible
+* sliding windows is an important class of computation in certain domains
+* show what sliding window looks like in C, ugly hard to parallelize
+* contrast with explicit support in StreamIt and Brook, lime, and spl
+* motivational numbers: don't parallelize peeking filters
+* motivation for optimization of parallelization of sliding window computations
+
+
+
 We build on the work of...~\cite{choi09}.
