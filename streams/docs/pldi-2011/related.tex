@@ -1,1 +1,45 @@
 \section{Related Work}
+
+
+Printz's ``signal flow graphs'' includes nodes that performed a
+sliding window~\cite{printz91thesis}.   Printz presents an
+implementation strategy translating the sharing requirement of data
+parallelization of peeking filters into communication.  However, his
+approach does not alter the steady-state of the graph to reduce
+sharing to neighboring fission products, and it does not further alter
+the steady-state to reduce sharing to under a given threshold.
+Instead, Printz's technique parallelizes the communication required
+by sharing via a pipelined sequence of transfers between neighboring
+cores on the iWarp machine.  Our techniques trade latency for reduced
+inter-core communication, a tradeoff that Printz did not explore.
+Finally, Printz did not implement his strategy; instead his evaluation
+relied on an model of a parallel architecture.
+
+In the Warp project, the AL language~\cite{tseng89thesis,tseng90} had
+a window operation for use with arrays.  The AL compiler targeted the
+Warp machine and translated loops into systolic computation.  The AL
+compiler did alter the blocking of distributed loop iterations to
+reduce the sharing requirement for the sharing of the sliding window
+among iterations of the loop.  However, this was in the context of an
+imperative language with parallel arrays and considered a different
+application class: matrix computation. 
+
+The Brook language requires a programmer to explicitly represent the
+communication of sliding windows by specifying that a filter reads
+overlapping portions of the input. Liao et al. map Brook to multicore
+processors by leveraging the affine partitioning
+model~\cite{liao06brook}. However, they do not alter the steady-state
+to reduce the number of items shared between the data parallel
+products of sliding window filters. Also, it is unclear if their
+techniques guarantee that an item is shared by at most 2 cores.
+
+Other languages have included the notion of a sliding window.  The ECOS
+graphs language allows actors to specify how many items are read but
+not consumed~\cite{huang_ecos_1992}; the Signal language allows access
+to the window of values that a variable assumed in the
+past~\cite{le_guernic_signal--data_1986}; and the SA-C language
+contains a two-dimensional windowing
+operation~\cite{draper_compiling_2001}.  However, to the best of our
+knowledge, translation systems for these languages do not utilize
+sliding windows to improve parallelism and reduce inter-core
+communication.
