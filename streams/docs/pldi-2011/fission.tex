@@ -63,6 +63,15 @@ steady-state.  We call this process {\it increasing} the steady-state
 of the graph by $c$.  Each of these preconditions can be enforced by
 increasing the steady-state of the graph.
 
+
+\begin{figure*}
+\centering
+\includegraphics[width=\textwidth]{figures/general-fission.pdf}
+\caption[Fission of a node in the general stream graph.]{Fission of a
+  node $f$ by $P$ in the general stream
+  graph.\label{fig:general-fission}}
+\end{figure*}
+
 The details of fission on a filter of the general stream graph are
 given in Figure~\ref{fig:general-fission}.  The process includes the
 following steps (Figure~\ref{fig:general-fission} illustrates steps
@@ -126,6 +135,20 @@ features:
   steady-state iteration $i$ shares items with $f_P$ executing at
   steady-state iteration $i-1$.
 \end{itemize}
+
+
+\begin{figure*}
+\centering
+\includegraphics[width=\textwidth]{figures/split-pattern.pdf}
+\caption[The output distribution required for general
+fission.]{
+The steady-state output distribution installed for identity node
+$ID_I$ by general fission.  Red edges denote items that are shared
+across fission products via duplication.  Though not demonstrated in
+the example of Figure~\ref{fig:fission-sharing2}, in the general
+case, if $C(f) > dup$, $C(f) - dup$ items at the end of the
+steady-state input are distributed to $f_1$. \label{fig:split-pattern}}
+\end{figure*}
 
 The general fission transformation creates two identity nodes ($ID_I$
 and $ID_O$) that are encoded to implemented the data distribution for

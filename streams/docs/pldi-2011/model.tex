@@ -160,6 +160,22 @@ dupset $d_i$ specifies that $w_i$ items be duplicated to the edges
 of the dupset.  Each tuple denotes that $w_i$ output items of $F$ are
 duplicated to the edges of $d_i$ before moving on to the next tuple.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=3in]{figures/dist-example.pdf}
+\caption[Example of input and output distribution.]{
+An example of a filter with non-trivial input and output distribution patterns.
+Filter $F_3$ has both multiple inputs and multiple outputs.  The input
+items from the multiple inputs are joined in the pattern described by
+its input distribution ($ID$): receive 1 item from $F_1$ and 2
+items from $F_2$, and repeat.  $F_3$'s output items are distributed to
+its multiple outputs as described by the output distribution pattern
+($OD$):  2 items to $F_4$, then 1 item is duplicated to both $F_4$ and
+$F_5$.  The output items of $F_3$ are indexed to show how they are
+distributed to $F_4$ and $F_5$.
+\label{fig:dist-example}}
+\end{figure}
+
 For both the $\mt{OD}$ and the $\mt{ID}$, the variable
 $\Sigma$ specifies the schedule which the distribution pattern
 describes, either $I$ for initialization, or $S$ for steady-state.

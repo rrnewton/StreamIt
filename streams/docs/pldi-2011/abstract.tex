@@ -20,7 +20,7 @@ general framework for the data-parallelization of sliding window
 filters that do not include other forms of stateful computation.  The
 techniques precisely route items across parallel copies, and allow the
 compiler to parameterize inter-core communication (at the expense of
-latency), We reduce the amount of inter-core communication compared
+latency). We reduce the amount of inter-core communication compared
 with previous techniques that blindly duplicate all input data.  We
 evaluate our framework in the context of the StreamIt programming
 language on 4 real-world applications.  Targeting a 16 core shared
