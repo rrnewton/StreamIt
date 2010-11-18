@@ -34,6 +34,27 @@
 \usepackage{algpseudocode}
 
 
+
+% make an environment for subfigures with verbatim
+\newbox\subfigbox	% Create a box to hold the subfigure. 
+\makeatletter
+  \newenvironment{subfloat}% % Create the new environment. 
+    {\def\caption##1{\gdef\subcapsave{\relax##1}}%
+    \let\subcapsave=\@empty % Save the subcaption text.  
+    \let\sf@oldlabel=\label 
+    \def\label##1{\xdef\sublabsave{\noexpand\label{##1}}}%
+    \let\sublabsave\relax  %
+    \setbox\subfigbox\hbox 
+        \bgroup}% 
+     {\egroup   %
+    \let\label=\sf@oldlabel
+    \subfigure[\subcapsave]{\box\subfigbox}}% 
+\makeatother
+
+\newcommand{\eightpoint}{\fontsize{8pt}{10pt}\selectfont}
+\newcommand{\ninepoint}{\fontsize{9pt}{11pt}\selectfont}
+
+
 % do not indent paragraphs of enumerated lists (my lists go on for pages...)
 % numbers flush left to paragraph text: \leftmargin=17pt
 \newcommand{\mybegin}{\begin{list}{\labelenumi}{\leftmargin=\parindent}\usecounter{enumi}}
@@ -78,8 +99,8 @@
 %keyword1, keyword2
 
 \input{intro}
-\input{slide-win}
 \input{model}
+\input{slide-win}
 \input{fission}
 \input{common}
 \input{sharing-red}
