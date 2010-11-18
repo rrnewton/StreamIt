@@ -1,71 +1,40 @@
 \section{Model of Computation}
+\label{model}
 
-The semantics of the model of computation employed in this
-paper are built upon synchronous dataflow (SDF)~\cite{leeSDF}.
-Computation is described by composing independent processing nodes
-into networks.  The processing nodes, termed {\it actors} or {\it
-  filters}, communicate via uni-directional FIFO data channels.  Each
-filter defines an atomic execution step that is performed repeatedly.
-The term {\it synchronous} denotes that a filter will not fire unless
-all of its input are available.  Synchronous dataflow requires that
-the number of items produced and consumed by a filter during each
-atomic execution step can be determined statically.  This allows the
-compiler to perform static scheduling of and transformations on the
-stream graph.
+The model we use for this paper is a general model that is agnostic of
+input language.  The semantics of the model of computation employed in
+this paper are built upon synchronous dataflow (SDF)~\cite{leeSDF}.
+Although the model was inspired by the StreamIt programming language,
+the model can represent aspects of other streaming programming
+languages such as Brook~\cite{brook04}, Lime~\cite{lime10},
+SPL~\cite{spl09} and SPUR~\cite{spur05samos}.  Consider a directed
+graph $G = (V, E)$ corresponding to a streaming application. $F \in V$
+is a filter in the application and $(f, g) \in E$ is an edge (or {\it
+  channel}) in the graph that denotes communication from $f$ to $g$
+using a FIFO channel.  Each filter is described by multiple rate
+declarations, data reorganization patterns, and compute functions as
+described below. The techniques in this paper require static-rate
+graphs, i.e., all of the qualities of the filters are statically
+determinable.
 
-The model we use for this paper is a general model that is agnostic
-of input language.  Although the model was inspired by the StreamIt
-programming language, the model can represent aspects of other
-streaming programming languages such as Brook~\cite{brook04},
-StreamC/KernelC~\cite{imagine03ieee}, and SPUR~\cite{spur05samos}.
-Consider a directed graph $G = (V, E)$ corresponding to a streaming
-application. $F \in V$ is a filter in the application and $(f, g) \in
-E$ is an edge in the graph that denotes communication from $f$ to $g$
-using a FIFO channel.  Edges are also termed {\it channels}. Note that
-there can exist multiple edges between 2
-filters. Figure~\ref{fig:streamgraph} gives an example stream graph
-for a FM radio with an equalizer.  The figure also includes details
-for two of the filters; the details are explained below.
+%  Figure~\ref{fig:streamgraph} gives an example
+% stream graph for a FM radio with an equalizer.  The figure also
+% includes details for two of the filters; the details are explained
+% below.
 
-The filter is the basic unit of execution in our model.  Each filter
-is described by multiple rate declarations, data reorganization
-patterns, and compute functions.  Basically, each filter defines the
-number of items it consumers and produces each time it is executed.
-The execution of a stream graph is represented by a {\it schedule} of
-a graph $G$.  A schedule gives a multiplicity for each filter $F \in
-V$ that denotes how many times to fire filter $F$.  When a schedule is
-executed, each filter fires when it has buffered enough input to
-satisfy its input requirement (a filter will not fire more times than
-given by a schedule).  In our notation, a schedule is represented by
-the variable $\Sigma$, and it denotes a mapping from filters to
-non-negative integers. The multiplicity of filter $F$ in schedule
-$\Sigma$ is denoted by $M(\Sigma, F)$.
-
-In the streaming domain, input items continuously enter the
-application, with application output continuously produced as items
-flow from producer filters to consumer filters.  To model this
-behavior statically, a schedule can be calculated such that all
-filters fire in the schedule, and the schedule can be repeated
-indefinitely.  Since our model of execution adheres to SDF, a {\it
-  steady-state} schedule, $S$, of a graph can be statically calculated
-such that the quantity of items on each of the filter's input buffer
-and output buffer remains unchanged by the complete execution of the
-schedule~\cite{lee87}.  Thus this schedule can be repeated
-indefinitely because buffers to not grow or shrink in size.
-Steady-state execution of the graph entails repeating the steady-state
-schedule for as much input as is expected.  Due to this, execution of
-the stream graph is conceptually wrapped in an outer loop that
-continuously executes the steady-state schedule.
-Figure~\ref{fig:pipeline-example}(a) gives an example of a
-steady-state schedule calculated for a graph that consists of three
-filters in a pipeline.
-
-Our model does not deal with arbitrary schedules of filter executions.
-The steady-state schedule, $S$, is explicitly represented.
-Furthermore, an {\it initialization} schedule, $I$, is explicitly
-represented that enables the steady-state schedule in the presence of
-peeking.  Thus, in our model $\Sigma \in \{I, S\}$.  More details on
-the initialization schedule are given below.
+% The filter is the basic unit of execution in our model.  Each filter
+% is described by multiple rate declarations, data reorganization
+% patterns, and compute functions.  Basically, each filter defines the
+% number of items it consumers and produces each time it is executed.
+% The execution of a stream graph is represented by a {\it schedule} of
+% a graph $G$.  A schedule gives a multiplicity for each filter $F \in
+% V$ that denotes how many times to fire filter $F$.  When a schedule is
+% executed, each filter fires when it has buffered enough input to
+% satisfy its input requirement (a filter will not fire more times than
+% given by a schedule).  In our notation, a schedule is represented by
+% the variable $\Sigma$, and it denotes a mapping from filters to
+% non-negative integers. The multiplicity of filter $F$ in schedule
+% $\Sigma$ is denoted by $M(\Sigma, F)$.
 
 For each filter, $F \in V$, a {\it work} function, $W_F$, is defined.
 The work function defines the atomic execution step for each filter.
@@ -75,13 +44,10 @@ items and producing the items statically defined.  For each filter, $F
 Prework describes a computation step that executes once at the first
 firing of a filter.  The prework function is executed only once per
 execution of the {\it application}; it describes any special
-initialization behavior required for a filter.  Many filters do not
-require a prework function that differs from the work function.  If a
-filter does not define a prework function, the work function is called
-on the first execution of the filter.  We denote a function with the variable
-$\mathcal{F} \in \{W^p, W\}$.   We sometimes leave out
-the subscript that denotes the filter if it is clear which work or
-prework function is intended.  
+initialization behavior required for a filter. We denote a function
+with the variable $\mathcal{F} \in \{W^p, W\}$.  We sometimes leave
+out the subscript that denotes the filter if it is clear which work or
+prework function is intended.
 
 For each filter $F \in V$ we define the following:
 \begin{itemize}
@@ -100,14 +66,55 @@ the {\it push} rate.
 
 \end{itemize}
 
-\noindent If $F$ does not define a prework function, $e(W^P_F, F) = o(W^P_F, F) =
-u(W^P_F, F) = 0$.  A filter with peek rate greater than pop rate is
-termed a {\it peeking} filter.  Figure~\ref{fig:pipeline-example}(b)
+\noindent Sliding window filters have a peek rate greater than the pop
+rate.  We somethings refer to sliding window filters as {\it peeking}
+filters. Figure~\ref{fig:pipeline-example}(b)
 demonstrates a peeking filter.  The figures shows that the window of
 items read for consecutive firings of the filter overlap.  For the
 work function execution, a peeking filter $F$ requires $e(W_F, F)$
 items to be on its input channel(s) to fire.  $F$ will consume
 (dequeue) the first $o(W_F, F)$ items after the firing of the work function.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.0in]{figures/pipeline-example.pdf}
+\caption[A pipeline of three filters with schedules.]{A pipeline of
+  three filters.  In the figure, the number to the left of a filter is
+  the number of items the filter consumes per firing; the number to
+  the right is the number of items produced per firing.  (a) gives a
+  legal steady-state schedule for the three filters.  (b) gives more
+  detail for $\mt{Filter}_2$ including its peek rate.  The figure
+  shows the window of items read for 3 consecutive firings of the
+  filter.  Notice the overlapping in the windows.  (c) gives a
+  legal initialization schedule for the graph that enables
+  $\mt{Filter}_2$'s peeking. 
+\label{fig:pipeline-example}}
+\end{figure}
+
+
+A schedule gives a multiplicity for each filter $F \in V$ that denotes
+how many times to fire filter $F$. A schedule can be calculated such
+that all filters fire in the schedule, and the schedule can be
+repeated indefinitely.  A {\it steady-state} schedule, $S$, of a graph
+can be statically calculated such that the quantity of items on each
+of the filter's input buffer and output buffer remains unchanged by
+the complete execution of the schedule~\cite{lee87}.  Thus this
+schedule can be repeated indefinitely because buffers to not grow or
+shrink in size.  Steady-state execution of the graph entails repeating
+the steady-state schedule for as much input as is expected.  Due to
+this, execution of the stream graph is conceptually wrapped in an
+outer loop that continuously executes the steady-state schedule.
+Figure~\ref{fig:pipeline-example}(a) gives an example of a
+steady-state schedule calculated for a graph that consists of three
+filters in a pipeline.
+
+
+Our model does not deal with arbitrary schedules of filter executions.
+The steady-state schedule, $S$, is explicitly represented.
+Furthermore, an {\it initialization} schedule, $I$, is explicitly
+represented that enables the steady-state schedule in the presence of
+peeking filters.  Thus, in our model $\Sigma \in \{I, S\}$.  More details on
+the initialization schedule are given below.
 
 An initialization schedule is required if peeking is present in a
 graph to enable the calculation and execution of a steady-state
@@ -120,16 +127,13 @@ then an initialization schedule is also
 required)~\cite{karczmarek-lctes03}.
 Figure~\ref{fig:pipeline-example}(c) gives a legal steady-state
 schedule for the pipeline that enables the peeking in filter
-$\mt{Filter}_2$.  During application execution, the initialization schedule
-is executed once followed by an infinite repetition of the
-steady-state schedule.  Figure~\ref{fig:timeline} shows how the
-execution of the initialization and steady-state schedules unfold for
-the pipeline example of Figure~\ref{fig:pipeline-example}.  The number
+$\mt{Filter}_2$.  During application execution, the initialization
+schedule is executed once followed by an infinite repetition of the
+steady-state schedule.   The number
 of items remaining on $F$'s input channel(s) after execution of the
 initialization schedule is represented by $C(F)$.  In the case of
-Figure~\ref{fig:timeline}, $C(\mt{Filter}_2) = 2$ and
+Figure~\ref{fig:pipeline-example}, $C(\mt{Filter}_2) = 2$ and
 $C(\mt{Filter}_1) = C(\mt{Filter}_3) = 0$.
-
 
 A filter may have multiple incoming edges and/or multiple outgoing
 edges.  Let \textsc{Out}$(F)$ represent the set of output edges of $F$, and 
@@ -196,31 +200,10 @@ $\mt{RI}(F_3, F_5) = \frac{1}{3}$.  Conversely, let $\mt{RI}(F_1, F_2,
 from $F_1$ for $\Sigma$.  For example, in
 Figure~\ref{fig:dist-example}, $\mt{RI}(F_2,F_3) = \frac{2}{3}$.
 
-Let $s(\mathcal{F}, F)$ denote the execution time (in cycles, with
-respect to a given real or conceptual machine) of function
-$\mathcal{F}$ of filter $F$.  For many of the static scheduling
-techniques covered in this thesis, we calculate a static estimation of
-the total amount of work for a filter $F$ in the steady-state, $s(W,
-F) \cdot M(S, F)$.  We often use the term {\it work estimation} to
-denote this quantity.
-
-We define one final property of a filter.  For filter $F$, given that
-there is sufficient input data and output data will be ordered
-properly, if it is required to execute firing $i$ of $F$ before firing
-$i+1$, then $F$ is termed {\it stateful}.  If firing $i$ of $F$ can be
-executed before (or in parallel with) $i+1$, then $F$ is termed a {\it
-  stateless} filters.  This section does not define how the
-computation of the work and prework functions is specified.  In the
-next section we will see that for StreamIt, a work function is
-imperative code that can include (field) variables live across firings
-of the filter.  In this case, a filter $F$ is stateless if $F$ does
-not write to a field variable that is read during a subsequent firing.
-This will create a loop-carried dependence and prevent
-data-parallelization.
-
-In general, if all of the quantities defined above can be statically
-determined for graph $F \in G$, then we say $G$ is {\it static}.
-Static graphs match closely the original formulation of synchronous
-dataflow (with the exception of peeking and prework).  The scheduling,
-partitioning, and mapping techniques presented in this thesis are
-enabled by and operate on static graphs.
+% Let $s(\mathcal{F}, F)$ denote the execution time (in cycles, with
+% respect to a given real or conceptual machine) of function
+% $\mathcal{F}$ of filter $F$.  For many of the static scheduling
+% techniques covered in this thesis, we calculate a static estimation of
+% the total amount of work for a filter $F$ in the steady-state, $s(W,
+% F) \cdot M(S, F)$.  We often use the term {\it work estimation} to
+% denote this quantity.
