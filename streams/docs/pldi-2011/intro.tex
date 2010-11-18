@@ -58,58 +58,96 @@ representing sliding windows in the language, a sliding window would
 have to be expressed as state retained between iterations of a
 filter.  If sliding window filters required state, this state would
 represent a new parallelization bottleneck in 11 of the
-17 real-world benchmarks in the StreamIt Benchmark
-Suite~\cite{streamit-suite} that contain sliding windows.  Focusing
+17 real-world benchmarks in the StreamIt Benchmark Suite 
+that contain sliding windows~\cite{streamit-suite}.  Focusing
 on the Channelvocoder benchmark, this state would limit scalability to
 18 cores, whereas our techniques scale to at least 64 cores.
 
-how data parallelization is accomplished (sharing)
-previous approaches
+Data-parallelizing a filter is performed via a transformation termed
+{\it fission} (verb form {\it fiss})~\cite{streamit-asplos}.  Fission
+is the process of data-parallelizing a stateless filter by duplicating
+the filter a certain number of ways, assigning duplicates to distinct
+cores, and correctly distributed input data to and collecting the
+output data from the duplicates.  The duplicated filters are referred
+to as {\it products}.  Fission requires that the sliding window
+properties and the output rates of a filter are statically
+determinable and constant.  When a sliding window is present, fission
+is accomplished by duplicating certain input items since they are
+required by multiple products.  This duplication translates into
+inter-core communication, possibly a limiting factor for scalability when
+targeting multicore architectures.
 
-fission paragraph
+Previous approaches duplicate each input data item to all products,
+with products ignoring (decimating) items that are not
+needed~\cite{streamit-asplos}.  We will show that this strategy limits
+scalability for certain multicores by requiring too much inter-core
+communication.  In contrast, our strategy precisely routes each input
+item to the minimal set of product filters that requires the item.
+Unlike previous work, our techniques are defined on
+multiple input and multiple output filters, removing the need
+introduce synchronization filters that serialize input data before and
+output data after the product filters.  
 
-sharing reduction paragraph
+Our techniques operate on {\it static-rate} stream graphs, meaning
+that the number of items produced, the number of items consumed, and
+the number of items inspected by each filter can be determined
+statically.  Because of this property, a steady-state schedule of
+filter firings can be calculated that does not grow buffers and can be
+executed indefinitely~\cite{lee87}.  Our techniques are conscious of
+the spatial locality between producers and consumers.  Our framework
+includes techniques that can determine when spatial locality can be
+increased by altering the steady-state schedule.  When applicable, our
+techniques can reduce the overall sharing (and thus inter-core
+communication) requirement to below a threshold percent of the total
+input communication for each sliding window filter that is
+data-parallelized.  This technique trades latency for reductions in
+inter-core communication.
 
-
-multicores and parallelization
-* managing parallelization is possible in the compiler
-* Static rates
-* data parallelization very effective
-* what if we did not parallelize peeking filters
-
-parallelization of sliding window computation
-* sharing input items / communication
-* figure
-* previous work shares all items 
-
-Stream programming discourages the programming from manually
-data-parallel\-izing filters. Thus, it is necessary for
-the compiler to introduce data-parallelism.  {\it Fission} (verb form
-{\it fiss}) is the process of data-parallelizing a stateless filter by
-duplicating the filter a certain number of ways, and wrapping the
-duplicates in a round-robin splitter and joiner to distribute the
-input data and collect the output data (SPMD).  The duplicated filters
-are referred to as {\it products}. 
+The framework presented is defined on a model of computation that is
+agnostic of source language.  To evaluate our techniques we have
+implemented them in the context of the StreamIt compiler
+infrastructure~\cite{gordon-asplos06}.  We employ 3 real-world
+benchmarks from the StreamIt Benchmark Suite~\cite{streamit-suite}
+that include of sliding window computation.  We demonstrate the
+effectiveness of our techniques by comparing them to previously
+published techniques on 2 multicore architectures: a 16-core SMP
+shared-memory multicore and a 64-core distributed-memory multicore.
+We show that our techniques are required to achieve scalable
+parallelization on both architectures, achieving a 5.5x mean speedup
+on the 16-core SMP and a 1.8x mean speedup on the 64-core distributed
+memory multicore over a previously published technique.
 
 \subsection{Contributions}
 This paper makes the following contributions:
-\mybegin
-\myitem{Fission}
-\myitem{Sharing Reduction}
-\myitem{Data parallelization}
-\myend
+\begin{itemize}
+  \myitem{Motivation for exposing sliding windows in stream
+    languages}: Without exposing sliding windows in the language, it
+  requires heroic effort by the compiler to analyze the input patterns
+  of such a filter. Without success, the compiler will not be able to
+  data-parallelize these filters.  This will severely limit
+  parallelization scalability for streaming applications with sliding
+  window computations.
 
+  \myitem{Generalized fission of sliding window filters}: We present a
+  transformation that fisses sliding window filters with multiple
+  input and multiple outputs.  The technique also supports filters
+  that with multiple schedules of execution.  General fission defines
+  a precise pattern of communication of input data to the products
+  that can be reasoned upon by our other techniques.
 
-* streaming, important class of applications
-* multicores require parallelization
-* data parallelization is great
-* want to expose as much data parallelism as possible
-* sliding windows is an important class of computation in certain domains
-* show what sliding window looks like in C, ugly hard to parallelize
-* contrast with explicit support in StreamIt and Brook, lime, and spl
-* motivational numbers: don't parallelize peeking filters
-* motivation for optimization of parallelization of sliding window computations
+  \myitem{Sharing Reduction}: We present a technique that decides when
+  it is possible to decrease the amount of sharing between fission
+  products by altering the steady-state of a stream graph, thus
+  decreasing inter-core communication.  The technique reasons about
+  all the sliding window filters of the stream graph, and when
+  possible, reduces the sharing requirement to below a given threshold
+  percent of the total input of the filters.
 
-
-
-We build on the work of...~\cite{choi09}.
+  \myitem{Data Parallelization of Stream Graph}: We present a
+  framework for data-parallelizing all of the filters of a stream
+  graph employing the fission transformation on individual filters and
+  applying sharing reduction when possible.  This framework optimizes
+  for spatial locality and enables the compiler to automatically and
+  effectively manage parallelization across varying multicore
+  architectures.
+\end{itemize}
