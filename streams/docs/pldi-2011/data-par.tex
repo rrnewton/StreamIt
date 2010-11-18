@@ -122,35 +122,3 @@ sharing is under 10\%.  The last filter in the graph, the
 $\mt{Equalizer}$ has a large $\mt{dup}$, and this had to be overcome
 for each core.
 
-Figure~\ref{fig:fission-table}(a) gives the constant $c$
-calculated for ChannelVocoder, Filterbank, and FMRadio for 4, 16, 36,
-and 64 cores with: $T_{\mt{sharing}} = 0.10$ and $T_{\mt{apply}} =
-0.05$.  The factor is larger for FMRadio because one filter
-has $C(f) \gg o(S, f)$.  The multiplication factor affects both
-latency and buffer sizes adversely.  The application designer will
-have to decide if the latency of these techniques can be borne given
-the application criteria.  The total buffering requirement is
-increased when the steady-state is increased.  However, since we are
-then fissing, the buffer is divided amongst the fission products, and
-the {\it per-core} buffering requirement is unaffected by the
-increase.  For example, FMRadio, has a per-core 18 KB buffering
-requirement across all configurations (4, 16, 36, and 64 cores).  This
-requirement fits in the per-core L2 size of 64 KB for the Tile64.
-
-Figure~\ref{fig:fission-table}(b) compares the steady-state with and
-without sharing reduction for a 64-core mapping.  For ChannelVocoder,
-sharing reduction has no effect because most of the peeking filters do
-not satisfy $T_{\mt{apply}} = 0.05$.  For the peeking filters that do,
-the steady-state multiplier required for legal general fission for the
-graph is enough to assure $T_{\mt{sharing}}$ is met.  Even though
-sharing reduction has no effect for ChannelVocoder, general fission
-avoids the 38\% of total items that were unnecessary duplicated by
-dupdec.
-
-For FMRadio and Filterbank, sharing reduction leads to significant
-decreases in the percentage of total items communicated inter-core for
-each steady-state.  The buffer requirement is increased an average of
-5.2x for these benchmarks.  The total number of words communicated
-inter-core during each steady-state is the same, with and without
-sharing reduction.  However, the steady-state is greater in the
-sharing reduction case, thus producing more outputs.
