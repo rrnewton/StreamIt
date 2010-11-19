@@ -37,7 +37,11 @@ graph can be performed:
 by the same constant $c$, and the result will still be a valid
 steady-state.  We call this process {\it increasing} the steady-state
 of the graph by $c$.  Each of these preconditions can be enforced by
-increasing the steady-state of the graph.
+increasing the steady-state of the graph. The details of fission on a
+filter of the general stream graph are given in
+Figure~\ref{fig:general-fission}: (a) gives the definition of the
+original filter $f$, (b) lists the 11 steps of the algorithm, and
+(c) gives details for steps 1-9 of the transformation.
 
 \begin{figure*}
 \centering
@@ -46,9 +50,6 @@ increasing the steady-state of the graph.
   node $f$ by $P$ in the general stream
   graph.\label{fig:general-fission}}
 \end{figure*}
-
-The details of fission on a filter of the general stream graph are
-given in Figure~\ref{fig:general-fission}. 
 
 To understand the transformation, we first need to understand the item
 distribution and sharing that is required by fission on a filter $f$
