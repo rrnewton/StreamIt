@@ -1,29 +1,29 @@
 \section{Data Parallelization Common Case}
 
-The techniques covered above are employed during the compiler flow
-outlined in Chapter~\ref{ch:datapar} to effectively leverage data and
-task parallelism.  The coarsened StreamIt graph is converted into a
-general by employing \textsc{SynchRemove} (see
-Section~\ref{sec:synch-remove} for details).  \textsc{JudiciousFission} is
-performed on the coarsened general graph using the technique covered
-in Section~\ref{sec:levels}.  Fission of a node in the general graph
-replaces fission of a filter in the StreamIt graph (see
-Section~\ref{sec:fission-streamit}) in the process of judicious
-fission.  Conversion to the general graph with synchronization
-removal, accompanied by employing general fission, greatly reduces the
-inter-core communication requirement of the resulting mapping when
-fissing filters that peek.  Figure~\ref{fig:fission-versus} gives a
-simple example of the potential savings.
+% The techniques covered above are employed during the compiler flow
+% outlined in Chapter~\ref{ch:datapar} to effectively leverage data and
+% task parallelism.  The coarsened StreamIt graph is converted into a
+% general by employing \textsc{SynchRemove} (see
+% Section~\ref{sec:synch-remove} for details).  \textsc{JudiciousFission} is
+% performed on the coarsened general graph using the technique covered
+% in Section~\ref{sec:levels}.  Fission of a node in the general graph
+% replaces fission of a filter in the StreamIt graph (see
+% Section~\ref{sec:fission-streamit}) in the process of judicious
+% fission.  Conversion to the general graph with synchronization
+% removal, accompanied by employing general fission, greatly reduces the
+% inter-core communication requirement of the resulting mapping when
+% fissing filters that peek.  Figure~\ref{fig:fission-versus} gives a
+% simple example of the potential savings.
 
-The design of the general fission algorithm was informed by the fact
-that for most fission applications of judicious fission, a producer
-and consumer are fissed by an equal width.  This is because in most of
-our benchmarks, a level's width of task parallelism is equal to the
-width of task parallelism for it's consuming level.  In this case,
-fission on the general graph will map the bulk of communication to
-intra-core resources.  Furthermore, in the next section we demonstrate
-that the ratio of inter-core communication to total communication is
-parametrizable for this case.
+% The design of the general fission algorithm was informed by the fact
+% that for most fission applications of judicious fission, a producer
+% and consumer are fissed by an equal width.  This is because in most of
+% our benchmarks, a level's width of task parallelism is equal to the
+% width of task parallelism for it's consuming level.  In this case,
+% fission on the general graph will map the bulk of communication to
+% intra-core resources.  Furthermore, in the next section we demonstrate
+% that the ratio of inter-core communication to total communication is
+% parametrizable for this case.
 
 To understand why general fission achieves the reduction of inter-core
 communication for this case, we must remember a few properties of the
