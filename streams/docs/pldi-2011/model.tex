@@ -102,8 +102,10 @@ graph is conceptually wrapped in an outer loop that continuously
 executes the steady-state schedule.
 Figure~\ref{fig:pipeline-example}(a) gives an example of a
 steady-state schedule calculated for a graph that consists of three
-filters in a pipeline.
-
+filters in a pipeline.  All the multiplicities of the steady-state can
+be multiplied by the same constant $c$, and the result will still be a
+valid steady-state.  We call this process {\it increasing} the
+steady-state of the graph by $c$.
 
 Our model does not deal with arbitrary schedules of filter executions.
 The steady-state schedule, $S$, is explicitly represented.
