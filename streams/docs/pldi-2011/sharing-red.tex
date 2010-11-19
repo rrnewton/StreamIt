@@ -14,45 +14,25 @@ consumer to a producer in a different pair.
 \centering
 \includegraphics[width=\textwidth]{figures/remaining-dup-case.pdf}
 \caption[Extra inter-core communication when $C(g) > \mt{dup}_g$.]
-{  Inter-core communication details for fission products of consumer $f$
-   and producer $g$ each fissed by $P$.  $f$ was a single output node,
-   and $g$ was a single input node.  For $g$, $C(g) > \mt{dup}_g$.
-   Each $f_i$, $g_i$ pair are mapped to the same core.
-   The sizes of the buffer sections are in terms of $g$. Red arrows
-   denote inter-core communication.\label{fig:remaining-dup}}
- \end{figure*}
+{Inter-core communication details for fission products of consumer $f$
+  and producer $g$ each fissed by $P$.  $f$ was a single output node,
+  and $g$ was a single input node.  For $g$, $C(g) > \mt{dup}_g$.
+  Each $f_i$, $g_i$ pair are mapped to the same core.  The sizes of
+  the buffer sections are in terms of $g$. Red arrows denote
+  inter-core communication.\label{fig:remaining-dup}}
+\end{figure*}
 
- Figure~\ref{fig:remaining-dup} illustrates the details of
- communication between $f$ and $g$ when each is fissed by $P$.  In the
- graph before fission is applied, $C(g)$ items will remain in the
- input buffer of $g$ between steady-state iterations.  After fission by $P$,
- for each steady-state, $g_1$ will first consume the $C(g)$ items that
- $f_p$ sent it from the previous steady-state iteration.  $g_1$ will
- then require:
-
-\[ M(S, g)/P \cdot o(W, g) + \mt{dup} - C(g)\]
-
-\noindent additional items from $f_1$.\footnote{It is guaranteed that
-  $M(S, g)/P \cdot o(W, g) > C(g)$ by the precondition of general
-  fission.} This requirement is less than the number of items that
-$f_1$ produces $M(S, g)/P \cdot o(W, g)$ since $C(g) > \mt{dup}$. So,
-$C(g) - \mt{dup}$ items must be transferred from $f_1$ to $g_2$ in
-addition to the shared and duplicated $\mt{dup}$. In all, $C(g)$ items
-must be transferred from $f_i$ to $g_{i+1}$.
-
- Each $f_i$ produces $M(S,f)/p
-\cdot u(S,f)$ items, while each $g_i$ must consume the original pop
-rate multiplied by it's slice of $f$'s multiplicity plus the number of
-inspected items of $g$:
-
-\[ M(S,g)/P \cdot o(W, g) + C(g) \]
-
-\noindent Since $M(S,g)/P \cdot o(W, g) = M(S,f)/p
-\cdot u(S,f)$, the number of items each $f_i$ produces and the number
-of items each $g_i$ consumes differs by $C(g)$.
-As Figure~\ref{fig:core-comm} demonstrates, each $g_i$
-receives $C(g)$ duplicated items from $g_{i-1}$ (with $g_1$
-receiving from $f_p$).  
+Figure~\ref{fig:remaining-dup} illustrates the details of
+communication between $f$ and $g$ when each is fissed by $P$ with each
+$f_i$ mapped to a distinct core, and to the same core as $g_i$.  From
+the figure, notice that $C(g)$ items are communicated from $f_i$ to
+$g_{i+ 1}$, with $f_P$ sending to $g_1$.  Of the $C(g)$ items,
+$\mt{dup}_g$ items are required by both $g_i$ and $g_{i+1}$.  This
+corresponds to the orignal number of input items of $g$ that were
+inspected by not dequeued for one firing of $g$.  The remaining items,
+$C(g) - \mt{dup}_g$, are required to be transfered from $f_i$ to
+$g_{i+1}$ when $C(g) > \mt{dup}$ because of misalignment of the items
+produced by $f_i$ and required by $g_i$.
 
 When the fission products are assigned to
 cores as given in the figure, the percentage of inter-core
@@ -86,7 +66,7 @@ may increase the latency of the steady-state.
 
 By recognizing this property, we can directly reduce the amount of
 inter-core communication that occurs between the fission products of a
-fissed peeking filter for certain cases of general fission, including
+fissed peeking filter for many cases of general fission, including
 the common case.  As we have seen above, the duplicated shared items
 translate directly into inter-core communication for the common case
 of fissing a producer and consumer by the same width.  For producer
@@ -106,28 +86,7 @@ c_g = \frac{1}{T_{\mt{sharing}}} \cdot \frac{C(g) \cdot P}{M(S,g) \cdot o(W,g)}
 \noindent where $0.0 < T_{\mt{sharing}} \le \mt{InterCore}$. Increasing the
 steady-state of the graph by $c_g$ before general fission is applied
 will assure that the percentage of items duplicated will be equal to
-$T_{\mt{sharing}}$.  For each producer $f$ and consumer $g$ that is
-duplicated by the same amount, and mapped to cores such that $f_i$ is
-mapped to same core as $g_i$, this will ensure that at most
-$T_{\mt{sharing}}$ fraction of total items are communicated inter-core.
-
-
-
-The analysis of the inter-core communication requirements of the
-fission of producer $f$ and consumer $g$ has so far assumed that $C(g)
-= \mt{dup}_g $.  This is not always the case however.  If $C(g) >
-\mt{dup}_g$, the communication between the fission products of $f$ and
-$g$ will be unaligned.  Figure~\ref{fig:remaining-dup} illustrates
-this case.  
-
-Thus, even in the general
-case where $C(g) > \mt{dup}_g$, Equation~\ref{eq:min-dup} calculates
-the percentage of total communication that is inter-core for the
-fission of $g$ by $P$ given the original steady-state. Furthermore,
-Equation~\ref{eq:ic-thresh} calculates the constant $c_g$ by which to
-increase the steady-state so that inter-core communication resulting
-from the fission of $g$ is equal to $T_{\mt{sharing}}$ fraction of
-total communication.
+$T_{\mt{sharing}}$.  
 
 \subsection{Sharing Reduction for Other Fission Cases}
 
@@ -137,46 +96,18 @@ single output producer $f$ and single input consumer $g$ with $(f,g)
 \in E$, but $f$ and $g$ are fissed by differing widths, i.e., $P_f \ne
 P_g$.  This case engenders inter-core communication not only because
 of sharing but because of the communication required by the differing
-fission widths.  For simplicity of analysis, let us assume that $C(g)
-= 0$, and $P_f$ is a multiple of $P_g$. Figure~\ref{fig:diff-widths}
-presents an example with these assumptions.  In the example, $f$ and
-$g$ are fissed by 8 and 4 respectively.  Since we want to maintain
-data parallelism, each $f_i$, $1 \le i \le P_f$, is mapped to a
-distinct core, as is each $g_j$, $1 \le j \le P_g$.  Since each $f_i$
-produces half the number of items required by each $g_j$, half the
-communication in this case is inter-core, caused by the misalignment
-of the rates of the producer and consumer fission products.
+fission widths.  
 
 Going forward, let us assume that $P_f > P_g$.  If $P_f$ is a multiple
-of $P_g$, the analysis is straightforward: the percentage of inter-core
-communication to total communication is $(1 - \frac{P_g}{P_f}$). If $P_f$ is
-not a multiple of $P_g$ misalignment also occurs because for one or
-more $g_j$, it's input does not begin in alignment with any $f_i$'s.
-The analysis of the percent of inter-core communication for this latter
-case is complex, but it suffices for our purposes to bound it by
-$(1 - \frac{P_g}{P_f})$.
+of $P_g$, the analysis is straightforward: the percentage of
+inter-core communication to total communication is $(1 -
+\frac{P_g}{P_f}$). If $P_f$ is not a multiple of $P_g$ misalignment
+also occurs because for one or more $g_j$, it's input does not begin
+in alignment with any $f_i$'s.  The analysis of the percent of
+inter-core communication for this latter case is complex, but it
+suffices for our purposes to bound it by $(1 - \frac{P_g}{P_f})$.
 
-Additionally, if $C(g) > 0$, it is required to share $C(g)$ items
-between two cores.  There are $P_g$ sections of $C(g)$ items, and this
-data has to be communicated inter-core to one other core.  Given this
-analysis, we can quantify an {\it approximation} of the percentage of
-inter-core communication for the fission application of $g$ when $P_f
-> P_g$:
-
-\begin{align}
-\mt{InterCore}(g) & = & \frac{(1 - \frac{P_g}{P_f}) \cdot M(S, g) \cdot o(W, g) +
-P_g \cdot C(g)}{M(S, g) \cdot o(W, g)} \\
-\label{eq:diff-fiss}
-\mt{InterCore}(g) & = & (1 - \frac{P_g}{P_f}) +
-\frac{P_g \cdot C(g)}{M(S, g) \cdot o(W, g)}
-\end{align}
-
-The first term on the RHS of Equation~\ref{eq:diff-fiss} gives the
-percentage of inter-core communication produced by the fission width
-inequality.  The second term quantifies the percentage of inter-core
-communication caused by the sharing due to peeking.  
-
-Consider the case where $g$ has multiple inputs. In this case $g$
+Also consider the case where $g$ has multiple inputs. In this case $g$
 receives $\mt{RI}(f, g, S) \cdot M(S, g) \cdot o(W,g)$ items from $f$
 during the steady-state, and $(1 -\mt{RI}(f, g, S) \cdot M(S, g) \cdot
 o(W,g))$ from its other producers. There is a choice: for which
@@ -186,30 +117,23 @@ inter-core communication by co-locating the fission products of $f$
 and $g$ just as the assignment would when $g$ is single input.
 However, the calculation must now account for the inter-core
 communication of the other producers sending to the fission products
-of $g$. We define $\mt{InterCore}(g, f)$ to approximate the percentage
+of $g$. 
+
+We define $\mt{InterCore}(g, f)$ to approximate the percentage
 of inter-core communication to total communication for the input of
 the fission products of $g$ optimizing for the placement of the
 fission products of $f$:
-
-\begin{equation}
-\label{eq:tcomm-fopt1}
- \mt{InterCore}(g,f)   = (1 - \mt{RI}(f,
-   g, S))  + (1 - \frac{P_g}{P_f}) \cdot \mt{RI}(f,
-   g, S)   + \frac{P_g \cdot C(g)}{M(S, g) \cdot o(W, g)} 
-\end{equation}
-
-\noindent The first term accounts for the percentage of items that $g$'s fission
-products receive from producers that are not products of $f$.  The
-second term, the percentage items that are communicated inter-core
-because of the fission width mis-alignment, must now account for the
-fact that not all items are from $f$.  Equation~\ref{eq:tcomm-fopt1}
-can be simplified to:
 
 \begin{equation}
 \label{eq:tcomm-fopt}
  \mt{InterCore}(g, f)   =  (1 -\mt{RI}(f,g, S) \cdot \frac{P_g}{P_f})
  + \frac{P_g \cdot C(g)}{M(S, g) \cdot o(W, g)}
 \end{equation}
+
+\noindent The first term approximates the inter-core communication due
+to the fission width discrepancy and the multiple input of $g$.  The
+second term quantifies the percentage of inter-core communication
+caused by the sharing due to peeking.
 
 How do we decide whether it is worthwhile to apply the sharing
 reduction optimization to $g$ given Equation~\ref{eq:tcomm-fopt}? When
@@ -247,6 +171,51 @@ $f$ has single output and $g$ has single input, the RHS of
 Equation~\ref{eq:apply-sharing} evaluates to 0, indicating to always
 apply sharing reduction for this case.
 
+% For simplicity of analysis, let us assume that $C(g)
+% = 0$, and $P_f$ is a multiple of $P_g$. Figure~\ref{fig:diff-widths}
+% presents an example with these assumptions.  In the example, $f$ and
+% $g$ are fissed by 8 and 4 respectively.  Since we want to maintain
+% data parallelism, each $f_i$, $1 \le i \le P_f$, is mapped to a
+% distinct core, as is each $g_j$, $1 \le j \le P_g$.  Since each $f_i$
+% produces half the number of items required by each $g_j$, half the
+% communication in this case is inter-core, caused by the misalignment
+% of the rates of the producer and consumer fission products.
+
+
+% Additionally, if $C(g) > 0$, it is required to share $C(g)$ items
+% between two cores.  There are $P_g$ sections of $C(g)$ items, and this
+% data has to be communicated inter-core to one other core.  Given this
+% analysis, we can quantify an {\it approximation} of the percentage of
+% inter-core communication for the fission application of $g$ when $P_f
+% > P_g$:
+
+% \begin{align}
+% \mt{InterCore}(g) & = & \frac{(1 - \frac{P_g}{P_f}) \cdot M(S, g) \cdot o(W, g) +
+% P_g \cdot C(g)}{M(S, g) \cdot o(W, g)} \\
+% \label{eq:diff-fiss}
+% \mt{InterCore}(g) & = & (1 - \frac{P_g}{P_f}) +
+% \frac{P_g \cdot C(g)}{M(S, g) \cdot o(W, g)}
+% \end{align}
+
+% The first term on the RHS of Equation~\ref{eq:diff-fiss} gives the
+% percentage of inter-core communication produced by the fission width
+% inequality.  
+
+% \begin{equation}
+% \label{eq:tcomm-fopt1}
+%  \mt{InterCore}(g,f)   = (1 - \mt{RI}(f,
+%    g, S))  + (1 - \frac{P_g}{P_f}) \cdot \mt{RI}(f,
+%    g, S)   + \frac{P_g \cdot C(g)}{M(S, g) \cdot o(W, g)} 
+% \end{equation}
+
+% \noindent The first term accounts for the percentage of items that $g$'s fission
+% products receive from producers that are not products of $f$.  The
+% second term, the percentage items that are communicated inter-core
+% because of the fission width mis-alignment, must now account for the
+% fact that not all items are from $f$.  Equation~\ref{eq:tcomm-fopt1}
+% can be simplified to:
+
+
 \subsection{Sharing Reduction Applied to the Stream Graph}
 So far we have considered the application of the sharing reduction
 optimization to a single filter $g$ in the stream graph.  Now we will
@@ -278,3 +247,37 @@ c = \frac{1}{T_{\mt{sharing}}} \cdot \frac{\sum_{g \in \Phi} P_g \cdot C(g) }{\s
 \noindent Increasing the steady-state by $c$ for all filters of the
 graph will reduce the total sharing for the filters of $\Phi$ to
 $T_{\mt{sharing}}$.  
+
+
+
+
+% In the
+%  graph before fission is applied, $C(g)$ items will remain in the
+%  input buffer of $g$ between steady-state iterations.  After fission by $P$,
+%  for each steady-state, $g_1$ will first consume the $C(g)$ items that
+%  $f_p$ sent it from the previous steady-state iteration.  $g_1$ will
+%  then require:
+
+% \[ M(S, g)/P \cdot o(W, g) + \mt{dup} - C(g)\]
+
+% \noindent additional items from $f_1$.\footnote{It is guaranteed that
+%   $M(S, g)/P \cdot o(W, g) > C(g)$ by the precondition of general
+%   fission.} This requirement is less than the number of items that
+% $f_1$ produces $M(S, g)/P \cdot o(W, g)$ since $C(g) > \mt{dup}$. So,
+% $C(g) - \mt{dup}$ items must be transferred from $f_1$ to $g_2$ in
+% addition to the shared and duplicated $\mt{dup}$. In all, $C(g)$ items
+% must be transferred from $f_i$ to $g_{i+1}$.
+
+%  Each $f_i$ produces $M(S,f)/p
+% \cdot u(S,f)$ items, while each $g_i$ must consume the original pop
+% rate multiplied by it's slice of $f$'s multiplicity plus the number of
+% inspected items of $g$:
+
+% \[ M(S,g)/P \cdot o(W, g) + C(g) \]
+
+% \noindent Since $M(S,g)/P \cdot o(W, g) = M(S,f)/p
+% \cdot u(S,f)$, the number of items each $f_i$ produces and the number
+% of items each $g_i$ consumes differs by $C(g)$.
+% As Figure~\ref{fig:core-comm} demonstrates, each $g_i$
+% receives $C(g)$ duplicated items from $g_{i-1}$ (with $g_1$
+% receiving from $f_p$).  
