@@ -1,4 +1,5 @@
 \section{Generalized Fission of Sliding Window Filters}
+\label{sec:fission}
 
 This section describes our technique for the fission of sliding window
 filters. Our technique for filter fission employs an optimization
@@ -12,16 +13,26 @@ please see~\cite{mgordon-phd}.
 Before we describe the fission transformation, we need to list the
 preconditions that must hold before fission of $f$ by $P$ in the general
 graph can be performed:
-\begin{itemize}
-\item $C(f) < (M(S,f) / P) \cdot o(W, f)$. The items remaining of
-  the input buffer of the original filter after initialization must be
-  less than the number of items dequeued by each fission product.
 
-\item $M(S,f) \mod P = 0$. In this version of the algorithm we create
+\begin{enumerate}
+\item The items remaining of the input buffer of the original
+filter after initialization must be less than the number of items
+dequeued by each fission product:
+\begin{equation}
+C(f) < (M(S,f) / P) \cdot o(W, f)
+\label{eq:fiss-precond1}
+\end{equation}
+
+\item In this version of the algorithm we create
   fission products with equal work, an equal division of the original
   steady-state multiplicity of $f$.  This restriction can be relaxed
-  via simple modifications to the algorithm.
-\end{itemize}
+  via simple modifications to the algorithm.  The following must hold:
+\begin{equation}
+M(S,f) \mod P = 0 
+\label{eq:mod-fiss}
+\end{equation}
+\end{enumerate}
+
 \noindent As Section~\ref{sec:data-par} describes, both of these
 preconditions can be enforced on any filter by increasing the
 steady-state of the graph. The details of fission on a filter of the

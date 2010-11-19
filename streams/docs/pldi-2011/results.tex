@@ -10,7 +10,7 @@ algorithms offer a holistic approach to exploiting coarse-grained
 task, data, and pipeline parallelism.   Once, the parallelization management
 algorithm decides how to exploit data-parallelism, i.e., which
 filters should be data parallelized and by what degree, our fission
-algorithm of Section~\ref{sec:datapar} is utilized to perform the
+algorithm of Section~\ref{sec:data-par} is utilized to perform the
 data-parallelization. 
 
 We compare our techniques to previously published techniques for
@@ -58,6 +58,11 @@ MB L2 cache shared across the two cores.  The front-side bus is clocked
 at 1066 MHz.  We utilize the cache coherency mechanism of the
 architecture for communication between cores. 
 
+Through empirical experimentation on FMRadio, Filterbank, and
+ChannelVocoder, we have settled on $T_{\mt{sharing}} =.10$ and
+$T_{\mt{apply}} = 0.05$. These constants are the sweet stop for the two
+architectures employed in the experimentation, being a good compromise
+between buffer size and inter-core communication.
 
 % \begin{figure*}[t]
 % \centering
