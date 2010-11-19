@@ -109,13 +109,13 @@ implemented them in the context of the StreamIt compiler
 infrastructure~\cite{gordon-asplos06}.  Our transformations are guided
 by the parallelization management techniques presented
 in~\cite{gordon-asplos06}.  We employ 3 real-world benchmarks from the
-StreamIt Benchmark Suite~\cite{streamit-suite} that include of sliding
+StreamIt Benchmark Suite~\cite{streamit-suite} that include sliding
 window computation.  We demonstrate the effectiveness of our
 techniques by comparing them to previously published techniques on 2
 multicore architectures: a 16-core SMP shared-memory multicore and a
 64-core distributed-memory multicore.  We show that our techniques are
 required to achieve scalable parallelization on both architectures,
-achieving a 5.5x mean speedup on the 16-core SMP and a 1.8x mean
+achieving a 6.7x mean speedup on the 16-core SMP and a 1.8x mean
 speedup on the 64-core distributed memory multicore over a previously
 published technique.
 
@@ -143,7 +143,8 @@ This paper makes the following contributions:
   decreasing inter-core communication.  The technique reasons about
   all the sliding window filters of the stream graph, and when
   possible, reduces the sharing requirement to below a given threshold
-  percent of the total input of the filters.
+  percent of the total input of the filters.  This technique is
+  application to an important common case of our benchmarks.
 
   \myitem{Data Parallelization of Stream Graph}: We present a
   framework for data-parallelizing all of the filters of a stream
