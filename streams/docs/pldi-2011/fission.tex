@@ -38,9 +38,6 @@ transformation.
   graph.\label{fig:general-fission}}
 \end{figure*}
 
-
-
-
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{figures/split-pattern.pdf}
@@ -88,17 +85,6 @@ The final steps of the general fission transformation applies
 communication directly between the fission products and $f$'s
 producer(s) and consumer(s).
  
-A key design goal for the implementation of fission was that
-communication between producers and consumers of the stream graph be
-efficient.  Often when data parallelism is applied, the producer
-filter is fissed at the same width as the consumer
-filter.  To make this common case efficient, general
-graph fission communicates a large number of items between disjoint
-producer-consumer pairs of products of the fission.  Next, a small number of
-items (the number of items inspected by the consumer filter) is
-duplicated and communicated from consumer to a producer in a different
-pair.
-
 %  The process includes the
 % following steps (Figure~\ref{fig:general-fission} illustrates steps
 % 1-9): 

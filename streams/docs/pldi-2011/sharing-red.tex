@@ -1,5 +1,79 @@
 \section{Sharing Reduction}
 
+A key design goal for the implementation of fission was that
+communication between producers and consumers of the stream graph be
+efficient.  Often when data parallelism is applied, the producer
+filter is fissed at the same width as the consumer filter.  To make
+this common case efficient, general graph fission communicates a large
+number of items between disjoint producer-consumer pairs of products
+of the fission.  Next, a small number of items (the number of items
+inspected by the consumer filter) is duplicated and communicated from
+consumer to a producer in a different pair.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/remaining-dup-case.pdf}
+\caption[Extra inter-core communication when $C(g) > \mt{dup}_g$.]
+{  Inter-core communication details for fission products of consumer $f$
+   and producer $g$ each fissed by $P$.  $f$ was a single output node,
+   and $g$ was a single input node.  For $g$, $C(g) > \mt{dup}_g$.
+   Each $f_i$, $g_i$ pair are mapped to the same core.
+   The sizes of the buffer sections are in terms of $g$. Red arrows
+   denote inter-core communication.\label{fig:remaining-dup}}
+ \end{figure*}
+
+ Figure~\ref{fig:remaining-dup} illustrates the details of
+ communication between $f$ and $g$ when each is fissed by $P$.  In the
+ graph before fission is applied, $C(g)$ items will remain in the
+ input buffer of $g$ between steady-state iterations.  After fission by $P$,
+ for each steady-state, $g_1$ will first consume the $C(g)$ items that
+ $f_p$ sent it from the previous steady-state iteration.  $g_1$ will
+ then require:
+
+\[ M(S, g)/P \cdot o(W, g) + \mt{dup} - C(g)\]
+
+\noindent additional items from $f_1$.\footnote{It is guaranteed that
+  $M(S, g)/P \cdot o(W, g) > C(g)$ by the precondition of general
+  fission.} This requirement is less than the number of items that
+$f_1$ produces $M(S, g)/P \cdot o(W, g)$ since $C(g) > \mt{dup}$. So,
+$C(g) - \mt{dup}$ items must be transferred from $f_1$ to $g_2$ in
+addition to the shared and duplicated $\mt{dup}$. In all, $C(g)$ items
+must be transferred from $f_i$ to $g_{i+1}$.
+
+ Each $f_i$ produces $M(S,f)/p
+\cdot u(S,f)$ items, while each $g_i$ must consume the original pop
+rate multiplied by it's slice of $f$'s multiplicity plus the number of
+inspected items of $g$:
+
+\[ M(S,g)/P \cdot o(W, g) + C(g) \]
+
+\noindent Since $M(S,g)/P \cdot o(W, g) = M(S,f)/p
+\cdot u(S,f)$, the number of items each $f_i$ produces and the number
+of items each $g_i$ consumes differs by $C(g)$.
+As Figure~\ref{fig:core-comm} demonstrates, each $g_i$
+receives $C(g)$ duplicated items from $g_{i-1}$ (with $g_1$
+receiving from $f_p$).  
+
+When the fission products are assigned to
+cores as given in the figure, the percentage of inter-core
+communication to total communication can be reduced to:
+
+\begin{equation}
+\label{eq:min-dup}
+\mt{InterCore}(g) = \frac{C(g)}{M(S,g) / P * o(W, g)}
+\end{equation}
+
+\noindent This percentage corresponds to the case in which a
+producer and consume are fissed by the same amount.  This case is
+common in our benchmarks.
+
+This section covers a technique that seeks to decrease the percentage
+of total communication that must be communicated inter-core.  The
+technique directly decreases the number of items that are shared,
+while also increasing the alignment of communication to minimize
+inter-core communication.
+
+
 Since streaming applications typically execute for
 many iterations of the steady-state, it is legal to increase the
 steady state by multiplying each filter's steady-state multiplicity by
@@ -7,7 +81,8 @@ the same constant.  As long as this constant $c$ is less than the number
 of steady-state iterations $I$ of the application, and $c$ is a factor of
 $I$, then the transformation is legal.  As mentioned above, we call
 this {\it increasing} the steady-state by $c$.  This transformation
-increases the latency of the steady-state.
+may increase the latency of the steady-state.
+
 
 By recognizing this property, we can directly reduce the amount of
 inter-core communication that occurs between the fission products of a
@@ -37,39 +112,15 @@ mapped to same core as $g_i$, this will ensure that at most
 $T_{\mt{sharing}}$ fraction of total items are communicated inter-core.
 
 
-% \begin{figure*}[t]
-% \centering
-% \includegraphics[width=\textwidth]{figures/remaining-dup-case.pdf}
-% \caption[Extra inter-core communication when $C(g) > \mt{dup}_g$.]
-% {  Inter-core communication details for fission products of consumer $f$
-%   and producer $g$ each fissed by $P$.  $f$ was a single output node,
-%   and $g$ was a single input node.  For $g$, $C(g) > \mt{dup}_g$.
-%   Each $f_i$, $g_i$ pair are mapped to the same core.
-%   The sizes of the buffer sections are in terms of $g$. Red arrows
-%   denote inter-core communication.\label{fig:remaining-dup}}
-% \end{figure*}
-
 
 The analysis of the inter-core communication requirements of the
 fission of producer $f$ and consumer $g$ has so far assumed that $C(g)
 = \mt{dup}_g $.  This is not always the case however.  If $C(g) >
 \mt{dup}_g$, the communication between the fission products of $f$ and
 $g$ will be unaligned.  Figure~\ref{fig:remaining-dup} illustrates
-this case.  In the graph before fission is applied, $C(g)$ items will
-remain in the input buffer between steady-state iterations.  After
-fission by $P$, for each steady-state, $g_1$ will first consume the
-$C(f)$ items that $f_p$ sent it from the previous steady-state
-iteration.  $g_1$ will then require:
+this case.  
 
-\[ M(S, g)/P \cdot o(W, g) + \mt{dup} - C(g)\]
-
-\noindent additional items from $f_1$.\footnote{It is guaranteed that
-  $M(S, g)/P \cdot o(W, g) > C(g)$ by the precondition of general
-  fission.} This requirement is less than the number of items that
-$f_1$ produces $M(S, g)/P \cdot o(W, g)$ since $C(g) > \mt{dup}$. So,
-$C(g) - \mt{dup}$ items must be transferred from $f_1$ to $g_2$ in
-addition to the shared and duplicated $\mt{dup}$. In all, $C(g)$ items
-must be transferred from $f_i$ to $g_{i+1}$. Thus, even in the general
+Thus, even in the general
 case where $C(g) > \mt{dup}_g$, Equation~\ref{eq:min-dup} calculates
 the percentage of total communication that is inter-core for the
 fission of $g$ by $P$ given the original steady-state. Furthermore,
