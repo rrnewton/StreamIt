@@ -19,12 +19,10 @@ automatic parallelization for multicore targets. We introduce a
 general framework for the data-parallelization of sliding window
 filters that do not include other forms of stateful computation.  The
 techniques precisely route items across parallel copies, and allow the
-compiler to parameterize inter-core communication (at the expense of
-latency). We reduce the amount of inter-core communication compared
-with previous techniques that blindly duplicate all input data.  We
-evaluate our framework in the context of the StreamIt programming
-language on 4 real-world applications.  Targeting a 16 core shared
-memory multicore and a 64 core distributed memory multicore, our
-techniques achieve a 6.7x mean speedup and a 1.8x mean speedup,
-respectively, over previously published techniques.
-
+compiler to parameterize inter-core communication (possibly at the
+expense of latency).  We evaluate our framework in the context of the
+StreamIt programming language on 4 real-world applications with
+sliding windows from the StreamIt Benchmark Suite.  Targeting
+a 16 core shared memory multicore and a 64 core distributed memory
+multicore, our techniques achieve a 6.7x mean speedup and a 1.8x mean
+speedup, respectively, over previously published techniques.

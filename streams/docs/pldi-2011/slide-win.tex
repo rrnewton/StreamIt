@@ -1,83 +1,21 @@
 \section{Sliding Windows and Data Parallelization}
 
-\begin{figure}[t]
-\centering
-\begin{subfloat}
-\begin{minipage}[b]{0.45\textwidth}
-\eightpoint
-\begin{verbatim}
-float->float filter FIR(int N) {
-  int srcBuffer[N];
-  int srcEnd = 0; 
-  ...
-  work push 1 pop 1 {
-    srcBuffer[srcEnd] = pop();
-    float sum = 0;
-    for (int i=0; i<N; i++) {
-      sum += weights[i] * srcBuffer[(srcEnd + i + 1) % N];
-    }
-    push(sum);
-    srcEnd = (srcEnd + 1) % N;
-  }
-}
-\end{verbatim}
-\vspace{-8pt}
-\end{minipage}%
-\caption{ \label{fig:fir-nopeeking}}
-\end{subfloat}%
-\qquad
-\begin{subfloat}
-\begin{minipage}[b]{0.45\textwidth}
-\eightpoint
-\begin{verbatim}
-float->float filter FIR(int N) {
-  ...
-  work push 1 pop 1 peek N {
-    float sum = 0;
-    for (int i=0; i<N; i++) {
-      sum += weights[i] * peek(i);
-    }
-    push(sum);
-    pop();
-  }
-}
-\end{verbatim}
-\vspace{-18pt}
-\end{minipage}
-\caption{ \label{fig:fir-streamit}}
-\end{subfloat}
-\caption[Two implementations of an FIR filter.]{\label{fig:fir-code}
-  Two StreamIt implementations of an FIR filter:
-   \subref{fig:fir-nopeeking} the non-peeking version implemented via a
-  stateful circular buffer; and \subref{fig:fir-streamit} the peeking version. Only steady-state implementation is
-  given.}
-\end{figure}
-
 For sliding window filters, some (or all) input items are required by
 multiple iterations.  Without explicit support for sliding window
 computations, shared items must be manually saved for a later
-iteration.  Figure~\ref{fig:fir-nopeeking} gives an implementation of
-an FIR filter in the StreamIt programming language without using the
-language's peeking support.  This implementation requires
-sophisticated compiler analyses in order to parallelize.
-The programmer is forced to use a circular buffer to represent the
-sliding window of the FIR computation.  Modulo operations are used in
-the address calculation for the circular buffer.  Modulo operations
-are typically not handled by array dependence analysis frameworks.  So
-in the presence of modulo operations, the compiler must conservatively
-assume that each read and write can access any location in the array.
-
-Obscuring the data parallelism in sliding window computations limits
-parallelization scalability.  For our benchmarks, ChannelVocoder,
-Filterbank, and FMRadio, stateful implementations of sliding window
-filters limits scalability to 18, 37, and 14 cores, respectively.
+iteration.  Figure~\ref{fig:fir-nopeeking} demonstrates a manual
+implementation of a sliding window.  This implementation is very
+difficult for a compiler to analyze and parallelize.  Obscuring the
+data parallelism in sliding window computations limits parallelization
+scalability.  For our benchmarks, ChannelVocoder, Filterbank, and
+FMRadio, stateful implementations of sliding window filters limits
+scalability to 18, 37, and 14 cores, respectively.
 Figure~\ref{fig:fir-streamit} gives an implementation of an FIR filter
 that utilizes StreamIt's peeking idiom.  The behavior of the sliding
 window is described by the pop and peek rates.  The window is accessed
 via the {\tt peek(i)} expression.  Exposing sliding windows in this
 manner enables the techniques presented in this paper thus enabling
 scalable parallelization to at least 64-cores.
-
 
 \begin{figure}[t]
 \centering
@@ -144,3 +82,14 @@ gives an example of the required sharing for a fission application.
 The filter $f$ is duplicated 4 ways, has $C(f) = 9$, $o(W, F) = 4$,
 and $M(S, f) = 16$.  From the above formula, each item is duplicated
 to an average of $3.25$ fission products.
+
+% Figure~\ref{fig:fir-nopeeking} gives an implementation of
+% an FIR filter in the StreamIt programming language without using the
+% language's peeking support.  This implementation requires
+% sophisticated compiler analyses in order to parallelize.
+% The programmer is forced to use a circular buffer to represent the
+% sliding window of the FIR computation.  Modulo operations are used in
+% the address calculation for the circular buffer.  Modulo operations
+% are typically not handled by array dependence analysis frameworks.  So
+% in the presence of modulo operations, the compiler must conservatively
+% assume that each read and write can access any location in the array.
