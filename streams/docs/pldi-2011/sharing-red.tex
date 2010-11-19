@@ -19,7 +19,7 @@ consumer to a producer in a different pair.
   and $g$ was a single input node.  For $g$, $C(g) > \mt{dup}_g$.
   Each $f_i$, $g_i$ pair are mapped to the same core.  The sizes of
   the buffer sections are in terms of $g$. Red arrows denote
-  inter-core communication.\label{fig:remaining-dup}}
+  inter-core communication.  \label{fig:remaining-dup}}
 \end{figure*}
 
 Figure~\ref{fig:remaining-dup} illustrates the details of
@@ -53,7 +53,6 @@ technique directly decreases the number of items that are shared,
 while also increasing the alignment of communication to minimize
 inter-core communication.
 
-
 Since streaming applications typically execute for
 many iterations of the steady-state, it is legal to increase the
 steady state by multiplying each filter's steady-state multiplicity by
@@ -62,7 +61,6 @@ of steady-state iterations $I$ of the application, and $c$ is a factor of
 $I$, then the transformation is legal.  As mentioned above, we call
 this {\it increasing} the steady-state by $c$.  This transformation
 may increase the latency of the steady-state.
-
 
 By recognizing this property, we can directly reduce the amount of
 inter-core communication that occurs between the fission products of a
@@ -83,10 +81,16 @@ $T_{\mt{sharing}}$:
 c_g = \frac{1}{T_{\mt{sharing}}} \cdot \frac{C(g) \cdot P}{M(S,g) \cdot o(W,g)}
 \end{equation}
 
-\noindent where $0.0 < T_{\mt{sharing}} \le \mt{InterCore}$. Increasing the
-steady-state of the graph by $c_g$ before general fission is applied
-will assure that the percentage of items duplicated will be equal to
-$T_{\mt{sharing}}$.  
+\noindent where $0.0 < T_{\mt{sharing}} \le
+\mt{InterCore}$. Increasing the steady-state of the graph by $c_g$
+before general fission is applied will assure that the percentage of
+items duplicated will be equal to $T_{\mt{sharing}}$.  Sharing
+reduction works by increasing the ratio of number of items that are
+only needed by one product to the number of items that are needed by
+two products.  When we increase the steady-state, in
+Figure~\ref{fig:remaining-dup}, the shared (red) sections of the input
+buffer to $g$ remain fixed in size, while the private sections of the
+input buffer (black) grow.
 
 \subsection{Sharing Reduction for Other Fission Cases}
 

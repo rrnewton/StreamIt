@@ -1,34 +1,30 @@
 \section{Data Parallelization of Stream Graph}
 \label{sec:data-par}
 
-General fission and sharing reduction are employed after
-\textsc{JudiciousFission} (see Algorithm~\ref{alg:jd}) calculates a
-fission width for each filter of the graph.  The formulation of
-general fission in Section~\ref{sec:general-fission} includes two
-preconditions for filter $g$:
+This paper presents a framework for data-parallelizing filters that
+perform sliding window computations.  The techniques in this paper are
+employed by the parallelization management phase of the compiler once
+the width of data-parallelization for each filter is calculated.
+Previous work describes numerous effective techniques for managing the
+parallelization of a stream
+graph~\cite{kudlur08,gordon-asplos06,flextream,udupa09-gpu,liao06brook}.
 
-\begin{equation}
-\label{eq:fiss-precond1}
-C(g) < (M(S,g) / P) \cdot o(W, g) 
-\end{equation}
-\begin{equation}
-\label{eq:mod-fiss}
-M(S,g) \mod P = 0
-\end{equation}
+\textsc{DataPar} of Algorithm~\ref{alg:data-parallelize} presents an
+algorithm for applying fission of sliding window filters with sharing
+reduction across the entire stream graph.  The extent of data
+parallelism for each filter is decided by the parallelization
+management phase, and is an argument to our algorithm, $P=(V
+\rightarrow \mathbb{N})$. 
 
-\noindent The compiler is required to calculate a multiplication
-factor $c$ for the entire graph that satisfies the preconditions for
-every filter.  At the same time, $c$ applies sharing
-reduction to the graph by increasing the graph such that
-Equation~\ref{eq:sr-mult} is satisfied by the constant.
+The compiler is required to calculate a multiplication factor $c$ for
+the entire graph that satisfies the preconditions for fission for
+every filter that will be fissed (see Section~\ref{sec:fission}).  At
+the same time, $c$ applies sharing reduction to these filters by
+increasing the steady-state such that Equation~\ref{eq:sr-mult} is
+satisfied by the constant.
 
-\textsc{DataParallelize} of Algorithm~\ref{alg:data-parallelize}
-highlights the steps for data parallelizing the general graph
-representation of the application.  This sequence is applied after the
-StreamIt graph has been coarsened and converted to a general graph.
-The algorithm first calculates the judicious fission widths for each
-filter of the general graph.  For each peeking filter $g$ that will be
-fissed, line~\ref{ln:dp1} finds the producer of $g$ that minimizes
+For each peeking filter $g$ that will be fissed, line~\ref{ln:dp1}
+finds the producer of $g$ that minimizes
 Equation~\ref{eq:apply-sharing}.  If this value is below
 $T_{\mt{apply}}$, $g$ is added to the sharing reduction calculation by
 adding $g$'s shared items and $g$'s total items to the running totals
@@ -42,23 +38,19 @@ multiplicity ($\mt{minMult}$) is required to be greater than the
 precondition multiplier.  Because of the precondition of
 Equation~\ref{eq:mod-fiss}, the final multiplication factor for
 increasing the steady-state must be a multiple of all the fission
-widths calculated by \textsc{JudiciousFission}.  The algorithm assures
+widths of the map $P$. The algorithm assures
 this by finding the least common multiple of all the $P_f$'s greater
 than $\mt{minMult}$ (line~\ref{ln:dp4}).  The steady-state
 multiplicity of the graph is then increased by multiplying all of the
-multiplicities by $c$.  Finally, each filter $f$ can be fissed by $P_f$ using
-general fission.
+multiplicities by $c$.  Finally, each filter $f$ can be fissed by
+$P_f$ using general fission.
 
 \begin{algorithm}[th!]
 \caption{Exploit Data Parallelism in the General Graph for $N$ Cores} \label {alg:data-parallelize}
-\textsc{DataParallelize}($G = (V, E), N, T_{\mt{sharing}}, T_{\mt{apply}} $)
+\textsc{DataPar}($G=(V, E), N, T_{\mt{sharing}},
+T_{\mt{apply}}, P=(V \rightarrow \mathbb{N}) $)
 \begin{algorithmic}[1]
 \State $\mt{preCondMult} \gets 1$, $\mt{sharingItems} \gets 0$, $\mt{totalItems} \gets 0$
-\State $\triangleright$ For each filter in the graph find the fiss factor
-\ForAll {$g \in V$}
-\State $P_g \gets $ \Call{JudiciousFission}{$g$, $N$} 
-\EndFor
-\Statex
 \State $\triangleright$ Calculate multiplier for fission preconditions and for sharing reduction
 \ForAll {$g \in V$}
 \State $\triangleright$ If this is a peeking filter we are fissing:
@@ -81,7 +73,7 @@ then record the sharing and total communication
 \label{ln:dp3}
 \EndIf
 \EndFor
-\Statex
+%\Statex
 \State $\triangleright$ Find the multiplier for sharing reduction
 \State $\mt{minMult} \gets T_{\mt{sharing}} \cdot \frac{\mt{sharingItems}
 }{\mt{totalItems}}$
@@ -93,32 +85,18 @@ adhere to  Eq.~\ref{eq:fiss-precond1}
 greater than $\mt{minMult}$ to adhere to Eq.~\ref{eq:mod-fiss}
 \State $c \gets $\Call{LCM}{$\forall P_f | f \in V$} $ >
 \mt{minMult}$
-\Statex
+%\Statex
 \label{ln:dp4}
 \State $\triangleright$ Increase the steady-state by $c$
 \ForAll {$f \in V$}
 \State $M(S,f) \gets c \cdot M(S, f)$
 \EndFor
-\Statex
+%\Statex
 \State $\triangleright$ Apply general fission to all nodes in the graph
 \ForAll {$f \in V$}
 \State \Call{GeneralFiss}{$f$, $P_f$}
 \EndFor
 \end{algorithmic}
-\vspace{10pt}
 \end{algorithm}
 
-
-Through empirical experimentation on FMRadio, Filterbank, and
-ChannelVocoder, we have settled on $T_{\mt{sharing}} =.10$ and
-$T_{\mt{apply}} = 0.05$. These constants are the sweet stop for the two
-architectures employed in the experimentation, being a good compromise
-between buffer size and inter-core communication.
-Figure~\ref{fig:fm-gen-comm} demonstrates the efficiency of general
-fission for the FMRadio benchmark when judiciously fissed to 4 cores.
-In the example, the coarsened version of FMRadio is given on the left.
-The steady-state of FMRadio is increased by 2560 so that the total
-sharing is under 10\%.  The last filter in the graph, the
-$\mt{Equalizer}$ has a large $\mt{dup}$, and this had to be overcome
-for each core.
 
