@@ -58,20 +58,36 @@ MB L2 cache shared across the two cores.  The front-side bus is clocked
 at 1066 MHz.  We utilize the cache coherency mechanism of the
 architecture for communication between cores. 
 
+
+% \begin{figure*}[t]
+% \centering
+% \subfigure[]{\includegraphics[width=3.7in]{figures/mult-table.pdf}} \\
+% \subfigure[]{\includegraphics[width=6in]{figures/64-core-table.pdf}}
+% \caption[Communication, multiplier and buffering statistics for
+% benchmarks.]{
+% Communication, multiplier and buffering characteristics for
+% benchmarks: (a) gives the steady-state multipliers calculated for
+% sharing reduction, (b) compares the steady-state with and without
+% sharing reduction. 
+% \label{fig:fission-table}}
+% \end{figure*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.3in]{figures/mult-table.pdf}
+\caption{\label{fig:mult-table}  The steady-state multipliers calculated for
+sharing reduction.}
+\end{figure}
+
 \begin{figure*}[t]
 \centering
-\subfigure[]{\includegraphics[width=3.7in]{figures/mult-table.pdf}} \\
-\subfigure[]{\includegraphics[width=6in]{figures/64-core-table.pdf}}
-\caption[Communication, multiplier and buffering statistics for
-benchmarks.]{
-Communication, multiplier and buffering characteristics for
-benchmarks: (a) gives the steady-state multipliers calculated for
-sharing reduction, (b) compares the steady-state with and without
+\includegraphics[width=6in]{figures/64-core-table.pdf}
+\caption{ Multiplier, buffering and communication for the steady-state with and without
 sharing reduction. 
 \label{fig:fission-table}}
 \end{figure*}
 
-Figure~\ref{fig:fission-table}(a) gives the constant $c$
+Figure~\ref{fig:mult-table} gives the constant $c$
 calculated for ChannelVocoder, Filterbank, and FMRadio for 4, 16, 36,
 and 64 cores with: $T_{\mt{sharing}} = 0.10$ and $T_{\mt{apply}} =
 0.05$.  The factor is larger for FMRadio because one filter
@@ -86,7 +102,7 @@ increase.  For example, FMRadio, has a per-core 18 KB buffering
 requirement across all configurations (4, 16, 36, and 64 cores).  This
 requirement fits in the per-core L2 size of 64 KB for the Tile64.
 
-Figure~\ref{fig:fission-table}(b) compares the steady-state with and
+Figure~\ref{fig:fission-table} compares the steady-state with and
 without sharing reduction for a 64-core mapping.  For ChannelVocoder,
 sharing reduction has no effect because most of the peeking filters do
 not satisfy $T_{\mt{apply}} = 0.05$.  For the peeking filters that do,
