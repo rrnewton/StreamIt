@@ -14,7 +14,7 @@ is a filter in the application and $(f, g) \in E$ is an edge (or {\it
 using a FIFO channel.  Each filter is described by multiple rate
 declarations, data reorganization patterns, and compute functions as
 described below. The techniques in this paper require static-rate
-graphs, i.e., all of the qualities of the filters are statically
+graphs, i.e., all of the quantities of the filters are statically
 determinable.
 
 %  Figure~\ref{fig:streamgraph} gives an example
@@ -93,17 +93,13 @@ items to be on its input channel(s) to fire.  $F$ will consume
 
 
 A schedule gives a multiplicity for each filter $F \in V$ that denotes
-how many times to fire filter $F$. A schedule can be calculated such
-that all filters fire in the schedule, and the schedule can be
-repeated indefinitely.  A {\it steady-state} schedule, $S$, of a graph
-can be statically calculated such that the quantity of items on each
-of the filter's input buffer and output buffer remains unchanged by
-the complete execution of the schedule~\cite{lee87}.  Thus this
-schedule can be repeated indefinitely because buffers to not grow or
-shrink in size.  Steady-state execution of the graph entails repeating
-the steady-state schedule for as much input as is expected.  Due to
-this, execution of the stream graph is conceptually wrapped in an
-outer loop that continuously executes the steady-state schedule.
+how many times to fire filter $F$. A {\it steady-state schedule} can
+be calculated such that all filters fire in the schedule, and the
+schedule can be repeated indefinitely~\cite{lee87}.  Steady-state
+execution of the graph entails repeating the steady-state schedule for
+as much input as is expected.  Due to this, execution of the stream
+graph is conceptually wrapped in an outer loop that continuously
+executes the steady-state schedule.
 Figure~\ref{fig:pipeline-example}(a) gives an example of a
 steady-state schedule calculated for a graph that consists of three
 filters in a pipeline.
@@ -113,8 +109,7 @@ Our model does not deal with arbitrary schedules of filter executions.
 The steady-state schedule, $S$, is explicitly represented.
 Furthermore, an {\it initialization} schedule, $I$, is explicitly
 represented that enables the steady-state schedule in the presence of
-peeking filters.  Thus, in our model $\Sigma \in \{I, S\}$.  More details on
-the initialization schedule are given below.
+peeking filters.  Thus, in our model $\Sigma \in \{I, S\}$. 
 
 An initialization schedule is required if peeking is present in a
 graph to enable the calculation and execution of a steady-state
@@ -136,9 +131,7 @@ Figure~\ref{fig:pipeline-example}, $C(\mt{Filter}_2) = 2$ and
 $C(\mt{Filter}_1) = C(\mt{Filter}_3) = 0$.
 
 A filter may have multiple incoming edges and/or multiple outgoing
-edges.  Let \textsc{Out}$(F)$ represent the set of output edges of $F$, and 
-let \textsc{In}$(F)$ represent the set of input edges of $F$.
-Filter inputs are organized into a single internal FIFO buffer for the
+edges.  Filter inputs are organized into a single internal FIFO buffer for the
 filter to read according to an {\it input distribution pattern}, and
 filter outputs are distributed from a single internal output FIFO
 buffer according to an {\it output distribution pattern}.   

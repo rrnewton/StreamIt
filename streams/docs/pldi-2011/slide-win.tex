@@ -105,14 +105,14 @@ requirement between fission products for a fission application.
 Previous work implement fission of sliding window filters via
 duplication of all input items to all fission products and decimation
 of unneeded items at each product filter~\cite{streamit-asplos}.  We
-call this technique {\it dupdec}. If each product is mapped to a
+call this technique {\it DupDec}. If each product is mapped to a
 distinct core, the replication of items is achieved via the
 communication network.
 
-The efficiency of dupdec depends on the application being mapped and
+The efficiency of DupDec depends on the application being mapped and
 the communication mechanism of the target. For our benchmarks, we can
 determine what percentage of total steady-state communication is
-unnecessarily duplicated by dupdec guided by the techniques described
+unnecessarily duplicated by DupDec guided by the techniques described
 in~\cite{gordon-asplos06}:
 
 \begin{itemize}
@@ -132,3 +132,15 @@ communication caused by fission, Filterbank 50\%, and FMRadio 93\%.
 Employing our techniques, for our benchmarks, we are able to reduce
 the percentage of inter-core communication by altering the steady
 state.
+
+In the general case, when fissing a filter that peeks, i.e., a filter
+$f$ with $e(W, f) - o(W, f) = \mt{dup}_f < C(f) > 0$, by $P$, the producers
+of $f$ need to duplicate output items to an average of:
+
+\[ \max \left ( 1 + \frac{C(f)}{M(S, f) \cdot o(W, f) / P}, P \right )\]
+
+\noindent fission products of $f$.  Figure~\ref{fig:fission-sharing}
+gives an example of the required sharing for a fission application.
+The filter $f$ is duplicated 4 ways, has $C(f) = 9$, $o(W, F) = 4$,
+and $M(S, f) = 16$.  From the above formula, each item is duplicated
+to an average of $3.25$ fission products.

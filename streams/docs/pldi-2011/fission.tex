@@ -1,15 +1,7 @@
-\section{Filter Fission}
+\section{Generalized Fission of Sliding Window Filters}
 
-This section covers an improved form of fission applied to nodes of the
-general graph.  Applying fission to nodes of the general graph allows
-the compiler to express more precise communication patterns for the
-distribution of input items to the fission products.  This allows the
-fission technique to avoid unnecessary duplication (and thus
-communication) of input items.  Figure~\ref{fig:fission-versus}
-demonstrates an example of the savings in communication for fission on
-the general graph versus fission on the StreamIt graph.
-
-A key design goal for the implementation of fission on the general graph
+This section describes our technique for the fission of sliding window
+filters. A key design goal for the implementation of fission 
 was that communication between levels of the stream graph be efficient
 (see Section~\ref{sec:levels} for the description of a level).  Often
 when data parallelism is applied, the producer filters in level $l$ are
@@ -18,25 +10,15 @@ make this common case efficient, general graph fission communicates a
 large number of items between disjoint producer-consumer pairs from the
 levels.  Next, a small number of items (the number of items inspected by
 the consumer filter) is duplicated and communicated from consumer to a
-producer in a different pair.  Figure~\ref{fig:fission-versus}(c),
-demonstrates this pattern, with $u_i$ and $v_i$ forming the pairs.  Each
-pair should be mapped to the same core, so that the bulk of
-communication for the fission distribution pattern is intra-core.  For
-Figure~\ref{fig:fission-versus}(c), if the pairs are mapped to same
-core, only 3 of 12 items are communicated inter-core.
+producer in a different pair.  
 
-
-In the general case, when fissing a filter that peeks, i.e., a filter
-$f$ with $e(W, f) - o(W, f) = \mt{dup}_f < C(f) > 0$, by $P$, the producers
-of $f$ need to duplicate output items to an average of:
-
-\[ \max \left ( 1 + \frac{C(f)}{M(S, f) \cdot o(W, f) / P}, P \right )\]
-
-\noindent fission products of $f$.  Figure~\ref{fig:fission-sharing}
-gives an example of the required sharing for a fission application.
-The filter $f$ is duplicated 4 ways, has $C(f) = 9$, $o(W, F) = 4$,
-and $M(S, f) = 16$.  From the above formula, each item is duplicated
-to an average of $3.25$ fission products.
+Our technique for filter fission employs an optimization termed {\it
+  Synchronization removal}.  This transformation is applied to
+nodes calculating the identity function in the general graph such that
+they can be removed, but their communication patterns remain embedded in
+the general graph. A description of synchronization removal is beyond
+the scope of this paper, for a complete exposition, please
+see~\cite{mgordon-phd}.  
 
 Before we describe the fission transformation, we need to list the
 preconditions that must hold before fission of $f$ by $P$ in the general
