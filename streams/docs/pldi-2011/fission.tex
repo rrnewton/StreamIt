@@ -13,12 +13,12 @@ the consumer filter) is duplicated and communicated from consumer to a
 producer in a different pair.  
 
 Our technique for filter fission employs an optimization termed {\it
-  Synchronization removal}.  This transformation is applied to
-nodes calculating the identity function in the general graph such that
-they can be removed, but their communication patterns remain embedded in
+  synchronization removal}.  This transformation is applied to nodes
+calculating the identity function in the general graph such that they
+can be removed, but their communication patterns remain embedded in
 the general graph. A description of synchronization removal is beyond
 the scope of this paper, for a complete exposition, please
-see~\cite{mgordon-phd}.  
+see~\cite{mgordon-phd}.
 
 Before we describe the fission transformation, we need to list the
 preconditions that must hold before fission of $f$ by $P$ in the general
@@ -27,12 +27,6 @@ graph can be performed:
 \item $C(f) < (M(S,f) / P) \cdot o(W, f)$. The items remaining of
   the input buffer of the original filter after initialization must be
   less than the number of items dequeued by each fission product.
-  This implies $\mt{dup}_f < (M(S,f) / P) \cdot o(W, f)$ since
-  $\mt{dup}_f \le C(f)$.  If $\mt{dup}_f$ for the steady-state is greater
-  than the number of items that each fission product pops, then some
-  items will be duplicated to more than 2 fission products.  We do not
-  support this case, as it can be avoided, and we want to limit
-  inter-core communication.
 
 \item $M(S,f) \mod P = 0$. In this version of the algorithm we create
   fission products with equal work, an equal division of the original
@@ -45,7 +39,6 @@ steady-state.  We call this process {\it increasing} the steady-state
 of the graph by $c$.  Each of these preconditions can be enforced by
 increasing the steady-state of the graph.
 
-
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{figures/general-fission.pdf}
@@ -55,33 +48,7 @@ increasing the steady-state of the graph.
 \end{figure*}
 
 The details of fission on a filter of the general stream graph are
-given in Figure~\ref{fig:general-fission}.  The process includes the
-following steps (Figure~\ref{fig:general-fission} illustrates steps
-1-9): 
-\begin{enumerate}
-\item Create $P$ copies of $f$ and set their rates
-and work functions according to Figure~\ref{fig:general-fission}.
-\item Create two identity nodes, $ID_I$ and $ID_O$, that will encode
-  the distribution for the fission.
-\item Move the initialization stage computation of $f$ to $f_1$
-  according to Figure~\ref{fig:general-fission}. 
-\item Move input distribution of $f$ to $ID_I$
-replacing occurrences of $f$ with $ID_I$ in edges.
-\item Move output distribution of $f$ to $ID_O$, replacing
-occurrences of $f$ with $ID_O$ in edges.
-\item Create the fission duplication pattern in the
-output distribution of $ID_I$.
-\item Create a round robin joining pattern for the output identity
-  filter $ID_O$ to receive from each fission product.
-\item For each node $p$ that is a producer of $f$, replace the
- occurrences of $f$ with $O_I$ in the edges of the dupsets of $p$'s
- output distribution.
-\item For each node $c$ that is a consumer of $f$, replace the
- occurrences of $f$ with $O_O$ in incoming edges $c$'s input
- distribution.
-\item \textsc{SynchRemove}($ID_I$)
-\item \textsc{SynchRemove}($ID_O$)
-\end{enumerate}
+given in Figure~\ref{fig:general-fission}. 
 
 To understand the transformation, we first need to understand the item
 distribution and sharing that is required by fission on a filter $f$
@@ -172,3 +139,32 @@ The final steps of the general fission transformation applies
 \textsc{SynchRemove} to remove the identity filters, and stitch the
 communication directly between the fission products and $f$'s
 producer(s) and consumer(s).
+ 
+
+%  The process includes the
+% following steps (Figure~\ref{fig:general-fission} illustrates steps
+% 1-9): 
+% \begin{enumerate}
+% \item Create $P$ copies of $f$ and set their rates
+% and work functions according to Figure~\ref{fig:general-fission}.
+% \item Create two identity nodes, $ID_I$ and $ID_O$, that will encode
+%   the distribution for the fission.
+% \item Move the initialization stage computation of $f$ to $f_1$
+%   according to Figure~\ref{fig:general-fission}. 
+% \item Move input distribution of $f$ to $ID_I$
+% replacing occurrences of $f$ with $ID_I$ in edges.
+% \item Move output distribution of $f$ to $ID_O$, replacing
+% occurrences of $f$ with $ID_O$ in edges.
+% \item Create the fission duplication pattern in the
+% output distribution of $ID_I$.
+% \item Create a round robin joining pattern for the output identity
+%   filter $ID_O$ to receive from each fission product.
+% \item For each node $p$ that is a producer of $f$, replace the
+%  occurrences of $f$ with $O_I$ in the edges of the dupsets of $p$'s
+%  output distribution.
+% \item For each node $c$ that is a consumer of $f$, replace the
+%  occurrences of $f$ with $O_O$ in incoming edges $c$'s input
+%  distribution.
+% \item \textsc{SynchRemove}($ID_I$)
+% \item \textsc{SynchRemove}($ID_O$)
+% \end{enumerate}
