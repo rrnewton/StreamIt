@@ -8,7 +8,7 @@ this common case efficient, general graph fission communicates a large
 number of items between disjoint producer-consumer pairs of products
 of the fission.  Next, a small number of items (the number of items
 inspected by the consumer filter) is duplicated and communicated from
-consumer to a producer in a different pair.
+producer to a consumer in a different pair.
 
 \begin{figure*}[t]
 \centering
@@ -36,7 +36,7 @@ produced by $f_i$ and required by $g_i$.
 
 When the fission products are assigned to
 cores as given in the figure, the percentage of inter-core
-communication to total communication can be reduced to:
+communication to total communication can be quantified as:
 
 \begin{equation}
 %b\vspace{-2pt}
@@ -55,26 +55,16 @@ technique directly decreases the number of items that are shared,
 while also increasing the alignment of communication to minimize
 inter-core communication.
 
-Since streaming applications typically execute for
-many iterations of the steady-state, it is legal to increase the
-steady state by multiplying each filter's steady-state multiplicity by
-the same constant.  As long as this constant $c$ is less than the number
-of steady-state iterations $I$ of the application, and $c$ is a factor of
-$I$, then the transformation is legal.  As mentioned above, we call
-this {\it increasing} the steady-state by $c$.  This transformation
-may increase the latency of the steady-state.
+Since streaming applications typically execute for many iterations of
+the steady-state, it is legal to increase the steady state by $c$.  As
+long as this constant $c$ is less than the number of steady-state
+iterations $I$ of the application, and $c$ is a factor of $I$.
 
 By recognizing this property, we can directly reduce the amount of
 inter-core communication that occurs between the fission products of a
-fissed peeking filter for many cases of general fission, including
-the common case.  As we have seen above, the duplicated shared items
-translate directly into inter-core communication for the common case
-of fissing a producer and consumer by the same width.  For producer
-$f$ and consumer $g$, fissed by $P$, where each $f_i$ is mapped the to
-same core as $g_i$, Equation~\ref{eq:min-dup} gives the formula for
-calculating the percentage of the total items that are duplicated for
-a fission application of $g$.  In the equation we can directly control
-the steady-state multiplicity of $g$, $M(S,g)$.  We can calculate a
+fissed peeking filter for many cases of general fission, including the
+common case.  In Equation~\ref{eq:min-dup} we can directly control the
+steady-state multiplicity of $g$, $M(S,g)$.  We can calculate a
 constant $c_g$ such that the percentage is less than a threshold
 $T_{\mt{sharing}}$:
 
@@ -125,10 +115,10 @@ However, the calculation must now account for the inter-core
 communication of the other producers sending to the fission products
 of $g$. 
 
-We define $\mt{InterCore}(g, f)$ to approximate the percentage
-of inter-core communication to total communication for the input of
-the fission products of $g$ optimizing for the placement of the
-fission products of $f$:
+Now, considering both cases above, we define $\mt{InterCore}(g, f)$ to
+approximate the percentage of inter-core communication to total
+communication for the input of the fission products of $g$ optimizing
+for the placement of the fission products of $f$:
 
 \begin{equation}
 \label{eq:tcomm-fopt}
@@ -137,7 +127,7 @@ fission products of $f$:
 \end{equation}
 
 \noindent The first term approximates the inter-core communication due
-to the fission width discrepancy and the multiple input of $g$.  The
+to the fission width discrepancy and the multiple inputs of $g$.  The
 second term quantifies the percentage of inter-core communication
 caused by the sharing due to peeking.
 
@@ -155,27 +145,35 @@ define a constant $T_{\mt{apply}}$ such that sharing
 reduction should only be applied to $g$ optimizing for $f$ if:
 
 \begin{equation}
-T_{\mt{sharing}}  >  T_{\mt{apply}} \ge (1 -\mt{RI}(f,g, S) \cdot
-\frac{P_g}{P_f})
-\end{equation}
-
-Finally, since it was assumed that $P_f > P_g$, in order to generalize
-the above equation to account for the opposite case, we must choose
-the appropriate fraction of local communication by taking the minimum
-of the two fission width ratios:
-
-\begin{equation}
 \label{eq:apply-sharing}
 T_{\mt{sharing}}  >  T_{\mt{apply}} \ge (1 -\mt{RI}(f,g, S) \cdot
 \min(\frac{P_g}{P_f}, \frac{P_f}{P_g}))
 \end{equation}
 
-\noindent As $T_{\mt{apply}} \rightarrow 0.0$ the application of
-sharing reduction to $g$ will approach $T_{\mt{sharing}}$. Notice in
-the common case where $f$ and $g$ are fissed by the same width, and
+% \begin{equation}
+% T_{\mt{sharing}}  >  T_{\mt{apply}} \ge (1 -\mt{RI}(f,g, S) \cdot
+% \frac{P_g}{P_f})
+% \end{equation}
+
+\noindent Since it was first assumed that $P_f > P_g$, in order to
+generalize we must choose the appropriate fraction of local
+communication by taking the minimum of the two fission width ratios.
+
+In the common case where $f$ and $g$ are fissed by the same width, and
 $f$ has single output and $g$ has single input, the RHS of
-Equation~\ref{eq:apply-sharing} evaluates to 0, indicating to always
-apply sharing reduction for this case.
+Eq.~\ref{eq:apply-sharing} evaluates to 0, indicating to always apply
+sharing reduction.  If however, the RHS of Eq.~\ref{eq:apply-sharing}
+does not evaluate to 0, there exists inter-core communication that is
+not attributed to sliding windows.  In this latter case,
+$T_{\mt{apply}}$ determines at what percent of total inter-core
+communication, non-sliding-window inter-core communication should
+prevent the application of sharing reduction.  For example, if
+$T_{\mt{apply}} = .05$, then we will apply sharing reduction only when
+sliding window inter-core communication accounts or at least 95\% of
+total inter-core communication for the proposed fission application of
+$g$. $T_{\mt{apply}}$ prevents the application of sharing reduction to
+fission when the bulk of inter-core communication of the fission is
+not caused by sliding windows.
 
 % For simplicity of analysis, let us assume that $C(g)
 % = 0$, and $P_f$ is a multiple of $P_g$. Figure~\ref{fig:diff-widths}
@@ -228,8 +226,9 @@ optimization to a single filter $g$ in the stream graph.  Now we will
 cover how to apply sharing reduction across all the filters of the
 stream graph for which it is appropriate.  The goal is reduce the
 percentage of inter-core communication due to the sharing between
-fission products of a peeking filter to {\it approximately}
-$T_{\mt{sharing}}$.  Sharing reduction may not achieve
+fission products of all peeking filters to {\it approximately}
+$T_{\mt{sharing}}$ of total inter-core communication for the fission
+of all peeking filters.  Sharing reduction may not achieve
 $T_{\mt{sharing}}$ because there may exist peeking filters that are to
 be fissed for which Equation~\ref{eq:apply-sharing} cannot be
 satisfied.  For these filters, we do not apply the sharing reduction

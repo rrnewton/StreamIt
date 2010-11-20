@@ -1,22 +1,5 @@
 \section{Sliding Windows and Data Parallelization}
 
-For sliding window filters, some (or all) input items are required by
-multiple iterations.  Without explicit support for sliding window
-computations, shared items must be manually saved for a later
-iteration.  Figure~\ref{fig:fir-nopeeking} demonstrates a manual
-implementation of a sliding window.  This implementation is very
-difficult for a compiler to analyze and parallelize.  Obscuring the
-data parallelism in sliding window computations limits parallelization
-scalability.  For our benchmarks, ChannelVocoder, Filterbank, and
-FMRadio, stateful implementations of sliding window filters limits
-scalability to 18, 37, and 14 cores, respectively.
-Figure~\ref{fig:fir-streamit} gives an implementation of an FIR filter
-that utilizes StreamIt's peeking idiom.  The behavior of the sliding
-window is described by the pop and peek rates.  The window is accessed
-via the {\tt peek(i)} expression.  Exposing sliding windows in this
-manner enables the techniques presented in this paper thus enabling
-scalable parallelization to at least 64-cores.
-
 \begin{figure*}[t]
 \centering
 \includegraphics[width=6.0in]{figures/fission-sharing.pdf}
@@ -33,6 +16,33 @@ per steady-state is split across the $f_i$s.
 \label{fig:fission-sharing}}
 \end{figure*}
 
+
+For sliding window filters, some (or all) input items are required by
+multiple iterations.  Without explicit support for sliding window
+computations, shared items must be manually saved for a later
+iteration.  Figure~\ref{fig:fir-nopeeking} demonstrates a manual
+implementation of a sliding window.  This implementation is very
+difficult for a compiler to analyze and parallelize.  Obscuring the
+data parallelism in sliding window computations limits parallelization
+scalability.  For our benchmarks, ChannelVocoder, Filterbank, and
+FMRadio, stateful implementations of sliding window filters limits
+scalability to 18, 37, and 14 cores, respectively.
+Figure~\ref{fig:fir-peeking} gives an implementation of an FIR filter
+that utilizes StreamIt's peeking idiom.  The behavior of the sliding
+window is described by the pop and peek rates.  The window is accessed
+via the {\tt peek(i)} expression.  Exposing sliding windows in this
+manner enables the techniques presented in this paper thus enabling
+scalable parallelization to at least 64-cores.
+
+\begin{figure*}
+\centering
+\includegraphics[width=\textwidth]{figures/general-fission.pdf}
+\caption[Fission of a node in the general stream graph.]{Fission of a
+  node $f$ by $P$ in the general stream
+  graph.\label{fig:general-fission}}
+\end{figure*}
+
+
 Data parallelization is possible if the compiler can reason about the
 sharing requirement of the sliding window filter.  When a sliding
 window filter is parallelized via the process of fission, the window
@@ -40,29 +50,29 @@ state inherent between iterations is transformed into the
 communication of shared items to multiple products of the filter.
 Figure~\ref{fig:fission-sharing} gives an example of the sharing
 requirement between fission products for a fission application. 
-Previous work implement fission of sliding window filters via
+Previous work implements fission of sliding window filters via
 duplication of all input items to all fission products and decimation
 of unneeded items at each product filter~\cite{streamit-asplos}.  We
 call this technique {\it DupDec}. If each product is mapped to a
-distinct core, the replication of items is achieved via the
-communication network.
+distinct core, the replication of items requires inter-core communication.
 
 The efficiency of DupDec depends on the application being mapped and
-the communication mechanism of the target. For our benchmarks, we can
-determine what percentage of total steady-state communication is
-unnecessarily duplicated by DupDec guided by the techniques described
+the communication mechanism of the target.  Two of our benchmarks
+include significant amounts of {\it unnecessary} duplication in the
+steady-state when DupDec is utilized by the techniques described
 in~\cite{gordon-asplos06}:
 
 \begin{itemize}
-\item ChannelVocoder: 38\% unnecessarily duplicated (5,200 of 13,336
-      total items)
-\item FMRadio: 61\% unnecessarily duplicated (1,108 of
-      1,808 total items) 
-\item FilterBank: 0\% duplicated (912 total items)
+\item ChannelVocoder: 5,200 of 13,336 total items (38\%)
+\item FMRadio: 1,108 of 1,808 total items (61\%) 
 \end{itemize}
 
-Our techniques will always avoid unncessary duplication of input
-items.  Even without unnecessarily duplication of items, inter-core
+This is because there is little overlap in the sliding windows of
+product filters for these benchmarks, however DupDec duplicates
+everything. Our techniques will always avoid unncessary duplication of
+input items.  
+
+Even without unnecessarily duplication of items, inter-core
 communication as a result of fission accounts for a large percentage
 of the total items communicated between filters of an application.
 ChannelVocoder has 48\% of total communication as inter-core

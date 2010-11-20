@@ -15,18 +15,15 @@ preconditions that must hold before fission of $f$ by $P$ in the general
 graph can be performed:
 
 \begin{enumerate}
-\item The items remaining of the input buffer of the original
-filter after initialization must be less than the number of items
-dequeued by each fission product:
+\item The items remaining of the input buffer of the original filter
+  after initialization must be less than the number of items that will
+  be dequeued by each fission product:
 \begin{equation}
 C(f) < (M(S,f) / P) \cdot o(W, f)
 \label{eq:fiss-precond1}
 \end{equation}
 
-\item In this version of the algorithm we create
-  fission products with equal work, an equal division of the original
-  steady-state multiplicity of $f$.  This restriction can be relaxed
-  via simple modifications to the algorithm.  The following must hold:
+\item Fission products divide the work of $f$ evenly:
 \begin{equation}
 M(S,f) \mod P = 0 
 \label{eq:mod-fiss}
@@ -37,17 +34,9 @@ M(S,f) \mod P = 0
 preconditions can be enforced on any filter by increasing the
 steady-state of the graph. The details of fission on a filter of the
 general stream graph are given in Figure~\ref{fig:general-fission}:
-(a) gives the definition of the original filter $f$, (b) lists the 11
-steps of the algorithm, and (c) gives details for steps 1-9 of the
-transformation.
+(a) the definition of the original filter $f$, (b) the steps of the
+algorithm, and (c) gives details for steps 1-9.
 
-\begin{figure*}
-\centering
-\includegraphics[width=\textwidth]{figures/general-fission.pdf}
-\caption[Fission of a node in the general stream graph.]{Fission of a
-  node $f$ by $P$ in the general stream
-  graph.\label{fig:general-fission}}
-\end{figure*}
 
 \begin{figure*}
 \centering
@@ -62,12 +51,13 @@ steady-state input are distributed to $f_1$. \label{fig:split-pattern}}
 
 The general fission transformation creates two identity nodes ($ID_I$
 and $ID_O$) that are encoded to implement the data distribution for
-the fission products.  Figure~\ref{fig:split-pattern} illustrates
-the pattern of communication between $ID_I$ and the products of $f$.
-This pattern is common to the transformation for all filters we seek
-to fiss that meet the preconditions of the transformation.
+the fission products.  Figure~\ref{fig:split-pattern} illustrates the
+pattern of communication between $ID_I$ and the products of $f$
+($f_1$... $f_P$).  This pattern is common to the transformation for
+all filters we seek to fiss that meet the preconditions of the
+transformation.
 
-The result of the fission transformation has the following properties:
+The fission transformation has the following properties:
 \begin{itemize}
 \item No item is read by more than 2 fission products.
 \item A fission product does not need to remember items across
