@@ -158,7 +158,7 @@ all 64 cores between each level of the graph!
 ChannelVocoder achieves a 60x speedup for general fission over a
 single core.  This is not perfectly linear because of the parallel
 mapping; asymmetries exist between the extent of task parallelism and
-the number of cores (see~\ref{mgordon-asplos06}).  The speedup over
+the number of cores (see~\cite{gordon-asplos06}).  The speedup over
 DupDec (1.62x) is more modest because the width of many of the
 fission applications is 3, so DupDec is duplicating input data to
 groups of 3 filters.  Filterbank is similar, the width of fission is 4
