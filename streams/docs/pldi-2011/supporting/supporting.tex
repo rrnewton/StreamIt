@@ -21,9 +21,26 @@
 
 
 \begin{document}
-\title{Sliding Window Computations in Stream Programs: Clarifying Examples and Figures}
+\title{Sliding Window Computations in Stream Programs: Supporting Material}
 
 \maketitle
+
+This short document provides further discussion and helpful figures to accompany the paper submission {\it Sliding Window Computation in Stream Programs}.  
+\begin{enumerate}
+\item Figure~\ref{fig:fission-overview} provides an overview of our techniques and previously published techniques for data-parallelizing a sliding window filter.
+\item Figure~\ref{fig:fission-sharing2} provides an example of the input sharing requirement of a filter $f$ that adheres to the precondition of filter fission.  Notice that no input item is shared by more than 2 fission products.
+\item Figure~\ref{fig:example-sr} provides an example application of synchronization removal.
+\item  Figure~\ref{fig:diff-widths} details the inter-core communication necessary when fissing producer $f$ and consumer $g$ by different factors. 
+\item  Figure~\ref{fig:fm-gen-comm} shows the result of our framework on the FMRadio benchmark for 4 cores.
+\end{enumerate}
+
+\section{Layout: Assigning Filters to Cores}
+The paper submission did not have sufficient space to cover the layout algorithm.  Here we will summarize the algorithm for mapping filters of the data-parallelized graph (including fission products of all fission applications) to cores.  
+
+For an acyclic stream graph, we can assign {\it levels} to each filter in the graph.  The first level $l_0$ consists of the source filters.  Each successive level $l_i$ is the set of filters whose input dependences are satisfied by previous levels $l_J$ where $j < i$.
+
+The layout algorithm greedily assigns filters of a level sequentially. Each filter is assigned to the core that will minimize the number of input items that will be communicated inter-core. In the common case of fission where a producer $f$ and a consumer $g$ are fissed by the same factor $p$, each producer fission product $f_i$ communicates to exactly two consumers, $g_i$ and $g_{i+1}$. The communication between $f_i$ and $g_i$ equals 10 times the communication between $f_i$ and $g_{i+1}$ because $T_{\mt{sharing}} = 0.1$. The layout algorithm will map $g_i$ to the core that $f_i$ was mapped to, minimizing inter-core communication. The filters of the first level of the graph $f_1$ through $f_n$ are mapped to the cores in a ``snake'' fashion, such that $f_i$ is neighbors with $f_{i+1}$, and $f_1$ is neighbors with $f_N$. This predisposes the layout to map common-case inter-core communication to neighboring tiles.
+
 
 \begin{figure}
 \centering
