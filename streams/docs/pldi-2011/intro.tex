@@ -16,26 +16,44 @@ Brook~\cite{brook04}, Cg~\cite{cg03},
 SPUR~\cite{spur05samos}, Spidle~\cite{spidle03}, Lime~\cite{lime10},
 and SPL~\cite{spl09}.
 
-In a stream program, filters define an atomic execution step that
+In a stream program, each filter defines an atomic execution step that
 repeats for many iterations; each execution step discards a number of
-data items from filter's input edge.  Often, a filter does not discard
-all the data items that it read for the current execution step,
-requiring these inspected (but not discarded) items for a future
-iteration (or iterations) of the filter.  This type of filter is
-described as performing a sliding window computation on its
-input. Sliding window computations are prevalent in stream programs.
-Examples of sliding window computations include FIR filters; moving
-averages and differences; error correcting codes; motion estimation;
-and network packet inspection.  A recent study of a large streaming
-benchmark suite written in the StreamIt programming language finds
-that 17 of the 30 real-world benchmarks include at least one filter
-that performs a sliding window computation~\cite{streamit-suite}.
+data items from the filter's input edge.  Often, a filter does not
+discard all the data items that it read for the current execution
+step, requiring these inspected (but not discarded) items for a future
+iteration of the filter.  This type of filter is described as
+performing a sliding window computation on its input. Sliding window
+computations are prevalent in stream programs.  Examples of sliding
+window computations include FIR filters; moving averages and
+differences; error correcting codes; motion estimation; and network
+packet inspection.  A recent study of a large streaming benchmark
+suite written in the StreamIt programming language finds that 17 of
+the 30 real-world benchmarks include at least one filter that performs
+a sliding window computation~\cite{streamit-suite}.
 
+A goal of stream programming is to directly expose to the software
+layer the necessary information to enable automatic management of
+coarse-grained parallelism.  Stream programs expose multiple forms of
+parallelism; however, data parallelism is the most attractive.  Data
+parallelism exists when a filter is stateless and can thus be
+replicated.  Data parallelism provides load-balanced and limitless
+parallelism (as long as input data is available).  A filter that is
+stateful, and cannot be data-parallelized, becomes a limit to
+parallelization scalability, as the work of that filter cannot be
+divided; the most load-intensive stateful filter becomes a bottleneck.
 
-Figure~\ref{fig:fir-nopeeking} shows how to perform a sliding
-window FIR filter via state carried between iterations of a filter.
-This implementation is difficult for the compiler to analyze and
-reason about.  Some programming languages (e.g., Brook, Lime,
+Figure~\ref{fig:fir-nopeeking} shows how to perform a sliding window
+FIR filter via state carried between iterations of a filter in the
+form of a circular buffer.  This implementation is extremely difficult
+for the compiler to analyze and reason about.  If the compiler cannot
+precisely reason about the state of a filter, it will be prevented
+from data-parallelizing the filter, and this state could represent the
+parallelization bottleneck.  If a compiler cannot data-parallelize them,
+sliding window computations would become the bottleneck in 11 of the
+17 real-world benchmarks in the StreamIt Benchmark Suite that contain
+sliding windows~\cite{streamit-suite}.
+
+ Some programming languages (e.g., Brook, Lime,
 StreamIt, and IBM SPL) go so far as to include idioms that directly
 represent sliding window computation, allowing the programmer to
 specify, for each filter, the size of the window and the number of
@@ -44,30 +62,10 @@ Figure~\ref{fig:fir-peeking} shows how language extensions of the
 StreamIt programming language elegantly expose sliding windows for
 compiler analysis and optimization.
 
-A goal of stream programming is to directly expose to the software
-layer the necessary information to enable automatic management of
-coarse-grained parallelism.  Stream programs expose multiple forms of
-parallelism: pipeline parallelism that exists between producers and
-consumers; task parallelism that exists between pairs of filters on
-parallel branches of the stream graph; and data parallelism that
-exists when a filter is stateless and can thus be replicated.  Data
-parallelism is the most attractive, as it provides load-balanced and
-limitless parallelism (as long as input data is available).  A filter
-that is stateful, and cannot be data-parallelized, becomes a limit to
-parallelization scalability, as the work of that filter cannot be
-divided; the most load-intensive stateful filter becomes a
-bottleneck.
-
 This paper presents a compiler framework for data-parallelizing
-filters that perform sliding window computations when the properties
-of the sliding window can be calculated statically.  If sliding window
-filters required state, this state would represent a new
-parallelization bottleneck.  Sliding windows are the bottleneck in 11
-of the 17 real-world benchmarks in the StreamIt Benchmark Suite that
-contain sliding windows~\cite{streamit-suite}.  For example, examining
-the Channelvocoder benchmark, this state would limit scalability to 18
-cores, whereas our techniques scale to at least 64 cores.
-
+filters that perform sliding window computations.  The framework is
+enabled by languages that expose sliding windows so that the
+properties of the sliding window can be calculated statically.
 Data-parallelizing a filter is performed via a transformation termed
 {\it fission} (verb form {\it fiss})~\cite{streamit-asplos}.  Fission
 is the process of data-parallelizing a stateless filter by duplicating
@@ -124,7 +122,7 @@ by the parallelization management techniques presented
 in~\cite{gordon-asplos06}.  We employ 3 real-world benchmarks from the
 StreamIt Benchmark Suite~\cite{streamit-suite} that include sliding
 window computation.  We demonstrate the effectiveness of our
-techniques by comparing them to previously published techniques on 2
+techniques by comparing them to previously published techniques on two
 multicore architectures: a 16-core SMP shared-memory multicore and the
 64-core distributed-memory Tilera TILE64.  We show that
 our techniques are required to achieve scalable parallelization on
@@ -147,15 +145,15 @@ This paper makes the following contributions:
   input and multiple outputs.  The technique also supports filters
   that with multiple schedules of execution.  General fission defines
   a precise pattern of communication of input data to the products
-  that can be reasoned upon by our other techniques.
+  that can be reasoned about by our other techniques.
 
   \myitem{Sharing Reduction}: We are the first to present a technique
   that decides when it is possible to decrease the amount of sharing
   between fission products by altering the steady-state of a stream
   graph, thus decreasing inter-core communication.  The technique
-  reasons about all the sliding window filters of the stream graph,
+  considers each sliding window filter of the stream graph,
   and when possible, reduces the sharing requirement to below a given
-  threshold percent of the total input of the filters. 
+  threshold percent of the total input of the filter. 
 
   \myitem{Data Parallelization of Stream Graph}: We present a
   framework for data-parallelizing all of the filters of a stream
