@@ -58,7 +58,7 @@ architecture for communication between cores.
 
 Through empirical experimentation on FMRadio, Filterbank, and
 ChannelVocoder, we have settled on $T_{\mt{sharing}} =.10$ and
-$T_{\mt{apply}} = 0.05$. These constants are the sweet stop for the two
+$T_{\mt{apply}} = 0.05$. These constants are the sweet spot for the two
 architectures employed in the experimentation, being a good compromise
 between buffer size and inter-core communication.
 
@@ -165,8 +165,8 @@ groups of 3 filters.  Filterbank is similar, the width of fission is 4
 for all filters when targeting 64 cores.
 
 Sharing reduction is required to achieve scalable speedups for both
-FMRadio and Filterbank.  For FMRadio, sharing reductions leads to a
-17\% speedup increase for 64 cores.  This because sharing reduction
+FMRadio and Filterbank.  For FMRadio, sharing reduction leads to a
+17\% speedup increase for 64 cores.  This is because sharing reduction
 significantly reduces the number of remote write store instructions
 required per output.  This affects FMRadio because of its low
 computation to communication ratio.  Sharing reduction sees a 12\%
