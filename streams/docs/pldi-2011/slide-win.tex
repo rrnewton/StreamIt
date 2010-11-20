@@ -17,9 +17,9 @@ via the {\tt peek(i)} expression.  Exposing sliding windows in this
 manner enables the techniques presented in this paper thus enabling
 scalable parallelization to at least 64-cores.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=3.0in]{figures/fission-sharing.pdf}
+\includegraphics[width=6.0in]{figures/fission-sharing.pdf}
 \caption[An example of the sharing required by fission.]  { An
   example of the duplication of items required by fission.  Filter $f$
   is fissed by 4 into $f_1$ - $f_4$.  Two steady-states of the item
@@ -31,7 +31,7 @@ scalable parallelization to at least 64-cores.
   products is the same as $f$, but the total number of items dequeued 
 per steady-state is split across the $f_i$s.
 \label{fig:fission-sharing}}
-\end{figure}
+\end{figure*}
 
 Data parallelization is possible if the compiler can reason about the
 sharing requirement of the sliding window filter.  When a sliding

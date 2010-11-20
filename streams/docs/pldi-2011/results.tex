@@ -77,20 +77,27 @@ between buffer size and inter-core communication.
 % \label{fig:fission-table}}
 % \end{figure*}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=3.3in]{figures/mult-table.pdf}
-\caption{\label{fig:mult-table}  The steady-state multipliers calculated for
-sharing reduction.}
-\end{figure}
-
 \begin{figure*}[t]
 \centering
-\includegraphics[width=6in]{figures/64-core-table.pdf}
-\caption{ Multiplier, buffering and communication for the steady-state with and without
-sharing reduction. 
-\label{fig:fission-table}}
+\includegraphics[width=\textwidth]{figures/big-table.pdf}
+\caption{\label{fig:mult-table}  The steady-state multipliers calculated for
+sharing reduction.}
 \end{figure*}
+
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=3.3in]{figures/mult-table.pdf}
+% \caption{\label{fig:mult-table}  The steady-state multipliers calculated for
+% sharing reduction.}
+% \end{figure}
+
+% \begin{figure*}[t]
+% \centering
+% \includegraphics[width=6in]{figures/64-core-table.pdf}
+% \caption{ Multiplier, buffering and communication for the steady-state with and without
+% sharing reduction. 
+% \label{fig:fission-table}}
+% \end{figure*}
 
 Figure~\ref{fig:mult-table} gives the constant $c$
 calculated for ChannelVocoder, Filterbank, and FMRadio for 4, 16, 36,
@@ -152,7 +159,7 @@ the graph!  Conversely, general fission results in near-neighbor
 communication in a ``snake'' across the 64 cores.  Dupdec achieves
 only a 30x speedup for 64 cores while general fission plus sharing
 reduction achieves a 67x speedup for 64 cores.
-
+ 
 For ChannelVocoder achieve a 60x speedup for general fission over a
 single core because the bottleneck for the application is a single
 filter.  However, since the width of many of the other fission
@@ -190,5 +197,3 @@ largest speedup increase in the comparison at 13.0x.  The reasons for
 this large speedup are similar as given in the previous section.
 However, the SMP communication mechanism is not as efficient as the
 TILE64, thus general fission gives a greater speedup.
-
-summary paragraph...

@@ -4,9 +4,8 @@
 The model we use for this paper is a general model that is agnostic of
 input language.  The semantics of the model of computation employed in
 this paper are built upon synchronous dataflow (SDF)~\cite{leeSDF}.
-Although the model was inspired by the StreamIt programming language,
-the model can represent aspects of other streaming programming
-languages such as Brook~\cite{brook04}, Lime~\cite{lime10},
+The model can represent streaming programming
+languages such as StreamIt, Brook~\cite{brook04}, Lime~\cite{lime10},
 SPL~\cite{spl09} and SPUR~\cite{spur05samos}.  Consider a directed
 graph $G = (V, E)$ corresponding to a streaming application. $F \in V$
 is a filter in the application and $(f, g) \in E$ is an edge (or {\it
@@ -38,16 +37,14 @@ determinable.
 
 For each filter, $F \in V$, a {\it work} function, $W_F$, is defined.
 The work function defines the atomic execution step for each filter.
-When a filter fires, its work function is called once, consuming the
-items and producing the items statically defined.  For each filter, $F
-\in V$, a {\it prework} function, $W_F^P$, can also be defined.
-Prework describes a computation step that executes once at the first
-firing of a filter.  The prework function is executed only once per
-execution of the {\it application}; it describes any special
-initialization behavior required for a filter. We denote a function
-with the variable $\mathcal{F} \in \{W^p, W\}$.  We sometimes leave
-out the subscript that denotes the filter if it is clear which work or
-prework function is intended.
+For each filter, $F \in V$, a {\it prework} function, $W_F^P$, can
+also be defined.  Prework describes a computation step that executes
+once at the first firing of a filter.  The prework function is
+executed only once per execution of the {\it application}; it
+describes any special initialization behavior required for a
+filter. We denote a function with the variable $\mathcal{F} \in \{W^p,
+W\}$.  We sometimes leave out the subscript that denotes the filter if
+it is clear which work or prework function is intended.
 
 For each filter $F \in V$ we define the following:
 \begin{itemize}
@@ -68,7 +65,7 @@ the {\it push} rate.
 
 \noindent Sliding window filters have a peek rate greater than the pop
 rate.  We somethings refer to sliding window filters as {\it peeking}
-filters. Figure~\ref{fig:pipeline-example}(b)
+filters. Figure~\ref{fig:pipeline-example}(a)
 demonstrates a peeking filter.  The figures shows that the window of
 items read for consecutive firings of the filter overlap.  For the
 work function execution, a peeking filter $F$ requires $e(W_F, F)$
@@ -78,19 +75,16 @@ items to be on its input channel(s) to fire.  $F$ will consume
 \begin{figure}[t]
 \centering
 \includegraphics[width=3.0in]{figures/pipeline-example.pdf}
-\caption[A pipeline of three filters with schedules.]{A pipeline of
+\caption[A pipeline of three filters with schedules.]{ (a) gives
+  details for a sliding window filter.  The figure
+  shows the window of items read for 3 consecutive firings of the
+  filter.  Notice the overlapping in the windows.  (b) presents a pipeline of
   three filters.  In the figure, the number to the left of a filter is
   the number of items the filter consumes per firing; the number to
-  the right is the number of items produced per firing.  (a) gives a
-  legal steady-state schedule for the three filters.  (b) gives more
-  detail for $\mt{Filter}_2$ including its peek rate.  The figure
-  shows the window of items read for 3 consecutive firings of the
-  filter.  Notice the overlapping in the windows.  (c) gives a
-  legal initialization schedule for the graph that enables
-  $\mt{Filter}_2$'s peeking. 
-\label{fig:pipeline-example}}
+  the right is the number of items produced per firing.  (b) also gives a
+  legal steady-state schedule and initialization schedule for the three filters. 
+  \label{fig:pipeline-example}}
 \end{figure}
-
 
 A schedule gives a multiplicity for each filter $F \in V$ that denotes
 how many times to fire filter $F$. A {\it steady-state schedule} can
@@ -100,7 +94,7 @@ execution of the graph entails repeating the steady-state schedule for
 as much input as is expected.  Due to this, execution of the stream
 graph is conceptually wrapped in an outer loop that continuously
 executes the steady-state schedule.
-Figure~\ref{fig:pipeline-example}(a) gives an example of a
+Figure~\ref{fig:pipeline-example}(b) gives an example of a
 steady-state schedule calculated for a graph that consists of three
 filters in a pipeline.  All the multiplicities of the steady-state can
 be multiplied by the same constant $c$, and the result will still be a
@@ -122,7 +116,7 @@ required to calculate a steady-state schedule for a graph with an $F$
 such that $e(W_F, F) - o(W_F, F) > 0$ (if the prework function peeks
 then an initialization schedule is also
 required)~\cite{karczmarek-lctes03}.
-Figure~\ref{fig:pipeline-example}(c) gives a legal steady-state
+Figure~\ref{fig:pipeline-example}(b) gives a legal initialization
 schedule for the pipeline that enables the peeking in filter
 $\mt{Filter}_2$.  During application execution, the initialization
 schedule is executed once followed by an infinite repetition of the
