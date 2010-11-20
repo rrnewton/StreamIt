@@ -1,20 +1,20 @@
 \section{Model of Computation}
 \label{model}
 
-The model we use for this paper is a general model that is agnostic of
-input language.  The semantics of the model of computation employed in
-this paper are built upon synchronous dataflow (SDF)~\cite{leeSDF}.
-Although the model was inspired by the StreamIt programming language,
-it is can represent aspects of other streaming languages such as
-Brook~\cite{brook04}, Lime~\cite{lime10}, SPL~\cite{spl09} and
-SPUR~\cite{spur05samos}.  Consider a directed graph $G = (V, E)$
-corresponding to a streaming application. $F \in V$ is a filter in the
-application and $(f, g) \in E$ is an edge (or {\it channel}) in the
-graph that denotes communication from $f$ to $g$ using a FIFO channel.
-Each filter is described by multiple rate declarations, data
-reorganization patterns, and compute functions as described below. The
-techniques in this paper require static-rate graphs, i.e., all of the
-quantities of the filters are statically determinable.
+The model of computation employed for this paper is a general model
+that is agnostic of input language.  The semantics of the model are
+built upon synchronous dataflow (SDF)~\cite{leeSDF}.  Although
+inspired by the StreamIt programming language, the model can represent
+aspects of other streaming languages such as Brook~\cite{brook04},
+Lime~\cite{lime10}, SPL~\cite{spl09} and SPUR~\cite{spur05samos}.
+Consider a directed graph $G = (V, E)$ corresponding to a streaming
+application. $F \in V$ is a filter in the application and $(f, g) \in
+E$ is an edge (or {\it channel}) in the graph that denotes
+communication from $f$ to $g$ using a FIFO channel.  Each filter is
+described by multiple rate declarations, data reorganization patterns,
+and compute functions as described below. The techniques in this paper
+require static-rate graphs, i.e., all of the quantities of the filters
+are statically determinable.
 
 %  Figure~\ref{fig:streamgraph} gives an example
 % stream graph for a FM radio with an equalizer.  The figure also

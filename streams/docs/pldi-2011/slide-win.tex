@@ -26,7 +26,7 @@ difficult for a compiler to analyze and parallelize.  Obscuring the
 data parallelism in sliding window computations limits parallelization
 scalability.  For our benchmarks, ChannelVocoder, Filterbank, and
 FMRadio, stateful implementations of sliding window filters limits
-scalability to 18, 37, and 14 cores, respectively.
+theoretical parallelization scalability to 18, 37, and 14 cores, respectively.
 Figure~\ref{fig:fir-peeking} gives an implementation of an FIR filter
 that utilizes StreamIt's peeking idiom.  The behavior of the sliding
 window is described by the pop and peek rates.  The window is accessed
@@ -68,9 +68,9 @@ in~\cite{gordon-asplos06}:
 \end{itemize}
 
 This is because there is little overlap in the sliding windows of
-product filters for these benchmarks, however DupDec duplicates
-everything. Our techniques will always avoid unncessary duplication of
-input items.  
+product filters for these benchmarks, and DupDec duplicates each input
+item to all products. Conversely, our techniques will always avoid
+unnecessary duplication of input items.
 
 Even without unnecessarily duplication of items, inter-core
 communication as a result of fission accounts for a large percentage

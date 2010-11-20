@@ -10,23 +10,23 @@ embedded in the general graph. A description of synchronization
 removal is beyond the scope of this paper, for a complete exposition,
 please see~\cite{mgordon-phd}.
 
-Before we describe the fission transformation, we need to list the
-preconditions that must hold before fission of $f$ by $P$ in the general
-graph can be performed:
-
+The fission transformation applied to $f$ by factor $P$ divides $f$'s
+work among $P$ fission products: $f_1...f_P$.  After the
+transformation, each $f$ performs $M(S,f) /P$ iterations of $f$'s work
+function in the steady-state.  The following preconditions must be met
+before it $f$ can be fissed by $P$:
 \begin{enumerate}
-\item The items remaining of the input buffer of the original filter
+\item Fission products divide the work of $f$ evenly:
+\begin{equation}
+M(S,f) \mod P = 0 
+\label{eq:mod-fiss}
+\end{equation}
+\item The items remaining in the input buffer of the original filter
   after initialization must be less than the number of items that will
   be dequeued by each fission product:
 \begin{equation}
 C(f) < (M(S,f) / P) \cdot o(W, f)
 \label{eq:fiss-precond1}
-\end{equation}
-
-\item Fission products divide the work of $f$ evenly:
-\begin{equation}
-M(S,f) \mod P = 0 
-\label{eq:mod-fiss}
 \end{equation}
 \end{enumerate}
 
@@ -35,12 +35,12 @@ preconditions can be enforced on any filter by increasing the
 steady-state of the graph. The details of fission on a filter of the
 general stream graph are given in Figure~\ref{fig:general-fission}:
 (a) the definition of the original filter $f$, (b) the steps of the
-algorithm, and (c) gives details for steps 1-9.
+algorithm, and (c) details for steps 1-9.
 
 
 \begin{figure*}
 \centering
-\includegraphics[width=6.0in]{figures/split-pattern.pdf}
+\includegraphics[width=6.3in]{figures/split-pattern.pdf}
 \caption[The output distribution required for general
 fission.]{
 The steady-state output distribution installed for identity node
@@ -52,10 +52,9 @@ steady-state input are distributed to $f_1$. \label{fig:split-pattern}}
 The general fission transformation creates two identity nodes ($ID_I$
 and $ID_O$) that are encoded to implement the data distribution for
 the fission products.  Figure~\ref{fig:split-pattern} illustrates the
-pattern of communication between $ID_I$ and the products of $f$
-($f_1$... $f_P$).  This pattern is common to the transformation for
-all filters we seek to fiss that meet the preconditions of the
-transformation.
+pattern of communication between $ID_I$ and the products of $f$.  This
+pattern is common to the transformation for all filters we seek to
+fiss that meet the preconditions of the transformation.
 
 The fission transformation has the following properties:
 \begin{itemize}

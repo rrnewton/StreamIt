@@ -3,7 +3,7 @@
 A key design goal for the implementation of fission was that
 communication between producers and consumers of the stream graph be
 efficient.  Often when data parallelism is applied, the producer
-filter is fissed at the same width as the consumer filter.  To make
+filter is fissed by the same factor as the consumer filter.  To make
 this common case efficient, general graph fission communicates a large
 number of items between disjoint producer-consumer pairs of products
 of the fission.  Next, a small number of items (the number of items
@@ -45,9 +45,10 @@ communication to total communication can be quantified as:
 %\vspace{-4pt}
 \end{equation}
 
-\noindent This percentage corresponds to the case in which a
-producer and consume are fissed by the same amount.  This case is
-common in our benchmarks.
+\noindent This percentage corresponds to inter-core communication
+ratio for each product filter and, since all product filters have the
+same rates, for the total inter-core communication required for the
+fission of $g$.
 
 This section covers a technique that seeks to decrease the percentage
 of total communication that must be communicated inter-core.  The
@@ -74,7 +75,7 @@ c_g = \frac{1}{T_{\mt{sharing}}} \cdot \frac{C(g) \cdot P}{M(S,g) \cdot o(W,g)}
 \end{equation}
 
 \noindent where $0.0 < T_{\mt{sharing}} \le
-\mt{InterCore}$. Increasing the steady-state of the graph by $c_g$
+\mt{InterCore(g)}$. Increasing the steady-state of the graph by $c_g$
 before general fission is applied will assure that the percentage of
 items duplicated will be equal to $T_{\mt{sharing}}$.  Sharing
 reduction works by increasing the ratio of number of items that are
@@ -127,22 +128,23 @@ for the placement of the fission products of $f$:
 \end{equation}
 
 \noindent The first term approximates the inter-core communication due
-to the fission width discrepancy and the multiple inputs of $g$.  The
-second term quantifies the percentage of inter-core communication
-caused by the sharing due to peeking.
+to (i) the fission factor discrepancy between $f$ and $g$, and (ii) the
+multiple inputs of $g$.  The second term quantifies the percentage of
+inter-core communication caused by the sharing due to peeking.
 
-How do we decide whether it is worthwhile to apply the sharing
-reduction optimization to $g$ given Equation~\ref{eq:tcomm-fopt}? When
-the sharing reduction optimization is applied, the steady-state
-multiplicity of $g$ is increased by a constant $c$.  If this is
-applied to Equation~\ref{eq:tcomm-fopt}, the first term will be
-unaffected, however the second term can be reduced because a smaller
-percentage of steady-state items needs to be duplicated.  By Amdahl's
-law, sharing reduction can only decrease $\mt{InterCore}(g,
-f)$ to under $T_{\mt{sharing}}$ if the second term of Equation~\ref{eq:tcomm-fopt}
-accounts for more than $(1-T_{\mt{sharing}} )$ of the duplication.  We
-define a constant $T_{\mt{apply}}$ such that sharing
-reduction should only be applied to $g$ optimizing for $f$ if:
+Increasing the steady-state will not alter the first term of
+Eq.~\ref{eq:tcomm-fopt}.  However, the second term can be reduced
+because a smaller percentage of steady-state items needs to be
+duplicated.  By Amdahl's law, increasing the steady-state can only
+decrease $\mt{InterCore}(g, f)$ to under $T_{\mt{sharing}}$ if the
+second term of Equation~\ref{eq:tcomm-fopt} accounts for more than
+$(1-T_{\mt{sharing}} )$ of the duplication.  
+
+We need to prevent the application of increasing the steady-state to a
+filter $g$ that will not benefit from it because the majority of
+inter-core communication from fission of $g$ is not caused by $g$'s
+sliding window.  We define a constant $T_{\mt{apply}}$ such that
+sharing reduction should only be applied to $g$ optimizing for $f$ if:
 
 \begin{equation}
 \label{eq:apply-sharing}
@@ -173,7 +175,8 @@ sliding window inter-core communication accounts or at least 95\% of
 total inter-core communication for the proposed fission application of
 $g$. $T_{\mt{apply}}$ prevents the application of sharing reduction to
 fission when the bulk of inter-core communication of the fission is
-not caused by sliding windows.
+not caused by sliding windows, and thus will not be reduced by
+increasing the steady-state.
 
 % For simplicity of analysis, let us assume that $C(g)
 % = 0$, and $P_f$ is a multiple of $P_g$. Figure~\ref{fig:diff-widths}
