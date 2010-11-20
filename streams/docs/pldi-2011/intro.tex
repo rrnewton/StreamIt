@@ -60,15 +60,13 @@ bottleneck.
 
 This paper presents a compiler framework for data-parallelizing
 filters that perform sliding window computations when the properties
-of the sliding window can be calculated statically.   Without explicitly
-representing sliding windows in the language, a sliding window would
-have to be expressed as state retained between iterations of a
-filter.  If sliding window filters required state, this state would
-represent a new parallelization bottleneck in 11 of the
-17 real-world benchmarks in the StreamIt Benchmark Suite 
-that contain sliding windows~\cite{streamit-suite}.  For example, 
-examining the Channelvocoder benchmark, this state would limit scalability to
-18 cores, whereas our techniques scale to at least 64 cores.
+of the sliding window can be calculated statically.  If sliding window
+filters required state, this state would represent a new
+parallelization bottleneck.  Sliding windows are the bottleneck in 11
+of the 17 real-world benchmarks in the StreamIt Benchmark Suite that
+contain sliding windows~\cite{streamit-suite}.  For example, examining
+the Channelvocoder benchmark, this state would limit scalability to 18
+cores, whereas our techniques scale to at least 64 cores.
 
 Data-parallelizing a filter is performed via a transformation termed
 {\it fission} (verb form {\it fiss})~\cite{streamit-asplos}.  Fission
@@ -137,12 +135,12 @@ over a previously published technique.
 \subsection{Contributions}
 This paper makes the following contributions:
 \begin{itemize}
-  \myitem{Motivation for Exposing Sliding Windows in Stream
-    Languages}: Without exposing sliding windows in the language, it
-  requires heroic effort by the compiler to analyze the access patterns
-  of such a filter. Without success, the compiler will not be able to
-  data-parallelize these filters.  This will prevent robust 
-  parallelization scalability for streaming applications.
+  % \myitem{Motivation for Exposing Sliding Windows in Stream
+  %   Languages}: Without exposing sliding windows in the language, it
+  % requires heroic effort by the compiler to analyze the access patterns
+  % of such a filter. Without success, the compiler will not be able to
+  % data-parallelize these filters.  This will prevent robust 
+  % parallelization scalability for streaming applications.
 
   \myitem{Generalized Fission of Sliding Window Filters}: We present a
   transformation that fisses sliding window filters with multiple
@@ -176,7 +174,6 @@ This paper makes the following contributions:
   parallelization speedup for the 64-core TILE64 across our benchmarks.
 
 \end{itemize}
-
 
 % \begin{figure}[t]
 % \centering
