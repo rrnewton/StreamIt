@@ -12,7 +12,7 @@ consumer to a producer in a different pair.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/remaining-dup-case.pdf}
+\includegraphics[width=6in]{figures/remaining-dup-case.pdf}
 \caption[Extra inter-core communication when $C(g) > \mt{dup}_g$.]
 {Inter-core communication details for fission products of consumer $f$
   and producer $g$ each fissed by $P$.  $f$ was a single output node,
@@ -39,8 +39,10 @@ cores as given in the figure, the percentage of inter-core
 communication to total communication can be reduced to:
 
 \begin{equation}
+%b\vspace{-2pt}
 \label{eq:min-dup}
 \mt{InterCore}(g) = \frac{C(g)}{M(S,g) / P * o(W, g)}
+%\vspace{-4pt}
 \end{equation}
 
 \noindent This percentage corresponds to the case in which a
