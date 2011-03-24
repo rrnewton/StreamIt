@@ -1,0 +1,103 @@
+\section{Data Parallelization of Stream Graph}
+\label{sec:data-par}
+
+This paper presents a framework for data-parallelizing filters that
+perform sliding window computations.  The techniques in this paper are
+employed by the parallelization management phase of the compiler once
+the width of data-parallelization for each filter is calculated.
+Previous work describes numerous effective techniques for managing the
+parallelization of a stream
+graph~\cite{kudlur08,gordon-asplos06,flextream,udupa09-gpu,liao06brook}.
+
+\textsc{DataPar} of Algorithm~\ref{alg:data-parallelize} presents an
+algorithm for applying fission of sliding window filters with sharing
+reduction across the entire stream graph.  The extent of data
+parallelism for each filter is decided by the parallelization
+management phase, and is an argument to our algorithm, $P=(V
+\rightarrow \mathbb{N})$. 
+
+The compiler is required to calculate a multiplication factor $c$ for
+the entire graph that satisfies the preconditions for fission for
+every filter that will be fissed (see Section~\ref{sec:fission}).  At
+the same time, $c$ applies sharing reduction to these filters by
+increasing the steady-state such that Equation~\ref{eq:sr-mult} is
+satisfied by the constant.
+
+For each peeking filter $g$ that will be fissed, line~\ref{ln:dp1}
+finds the producer of $g$ that minimizes
+Equation~\ref{eq:apply-sharing}.  If this value is below
+$T_{\mt{apply}}$, $g$ is added to the sharing reduction calculation by
+adding $g$'s shared items and $g$'s total items to the running totals
+of each quantity.  Sharing reduction is incorporated into the
+steady-state multiplier $\mt{minMult}$ in line~\ref{ln:dp2} employing
+Equation~\ref{eq:sr-mult}.  The algorithm applies
+Equation~\ref{eq:fiss-precond1} to each peeking filter that will be
+fissed by maintaining a running value of the minimum multiplier that
+enforce the precondition (line~\ref{ln:dp3}).  The sharing reduction
+multiplicity ($\mt{minMult}$) is required to be greater than the
+precondition multiplier.  Because of the precondition of
+Equation~\ref{eq:mod-fiss}, the final multiplication factor for
+increasing the steady-state must be a multiple of all the fission
+widths of the map $P$. The algorithm assures this by finding the least
+common multiple of all the $P_f$'s greater than $\mt{minMult}$
+(line~\ref{ln:dp4}).  The steady-state multiplicity of the graph is
+then increased by $c$.  Finally, each filter $f$ can be fissed by $P_f$
+using the fission transformation of Section~\ref{sec:fission}.
+
+\begin{algorithm}[t]
+\caption{Exploit Data Parallelism in $G$ for $N$
+  Cores} \label {alg:data-parallelize}
+\footnotesize
+\textsc{DataPar}($G=(V, E), N, T_{\mt{sharing}},
+T_{\mt{apply}}, P=(V \rightarrow \mathbb{N}) $)
+\begin{algorithmic}[1]
+\State $\mt{preCondMult} \gets 1$, $\mt{sharingItems} \gets 0$, $\mt{totalItems} \gets 0$
+\State $\triangleright$ Calculate multiplier for fission preconditions and sharing reduction
+\ForAll {$g \in V$}
+\State $\triangleright$ If this is a peeking filter we are fissing:
+\If {$P_g > 1 \wedge C(g) > 0$}
+\State $\triangleright$ Find the producer of $g$ with the lowest
+value for Eq.~\ref{eq:apply-sharing}
+\State $f \gets \min_{f \in \mt{In}(g)} (1 -\mt{RI}(f,g, S) \cdot
+\min(\frac{P_g}{P_f},\frac{P_f}{P_g} )) $
+\label{ln:dp1}
+\State $\triangleright$ If Eq.~\ref{eq:apply-sharing},
+then record the sharing and total communication
+\If {$T_{\mt{apply}} \ge  (1 -\mt{RI}(f,g, S) \cdot
+\min(\frac{P_g}{P_f},\frac{P_f}{P_g} ))$}
+\State $\mt{sharingItems} \gets \mt{sharingItems} + P_g \cdot C(g)$
+\State $\mt{totalItems} \gets \mt{totalItems} + M(S,g) \cdot o(W, g)$
+\EndIf 
+\State $\triangleright$ Assure that fissing peeking filters adhere to Eq.~\ref{eq:fiss-precond1}
+\State $\mt{preCondMult} \gets \max(\mt{preContMult}, \frac{C(g) \cdot P_g}{M(S,g)
+ \cdot o(W,g)})$  
+\label{ln:dp3}
+\EndIf
+\EndFor
+%\Statex
+\State $\triangleright$ Find the multiplier for sharing reduction
+\State $\mt{minMult} \gets T_{\mt{sharing}} \cdot \frac{\mt{sharingItems}
+}{\mt{totalItems}}$
+\label{ln:dp2}
+\State $\triangleright$ Make sure multiplier assures all fissing peeking filters
+adhere to  Eq.~\ref{eq:fiss-precond1}
+\State $\mt{minMult} \gets \max(\mt{minMult}, \mt{preCondMult})$
+\State $\triangleright$ Find the LCM of the $P_f$'s
+greater than $\mt{minMult}$ to adhere to Eq.~\ref{eq:mod-fiss}
+\State $c \gets $\Call{LCM}{$\forall P_f | f \in V$} $ >
+\mt{minMult}$
+%\Statex
+\label{ln:dp4}
+\State $\triangleright$ Increase the steady-state by $c$
+\ForAll {$f \in V$}
+\State $M(S,f) \gets c \cdot M(S, f)$
+\EndFor
+%\Statex
+\State $\triangleright$ Apply general fission to all nodes in the graph
+\ForAll {$f \in V$}
+\State \Call{GeneralFiss}{$f$, $P_f$}
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
