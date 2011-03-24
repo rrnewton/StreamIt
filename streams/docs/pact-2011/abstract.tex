@@ -1,0 +1,27 @@
+Stream programs represent an important class of high-performance
+computations. They are expressed as graphs of independent filters
+connected by data channels; filters execute repeatedly and
+communication between filters is regular and repeating.  Many stream
+programs include significant amounts of sliding window computation in
+which consecutive iterations of a filter inspect overlapping portions
+of the input channel.  Examples of sliding window computations include
+FIR filters; moving averages and differences; error correcting
+codes; motion estimation; and network packet inspection.  Some popular
+stream programming languages (e.g., Brook, Lime, StreamIt, and IBM
+SPL) go so far as to include idioms that directly represent sliding
+window computation, allowing the programmer to specify, for each
+filter, the size of the window and the number of items discarded after
+an execution of the filter.
+
+In this work we demonstrate that directly representing sliding window
+computation in a stream language is essential to achieving robust
+automatic parallelization for multicore targets. We introduce a
+general framework for the data-parallelization of sliding window
+filters that do not include other forms of stateful computation.  The
+techniques precisely route items across parallel copies, and allow the
+compiler to parametrize inter-core communication.  We evaluate our
+framework in the context of the StreamIt programming language on 3
+real-world applications with sliding windows from the StreamIt
+Benchmark Suite.  Targeting a 16 core shared memory multicore and a 64
+core distributed memory multicore, we achieve a 6.7x and a 1.8x mean
+speedup, respectively, over previously published techniques.

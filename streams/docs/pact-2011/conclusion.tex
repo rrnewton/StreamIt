@@ -1,0 +1,41 @@
+\section{Conclusion}
+
+% Given the dominance of multicores and the cessation of single-core
+% performance scaling, there exists an acute need for programming
+% languages and software techniques that enable effective automatic
+% management of parallelization.  This paper demonstrates that exposing
+% sliding window computation in a programming language is critical to
+% achieving robust parallelization scalability in the domain of stream
+% programs.  Without such support, the data-parallelization of sliding
+% window filters would require heroic effort by a compilation system.
+% If data-parallelization of sliding window filters cannot be achieved,
+% due to the prevalence of sliding windows, scalability is severely
+% curtailed.
+
+This paper presents a framework for data-parallelizing sliding window
+computations given that they are exposed to the compilation system.  Our
+framework enables scalable parallelization of sliding window
+computations for multicores where previous approaches would fail
+because they introduce too much communication.  When performing
+data-parallelization, our techniques convert the state of the sliding
+window into input items shared between the product filters in a
+process termed {\it fission}.  Our technique for filter fission
+communicates the minimum amount of shared state necessary for the
+data-parallelization.  We present a complementary optimization termed
+{\it Sharing Reduction} that alters the steady-state of a stream
+program to reduce the number of items shared between product filters
+of fission.  This has the effect of reducing inter-core communication.
+
+To evaluate our techniques we have implemented them in the context of
+the StreamIt compiler infrastructure~\cite{gordon-asplos06}.  We
+employ 3 real-world benchmarks from the StreamIt Benchmark
+Suite~\cite{streamit-suite} that include sliding window computation.
+We show that our techniques are required to achieve scalable
+parallelization on both architectures, achieving a mean
+parallelization speedups over single-core of 17x and 62.3x for a
+16-core SMP and a 64-core distributed-memory multicore, respectively.
+These results represent a 6.7x mean speedup on the 16-core SMP and a
+1.8x mean speedup on the 64-core distributed-memory multicore over a
+previously published technique.
+
+
