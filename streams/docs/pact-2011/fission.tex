@@ -1,14 +1,15 @@
 \section{Generalized Fission of Sliding Window Filters}
 \label{sec:fission}
 
-This section describes our technique for the fission of sliding window
-filters. Our technique for filter fission employs an optimization
-termed {\it synchronization removal}.  This transformation is applied
-to nodes calculating the identity function in the general graph such
-that they can be removed, but their communication patterns remain
-embedded in the general graph. A description of synchronization
-removal is beyond the scope of this paper, for a complete exposition,
-please see~\cite{mgordon-phd}.
+This section provides an overview of our technique for the fission of
+sliding window filters. A complete description is given in
+Figure~\ref{fig:general-fission} in the Appendix.  Our technique for
+filter fission employs an optimization termed {\it synchronization
+  removal}.  This transformation is applied to nodes calculating the
+identity function in the general graph such that they can be removed,
+but their communication patterns remain embedded in the general
+graph. A description of synchronization removal is beyond the scope of
+this paper, for a complete exposition, please see~\cite{mgordon-phd}.
 
 The fission transformation applied to $f$ by factor $P$ divides $f$'s
 work among $P$ fission products: $f_1...f_P$.  After the
@@ -35,12 +36,41 @@ C(f) < (M(S,f) / P) \cdot o(W, f)
 }
 \end{enumerate}
 
-\noindent As Section~\ref{sec:data-par} describes, both of these
-preconditions can be enforced on any filter by increasing the
-steady-state of the graph. The details of fission on a filter of the
-general stream graph are given in Figure~\ref{fig:general-fission}:
-(a) the definition of the original filter $f$, (b) the steps of the
-algorithm, and (c) details for steps 1-9.
+\noindent The second precondition assures that no item is read by more
+than 2 fission products.  As Section~\ref{sec:data-par} describes,
+both of these preconditions can be enforced on any filter by
+increasing the steady-state of the graph.  The process includes the
+following steps (Figure~\ref{fig:general-fission} illustrates steps
+1-9): 
+\begin{enumerate}
+\item Create $P$ copies of $f$ and set their rates
+and work functions according to Figure~\ref{fig:general-fission}.
+\item Create two identity nodes, $ID_I$ and $ID_O$, that will encode
+  the distribution for the fission.
+\item Move the initialization stage computation of $f$ to $f_1$
+  according to Figure~\ref{fig:general-fission}. 
+\item Move input distribution of $f$ to $ID_I$
+replacing occurrences of $f$ with $ID_I$ in edges.
+\item Move output distribution of $f$ to $ID_O$, replacing
+occurrences of $f$ with $ID_O$ in edges.
+\item Create the fission duplication pattern in the
+output distribution of $ID_I$.
+\item Create a round robin joining pattern for the output identity
+  filter $ID_O$ to receive from each fission product.
+\item For each node $p$ that is a producer of $f$, replace the
+ occurrences of $f$ with $O_I$ in the edges of the dupsets of $p$'s
+ output distribution.
+\item For each node $c$ that is a consumer of $f$, replace the
+ occurrences of $f$ with $O_O$ in incoming edges $c$'s input
+ distribution.
+\item \textsc{SynchRemove}($ID_I$)
+\item \textsc{SynchRemove}($ID_O$)
+\end{enumerate}
+
+The details of fission on a filter of the general stream graph are
+given in the Appendix in Figure~\ref{fig:general-fission}: (a) the
+definition of the original filter $f$, (b) the steps of the algorithm,
+and (c) details for steps 1-9.
 
 \begin{figure*}
 \centering
@@ -87,38 +117,11 @@ The fission transformation has the following properties:
 %   products are idle during this stage.
 \end{itemize}
 
-The final steps of the general fission transformation applies
-\textsc{SynchRemove} to remove the identity filters, and stitch the
-communication directly between the fission products and $f$'s
-producer(s) and consumer(s).
+% The final steps of the general fission transformation applies
+% \textsc{SynchRemove} to remove the identity filters, and stitch the
+% communication directly between the fission products and $f$'s
+% producer(s) and consumer(s).
  
-%  The process includes the
-% following steps (Figure~\ref{fig:general-fission} illustrates steps
-% 1-9): 
-% \begin{enumerate}
-% \item Create $P$ copies of $f$ and set their rates
-% and work functions according to Figure~\ref{fig:general-fission}.
-% \item Create two identity nodes, $ID_I$ and $ID_O$, that will encode
-%   the distribution for the fission.
-% \item Move the initialization stage computation of $f$ to $f_1$
-%   according to Figure~\ref{fig:general-fission}. 
-% \item Move input distribution of $f$ to $ID_I$
-% replacing occurrences of $f$ with $ID_I$ in edges.
-% \item Move output distribution of $f$ to $ID_O$, replacing
-% occurrences of $f$ with $ID_O$ in edges.
-% \item Create the fission duplication pattern in the
-% output distribution of $ID_I$.
-% \item Create a round robin joining pattern for the output identity
-%   filter $ID_O$ to receive from each fission product.
-% \item For each node $p$ that is a producer of $f$, replace the
-%  occurrences of $f$ with $O_I$ in the edges of the dupsets of $p$'s
-%  output distribution.
-% \item For each node $c$ that is a consumer of $f$, replace the
-%  occurrences of $f$ with $O_O$ in incoming edges $c$'s input
-%  distribution.
-% \item \textsc{SynchRemove}($ID_I$)
-% \item \textsc{SynchRemove}($ID_O$)
-% \end{enumerate}
 
 
 % To understand the transformation, we first need to understand the item

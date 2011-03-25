@@ -134,47 +134,47 @@ architectures, achieving a 6.7x mean speedup on the 16-core SMP and a
 1.8x mean speedup on the 64-core TILE64 over a
 previously published technique.
 
-This paper makes the following contributions:
-\begin{itemize}
-  % \myitem{Motivation for Exposing Sliding Windows in Stream
-  %   Languages}: Without exposing sliding windows in the language, it
-  % requires heroic effort by the compiler to analyze the access patterns
-  % of such a filter. Without success, the compiler will not be able to
-  % data-parallelize these filters.  This will prevent robust 
-  % parallelization scalability for streaming applications.
+% This paper makes the following contributions:
+% \begin{itemize}
+%   % \myitem{Motivation for Exposing Sliding Windows in Stream
+%   %   Languages}: Without exposing sliding windows in the language, it
+%   % requires heroic effort by the compiler to analyze the access patterns
+%   % of such a filter. Without success, the compiler will not be able to
+%   % data-parallelize these filters.  This will prevent robust 
+%   % parallelization scalability for streaming applications.
 
-  \myitem{Generalized Fission of Sliding Window Filters}: We present a
-  transformation that fisses sliding window filters with multiple
-  input and multiple outputs.  The technique also supports filters
-  that with multiple schedules of execution.  General fission defines
-  a precise pattern of communication of input data to the products
-  that can be reasoned about by our other techniques.
+%   \myitem{Generalized Fission of Sliding Window Filters}: We present a
+%   transformation that fisses sliding window filters with multiple
+%   input and multiple outputs.  The technique also supports filters
+%   that with multiple schedules of execution.  General fission defines
+%   a precise pattern of communication of input data to the products
+%   that can be reasoned about by our other techniques.
 
-  \myitem{Sharing Reduction}: We are the first to present a technique
-  that decides when it is possible to decrease the amount of sharing
-  between fission products by altering the steady-state of a stream
-  graph, thus decreasing inter-core communication.  The technique
-  considers each sliding window filter of the stream graph,
-  and when possible, reduces the sharing requirement to below a given
-  threshold percent of the total input of the filter. 
+%   \myitem{Sharing Reduction}: We are the first to present a technique
+%   that decides when it is possible to decrease the amount of sharing
+%   between fission products by altering the steady-state of a stream
+%   graph, thus decreasing inter-core communication.  The technique
+%   considers each sliding window filter of the stream graph,
+%   and when possible, reduces the sharing requirement to below a given
+%   threshold percent of the total input of the filter. 
 
-  \myitem{Data Parallelization of Stream Graph}: We present a
-  framework for data-parallelizing all of the filters of a stream
-  graph employing the fission transformation on individual filters and
-  applying sharing reduction when possible.  This framework optimizes
-  for spatial locality and enables the compiler to automatically and
-  effectively manage parallelization across varying multicore
-  architectures.
+%   \myitem{Data Parallelization of Stream Graph}: We present a
+%   framework for data-parallelizing all of the filters of a stream
+%   graph employing the fission transformation on individual filters and
+%   applying sharing reduction when possible.  This framework optimizes
+%   for spatial locality and enables the compiler to automatically and
+%   effectively manage parallelization across varying multicore
+%   architectures.
 
-  \myitem{Enable Robust Parallelization Scaling for Multicores}: For
-  streaming applications with sliding window computation, previously
-  published data-parallelization transformations do not scale for our
-  target multicores. Our techniques enable robust parallelization
-  scalability by reducing inter-core communication.  We achieve a 17x
-  mean parallelization speedup for a 16-core SMP and a 62.3x mean
-  parallelization speedup for the 64-core TILE64 across our benchmarks.
+%   \myitem{Enable Robust Parallelization Scaling for Multicores}: For
+%   streaming applications with sliding window computation, previously
+%   published data-parallelization transformations do not scale for our
+%   target multicores. Our techniques enable robust parallelization
+%   scalability by reducing inter-core communication.  We achieve a 17x
+%   mean parallelization speedup for a 16-core SMP and a 62.3x mean
+%   parallelization speedup for the 64-core TILE64 across our benchmarks.
 
-\end{itemize}
+%\end{itemize}
 
 % For sliding window filters, some (or all) input items are required by
 % multiple iterations.  Without explicit support for sliding window
@@ -256,7 +256,10 @@ application is represented in our streaming computation model.  The
 transformation is performed by altering the steady-state loop
 granularity appropriately.  This has the effect of expanding all edge
 arrays, redistributing filter iterations, and recalculating data
-routing.  This capability enables a programmer to write an application
+routing.  Our framework also includes closed-form formulas for
+calculating an appropriate granularity for the steady-state such that
+sharing does not overwhelm the benefits of parallelization.
+These capabilities enable a programmer to write an application
 and its filters at a natural granularity that is independent of
 parallelization considerations enabling portable, reusable, and
 malleable code.  Furthermore, fine-grained implementations of filters
