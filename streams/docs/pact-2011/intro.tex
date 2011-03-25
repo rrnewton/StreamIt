@@ -115,23 +115,24 @@ data-parallelized.
    (a) the non-peeking version implemented via a
   stateful circular buffer; and (b) the peeking version. Only steady-state implementation is
   given.}
+\vspace{-10pt}
 \end{figure}
 
-The framework presented is defined on a model of computation that is
-agnostic of source language.  To evaluate our techniques we have
-implemented them in the context of the StreamIt compiler
+The framework presented is defined on an execution model that is
+agnostic of source language.  For evaluation, we have implemented our
+techniques in the context of the StreamIt compiler
 infrastructure~\cite{gordon-asplos06}.  Our transformations are guided
 by the parallelization management techniques presented
-in~\cite{gordon-asplos06}.  We employ 3 real-world benchmarks from the
-StreamIt Benchmark Suite~\cite{streamit-suite} that include sliding
-window computation.  We demonstrate the effectiveness of our
+in~\cite{gordon-asplos06}.  We employ 3 real-world benchmarks that
+include sliding window computation from the StreamIt Benchmark
+Suite~\cite{streamit-suite}.  We demonstrate the effectiveness of our
 techniques by comparing them to previously published techniques on two
 multicore architectures: a 16-core SMP shared-memory multicore and the
-64-core distributed-memory Tilera TILE64.  We show that
-our techniques are required to achieve scalable parallelization on
-both architectures, achieving a 6.7x mean speedup on the 16-core SMP
-and a 1.8x mean speedup on the 64-core distributed memory multicore
-over a previously published technique.
+64-core distributed-memory Tilera TILE64.  We show that our techniques
+are required to achieve scalable parallelization on both
+architectures, achieving a 6.7x mean speedup on the 16-core SMP and a
+1.8x mean speedup on the 64-core TILE64 over a
+previously published technique.
 
 \subsection{Perspective on our Framework}
 
@@ -146,20 +147,22 @@ saved across iterations of the outer steady-state loop employing
 either a circular buffer or copy/shift operators, both of which are
 non-affine.
 
-Many traditional parallelization frameworks are able to parallelize
-the inner scheduling loop of a filter within a single iteration of the
-outer loop, and block executions to reduce communication of shared
-data.  However, we do not know of a technique that will parallelize
-and block the inner scheduling loop across iterations of the outer
-steady-state loop because the inner loop's dependences across outer
-loop iterations are non-affine.
+Many traditional frameworks are able to parallelize the inner
+scheduling loop of a sliding window filter within a single iteration
+of the outer loop, and block executions to reduce communication of
+shared data.  This corresponds to parallelizing and blocking a stencil
+pattern across loop iterations.  However, we do not know of a
+framework that will parallelize and block the inner scheduling loop
+across iterations of the outer steady-state loop because, for sliding
+window fliters, the inner loop's dependences across outer loop
+iterations are non-affine.
 
 Our techniques are able to parallelize and block the inner scheduling
 loop across iterations of the outer steady-state loop in the presence
-of non-affine dependences.  This capability enables the programmer to
-write the application and its filters at a granularity that is natural
-and independent of parallelization considerations.  The compiler will
-schedule filter executions and parallelize at the appropriate
+of non-affine dependences.  This capability enables a programmer to
+write an application and its filters at a natural granularity that is 
+independent of parallelization considerations.  The compiler
+schedules filter executions and parallelizes at the appropriate
 granularity to reduce inter-core communication.
 
 % \subsection{Contributions}
