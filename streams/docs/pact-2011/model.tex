@@ -49,17 +49,15 @@ it is clear which work or prework function is intended.
 For each filter $F \in V$ we define the following:
 \begin{itemize}
 
-\item $o(\mathcal{F}, F)$, the number of items dequeued from $F$'s
-input buffer per firing of $\mathcal{F}$.  This quantity is termed the
-{\it pop} rate.
+\item $o(\mathcal{F}, F)$, or {\it pop} rate, is the number of items
+  dequeued from $F$'s input buffer per firing of $\mathcal{F}$.
 
-\item $e(\mathcal{F}, F)$, 1 $+$ the greatest index that is read (but
+\item $e(\mathcal{F}, F)$, or  {\it peek} rate, 1 $+$ the greatest index that is read (but
   not necessarily dequeued) from $F$'s input buffer per firing of
-  $\mathcal{F}$.  This quantity is termed the {\it peek} rate.
+  $\mathcal{F}$. 
 
-\item $u(\mathcal{F}, F)$, the number of items enqueued to $F$'s
-output buffer per firing of $\mathcal{F}$.  This quantity is termed
-the {\it push} rate.
+\item $u(\mathcal{F}, F)$, or {\it push} rate , the number of items enqueued to $F$'s
+output buffer per firing of $\mathcal{F}$.  
 
 \end{itemize}
 
@@ -107,7 +105,7 @@ Furthermore, an {\it initialization} schedule, $I$, is explicitly
 represented that enables the steady-state schedule in the presence of
 peeking filters.  An initialization schedule is required if peeking is
 present in a graph to enable the calculation and execution of a
-steady-state schedule~\cite{karczma-thesis}.  After the initialization
+steady-state schedule~\cite{karczmarek-lctes03}.  After the initialization
 schedule executes, each filter $F$ is guaranteed to have at least
 $e(W_F, F) - o(W_F, F)$ items in its input buffer.
 Figure~\ref{fig:pipeline-example}(b) gives a legal initialization
