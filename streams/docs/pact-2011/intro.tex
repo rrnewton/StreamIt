@@ -198,35 +198,67 @@ This paper makes the following contributions:
 \begin{figure}[t]
 \centering
 \includegraphics[width=3.3in]{figures/early-example.pdf}
-\caption{\label{fig:comparison}}
+\caption{(a) Flexible skeleton implementation of a streaming
+  application in an imperative language focusing on sliding window
+  operation $f$. (b) The elements of {\tt f\_in} inspected by
+  iterations of $f$ for the first two steady-states.
+\label{fig:comparison}}
 \vspace{-10pt}
 \end{figure}
 
-To appreciate the contributions of our framework, consider the
-following.  In a translation to an imperative language, each filter is
-wrapped in a scheduling loop that executes for the number of times
-that the filter appears in the steady-state schedule. An array
-implements the input edge of each filter.  All loops that represent
-filters are then wrapped in an outer loop that executes until input
-data is exhausted.  For sliding window filters, data items must be
-saved across iterations of the outer steady-state loop employing
-either a circular buffer or copy/shift operators, both of which are
-non-affine.
+To appreciate the contributions of our framework, let us discuss the
+program transformation in the context of an imperative language and a
+traditional optimizing compiler.  Consider a sliding window filtering
+operation $f$ embedded in a streaming application.  $f$ is repeatedly
+called as long as input is available.  Figure~\ref{fig:comparison}(a)
+shows a flexible skeleton implementation of a streaming application
+with an embedded $f$.  An outer ({\tt while}) loop iterates as long as
+input data is available; $f$ is wrapped in an inner ({\tt for}) loop
+that executes for {\tt N} iterations.  The combination of these loops
+captures that fact that it is often natural for a filter to operate on
+a subset of inputs at a time (e.g., a frame, sampling window). An
+array ({\tt f\_in}) implements the input edge of $f$.  Copy-shift
+operations move items that are shared at the boundary of
+steady-states. 
 
-Many traditional frameworks are able to parallelize the inner
-scheduling loop of a sliding window filter within a single iteration
-of the outer loop, and block executions to reduce communication of
-shared data.  This corresponds to parallelizing and blocking a stencil
-pattern across loop iterations.  However, we do not know of a
-framework that will parallelize and block the inner scheduling loop
-across iterations of the outer steady-state loop because, for sliding
-window fliters, the inner loop's dependences across outer loop
-iterations are non-affine.
+Figure~\ref{fig:comparison}(b) illustrates the sharing of input items
+across executions of $f$ within a steady-state (an iteration of the
+{\tt while} loop) an across steady-states.  Notice that within a
+steady-state, iterations of $f$ read overlapping portions of {\tt
+  f\_in}.  Traditional automatic parallelizing compilers will be able
+to data parallelize the inner {\tt for} loop as there are no true
+dependences between iterations (there are no writes to {\tt f\_in}).
+Blocking could be performed to minimize communication, as
+communication is introduced when successive iterations are mapped to
+distinct cores.  
 
-Our techniques are able to parallelize and block the inner scheduling
-loop across iterations of the outer steady-state loop in the presence
-of non-affine dependences.  This capability enables a programmer to
-write an application and its filters at a natural granularity that is 
-independent of parallelization considerations.  The compiler
-schedules filter executions and parallelizes at the appropriate
-granularity to reduce inter-core communication.
+There is a problem if there are not enough iterations of $f$ within a
+steady-state to spread across the cores of the machine and overcome
+the cost of communicating the sharing. It would require heroic
+compiler analysis and program understanding to parallelize and block
+$f$ across iterations of the outer steady-state loop.  The granularity
+of the implementation obscures this: {\tt f\_in} has a finite size and
+the presence of the copy-shift dependences.  A super compiler would
+have to (i) unroll the {\tt while} loop, (ii) perform array expansion
+on {\tt f\_in} comprehending the copy-shift dependences, (iii)
+redistribute the iterations counts of all loops (corresponding to all
+filters).
+
+An alternative implementation could implement {\tt f\_in} as a
+circular buffer, eliminating the copy-shift operations. However, the
+modulo operation of each array access would confuse a dependence
+analysis framework.
+
+As we will demonstrate, our techniques are able to parallelize and
+block the inner scheduling loop across iterations of the outer
+steady-state loop in the presence of non-affine dependences when the
+application is represented in our streaming computation model.  The
+transformation is performed by altering the steady-state loop
+granularity appropriately.  This has the effect of expanding all edge
+arrays, redistributing filter iterations, and recalculating data
+routing.  This capability enables a programmer to write an application
+and its filters at a natural granularity that is independent of
+parallelization considerations enabling portable, reusable, and
+malleable code.  Furthermore, fine-grained implementations of filters
+enables the compiler to perform guided filter fusion that balances
+data and instruction cache behavior~\cite{sermulins-lctes05}.  
