@@ -1,13 +1,17 @@
 \section{Data Parallelization of Stream Graph}
 \label{sec:data-par}
 
-This paper presents a framework for data-parallelizing filters that
-perform sliding window computations.  The techniques in this paper are
-employed by the parallelization management phase of the compiler once
-the width of data-parallelization for each filter is calculated.
-Previous work describes numerous effective techniques for managing the
+The techniques in this paper are employed by the parallelization
+management phase of the compiler once the width of
+data-parallelization for each filter is calculated.  Previous work
+describes numerous effective techniques for managing the
 parallelization of a stream
 graph~\cite{kudlur08,gordon-asplos06,flextream,udupa09-gpu,liao06brook}.
+Note that our framework extends to cyclic graphs as along as there is
+enough delay in any backedge to account for the increase in the
+steady-state multiplicity factor that is applied by our techniques.
+In StreamIt, example, this delay can be specified using the
+{\tt enqueue} block.
 
 \textsc{DataPar} of Algorithm~\ref{alg:data-parallelize} presents an
 algorithm for applying fission of sliding window filters with sharing
