@@ -27,27 +27,6 @@ the same time, $c$ applies sharing reduction to these filters by
 increasing the steady-state such that Equation~\ref{eq:sr-mult} is
 satisfied by the constant.
 
-For each peeking filter $g$ that will be fissed, line~\ref{ln:dp1}
-finds the producer of $g$ that minimizes
-Equation~\ref{eq:apply-sharing}.  If this value is below
-$T_{\mt{apply}}$, $g$ is added to the sharing reduction calculation by
-adding $g$'s shared items and $g$'s total items to the running totals
-of each quantity.  Sharing reduction is incorporated into the
-steady-state multiplier $\mt{minMult}$ in line~\ref{ln:dp2} employing
-Equation~\ref{eq:sr-mult}.  The algorithm applies
-Equation~\ref{eq:fiss-precond1} to each peeking filter that will be
-fissed by maintaining a running value of the minimum multiplier that
-enforce the precondition (line~\ref{ln:dp3}).  The sharing reduction
-multiplicity ($\mt{minMult}$) is required to be greater than the
-precondition multiplier.  Because of the precondition of
-Equation~\ref{eq:mod-fiss}, the final multiplication factor for
-increasing the steady-state must be a multiple of all the fission
-widths of the map $P$. The algorithm assures this by finding the least
-common multiple of all the $P_f$'s greater than $\mt{minMult}$
-(line~\ref{ln:dp4}).  The steady-state multiplicity of the graph is
-then increased by $c$.  Finally, each filter $f$ can be fissed by $P_f$
-using the fission transformation of Section~\ref{sec:fission}.
-
 \begin{algorithm}[t]
 \caption{Exploit Data Parallelism in $G$ for $N$
   Cores} \label {alg:data-parallelize}
@@ -103,5 +82,27 @@ greater than $\mt{minMult}$ to adhere to Eq.~\ref{eq:mod-fiss}
 \EndFor
 \end{algorithmic}
 \end{algorithm}
+
+For each peeking filter $g$ that will be fissed, line~\ref{ln:dp1}
+finds the producer of $g$ that minimizes
+Equation~\ref{eq:apply-sharing}.  If this value is below
+$T_{\mt{apply}}$, $g$ is added to the sharing reduction calculation by
+adding $g$'s shared items and $g$'s total items to the running totals
+of each quantity.  Sharing reduction is incorporated into the
+steady-state multiplier $\mt{minMult}$ in line~\ref{ln:dp2} employing
+Equation~\ref{eq:sr-mult}.  The algorithm applies
+Equation~\ref{eq:fiss-precond1} to each peeking filter that will be
+fissed by maintaining a running value of the minimum multiplier that
+enforce the precondition (line~\ref{ln:dp3}).  The sharing reduction
+multiplicity ($\mt{minMult}$) is required to be greater than the
+precondition multiplier.  Because of the precondition of
+Equation~\ref{eq:mod-fiss}, the final multiplication factor for
+increasing the steady-state must be a multiple of all the fission
+widths of the map $P$. The algorithm assures this by finding the least
+common multiple of all the $P_f$'s greater than $\mt{minMult}$
+(line~\ref{ln:dp4}).  The steady-state multiplicity of the graph is
+then increased by $c$.  Finally, each filter $f$ can be fissed by $P_f$
+using the fission transformation of Section~\ref{sec:fission}.
+
 
 

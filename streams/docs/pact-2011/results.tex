@@ -2,33 +2,6 @@
 \section{Evaluation}
 \label{sec:eval}
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=6.1in]{figures/big-table.pdf}
-\caption{\label{fig:big-table}  Steady-state multiplicity, buffering,
-  and communication for fission with and without sharing reduction.}
-\vspace{-10pt}
-\end{figure*}
-
-
-\begin{figure*}[t]
-\begin{minipage}[b]{0.5\linewidth}
-\centering
-\includegraphics[width=3.3in]{figures/tilera-chart.pdf}
-\caption{ Evaluation for DupDec versus general fission versus general fission with sharing reduction
-  4, 16, 36, and 64 cores on the TILE64.}
-\label{fig:tilera-chart}
-\end{minipage}
-\hspace{0.5cm}
-\begin{minipage}[b]{0.5\linewidth}
-\centering
-\includegraphics[width=3.3in]{figures/smp-chart.pdf}
-\caption{Evaluation for DupDec versus general fission with sharing reduction
-  for the 16-core SMP architecture. }
-\label{fig:smp-chart}
-\end{minipage}
-\vspace{-10pt}
-\end{figure*}
 
 We have implemented the techniques in the context of the StreamIt
 compiler infrastructure~\cite{gordon-asplos06}.  The fission and
@@ -117,6 +90,34 @@ between buffer size and inter-core communication.
 % sharing reduction. 
 % \label{fig:fission-table}}
 % \end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=6.1in]{figures/big-table.pdf}
+\caption{\label{fig:big-table}  Steady-state multiplicity, buffering,
+  and communication for fission with and without sharing reduction.}
+\vspace{-10pt}
+\end{figure*}
+
+
+\begin{figure*}[t]
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[width=3.3in]{figures/tilera-chart.pdf}
+\caption{ Evaluation for DupDec versus general fission versus general fission with sharing reduction
+  4, 16, 36, and 64 cores on the TILE64.}
+\label{fig:tilera-chart}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[width=3.3in]{figures/smp-chart.pdf}
+\caption{Evaluation for DupDec versus general fission with sharing reduction
+  for the 16-core SMP architecture. }
+\label{fig:smp-chart}
+\end{minipage}
+\vspace{-10pt}
+\end{figure*}
 
 Figure~\ref{fig:big-table} compares the steady-state with and
 without sharing reduction for a 64-core mapping, as well as gives the
