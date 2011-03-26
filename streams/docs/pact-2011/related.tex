@@ -37,6 +37,17 @@ sharing caused by sliding windows.  Our framework frees the programmer
 from having to consider buffers and granularity, enabling portable,
 reusable, and malleable code.
 
+Stream reuse frameworks~\cite{stream-reuse} seek to optimize explicit
+copying of data items to distinct streams.  Stream reuse reduces
+memory bandwidth when multiple different filters read overlapping
+sections of the same input (possibly on different iterations). Stream
+reuse does explicitly capture stream-stencil reuse in the context of
+Brook or StreamC/KernelC.  After a filter is data parallelized, a
+stream reuse framework may capture the sharing caused by sliding
+window input between product filters, however, the framework will not
+introduce blocking across steady-states to reduce the sharing
+requirement.
+
 Other languages have included the notion of a sliding window.  The ECOS
 graphs language allows actors to specify how many items are read but
 not consumed~\cite{huang_ecos_1992}; the Signal language allows access
@@ -47,19 +58,6 @@ operation~\cite{draper_compiling_2001}.  However, to the best of our
 knowledge, translation systems for these languages do not utilize
 sliding windows to improve parallelism and reduce inter-core
 communication.
-
-Traditional parallelizing compilers could achieve similar mappings
-(i.e., data parallelizing a loop nest and reducing the sharing between
-iterations mapped to separate cores), but the application would have
-to be expressed at a granularity coarse enough that the compiler could
-block the iterations of the inner loops as necessary for the parallel
-mapping.  This would require the programmer to consider and explicitly
-specify loop bounds on the inner loops representing producers and
-consumers.  Given access patterns of the sliding window filters that
-we are considering (similar to a stencil pattern in scientific
-computing) and the complexity of the fine-grained communication
-described by scatter and gather operations, this is a very difficult
-task for the applications we consider.
 
 Our key contribution over previous work in both streaming computation
 and traditional scientific frameworks is that we automatically adjust
