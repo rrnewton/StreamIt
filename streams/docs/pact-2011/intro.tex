@@ -211,19 +211,20 @@ program transformation in the context of an imperative language and a
 traditional optimizing compiler.  Consider a sliding window filtering
 operation $f$ embedded in a streaming application.  $f$ is repeatedly
 called as long as input is available.  Figure~\ref{fig:comparison}(a)
-shows a flexible skeleton implementation of a streaming application
-with an embedded $f$.  An outer ({\tt while}) loop iterates as long as
-input data is available; $f$ is wrapped in an inner ({\tt for}) loop
-that executes for {\tt M} iterations.  The combination of these loops
-captures that fact that it is often natural for a filter to operate on
-a subset of inputs at a time (e.g., a frame, sampling window). An
-array ({\tt f\_in}) implements the input edge of $f$.  Copy-shift
-operations move items that are shared at the boundary of
-steady-states. 
+shows a flexible skeleton implementation in an imperative language of
+a streaming application with an embedded $f$.  An outer ({\tt while})
+loop iterates as long as input data is available; $f$ is wrapped in an
+inner ({\tt for}) loop that executes for {\tt M} iterations.  The
+combination of these loops captures that fact that it is often natural
+for a filter to operate on a subset of inputs at a time (e.g., a
+frame, sampling window). An array ({\tt f\_in}) implements the input
+edge of $f$.  Copy-shift operations move items that are shared at the
+boundary of steady-states.
 
 Figure~\ref{fig:comparison}(b) illustrates the sharing of input items
-across executions of $f$ within a steady-state (an iteration of the
-{\tt while} loop) an across steady-states.  Notice that within a
+across executions of $f$ within a steady-state (within iteration of the
+{\tt while} loop) and across steady-states (across iterations of the
+{\tt while} loop).  Notice that within a
 steady-state, iterations of $f$ read overlapping portions of {\tt
   f\_in}.  Traditional automatic parallelizing compilers will be able
 to data parallelize the inner {\tt for} loop as there are no true
@@ -249,20 +250,21 @@ circular buffer, eliminating the copy-shift operations. However, the
 modulo operation of each array access would confuse a dependence
 analysis framework.
 
-As we will demonstrate, our techniques are able to parallelize and
-block the inner scheduling loop across iterations of the outer
-steady-state loop in the presence of non-affine dependences when the
-application is represented in our streaming computation model.  The
-transformation is performed by altering the steady-state loop
-granularity appropriately.  This has the effect of expanding all edge
-arrays, redistributing filter iterations, and recalculating data
-routing.  Our framework also includes closed-form formulas for
-calculating an appropriate granularity for the steady-state such that
-sharing does not overwhelm the benefits of parallelization.  These
-capabilities enable a programmer to write an application and its
-filters at a natural granularity that is independent of
-parallelization considerations enabling portable, reusable, and
-malleable code (see Figure~\ref{fig:fir-peeking}).  Furthermore,
-fine-grained implementations of filters enables the compiler to
-perform guided filter fusion that balances data and instruction cache
+Enabled by representing sliding windows explicitly, our techniques are
+able to parallelize and block the inner scheduling loop across
+iterations of the outer steady-state loop in the presence of
+non-affine dependences when the application is represented in our
+streaming computation model.  The transformation is performed by
+altering the steady-state loop granularity appropriately.  This has
+the effect of expanding all edge arrays, redistributing filter
+iterations, and recalculating data routing.  Our framework also
+includes closed-form formulas for calculating an appropriate
+granularity for the steady-state such that sharing does not overwhelm
+the benefits of parallelization.  These capabilities enable a
+programmer to write an application and its filters at a natural
+granularity that is independent of parallelization considerations
+enabling portable, reusable, and malleable code (see
+Figure~\ref{fig:fir-peeking}).  Furthermore, fine-grained
+implementations of filters enables the compiler to perform guided
+filter fusion that balances data and instruction cache
 behavior~\cite{sermulins-lctes05}.
