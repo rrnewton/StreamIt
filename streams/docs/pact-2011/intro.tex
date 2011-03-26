@@ -214,7 +214,7 @@ called as long as input is available.  Figure~\ref{fig:comparison}(a)
 shows a flexible skeleton implementation of a streaming application
 with an embedded $f$.  An outer ({\tt while}) loop iterates as long as
 input data is available; $f$ is wrapped in an inner ({\tt for}) loop
-that executes for {\tt N} iterations.  The combination of these loops
+that executes for {\tt M} iterations.  The combination of these loops
 captures that fact that it is often natural for a filter to operate on
 a subset of inputs at a time (e.g., a frame, sampling window). An
 array ({\tt f\_in}) implements the input edge of $f$.  Copy-shift
@@ -258,10 +258,11 @@ granularity appropriately.  This has the effect of expanding all edge
 arrays, redistributing filter iterations, and recalculating data
 routing.  Our framework also includes closed-form formulas for
 calculating an appropriate granularity for the steady-state such that
-sharing does not overwhelm the benefits of parallelization.
-These capabilities enable a programmer to write an application
-and its filters at a natural granularity that is independent of
+sharing does not overwhelm the benefits of parallelization.  These
+capabilities enable a programmer to write an application and its
+filters at a natural granularity that is independent of
 parallelization considerations enabling portable, reusable, and
-malleable code.  Furthermore, fine-grained implementations of filters
-enables the compiler to perform guided filter fusion that balances
-data and instruction cache behavior~\cite{sermulins-lctes05}.  
+malleable code (see Figure~\ref{fig:fir-peeking}).  Furthermore,
+fine-grained implementations of filters enables the compiler to
+perform guided filter fusion that balances data and instruction cache
+behavior~\cite{sermulins-lctes05}.
