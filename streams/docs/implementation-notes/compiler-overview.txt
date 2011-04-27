@@ -5,9 +5,6 @@ Java.  It is available from:
 
 http://www.dms.at/kopi/
 
-Kopi 2 has been released, to support Java generics and ASSERT
-statements, but we haven't seen it necessary to incorporate their
-changes as of yet.  
 
 Compiler Flow
 -------------
@@ -29,6 +26,14 @@ Here's the general flow of the compiler as it stands now:
    of a stream graph of filters, pipelines, splitjoins, and
    feedbackloops.  The class that does this translation is
    kjc/Kopi2SIR; the toplevel streamit stuff is in kjc/StreaMITMain.
+
+  SIR is located at src/at/dms/kjc/sir.  It is a hierarchical IR with
+  direct representations for pipelines, feedbackloops, and
+  splitjoins. Variable rates are supported in the SIR.  The SIR also
+  includes a custom cloning implementation used to clone sections of (or
+  the complete) graph.  If you are adding fields to an SIR class, you
+  must run a pass that auto-generates the cloning code (see
+  at/dms/kjc/CloneGenerator.java).
 
 4. We have some passes that operate on the sir code, such as:
 
@@ -52,49 +57,65 @@ Here's the general flow of the compiler as it stands now:
 
 -----
 
-Then the flow splits up into three parts: one for the default
-(uniprocessor/multicore/cluster) backend, one for the simpleC backend,
-and one for the Raw backend.  Please consult the StreamIt cookbook for
-a discussion of these backends.
-
-Uniprocessor/Multicore/Cluster Backend
+Backends
 --------------------------------------
 
-TODO
+Currently, by default the "Cluster" backend runs.  This backend
+follows a space-multiplexed pipeline parallelism approach.  It has
+support for dynamic rates and teleport messaging.  It support multiple
+threads per processor, and also multiple machines connected over a LAN
+(cluster).  We are in the process of deprecating this backend, so it
+will not be covered further. 
 
-SimpleC Backend
----------------
+SMP Backend:
 
-TODO
+The smp backend was developed using the tilera backend as a base.  It
+is enabled via the -smp X option, where X is the number of cores the
+user desires to target.  The backend is located at at/dms/kjc/smp.
+The driver of the backend is SMPBackend.java, called by
+StreaMITMain.java.  
 
-Raw Backend
------------
+The SMP backend uses our shared backend infrastructure that seeks to
+ease development of new backends.  This infrastructure is located in
+at/dms/kjc/backendsuppport.  The process for adding a backend is
+documented at: docs/implementation-notes/adding-a-backend.html.  See
+at/dms/kjc/backendSupport/package.html for more information on the
+structure of our extensible backend infrastructure.
 
-The Raw side of the project (in kjc/spacedynamic) does partitioning,
-layout, and communication scheduling for a Raw backend.  This
-generally works by conversion to a flat, unstructured graph, and then
-simulation of the execution according to a legal schedule.  The
-toplevel controller for the raw backend is
-kjc/spacedynamic/SpaceDynamicBackend.java.  You can trace the modules
-that it calls in the backend from there.
+Upon entry to SMPBackend, a suite of passes common across backends is
+run.  See at/dms/kjc/CommonPasses.  The most important task
+accomplished here is the lowering of the SIR to a lower IR called
+Slice IR or Slice graph (see at/dms/kjc/slicegraph).  Slicegraph is a
+flat IR with nodes that support multiple input and output.  The
+conversion from SIR to slicegraph folds splitters and joiners into
+their upstream and downstream fliters, respectively.  The slicegraph
+also includes more power splitting operations where a node can
+duplication and round-robin distribute output items.    The slice can
+be thought of as a wrapper for SIRFilter(s).  The slicegraph
+was originally designed to facilitate an experimental combination of
+pipeline parallelism, so a slice is defined as a pipeline of filters.
+However, this experiment was abandoned, so a slice is now mostly
+standarded to include exactly one filter. 
 
-There are two partitioning algorithms implemented to do automatic
-load-balancing on Raw:
+Parallelization is performed in CommonPasses, and depending on the
+method, is performed on either the SIR or the slicegraph.  The
+streamit compiler is a research compiler, so it includes many
+experimental parallelization passes that are enabled by options, one
+important task to complete before a release is to standardize a
+parallelization flow.
 
- - dynamic programming 
-    - in kjc/sir/lowering/partition/dynamicprogramming
-    - global analysis of large space of partitioning options
-    - can use stream transformations to adjust graph to facilitate
-      partitioning
+The SMP backend relies on time-multiplexed data and task parallelism
+as defined by our ASPLOS 06 paper (though this is not enable by
+default).  The backend currently does not support dynamic rates.  The
+backend currently supports a limited implementation of dynamic
+workload balancing enabled with --loadbalance (see Tan Masters
+Thesis).   
 
- - greedy algorithm
-    - in kjc/sir/lowering/partition/GreedyPartitioner.java
-    - locally fuses the filters with the least amount of work
+Tilera Backend:
 
-The Raw backend will output a series of tile and switch files that you
-can compile for the Raw simulator by typing "make".  You can do "make
--f Makefile.streamit debug" to run the simulator, and "make -f
-Makefile.streamit run" to just run it.
+Similar to SMP backend, but generates communication code for the
+remote store programming paradigm of the Tilera chip.  See Gordon PhD
+thesis for more information on the implementation.
 
 The Directory Structure
 -----------------------
@@ -207,5 +228,7 @@ compiler, but differs on details for things like phased filters.
 There are also plans to change the calling convention for init
 functions for the library path only to avoid needing a valid
 constructor for every possible set of parameters.  The output of the
-front-end in this case would be directly compiled with javac or jikes,
+front-end in this case would be directly compiled with javac,
 and run with java.
+
+FAQ: docs/implementation-notes/developer-FAQ.html
