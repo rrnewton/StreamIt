@@ -1,6 +1,6 @@
 void->void pipeline ArrayTest2
 {
-  add void->float[4][4] filter {
+  add void->float[4][4] stateful filter {
     float val;
     init { val = 1.0; }
     work push 1 {
