@@ -2,7 +2,7 @@
  * this should println 1.0, 2.0, 3.0 ...
  */
 void->void pipeline ArrayTest {
-    add void->float[1][1] filter {
+    add void->float[1][1] stateful filter {
 	float val;
 	init {
 	    val = 1.0;

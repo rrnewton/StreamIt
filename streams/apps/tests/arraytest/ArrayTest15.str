@@ -8,7 +8,7 @@ void->void pipeline ArrayTest15 {
     add Printer();
 }
 
-int->int filter Test(int width) {
+int->int stateful filter Test(int width) {
     int[width] A;
     int[width] B;
 
@@ -18,7 +18,7 @@ int->int filter Test(int width) {
     }
 }
 
-void->int filter Source {
+void->int stateful filter Source {
     int i = 0;
     work push 1 { push(i++); }
 }

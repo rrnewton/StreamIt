@@ -29,7 +29,7 @@ float[2][2]->float[2][2] filter f2 () {
       }
 }
 
-void->float[2][2] filter source() {
+void->float[2][2] stateful filter source() {
     float val;
     init { val = 1.0; }
     work push 1 {
