@@ -14,16 +14,17 @@ import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRPhasedFilter;
 
 
+
 public class Filter {
 
 	/* Input distribution Pattern Fields */
 		
 	/** The incoming round robin weights for this filter for the steady and for init 
-     * if the initWeights are null. */
+     * if the initInputWeights are null. */
     protected int[] inputWeights;
     /** if this filter requires a different joiner pattern for init, this will encode the weights */
     protected int[] initInputWeights;
-    /** The sources that correspond to the weights for the steady and for init if initWeights/initSources
+    /** The sources that correspond to the weights for the steady and for init if initInputWeights/initSources
      * are null
      */
     protected Channel[] inputSources;
@@ -888,5 +889,405 @@ public class Filter {
         return 0;
     }
     
+    /* input distribution methods */
     
+    
+    /**
+     * Merge neighboring channel and weights if the neighboring edges
+     * are actually the same Edge object. 
+     * This operation exists as a cleanup operation for synch removal.
+     */
+    public void canonicalizeInput(SchedulingPhase phase) {
+        if (getInputWeights(phase).length == 0)
+            return;
+
+        int[] weights = new int[getInputWeights(phase).length];
+        Channel[] edges = new Channel[getInputWeights(phase).length];
+        int curPort = 0;
+
+        //add the first port to the new edges and weights
+        edges[0] = getInputSources(phase)[0];
+        weights[0] = getInputWeights(phase)[0];
+
+        for(int i = 1 ; i < getInputWeights(phase).length ; i++) {
+            if(edges[curPort].equals(getInputSources(phase)[i])) {
+                weights[curPort] += getInputWeights(phase)[i];
+            }
+            else {
+                curPort++;
+                edges[curPort] = getInputSources(phase)[i];
+                weights[curPort] = getInputWeights(phase)[i];
+            }
+        }
+
+        Channel[] newEdges = new Channel[curPort + 1];
+        int[] newWeights = new int[curPort + 1];
+
+        System.arraycopy(edges, 0, newEdges, 0, curPort + 1);
+        System.arraycopy(weights, 0, newWeights, 0, curPort + 1);
+
+        //set the new weights and the dests
+        setInput(newWeights, newEdges, phase);
+    }
+    
+    /** Is this filter a filewriter? */
+    public boolean isFileOutput() {
+        return this instanceof FileWriterFilter;
+    }
+
+    public boolean inputSingleAppearance() {
+        return inputSingleAppearance(SchedulingPhase.STEADY) && inputSingleAppearance(SchedulingPhase.INIT);
+    }
+    
+    /**
+     * @return true if each input channel appears only once in the schedule of joining
+     */
+    public boolean inputSingleAppearance(SchedulingPhase phase) {
+        return getInputSourceSet(phase).size() == getInputSourceList(phase).size();
+    }
+    
+    /**
+     * Return true if the input for this filter has an incoming channel from <node> in <phase>.
+     */
+    public boolean hasInputChannelFrom(SchedulingPhase phase, Filter node) {
+        for (Channel channel : getInputSourceSet(phase)) {
+            if (channel.getSrc() == node) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * return the channel that goes from node's output to this filter's input
+     * 
+     */
+    public Channel getInputChannelFrom(SchedulingPhase phase, Filter node) {
+        Channel ret = null;
+        
+        for (Channel channel : getInputSourceSet(phase)) {
+            if (channel.getSrc() == node) {
+                assert ret == null;
+                ret = channel;
+            }
+        }
+        
+        assert ret != null : "cannot find channel to " + node + " in getInputEdgeFrom() in " + this + " filter for " + phase;
+        return ret;
+    }
+    
+    /**
+     * return the sum of the weights that appear before index in the joining schedule
+     */
+    public int inputWeightBefore(int index, SchedulingPhase phase) {
+        assert index < inputWeights.length;
+        int total = 0;
+        
+        for (int i = 0; i < index; i++) {
+            total += getInputWeights(phase)[i];
+        }
+ 
+        return total;
+    }
+    
+    /**
+     * return the sum of the weights that appear before this channel in the joining schedule
+     * 
+     * @param channel the channel in question
+     * 
+     * @return the sum of the weights before channel
+     */
+    public int inputWeightBefore(Channel channel, SchedulingPhase phase) {
+        assert inputSingleAppearance(phase);
+        
+        int total = 0;
+        for (int i = 0; i < getInputWeights(phase).length; i++) {
+            if (getInputSources(phase)[i] == channel) 
+                return total;
+            
+            total += getInputWeights(phase)[i];
+        }
+        assert false;
+        return 0;
+    }
+    
+    /**
+     * Return the number of unique inputs (Edges) to this join.
+     * 
+     * @return The width of the join.
+     */
+    public int getInputWidth(SchedulingPhase phase) {
+        return getInputSourceSet(phase).size();
+    }
+    
+    /**
+     * Return the number of items that traverse this channel
+     * on one iteration of this filter's input, remember
+     * that a single channel can appear multiple times in the joining
+     * pattern.
+     * 
+     * @param channel The channel to query.
+     * @return The number of items passing on the channel.
+     */
+    public int getInputItems(Channel channel, SchedulingPhase phase) {
+        int items = 0;
+        
+        for (int i = 0; i < getInputSources(phase).length; i++) {
+            if (getInputSources(phase)[i] == channel) {
+                items += getInputWeights(phase)[i];
+            }
+        }
+        
+        return items;
+    }
+
+    /** @return array of channel weights */
+    public int[] getInputWeights(SchedulingPhase phase) {
+        if (phase == SchedulingPhase.INIT && initInputWeights != null)
+            return initInputWeights;
+        
+        return inputWeights;
+    }
+
+    /** @return array of edges */
+    public Channel[] getInputSources(SchedulingPhase phase) {
+        if (phase == SchedulingPhase.INIT && initInputSources != null)
+            return initInputSources;
+        
+        return inputSources;
+    }
+
+
+    /** @return array of channel weights for the init schedule */
+    public int[] getInitInputWeights() {
+        return initInputWeights;
+    }
+
+    /** @return array of edges for the init schedule*/
+    public Channel[] getInitInputSources() {
+        return initInputSources;
+    }
+
+    
+    /**
+     * Set the weights and sources array for this filter's input
+     * to the weights list and the edges list.
+     * 
+     * @param weights The list of weights (Integer).
+     * @param edges The list of edges.
+     */
+    public void setInput(LinkedList<Integer> weights, 
+            LinkedList<Channel> edges, SchedulingPhase phase) {
+        int[] intArr = new int[weights.size()]; 
+        
+        for (int i = 0; i < weights.size(); i++)
+            intArr[i] = weights.get(i).intValue();
+        if (SchedulingPhase.INIT == phase) {
+            setInitInputWeights(intArr);
+            setInitInputSources(edges.toArray(new Channel[edges.size()]));
+        } else {
+            setInputWeights(intArr);
+            setInputSources(edges.toArray(new Channel[edges.size()]));
+        }
+    }
+
+    /**
+     * Set the weights and sources array of this filter's input
+     * to the weights list and the edges list.
+     * 
+     * @param weights The array of weights (integer).
+     * @param edges The array of edges.
+     */
+    public void setInput(int[] weights, Channel[] edges, SchedulingPhase phase) {
+        if (SchedulingPhase.INIT == phase) {
+            setInitInputWeights(weights);
+            setInitInputSources(edges);
+        } else {
+            setInputWeights(weights);
+            setInputSources(edges);
+        }
+    }
+    
+    /**
+     * Set the initialization weights.
+     * 
+     * @param newWeights The new weights
+     */
+    public void setInitInputWeights(int[] newWeights) {
+        if (newWeights != null && newWeights.length == 1)
+            this.initInputWeights = new int[]{1};
+        else 
+            this.initInputWeights = newWeights;
+    }
+    
+    /**
+     * If the initialization pattern needs to be different from steady,
+     * set the weights to newWeights.
+     * 
+     * @param newWeights
+     */
+    public void setInputWeights(int[] newWeights) {
+        if (newWeights.length == 1)
+            this.inputWeights = new int[]{1};
+        else 
+            this.inputWeights = newWeights;
+    }
+    
+    /** Set the source edges. (shares, does not copy.) */
+    public void setInputSources(Channel[] sources) {
+        this.inputSources = sources;
+    }
+
+    /**
+     * If the initialization pattern needs to be different from steady,
+     * set the sources to newSrcs.  (shares, does not copy)
+     * 
+     * @param newSrcs The new sources.
+     */
+    public void setInitInputSources(Channel[] newSrcs) {
+        this.initInputSources = newSrcs;
+    }
+    
+    /** @return total weight of all edges */
+    public int totalInputWeights(SchedulingPhase phase) {
+        int sum = 0;
+        for (int i = 0; i < getInputWeights(phase).length; i++)
+            sum += getInputWeights(phase)[i];
+        return sum;
+    }
+
+    /** @return total weight on all connections to a single Edge. 
+     * @param out The Edge that we are interested in*/
+    public int getInputWeight(Channel out, SchedulingPhase phase) {
+        int sum = 0;
+
+        for (int i = 0; i < getInputSources(phase).length; i++)
+            if (getInputSources(phase)[i] == out)
+                sum += getInputWeights(phase)[i];
+
+        return sum;
+    }
+    
+    /**
+     * Does sources have a single element in phase
+     *  
+     * @return true if there is a single element in sources. */
+    public boolean oneInput(SchedulingPhase phase) {
+        return getInputSources(phase).length == 1;
+    }
+    
+    /** 
+     * Is a joiner if there are at least 2 sources (even if same Edge object).
+     * @return is a joiner.
+     */
+    public boolean isJoiner(SchedulingPhase phase) {
+        return getInputSources(phase).length >= 2;
+    }
+
+    /** Get the singleton channel. 
+     * Must have only one input in sources.
+     * @return the channel, or throw AssertionError
+     */
+    public Channel getSingleInputChannel(SchedulingPhase phase) {
+        assert oneInput(phase) : "Calling getSingeInputEdge() on filter with less/more than one input";
+        return getInputSources(phase)[0];
+    }
+
+    /** Are there no inputs?
+     * 
+     * @return
+     */
+    public boolean noInputs(SchedulingPhase phase) {
+        return getInputSources(phase).length == 0;
+    }
+    
+    public boolean noInputs() {
+        return noInputs(SchedulingPhase.INIT) && noInputs(SchedulingPhase.STEADY);
+    }
+
+  
+    
+    /** return ratio of weight of channel to totalWeights().
+     * 
+     * @param channel
+     * @return  0.0 if totalWeights() == 0, else ratio.
+     */
+    public double inputRatio(Channel channel, SchedulingPhase phase) {
+        if (totalInputWeights(phase) == 0)
+            return 0.0;
+        return ((double) getInputWeight(channel, phase) / (double) totalInputWeights(phase));
+    }
+
+    /**
+     * Return a list of the edges with each channel appearing once
+     * and ordered by the order in which each channel appears in the
+     * join pattern.
+     * 
+     * @return The list.
+     */
+    public LinkedList<Channel> getInputSourceSequence(SchedulingPhase phase) {
+        LinkedList<Channel> list = new LinkedList<Channel>();
+        for (int i = 0; i < getInputSources(phase).length; i++) {
+            if (!list.contains(getInputSources(phase)[i]))
+                list.add(getInputSources(phase)[i]);
+        }
+        return list;
+    }
+    
+    /**
+     * Return a set of all the filters that are inputs to this filter
+     * 
+     * @return a set of all the filters that are inputs to this filter.
+     */
+    public Set<Filter> getInputSourceFilters(SchedulingPhase phase) {
+        HashSet<Filter> filters = new HashSet<Filter>();
+        for (Channel channel : getInputSourceList(phase)) {
+            filters.add(channel.getSrc());
+        }
+        return filters;
+    }
+    
+    /**
+     * Return a linked list of the sources pattern.
+     * 
+     * @return The linked list of the sources pattern.
+     */
+    public LinkedList<Channel> getInputSourceList(SchedulingPhase phase) {
+       LinkedList<Channel> list = new LinkedList<Channel>();
+       for (int i = 0; i < getInputSources(phase).length; i++)
+           list.add(getInputSources(phase)[i]);
+       return list;
+    }
+    
+    public Set<Channel> getInputSourceSet(SchedulingPhase phase) {
+        HashSet<Channel> set = new HashSet<Channel>();
+        for (int i = 0; i < getInputSources(phase).length; i++)
+            set.add(getInputSources(phase)[i]);
+        return set;
+    }
+  
+
+    /**
+     * In the sources array for the input, replace all instances of 
+     * oldEdge with newEdge.
+     * 
+     * @param oldEdge The channel to replace.
+     * @param newEdge The channel to install.
+     */
+    public void replaceInputChannel(Channel oldEdge, Channel newEdge, SchedulingPhase phase) {
+        if (phase == SchedulingPhase.INIT) {
+            for (int i = 0; i < initInputSources.length; i++) {
+                if (initInputSources[i] == oldEdge)
+                    initInputSources[i] = newEdge;
+            }
+
+        }
+        else {
+            for (int i = 0; i < inputSources.length; i++) {
+                if (inputSources[i] == oldEdge)
+                    inputSources[i] = newEdge;
+            }
+        }
+    }
+
 }

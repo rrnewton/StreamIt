@@ -23,4 +23,8 @@ public class Channel {
 	public Filter getDest() {
 		return dest;
 	}
+
+	public Filter getSrc() {
+		return src;
+	}
 }
