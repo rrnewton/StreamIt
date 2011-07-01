@@ -26,7 +26,7 @@ public class ConstList implements Serializable, Cloneable {
     }
 
     /** Returns true if this list contains all of the elements of the specified collection. */
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(Collection c) {
         return list.containsAll(c);
     }
     

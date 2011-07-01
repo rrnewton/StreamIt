@@ -58,7 +58,7 @@ public class Pair<S,T>
         if(!(o instanceof Pair))
             return false;
 
-        Pair<?, ?> other = (Pair<?, ?>) o;
+        Pair other = (Pair) o;
 
         return getFirst() == other.getFirst() && 
             getSecond() == other.getSecond();

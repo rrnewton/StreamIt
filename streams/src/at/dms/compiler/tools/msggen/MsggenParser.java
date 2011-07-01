@@ -220,7 +220,7 @@ public class MsggenParser extends at.dms.compiler.tools.antlr.runtime.LLkParser
         MessageDefinition[] self = null;
         
         
-        Vector<?>      container = new Vector<Object>();
+        Vector      container = new Vector();
         MessageDefinition   def;
         
         

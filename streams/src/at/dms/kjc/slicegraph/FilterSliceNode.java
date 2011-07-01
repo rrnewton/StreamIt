@@ -56,7 +56,7 @@ public class FilterSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
         return filter.toString();   
     }
     
-    public String toString(Layout<?> layout) 
+    public String toString(Layout layout) 
     {
         return filter.toString() + " " + 
         (layout != null ? layout.getComputeNode(this) : "");   

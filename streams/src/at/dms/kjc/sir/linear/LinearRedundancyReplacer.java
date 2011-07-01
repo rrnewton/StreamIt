@@ -525,7 +525,7 @@ public class LinearRedundancyReplacer extends LinearReplacer implements Constant
             int tupleIndex = 0;
             while(tupleIter.hasNext()) {
                 Object tuple = tupleIter.next();
-                Iterator<?> useIter = tuplesToUses.get(tuple).iterator();
+                Iterator useIter = tuplesToUses.get(tuple).iterator();
                 while(useIter.hasNext()) {
                     Integer currentUse = (Integer)useIter.next();
                     Integer oldMin = (Integer)this.minUse.get(tuple);
@@ -566,7 +566,7 @@ public class LinearRedundancyReplacer extends LinearReplacer implements Constant
                 this.compMap.put(tuple, new TupleCoupling(tuple, 0));
 
                 // get an iterator over the list of uses
-                Iterator<?> useIter = tuplesToUses.get(tuple).iterator();
+                Iterator useIter = tuplesToUses.get(tuple).iterator();
                 while(useIter.hasNext()) {
                     int use = ((Integer)useIter.next()).intValue();
             

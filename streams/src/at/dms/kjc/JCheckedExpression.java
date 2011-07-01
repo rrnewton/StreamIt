@@ -102,7 +102,7 @@ public final class JCheckedExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         throw new InconsistencyException("CHECK ME BEFORE AND YOU WONT SEE ME ANYMORE");
     }
 

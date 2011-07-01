@@ -530,7 +530,7 @@ public abstract class Stream extends Operator
     int uncompressedSize = 0;
     int totalSize = 0;
     HashMap<Object, Integer> sizeMap = new HashMap<Object, Integer>();
-    HashSet<?> usefulSet = new HashSet<Object>();
+    HashSet usefulSet = new HashSet();
     public static int totalBuffer = 0;
     boolean finegrained = false;
 
@@ -598,7 +598,7 @@ public abstract class Stream extends Operator
                 else if (oper instanceof SplitJoin)
                     {
                         assert function instanceof Pair;
-                        Pair<?, ?> pair = (Pair<?, ?>)function;
+                        Pair pair = (Pair)function;
                         assert pair.getFirst() instanceof Operator;
                         Operator sORj = (Operator)pair.getFirst();
                         int funcNum = ((Integer)pair.getSecond()).intValue();

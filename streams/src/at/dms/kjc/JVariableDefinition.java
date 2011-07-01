@@ -202,7 +202,7 @@ public class JVariableDefinition extends JLocalVariable {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitVariableDefinition(this, modifiers, type, getIdent(), expr);
     }
 

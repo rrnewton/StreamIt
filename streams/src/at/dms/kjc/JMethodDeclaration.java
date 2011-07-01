@@ -76,7 +76,7 @@ public class JMethodDeclaration extends JMemberDeclaration {
         this.exceptions = CClassType.EMPTY;
         JavaStyleComment[] comments = new JavaStyleComment[1];
         comments[0]= new JavaStyleComment(comment,false,false,false);
-        this.body = new JBlock(/*where*/null, new LinkedList<Object>(), comments);
+        this.body = new JBlock(/*where*/null, new LinkedList(), comments);
         this.ident = "/* '" + comment + "' */ DUMMY UNINITIALIZED METHOD";
     }
 
@@ -184,14 +184,14 @@ public class JMethodDeclaration extends JMemberDeclaration {
     /**
      * Adds all statements in <pre>lst</pre> to this, at the specified position.
      */
-    public void addAllStatements(int pos, List<?> lst) {
+    public void addAllStatements(int pos, List lst) {
         body.addAllStatements(pos, lst);
     }
 
     /**
      * Adds all statements in <pre>lst</pre> to end of this.
      */
-    public void addAllStatements(List<?> lst) {
+    public void addAllStatements(List lst) {
         body.addAllStatements(lst);
     }
 
@@ -628,7 +628,7 @@ public class JMethodDeclaration extends JMemberDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         Object trash =  super.accept(p);
 
         return p.visitMethodDeclaration(this,
@@ -658,7 +658,7 @@ public class JMethodDeclaration extends JMemberDeclaration {
     /**
      * Returns iterator of statements in this.  
      */
-    public ListIterator<?> getStatementIterator() {
+    public ListIterator getStatementIterator() {
         return body.getStatementIterator();
     }
 
@@ -680,7 +680,7 @@ public class JMethodDeclaration extends JMemberDeclaration {
     /**
      * Returns list of statements in this.  
      */
-    public List<?> getStatements() {
+    public List getStatements() {
         return body.getStatements();
     }
 

@@ -84,9 +84,9 @@ public class LatencyNode extends streamit.misc.Misc
 
                         // force insertion of the pair <dataNeeded, phase>
                         // into the map
-                        Pair<OMapIterator, Boolean> insertResult =
+                        Pair insertResult =
                             dataItems2numExecs[nChannel].insert(dataNeeded, phase);
-                        insertResult.getFirst().setData(phase);
+                        ((OMapIterator)insertResult.getFirst()).setData(phase);
                     }
             }
     }

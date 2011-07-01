@@ -26,7 +26,7 @@ import java.io.*;
 
 public class FileWriter extends Filter
 {
-    Class<?> fileType;
+    Class fileType;
     File outputFile;
     DataOutputStream outputStream;
     boolean closed = true;
@@ -35,7 +35,7 @@ public class FileWriter extends Filter
      */
     private static List<FileWriter> allFileWriters = new LinkedList<FileWriter>();
 
-    public FileWriter (String fileName, Class<?> type, boolean TREAT_AS_BITS)
+    public FileWriter (String fileName, Class type, boolean TREAT_AS_BITS)
     {
         allFileWriters.add(this);
         // This is part of the hack to make FileReader/Writer&lt;bit:gt; work
@@ -58,7 +58,7 @@ public class FileWriter extends Filter
     }
 
     // This is part of the hack to make FileReader/Writer&lt;bit:gt; work
-    public FileWriter (String fileName, Class<?> type) {
+    public FileWriter (String fileName, Class type) {
         this(fileName, type, false);
     }
 

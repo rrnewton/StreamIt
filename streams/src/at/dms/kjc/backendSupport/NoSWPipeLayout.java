@@ -52,7 +52,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * Callable only during {@link at.dms.kjc.common.SimulatedAnnealing Simulated Annealing}.
      * @param newAssign
      */
-    public void setAssignment(HashMap<FilterSliceNode, ?> newAssign) {
+    public void setAssignment(HashMap newAssign) {
         this.assignment = newAssign;
     }
     
@@ -119,7 +119,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
                     continue;
                 FilterSliceNode upStream = edge.getSrc().getPrevFilter();
                 
-                ComputeNode<?> upTile = (T)assignment.get(upStream);
+                ComputeNode upTile = (T)assignment.get(upStream);
                 assert endTime.containsKey(upStream); // TODO: assertion fails on fedback loop.
                 if (endTime.get(upStream).doubleValue() > maxDepStartTime)
                     maxDepStartTime = endTime.get(upStream).doubleValue();

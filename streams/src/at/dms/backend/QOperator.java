@@ -80,7 +80,7 @@ class QOperator implements QOrigin {
      * Returns the used temporaries.
      */
     public QTemporary[] getUses() {
-        Vector<Object>  vect = new Vector<Object>();
+        Vector  vect = new Vector();
 
         for (int i = 0; i < operands.length; i++) {
             if ((operands[i] instanceof QTemporary) && (!vect.contains(operands[i]))) {

@@ -115,7 +115,7 @@ public abstract class Compiler implements at.dms.kjc.DeepCloneable {
      * @return  a vector of files known to exist
      * @exception   UnpositionedError   at least one file does not exist
      */
-    public Vector<File> verifyFiles(Vector<Object> names) throws UnpositionedError {
+    public Vector verifyFiles(Vector names) throws UnpositionedError {
         return Utils.toVector(verifyFiles((String[])Utils.toArray(names, String.class)));
     }
 

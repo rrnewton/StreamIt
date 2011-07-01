@@ -115,7 +115,7 @@ public class CFGBuilder extends FENullVisitor
         CFGNode current = entry;
 
         // Walk through all of the contained statements.
-        for (Iterator<?> iter = block.getStmts().iterator(); iter.hasNext(); )
+        for (Iterator iter = block.getStmts().iterator(); iter.hasNext(); )
             {
                 Statement stmt = (Statement)iter.next();
                 CFGNodePair pair = visitStatement(stmt);

@@ -31,7 +31,7 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
         ifDepth=0;
     }
     
-    public BranchAnalyzer(Hashtable<?, ?> table) {
+    public BranchAnalyzer(Hashtable table) {
         //Want to just build up constants in the beginning
         //Only when we gather new information do we start writing
         //super(table,false);
@@ -52,7 +52,7 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
         if (str instanceof SIRPipeline)
             {
                 SIRPipeline pl = (SIRPipeline)str;
-                Iterator<?> iter = pl.getChildren().iterator();
+                Iterator iter = pl.getChildren().iterator();
                 while (iter.hasNext())
                     {
                         SIRStream child = (SIRStream)iter.next();
@@ -72,7 +72,7 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
         if (str instanceof SIRFilter || str instanceof SIRPhasedFilter)
             for (int i = 0; i < str.getMethods().length; i++) {
                 str.getMethods()[i].accept(this);
-                str.getMethods()[i].accept(new Propagator(new Hashtable<JLocalVariable, Object>()));
+                str.getMethods()[i].accept(new Propagator(new Hashtable()));
             }
     }
     
@@ -194,14 +194,14 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
      */
     private JBlock split() {
         JStatement[] body=new JStatement[size-index-1];
-        LinkedList<?> list=(LinkedList<?>)block.getStatements();
+        LinkedList list=(LinkedList)block.getStatements();
         int start=index+1;
         for(int i=start;i<size;i++) {
             body[i-start]=(JStatement)list.get(i);
         }
         index++;
         for(;index<size;index++) {
-            ((LinkedList<?>)list).removeLast();
+            ((LinkedList)list).removeLast();
         }
         return new JBlock(null,body,null);
     }
@@ -250,7 +250,7 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
     //Copy block starting from index statement
     private JBlock copyBlock(int index,JBlock block) {
         JBlock out=(JBlock)ObjectDeepCloner.deepCopy(index,block);
-        LinkedList<?> list=(LinkedList<?>)out.getStatements();
+        LinkedList list=(LinkedList)out.getStatements();
         for(int i=0;i<index;i++)
             list.removeFirst();
         return out;
@@ -263,9 +263,9 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
         int saveSize=size;
         block=self;
         size=self.size();
-        List<JStatement> statements=self.getStatements();
+        List statements=self.getStatements();
         for(index=0;index<size;index++) {
-            JStatement oldBody=statements.get(index);
+            JStatement oldBody=(JStatement)statements.get(index);
             Object newBody=oldBody.accept(this);
             if (!(newBody instanceof JStatement))
                 continue;

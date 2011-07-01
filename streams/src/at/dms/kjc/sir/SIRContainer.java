@@ -66,8 +66,8 @@ public abstract class SIRContainer extends SIRStream {
     /**
      * Returns copy of list of parameters passed to children of this.
      */
-    public List<?> getParams() {
-        List<?> result = new LinkedList<Object>();
+    public List getParams() {
+        List result = new LinkedList();
         for (int i=0; i<size(); i++) {
             result.add(getParams(i));
         }
@@ -108,20 +108,20 @@ public abstract class SIRContainer extends SIRStream {
      * Add a <child> with empty parameters.
      */
     public void add(SIRStream str) {
-        this.add(str, new LinkedList<Object>());
+        this.add(str, new LinkedList());
     }
 
     /**
      * Adds <str> at index <index> with empty parameters.
      */
     public void add(int index, SIRStream str) {
-        this.add(index, str, new LinkedList<Object>());
+        this.add(index, str, new LinkedList());
     }
 
     /**
      * Adds <str> at the end of this with parameters <param>.
      */
-    public void add(SIRStream str, List<?> param) {
+    public void add(SIRStream str, List param) {
         this.add(size(), str, param);
     }
 
@@ -129,7 +129,7 @@ public abstract class SIRContainer extends SIRStream {
      * Adds <b>str</b> at index <b>index</b> with parameters <b>param</b>, and sets
      * parent of <b>str</b> to this.
      */
-    public void add(int index, SIRStream str, List<?> param) {
+    public void add(int index, SIRStream str, List param) {
         children.add(index, str);
         params.add(index, param);
         if (str!=null) {
@@ -173,7 +173,7 @@ public abstract class SIRContainer extends SIRStream {
      * Try {@link at.dms.kjc.sir.SIRNavigationUtils#getSuccessorOper(SIRStream)}.
      */
     public SIROperator getSuccessor(SIRStream child) {
-        List<?> myChildren = getChildren();
+        List myChildren = getChildren();
         int i = myChildren.indexOf(child);
         if (i==myChildren.size()-1) {
             // if it's at the end of the whole program, return null
@@ -220,7 +220,7 @@ public abstract class SIRContainer extends SIRStream {
     /**
      * Set parameters for <i>'th child to <params>
      */
-    public void setParams(int index, List<?> params) {
+    public void setParams(int index, List params) {
         this.params.set(index, params);
     }
 
@@ -229,8 +229,8 @@ public abstract class SIRContainer extends SIRStream {
      * passed to the i'th child of this, or null if the parameters
      * have not been resolved yet.
      */
-    public List<?> getParams(int i) {
-        return (List<?>)params.get(i);
+    public List getParams(int i) {
+        return (List)params.get(i);
     }
 
     /**

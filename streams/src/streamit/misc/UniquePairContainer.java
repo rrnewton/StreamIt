@@ -41,7 +41,7 @@ public class UniquePairContainer
 {
     private Map<Object, Map> firstMap = new HashMap<Object, Map> ();
     
-    public Pair<?, ?> getPair (Object first, Object second)
+    public Pair getPair (Object first, Object second)
     {
         Map<Object, Pair> secondMap;
         secondMap = firstMap.get(first);
@@ -52,12 +52,12 @@ public class UniquePairContainer
                 firstMap.put(first, secondMap);
             }
         
-        Pair<?, ?> pair;
+        Pair pair;
         pair = secondMap.get (second);
         
         if (pair == null)
             {
-                pair = new Pair<Object, Object> (first, second);
+                pair = new Pair (first, second);
                 secondMap.put(second, pair);
             }
         

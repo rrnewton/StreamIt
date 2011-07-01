@@ -153,7 +153,7 @@ class QQuadruple extends QNode implements QOrigin {
                                                BasicBlock block,
                                                InstructionHandle[] insns,
                                                QTemporary[] entryStack,
-                                               Vector<Object> vect) {
+                                               Vector vect) {
         Stack<Object>   stack = new Stack<Object>();
 
         for (int i = 0; entryStack != null && i < entryStack.length; i++) {
@@ -255,7 +255,7 @@ class QQuadruple extends QNode implements QOrigin {
     }
 
     private static QOperand[] readOperands(Stack<Object> stack, int size) {
-        Vector<Object>  vect = new Vector<Object>();
+        Vector  vect = new Vector();
 
         for (int i = 0; size > 0; i++) {
             QOperand    oper = (QOperand)stack.pop();

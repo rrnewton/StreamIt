@@ -42,7 +42,7 @@ public class StreamSpec extends FENode
     private StreamType st;
     private boolean stateful;
     private String name;
-    private List<?> params;
+    private List params;
     private List<FieldDecl> vars;
     private List<Function> funcs;
 
@@ -76,7 +76,7 @@ public class StreamSpec extends FENode
      *                 functions of the stream object
      */
     public StreamSpec(FEContext context, int type, StreamType st,
-                      String name, List<?> params, List<FieldDecl> vars, List<Function> funcs)
+                      String name, List params, List<FieldDecl> vars, List<Function> funcs)
     {
         this(context, type, st, name, params, vars, funcs, false);
     }
@@ -99,7 +99,7 @@ public class StreamSpec extends FENode
      *                 the object
      */
     public StreamSpec(FEContext context, int type, StreamType st,
-                      String name, List<?> params, Statement init)
+                      String name, List params, Statement init)
     {
         this(context, type, st, name, params, Collections.EMPTY_LIST,
              Collections.singletonList(Function.newInit(init.getContext(),
@@ -127,7 +127,7 @@ public class StreamSpec extends FENode
      *                 stateful
      */
     public StreamSpec(FEContext context, int type, StreamType st,
-                      String name, List<?> params, List<FieldDecl> vars, List<Function> funcs, boolean stateful)
+                      String name, List params, List<FieldDecl> vars, List<Function> funcs, boolean stateful)
     {
         super(context);
         this.type = type;

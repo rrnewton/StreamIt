@@ -55,7 +55,7 @@ public class SymbolTable
     
     private Map<String, Object> vars, fns;
     private SymbolTable parent;
-    private List<?> includedFns;
+    private List includedFns;
 
     private static class VarInfo
     {
@@ -232,7 +232,7 @@ public class SymbolTable
             }
         if (includedFns != null)
             {
-                for (Iterator<?> iter = includedFns.iterator(); iter.hasNext(); )
+                for (Iterator iter = includedFns.iterator(); iter.hasNext(); )
                     {
                         SymbolTable other = (SymbolTable)iter.next();
                         fn = other.doLookupFn(name);

@@ -127,12 +127,12 @@ public abstract class Slicer {
         return false;
     }
   
-    public void dumpGraph(String filename, Layout<?> layout) {
+    public void dumpGraph(String filename, Layout layout) {
         dumpGraph(filename, layout, true);
     }
     
     // dump the the completed partition to a dot file
-    public void dumpGraph(String filename, Layout<?> layout, boolean fullInfo) {
+    public void dumpGraph(String filename, Layout layout, boolean fullInfo) {
         Slice[] sliceGraph = getSliceGraph();
         StringBuffer buf = new StringBuffer();
         buf.append("digraph Flattend {\n");
@@ -215,7 +215,7 @@ public abstract class Slicer {
     
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
-    protected  String sliceName(Slice slice, Layout<?> layout, boolean fullInfo) {
+    protected  String sliceName(Slice slice, Layout layout, boolean fullInfo) {
         SliceNode node = slice.getHead();
 
         StringBuffer out = new StringBuffer();

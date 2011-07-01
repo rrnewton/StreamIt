@@ -203,7 +203,7 @@ abstract public class Splitter extends Operator
             }
         if (splitWorks[nWork] == null)
             {
-                splitWorks[nWork] = new Pair<Splitter, Integer>(this, new Integer(nWork));
+                splitWorks[nWork] = new Pair(this, new Integer(nWork));
             }
 
         return splitWorks[nWork];

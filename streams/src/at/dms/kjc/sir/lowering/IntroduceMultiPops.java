@@ -68,7 +68,7 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
         }
         if (str instanceof SIRPipeline) {
             SIRPipeline pl = (SIRPipeline) str;
-            Iterator<?> iter = pl.getChildren().iterator();
+            Iterator iter = pl.getChildren().iterator();
             while (iter.hasNext()) {
                 SIRStream child = (SIRStream) iter.next();
                 introduceMultiProps(child);
@@ -142,9 +142,9 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
         
         JBlock newBlock = (JBlock)super.visitBlockStatement(oldBlock,comments);
         
-        List /*<JStatement>*/<?> oldStatements = newBlock.getStatements();
-        List /*<JStatement>*/<?> simplifiedStatements = new LinkedList<Object>();
-        for (Iterator<?> i = oldStatements.iterator(); i.hasNext();) {
+        List /*<JStatement>*/ oldStatements = newBlock.getStatements();
+        List /*<JStatement>*/ simplifiedStatements = new LinkedList();
+        for (Iterator i = oldStatements.iterator(); i.hasNext();) {
             Object o = i.next();
 	    // null statments (which may not exist, just following others here)
 	    // and EmptyStatements do not go into the list of returned 

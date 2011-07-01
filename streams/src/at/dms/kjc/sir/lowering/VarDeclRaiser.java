@@ -56,7 +56,7 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
         if (str instanceof SIRPipeline)
             {
                 SIRPipeline pl = (SIRPipeline)str;
-                Iterator<?> iter = pl.getChildren().iterator();
+                Iterator iter = pl.getChildren().iterator();
                 if (str.getInit()!=null) 
                     str.getInit().accept(this);
                 while (iter.hasNext())

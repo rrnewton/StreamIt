@@ -231,7 +231,7 @@ public class Optimizer implements AccessorContainer {
      * instruction sequence.
      */
     private LineNumberInfo[] buildLineNumberInfo() {
-        Vector<Object>  lineNumbers = new Vector<Object>();
+        Vector  lineNumbers = new Vector();
 
         for (InstructionHandle handle = this.codeStart; handle != null; handle = handle.getNext()) {
             handle.addLineNumberInfo(lineNumbers);

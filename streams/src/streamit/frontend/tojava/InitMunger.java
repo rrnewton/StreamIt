@@ -35,11 +35,11 @@ import java.util.ArrayList;
  */
 abstract public class InitMunger extends FEReplacer
 {
-    public static Function findInit(FEContext context, List<Function> fns)
+    public static Function findInit(FEContext context, List fns)
     {
-        for (Iterator<Function> iter = fns.iterator(); iter.hasNext(); )
+        for (Iterator iter = fns.iterator(); iter.hasNext(); )
             {
-                Function fn = iter.next();
+                Function fn = (Function)iter.next();
                 if (fn.getCls() == Function.FUNC_INIT)
                     return fn;
             }
@@ -53,13 +53,13 @@ abstract public class InitMunger extends FEReplacer
     // Finds an init function in fns, or creates one using context.
     // Removes it from fns, and replaces it with an equivalent function
     // with stmts at the start of its body.  Returns fns.
-    public static List<Function> replaceInitWithPrepended(FEContext context,
-                                                List<Function> fns, List<?> stmts)
+    public static List replaceInitWithPrepended(FEContext context,
+                                                List fns, List stmts)
     {
         Function init = findInit(context, fns);
         fns.remove(init);
         StmtBlock oldBody = (StmtBlock)init.getBody();
-        List<?> newStmts = new ArrayList<Object>(stmts);
+        List newStmts = new ArrayList(stmts);
         newStmts.addAll(oldBody.getStmts());
         Statement newBody = new StmtBlock(oldBody.getContext(), newStmts);
         init = new Function(init.getContext(), init.getCls(),

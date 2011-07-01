@@ -85,7 +85,7 @@ public class LList implements List, Stack {
     /**
      * Return an enumeration of the list elements
      */
-    public Enumeration<?> elements() { return new LLEnumeration(this); }
+    public Enumeration elements() { return new LLEnumeration(this); }
     /**
      * How high is the stack?
      */

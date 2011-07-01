@@ -112,7 +112,7 @@ public class CFG
         for (Iterator<CFGNode> iter = edges.keySet().iterator(); iter.hasNext(); )
             {
                 CFGNode other = iter.next();
-                List<?> targets = edges.get(other);
+                List targets = edges.get(other);
                 if (targets.contains(node))
                     result.add(other);
             }
@@ -166,8 +166,8 @@ public class CFG
         for (Iterator<CFGNode> fiter = edges.keySet().iterator(); fiter.hasNext(); )
             {
                 CFGNode from = fiter.next();
-                List<?> targets = edges.get(from);
-                for (Iterator<?> titer = targets.iterator(); titer.hasNext(); )
+                List targets = edges.get(from);
+                for (Iterator titer = targets.iterator(); titer.hasNext(); )
                     {
                         CFGNode to = (CFGNode)titer.next();
                         result.append(nodeName.get(from) + " -> " +

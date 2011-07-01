@@ -21,9 +21,9 @@ import streamit.library.Channel;
 
 public class DataPrinter extends Filter
 {
-    Class<?> fileType;
+    Class fileType;
 
-    public DataPrinter (Class<?> type)
+    public DataPrinter (Class type)
     {
         fileType = type;
     }

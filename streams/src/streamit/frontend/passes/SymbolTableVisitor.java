@@ -163,7 +163,7 @@ public class SymbolTableVisitor extends FEReplacer
     {
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
-        for (Iterator<?> iter = func.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = func.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 symtab.registerVar(param.getName(),
@@ -198,7 +198,7 @@ public class SymbolTableVisitor extends FEReplacer
             TypeStruct struct = iter.next();
             structsByName.put(struct.getName(), struct);
         }
-        for (Iterator<?> iter = prog.getHelpers().iterator(); iter.hasNext();) {
+        for (Iterator iter = prog.getHelpers().iterator(); iter.hasNext();) {
             TypeHelper helper = (TypeHelper) iter.next();
             helpersByName.put(helper.getName(), helper);
         }

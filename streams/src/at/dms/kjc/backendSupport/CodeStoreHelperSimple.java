@@ -35,7 +35,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
      * @param node          A filter slice node to wrap code for.
      * @param backEndBits   The back end factory as a source of data and back end specific functions.
      */
-    public CodeStoreHelperSimple(FilterSliceNode node, BackEndFactory<?, ?, ?, ?> backEndBits) {
+    public CodeStoreHelperSimple(FilterSliceNode node, BackEndFactory backEndBits) {
         super(node,node.getAsFilter().getFilter(),backEndBits);
     }
 

@@ -162,9 +162,9 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
                                       int popCount) {
         // generate the push expressions that will make up the body of the
         // new work method.
-        Vector<?> pushStatements = makePushStatementVector(representation, inputType, outputType);
+        Vector pushStatements = makePushStatementVector(representation, inputType, outputType);
         // make a vector filled with the appropriate number of pop expressions
-        Vector<?> popStatements  = new Vector<Object>();
+        Vector popStatements  = new Vector();
         SIRPopExpression popExpr = new SIRPopExpression(inputType, popCount);
         // wrap the pop expression so it is a statement.
         JExpressionStatement popWrapper = new JExpressionStatement(null, // token reference,
@@ -198,10 +198,10 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
      * SIRPushExpressions that implement (directly) the
      * matrix multiplication represented by the linear representation.
      **/
-    public Vector<?> makePushStatementVector(LinearFilterRepresentation representation,
+    public Vector makePushStatementVector(LinearFilterRepresentation representation,
                                           CType inputType,
                                           CType outputType) {
-        Vector<?> returnVector = new Vector<Object>();
+        Vector returnVector = new Vector();
 
         int peekCount = representation.getPeekCount();
         int pushCount = representation.getPushCount();
@@ -390,7 +390,7 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
             // if we don't know anything about this container, we are done, though we need
             // to do the recursion to the children
             if (!linearInformation.hasLinearRepresentation(self)) {
-                Iterator<?> childIter = self.getChildren().iterator();
+                Iterator childIter = self.getChildren().iterator();
                 while (childIter.hasNext()) {
                     ((SIROperator)childIter.next()).accept(this);
                 }
@@ -402,7 +402,7 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
 
             // calculate the cost of doing the optimal replacement of the children.
             LinearReplaceCalculator childCalculator = new LinearReplaceCalculator(linearInformation);
-            Iterator<?> childIter = self.getChildren().iterator();
+            Iterator childIter = self.getChildren().iterator();
             while(childIter.hasNext()) {
                 ((SIROperator)childIter.next()).accept(childCalculator);
             }

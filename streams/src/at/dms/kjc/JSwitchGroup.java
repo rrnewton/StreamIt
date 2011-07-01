@@ -107,7 +107,7 @@ public class JSwitchGroup extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitSwitchGroup(this, labels, stmts);
     }
 
@@ -116,7 +116,7 @@ public class JSwitchGroup extends JPhylum {
      * @param   matches         a vector of values to match
      * @param   targets         a vector of target labels
      */
-    public void collectLabels(CodeLabel deflab, Vector<Integer> matches, Vector<Object> targets) {
+    public void collectLabels(CodeLabel deflab, Vector<Integer> matches, Vector targets) {
         pos = null;
 
         // check if one of the labels is "default:"

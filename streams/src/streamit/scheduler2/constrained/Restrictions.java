@@ -287,15 +287,15 @@ public class Restrictions extends streamit.misc.Misc
                 {
                     // nope - make sure that the node has restrictions
                     // initialized before adding :)
-                    Pair<OMapIterator, Boolean> result =
+                    Pair result =
                         restrictions.insert(
                                             restrictedNode,
                                             new OSet(new RestrictionExecutionsComperator()));
 
                     // better not have anything in there - that would be 
                     // a bug in the container or something
-                    assert result.getSecond().booleanValue();
-                    nodeRestrictionsIter = result.getFirst();
+                    assert ((Boolean)result.getSecond()).booleanValue();
+                    nodeRestrictionsIter = (OMapIterator)result.getFirst();
                 }
 
             OSet nodeRestrictions = (OSet)nodeRestrictionsIter.getData();
@@ -305,14 +305,14 @@ public class Restrictions extends streamit.misc.Misc
         // now remove any old restrictions
         Restriction oldRestriction = null;
         {
-            Pair<OSetIterator, Boolean> result = allRestrictions.insert(restriction);
+            Pair result = allRestrictions.insert(restriction);
 
-            if (result.getSecond().booleanValue() == false)
+            if (((Boolean)result.getSecond()).booleanValue() == false)
                 {
                     // there already is a restriction for this portal/node pair!
                     // remove it from allRestrictions first
                     OSetIterator oldRestrictionIter =
-                        result.getFirst();
+                        (OSetIterator)result.getFirst();
                     oldRestriction = (Restriction)oldRestrictionIter.get();
                     allRestrictions.erase(oldRestrictionIter);
 

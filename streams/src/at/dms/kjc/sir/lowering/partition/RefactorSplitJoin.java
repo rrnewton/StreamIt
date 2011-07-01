@@ -133,7 +133,7 @@ public class RefactorSplitJoin {
 
         // get copy of children and params
         List<SIRStream> children = sj.getParallelStreams();
-        List<?> params = sj.getParams();
+        List params = sj.getParams();
     
         // the new and old weights for the splitter and joiner
         int[] oldSplit=sj.getSplitter().getWeights();
@@ -148,7 +148,7 @@ public class RefactorSplitJoin {
                 // if there is only one stream in the partition, then
                 // we don't need to do anything; just add the children
                 int pos = partition.getFirst(i);
-                result.add(children.get(pos), (List<?>)params.get(pos));
+                result.add(children.get(pos), (List)params.get(pos));
                 newSplit[i]=new JIntLiteral(oldSplit[pos]);
                 newJoin[i]=new JIntLiteral(oldJoin[pos]);
             } else {
@@ -168,7 +168,7 @@ public class RefactorSplitJoin {
                     sumJoin+=oldJoin[l];
                     childSplit[k]=new JIntLiteral(oldSplit[l]);
                     childJoin[k]=new JIntLiteral(oldJoin[l]);
-                    childSplitJoin.add(children.get(l), (List<?>)params.get(l));
+                    childSplitJoin.add(children.get(l), (List)params.get(l));
                 }
                 // in the case of a duplicate splitter, <pre>create</pre>
                 // disregards the weights array and makes them all 1
@@ -634,7 +634,7 @@ public class RefactorSplitJoin {
                 while (sjChild.size() > 0)
                     {
                         SIRStream child2 = sjChild.get(0);
-                        List<?> params = sjChild.getParams(0);
+                        List params = sjChild.getParams(0);
                         sjChild.remove(0);
                         sj.add(index, child2, params);
                         index++;
@@ -726,7 +726,7 @@ public class RefactorSplitJoin {
             while (sjChild.size() > 0)
                 {
                     SIRStream child2 = sjChild.get(0);
-                    List<?> params = sjChild.getParams(0);
+                    List params = sjChild.getParams(0);
                     sjChild.remove(0);
                     sj.add(index, child2, params);
                     index++;

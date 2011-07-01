@@ -179,7 +179,7 @@ public class PrintProgram extends streamit.misc.AssertedClass
                                                 + "\");\n");
                         map.insert(
                                    filter.getInitFunctionStage(nInitPhase),
-                                   new Pair<Integer, Boolean>(new Integer(nInitPhase), new Boolean(true)));
+                                   new Pair(new Integer(nInitPhase), new Boolean(true)));
 
                         peeks |= (filter.getInitPeekStage(nInitPhase) != 0);
                         pops |= (filter.getInitPopStage(nInitPhase) != 0);
@@ -203,7 +203,7 @@ public class PrintProgram extends streamit.misc.AssertedClass
 
                         map.insert(
                                    filter.getWorkFunctionPhase(nWorkPhase),
-                                   new Pair<Integer, Boolean>(new Integer(nWorkPhase), new Boolean(false)));
+                                   new Pair(new Integer(nWorkPhase), new Boolean(false)));
 
                         peeks |= (filter.getPeekPhase(nWorkPhase) != 0);
                         pops |= (filter.getPopPhase(nWorkPhase) != 0);

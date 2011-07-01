@@ -60,7 +60,7 @@ public class ScheduleBuffers extends DestroyedClass
     {
         Iterator before = user2persistent.get(userBefore);
         Iterator after = user2persistent.get(userAfter);
-        Pair<?, ?> beforeAfter = pairs.getPair(before, after);
+        Pair beforeAfter = pairs.getPair(before, after);
         BufferStatus status = bufferSizes.get(beforeAfter);
         return status.getBufferSize();
     }
@@ -168,7 +168,7 @@ public class ScheduleBuffers extends DestroyedClass
                             Iterator childBefore = pipeline.getChild(nChild);
                             Iterator childAfter = pipeline.getChild(nChild + 1);
 
-                            Pair<?, ?> pair = pairs.getPair(childBefore, childAfter);
+                            Pair pair = pairs.getPair(childBefore, childAfter);
                             BufferStatus buffer = new BufferStatus();
 
                             // buffer pair:
@@ -236,7 +236,7 @@ public class ScheduleBuffers extends DestroyedClass
                             // (the one at the top of the sj, 
                             // above child, below splitter
                             {
-                                Pair<?, ?> pair = pairs.getPair(stream, child);
+                                Pair pair = pairs.getPair(stream, child);
                                 BufferStatus buffer = new BufferStatus();
 
                                 // buffer pair:
@@ -257,7 +257,7 @@ public class ScheduleBuffers extends DestroyedClass
                             // (the one at the bottom of the sj, 
                             // below child, above joiner)
                             {
-                                Pair<?, ?> pair = pairs.getPair(child, stream);
+                                Pair pair = pairs.getPair(child, stream);
                                 BufferStatus buffer = new BufferStatus();
 
                                 // buffer pair:
@@ -321,7 +321,7 @@ public class ScheduleBuffers extends DestroyedClass
                     // (the one at the top of the feedbackLoop, 
                     // above body, below joiner
                     {
-                        Pair<?, ?> pair = pairs.getPair(stream, body);
+                        Pair pair = pairs.getPair(stream, body);
                         BufferStatus buffer = new BufferStatus();
 
                         // buffer pair:
@@ -340,7 +340,7 @@ public class ScheduleBuffers extends DestroyedClass
                     // (the one at the bottom of the feedbackLoop, 
                     // below body, above splitter)
                     {
-                        Pair<?, ?> pair = pairs.getPair(body, stream);
+                        Pair pair = pairs.getPair(body, stream);
                         BufferStatus buffer = new BufferStatus();
 
                         // buffer pair:
@@ -363,7 +363,7 @@ public class ScheduleBuffers extends DestroyedClass
                     // (the one at the top of the feedbackLoop, 
                     // above loop, below joiner
                     {
-                        Pair<?, ?> pair = pairs.getPair(loop, stream);
+                        Pair pair = pairs.getPair(loop, stream);
                         BufferStatus buffer = new BufferStatus();
 
                         // initialize the buffer with amount of data pushed
@@ -386,7 +386,7 @@ public class ScheduleBuffers extends DestroyedClass
                     // (the one at the bottom of the feedbackLoop, 
                     // below loop, above splitter)
                     {
-                        Pair<?, ?> pair = pairs.getPair(stream, loop);
+                        Pair pair = pairs.getPair(stream, loop);
                         BufferStatus buffer = new BufferStatus();
 
                         // buffer pair:
@@ -491,10 +491,10 @@ public class ScheduleBuffers extends DestroyedClass
 
     void combineBufferExecutions(Map<BufferStatus, Object> left, Map<BufferStatus, Object> right)
     {
-        Set<?> buffers = (Set<?>) (right.get(null));
+        Set buffers = (Set) (right.get(null));
         assert buffers != null;
 
-        java.util.Iterator<?> iter = buffers.iterator();
+        java.util.Iterator iter = buffers.iterator();
         while (iter.hasNext())
             {
                 BufferStatus buffer = (BufferStatus)iter.next();
@@ -517,8 +517,8 @@ public class ScheduleBuffers extends DestroyedClass
     {
         Map<BufferStatus, Object> map = computeBuffersMap(schedule, 1);
 
-        Set<?> buffers = (Set<?>)map.get(null);
-        java.util.Iterator<?> iter = buffers.iterator();
+        Set buffers = (Set)map.get(null);
+        java.util.Iterator iter = buffers.iterator();
         while (iter.hasNext())
             {
                 BufferStatus buffer = (BufferStatus)iter.next();
@@ -566,7 +566,7 @@ public class ScheduleBuffers extends DestroyedClass
                                 user2persistent.get(schedule.getStream());
 
                             // figure out what object contributed this work function:
-                            Pair<?, ?> workInfo = pairs.getPair(workFunc, workStream);
+                            Pair workInfo = pairs.getPair(workFunc, workStream);
                             int numWork =
                                 workFunctions.get(workInfo).intValue();
 
@@ -910,7 +910,7 @@ public class ScheduleBuffers extends DestroyedClass
                 if (deltasNumExecs == null)
                     {
                         deltasNumExecs = new HashMap<BufferStatus, Object>();
-                        deltasNumExecs.put(null, new HashSet<Object>());
+                        deltasNumExecs.put(null, new HashSet());
                         assert deltasNumExecs.get(null) != null;
 
                         for (int n = 0; n < numExecs; n++)

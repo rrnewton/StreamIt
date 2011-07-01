@@ -183,7 +183,7 @@ public class JEqualityExpression extends JBinaryExpression {
      * @param   p       the visitor
      */
     @Override
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitEqualityExpression(this, equal, left, right);
     }
 

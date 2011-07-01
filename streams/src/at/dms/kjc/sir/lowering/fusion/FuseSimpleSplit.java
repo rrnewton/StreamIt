@@ -222,7 +222,7 @@ public class FuseSimpleSplit {
 
         // don't bother adding identity filters to the pipeline
         if (!(newFilter instanceof SIRIdentity)) {
-            pipe.add(newFilter, new LinkedList<Object>(sj.getParent().getParams(index)));
+            pipe.add(newFilter, new LinkedList(sj.getParent().getParams(index)));
         }
 
         // make a joinFilter only if it's not a not a null join
@@ -429,7 +429,7 @@ public class FuseSimpleSplit {
         // get total weights
         int sumOfWeights = split.getSumOfWeights();
         // make list of statements for work function
-        LinkedList<?> list = new LinkedList<Object>();
+        LinkedList list = new LinkedList();
 
         // mark beginning of splitter
         list.add(MarkFilterBoundaries.makeBeginMarker(split));
@@ -608,7 +608,7 @@ public class FuseSimpleSplit {
         // get total weights
         int sumOfWeights = join.getSumOfWeights();
         // make list of statements for work function
-        LinkedList<?> list = new LinkedList<Object>();
+        LinkedList list = new LinkedList();
 
         // mark end of splitter
         list.add(MarkFilterBoundaries.makeBeginMarker(join));
@@ -792,7 +792,7 @@ public class FuseSimpleSplit {
         // add calls to init functions
         for (int i=0; i<sj.size(); i++) {
             SIRStream child = sj.get(i);
-            List<?> params = sj.getParams(i);
+            List params = sj.getParams(i);
             if (child.needsInit()) {
                 init.addStatement(new JExpressionStatement(null,
                                                            new JMethodCallExpression(null,

@@ -284,7 +284,7 @@ public class GenerateCopies extends SymbolTableVisitor
         boolean hasChanged = false;
         Expression result = expr;
         List<Expression> newParams = new ArrayList<Expression>();
-        for (Iterator<?> iter = expr.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = expr.getParams().iterator(); iter.hasNext(); )
             {
                 Expression param = (Expression)iter.next();
                 Expression newParam = param;

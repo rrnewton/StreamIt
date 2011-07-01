@@ -103,7 +103,7 @@ public class NoRefTypes extends FEReplacer
         // Visit the parameter list, then let FEReplacer do the
         // rest of the work.
         List<Parameter> newParams = new java.util.ArrayList<Parameter>();
-        for (Iterator<?> iter = func.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = func.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 Type type = remapType(param.getType());

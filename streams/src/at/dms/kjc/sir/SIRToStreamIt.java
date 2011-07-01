@@ -1385,7 +1385,7 @@ public class SIRToStreamIt
                                 // it to print an add/body/loop statement and
                                 // enqueue the stream's code to be printed.
                                 p.newLine();
-                                new SIRInitStatement(/*params*/new LinkedList<Object>(), child).accept(this);
+                                new SIRInitStatement(/*params*/new LinkedList(), child).accept(this);
                             }
                     }
             }
@@ -2151,7 +2151,7 @@ public class SIRToStreamIt
                 else
                     p.print(stream.getName());
                 // Dump the parameter list, if any.
-                List<?> params = self.getArgs();
+                List params = self.getArgs();
                 if (!(params.isEmpty()))
                     {
                         p.print("(");

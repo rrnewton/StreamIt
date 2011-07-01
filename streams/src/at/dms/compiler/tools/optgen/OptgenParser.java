@@ -263,7 +263,7 @@ public class OptgenParser extends at.dms.compiler.tools.antlr.runtime.LLkParser
         OptionDefinition[] self = null;
         
         
-        Vector<?>      container = new Vector<Object>();
+        Vector      container = new Vector();
         OptionDefinition    def;
         
         

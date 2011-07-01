@@ -846,7 +846,7 @@ public class JavaCodeGenerator {
         }
         tabs--;
 
-        Enumeration<?> ids;
+        Enumeration ids;
         // Generate the setting of various generated options.
         println("caseSensitiveLiterals = " + g.caseSensitiveLiterals + ";");
         println("setCaseSensitive("+g.caseSensitive+");");
@@ -1060,7 +1060,7 @@ public class JavaCodeGenerator {
         }
 
         // Generate code for each rule in the grammar
-        Enumeration<?> ids = grammar.rules.elements();
+        Enumeration ids = grammar.rules.elements();
         int ruleNum=0;
         while ( ids.hasMoreElements() ) {
             GrammarSymbol sym = (GrammarSymbol) ids.nextElement();

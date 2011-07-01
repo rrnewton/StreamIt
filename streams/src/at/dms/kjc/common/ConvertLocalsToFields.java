@@ -83,12 +83,12 @@ public class ConvertLocalsToFields {
         }
 
         // add the fields to the filter
-        List<JFieldDeclaration> fields = new LinkedList<JFieldDeclaration>(Arrays.asList(filter.getFields()));
+        List fields = new LinkedList(Arrays.asList(filter.getFields()));
         for (Iterator<JVariableDefinition> it = locals.iterator(); it.hasNext(); ) {
             JVariableDefinition local = it.next();
             fields.add(new JFieldDeclaration(local));
         }
-        filter.setFields(fields.toArray(new JFieldDeclaration[0]));
+        filter.setFields((JFieldDeclaration[])fields.toArray(new JFieldDeclaration[0]));
     }
 
     /**

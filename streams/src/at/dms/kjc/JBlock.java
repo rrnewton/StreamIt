@@ -98,7 +98,7 @@ public class JBlock extends JStatement {
      * statements; just copy list of statements.)
      */
     public JBlock copy() {
-        return new JBlock(null, new LinkedList<Object>(body), getComments());
+        return new JBlock(null, new LinkedList(body), getComments());
     }
 
     /**
@@ -127,7 +127,7 @@ public class JBlock extends JStatement {
     /**
      * Adds <pre>statement</pre> to front of this.
      */
-    public void addAllStatementsFirst(List<?> lst) {
+    public void addAllStatementsFirst(List lst) {
         for (int i=0; i<lst.size(); i++) {
             addStatementFirst((JStatement)lst.get(lst.size()-i-1));
         }
@@ -143,14 +143,14 @@ public class JBlock extends JStatement {
     /**
      * Adds all statements in <pre>lst</pre> to this, at the specified position.
      */
-    public void addAllStatements(int pos, List<?> lst) {
+    public void addAllStatements(int pos, List lst) {
         body.addAll(pos, lst);
     }
 
     /**
      * Adds all statements in <pre>lst</pre> to end of this.
      */
-    public void addAllStatements(List<?> lst) {
+    public void addAllStatements(List lst) {
         body.addAll(lst);
     }
 
@@ -203,7 +203,7 @@ public class JBlock extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitBlockStatement(this, getComments());
     }
 
@@ -247,7 +247,7 @@ public class JBlock extends JStatement {
     /**
      * Returns iterator of statements in this.  
      */
-    public ListIterator<?> getStatementIterator() {
+    public ListIterator getStatementIterator() {
         return body.listIterator();
     }
 
@@ -279,7 +279,7 @@ public class JBlock extends JStatement {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.JBlock other) {
         super.deepCloneInto(other);
-        other.body = (java.util.LinkedList<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
+        other.body = (java.util.LinkedList)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

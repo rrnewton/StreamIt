@@ -15,13 +15,13 @@ public class GetOrMakeChannel  {
      */
     private static boolean debug = false;
     
-    protected BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits;
+    protected BackEndFactory backEndBits;
     
     /**
      * Crete a channel selector giving it a BackEndFactory to query.
      * @param backendBits
      */
-    public GetOrMakeChannel(BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+    public GetOrMakeChannel(BackEndFactory backEndBits) {
         this.backEndBits = backEndBits;
     }
     

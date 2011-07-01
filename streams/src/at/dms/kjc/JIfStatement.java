@@ -110,7 +110,7 @@ public class JIfStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return p.visitIfStatement(this, cond, thenClause, elseClause);
     }        
 

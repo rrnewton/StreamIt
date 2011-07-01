@@ -62,11 +62,11 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitProgram(Program p) {
         /* We visit each stream and each struct */
-        List<?> feirStreams;
-        List<?> feirStructs;
+        List feirStreams;
+        List feirStructs;
         List<Object> sirStreams;
         List<SIRStructure> sirStructs;
-        Iterator<?> iter;
+        Iterator iter;
 
         theProgram = p;
         parent = null;
@@ -112,7 +112,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         if (searchList.contains(name))
             return new SIRRecursiveStub(name, this);
         // Hmm.  Is it in the top-level Program?
-        for (Iterator<?> iter = theProgram.getStreams().iterator();
+        for (Iterator iter = theProgram.getStreams().iterator();
              iter.hasNext(); )
             {
                 StreamSpec spec = (StreamSpec)iter.next();
@@ -137,7 +137,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         SIRStream current = null;
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
-        for (Iterator<?> iter = spec.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 symtab.registerVar(param.getName(), param.getType(), param,
@@ -289,7 +289,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public SIRStream visitFilterSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRFilter result = new SIRFilter();
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -307,7 +307,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -357,7 +357,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public SIRStream visitPipelineSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRPipeline result = new SIRPipeline(spec.getName());
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -372,7 +372,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -640,7 +640,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitExprFunCall(ExprFunCall exp) {
         debug("In visitExprFunCall\n");
-        List<?> params = exp.getParams();
+        List params = exp.getParams();
         JExpression[] args = new JExpression[params.size()];
         int i;
         for (i = 0; i < params.size(); i++) {
@@ -753,12 +753,12 @@ public class FEIRToSIR implements FEVisitor, Constants {
     public Object visitFunction(Function func) {
         debug("In visitFunction\n");
         int i = 0;
-        List<?> list;
+        List list;
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
         Parameter[] feirParams = new Parameter[func.getParams().size()];
         JFormalParameter[] sirParams = new JFormalParameter[feirParams.length];
-        for (Iterator<?> iter = func.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = func.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 sirParams[i] = (JFormalParameter)visitParameter(param);
@@ -814,7 +814,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitSplitJoinSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRSplitJoin result = new SIRSplitJoin((SIRContainer) parent, spec.getName());
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -829,7 +829,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -860,7 +860,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitFeedbackLoopSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRFeedbackLoop result = new SIRFeedbackLoop((SIRContainer) parent, spec.getName());
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -875,7 +875,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -932,8 +932,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         debug("In visitSCSimple\n");
         /* Translate the arguments */
         int i;
-        List<?> feirP = sc.getParams();
-        List<?> sirP = new LinkedList<Object>();
+        List feirP = sc.getParams();
+        List sirP = new LinkedList();
         for (i = 0; i < feirP.size(); i++) {
             sirP.add(((Expression) feirP.get(i)).accept(this));
         }
@@ -973,7 +973,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitSJWeightedRR(SJWeightedRR sj) { 
         debug("In visitSJWeightedRR\n");
-        List<?> weights = sj.getWeights();
+        List weights = sj.getWeights();
         JExpression[] newWeights = new JExpression[weights.size()];
         int i;
 
@@ -1030,8 +1030,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
         JBlock result = new JBlock();
-        List<?> stmts = stmt.getStmts();
-        Iterator<?> i;
+        List stmts = stmt.getStmts();
+        Iterator i;
         for (i = stmts.iterator(); i.hasNext(); ) {
             Statement s = (Statement) i.next();
             Object x = s.accept(this);

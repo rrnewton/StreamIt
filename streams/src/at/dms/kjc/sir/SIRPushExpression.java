@@ -124,9 +124,9 @@ public class SIRPushExpression extends JExpression {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitPushExpression(this,
+            return ((SLIRAttributeVisitor)p).visitPushExpression(this,
                                                                  tapeType,
                                                                  arg);
         } else {

@@ -44,9 +44,9 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
      */
     public Object visitInitStatement(SIRInitStatement self,
                                      SIRStream target) {
-        List<JExpression> args = self.getArgs();
+        List args = self.getArgs();
         for (int i=0; i<args.size(); i++) {
-            JExpression newExp = (JExpression)args.get(i).accept(this);
+            JExpression newExp = (JExpression)((JExpression)args.get(i)).accept(this);
             if (newExp!=null && newExp!=args.get(i)) {
                 args.set(i, newExp);
             }

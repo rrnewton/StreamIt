@@ -83,7 +83,7 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
      */
     public SwitchInstruction(InstructionAccessor deflab,
                              Vector<Integer> matches,
-                             Vector<Object> targets)
+                             Vector targets)
     {
         this(deflab,
              Utils.toIntArray(matches),

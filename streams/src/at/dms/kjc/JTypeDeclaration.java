@@ -191,7 +191,7 @@ public abstract class JTypeDeclaration extends JMemberDeclaration {
         CClassContext   self = new CClassContext(context, sourceClass, this);
         Hashtable<String, CField>       hashField;
         CMethod[]       methodList;
-        Hashtable<?, ?>       hashMethod;
+        Hashtable       hashMethod;
 
         if (!uniqueSourceClass) {
             context.reportTrouble(new PositionedError(getTokenReference(),

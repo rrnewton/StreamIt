@@ -105,7 +105,7 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
      */
     public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
-        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
+        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
             JStatement oldBody = (JStatement)it.next();
             Object newBody = oldBody.accept(this);
             if (!(newBody instanceof JStatement))

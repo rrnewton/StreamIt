@@ -18,8 +18,8 @@ package streamit.library;
 
 public class ChannelConnectFilter extends Filter
 {
-    Class<?> type;
-    public ChannelConnectFilter (Class<?> ioType)
+    Class type;
+    public ChannelConnectFilter (Class ioType)
     {
         super ();
         type = ioType;

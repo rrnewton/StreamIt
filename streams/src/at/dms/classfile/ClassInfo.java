@@ -101,9 +101,9 @@ public class ClassInfo extends Member {
     public ClassInfo(short modifiers,
                      String thisClass,
                      String superClass,
-                     Vector<?> interfaces,
-                     Vector<Object> fields,
-                     Vector<Object> methods,
+                     Vector interfaces,
+                     Vector fields,
+                     Vector methods,
                      InnerClassInfo[] innerClasses,
                      String sourceFile,
                      boolean deprecated)
@@ -475,7 +475,7 @@ public class ClassInfo extends Member {
     /**
      *
      */
-    private static ClassConstant[] makeInterfacesArray(Vector<?> vector) {
+    private static ClassConstant[] makeInterfacesArray(Vector vector) {
         ClassConstant[] array;
 
         array = new ClassConstant[vector.size()];

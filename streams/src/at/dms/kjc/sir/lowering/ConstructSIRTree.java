@@ -142,8 +142,8 @@ public class ConstructSIRTree {
          * Removes constant args from <self>.
          */
         private void removeConstantArgs(SIRInitStatement self) {
-            List<?> args = self.getArgs();
-            LinkedList<?> newArgs = new LinkedList<Object>();
+            List args = self.getArgs();
+            LinkedList newArgs = new LinkedList();
             JMethodDeclaration init = self.getTarget().getInit();
             final JFormalParameter[] params = init.getParameters();
             JBlock initBlock = init.getBody();

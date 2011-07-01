@@ -11,7 +11,7 @@ public class CodeStoreHelperSplitter extends CodeStoreHelper {
      * @param node   The OutputSliceNode for the splitter
       * @param backEndBits  An instance of a subclass of a BackEndFactory to access backend-specific code / data.
      */
-    public CodeStoreHelperSplitter(OutputSliceNode node, BackEndFactory<?, ?, ?, ?> backEndBits) {
+    public CodeStoreHelperSplitter(OutputSliceNode node, BackEndFactory backEndBits) {
         super(node, backEndBits);
     }
     @Override

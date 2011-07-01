@@ -40,7 +40,7 @@ public class LexgenParser extends at.dms.compiler.tools.antlr.runtime.LLkParser
         String      prefix = null;
         String      packageName = null;
         String      vocabulary = null;
-        Vector<?>      definitions = new Vector<Object>();
+        Vector      definitions = new Vector();
         TokenDefinition def;
         
         

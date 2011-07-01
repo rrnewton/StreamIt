@@ -79,11 +79,11 @@ public class OMap
         return set.empty();
     }
 
-    public Pair<OMapIterator, Boolean> insert(Object key, Object data)
+    public Pair insert(Object key, Object data)
     {
-        Pair<OSetIterator, Boolean> result = set.insert(new Pair<Object, Object>(key, data));
-        return new Pair<OMapIterator, Boolean>(
-                        new OMapIterator(result.first),
+        Pair result = set.insert(new Pair(key, data));
+        return new Pair(
+                        new OMapIterator((OSetIterator)result.first),
                         result.second);
     }
 
@@ -94,14 +94,14 @@ public class OMap
 
     public void erase(Object key)
     {
-        OSetIterator node = set.find(new Pair<Object, Object>(key, null));
+        OSetIterator node = set.find(new Pair(key, null));
         if (node != set.end())
             set.erase(node);
     }
 
     public OMapIterator find(Object key)
     {
-        return new OMapIterator(set.find(new Pair<Object, Object> (key, null)));
+        return new OMapIterator(set.find(new Pair (key, null)));
     }
     
     public OMapIterator upper_bound(Object key)

@@ -122,7 +122,7 @@ public class JClassImport extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (comments != null) {
             return p.visitComments(comments);
         }

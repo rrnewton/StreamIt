@@ -278,11 +278,11 @@ public class NodesToJava implements FEVisitor
     }
 
     // Return a representation of a list of Parameter objects.
-    public String doParams(List<?> params, String prefix)
+    public String doParams(List params, String prefix)
     {
         String result = "(";
         boolean first = true;
-        for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+        for (Iterator iter = params.iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 if (!first) result += ", ";
@@ -376,7 +376,7 @@ public class NodesToJava implements FEVisitor
         StringBuffer sb = new StringBuffer();
         sb.append("{");
 
-        List<?> elems = exp.getElements();
+        List elems = exp.getElements();
         for (int i=0; i<elems.size(); i++) {
             sb.append((String)((Expression)elems.get(i)).accept(this));
             if (i!=elems.size()-1) {
@@ -624,7 +624,7 @@ public class NodesToJava implements FEVisitor
             mathFunction = true;
         }
         boolean first = true;
-        for (Iterator<?> iter = exp.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = exp.getParams().iterator(); iter.hasNext(); )
             {
                 Expression param = (Expression)iter.next();
                 if (!first) result += ", ";
@@ -646,7 +646,7 @@ public class NodesToJava implements FEVisitor
     {
         String result = exp.getHelperPackage() + '.' + exp.getName() + '(';
         boolean first = true;
-        for (Iterator<?> iter = exp.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = exp.getParams().iterator(); iter.hasNext(); )
             {
                 Expression param = (Expression)iter.next();
                 if (!first) result += ", ";
@@ -890,7 +890,7 @@ public class NodesToJava implements FEVisitor
         // structures and streams.
         String result = "";
 
-        for (Iterator<?> iter = prog.getStructs().iterator(); iter.hasNext();) {
+        for (Iterator iter = prog.getStructs().iterator(); iter.hasNext();) {
             TypeStruct struct = (TypeStruct) iter.next();
 
             if (struct.getName().equals("String"))
@@ -914,7 +914,7 @@ public class NodesToJava implements FEVisitor
             result += indent + "}\n";
         }
 
-        for (Iterator<?> iter = prog.getHelpers().iterator(); iter.hasNext();) {
+        for (Iterator iter = prog.getHelpers().iterator(); iter.hasNext();) {
             TypeHelper th = (TypeHelper) iter.next();
             result += visitTypeHelper(th);
         }
@@ -988,7 +988,7 @@ public class NodesToJava implements FEVisitor
         }
 
         StreamSpec main = null;
-        for (Iterator<?> iter = prog.getStreams().iterator(); iter.hasNext();) {
+        for (Iterator iter = prog.getStreams().iterator(); iter.hasNext();) {
             StreamSpec spec = ((StreamSpec) iter.next());
 
             if (isTopLevelSpec(spec)) {
@@ -1032,14 +1032,14 @@ public class NodesToJava implements FEVisitor
         else
             result = "new " + creator.getName() + "(";
         boolean first = true;
-        for (Iterator<?> iter = creator.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = creator.getParams().iterator(); iter.hasNext(); )
             {
                 Expression param = (Expression)iter.next();
                 if (!first) result += ", ";
                 result += (String)param.accept(this);
                 first = false;
             }
-        for (Iterator<?> iter = creator.getTypes().iterator(); iter.hasNext(); )
+        for (Iterator iter = creator.getTypes().iterator(); iter.hasNext(); )
             {
                 Type type = (Type)iter.next();
                 if (!first) result += ", ";
@@ -1071,7 +1071,7 @@ public class NodesToJava implements FEVisitor
     {
         String result = "WEIGHTED_ROUND_ROBIN(";
         boolean first = true;
-        for (Iterator<?> iter = sj.getWeights().iterator(); iter.hasNext(); )
+        for (Iterator iter = sj.getWeights().iterator(); iter.hasNext(); )
             {
                 Expression weight = (Expression)iter.next();
                 if (!first) result += ", ";
@@ -1086,7 +1086,7 @@ public class NodesToJava implements FEVisitor
     {
         // If the stream creator involves registering with a portal,
         // we need a temporary variable.
-        List<?> portals = sc.getPortals();
+        List portals = sc.getPortals();
         if (portals.isEmpty()) {
             // basic behavior: put expression in-line.
             //System.err.println("basic \"" + ((SCSimple)sc).getName() + "\"");
@@ -1100,7 +1100,7 @@ public class NodesToJava implements FEVisitor
         String result = scsimple.getName() + " " + tempVar + " = " +
             (String)sc.accept(this);
         result += ";\n" + indent + how + "(" + tempVar + ")";
-        for (Iterator<?> iter = portals.iterator(); iter.hasNext(); )
+        for (Iterator iter = portals.iterator(); iter.hasNext(); )
             {
                 Expression portal = (Expression)iter.next();
                 result += ";\n" + indent + (String)portal.accept(this) +
@@ -1149,7 +1149,7 @@ public class NodesToJava implements FEVisitor
             result += " // " + stmt.getContext();
         result += "\n";
         addIndent();
-        for (Iterator<?> iter = stmt.getStmts().iterator(); iter.hasNext(); )
+        for (Iterator iter = stmt.getStmts().iterator(); iter.hasNext(); )
             {
                 Statement s = (Statement)iter.next();
                 String line = indent;
@@ -1296,7 +1296,7 @@ public class NodesToJava implements FEVisitor
             result += indent + receiver + ".enqueueMessage(this, \""
                 + stmt.getName() + "\", new Object[] {";
             boolean first = true;
-            for (Iterator<?> iter = stmt.getParams().iterator(); iter.hasNext();) {
+            for (Iterator iter = stmt.getParams().iterator(); iter.hasNext();) {
                 Expression param = (Expression) iter.next();
                 if (!first) { result += ", "; }
                 first = false;
@@ -1310,7 +1310,7 @@ public class NodesToJava implements FEVisitor
             // not library format: don't package parameters...
             result += indent + receiver + "." + stmt.getName() + "(";
             boolean first = true;
-            for (Iterator<?> iter = stmt.getParams().iterator(); iter.hasNext();) {
+            for (Iterator iter = stmt.getParams().iterator(); iter.hasNext();) {
                 Expression param = (Expression) iter.next();
                 if (!first) { result += ", "; }
                 first = false;
@@ -1325,7 +1325,7 @@ public class NodesToJava implements FEVisitor
     {
         String result = stmt.getHelperPackage() + '.' + stmt.getName() + '(';
         boolean first = true;
-        for (Iterator<?> iter = stmt.getParams().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = stmt.getParams().iterator(); iter.hasNext(); ) {
             Expression param = (Expression)iter.next();
             if (!first) result += ", ";
             first = false;
@@ -1377,7 +1377,7 @@ public class NodesToJava implements FEVisitor
     private String maybeGeneratePortal(StreamSpec spec)
     {
         List<Function> handlers = new java.util.ArrayList<Function>();
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 if (func.getCls() == Function.FUNC_HANDLER)
@@ -1436,7 +1436,7 @@ public class NodesToJava implements FEVisitor
         // find the parameters of the init function.
         Function init = spec.getInitFunc();
         // (ASSERT: init != null)
-        List<?> params = init.getParams();
+        List params = init.getParams();
 
         if (spec.getType() == StreamSpec.STREAM_GLOBAL) {
 
@@ -1463,7 +1463,7 @@ public class NodesToJava implements FEVisitor
             {
 
                 // Generate fields for each of the parameters.
-                for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+                for (Iterator iter = params.iterator(); iter.hasNext(); )
                     {
                         Parameter param = (Parameter)iter.next();
                         result.append(indent + "private " +
@@ -1475,7 +1475,7 @@ public class NodesToJava implements FEVisitor
                 result.append(indent + "public static " + spec.getName() +
                               " __construct(");
                 boolean first = true;
-                for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+                for (Iterator iter = params.iterator(); iter.hasNext(); )
                     {
                         Parameter param = (Parameter)iter.next();
                         if (!first) result.append(", ");
@@ -1487,7 +1487,7 @@ public class NodesToJava implements FEVisitor
                 addIndent();
                 result.append(indent + spec.getName() + " __obj = new " +
                               spec.getName() + "();\n");
-                for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+                for (Iterator iter = params.iterator(); iter.hasNext(); )
                     {
                         Parameter param = (Parameter)iter.next();
                         String name = param.getName();
@@ -1504,7 +1504,7 @@ public class NodesToJava implements FEVisitor
                 addIndent();
                 result.append(indent + "init(");
                 first = true;
-                for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+                for (Iterator iter = params.iterator(); iter.hasNext(); )
                     {
                         Parameter param = (Parameter)iter.next();
                         if (!first) result.append(", ");
@@ -1520,7 +1520,7 @@ public class NodesToJava implements FEVisitor
             {
                 result.append(indent + "public " + spec.getName() + "(");
                 boolean first = true;
-                for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+                for (Iterator iter = params.iterator(); iter.hasNext(); )
                     {
                         Parameter param = (Parameter)iter.next();
                         if (!first) result.append(", ");
@@ -1615,14 +1615,14 @@ public class NodesToJava implements FEVisitor
         ss = spec;
 
         // Output field definitions:
-        for (Iterator<?> iter = spec.getVars().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getVars().iterator(); iter.hasNext(); )
             {
                 FieldDecl varDecl = (FieldDecl)iter.next();
                 result += (String)varDecl.accept(this);
             }
         
         // Output method definitions:
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             result += (String)(((Function)iter.next()).accept(this));
 
         ss = oldSS;

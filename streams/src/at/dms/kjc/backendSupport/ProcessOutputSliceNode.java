@@ -17,10 +17,10 @@ public class ProcessOutputSliceNode {
 
     protected OutputSliceNode outputNode;
     protected SchedulingPhase whichPhase;
-    protected BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits;
+    protected BackEndFactory backEndBits;
     protected CodeStoreHelper splitter_code;
-    protected ComputeNode<ComputeCodeStore<?>> location;
-    protected ComputeCodeStore<?> codeStore;
+    protected ComputeNode location;
+    protected ComputeCodeStore codeStore;
     
     /**
      * Constructor
@@ -29,7 +29,7 @@ public class ProcessOutputSliceNode {
      * @param backEndBits  a BackEndFactory to access layout, etc.
      */
     public ProcessOutputSliceNode(OutputSliceNode outputNode, 
-            SchedulingPhase whichPhase, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+            SchedulingPhase whichPhase, BackEndFactory backEndBits) {
         this.outputNode = outputNode;
         this.whichPhase = whichPhase;
         this.backEndBits = backEndBits;
@@ -199,7 +199,7 @@ public class ProcessOutputSliceNode {
          * @return
          */
         private static void makeSplitterCode(OutputSliceNode splitter, 
-                BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits, CodeStoreHelper helper) {
+                BackEndFactory backEndBits, CodeStoreHelper helper) {
             String splitter_name = "_splitter_" + ProcessFilterSliceNode.getUid();
             String splitter_method_name =  splitter_name + splitter.getPrevFilter().getFilter().getName();
 
@@ -337,7 +337,7 @@ public class ProcessOutputSliceNode {
          * @param backEndBits
          * @return
          */
-        public static  CodeStoreHelper getSplitterCode(OutputSliceNode splitter, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+        public static  CodeStoreHelper getSplitterCode(OutputSliceNode splitter, BackEndFactory backEndBits) {
             CodeStoreHelper splitter_code = CodeStoreHelper.findHelperForSliceNode(splitter);
             if (splitter_code == null) {
                 splitter_code = backEndBits.getCodeStoreHelper(splitter);

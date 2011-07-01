@@ -43,7 +43,7 @@ public class Main {
      * file pointer is already set correctly
      */
     private static String[] readHeader(RandomAccessFile input) throws java.io.IOException {
-        Vector<?>  lines = new Vector<Object>();
+        Vector  lines = new Vector();
 
         // read until meet /^%%/
         while (true) {
@@ -73,7 +73,7 @@ public class Main {
      * file pointer is already set correctly
      */
     private static String[] readKeywords(RandomAccessFile input) {
-        Vector<?>  lines = new Vector<Object>();
+        Vector  lines = new Vector();
 
         while (true) {
             String  currentLine = null;
@@ -109,7 +109,7 @@ public class Main {
      * file pointer is already set correctly
      */
     private static String[] readFooter(RandomAccessFile input) throws java.io.IOException {
-        Vector<?>  lines = new Vector<Object>();
+        Vector  lines = new Vector();
 
         while (true) {
             String  currentLine = null;

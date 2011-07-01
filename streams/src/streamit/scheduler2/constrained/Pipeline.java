@@ -162,7 +162,7 @@ public class Pipeline
                       + "!");
             }
 
-        Pair<OMapIterator, Boolean> oldSDEP = portal2sdep.insert(portal, sdep);
+        Pair oldSDEP = portal2sdep.insert(portal, sdep);
     }
 
     Restrictions restrictions;
@@ -286,7 +286,7 @@ public class Pipeline
 
         portal2restrictionPair.insert(
                                       portal,
-                                      new Pair<SteadyUpstreamRestriction, SteadyDownstreamRestriction>(upstreamRestriction, downstreamRestriction));
+                                      new Pair(upstreamRestriction, downstreamRestriction));
     }
 
     public boolean isDoneInitializing()
@@ -390,7 +390,7 @@ public class Pipeline
                      !portal2restrictionPairIter.equals(lastIter);
                      portal2restrictionPairIter.next())
                     {
-                        Pair<?, ?> pair = (Pair<?, ?>)portal2restrictionPairIter.getData();
+                        Pair pair = (Pair)portal2restrictionPairIter.getData();
                         SteadyUpstreamRestriction upstreamRestr =
                             (SteadyUpstreamRestriction)pair.getFirst();
                         SteadyDownstreamRestriction downstreamRestr =

@@ -124,10 +124,10 @@ public class SIRInterfaceTable extends JExpression
             }
     }
     
-    public Object accept(AttributeVisitor<?> p) 
+    public Object accept(AttributeVisitor p) 
     {
         if (p instanceof SLIRAttributeVisitor)
-            return ((SLIRAttributeVisitor<?>)p).visitInterfaceTable(this);
+            return ((SLIRAttributeVisitor)p).visitInterfaceTable(this);
         else
             return this;
     }

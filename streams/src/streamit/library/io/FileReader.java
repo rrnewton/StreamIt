@@ -24,12 +24,12 @@ import java.io.*;
 
 public class FileReader extends Filter
 {
-    Class<?> fileType;
+    Class fileType;
     File inputFile;
     String fileName;
     DataInputStream inputStream;
 
-    public FileReader (String fileName, Class<?> type, boolean TREAT_AS_BITS)
+    public FileReader (String fileName, Class type, boolean TREAT_AS_BITS)
     {
         // This is part of the hack to make FileReader/Writer<bit> work
         if (TREAT_AS_BITS)
@@ -41,7 +41,7 @@ public class FileReader extends Filter
     }
 
     // This is part of the hack to make FileReader/Writer<bit> work
-    public FileReader (String fileName, Class<?> type) {
+    public FileReader (String fileName, Class type) {
         this(fileName, type, false);
     }
 

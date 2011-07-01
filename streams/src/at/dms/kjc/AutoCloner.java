@@ -193,7 +193,7 @@ public class AutoCloner {
         }
         // hashtables -- clone along with contents
         else if (o instanceof Hashtable) {
-            result = cloneHashtable((Hashtable<?, ?>)o);
+            result = cloneHashtable((Hashtable)o);
         } 
         // arrays -- need to clone children as well
         else if (o.getClass().isArray()) {
@@ -229,15 +229,15 @@ public class AutoCloner {
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o instanceof LinkedList) {
-            result = ((LinkedList<?>)o).clone();
+            result = ((LinkedList)o).clone();
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o instanceof Stack) {
-            result = ((Stack<?>)o).clone();
+            result = ((Stack)o).clone();
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o instanceof Vector) {
-            result = ((Vector<?>)o).clone();
+            result = ((Vector)o).clone();
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o.getClass().toString().equals("class at.dms.kjc.sir.SIRGlobal")) {
@@ -302,10 +302,10 @@ public class AutoCloner {
      * Helper function.  Should only be called as part of automatic
      * cloning process.
      */
-    static private Object cloneHashtable(Hashtable<?, ?> orig) {
+    static private Object cloneHashtable(Hashtable orig) {
         Hashtable<Object, Object> result = new Hashtable<Object, Object>();
         register(orig, result);
-        Enumeration<?> e = orig.keys();
+        Enumeration e = orig.keys();
         while (e.hasMoreElements()) {
             Object key = e.nextElement();
             Object value = orig.get(key);

@@ -70,7 +70,7 @@ public class Vector implements Cloneable {
         }
         return data[i];
     }
-    public synchronized Enumeration<?> elements() {
+    public synchronized Enumeration elements() {
         return new VectorEnumerator(this);
     }
     public synchronized void ensureCapacity(int minIndex) {

@@ -49,12 +49,12 @@ public class InsertIODecls extends InitMunger
      * @param fns   List of functions to search
      * @return      Primary work function in fns
      */
-    public static Function findWork(List<Function> fns, boolean init)
+    public static Function findWork(List fns, boolean init)
     {
         Function work = null;
-        for (Iterator<Function> iter = fns.iterator(); iter.hasNext(); )
+        for (Iterator iter = fns.iterator(); iter.hasNext(); )
             {
-                Function fn = iter.next();
+                Function fn = (Function)iter.next();
                 int cls = init ? Function.FUNC_PREWORK : Function.FUNC_WORK;
                 if (fn.getCls() == cls)
                     {
@@ -75,9 +75,9 @@ public class InsertIODecls extends InitMunger
         if (spec.getType() != StreamSpec.STREAM_FILTER)
             return spec;
 
-        List<Function> fns = new ArrayList<Function>(spec.getFuncs());
+        List fns = new ArrayList(spec.getFuncs());
         StreamType st = spec.getStreamType();
-        List<?> newStmts = new ArrayList<Object>();
+        List newStmts = new ArrayList();
         newStmts.add(new StmtSetTypes(spec.getContext(), st));
         translateWork((FuncWork)findWork(fns, true), true, newStmts);
         translateWork((FuncWork)findWork(fns, false), false, newStmts);
@@ -90,7 +90,7 @@ public class InsertIODecls extends InitMunger
                               fns, spec.isStateful());
     }
 
-    private void translateWork(FuncWork work, boolean init, List<?> newStmts)
+    private void translateWork(FuncWork work, boolean init, List newStmts)
     {
         // Do nothing if we didn't actually find the function.
         if (work == null)
@@ -98,7 +98,7 @@ public class InsertIODecls extends InitMunger
         newStmts.add(new StmtIODecl(work.getContext(), init, work));
     }
 
-    private void translateHelpers(List<Function> helpers, List<?> newStmts)
+    private void translateHelpers(List<Function> helpers, List newStmts)
     {
         for (Iterator<Function> iter = helpers.iterator(); iter.hasNext(); ) {
             Function helper = iter.next();

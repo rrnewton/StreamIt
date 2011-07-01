@@ -558,7 +558,7 @@ public abstract class CClass extends CMember {
     public CMethod[] lookupSuperMethod(String ident, CType[] actuals)
         throws UnpositionedError
     {
-        Vector<Object>  container = new Vector<Object>();
+        Vector  container = new Vector();
 
         if (superClass != null) {
             // java.lang.object
@@ -585,7 +585,7 @@ public abstract class CClass extends CMember {
      *  declares nor inherits a method that implements it.
      */
     public CMethod[] getAbstractMethods() {
-        Vector<Object>  container = new Vector<Object>();
+        Vector  container = new Vector();
 
         // C explicitly contains a declaration of an abstract method.
         for (int i = 0; i < methods.length; i++) {
@@ -655,7 +655,7 @@ public abstract class CClass extends CMember {
      * @param   actuals     method invocation arguments
      */
     public CMethod[] getApplicableMethods(String ident, CType[] actuals) {
-        Vector<Object>  container = new Vector<Object>();
+        Vector  container = new Vector();
 
         collectApplicableMethods(container, ident, actuals);
         return (CMethod[])Utils.toArray(container, CMethod.class);
@@ -667,7 +667,7 @@ public abstract class CClass extends CMember {
      * @param   ident       method invocation name
      * @param   actuals     method invocation arguments
      */
-    public void collectApplicableMethods(Vector<Object> container, String ident, CType[] actuals) {
+    public void collectApplicableMethods(Vector container, String ident, CType[] actuals) {
         // look in current class
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].isApplicableTo(ident, actuals)) {
@@ -824,7 +824,7 @@ public abstract class CClass extends CMember {
         other.innerClasses = (at.dms.kjc.CClassType[])at.dms.kjc.AutoCloner.cloneToplevel(this.innerClasses);
         other.superClass = (at.dms.kjc.CClassType)at.dms.kjc.AutoCloner.cloneToplevel(this.superClass);
         other.hasOuterThis = this.hasOuterThis;
-        other.fields = (java.util.Hashtable<?, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.fields);
+        other.fields = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.fields);
         other.methods = (at.dms.kjc.CMethod[])at.dms.kjc.AutoCloner.cloneToplevel(this.methods);
         other.qualifiedAndAnonymous = this.qualifiedAndAnonymous;
     }

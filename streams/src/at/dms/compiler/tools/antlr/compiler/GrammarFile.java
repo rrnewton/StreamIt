@@ -74,7 +74,7 @@ public class GrammarFile {
         String o = options==null ? "" : Hierarchy.optionsToString(options);
 
         String s=h+o;
-        for (Enumeration<?> e=grammars.elements(); e.hasMoreElements(); ) {
+        for (Enumeration e=grammars.elements(); e.hasMoreElements(); ) {
             GrammarDefinition g = (GrammarDefinition)e.nextElement();
             s += g;
         }

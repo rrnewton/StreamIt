@@ -95,7 +95,7 @@ public class JBitwiseComplementExpression extends JUnaryExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitBitwiseComplementExpression(this, expr);
     }
 

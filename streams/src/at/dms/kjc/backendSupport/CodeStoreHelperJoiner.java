@@ -9,7 +9,7 @@ public class CodeStoreHelperJoiner extends CodeStoreHelper {
 
     
     
-    public CodeStoreHelperJoiner(InputSliceNode node, BackEndFactory<?, ?, ?, ?> backEndBits) {
+    public CodeStoreHelperJoiner(InputSliceNode node, BackEndFactory backEndBits) {
         super(node, backEndBits);
     }
     @Override

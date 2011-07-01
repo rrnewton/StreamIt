@@ -16,10 +16,10 @@ import java.lang.Math;
 public abstract class DataFlow extends SLIRReplacingVisitor {
     //Gets a little awkward at times but alows for general behavior that can be inherited
     //and still fits in with their visitor framework
-    protected HashMap<?, ?> map;
+    protected HashMap map;
     
     public DataFlow() {
-        map=new HashMap<Object, Object>();
+        map=new HashMap();
     }
     
     // ----------------------------------------------------------------------
@@ -33,7 +33,7 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
                                       JExpression cond,
                                       JStatement body) {
         cond.accept(this);
-        HashMap<?, ?> mapStore=(HashMap<?, ?>)map.clone();
+        HashMap mapStore=(HashMap)map.clone();
         body.accept(this);
         mergeFunction(mapStore);
         while(!map.equals(mapStore)) { //Iterate until fixed point
@@ -51,9 +51,9 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
                                    JStatement thenClause,
                                    JStatement elseClause) {
         cond.accept(this);
-        HashMap<?, ?> mapStore=(HashMap<?, ?>)map.clone();
+        HashMap mapStore=(HashMap)map.clone();
         thenClause.accept(this);
-        HashMap<?, ?> mapThen=map;
+        HashMap mapThen=map;
         map=mapStore;
         elseClause.accept(this);
         mergeFunction(mapThen);
@@ -70,7 +70,7 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
                                     JStatement body) {
         init.accept(this);
         cond.accept(this);
-        HashMap<?, ?> mapStore=(HashMap<?, ?>)map.clone();
+        HashMap mapStore=(HashMap)map.clone();
         body.accept(this);
         incr.accept(this);
         mergeFunction(mapStore);
@@ -89,8 +89,8 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
                                        JExpression expr,
                                        JSwitchGroup[] body) {
         expr.accept(this);
-        HashMap<?, ?> mapStore=(HashMap<?, ?>)map.clone();
-        HashMap<?, ?> mapAccum=(HashMap<?, ?>)map.clone();
+        HashMap mapStore=(HashMap)map.clone();
+        HashMap mapAccum=(HashMap)map.clone();
         for (int i = 0; i < body.length; i++) {
             body[i].accept(this);
             mergeFunction(mapAccum);
@@ -103,7 +103,7 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
     
     //Merges map2 with field map and stores in map
     //Override with applicable merge function
-    protected abstract void mergeFunction(HashMap<?, ?> map2);
+    protected abstract void mergeFunction(HashMap map2);
 
     //Override visit methods with appropriate merge functions
     //More default behavior to be included as I start extending

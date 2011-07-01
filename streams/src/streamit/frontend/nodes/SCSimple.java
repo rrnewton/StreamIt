@@ -29,7 +29,7 @@ import java.util.List;
 public class SCSimple extends StreamCreator
 {
     private String name;
-    private List<?> types;
+    private List types;
     private List<Expression> params;
     
     /**
@@ -44,7 +44,7 @@ public class SCSimple extends StreamCreator
      * @param portals  list of <code>Expression</code> giving the
      *                 portals to register the new stream with
      */
-    public SCSimple(FEContext context, String name, List<?> types, List<Expression> params,
+    public SCSimple(FEContext context, String name, List types, List<Expression> params,
                     List<Expression> portals)
     {
         super(context, portals);
@@ -67,7 +67,7 @@ public class SCSimple extends StreamCreator
      *
      * @return  list of <code>Type</code>
      */
-    public List<?> getTypes()
+    public List getTypes()
     {
         return types;
     }

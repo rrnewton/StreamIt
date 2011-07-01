@@ -58,7 +58,7 @@ public class LIRNode extends JStatement {
         p.visitNode(this);
     }
 
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         // no action is defined for attribute visitors on lir nodes
         return this;
     }

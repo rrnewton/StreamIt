@@ -115,7 +115,7 @@ public abstract class JStatement extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public abstract Object accept(AttributeVisitor<?> p);
+    public abstract Object accept(AttributeVisitor p);
 
     /**
      * Returns the comments

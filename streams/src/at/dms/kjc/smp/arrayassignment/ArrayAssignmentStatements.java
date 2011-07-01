@@ -37,7 +37,7 @@ public class ArrayAssignmentStatements {
         
         java.util.Collections.sort(singles);
         
-        assignments = (LinkedList<?>)singles;
+        assignments = (LinkedList)singles;
     }
     
     public void compress() {

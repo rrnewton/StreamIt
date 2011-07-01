@@ -99,7 +99,7 @@ public class FEReplacer implements FEVisitor
      * 
      * @param stmts The statements to add
      */ 
-    protected void addStatements(Collection<?> stmts)
+    protected void addStatements(Collection stmts)
     {
         newStatements.addAll(stmts);
     }
@@ -361,11 +361,11 @@ public class FEReplacer implements FEVisitor
         // will change.
         List<StreamSpec> newStreams = new ArrayList<StreamSpec>();
         for (Iterator<StreamSpec> iter = prog.getStreams().iterator(); iter.hasNext(); )
-            newStreams.add((StreamSpec)(iter.next()).accept(this));
+            newStreams.add((StreamSpec)((FENode)(iter.next())).accept(this));
 
         List<TypeHelper> newHelpers = prog.getHelpers();
         for (Iterator<TypeHelper> iter = newHelpers.iterator(); iter.hasNext(); ) {
-            TypeHelper helper = iter.next();
+            TypeHelper helper = (TypeHelper)iter.next();
             for (int i = 0; i < helper.getNumFuncs(); i++) {
                 helper.setFunction(i, (Function)helper.getFunction(i).accept(this));
             }
@@ -394,7 +394,7 @@ public class FEReplacer implements FEVisitor
                 newParams.add(newParam);
                 if (newParam != param) hasChanged = true;
             }
-        for (Iterator<?> iter = creator.getPortals().iterator(); iter.hasNext(); )
+        for (Iterator iter = creator.getPortals().iterator(); iter.hasNext(); )
             {
                 Expression portal = (Expression)iter.next();
                 Expression newPortal = doExpression(portal);
