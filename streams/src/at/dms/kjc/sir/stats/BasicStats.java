@@ -42,9 +42,9 @@ public class BasicStats {
     // number of filters with a multiplicity of 1 in the steady state
     int multiplicityOneFilters = 0;
     // names of stateful filters
-    List stateful = new ArrayList();
+    List<String> stateful = new ArrayList<String>();
     // names of peeking filters
-    List peeking = new ArrayList();
+    List<String> peeking = new ArrayList<String>();
     // dynamic rate filters
     List<SIRFilter> dynamicRateFilters = new ArrayList<SIRFilter>();
     // total work in the program
@@ -58,7 +58,7 @@ public class BasicStats {
     // total work in feedback loops
     long totalFeedbackWork = 0;
     // list of multiplicities of filters (in the schedule)
-    List multiplicities = new LinkedList();
+    List<Integer> multiplicities = new LinkedList<Integer>();
     // unique multiplicities of filters (in the schedule)
     HashSet<Integer> uniqueMultiplicities = new HashSet<Integer>();
 
@@ -178,7 +178,7 @@ public class BasicStats {
             }));
 
         // calculate the min, median, max multiplicity
-        Integer[] mults = (Integer[])multiplicities.toArray(new Integer[0]);
+        Integer[] mults = multiplicities.toArray(new Integer[0]);
         Arrays.sort(mults);
         int minMult = mults[0].intValue();
         int medianMult = (mults.length%2==0 ? 

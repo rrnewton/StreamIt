@@ -81,9 +81,9 @@ public class JVectorLiteral extends JExpression {
      * @see at.dms.kjc.JExpression#accept(at.dms.kjc.AttributeVisitor)
      */
     @Override
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor)p).visitVectorLiteral(this,scalar);
+            return ((SLIRAttributeVisitor<?>)p).visitVectorLiteral(this,scalar);
         } else {
             return this;
         }

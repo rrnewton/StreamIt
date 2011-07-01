@@ -122,7 +122,7 @@ public class StreaMITMain {
         params[5] = k2s.getGlobal();
 
         Method theMethod = null;
-        Class theBackend = null;
+        Class<?> theBackend = null;
         
         try {
             paramTypes[0] = Class.forName("at.dms.kjc.sir.SIRStream");

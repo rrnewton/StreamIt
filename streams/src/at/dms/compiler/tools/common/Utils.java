@@ -65,7 +65,7 @@ public abstract class Utils {
      * @param   vect        the vector containing the elements
      * @param   type        the type of the elements
      */
-    public static Object[] toArray(Vector vect, Class type) {
+    public static Object[] toArray(Vector<?> vect, Class<?> type) {
         if (vect != null && vect.size() > 0) {
             Object[]    array = (Object[])Array.newInstance(type, vect.size());
 
@@ -87,7 +87,7 @@ public abstract class Utils {
      *
      * @param   vect        the vector containing the elements
      */
-    public static int[] toIntArray(Vector vect) {
+    public static int[] toIntArray(Vector<?> vect) {
         if (vect != null && vect.size() > 0) {
             int[]   array = new int[vect.size()];
 

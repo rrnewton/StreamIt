@@ -280,7 +280,7 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
                      LoweringConstants.STATE_PARAM_NAME);
         // for each statement in the method, change references
         KjcVisitor resolver = new FieldResolver();
-        ListIterator statements = method.getStatementIterator();
+        ListIterator<?> statements = method.getStatementIterator();
         while (statements.hasNext()) {
             ((JStatement)statements.next()).accept(resolver);
         }

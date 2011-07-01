@@ -55,7 +55,7 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
         if (str instanceof SIRPipeline)
             {
                 SIRPipeline pl = (SIRPipeline)str;
-                Iterator iter = pl.getChildren().iterator();
+                Iterator<?> iter = pl.getChildren().iterator();
                 while (iter.hasNext())
                     {
                         SIRStream child = (SIRStream)iter.next();
@@ -408,12 +408,12 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
             self.setAccessor(newExp);
         }
         if((prefix instanceof JLocalVariableExpression)&&(accessor instanceof JIntLiteral)) {
-            JLocalVariable[] varArray=(JLocalVariable[])replaced.get(((JLocalVariableExpression)prefix).getVariable());
+            JLocalVariable[] varArray=replaced.get(((JLocalVariableExpression)prefix).getVariable());
             if(varArray!=null)
                 return new JLocalVariableExpression(null,varArray[((JIntLiteral)accessor).intValue()]);
         }
         if((prefix instanceof JFieldAccessExpression)&&(((JFieldAccessExpression)prefix).getPrefix() instanceof JThisExpression)&&(accessor instanceof JIntLiteral)) {
-            String[] fieldArray=(String[])replacedFields.get(((JFieldAccessExpression)prefix).getIdent());
+            String[] fieldArray=replacedFields.get(((JFieldAccessExpression)prefix).getIdent());
             if(fieldArray!=null)
                 return new JFieldAccessExpression(null,((JFieldAccessExpression)prefix).getPrefix(),fieldArray[((JIntLiteral)accessor).intValue()],null);
         }

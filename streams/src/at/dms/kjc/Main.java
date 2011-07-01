@@ -253,7 +253,7 @@ public class Main extends Compiler {
             }
             String clazz = fieldname.substring(0,fieldpos);
             String fieldinclass = fieldname.substring(fieldpos+1);
-            Class cls;
+            Class<?> cls;
             try {
                 cls = Class.forName(clazz);
             } catch (Throwable e) {
@@ -672,7 +672,7 @@ public class Main extends Compiler {
     // PROTECTED DATA MEMBERS
     // ----------------------------------------------------------------------
 
-    protected Vector        infiles = new Vector();
+    protected Vector<?>        infiles = new Vector<Object>();
     protected boolean       errorFound;
 
     // refer to 'options' for non-static, 'KjcOptions' for static
@@ -681,11 +681,11 @@ public class Main extends Compiler {
     private WarningFilter       filter = new DefaultFilter();
 
     // all generated classes
-    private Vector      classes = new Vector(100);
+    private Vector<?>      classes = new Vector<Object>(100);
 
     // deported here because of a javac bug
     static class ThreadedParser extends Thread {
-        ThreadedParser(Main compiler, Vector infiles, JCompilationUnit[] tree, int start, int end) {
+        ThreadedParser(Main compiler, Vector<?> infiles, JCompilationUnit[] tree, int start, int end) {
             this.compiler = compiler;
             this.start = start;
             this.end = end;
@@ -703,7 +703,7 @@ public class Main extends Compiler {
         private int         start;
         private int         end;
         private JCompilationUnit[]  tree;
-        private Vector      infiles;
+        private Vector<?>      infiles;
     }
 
     static class ThreadedChecker extends Thread {

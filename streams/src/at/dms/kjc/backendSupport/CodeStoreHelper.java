@@ -30,7 +30,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     protected SliceNode sliceNode;
     
     /** a BackEndFactory for getting information about other parts of the back end */
-    protected BackEndFactory backEndBits;
+    protected BackEndFactory<?, ?, ?, ?> backEndBits;
     
     //keep a unique integer for each filter in each trace
     //so var names do not clash
@@ -49,7 +49,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     protected JMethodDeclaration workMethod = null;
     
     /** General constructor: need to add fields and methods later. */
-    public CodeStoreHelper (SliceNode node, BackEndFactory backEndBits) {
+    public CodeStoreHelper (SliceNode node, BackEndFactory<?, ?, ?, ?> backEndBits) {
         super(new JFieldDeclaration[0], new JMethodDeclaration[0]);
         sliceNode = node;
         this.backEndBits = backEndBits;
@@ -58,7 +58,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     
     /** Constructor from a FilterContent, fills out fields, methods, initMethod, preWorkMethod, workMethod.
      * Note: clones inputs. */
-    public CodeStoreHelper(SliceNode node, FilterContent filter, BackEndFactory backEndBits) {
+    public CodeStoreHelper(SliceNode node, FilterContent filter, BackEndFactory<?, ?, ?, ?> backEndBits) {
         this(node, backEndBits);
         setFields((JFieldDeclaration[])ObjectDeepCloner.deepCopy(filter.getFields()));
         setMethods((JMethodDeclaration[])ObjectDeepCloner.deepCopy(filter.getMethods()));

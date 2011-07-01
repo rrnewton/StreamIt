@@ -108,7 +108,7 @@ class Rule {
             s += System.getProperty("line.separator")+
                 "options {"+
                 System.getProperty("line.separator");
-            for (Enumeration e = options.elements() ; e.hasMoreElements() ;) {
+            for (Enumeration<?> e = options.elements() ; e.hasMoreElements() ;) {
                 s += (Option)e.nextElement()+System.getProperty("line.separator");
             }
             s += "}"+System.getProperty("line.separator");

@@ -131,8 +131,8 @@ public class CTryFinallyContext extends CBlockContext {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CTryFinallyContext other) {
         super.deepCloneInto(other);
-        other.breaks = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.breaks);
-        other.continues = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.continues);
+        other.breaks = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.breaks);
+        other.continues = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.continues);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

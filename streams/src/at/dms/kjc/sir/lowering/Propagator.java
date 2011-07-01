@@ -230,7 +230,7 @@ public class Propagator extends SLIRReplacingVisitor {
             Enumeration<JLocalVariable> remove=newProp.changed.keys();
             //BUG!!!  visiting with newProp could replace references!
             while(remove.hasMoreElements()) {
-                JLocalVariable var=(JLocalVariable)remove.nextElement();
+                JLocalVariable var=remove.nextElement();
                 constants.remove(var);
                 changed.put(var,Boolean.TRUE);
             }
@@ -755,7 +755,7 @@ public class Propagator extends SLIRReplacingVisitor {
             body.accept(newProp);
             Enumeration<JLocalVariable> remove=newProp.changed.keys();
             while(remove.hasMoreElements()) {
-                JLocalVariable var=(JLocalVariable)remove.nextElement();
+                JLocalVariable var=remove.nextElement();
                 constants.remove(var);
                 changed.put(var,Boolean.TRUE);
             }

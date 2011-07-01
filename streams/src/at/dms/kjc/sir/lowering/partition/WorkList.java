@@ -12,7 +12,7 @@ import java.io.*;
  */
 public class WorkList extends java.util.LinkedList {
 
-    public WorkList(Collection c) {
+    public WorkList(Collection<?> c) {
         super(c);
     }
 

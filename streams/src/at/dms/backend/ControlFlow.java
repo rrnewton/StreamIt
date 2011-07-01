@@ -119,8 +119,8 @@ public class ControlFlow {
     // --------------------------------------------------------------------
 
     private void buildBasicBlocks(InstructionHandle start, HandlerInfo[] handlers) {
-        Vector  bblocks = new Vector();
-        Vector  body = new Vector();
+        Vector<?>  bblocks = new Vector<Object>();
+        Vector<?>  body = new Vector<Object>();
         BasicBlock  current = null;
         boolean startBB = true;
         int     countBB = 0;
@@ -154,14 +154,14 @@ public class ControlFlow {
         clean(handlers, bblocks);
     }
 
-    private void closeBasicBlock(BasicBlock current, Vector body, Vector bblocks) {
+    private void closeBasicBlock(BasicBlock current, Vector<?> body, Vector<?> bblocks) {
         current.setBody((InstructionHandle[])Utils.toArray(body, InstructionHandle.class));
         body.setSize(0);
         bblocks.addElement(current);
         current.setMarked(true);
     }
 
-    private void clean(HandlerInfo[] handlers, Vector vbblocks) {
+    private void clean(HandlerInfo[] handlers, Vector<?> vbblocks) {
         bblocks = (BasicBlock[])Utils.toArray(vbblocks, BasicBlock.class);
 
         for (int i = 0; i < bblocks.length; i++ ) {

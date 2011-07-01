@@ -150,7 +150,7 @@ public class Unroller extends SLIRReplacingVisitor {
         if (str instanceof SIRPipeline)
             {
                 SIRPipeline pl = (SIRPipeline)str;
-                Iterator iter = pl.getChildren().iterator();
+                Iterator<?> iter = pl.getChildren().iterator();
                 while (iter.hasNext())
                     {
                         SIRStream child = (SIRStream)iter.next();

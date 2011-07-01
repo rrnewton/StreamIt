@@ -156,7 +156,7 @@ class BasicBlock extends AbstractInstructionAccessor implements AccessorContaine
         }
         setMarked(true);
 
-        Vector  vquads = new Vector();
+        Vector<?>  vquads = new Vector<Object>();
         remainingStack = QQuadruple.buildQuadruples(env, this, insns, entryStack, vquads);
         quads = (QNode[])Utils.toArray(vquads, QNode.class);
         insns = null;

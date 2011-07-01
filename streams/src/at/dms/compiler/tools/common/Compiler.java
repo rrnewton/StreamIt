@@ -115,7 +115,7 @@ public abstract class Compiler {
      * @return  a vector of files known to exist
      * @exception   UnpositionedError   at least one file does not exist
      */
-    public Vector<Object> verifyFiles(Vector names) throws UnpositionedError {
+    public Vector<Object> verifyFiles(Vector<?> names) throws UnpositionedError {
         return Utils.toVector(verifyFiles((String[])Utils.toArray(names, String.class)));
     }
 

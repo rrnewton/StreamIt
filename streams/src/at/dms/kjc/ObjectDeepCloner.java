@@ -103,7 +103,7 @@ public class ObjectDeepCloner
      * elements of the array are of the same type.
      */
     static public JPhylum[] deepCopy(JPhylum[] oldObj) {
-        Class componentType = oldObj.getClass().getComponentType();
+        Class<?> componentType = oldObj.getClass().getComponentType();
         JPhylum[] result = (JPhylum[])Array.newInstance(componentType, oldObj.length);
 
         for (int i=0; i<oldObj.length; i++) {

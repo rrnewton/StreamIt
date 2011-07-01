@@ -44,7 +44,7 @@ public class Flattener {
         System.err.print("Running Constant Prop and Unroll... ");
         Set<SIRGlobal> theStatics = new HashSet<SIRGlobal>();
         if (global != null) theStatics.add(global);
-        Map associatedGlobals = StaticsProp.propagate(str,theStatics);
+        Map<?, ?> associatedGlobals = StaticsProp.propagate(str,theStatics);
         ConstantProp.propagateAndUnroll(str,true);
         System.err.println("done.");
 

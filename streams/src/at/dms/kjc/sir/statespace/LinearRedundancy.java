@@ -84,7 +84,7 @@ public class LinearRedundancy {
         }
         // if we don't have a list mapping to this tuple yet, make one.
         if (!this.tuplesToUses.containsKey(tuple)) {
-            this.tuplesToUses.put(tuple, new LinkedList());
+            this.tuplesToUses.put(tuple, new LinkedList<Object>());
         }
         // now, add the specified use to the list that the tuple maps to.
         this.tuplesToUses.get(tuple).add(new Integer(use));
@@ -116,9 +116,9 @@ public class LinearRedundancy {
             if (currentTuple.getCoefficient().equals(ComplexNumber.ZERO)) {
                 // do nothing this iteration
             } else {
-                List useList = this.tuplesToUses.get(currentTuple);
+                List<?> useList = this.tuplesToUses.get(currentTuple);
                 // now, for each use, update the tuple counts appropriately
-                Iterator useIter = useList.iterator();
+                Iterator<?> useIter = useList.iterator();
                 // flag that is set when we have 
                 //seen the first use of this tuple (so we can begin counting redundancy)
                 boolean seenFirstUse = false; 
@@ -220,7 +220,7 @@ public class LinearRedundancy {
         while(tupleIter.hasNext()) {
             Object tuple = tupleIter.next();
             str += tuple + "-->(";
-            Iterator listIter = this.tuplesToUses.get(tuple).iterator();
+            Iterator<?> listIter = this.tuplesToUses.get(tuple).iterator();
             while(listIter.hasNext()) {
                 str += listIter.next() + ",";
             }
@@ -244,13 +244,13 @@ public class LinearRedundancy {
             if (!(valObject instanceof List)) {
                 throw new RuntimeException("non list as value");
             }
-            List useList = (List)valObject;
+            List<?> useList = (List<?>)valObject;
             // list should be non-empty
             if (useList.isEmpty()) {
                 throw new RuntimeException("use list is empty");
             }
             // now, each element of the list should be an Integer object
-            Iterator listIter = useList.iterator();
+            Iterator<?> listIter = useList.iterator();
             while(listIter.hasNext()) {
                 Object listObject = listIter.next();
                 if (!(listObject instanceof Integer)) {

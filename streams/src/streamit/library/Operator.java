@@ -1319,7 +1319,7 @@ public class Operator extends DestroyedClass
 
     public static void passOneData (Channel from, Channel to)
     {
-        Class type = from.getType ();
+        Class<?> type = from.getType ();
         assert type == to.getType ();
 
         if (type == Integer.TYPE)
@@ -1348,7 +1348,7 @@ public class Operator extends DestroyedClass
 
     public static void duplicateOneData (Channel from, Channel [] to)
     {
-        Class type = from.getType ();
+        Class<?> type = from.getType ();
         assert to != null && type == to[0].getType ();
 
         if (type == Integer.TYPE)

@@ -676,7 +676,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @param   type        the type of the elements
      * @deprecated
      */
-    public static Object[] toArray(Vector vect, Class type) {
+    public static Object[] toArray(Vector<?> vect, Class<?> type) {
         if (vect != null && vect.size() > 0) {
             Object[]    array = (Object[])Array.newInstance(type, vect.size());
 

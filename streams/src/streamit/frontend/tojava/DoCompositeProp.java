@@ -82,7 +82,7 @@ public class DoCompositeProp extends SymbolTableVisitor
             if (t.equals(float4type)) dim = 4;
 
             if (unary.getOp() == ExprUnary.UNOP_NEG) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(expr);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "neg"+dim, params);
             }
@@ -111,22 +111,22 @@ public class DoCompositeProp extends SymbolTableVisitor
             if (lt.equals(float4type)) dim = 4;
 
             if (exp.getOp() == ExprBinary.BINOP_ADD) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "add"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_SUB) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "sub"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_MUL) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "mul"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_DIV) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "div"+dim, params);
             }
@@ -147,22 +147,22 @@ public class DoCompositeProp extends SymbolTableVisitor
             if (lt.equals(float4type)) dim = 4;
         
             if (exp.getOp() == ExprBinary.BINOP_ADD) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "addScalar"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_SUB) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "subScalar"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_MUL) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "scale"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_DIV) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(left); params.add(right);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "scaleInv"+dim, params);
             }
@@ -182,17 +182,17 @@ public class DoCompositeProp extends SymbolTableVisitor
             if (rt.equals(float4type)) dim = 4;
         
             if (exp.getOp() == ExprBinary.BINOP_ADD) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(right); params.add(left);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "addScalar"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_SUB) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(right); params.add(left);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "subScalar"+dim, params);
             }
             if (exp.getOp() == ExprBinary.BINOP_MUL) {
-                List params = new ArrayList();
+                List<?> params = new ArrayList<Object>();
                 params.add(right); params.add(left);
                 return new ExprHelperCall(ctx, "StreamItVectorLib", "scale"+dim, params);
             }
@@ -210,8 +210,8 @@ public class DoCompositeProp extends SymbolTableVisitor
         FEContext ctx = exp.getContext();
 
         // Start by resolving all of the parameters.
-        List newParams = new ArrayList();
-        Iterator iter = exp.getParams().iterator();
+        List<?> newParams = new ArrayList<Object>();
+        Iterator<?> iter = exp.getParams().iterator();
         while (iter.hasNext()) {
             Expression param = (Expression)iter.next();
             newParams.add(param.accept(this));

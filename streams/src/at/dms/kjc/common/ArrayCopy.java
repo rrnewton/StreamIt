@@ -6,7 +6,7 @@ import java.util.*;
 
 public class ArrayCopy {
     //Only handles rectangle multi dim arrays now
-    public static void acceptInit(JMethodDeclaration init,Hashtable constants) {
+    public static void acceptInit(JMethodDeclaration init,Hashtable<JLocalVariable, ?> constants) {
         JBlock body=init.getBody();
         JFormalParameter[] params=init.getParameters();
         for(int i=params.length-1;i>=0;i--) {

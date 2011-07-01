@@ -312,7 +312,7 @@ public class EmitTileCode extends EmitCode {
      * @param p The CodegenPrintWriter (left open on return).
      */
     public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
-            ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
+            ComputeNode<?> n, CodegenPrintWriter p, CodeGen codegen) {
         
         // Standard final optimization of a code unit before code emission:
         // unrolling and constant prop as allowed, DCE, array destruction into scalars.

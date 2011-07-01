@@ -347,7 +347,7 @@ public class FusePipe {
      */
     static void replace(SIRPipeline parent, 
                         SIRFilter fused,
-                        List initArgs) {
+                        List<?> initArgs) {
         // replace <filterList> with <fused>
         parent.replace(parent.get(0), parent.get(parent.size()-1), fused);
         // add args to <fused>'s init

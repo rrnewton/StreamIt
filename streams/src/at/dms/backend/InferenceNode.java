@@ -200,7 +200,7 @@ class InferenceNode {
     // DATA MEMBERS
     // ----------------------------------------------------------------------
 
-    private Vector  temps = new Vector();
+    private Vector<?>  temps = new Vector<Object>();
     private Vector<InferenceNode>  links = new Vector<InferenceNode>();
     private boolean removed;
     private int     color;

@@ -210,7 +210,7 @@ public class CollapseDataParallelism {
         int U = filter.getPushInt();
         SIRSplitter origSplit = sj.getSplitter();
         SIRJoiner origJoin = sj.getJoiner();
-        HashMap reps = SIRScheduler.getExecutionCounts(sj)[1];
+        HashMap<?, ?> reps = SIRScheduler.getExecutionCounts(sj)[1];
 
         // make new first splitjoin
         SIRSplitJoin sj1 = new SIRSplitJoin(null, "CollapsedDataParallel_1");
@@ -259,7 +259,7 @@ public class CollapseDataParallelism {
      * However, if all the weights are the same, then collapses all
      * the values down to "k".
      */
-    private JExpression[] createWeights(SIRSplitJoin sj, HashMap reps, int k) {
+    private JExpression[] createWeights(SIRSplitJoin sj, HashMap<?, ?> reps, int k) {
         JExpression[] weights = new JExpression[sj.size()];
         for (int i=0; i<sj.size(); i++) {
             weights[i] = new JIntLiteral(((int[])reps.get(sj.get(i)))[0] * k);
@@ -281,7 +281,7 @@ public class CollapseDataParallelism {
      * Returns whether or not the i'th child of 'sj' is eligible for
      * the collapsing, given the rules documented above.
      */
-    private boolean isEligible(SIRStream childStr, List args, int i) {
+    private boolean isEligible(SIRStream childStr, List<?> args, int i) {
         SIRFilter child = null;
         // check for filter
         if (childStr instanceof SIRFilter) {
@@ -330,11 +330,11 @@ public class CollapseDataParallelism {
      * Checks if the 'args' for the i'th 'child' of the splitjoin are
      * constant and consistent with previous children.
      */
-    private List firstArgs; // args of first child
+    private List<?> firstArgs; // args of first child
     private String firstIdent; // name of first child
-    private boolean eligibleArgs(SIRFilter child, List args, int i) {
+    private boolean eligibleArgs(SIRFilter child, List<?> args, int i) {
         // for all children, check that the args are literals
-        for (Iterator it = args.iterator(); it.hasNext(); ) {
+        for (Iterator<?> it = args.iterator(); it.hasNext(); ) {
             JExpression arg = (JExpression)it.next();
             if (!(arg instanceof JLiteral)) {
                 return false;
@@ -348,8 +348,8 @@ public class CollapseDataParallelism {
             firstIdent = child.getIdent();
         } else {
             // for other children, compare to first args
-            Iterator first = firstArgs.iterator();
-            Iterator cur = args.iterator();
+            Iterator<?> first = firstArgs.iterator();
+            Iterator<?> cur = args.iterator();
             while (first.hasNext() && cur.hasNext()) {
                 // we know they are literals now
                 JLiteral lit1 = (JLiteral)first.next();

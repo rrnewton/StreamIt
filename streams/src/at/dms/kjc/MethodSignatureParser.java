@@ -99,7 +99,7 @@ public class MethodSignatureParser implements DeepCloneable {
     public synchronized CType[] parseMethodSignature(String signature) {
         // assert sig.charAt(0) == '(';
 
-        Vector  container = new Vector();
+        Vector<?>  container = new Vector<Object>();
         char[]  sig = signature.toCharArray();
         int     current = 1;
 

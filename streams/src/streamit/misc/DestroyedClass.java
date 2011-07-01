@@ -36,7 +36,7 @@ import java.lang.reflect.*;
 public class DestroyedClass extends Misc
 {
     private boolean Destroyed = false;
-    private static Class DestroyedClass;
+    private static Class<?> DestroyedClass;
 
 
     // The class initializer initializes thisClass
@@ -72,7 +72,7 @@ public class DestroyedClass extends Misc
         assert !Destroyed;
         Destroyed = true;
 
-        Class objectClass = this.getClass ();
+        Class<?> objectClass = this.getClass ();
         assert objectClass != null;
 
         for ( ; objectClass != DestroyedClass ; objectClass = objectClass.getSuperclass ())

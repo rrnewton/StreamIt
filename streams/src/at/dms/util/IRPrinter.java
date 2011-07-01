@@ -686,7 +686,7 @@ public class IRPrinter extends Utils implements SLIRVisitor
                                     JavaStyleComment[] comments)
     {
         blockStart("BlockStatement");
-        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
+        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
             ((JStatement)it.next()).accept(this);
         }
         // comments
@@ -1432,7 +1432,7 @@ public class IRPrinter extends Utils implements SLIRVisitor
         blockStart("SIRInitStatement");
         attrPrint("target ", target.toString());
         attrStart("args");
-        List args = self.getArgs();
+        List<?> args = self.getArgs();
         for (int i=0; i<args.size(); i++) {
             ((JExpression)args.get(i)).accept(this);
         }

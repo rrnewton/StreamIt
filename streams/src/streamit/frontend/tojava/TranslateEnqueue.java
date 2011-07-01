@@ -59,7 +59,7 @@ public class TranslateEnqueue extends FEReplacer
     private Function makeInitPath(StreamSpec ss)
     {
         FEContext context = ss.getContext();
-        List stmts = new ArrayList();
+        List<?> stmts = new ArrayList<Object>();
         Expression n = new ExprVar(context, "n");
         int i = 0;
         for (Iterator<Expression> iter = vals.iterator(); iter.hasNext(); )
@@ -118,7 +118,7 @@ public class TranslateEnqueue extends FEReplacer
         // If we have extra values, then generate an initPath function.
         if (!vals.isEmpty())
             {
-                List fns = new ArrayList(ssNew.getFuncs());
+                List<Function> fns = new ArrayList<Function>(ssNew.getFuncs());
                 fns.add(makeInitPath(ss));
                 ssNew = new StreamSpec(ssNew.getContext(), ssNew.getType(),
                                        ssNew.getStreamType(), ssNew.getName(),
@@ -147,7 +147,7 @@ public class TranslateEnqueue extends FEReplacer
                 Statement call = new StmtExpr(delay);
                 // Now add the statement to the function.
                 StmtBlock body = (StmtBlock)fnNew.getBody();
-                List stmts = new ArrayList(body.getStmts());
+                List<?> stmts = new ArrayList<Object>(body.getStmts());
                 stmts.add(call);
                 body = new StmtBlock(body.getContext(), stmts);
                 fnNew = new Function(fnNew.getContext(), fnNew.getCls(),

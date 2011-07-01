@@ -22,7 +22,7 @@ public class PartitionDot extends StreamItDot {
     private HashMap[] execCounts; // schedule for stream (only used if markIO is true)
     private HashMap<SIROperator, Object> partitions;
     // color managemet:
-    private HashMap<Long, String> colorMap = new HashMap(); // maps from a partition value to a color for that partition
+    private HashMap<Long, String> colorMap = new HashMap<Long, Object>(); // maps from a partition value to a color for that partition
     // for some reason, I can only get DOT colors to work in HSV.  Take the middle 9 points of an 11-point brewer scale:
     // http://www.personal.psu.edu/cab38/ColorBrewer/ColorBrewer.html
     private static final String[] color_table = {"\"0.59166,0.61,0.7\"",
@@ -131,9 +131,9 @@ public class PartitionDot extends StreamItDot {
     // assuming they are integral.  Useful for adding gradient
     // shading, like hotter colors for more work.
     private void mapColors(HashMap<SIROperator, Object> partitions) {
-        Set keySet = partitions.keySet();
-        Set valueSet = new HashSet();
-        for (Iterator it = keySet.iterator(); it.hasNext(); ) {
+        Set<?> keySet = partitions.keySet();
+        Set<Long> valueSet = new HashSet<Long>();
+        for (Iterator<?> it = keySet.iterator(); it.hasNext(); ) {
             Object next = it.next();
             // we go to a string and then back to a number as a
             // general way of representing what the partition info
@@ -141,7 +141,7 @@ public class PartitionDot extends StreamItDot {
             valueSet.add(Long.valueOf(""+partitions.get(next)));
         }
         // sort the value set
-        Long[] values = (Long[])valueSet.toArray(new Long[0]);
+        Long[] values = valueSet.toArray(new Long[0]);
         Arrays.sort(values);
         // map each value to the scaled part of the color array
         for (int i=0; i<values.length; i++) {
@@ -327,10 +327,10 @@ public class PartitionDot extends StreamItDot {
                                           HashMap[] execCounts) {
         // make a string representation for init/steady schedules
         HashMap<SIROperator, Object> stringMap = new HashMap<SIROperator, Object>();
-        HashSet allKeys = new HashSet();
+        HashSet<?> allKeys = new HashSet<Object>();
         allKeys.addAll(execCounts[0].keySet());
         allKeys.addAll(execCounts[1].keySet());
-        for (Iterator it = allKeys.iterator(); it.hasNext(); ) {
+        for (Iterator<?> it = allKeys.iterator(); it.hasNext(); ) {
             SIROperator op = (SIROperator)it.next();
             String string;
             // retain rate labels for filters

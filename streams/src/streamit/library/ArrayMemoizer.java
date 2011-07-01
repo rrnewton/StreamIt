@@ -21,9 +21,9 @@ import java.lang.reflect.Array;
 
 class ArrayInitArguments
 {
-    private Class componentType;
+    private Class<?> componentType;
     private int[] dimensions;
-    public ArrayInitArguments(Class _componentType, int[] _dimensions) 
+    public ArrayInitArguments(Class<?> _componentType, int[] _dimensions) 
     {
         componentType = _componentType;
         dimensions = _dimensions;
@@ -75,7 +75,7 @@ public class ArrayMemoizer
     public static Object initArray(Object sampleArrayOfType, int[] dimensions) 
         throws NegativeArraySizeException
     {
-        Class componentType = sampleArrayOfType.getClass().getComponentType();
+        Class<?> componentType = sampleArrayOfType.getClass().getComponentType();
         ArrayInitArguments args = new ArrayInitArguments(componentType, dimensions);
         Object lookupArray = singleton.storedArrays.get(args);
         if (lookupArray == null)

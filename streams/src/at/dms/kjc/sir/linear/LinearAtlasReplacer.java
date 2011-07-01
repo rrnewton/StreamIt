@@ -152,10 +152,10 @@ public class LinearAtlasReplacer extends LinearDirectReplacer implements Constan
      * }
      * </pre>
      **/
-    public Vector makePushStatementVector(LinearFilterRepresentation linearRep,
+    public Vector<?> makePushStatementVector(LinearFilterRepresentation linearRep,
                                           CType inputType,
                                           CType outputType) {
-        Vector result = new Vector();
+        Vector<?> result = new Vector<Object>();
 
         // make loop bodies and loop counters
         JVariableDefinition iVar = new JVariableDefinition(/* where */ null,  /* modifiers */ 0, /* type */ CStdType.Integer,

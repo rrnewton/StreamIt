@@ -29,7 +29,7 @@ public abstract class CharScanner implements TokenStream {
     protected ANTLRStringBuffer text; // text of current token
 
     protected boolean saveConsumedInput = true; // does consume() save characters?
-    protected Class tokenObjectClass; // what kind of tokens to create?
+    protected Class<?> tokenObjectClass; // what kind of tokens to create?
     protected boolean caseSensitive = true;
     protected boolean caseSensitiveLiterals = true;
     protected Hashtable<ANTLRHashString, Integer> literals; // set by subclass

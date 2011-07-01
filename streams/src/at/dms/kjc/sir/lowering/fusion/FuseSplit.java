@@ -505,7 +505,7 @@ public class FuseSplit {
             numExec = rep.splitter;
         }
         // make list of statements for work function
-        LinkedList list = new LinkedList();
+        LinkedList<?> list = new LinkedList<Object>();
         // in initMode, don't worry about code size
         if (initMode) {
             for (int k=0; k<weights.length; k++) {
@@ -678,7 +678,7 @@ public class FuseSplit {
         int sumOfWeights = join.getSumOfWeights();
 
         // make list of statements for work function
-        LinkedList list = new LinkedList();
+        LinkedList<?> list = new LinkedList<Object>();
 
         // increment the read indices by the pop amounts
         /*
@@ -796,7 +796,7 @@ public class FuseSplit {
         // add calls to init functions
         for (int i=0; i<sj.size(); i++) {
             SIRStream child = sj.get(i);
-            List params = sj.getParams(i);
+            List<?> params = sj.getParams(i);
             if (!child.needsInit()) {
                 continue;
             }
@@ -999,7 +999,7 @@ public class FuseSplit {
     private static JFieldDeclaration[] makeFields(SIRSplitJoin sj,
                                                   SJChildInfo[] childInfo)
     {
-        Iterator childIter;
+        Iterator<?> childIter;
         
         // Walk the list of children to get the total field length.
         int numFields = 0;

@@ -41,9 +41,9 @@ public class LowerInitFunctions implements StreamVisitor {
      * inserted at the beginning of an init function.  Adds statements
      * to <prologue> that do the registering.
      */
-    private void registerChildren(List children, List prologue) {
+    private void registerChildren(List<?> children, List<?> prologue) {
         // iterate in reverse order so they come out right
-        for (ListIterator it = children.listIterator(); it.hasNext(); ) {
+        for (ListIterator<?> it = children.listIterator(); it.hasNext(); ) {
             // extract child
             SIROperator child = (SIROperator)it.next();
             if (child instanceof SIRFileReader) {
@@ -277,7 +277,7 @@ public class LowerInitFunctions implements StreamVisitor {
      * Lowers an SIRInitStatement and returns the result.
      */
     private JStatement
-        lowerInitStatement(SIRStream str, List args) {
+        lowerInitStatement(SIRStream str, List<?> args) {
         // if the target is a special type that doesn't need
         // initializing, then just return an empty statement
         if (!str.needsInit()) {
@@ -383,7 +383,7 @@ public class LowerInitFunctions implements StreamVisitor {
 
         // first, a prologue that comes before the original statements
         // in the init function.  It is a list of statements.
-        List prologue = new LinkedList();
+        List<?> prologue = new LinkedList<Object>();
 
         // start building up the prologoue, in order...
         // first, set stream type to pipeline
@@ -403,7 +403,7 @@ public class LowerInitFunctions implements StreamVisitor {
         registerChildren(self.getChildren(), prologue);
 
         // rewrite SIR reg-receiver calls into LIR
-        ListIterator it = init.getStatementIterator();
+        ListIterator<?> it = init.getStatementIterator();
         while (it.hasNext())
             {
                 JStatement stmt = (JStatement)it.next();

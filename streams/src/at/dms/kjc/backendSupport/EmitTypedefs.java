@@ -19,12 +19,12 @@ public class EmitTypedefs {
      * @param backendbits   BackEndFactory to get access to rest of code.
      * @param p             a CodeGenPrintWriter on which to emit the C code.
      */
-    static public void emitTypedefs(SIRStructure[] structs, BackEndFactory backendbits, CodegenPrintWriter p) {
+    static public void emitTypedefs(SIRStructure[] structs, BackEndFactory<?, ?, ?, ?> backendbits, CodegenPrintWriter p) {
 
         // mess for getting typedefs for all vector types in program into vectorTypeDefs
         final Set<String> vectorTypeDefs = new HashSet<String>();
         for (int i = 0; i < backendbits.getComputeNodes().size(); i++) {
-            ComputeCodeStore c = backendbits.getComputeNodes().getNthComputeNode(i).getComputeCode();
+            ComputeCodeStore<?> c = backendbits.getComputeNodes().getNthComputeNode(i).getComputeCode();
             for (JFieldDeclaration m : c.getFields()) {
                 m.accept(new SLIREmptyVisitor(){
                     @Override

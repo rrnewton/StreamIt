@@ -102,7 +102,7 @@ public class InlineAssembly extends JStatement {
      * anything. InlineAssembly should be blackbox to everyone but
      * codegen.
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         //Utils.fail("accept(AttributeVisitor) not supported by InlineAssembly");
         return null;
     }

@@ -248,10 +248,10 @@ public class LinearIndirectReplacer extends LinearDirectReplacer implements Cons
      * }
      * </pre>
      **/
-    public Vector makePushStatementVector(LinearFilterRepresentation linearRep,
+    public Vector<?> makePushStatementVector(LinearFilterRepresentation linearRep,
                                           CType inputType,
                                           CType outputType) {
-        Vector result = new Vector();
+        Vector<?> result = new Vector<Object>();
 
         // declare our sum and count variables
         String NAME_SUM = "sum";

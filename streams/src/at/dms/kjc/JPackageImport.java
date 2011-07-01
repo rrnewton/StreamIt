@@ -139,7 +139,7 @@ public class JPackageImport extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         if (comments != null) {
             return p.visitComments(comments);
         }
@@ -170,7 +170,7 @@ public class JPackageImport extends JPhylum {
         super.deepCloneInto(other);
         other.name = (java.lang.String)at.dms.kjc.AutoCloner.cloneToplevel(this.name);
         other.comments = (at.dms.compiler.JavaStyleComment[])at.dms.kjc.AutoCloner.cloneToplevel(this.comments);
-        other.classesUsed = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.classesUsed);
+        other.classesUsed = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.classesUsed);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

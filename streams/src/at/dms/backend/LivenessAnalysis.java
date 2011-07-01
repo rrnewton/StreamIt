@@ -223,7 +223,7 @@ public class LivenessAnalysis {
         if (nodes.length == 1) {
             return nodes[0].getLivein();
         } else {
-            Vector  vect = new Vector();
+            Vector<?>  vect = new Vector<Object>();
 
             for (int i = 0; i < nodes.length; i++) {
                 QTemporary[]    tt = nodes[i].getLivein();
@@ -283,8 +283,8 @@ public class LivenessAnalysis {
     // DATA MEMBERS
     // --------------------------------------------------------------------
 
-    private Hashtable           hash = new Hashtable(); // collects temporaries
-    private Vector          vect = new Vector();
+    private Hashtable<?, ?>           hash = new Hashtable<Object, Object>(); // collects temporaries
+    private Vector<?>          vect = new Vector<Object>();
     private QTemporary[]            temps;   // List of temporaries
     private BasicBlock[]            bblocks; // List of basic blocks
     private BasicBlock[]            eblocks; // List of exception handler

@@ -44,7 +44,7 @@ public class UnflatFilter {
     /**
      * Set of all names (maps String->null) to prevent name collisions
      */
-    private static HashMap names=new HashMap();
+    private static HashMap<String, ?> names=new HashMap<String, Object>();
     /**
      * For linear filters, the A in its Ax+b representation.
      */

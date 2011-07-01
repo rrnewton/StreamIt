@@ -180,7 +180,7 @@ public class JStringLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         /*
           StringBuffer s = new StringBuffer();
           for (int i = 0; i < value.length(); i++) {

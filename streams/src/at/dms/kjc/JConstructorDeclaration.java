@@ -170,7 +170,7 @@ public class JConstructorDeclaration extends JMethodDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         Object Trash = genComments1(p);
         return p.visitConstructorDeclaration(this,
                                              modifiers,

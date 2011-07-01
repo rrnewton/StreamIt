@@ -27,7 +27,7 @@ public class ConstantProp {
      */
     public static void propagateAndUnroll(SIRStream str) {
         // start at the outermost loop with an empty set of constants
-        new ConstantProp(false).propagateAndUnroll(str, new Hashtable());
+        new ConstantProp(false).propagateAndUnroll(str, new Hashtable<JLocalVariable, Object>());
     }
 
     /**
@@ -39,13 +39,13 @@ public class ConstantProp {
      */  
     public static void propagateAndUnroll(SIRStream str, boolean removeDeadFields) {
         // start at the outermost loop with an empty set of constants
-        new ConstantProp(removeDeadFields).propagateAndUnroll(str, new Hashtable());
+        new ConstantProp(removeDeadFields).propagateAndUnroll(str, new Hashtable<JLocalVariable, Object>());
     }
     /**
      * Does the work on <str>, given that <constants> maps from
      * a JLocalVariable to a JLiteral for all constants that are known.
      */
-    private void propagateAndUnroll(SIRStream str, Hashtable constants) {
+    private void propagateAndUnroll(SIRStream str, Hashtable<JLocalVariable, ?> constants) {
         Unroller unroller;
         
         do {
@@ -166,7 +166,7 @@ public class ConstantProp {
     /**
      * Recurses from <str> into all its substreams.
      */
-    private void recurseFrom(SIRContainer str, Hashtable constants) {
+    private void recurseFrom(SIRContainer str, Hashtable<JLocalVariable, ?> constants) {
         // if we're at the bottom, we're done
         if (str.getInit()==null) {
             return;
@@ -193,19 +193,19 @@ public class ConstantProp {
     }
 
     class InitPropagator extends Propagator {
-        public InitPropagator(Hashtable constants) {
+        public InitPropagator(Hashtable<JLocalVariable, ?> constants) {
             super(constants);
         }
 
-        public InitPropagator(Hashtable constants,boolean write) {
+        public InitPropagator(Hashtable<JLocalVariable, ?> constants,boolean write) {
             super(constants,write);
         }
     
-        public Propagator construct(Hashtable constants) {
+        public Propagator construct(Hashtable<JLocalVariable, ?> constants) {
             return new InitPropagator(constants);
         }
     
-        public Propagator construct(Hashtable constants,boolean write) {
+        public Propagator construct(Hashtable<JLocalVariable, ?> constants,boolean write) {
             return new InitPropagator(constants,write);
         }
     
@@ -236,7 +236,7 @@ public class ConstantProp {
      * Recurses into <str> given that it is instantiated with
      * arguments <args>, and <constants> were built for the parent.
      */
-    private void recurseInto(SIRStream str, List args, Hashtable constants) {
+    private void recurseInto(SIRStream str, List<?> args, Hashtable<JLocalVariable, ?> constants) {
         JMethodDeclaration initMethod = str.getInit();
         // if there is no init function, we're done
         //System.err.println("   Recursing into:"+str);

@@ -835,7 +835,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
 
     protected boolean printExp(JExpression expr) {
 
-        List exps = splitForPrint(expr);
+        List<?> exps = splitForPrint(expr);
 
         // for timing runs we want an easily recognized bit of code 
         // that can not be optimized away by gcc
@@ -843,7 +843,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
         if (ToCCommon.alternatePrintsForTiming) {
             p.newline();
             p.print("// TIMER_PRINT_CODE: ");
-            for (Iterator i = exps.iterator(); i.hasNext();) {
+            for (Iterator<?> i = exps.iterator(); i.hasNext();) {
                 JExpression exp = ((JExpression)i.next());
                 p.print("__print_sink__ += (int)(");
                 exp.accept(this);
@@ -854,7 +854,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
         
         // now print for real...
         boolean printedOK = true;
-        for (Iterator i = exps.iterator(); i.hasNext();) {
+        for (Iterator<?> i = exps.iterator(); i.hasNext();) {
             JExpression exp = ((JExpression)i.next());
             CType t = null;
             try {

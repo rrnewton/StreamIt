@@ -44,7 +44,7 @@ class DefinitionFile {
                           String packageName,
                           String vocabulary,
                           String prefix,
-                          Vector definitions)
+                          Vector<?> definitions)
     {
         this.sourceFile = sourceFile;
         this.packageName    = packageName;
@@ -165,7 +165,7 @@ class DefinitionFile {
     /**
      * Adds keywords to vector
      */
-    public void putKeywords(Vector keywords, Vector types, String prefix) {
+    public void putKeywords(Vector<?> keywords, Vector<?> types, String prefix) {
         for (int i = 0; i < definitions.length; i++) {
             definitions[i].putKeyword(keywords, types, prefix);
         }

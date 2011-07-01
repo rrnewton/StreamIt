@@ -460,7 +460,7 @@ public class EmitSMPCode extends EmitCode {
      * @param p The CodegenPrintWriter (left open on return).
      */
     public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
-            ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
+            ComputeNode<?> n, CodegenPrintWriter p, CodeGen codegen) {
         
         p.println("// code for core " + n.getUniqueId());
         p.println(((Core)n).getComputeCode().getGlobalText());

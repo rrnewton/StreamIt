@@ -203,7 +203,7 @@ public class SIRScheduler implements Constants {
     private static void printExecutionCounts(HashMap[] result) {
         for (int i=0; i<2; i++) {
             System.err.println(i==0 ? "Initial counts:" : "Steady counts:");
-            for (java.util.Iterator it=result[i].keySet().iterator(); it.hasNext(); ) {
+            for (java.util.Iterator<?> it=result[i].keySet().iterator(); it.hasNext(); ) {
                 SIROperator op = (SIROperator)it.next();
                 int[] count = (int[])result[i].get(op);
                 System.err.println("  " + op.getName() + ": " + (count==null ? "empty" : "" + count[0]));

@@ -89,13 +89,13 @@ public class ToJava
      */
     public static Program emptyProgram()
     {
-        List streams = new java.util.ArrayList();
-        List structs = new java.util.ArrayList();
-        List helpers = new java.util.ArrayList();
+        List<?> streams = new java.util.ArrayList<Object>();
+        List<?> structs = new java.util.ArrayList<Object>();
+        List<?> helpers = new java.util.ArrayList<Object>();
         
         // Complex structure type:
-        List fields = new java.util.ArrayList();
-        List ftypes = new java.util.ArrayList();
+        List<?> fields = new java.util.ArrayList<Object>();
+        List<?> ftypes = new java.util.ArrayList<Object>();
         Type floattype = new TypePrimitive(TypePrimitive.TYPE_FLOAT);
         fields.add("real");
         ftypes.add(floattype);
@@ -106,8 +106,8 @@ public class ToJava
         structs.add(complexStruct);
 
         // float2
-        fields = new java.util.ArrayList();
-        ftypes = new java.util.ArrayList();
+        fields = new java.util.ArrayList<Object>();
+        ftypes = new java.util.ArrayList<Object>();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -115,8 +115,8 @@ public class ToJava
         structs.add(new TypeStruct(null, "float2", fields, ftypes));
 
         // float3
-        fields = new java.util.ArrayList();
-        ftypes = new java.util.ArrayList();
+        fields = new java.util.ArrayList<Object>();
+        ftypes = new java.util.ArrayList<Object>();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -126,8 +126,8 @@ public class ToJava
         structs.add(new TypeStruct(null, "float3", fields, ftypes));
 
         // float4
-        fields = new java.util.ArrayList();
-        ftypes = new java.util.ArrayList();
+        fields = new java.util.ArrayList<Object>();
+        ftypes = new java.util.ArrayList<Object>();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -138,8 +138,8 @@ public class ToJava
         ftypes.add(floattype);
         structs.add(new TypeStruct(null, "float4", fields, ftypes));
         
-        fields = new java.util.ArrayList(); 
-        ftypes = new java.util.ArrayList(); 
+        fields = new java.util.ArrayList<Object>(); 
+        ftypes = new java.util.ArrayList<Object>(); 
         TypeStruct stringStruct = new TypeStruct(null, "String", fields, ftypes);
         structs.add(stringStruct);
 
@@ -184,14 +184,14 @@ public class ToJava
                 Program pprog = parser.program();
                 if (pprog != null)
                     {
-                        List newStreams, newStructs, newHelpers;
-                        newStreams = new java.util.ArrayList();
+                        List<?> newStreams, newStructs, newHelpers;
+                        newStreams = new java.util.ArrayList<Object>();
                         newStreams.addAll(prog.getStreams());
                         newStreams.addAll(pprog.getStreams());
-                        newStructs = new java.util.ArrayList();
+                        newStructs = new java.util.ArrayList<Object>();
                         newStructs.addAll(prog.getStructs());
                         newStructs.addAll(pprog.getStructs());
-                        newHelpers = new java.util.ArrayList();
+                        newHelpers = new java.util.ArrayList<Object>();
                         newHelpers.addAll(prog.getHelpers());
                         newHelpers.addAll(pprog.getHelpers());
                         prog = new Program(null, newStreams, newStructs, newHelpers);

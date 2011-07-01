@@ -380,7 +380,7 @@ public class LinearAnalyzer extends EmptyStreamVisitor {
         LinearPrinter.println("Visiting pipeline: " + "(" + self + ")");
     
         // This bit just goes and prints out the children of the pipeline (for debugging)
-        Iterator kidIter = self.getChildren().iterator();
+        Iterator<?> kidIter = self.getChildren().iterator();
         LinearPrinter.println("Children: ");
         while(kidIter.hasNext()) {
             SIRStream currentKid = (SIRStream)kidIter.next();
@@ -559,7 +559,7 @@ public class LinearAnalyzer extends EmptyStreamVisitor {
 
 
         // this is just debugging information that gets printed
-        Iterator childIter = self.getChildren().iterator();
+        Iterator<?> childIter = self.getChildren().iterator();
         boolean nonLinearFlag = false;
         while(childIter.hasNext()) {
             SIROperator currentChild = (SIROperator)childIter.next();
@@ -588,7 +588,7 @@ public class LinearAnalyzer extends EmptyStreamVisitor {
         // are the splitter and the joiner so we get rid of them right off the
         // bat.
         List<LinearFilterRepresentation> repList = new LinkedList<LinearFilterRepresentation>();
-        List childList = self.getChildren(); // get copy of the child list 
+        List<?> childList = self.getChildren(); // get copy of the child list 
         childList.remove(0); childList.remove(childList.size()-1); // remove the splitter and the joiner
         childIter = childList.iterator();
         while (childIter.hasNext()) {

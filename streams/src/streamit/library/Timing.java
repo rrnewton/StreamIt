@@ -28,9 +28,9 @@ public class Timing {
     static long lastBegin; // time that the last operator started executing
     static Operator lastOp; // operator that was last running
     static long totalElapsedTime = 0; // the total elapsed time allotted to filters
-    static HashMap typeToElapsed = new HashMap(); // records the elapsed time spent in each operator type
+    static HashMap<Class<? extends Operator>, Long> typeToElapsed = new HashMap<Class<? extends Operator>, Long>(); // records the elapsed time spent in each operator type
     // to handle pull scheduling (dynamic rates), keep a stack of currently executing operators
-    static Stack executingOps = new Stack(); 
+    static Stack<Operator> executingOps = new Stack<Operator>(); 
 
     /**
      * When -profile is turned on, these functions are called to
@@ -64,7 +64,7 @@ public class Timing {
 
         // if we were previously executing some other filter, resume timing that one
         if (!executingOps.empty()) {
-            lastOp = (Operator)executingOps.pop();
+            lastOp = executingOps.pop();
             lastBegin = System.currentTimeMillis();
         } else {
             lastOp = null;
@@ -81,9 +81,9 @@ public class Timing {
         // record by class name -- this will collapsed separate
         // instances, which is a good thing for simplifying big graphs
         totalElapsedTime += elapsed;
-        Class type = op.getClass();
+        Class<? extends Operator> type = op.getClass();
         if (typeToElapsed.containsKey(type)) {
-            elapsed += ((Long)typeToElapsed.get(type)).longValue();
+            elapsed += typeToElapsed.get(type).longValue();
         }
         typeToElapsed.put(type, new Long(elapsed));
     }
@@ -93,13 +93,13 @@ public class Timing {
      */
     public static void saveTimingData() {
         // sort the entries by decreasing amount of work done
-        List entryList = new ArrayList(typeToElapsed.entrySet());
+        List<?> entryList = new ArrayList<Object>(typeToElapsed.entrySet());
         Collections.sort(entryList, new Comparator() {
                 public int compare(Object o1, Object o2) {
-                    Map.Entry e1 = (Map.Entry) o1;
-                    Map.Entry e2 = (Map.Entry) o2;
-                    Comparable c1 = (Comparable)e1.getValue();
-                    Comparable c2 = (Comparable)e2.getValue();
+                    Map.Entry<?, ?> e1 = (Map.Entry<?, ?>) o1;
+                    Map.Entry<?, ?> e2 = (Map.Entry<?, ?>) o2;
+                    Comparable<?> c1 = (Comparable<?>)e1.getValue();
+                    Comparable<Comparable<?>> c2 = (Comparable<Comparable<?>>)e2.getValue();
                     // sort in reverse order
                     return c2.compareTo(c1);
                 }
@@ -109,8 +109,8 @@ public class Timing {
         try {
             PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("profile.java.log")));
 
-            for (Iterator it = entryList.iterator(); it.hasNext(); ) {
-                Map.Entry entry = (Map.Entry)it.next();
+            for (Iterator<?> it = entryList.iterator(); it.hasNext(); ) {
+                Map.Entry<?, ?> entry = (Map.Entry<?, ?>)it.next();
                 String type = ((Class)entry.getKey()).toString();
                 Long value = (Long)entry.getValue();
 

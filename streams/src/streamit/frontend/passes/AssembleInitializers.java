@@ -43,7 +43,7 @@ public class AssembleInitializers extends FEReplacer
     {
         List<Statement> oldStatements = newStatements;
         newStatements = new java.util.ArrayList<Statement>();
-        for (ListIterator iter = block.getStmts().listIterator();
+        for (ListIterator<?> iter = block.getStmts().listIterator();
              iter.hasNext(); )
             {
                 Statement stmt = (Statement)iter.next();

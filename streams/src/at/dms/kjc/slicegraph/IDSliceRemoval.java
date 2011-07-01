@@ -83,7 +83,7 @@ public class IDSliceRemoval {
             indexToIndex.put(edge.getSrc(), outputs.size() - 1);
             DistributionUnroller.unroll(edge.getSrc());
         }
-        usOutputs = (OutputSliceNode[])outputs.toArray(new OutputSliceNode[0]);
+        usOutputs = outputs.toArray(new OutputSliceNode[0]);
         usOutputIndices = new int[usOutputs.length];
         Arrays.fill(usOutputIndices, -1);
         
@@ -94,7 +94,7 @@ public class IDSliceRemoval {
             indexToIndex.put(edge.getDest(), inputs.size() - 1);
             DistributionUnroller.unroll(edge.getDest());
         }
-        dsInputs = (InputSliceNode[])inputs.toArray(new InputSliceNode[0]);
+        dsInputs = inputs.toArray(new InputSliceNode[0]);
         dsInputIndices = new int[dsInputs.length];
         Arrays.fill(dsInputIndices, -1);
         

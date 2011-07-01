@@ -152,5 +152,5 @@ public interface Constants extends at.dms.classfile.Constants {
     // UTILITIES EMPTY COLLECTION
     // ----------------------------------------------------------------------
 
-    Vector  VECTOR_EMPTY    = new Vector();
+    Vector<?>  VECTOR_EMPTY    = new Vector<Object>();
 }

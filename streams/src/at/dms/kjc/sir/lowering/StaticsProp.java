@@ -494,7 +494,7 @@ public class StaticsProp {
                         new HashMap<StaticAndField,String>();
                     // if any references to statics in stream
                     if (toPropagate != null) { 
-                        for (Iterator it = toPropagate.iterator();
+                        for (Iterator<?> it = toPropagate.iterator();
                           it.hasNext();) {
                             StaticAndField sf = (StaticAndField)it.next();
                                 
@@ -515,7 +515,7 @@ public class StaticsProp {
                                 new LinkedList<JStatement>();
                             List<JStatement> oldAssignments = 
                                 staticNameToAssignments.get(sf);
-                            for (Iterator i = oldAssignments.iterator(); i
+                            for (Iterator<?> i = oldAssignments.iterator(); i
                                     .hasNext();) {
                                 newAssignments
                                 .addLast((JStatement) ObjectDeepCloner
@@ -631,7 +631,7 @@ public class StaticsProp {
         final String oldFieldName = sf.getTheField();
         
 
-        for (Iterator it = theCode.iterator(); it.hasNext();) {
+        for (Iterator<?> it = theCode.iterator(); it.hasNext();) {
             ((JStatement)it.next()).accept(new KjcEmptyVisitor() {
                 public void visitFieldExpression(JFieldAccessExpression self,
                                                  JExpression left, 
@@ -699,7 +699,7 @@ public class StaticsProp {
         // Add declaration or local and assignments in body of init.
         JMethodDeclaration init = str.getInit();
         JBlock body = init.getBody();
-        ListIterator stmtIter = body.getStatementIterator();
+        ListIterator<?> stmtIter = body.getStatementIterator();
         // iterate past JVariableDeclarationStatement's
         while (stmtIter.hasNext() 
                && stmtIter.next() instanceof JVariableDeclarationStatement){}

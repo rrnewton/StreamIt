@@ -162,7 +162,7 @@ public abstract class JPhylum extends at.dms.compiler.Phylum implements Constant
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public abstract Object accept(AttributeVisitor p);
+    public abstract Object accept(AttributeVisitor<?> p);
 
     /**
      * Sets the line number of this phylum in the code sequence.

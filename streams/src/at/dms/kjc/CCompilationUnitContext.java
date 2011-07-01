@@ -55,7 +55,7 @@ public class CCompilationUnitContext extends CContext {
      */
     CCompilationUnitContext(Compiler compiler,
                             CCompilationUnit cunit,
-                            Vector classes)
+                            Vector<?> classes)
     {
         super(null);
         this.compiler = compiler;
@@ -170,7 +170,7 @@ public class CCompilationUnitContext extends CContext {
     // ----------------------------------------------------------------------
 
     private /*final*/ Compiler      compiler;
-    private /*final*/ Vector        classes;
+    private /*final*/ Vector<?>        classes;
     private /*final*/ CCompilationUnit  cunit;
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
@@ -187,7 +187,7 @@ public class CCompilationUnitContext extends CContext {
     protected void deepCloneInto(at.dms.kjc.CCompilationUnitContext other) {
         super.deepCloneInto(other);
         other.compiler = (at.dms.compiler.Compiler)at.dms.kjc.AutoCloner.cloneToplevel(this.compiler);
-        other.classes = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.classes);
+        other.classes = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.classes);
         other.cunit = (at.dms.kjc.CCompilationUnit)at.dms.kjc.AutoCloner.cloneToplevel(this.cunit);
     }
 

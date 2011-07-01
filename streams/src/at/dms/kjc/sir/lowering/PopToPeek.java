@@ -68,8 +68,8 @@ public class PopToPeek extends EmptyStreamVisitor implements Constants {
     }
     
     /** returns a list of pop statements that are appended on the end of the work function. **/
-    public List makePopStatements(int popCount, CType tapeType) {
-        LinkedList popList = new LinkedList();
+    public List<?> makePopStatements(int popCount, CType tapeType) {
+        LinkedList<?> popList = new LinkedList<Object>();
         for (int i=0; i<popCount; i++) {
             popList.add(new JExpressionStatement(null, new SIRPopExpression(tapeType), null));
         }

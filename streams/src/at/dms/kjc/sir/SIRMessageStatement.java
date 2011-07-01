@@ -122,9 +122,9 @@ public class SIRMessageStatement extends JStatement {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor)p).visitMessageStatement(this,
+            return ((SLIRAttributeVisitor<?>)p).visitMessageStatement(this,
                                                                    portal,
                                                                    iname,
                                                                    ident,

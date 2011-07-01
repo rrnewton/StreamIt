@@ -142,7 +142,7 @@ public class AssignLoopTypes extends FEReplacer
                 // If so, assume it's T->T.
                 if (st == null)
                     {
-                        List types = scs.getTypes();
+                        List<?> types = scs.getTypes();
                         if (!types.isEmpty())
                             st = new StreamType(sc.getContext(),
                                                 (Type)types.get(0),

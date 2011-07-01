@@ -269,7 +269,7 @@ public abstract class SIRSlicer extends Slicer {
      */
     public FilterSliceNode getSliceBNFilter(Slice slice) {
         assert bottleNeckFilter.containsKey(slice);
-        return (FilterSliceNode)bottleNeckFilter.get(slice);
+        return bottleNeckFilter.get(slice);
     }
     
     

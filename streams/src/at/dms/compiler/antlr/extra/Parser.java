@@ -94,7 +94,7 @@ public abstract class Parser extends LLkParser {
     /**
      *
      */
-    protected Vector getComment() {
+    protected Vector<?> getComment() {
         return null; // scanner.getComment();
     }
 

@@ -430,7 +430,7 @@ public class KjcEmptyVisitor implements Constants, KjcVisitor {
      */
     public void visitBlockStatement(JBlock self,
                                     JavaStyleComment[] comments) {
-        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
+        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
             ((JStatement)it.next()).accept(this);
         }
     }

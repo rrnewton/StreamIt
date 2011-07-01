@@ -168,7 +168,7 @@ class TokenDefinition {
     /**
      * Adds keywords to vector
      */
-    public void putKeyword(Vector keywords, Vector types, String prefix) {
+    public void putKeyword(Vector<?> keywords, Vector<?> types, String prefix) {
         if (type == LITERAL || type == KEYWORD) {
             keywords.addElement(value == null ? name : value);
             types.addElement(type == LITERAL ? prefix + name : name);

@@ -75,7 +75,7 @@ public class JClassFieldDeclarator extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         return    null;   // utility class for classfile
     }
 

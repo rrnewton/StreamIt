@@ -267,10 +267,10 @@ class ModuloPipelineFusion {
         for (ListIterator<FilterInfo> it = filterInfo.listIterator(); it.hasNext(); ) {
             FilterInfo info = it.next();
             // get list of local variable definitions from <filterInfo>
-            List locals = 
+            List<?> locals = 
                 init ? info.init.getVariables() : info.steady.getVariables();
             // go through locals, adding variable declaration
-            for (ListIterator loc = locals.listIterator(); loc.hasNext(); ) {
+            for (ListIterator<?> loc = locals.listIterator(); loc.hasNext(); ) {
                 // get local
                 JVariableDefinition local = 
                     (JVariableDefinition)loc.next();
@@ -837,7 +837,7 @@ class ModuloPipelineFusion {
          * A list of the arguments to the init function of the fused
          * block, all of type JExpression.
          */
-        private List fusedArgs;
+        private List<?> fusedArgs;
 
         /**
          * Cached copy of the method decl for the init function.
@@ -858,7 +858,7 @@ class ModuloPipelineFusion {
             this.filterInfo = filterInfo;
             this.fusedBlock = new JBlock();
             this.fusedParam = new LinkedList<JFormalParameter>();
-            this.fusedArgs = new LinkedList();
+            this.fusedArgs = new LinkedList<Object>();
             this.numFused = 0;
         }
 
@@ -877,7 +877,7 @@ class ModuloPipelineFusion {
          * incorporate this info into the init function of the fused
          * filter.
          */
-        private void processArgs(FilterInfo info, List args) {
+        private void processArgs(FilterInfo info, List<?> args) {
             // make parameters for <args>, and build <newArgs> to pass
             // to new init function call
             JExpression[] newArgs = new JExpression[args.size()];
@@ -949,7 +949,7 @@ class ModuloPipelineFusion {
          * Returns the list of arguments that should be passed to init
          * function.
          */
-        public List getInitArgs() {
+        public List<?> getInitArgs() {
             return fusedArgs;
         }
     
