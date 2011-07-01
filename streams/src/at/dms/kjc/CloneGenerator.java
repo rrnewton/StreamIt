@@ -1,12 +1,12 @@
 package at.dms.kjc;
 
-import at.dms.util.*;
-import at.dms.kjc.*;
-
-import java.security.Permission;
-import java.util.*;
-import java.lang.reflect.*;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.security.Permission;
+import java.util.HashSet;
+
+import at.dms.util.Utils;
 
 /**
  * This class will generate code to clone fields that it thinks should

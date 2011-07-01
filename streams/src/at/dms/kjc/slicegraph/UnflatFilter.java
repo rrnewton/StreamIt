@@ -1,8 +1,10 @@
 package at.dms.kjc.slicegraph;
 
-import at.dms.kjc.sir.*;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Intermediate file used in (super) synch removal. Represents filter

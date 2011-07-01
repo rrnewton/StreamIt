@@ -28,10 +28,6 @@ import java.io.PrintWriter;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import at.dms.compiler.tools.common.Message;
-import at.dms.compiler.tools.common.MessageDescription;
-import at.dms.compiler.tools.common.Utils;
-
 /**
  * This class defines the common behaviour of all KOPI compilers.
  */

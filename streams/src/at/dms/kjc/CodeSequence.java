@@ -29,7 +29,21 @@ package at.dms.kjc;
 import java.util.Stack;
 import java.util.Vector;
 
-import at.dms.classfile.*;
+import at.dms.classfile.AccessorContainer;
+import at.dms.classfile.AccessorTransformer;
+import at.dms.classfile.BadAccessorException;
+import at.dms.classfile.ClassRefInstruction;
+import at.dms.classfile.FieldRefInstruction;
+import at.dms.classfile.HandlerInfo;
+import at.dms.classfile.Instruction;
+import at.dms.classfile.InstructionAccessor;
+import at.dms.classfile.JumpInstruction;
+import at.dms.classfile.LineNumberInfo;
+import at.dms.classfile.LocalVarInstruction;
+import at.dms.classfile.LocalVariableInfo;
+import at.dms.classfile.MethodRefInstruction;
+import at.dms.classfile.NewarrayInstruction;
+import at.dms.classfile.NoArgInstruction;
 import at.dms.util.InconsistencyException;
 import at.dms.util.Utils;
 

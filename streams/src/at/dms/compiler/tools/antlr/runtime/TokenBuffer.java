@@ -35,7 +35,6 @@ package at.dms.compiler.tools.antlr.runtime;
  * @see at.dms.compiler.tools.antlr.runtime.TokenQueue
  */
 
-import java.io.IOException;
 
 public class TokenBuffer {
 

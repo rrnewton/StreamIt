@@ -16,18 +16,19 @@
 
 package streamit.scheduler2.print;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.DataOutputStream;
-import streamit.scheduler2.iriter.FilterIter;
-import streamit.scheduler2.iriter.PipelineIter;
-import streamit.scheduler2.iriter.SplitJoinIter;
-import streamit.scheduler2.iriter.FeedbackLoopIter;
-import streamit.scheduler2.iriter.IteratorBase;
-import streamit.scheduler2.iriter.Iterator;
-import streamit.misc.Pair;
+
 import streamit.misc.OMap;
 import streamit.misc.OMapIterator;
+import streamit.misc.Pair;
+import streamit.scheduler2.iriter.FeedbackLoopIter;
+import streamit.scheduler2.iriter.FilterIter;
+import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.iriter.IteratorBase;
+import streamit.scheduler2.iriter.PipelineIter;
+import streamit.scheduler2.iriter.SplitJoinIter;
 
 public class PrintProgram extends streamit.misc.AssertedClass
 {

@@ -20,7 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.Token;
 
 class StringLiteralElement extends GrammarAtom {
     // atomText with quotes stripped and escape codes processed

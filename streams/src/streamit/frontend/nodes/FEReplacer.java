@@ -16,11 +16,14 @@
 
 package streamit.frontend.nodes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import streamit.frontend.tojava.*;
-import java.util.ArrayList;
+
+import streamit.frontend.tojava.ExprJavaConstructor;
+import streamit.frontend.tojava.StmtIODecl;
+import streamit.frontend.tojava.StmtSetTypes;
 
 /**
  * Replaces nodes in a front-end tree.  

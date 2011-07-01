@@ -2,11 +2,8 @@ package at.dms.kjc.slicegraph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import at.dms.kjc.flatgraph.DataFlowTraversal;
 
 /**
  * The new synch remover to replace Jasp's old synch remover in converting a SIR graph to a slice graph (not yet integrated and tested).

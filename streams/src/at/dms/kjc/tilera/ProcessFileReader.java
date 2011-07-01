@@ -1,13 +1,23 @@
 package at.dms.kjc.tilera;
 
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.backendSupport.*;
 import java.io.File;
-
-import at.dms.kjc.*;
-
 import java.util.HashMap;
 import java.util.HashSet;
+
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.slicegraph.FileInputContent;
+import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slicegraph.OutputSliceNode;
+import at.dms.kjc.slicegraph.SchedulingPhase;
 
 public class ProcessFileReader {
     

@@ -16,24 +16,19 @@
 
 package streamit.scheduler2;
 
-import streamit.misc.DestroyedClass;
-import streamit.misc.UniquePairContainer;
-import streamit.misc.Pair;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
-import streamit.scheduler2.iriter./*persistent.*/
-    Iterator;
-import streamit.scheduler2.iriter./*persistent.*/
-    FilterIter;
-import streamit.scheduler2.iriter./*persistent.*/
-    PipelineIter;
-import streamit.scheduler2.iriter./*persistent.*/
-    SplitJoinIter;
-import streamit.scheduler2.iriter./*persistent.*/
-    FeedbackLoopIter;
-import streamit.scheduler2.Schedule;
+import java.util.Map;
+import java.util.Set;
+
+import streamit.misc.DestroyedClass;
+import streamit.misc.Pair;
+import streamit.misc.UniquePairContainer;
+import streamit.scheduler2.iriter.FeedbackLoopIter;
+import streamit.scheduler2.iriter.FilterIter;
+import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.iriter.PipelineIter;
+import streamit.scheduler2.iriter.SplitJoinIter;
 
 /**
  * This class uses a valid schedule and an iterator to determine 

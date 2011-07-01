@@ -1,8 +1,9 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
-import at.dms.util.Utils;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.sir.SIRPrintStatement;
 
 /**
  * This class gathers common code for printing on the raw simulator,

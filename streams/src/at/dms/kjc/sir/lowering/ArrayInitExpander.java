@@ -1,10 +1,20 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JArrayInitializer;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFloatLiteral;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.JStringLiteral;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class expands array initializers that read from files into

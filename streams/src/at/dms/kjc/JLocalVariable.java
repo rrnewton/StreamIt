@@ -20,9 +20,11 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.TokenReference;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import at.dms.compiler.CWarning;
-import java.io.*;
+import at.dms.compiler.TokenReference;
 
 /**
  * This class represents a local variable declaration

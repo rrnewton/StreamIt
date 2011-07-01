@@ -16,9 +16,8 @@
 
 package streamit.misc;
 
-import java.util.Map;
 import java.util.HashMap;
-import streamit.misc.Pair;
+import java.util.Map;
 
 /* $Id: UniquePairContainer.java,v 1.5 2006-09-25 13:54:55 dimock Exp $ */
 

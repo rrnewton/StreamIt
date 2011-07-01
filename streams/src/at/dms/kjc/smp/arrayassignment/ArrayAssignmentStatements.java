@@ -1,8 +1,8 @@
 package at.dms.kjc.smp.arrayassignment;
 
-import at.dms.kjc.JStatement;
+import java.util.LinkedList;
 
-import java.util.*;
+import at.dms.kjc.JStatement;
 
 public class ArrayAssignmentStatements {
     

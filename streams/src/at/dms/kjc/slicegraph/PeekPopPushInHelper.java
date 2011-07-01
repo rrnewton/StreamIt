@@ -1,7 +1,12 @@
 package at.dms.kjc.slicegraph;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
 
 /**
  * This class will search for all communication expressions outside of the work

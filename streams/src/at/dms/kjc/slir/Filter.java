@@ -10,7 +10,6 @@ import java.util.Vector;
 import at.dms.kjc.CType;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRPhasedFilter;
 
 

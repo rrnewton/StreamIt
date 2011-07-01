@@ -23,11 +23,13 @@ package at.dms.kjc;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import at.dms.classfile.ClassPath;
 import at.dms.classfile.ClassFileFormatException;
+import at.dms.classfile.ClassPath;
 import at.dms.compiler.CWarning;
 import at.dms.compiler.Compiler;
 import at.dms.compiler.CompilerMessages;

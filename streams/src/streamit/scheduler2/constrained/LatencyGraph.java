@@ -16,15 +16,14 @@
 
 package streamit.scheduler2.constrained;
 
-import streamit.misc.DLList;
-import streamit.misc.DLList_const;
-import streamit.misc.DLListIterator;
-
-import java.util.Iterator;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Stack;
 
+import streamit.misc.DLList;
+import streamit.misc.DLListIterator;
+import streamit.misc.DLList_const;
 import streamit.scheduler2.SDEPData;
 
 /**

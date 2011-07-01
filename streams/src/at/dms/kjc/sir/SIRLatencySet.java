@@ -1,8 +1,12 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import java.util.TreeSet;
 import java.util.Iterator;
+import java.util.TreeSet;
+
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * A set of Integers corresponding to possible latencies for message

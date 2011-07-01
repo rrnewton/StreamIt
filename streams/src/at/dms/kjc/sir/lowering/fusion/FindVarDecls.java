@@ -1,9 +1,15 @@
 
 package at.dms.kjc.sir.lowering.fusion;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import java.util.HashMap;
+
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIREmptyVisitor;
 
 /**
  * Unused!

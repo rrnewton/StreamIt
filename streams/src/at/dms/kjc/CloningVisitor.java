@@ -1,13 +1,22 @@
 package at.dms.kjc;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.*;
-import at.dms.compiler.JavaStyleComment;
+import java.util.HashSet;
 
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.Array;
+import at.dms.compiler.JavaStyleComment;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRPhasedFilterIter;
+import at.dms.kjc.iterator.SIRPipelineIter;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRInitStatement;
+import at.dms.kjc.sir.SIRPhasedFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.StreamVisitor;
 
 /**
  * This descends through a stream hierarchy and identifies local

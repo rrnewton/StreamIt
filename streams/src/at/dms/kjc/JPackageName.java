@@ -20,8 +20,8 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.TokenReference;
 import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.TokenReference;
 
 /**
  * This class represents the "package at.dms.kjc" statement

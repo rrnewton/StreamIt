@@ -16,11 +16,10 @@
 
 package streamit.scheduler2.singleappearance;
 
-import streamit.scheduler2.iriter./*persistent.*/
-    SplitJoinIter;
 import streamit.scheduler2.base.StreamFactory;
-import streamit.scheduler2.hierarchical.StreamInterface;
 import streamit.scheduler2.hierarchical.PhasingSchedule;
+import streamit.scheduler2.hierarchical.StreamInterface;
+import streamit.scheduler2.iriter.SplitJoinIter;
 
 /**
  * This class implements a single-appearance algorithm for creating

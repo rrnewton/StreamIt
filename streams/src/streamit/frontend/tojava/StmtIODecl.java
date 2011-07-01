@@ -16,7 +16,12 @@
 
 package streamit.frontend.tojava;
 
-import streamit.frontend.nodes.*;
+import streamit.frontend.nodes.Expression;
+import streamit.frontend.nodes.FEContext;
+import streamit.frontend.nodes.FEVisitor;
+import streamit.frontend.nodes.FuncWork;
+import streamit.frontend.nodes.Function;
+import streamit.frontend.nodes.Statement;
 
 /**
  * This statement is used to indicate that a given function has a

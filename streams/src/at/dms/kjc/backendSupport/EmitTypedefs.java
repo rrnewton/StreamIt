@@ -1,10 +1,18 @@
 package at.dms.kjc.backendSupport;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.CVectorType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.common.CodegenPrintWriter;
-import at.dms.kjc.sir.SIRStructure;
-import java.util.*;
-import at.dms.kjc.*;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.sir.SIRStructure;
 
 /**
  * Emit code defining the vector types and structure types used in the program.

@@ -1,9 +1,14 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
-import at.dms.kjc.slicegraph.*;
+import java.io.FileWriter;
 
-import java.io.*;
+import at.dms.kjc.slicegraph.Edge;
+import at.dms.kjc.slicegraph.FilterContent;
+import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.SIRSlicer;
+import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slicegraph.SliceNode;
 
 /** Dump a graph with info about slices and channels. */
 public class DumpSlicesAndChannels {

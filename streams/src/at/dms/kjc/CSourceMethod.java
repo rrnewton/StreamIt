@@ -20,8 +20,8 @@
 
 package at.dms.kjc;
 
-import at.dms.classfile.MethodInfo;
 import at.dms.classfile.CodeInfo;
+import at.dms.classfile.MethodInfo;
 
 /**
  * This class represents an exported member of a class (fields)

@@ -20,8 +20,8 @@
 
 package at.dms.backend;
 
-import java.util.Vector;
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * This class compute the liveness of each temporaries

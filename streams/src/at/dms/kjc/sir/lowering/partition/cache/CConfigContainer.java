@@ -1,16 +1,18 @@
 package at.dms.kjc.sir.lowering.partition.cache;
 
-import java.util.*;
-import java.io.*;
+import java.util.LinkedList;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.fusion.FuseAll;
+import at.dms.kjc.sir.lowering.fusion.FusePipe;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
+import at.dms.kjc.sir.lowering.partition.PartitionRecord;
+import at.dms.kjc.sir.lowering.partition.RecordingStreamVisitor;
+import at.dms.util.Utils;
 
 abstract class CConfigContainer extends CConfig {
     /**

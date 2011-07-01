@@ -16,10 +16,11 @@
 
 package streamit.scheduler2.base;
 
-import streamit.scheduler2.iriter.FeedbackLoopIter;
 import java.math.BigInteger;
+
 import streamit.misc.Fraction;
-import at.dms.kjc.sir.*;
+import streamit.scheduler2.iriter.FeedbackLoopIter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Computes some basic steady state data for FeedbackLoops.

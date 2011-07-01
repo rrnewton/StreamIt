@@ -16,8 +16,10 @@
 
 package streamit.library;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class Cloner extends streamit.misc.DestroyedClass {
     /**

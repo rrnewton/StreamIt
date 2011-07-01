@@ -3,15 +3,50 @@
  */
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import java.util.regex.*;
-import java.lang.IllegalArgumentException;
-import at.dms.kjc.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.EmptyAttributeVisitor;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JNameExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JTypeNameExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcEmptyVisitor;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.ReplacingVisitor;
+import at.dms.kjc.SLIREmptyAttributeVisitor;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRGlobal;
+import at.dms.kjc.sir.SIRPhasedFilter;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRToStreamIt;
-import at.dms.kjc.sir.lowering.ConstantProp;
 
 /**
  * StaticsProp propagates constants from 'static' sections.

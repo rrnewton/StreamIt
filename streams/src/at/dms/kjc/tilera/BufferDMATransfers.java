@@ -1,10 +1,27 @@
 package at.dms.kjc.tilera;
 
-import java.util.LinkedList;
 import java.util.List;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.*;
+
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.slicegraph.InputSliceNode;
+import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slicegraph.SchedulingPhase;
 
 public class BufferDMATransfers extends BufferTransfers {
     /** reference to head if this input buffer is shared as an output buffer */

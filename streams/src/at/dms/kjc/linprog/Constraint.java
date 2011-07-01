@@ -1,7 +1,6 @@
 package at.dms.kjc.linprog;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
 
 /**
  * Representation of a constraint for linprog package.

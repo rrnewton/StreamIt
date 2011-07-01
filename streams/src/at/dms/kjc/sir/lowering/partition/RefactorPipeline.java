@@ -1,12 +1,9 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.sir.lowering.fusion.Lifter;
 import java.util.List;
+
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class is for refactoring pipelines.

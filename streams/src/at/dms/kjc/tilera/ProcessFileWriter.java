@@ -1,12 +1,14 @@
 package at.dms.kjc.tilera;
 
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
 import at.dms.kjc.JBlock;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slicegraph.FileOutputContent;
+import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.SchedulingPhase;
 
 public class ProcessFileWriter {
     private static int totalOutputs = 0;

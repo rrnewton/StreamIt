@@ -1,8 +1,9 @@
 package at.dms.kjc.lir;
 
-import at.dms.compiler.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.sir.SIRInterfaceTable;
+import at.dms.kjc.sir.SIRPortal;
 
 /**
  * Call to the C library register_receiver() function.

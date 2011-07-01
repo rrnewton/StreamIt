@@ -1,10 +1,20 @@
 package at.dms.kjc.slicegraph;
 
-import java.util.*;
 import java.io.FileWriter;
-import at.dms.kjc.sir.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.linear.FilterMatrix;
+import at.dms.kjc.sir.linear.LinearAnalyzer;
+import at.dms.kjc.sir.linear.LinearFilterRepresentation;
 import at.dms.util.Utils;
-import at.dms.kjc.sir.linear.*;
 
 /**
  * Flatten graph with new synch removal. Removes structure and reveals

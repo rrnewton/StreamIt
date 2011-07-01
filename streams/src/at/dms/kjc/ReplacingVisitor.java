@@ -1,12 +1,9 @@
 package at.dms.kjc;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
+import java.util.ListIterator;
+
 import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.JavadocComment;
+import at.dms.util.Utils;
 
 /**
  * This class descends through the tree, and tests if any of the

@@ -1,6 +1,5 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.sir.*;
 import at.dms.kjc.slicegraph.SliceNode;
 
 public class SMD extends Scheduler {

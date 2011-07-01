@@ -1,11 +1,36 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
+import java.util.Iterator;
+import java.util.List;
+
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.TokenReference;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JDoubleLiteral;
+import at.dms.kjc.JEqualityExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFloatLiteral;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIfStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JNullLiteral;
+import at.dms.kjc.JReturnStatement;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Create initPath() functions for feedback loops that don't have them.

@@ -1,7 +1,9 @@
 package at.dms.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Intended to be used in conjunction with ConstList, if one user

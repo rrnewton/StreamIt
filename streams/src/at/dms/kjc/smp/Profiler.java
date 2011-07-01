@@ -1,15 +1,13 @@
 package at.dms.kjc.smp;
 
+import java.io.IOException;
+
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CodegenPrintWriter;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class Profiler {
 

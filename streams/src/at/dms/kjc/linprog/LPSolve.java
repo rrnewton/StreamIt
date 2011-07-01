@@ -1,10 +1,5 @@
 package at.dms.kjc.linprog;
 
-import lpsolve.lprec;
-import lpsolve.constant;
-import lpsolve.solve;
-
-import at.dms.util.*;
 
 /**
  * This is an integer linear program solver based on the Java port of

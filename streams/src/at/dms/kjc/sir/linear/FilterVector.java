@@ -1,6 +1,5 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.*;
 
 /**
  * A FilterVector is, at its most basic level, a simple, one dimensional

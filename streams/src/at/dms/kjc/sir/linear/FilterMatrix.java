@@ -1,7 +1,5 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.*;
-import at.dms.util.Utils;
 
 /**
  * A FilterMatrix represents a matrix for use in the 

@@ -1,7 +1,8 @@
 package at.dms.kjc.smp.arrayassignment;
 
-import at.dms.kjc.*;
-import at.dms.kjc.smp.*;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.smp.Util;
 
 public class LoopedAssignments implements AAStatement {
     public static final int MIN_LOOP_ITERATIONS = 10;

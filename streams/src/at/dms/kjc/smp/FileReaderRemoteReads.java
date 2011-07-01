@@ -1,15 +1,14 @@
 package at.dms.kjc.smp;
 
 import java.util.List;
-import java.util.LinkedList;
-import at.dms.kjc.smp.arrayassignment.*;
-import at.dms.kjc.JEmittedTextExpression;
-import at.dms.kjc.JExpressionStatement;
+
 import at.dms.kjc.JStatement;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.slicegraph.fission.*;
+import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.smp.arrayassignment.ArrayAssignmentStatements;
 
 
 public class FileReaderRemoteReads extends FileReaderCode {

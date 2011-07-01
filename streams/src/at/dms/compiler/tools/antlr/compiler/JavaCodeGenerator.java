@@ -20,11 +20,17 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.util.Enumeration;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.BitSet;
+import at.dms.compiler.tools.antlr.runtime.CharFormatter;
+import at.dms.compiler.tools.antlr.runtime.CharStreamException;
+import at.dms.compiler.tools.antlr.runtime.RecognitionException;
+import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
+import at.dms.compiler.tools.antlr.runtime.Vector;
 
 /**
  * A Java code generator.

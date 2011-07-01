@@ -1,6 +1,6 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.kjc.*;
+import at.dms.kjc.KjcOptions;
 
 /**
  * This interface contains estimates of work for various operations.

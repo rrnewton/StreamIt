@@ -21,11 +21,10 @@
 package at.dms.kjc;
 
 import java.io.Serializable;
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import at.dms.classfile.InvokeinterfaceInstruction;
-import at.dms.classfile.MethodInfo;
 import at.dms.compiler.UnpositionedError;
 import at.dms.util.InconsistencyException;
 

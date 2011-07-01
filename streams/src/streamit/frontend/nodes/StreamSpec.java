@@ -16,11 +16,10 @@
 
 package streamit.frontend.nodes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import java.util.ArrayList;
 
 /**
  * Container class containing all of the state for a StreamIt stream

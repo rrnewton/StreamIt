@@ -20,11 +20,13 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.util.Hashtable;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Enumeration;
-import java.io.*;
+import java.util.Hashtable;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.ANTLRException;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
 
 public class Hierarchy {
     public Hierarchy() {

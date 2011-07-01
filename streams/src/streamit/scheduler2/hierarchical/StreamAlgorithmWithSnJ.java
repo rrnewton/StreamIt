@@ -16,8 +16,8 @@
 
 package streamit.scheduler2.hierarchical;
 
-import streamit.scheduler2.base.StreamInterfaceWithSnJ.SplitFlow;
 import streamit.scheduler2.base.StreamInterfaceWithSnJ.JoinFlow;
+import streamit.scheduler2.base.StreamInterfaceWithSnJ.SplitFlow;
 
 /**
  * This class provides an implementation for StreamInterface.

@@ -1,12 +1,12 @@
 package at.dms.kjc.sir.statespace.transform;
 
-import at.dms.kjc.sir.statespace.*;
+import java.util.Iterator;
+import java.util.List;
 
-import java.util.*;
-//import at.dms.kjc.*;
-//mport at.dms.kjc.sir.*;
-//import at.dms.kjc.sir.statespace.*;
-//import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.statespace.FilterMatrix;
+import at.dms.kjc.sir.statespace.FilterVector;
+import at.dms.kjc.sir.statespace.LinearFilterRepresentation;
+import at.dms.kjc.sir.statespace.LinearPrinter;
 
 /**
  * Contains the code for merging all the filters from a split join

@@ -1,8 +1,8 @@
 package at.dms.kjc.slicegraph;
 
-import at.dms.kjc.backendSupport.*;
 import java.util.Arrays;
-import java.util.ArrayList;
+
+import at.dms.kjc.backendSupport.FilterInfo;
 
 /**
  * This class will unroll the splitting and joining distribution of the slice (or slices)

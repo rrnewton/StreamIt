@@ -34,8 +34,8 @@ package at.dms.compiler.tools.antlr.runtime;
  * @see at.dms.compiler.tools.antlr.CharQueue
  */
 
-import java.io.Reader; // SAS: changed to properly read text files
 import java.io.IOException;
+import java.io.Reader;
 
 // SAS: Move most functionality into InputBuffer -- just the file-specific
 //      stuff is in here

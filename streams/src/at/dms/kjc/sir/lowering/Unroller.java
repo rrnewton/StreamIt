@@ -1,14 +1,39 @@
 
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-//import at.dms.util.*;
-import at.dms.kjc.sir.*;
-//import at.dms.kjc.lir.*;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import at.dms.compiler.JavaStyleComment;
-//import at.dms.compiler.JavadocComment;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPrintStatement;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class unrolls loops where it can.

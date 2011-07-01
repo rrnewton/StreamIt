@@ -20,12 +20,11 @@
 
 package at.dms.kjc;
 
-import at.dms.util.*;
+import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-import at.dms.compiler.JavaStyleComment;
-import at.dms.util.MessageDescription;
 import at.dms.util.InconsistencyException;
+import at.dms.util.MessageDescription;
 
 /**
  * JLS 14.5: Statement

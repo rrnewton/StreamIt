@@ -16,12 +16,12 @@
 
 package streamit.scheduler2.constrained;
 
-import streamit.misc.DestroyedClass;
-import streamit.scheduler2.iriter.Iterator;
-import streamit.scheduler2.base.StreamInterface;
-
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import streamit.misc.DestroyedClass;
+import streamit.scheduler2.base.StreamInterface;
+import streamit.scheduler2.iriter.Iterator;
 
 /**
  * This class basically implements the StreamFactory interface.  In the 

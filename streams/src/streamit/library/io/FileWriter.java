@@ -16,13 +16,16 @@
 
 package streamit.library.io;
 
-import streamit.library.Filter;
-import streamit.library.Channel;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
-import java.io.*;
+import streamit.library.Channel;
+import streamit.library.Filter;
 
 public class FileWriter extends Filter
 {

@@ -1,10 +1,34 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
-import at.dms.kjc.iterator.*;
-import java.util.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JReturnStatement;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JUnqualifiedInstanceCreation;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.iterator.SIRPhasedFilterIter;
+import at.dms.kjc.iterator.SIRPipelineIter;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.lir.LIRWorkEntry;
+import at.dms.kjc.lir.LIRWorkExit;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPhasedFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.StreamVisitor;
 
 /**
  * This class adds LIR hooks to work functions.

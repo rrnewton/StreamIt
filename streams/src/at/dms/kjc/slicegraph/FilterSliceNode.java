@@ -1,9 +1,9 @@
 package at.dms.kjc.slicegraph;
 
 //import at.dms.kjc.sir.*;
-import at.dms.kjc.backendSupport.Layout;
+import java.util.HashMap;
 
-import java.util.*;
+import at.dms.kjc.backendSupport.Layout;
 /** 
  * A {@link SliceNode} that references a {@link FilterContent}.
  **/

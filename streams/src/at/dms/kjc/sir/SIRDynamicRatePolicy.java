@@ -1,6 +1,7 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JIntLiteral;
 
 /**
  * This represents a single policy for interpreting dynamic rates in a

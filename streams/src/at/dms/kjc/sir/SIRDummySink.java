@@ -1,9 +1,16 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.lir.LIRStreamType;
-import at.dms.kjc.sir.lowering.LoweringConstants;
-import at.dms.kjc.*;
-import at.dms.util.*;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
 
 /**
  * This represents a StreamIT filter that just pushes 1 for int type and 1.0f for float.

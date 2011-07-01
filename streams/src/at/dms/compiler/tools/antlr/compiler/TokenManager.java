@@ -22,7 +22,7 @@ package at.dms.compiler.tools.antlr.compiler;
 
 import java.util.Enumeration;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.Vector;
 
 /**
  * Interface that describes the set of defined tokens

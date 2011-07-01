@@ -20,7 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.Token;
 
 class ExceptionHandler {
     // Type of the ANTLR exception class to catch and the variable decl

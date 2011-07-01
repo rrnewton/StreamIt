@@ -1,11 +1,11 @@
 package at.dms.kjc.sir.linear.frequency;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.iterator.*;
-import at.dms.compiler.*;
+import at.dms.kjc.Constants;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.linear.LinearAnalyzer;
+import at.dms.kjc.sir.linear.LinearPrinter;
+import at.dms.kjc.sir.linear.LinearReplacer;
 
 
 /**

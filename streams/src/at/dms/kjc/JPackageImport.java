@@ -21,10 +21,11 @@
 package at.dms.kjc;
 
 import java.util.Vector;
-import at.dms.compiler.Compiler;
+
 import at.dms.compiler.CWarning;
-import at.dms.compiler.TokenReference;
+import at.dms.compiler.Compiler;
 import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.TokenReference;
 
 /**
  * This class represents the "package at.dms.kjc" statement

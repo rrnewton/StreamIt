@@ -1,7 +1,11 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /** 
  * This represents a maximum latency for message delivery.

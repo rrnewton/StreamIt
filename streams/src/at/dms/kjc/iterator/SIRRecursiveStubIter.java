@@ -1,7 +1,10 @@
 package at.dms.kjc.iterator; 
 
-import at.dms.kjc.sir.*;
-import streamit.scheduler2.iriter.*;
+import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.iriter.IteratorBase;
+import at.dms.kjc.sir.SIRRecursiveStub;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.StreamVisitor;
 
 
 /**

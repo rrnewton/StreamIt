@@ -20,9 +20,10 @@
 
 package at.dms.kjc;
 
+import java.util.ListIterator;
+
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
-import java.util.ListIterator;
 
 /**
  * This is a visitor that just recurses into children at every node.

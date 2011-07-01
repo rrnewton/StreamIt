@@ -1,7 +1,7 @@
 package at.dms.kjc.lir;
 
-import at.dms.kjc.*;
-import at.dms.compiler.*;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * This sets how many items are popped by this stream.

@@ -1,8 +1,16 @@
 package at.dms.kjc.iterator; 
 
 import java.util.LinkedList;
-import at.dms.kjc.sir.*;
-import streamit.scheduler2.iriter.*;
+
+import streamit.scheduler2.iriter.FeedbackLoopIter;
+import streamit.scheduler2.iriter.FilterIter;
+import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.iriter.PipelineIter;
+import streamit.scheduler2.iriter.SplitJoinIter;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.StreamVisitor;
 
 /**
  * Abstract class from which 'Iter's inherit.

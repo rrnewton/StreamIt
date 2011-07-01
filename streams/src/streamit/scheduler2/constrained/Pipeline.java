@@ -16,18 +16,14 @@
 
 package streamit.scheduler2.constrained;
 
-import streamit.scheduler2.iriter./*persistent.*/
-    PipelineIter;
-import streamit.scheduler2.iriter./*persistent.*/
-    Iterator;
-
-import streamit.misc.Pair;
 import streamit.misc.DLList;
 import streamit.misc.OMap;
 import streamit.misc.OMapIterator;
-
-import streamit.scheduler2.hierarchical.PhasingSchedule;
+import streamit.misc.Pair;
 import streamit.scheduler2.SDEPData;
+import streamit.scheduler2.hierarchical.PhasingSchedule;
+import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.iriter.PipelineIter;
 
 /**
  * streamit.scheduler2.constrained.Pipeline is the pipeline constrained 

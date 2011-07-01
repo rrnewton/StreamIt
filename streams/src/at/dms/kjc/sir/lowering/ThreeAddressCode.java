@@ -3,15 +3,70 @@
   */
 package at.dms.kjc.sir.lowering;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+
+import streamit.misc.Pair;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
 import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.lir.*;
-import java.util.*;
-
-import streamit.misc.Pair;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.lir.LIRFileReader;
+import at.dms.kjc.lir.LIRFileWriter;
+import at.dms.kjc.lir.LIRFunctionPointer;
+import at.dms.kjc.lir.LIRIdentity;
+import at.dms.kjc.lir.LIRMainFunction;
+import at.dms.kjc.lir.LIRNode;
+import at.dms.kjc.lir.LIRRegisterReceiver;
+import at.dms.kjc.lir.LIRSetBodyOfFeedback;
+import at.dms.kjc.lir.LIRSetChild;
+import at.dms.kjc.lir.LIRSetDecode;
+import at.dms.kjc.lir.LIRSetDelay;
+import at.dms.kjc.lir.LIRSetEncode;
+import at.dms.kjc.lir.LIRSetJoiner;
+import at.dms.kjc.lir.LIRSetLoopOfFeedback;
+import at.dms.kjc.lir.LIRSetParallelStream;
+import at.dms.kjc.lir.LIRSetPeek;
+import at.dms.kjc.lir.LIRSetPop;
+import at.dms.kjc.lir.LIRSetPush;
+import at.dms.kjc.lir.LIRSetSplitter;
+import at.dms.kjc.lir.LIRSetStreamType;
+import at.dms.kjc.lir.LIRSetTape;
+import at.dms.kjc.lir.LIRSetWork;
+import at.dms.kjc.lir.LIRStreamType;
+import at.dms.kjc.lir.LIRWorkEntry;
+import at.dms.kjc.lir.LIRWorkExit;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRCreatePortal;
+import at.dms.kjc.sir.SIRDynamicToken;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRInitStatement;
+import at.dms.kjc.sir.SIRInterfaceTable;
+import at.dms.kjc.sir.SIRIterationExpression;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIRLatency;
+import at.dms.kjc.sir.SIRLatencyMax;
+import at.dms.kjc.sir.SIRLatencyRange;
+import at.dms.kjc.sir.SIRLatencySet;
+import at.dms.kjc.sir.SIRMarker;
+import at.dms.kjc.sir.SIRMessageStatement;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRPrintStatement;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.sir.SIRRangeExpression;
+import at.dms.kjc.sir.SIRRegReceiverStatement;
+import at.dms.kjc.sir.SIRRegSenderStatement;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Turn statements into three-address code optionally depending on overridable simpleExpression 

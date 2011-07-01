@@ -20,8 +20,9 @@
 
 package at.dms.backend;
 
-import java.util.Vector;
 import java.util.Stack;
+import java.util.Vector;
+
 import at.dms.classfile.IincInstruction;
 import at.dms.classfile.LocalVarInstruction;
 import at.dms.classfile.PushLiteralInstruction;

@@ -20,15 +20,12 @@
 
 package at.dms.kjc;
 
-import java.io.*;
 import java.util.Hashtable;
 
 import at.dms.classfile.ClassInfo;
 import at.dms.classfile.FieldInfo;
 import at.dms.classfile.InnerClassInfo;
 import at.dms.classfile.MethodInfo;
-
-import at.dms.compiler.Compiler;
 
 /**
  * This class represents the exported members of a binary class, i.e.

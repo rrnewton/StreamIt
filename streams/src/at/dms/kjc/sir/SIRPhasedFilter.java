@@ -1,9 +1,12 @@
 package at.dms.kjc.sir;
 
+import java.util.HashMap;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.lir.LIRStreamType;
 import at.dms.util.Utils;
-import at.dms.kjc.*;
-import java.util.HashMap;
 
 /**
  * A StreamIt phased filter.  Like SIRFilter, this has constant

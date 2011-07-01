@@ -20,18 +20,18 @@
 
 package at.dms.kjc;
 
-import at.dms.util.Utils;
-import at.dms.compiler.PositionedError;
-import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.JavadocComment;
-import at.dms.compiler.TokenReference;
-import at.dms.compiler.UnpositionedError;
-import at.dms.util.InconsistencyException;
-import at.dms.kjc.sir.SIRDynamicRateManager;
-
-import java.util.ListIterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+
+import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.JavadocComment;
+import at.dms.compiler.PositionedError;
+import at.dms.compiler.TokenReference;
+import at.dms.compiler.UnpositionedError;
+import at.dms.kjc.sir.SIRDynamicRateManager;
+import at.dms.util.InconsistencyException;
+import at.dms.util.Utils;
 
 /**
  * This class represents a Java method declaration in the syntax tree.

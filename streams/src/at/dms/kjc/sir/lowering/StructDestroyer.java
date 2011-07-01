@@ -1,14 +1,34 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.JavadocComment;
-import java.lang.Math;
-import at.dms.compiler.TokenReference;
+import at.dms.kjc.CClass;
+import at.dms.kjc.CClassNameType;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CField;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JCastExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRInitStatement;
+import at.dms.kjc.sir.SIRRecursiveStub;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class breaks up structures as much as possible. The goal is to

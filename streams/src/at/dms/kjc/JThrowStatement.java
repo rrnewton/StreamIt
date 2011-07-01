@@ -20,9 +20,9 @@
 
 package at.dms.kjc;
 
+import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.17: Throw Statement

@@ -16,11 +16,12 @@
 
 package streamit.scheduler2;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
+
 import streamit.misc.AssertedClass;
 import streamit.scheduler2.iriter.Iterator;
 

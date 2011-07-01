@@ -20,12 +20,10 @@
 
 package at.dms.kjc;
 
-import java.util.Vector;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
+import at.dms.kjc.iterator.IterFactory;
 import at.dms.util.MessageDescription;
-import at.dms.util.Utils;
-import at.dms.kjc.iterator.*;
 
 /**
  * This class represents the root class for all elements of the parsing tree

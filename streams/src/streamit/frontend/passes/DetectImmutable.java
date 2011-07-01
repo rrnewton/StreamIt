@@ -16,8 +16,24 @@
 
 package streamit.frontend.passes;
 
-import streamit.frontend.nodes.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import streamit.frontend.nodes.ExprArray;
+import streamit.frontend.nodes.ExprFunCall;
+import streamit.frontend.nodes.ExprVar;
+import streamit.frontend.nodes.Expression;
+import streamit.frontend.nodes.Function;
+import streamit.frontend.nodes.Parameter;
+import streamit.frontend.nodes.StmtAssign;
+import streamit.frontend.nodes.StreamSpec;
+import streamit.frontend.nodes.SymbolTable;
+import streamit.frontend.nodes.TypeArray;
 
 /**
  * Analyzes a program to determine which arrays are "immutable,"

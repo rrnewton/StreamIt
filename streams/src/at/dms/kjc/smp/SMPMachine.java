@@ -1,6 +1,7 @@
 package at.dms.kjc.smp;
 
 import java.util.LinkedList;
+
 import at.dms.kjc.backendSupport.ComputeNodesI;
 
 public class SMPMachine implements ComputeNodesI<CoreCodeStore> {

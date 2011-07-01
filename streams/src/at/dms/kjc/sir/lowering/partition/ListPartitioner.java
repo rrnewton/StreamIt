@@ -1,8 +1,19 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This is a partitioner that keeps a canonical list of underlying

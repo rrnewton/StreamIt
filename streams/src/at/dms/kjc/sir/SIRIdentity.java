@@ -1,8 +1,12 @@
 package at.dms.kjc.sir;
 
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.sir.lowering.Propagator;
-import at.dms.kjc.*;
-import at.dms.compiler.JavaStyleComment; // for debugging
 
 /**
  * This represents a StreaMIT filter that just reads <N> item and sends it along.

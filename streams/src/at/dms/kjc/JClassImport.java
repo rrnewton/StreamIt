@@ -22,8 +22,8 @@ package at.dms.kjc;
 
 import at.dms.compiler.CWarning;
 import at.dms.compiler.Compiler;
-import at.dms.compiler.TokenReference;
 import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.TokenReference;
 
 /**
  * JLS 7.5.1 Single-Type-Import Declaration.

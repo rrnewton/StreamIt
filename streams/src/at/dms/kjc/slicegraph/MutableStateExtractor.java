@@ -4,19 +4,14 @@ import java.util.HashSet;
 import java.util.List;
 
 import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
 import at.dms.kjc.JCompoundAssignmentExpression;
 import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldAccessExpression;
 import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JPostfixExpression;
 import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.slicegraph.FilterContent;
 import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.util.GetSteadyMethods;
 

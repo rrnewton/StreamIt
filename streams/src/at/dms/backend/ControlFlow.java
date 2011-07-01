@@ -21,10 +21,10 @@
 package at.dms.backend;
 
 import java.util.Vector;
-import at.dms.util.Utils;
-import at.dms.classfile.SwitchInstruction;
+
 import at.dms.classfile.HandlerInfo;
-import at.dms.backend.InstructionHandle;
+import at.dms.classfile.SwitchInstruction;
+import at.dms.util.Utils;
 
 /**
  * This is the entry point of the backend, this class constructs the

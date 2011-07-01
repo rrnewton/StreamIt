@@ -16,9 +16,10 @@
 
 package streamit.scheduler2;
 
+import java.util.Vector;
+
 import streamit.misc.AssertedClass;
 import streamit.misc.Pair;
-import java.util.Vector;
 
 /**
  * <dl>

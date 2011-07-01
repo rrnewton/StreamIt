@@ -1,9 +1,8 @@
 package at.dms.kjc.tilera.arrayassignment;
 
-import at.dms.kjc.JStatement;
-import at.dms.kjc.tilera.Util;
+import java.util.LinkedList;
 
-import java.util.*;
+import at.dms.kjc.JStatement;
 
 public class ArrayAssignmentStatements {
     

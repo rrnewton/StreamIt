@@ -1,7 +1,9 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import java.util.List;
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
 
 /**
  * This visitor is for visiting stream structures in the SIR.  It

@@ -16,13 +16,13 @@
 
 package streamit.library;
 
-import java.util.*;
-// 1 input, many output
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
-import streamit.misc.Pair;
-
-import streamit.library.iriter.SplitJoinIter;
 import streamit.library.iriter.FeedbackLoopIter;
+import streamit.library.iriter.SplitJoinIter;
+import streamit.misc.Pair;
 
 abstract public class Splitter extends Operator
 {

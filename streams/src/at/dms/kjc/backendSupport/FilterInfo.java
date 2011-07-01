@@ -3,8 +3,8 @@ package at.dms.kjc.backendSupport;
 //import at.dms.kjc.sir.*;
 //import at.dms.util.Utils;
 //import java.util.HashSet;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import at.dms.kjc.slicegraph.FilterContent;
 import at.dms.kjc.slicegraph.FilterSliceNode;

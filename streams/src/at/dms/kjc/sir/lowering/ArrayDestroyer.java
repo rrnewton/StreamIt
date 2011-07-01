@@ -1,17 +1,40 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import at.dms.kjc.*;
-//import at.dms.util.*;
-import at.dms.kjc.sir.*;
-//import at.dms.kjc.lir.*;
-//import at.dms.compiler.JavaStyleComment;
-//import at.dms.compiler.JavadocComment;
-
-import java.io.Serializable;
-//import java.lang.Math;
-//import at.dms.compiler.TokenReference;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JArrayInitializer;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JNewArrayExpression;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class breaks up arrays into local vars as much as possible

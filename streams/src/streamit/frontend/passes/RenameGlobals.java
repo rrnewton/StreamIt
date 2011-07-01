@@ -16,10 +16,12 @@
 
 package streamit.frontend.passes;
 
-import streamit.frontend.nodes.*;
-
-import java.util.Iterator;
-import java.util.List;
+import streamit.frontend.nodes.ExprField;
+import streamit.frontend.nodes.ExprVar;
+import streamit.frontend.nodes.Expression;
+import streamit.frontend.nodes.FEContext;
+import streamit.frontend.nodes.StreamSpec;
+import streamit.frontend.nodes.SymbolTable;
 
 /**
  * Front-end visitor passes that replaces global variable expressions

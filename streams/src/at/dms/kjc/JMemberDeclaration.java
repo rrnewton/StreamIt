@@ -20,9 +20,9 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.TokenReference;
-import at.dms.compiler.JavadocComment;
 import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.JavadocComment;
+import at.dms.compiler.TokenReference;
 
 
 /**

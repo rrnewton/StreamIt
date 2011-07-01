@@ -1,14 +1,26 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.JavadocComment;
-import java.lang.Math;
-import at.dms.compiler.TokenReference;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEqualityExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIfStatement;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPhasedFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class aggressively analyzes branches in control flow for information

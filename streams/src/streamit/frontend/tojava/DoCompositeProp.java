@@ -16,14 +16,21 @@
 
 package streamit.frontend.tojava;
 
-import streamit.frontend.nodes.*;
-import streamit.frontend.passes.SymbolTableVisitor;
-
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
-import java.util.ArrayList;
+import streamit.frontend.nodes.ExprBinary;
+import streamit.frontend.nodes.ExprFunCall;
+import streamit.frontend.nodes.ExprHelperCall;
+import streamit.frontend.nodes.ExprUnary;
+import streamit.frontend.nodes.Expression;
+import streamit.frontend.nodes.FEContext;
+import streamit.frontend.nodes.StmtAssign;
+import streamit.frontend.nodes.TempVarGen;
+import streamit.frontend.nodes.Type;
+import streamit.frontend.nodes.TypePrimitive;
+import streamit.frontend.passes.SymbolTableVisitor;
 
 /*
  * This class replaces vector aritmetic with appropriate calls to

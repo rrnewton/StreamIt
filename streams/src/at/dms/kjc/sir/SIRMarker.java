@@ -1,7 +1,13 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.compiler.*;
+import at.dms.compiler.PositionedError;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.CBodyContext;
+import at.dms.kjc.CodeSequence;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * This class represents an annotation in the IR.  It represents an

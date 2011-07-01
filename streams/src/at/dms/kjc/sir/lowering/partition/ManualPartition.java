@@ -1,16 +1,34 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.partition.dynamicprog.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.NumberDot;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.ArrayDestroyer;
+import at.dms.kjc.sir.lowering.BlockFlattener;
+import at.dms.kjc.sir.lowering.DeadCodeElimination;
+import at.dms.kjc.sir.lowering.Propagator;
+import at.dms.kjc.sir.lowering.Unroller;
+import at.dms.kjc.sir.lowering.VarDeclRaiser;
+import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
+import at.dms.kjc.sir.lowering.fusion.FusePipe;
+import at.dms.kjc.sir.lowering.fusion.FusePipelines;
+import at.dms.kjc.sir.lowering.fusion.FuseSplit;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
+import at.dms.kjc.sir.lowering.partition.dynamicprog.DynamicProgPartitioner;
+import at.dms.util.Utils;
 
 /**
  * Represents an interface to the StreamIt compiler that allows the

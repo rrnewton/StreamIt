@@ -20,7 +20,6 @@
 
 package at.dms.compiler.tools.antlr.runtime;
 
-import java.io.IOException;
 import java.util.Hashtable;
 
 public abstract class CharScanner implements TokenStream {

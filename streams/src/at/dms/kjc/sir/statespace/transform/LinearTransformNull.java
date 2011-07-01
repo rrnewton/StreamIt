@@ -1,6 +1,6 @@
 package at.dms.kjc.sir.statespace.transform;
 
-import at.dms.kjc.sir.statespace.*;
+import at.dms.kjc.sir.statespace.LinearFilterRepresentation;
 
 /**
  * Represents a null transform -- eg no transform to apply.

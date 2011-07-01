@@ -29,10 +29,9 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import at.dms.compiler.tools.common.CompilerMessages;
+import at.dms.compiler.tools.antlr.runtime.ParserException;
 import at.dms.compiler.tools.common.PositionedError;
 import at.dms.compiler.tools.common.TokenReference;
-import at.dms.compiler.tools.antlr.runtime.ParserException;
 import at.dms.compiler.tools.common.Utils;
 
 class DefinitionFile {

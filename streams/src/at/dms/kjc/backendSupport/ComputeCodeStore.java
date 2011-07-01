@@ -5,6 +5,7 @@ import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JBooleanLiteral;
+import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
@@ -12,13 +13,11 @@ import at.dms.kjc.JFormalParameter;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcOptions;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JWhileStatement;
-import at.dms.kjc.sir.SIRCodeUnit;
-import at.dms.kjc.JEmittedTextExpression;
-//import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.ALocalVariable;
+import at.dms.kjc.sir.SIRCodeUnit;
 
 /**
  * A data structure for associating code with each compute node at each phase.

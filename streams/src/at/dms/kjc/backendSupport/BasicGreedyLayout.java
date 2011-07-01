@@ -3,11 +3,19 @@
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.spacetime.CompareSliceBNWork;
-import at.dms.kjc.spacetime.SpaceTimeBackend;
+import at.dms.kjc.slicegraph.DataFlowOrder;
+import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.InputSliceNode;
+import at.dms.kjc.slicegraph.OutputSliceNode;
+import at.dms.kjc.slicegraph.SIRSlicer;
+import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slicegraph.SliceNode;
 
 
 /**

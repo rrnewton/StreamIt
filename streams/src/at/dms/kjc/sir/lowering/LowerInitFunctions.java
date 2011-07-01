@@ -1,15 +1,60 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.util.IRPrinter;
-import at.dms.util.Utils;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
-
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.iterator.SIRPhasedFilterIter;
+import at.dms.kjc.iterator.SIRPipelineIter;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.lir.LIRFileReader;
+import at.dms.kjc.lir.LIRFileWriter;
+import at.dms.kjc.lir.LIRFunctionPointer;
+import at.dms.kjc.lir.LIRIdentity;
+import at.dms.kjc.lir.LIRRegisterReceiver;
+import at.dms.kjc.lir.LIRSetBodyOfFeedback;
+import at.dms.kjc.lir.LIRSetChild;
+import at.dms.kjc.lir.LIRSetDelay;
+import at.dms.kjc.lir.LIRSetJoiner;
+import at.dms.kjc.lir.LIRSetLoopOfFeedback;
+import at.dms.kjc.lir.LIRSetParallelStream;
+import at.dms.kjc.lir.LIRSetPeek;
+import at.dms.kjc.lir.LIRSetPop;
+import at.dms.kjc.lir.LIRSetPush;
+import at.dms.kjc.lir.LIRSetSplitter;
+import at.dms.kjc.lir.LIRSetStreamType;
+import at.dms.kjc.lir.LIRSetTape;
+import at.dms.kjc.lir.LIRSetWork;
+import at.dms.kjc.lir.LIRStreamType;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPhasedFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRRegReceiverStatement;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.StreamVisitor;
+import at.dms.util.Utils;
 
 /**
  * This class adds LIR hooks to the init functions.

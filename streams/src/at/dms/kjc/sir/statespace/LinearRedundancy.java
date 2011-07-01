@@ -1,6 +1,10 @@
 package at.dms.kjc.sir.statespace;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A LinearRedundancy contains information about redundant computations

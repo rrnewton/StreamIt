@@ -1,12 +1,34 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import at.dms.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.sir.lowering.fusion.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
+import at.dms.kjc.sir.ReplacingStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRInitStatement;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
+import at.dms.kjc.sir.lowering.fusion.FuseSimpleSplit;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
+import at.dms.util.Utils;
 
 /**
  * OVERVIEW ----------------------------------------------------
