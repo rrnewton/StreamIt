@@ -1228,9 +1228,9 @@ public class ThreeAddressCode {
         
         Pair<List<JStatement>,JExpression> recurrTopExpressionL (JExpression expr) {
             if (! shouldConvertExpression(expr)) {
-                return new Pair(new LinkedList<JStatement>(),expr);
+                return new Pair<Object, Object>(new LinkedList<JStatement>(),expr);
             } else {
-                return new Pair((List<JStatement>)expr.accept(this,null), expr);
+                return new Pair<Object, Object>((List<JStatement>)expr.accept(this,null), expr);
             }
         }
         

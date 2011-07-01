@@ -57,7 +57,7 @@ public class EnqueueToInitPath
                 public void visitBlockStatement(JBlock self,
                                                 JavaStyleComment[] comments) {
                     super.visitBlockStatement(self, comments);
-                    for (Iterator iter = self.getStatementIterator(); iter.hasNext(); )
+                    for (Iterator<?> iter = self.getStatementIterator(); iter.hasNext(); )
                         {
                             JStatement stmt = (JStatement)iter.next();
                             // What we're looking for is function calls that
@@ -88,7 +88,7 @@ public class EnqueueToInitPath
         String enqType = enqTypeWrapper[0];
 
         // Now build the new function.
-        List stmts = new java.util.ArrayList();
+        List<?> stmts = new java.util.ArrayList<Object>();
         JFormalParameter params[] = new JFormalParameter[1];
         params[0] = new JFormalParameter(null, // token reference
                                          JLocalVariable.DES_PARAMETER,

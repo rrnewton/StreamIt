@@ -214,7 +214,7 @@ public class JFieldDeclaration extends JMemberDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         Object Trash = super.accept(p);
         return p.visitFieldDeclaration(this,
                                        variable.getModifiers(),

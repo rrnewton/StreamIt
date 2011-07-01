@@ -253,7 +253,7 @@ public abstract class Portal
         List<HashSet<Object>> downstreamReceivers = getDownstreamReceiverSets(downstream);
         // do one calculation per set
         for (java.util.Iterator<HashSet<Object>> i = downstreamReceivers.iterator(); i.hasNext(); ) {
-            HashSet receiverSet = i.next();
+            HashSet<?> receiverSet = i.next();
             assert receiverSet.size() > 0;
 
             // make factory (this used to be used for phased filters,
@@ -263,7 +263,7 @@ public abstract class Portal
 
             // map receiverSet (holds Streams) to receiverIters (holds Iterators)
             HashSet<Iterator> receiverIters = new HashSet<Iterator>();
-            for (java.util.Iterator setIter = receiverSet.iterator(); setIter.hasNext(); ) {
+            for (java.util.Iterator<?> setIter = receiverSet.iterator(); setIter.hasNext(); ) {
                 receiverIters.add(new Iterator((Stream)setIter.next(), factory));
             }
 

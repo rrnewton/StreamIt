@@ -479,7 +479,7 @@ public abstract class CBodyContext extends CContext {
      *
      */
     public void mergeThrowables(CBodyContext source) {
-        Enumeration     eNum = source.getThrowables().elements();
+        Enumeration<?>     eNum = source.getThrowables().elements();
 
         while (eNum.hasMoreElements()) {
             addThrowable((CThrowableInfo)eNum.nextElement());
@@ -497,7 +497,7 @@ public abstract class CBodyContext extends CContext {
     /**
      * @return the list of exception that may be thrown
      */
-    public Hashtable getThrowables() {
+    public Hashtable<?, ?> getThrowables() {
         return throwables == null ? EMPTY : throwables;
     }
 
@@ -559,7 +559,7 @@ public abstract class CBodyContext extends CContext {
     // DATA MEMBERS
     // ----------------------------------------------------------------------
 
-    private static final Hashtable  EMPTY = new Hashtable(1);
+    private static final Hashtable<?, ?>  EMPTY = new Hashtable<Object, Object>(1);
 
     private static final int    FLO_UNREACHABLE = 1 << 0;
     private static final int    FLO_BREAKED = 1 << 1;
@@ -582,7 +582,7 @@ public abstract class CBodyContext extends CContext {
         other.flowState = this.flowState;
         other.variableInfo = (at.dms.kjc.CVariableInfo)at.dms.kjc.AutoCloner.cloneToplevel(this.variableInfo);
         other.fieldInfo = (at.dms.kjc.CVariableInfo)at.dms.kjc.AutoCloner.cloneToplevel(this.fieldInfo);
-        other.throwables = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.throwables);
+        other.throwables = (java.util.Hashtable<?, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.throwables);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

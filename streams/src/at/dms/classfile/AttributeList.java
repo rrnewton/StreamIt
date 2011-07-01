@@ -110,7 +110,7 @@ import at.dms.util.Utils;
         int     count = in.readUnsignedShort();
 
         if (count > 0) {
-            Vector  attributes = new Vector();
+            Vector<Object>  attributes = new Vector<Object>();
 
             for (int i = 0; i < count; i += 1) {
                 if (noCode) {  
@@ -141,7 +141,7 @@ import at.dms.util.Utils;
     {
         int     count = in.readUnsignedShort();
 
-        Vector  attributes = new Vector(count);
+        Vector<Object>  attributes = new Vector<Object>(count);
         for (int i = 0; i < count; i += 1) {
             attributes.addElement(Attribute.readCodeInfoAttribute(in, cp, insns));
         }

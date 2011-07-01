@@ -64,7 +64,7 @@ public class ClassPath {
      * @param   classPath   the directory names defining the class path
      */
     private static ClassDirectory[] loadClassPath(String classPath) {
-        Vector      container = new Vector();
+        Vector<Object>      container = new Vector<Object>();
 
         // load specified class directories
         StringTokenizer entries;

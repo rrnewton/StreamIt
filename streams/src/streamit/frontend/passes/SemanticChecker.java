@@ -800,7 +800,7 @@ public class SemanticChecker
                 public Object visitExprArrayInit(ExprArrayInit expr)
                 {
                     // check for uniform length and dimensions among all children.
-                    List elems = expr.getElements();
+                    List<?> elems = expr.getElements();
             
                     // only worry about it if we have elements
                     if (elems.size()>0) {
@@ -959,7 +959,7 @@ public class SemanticChecker
         final Set<Statement> reported = new HashSet<Statement>();
 
         // Use data flow to check the stream types.
-        Map inTypes = new DataFlow() {
+        Map<?, ?> inTypes = new DataFlow() {
                 public Lattice getInit()
                 {
                     if (st == null)
@@ -1059,7 +1059,7 @@ public class SemanticChecker
         Function init = ss.getInitFunc();
         assert init != null;
         CFG cfg = CFGBuilder.buildCFG(init);
-        Map typeMap = new DataFlow() {
+        Map<?, ?> typeMap = new DataFlow() {
                 public Lattice getInit()
                 {
                     StreamType st = ss.getStreamType();
@@ -1241,7 +1241,7 @@ public class SemanticChecker
         Function init = ss.getInitFunc();
         assert init != null;
         CFG cfg = CFGBuilder.buildCFG(init);
-        Map splitCounts = sc.run(cfg);
+        Map<?, ?> splitCounts = sc.run(cfg);
         // TODO: modularize this analysis; report the first place
         // where there's a second split/join, and/or the first place
         // where there's ambiguity (bottom).  This would be easier if
@@ -1538,7 +1538,7 @@ public class SemanticChecker
                 // long as there are array
                 // initializers to match.
                 type = ((TypeArray)type).getBase();
-                List elems = ((ExprArrayInit)init).getElements();
+                List<?> elems = ((ExprArrayInit)init).getElements();
                 if (elems.size()>0) {
                     init = (Expression)elems.get(0);
                 } else {

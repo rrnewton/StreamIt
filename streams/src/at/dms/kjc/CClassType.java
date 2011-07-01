@@ -66,7 +66,7 @@ public class CClassType extends CType {
 
     public static CClassType lookup(String qualifiedName) {
         if (qualifiedName.indexOf('/') >= 0) {
-            CClassType  type = (CClassType)allCClassType.get(qualifiedName);
+            CClassType  type = allCClassType.get(qualifiedName);
 
             if (type == null) {
                 type = new CClassNameType(qualifiedName);
@@ -284,7 +284,7 @@ public class CClassType extends CType {
 
     public static final CClassType[]        EMPTY = new CClassType[0];
 
-    private static Hashtable    allCClassType = new Hashtable(2000);
+    private static Hashtable<?, CClassType>    allCClassType = new Hashtable<Object, CClassType>(2000);
     private static final CClass BAC_CLASS = new CBadClass("<NOT YET DEFINED>");
 
     private CClass      clazz;

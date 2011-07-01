@@ -127,7 +127,7 @@ public class JInitializerDeclaration extends JMethodDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         return null;    // Don t print initializers
     }
 

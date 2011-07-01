@@ -43,7 +43,7 @@ public class OMapIterator
      */
     public Object setData(Object newData)
     {
-        Pair mapPair = (Pair)setIter.get(); 
+        Pair<?, Object> mapPair = (Pair<?, Object>)setIter.get(); 
         Object oldData = mapPair.second;
         mapPair.second = newData;
         

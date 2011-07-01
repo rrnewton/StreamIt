@@ -29,11 +29,11 @@ public class ProcessFilterSliceNode {
     protected static Map<SliceNode,Boolean>  basicCodeWritten = new WeakHashMap<SliceNode,Boolean>();
     
     protected CodeStoreHelper filter_code;
-    protected ComputeCodeStore codeStore;
+    protected ComputeCodeStore<?> codeStore;
     protected FilterSliceNode filterNode;
     protected SchedulingPhase whichPhase;
-    protected BackEndFactory backEndBits;
-    protected ComputeNode location;
+    protected BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits;
+    protected ComputeNode<ComputeCodeStore<?>> location;
     
     /**
     * @param filterNode   the filterNode that needs code generated.
@@ -41,7 +41,7 @@ public class ProcessFilterSliceNode {
     * @param backEndBits  a BackEndFactory to access layout, etc.
     * */
    public ProcessFilterSliceNode(FilterSliceNode filterNode, 
-            SchedulingPhase whichPhase, BackEndFactory backEndBits) {
+            SchedulingPhase whichPhase, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
         this.filterNode = filterNode;
         this.whichPhase = whichPhase;
         this.backEndBits = backEndBits;
@@ -233,7 +233,7 @@ public class ProcessFilterSliceNode {
      */
     private static CodeStoreHelper makeFilterCode(FilterSliceNode filter, 
             Channel inputChannel, Channel outputChannel,
-            BackEndFactory backEndBits) {
+            BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
         
         final String peekName;
 
@@ -311,7 +311,7 @@ public class ProcessFilterSliceNode {
      * @return
      */
     public static  CodeStoreHelper getFilterCode(FilterSliceNode filter, 
-            Channel inputChannel, Channel outputChannel, BackEndFactory backEndBits) {
+            Channel inputChannel, Channel outputChannel, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
         CodeStoreHelper filter_code = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filter_code == null) {
             filter_code = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);

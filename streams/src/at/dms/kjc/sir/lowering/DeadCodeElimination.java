@@ -277,7 +277,7 @@ public class DeadCodeElimination {
                     public Object visitBlockStatement(JBlock self,
                                                       JavaStyleComment[] comments) {
                         ArrayList<Object> newStatements = new ArrayList<Object>();
-                        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
+                        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
                             JStatement oldBody = (JStatement)it.next();
                             Object newBody = oldBody.accept(this);
                             if (newBody != null) newStatements.add(newBody);

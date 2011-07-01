@@ -43,9 +43,9 @@ public class LIRFunctionPointer {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor)p).visitFunctionPointer(this, name);
+            return ((SLIRAttributeVisitor<?>)p).visitFunctionPointer(this, name);
         } else {
             return this;
         }

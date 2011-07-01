@@ -141,10 +141,10 @@ public class DoComplexProp extends SymbolTableVisitor
      * of the Expressions in l, except with any ExprComplex values
      * replaced with temporary variables.
      */
-    private List createListTemporaries(List l)
+    private List<?> createListTemporaries(List<?> l)
     {
-        List nl = new ArrayList();
-        for (Iterator iter = l.iterator(); iter.hasNext(); )
+        List<?> nl = new ArrayList<Object>();
+        for (Iterator<?> iter = l.iterator(); iter.hasNext(); )
             {
                 Expression expr = (Expression)iter.next();
                 if (expr instanceof ExprComplex)

@@ -17,10 +17,10 @@ public class ProcessInputSliceNode {
     
     protected InputSliceNode inputNode;
     protected SchedulingPhase whichPhase;
-    protected BackEndFactory backEndBits;
+    protected BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits;
     protected CodeStoreHelper joiner_code;
-    protected ComputeNode location;
-    protected ComputeCodeStore codeStore;
+    protected ComputeNode<ComputeCodeStore<?>> location;
+    protected ComputeCodeStore<?> codeStore;
     
     /**
      * Constructor 
@@ -29,7 +29,7 @@ public class ProcessInputSliceNode {
      * @param backEndBits  a BackEndFactory to access layout, etc.
      */
     public ProcessInputSliceNode(InputSliceNode inputNode,
-            SchedulingPhase whichPhase, BackEndFactory backEndBits) {
+            SchedulingPhase whichPhase, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
         this.inputNode = inputNode;
         this.whichPhase = whichPhase;
         this.backEndBits = backEndBits;
@@ -228,7 +228,7 @@ public class ProcessInputSliceNode {
          * @param helper CodeStoreHelper to get the fields and method implementing the joiner
          */
         private static  void makeJoinerCode(InputSliceNode joiner,
-                BackEndFactory backEndBits, CodeStoreHelper helper) {
+                BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits, CodeStoreHelper helper) {
             String joiner_name = "_joiner_" + ProcessFilterSliceNode.getUid();
             String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
             
@@ -361,7 +361,7 @@ public class ProcessInputSliceNode {
          */
         
         public static  void makeJoinerWork(InputSliceNode joiner,
-                BackEndFactory backEndBits, CodeStoreHelper joiner_code) {
+                BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits, CodeStoreHelper joiner_code) {
             JMethodDeclaration joinerWork;
 
             // the work function will need a temporary variable
@@ -441,7 +441,7 @@ public class ProcessInputSliceNode {
          * @param backEndBits
          * @return
          */
-        public static  CodeStoreHelper getJoinerCode(InputSliceNode joiner, BackEndFactory backEndBits) {
+        public static  CodeStoreHelper getJoinerCode(InputSliceNode joiner, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
             CodeStoreHelper joiner_code = CodeStoreHelper.findHelperForSliceNode(joiner);
             if (joiner_code == null) {
                 joiner_code = backEndBits.getCodeStoreHelper(joiner);

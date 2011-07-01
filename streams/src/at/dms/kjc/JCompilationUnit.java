@@ -152,7 +152,7 @@ public class JCompilationUnit extends JPhylum {
      * such as Classes, Interfaces, Methods, Constructors and Fields
      * @exception   PositionedError an error with reference to the source file
      */
-    public void checkInitializers(Compiler compiler, Vector classes) throws PositionedError {
+    public void checkInitializers(Compiler compiler, Vector<CSourceClass> classes) throws PositionedError {
         CCompilationUnitContext context = new CCompilationUnitContext(compiler, export, classes);
         for (int i = 0; i < typeDeclarations.length ; i++) {
             typeDeclarations[i].checkInitializers(context);
@@ -167,7 +167,7 @@ public class JCompilationUnit extends JPhylum {
      * Check expression and evaluate and alter context
      * @exception   PositionedError Error catched as soon as possible
      */
-    public void checkBody(Compiler compiler, Vector classes) throws PositionedError {
+    public void checkBody(Compiler compiler, Vector<CSourceClass> classes) throws PositionedError {
         CCompilationUnitContext context = new CCompilationUnitContext(compiler, export, classes);
 
         if (packageName == JPackageName.UNNAMED) {
@@ -222,7 +222,7 @@ public class JCompilationUnit extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         return    p.visitCompilationUnit(this, packageName, importedPackages, importedClasses, typeDeclarations);
     }
 
@@ -259,7 +259,7 @@ public class JCompilationUnit extends JPhylum {
         other.importedClasses = (at.dms.kjc.JClassImport[])at.dms.kjc.AutoCloner.cloneToplevel(this.importedClasses);
         other.importedPackages = (at.dms.kjc.JPackageImport[])at.dms.kjc.AutoCloner.cloneToplevel(this.importedPackages);
         other.typeDeclarations = (at.dms.kjc.JTypeDeclaration[])at.dms.kjc.AutoCloner.cloneToplevel(this.typeDeclarations);
-        other.allLoadedClasses = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.allLoadedClasses);
+        other.allLoadedClasses = (java.util.Hashtable<?, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.allLoadedClasses);
         other.export = (at.dms.kjc.CCompilationUnit)at.dms.kjc.AutoCloner.cloneToplevel(this.export);
     }
 

@@ -256,10 +256,10 @@ public class Main {
         String      prefix = definitions[definitions.length - 1].getPrefix();
         String      packageName = definitions[definitions.length - 1].getPackageName();
 
-        Vector      keywords = new Vector();
-        Vector      types = new Vector();
-        Vector      header = new Vector();
-        Vector      footer = new Vector();
+        Vector<?>      keywords = new Vector<Object>();
+        Vector<?>      types = new Vector<Object>();
+        Vector<?>      header = new Vector<Object>();
+        Vector<?>      footer = new Vector<Object>();
 
         // retrieve keywords to hash
         for (int i = 0; i < definitions.length; i++) {

@@ -99,11 +99,11 @@ public class InsertInitConstructors extends InitMunger
      *              type; useful for members of multidimensional
      *              arrays
      */
-    private List stmtsForConstructor(FEContext ctx, Expression name,
+    private List<?> stmtsForConstructor(FEContext ctx, Expression name,
                                      Type type, Expression init, 
                                      boolean arrayConstructor)
     {
-        List result = new java.util.ArrayList();
+        List<?> result = new java.util.ArrayList<Object>();
 
         // If the type doesn't involve a constructor, there are no
         // generated statements.
@@ -130,7 +130,7 @@ public class InsertInitConstructors extends InitMunger
                     {
                         String tempVar = varGen.nextVar();
                         Expression varExp = new ExprVar(ctx, tempVar);
-                        List elements = new ArrayList();
+                        List<?> elements = new ArrayList<Object>();
                         Type base = type;
                         while (base instanceof TypeArray) 
                         {
@@ -253,11 +253,11 @@ public class InsertInitConstructors extends InitMunger
         if (spec.getVars().isEmpty())
             return spec;
         
-        List newStmts = new ArrayList();
+        List<?> newStmts = new ArrayList<Object>();
             
         // Walk through the variables.  If any of them are for
         // complex or non-primitive types, generate a constructor.
-        for (Iterator iter = spec.getVars().iterator(); iter.hasNext(); )
+        for (Iterator<?> iter = spec.getVars().iterator(); iter.hasNext(); )
             {
                 FieldDecl field = (FieldDecl)iter.next();
                 for (int i = 0; i < field.getNumFields(); i++)
@@ -279,7 +279,7 @@ public class InsertInitConstructors extends InitMunger
             return spec;
         
         // Okay.  Prepend the new statements to the init function.
-        List newFuncs = new ArrayList(spec.getFuncs());
+        List<Function> newFuncs = new ArrayList<Function>(spec.getFuncs());
         newFuncs = replaceInitWithPrepended(spec.getContext(), newFuncs,
                                             newStmts);
         

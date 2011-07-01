@@ -79,7 +79,7 @@ public class JCompoundStatement extends JStatement {
         p.visitCompoundStatement(this, body);
     }
     
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         return p.visitCompoundStatement(this, body);
     }
     

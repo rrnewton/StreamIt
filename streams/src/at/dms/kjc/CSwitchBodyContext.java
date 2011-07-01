@@ -134,7 +134,7 @@ public class CSwitchBodyContext extends CBodyContext {
     // ----------------------------------------------------------------------
 
     private /* final */ JSwitchStatement    stmt; // removed final for cloner
-    private /* final */ Hashtable       labels = new Hashtable(); // removed final for cloner
+    private /* final */ Hashtable<Integer, ?>       labels = new Hashtable<Integer, Object>(); // removed final for cloner
     private boolean         defaultExist;
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
@@ -151,7 +151,7 @@ public class CSwitchBodyContext extends CBodyContext {
     protected void deepCloneInto(at.dms.kjc.CSwitchBodyContext other) {
         super.deepCloneInto(other);
         other.stmt = (at.dms.kjc.JSwitchStatement)at.dms.kjc.AutoCloner.cloneToplevel(this.stmt);
-        other.labels = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.labels);
+        other.labels = (java.util.Hashtable<Integer, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.labels);
         other.defaultExist = this.defaultExist;
     }
 

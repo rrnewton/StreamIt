@@ -58,7 +58,7 @@ public class EmptyAttributeStreamVisitor implements AttributeStreamVisitor {
                                 JMethodDeclaration[] methods,
                                 JMethodDeclaration init) {
         /** visit each child. **/
-        Iterator childIter = self.getChildren().iterator();
+        Iterator<?> childIter = self.getChildren().iterator();
         while(childIter.hasNext()) {
             SIROperator currentChild = (SIROperator)childIter.next();
             currentChild.accept(this);
@@ -76,7 +76,7 @@ public class EmptyAttributeStreamVisitor implements AttributeStreamVisitor {
         // visit splitter
         self.getSplitter().accept(this);
         // visit children
-        Iterator childIter = self.getParallelStreams().iterator();
+        Iterator<?> childIter = self.getParallelStreams().iterator();
         while(childIter.hasNext()) {
             SIROperator currentChild = (SIROperator)childIter.next();
             currentChild.accept(this);

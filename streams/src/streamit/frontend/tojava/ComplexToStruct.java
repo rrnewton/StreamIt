@@ -17,6 +17,7 @@
 package streamit.frontend.tojava;
 
 import streamit.frontend.nodes.*;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -71,9 +72,9 @@ public class ComplexToStruct extends FEReplacer
         // Go through the list of structures, and notice them all.
         // We also need to rewrite the structures, in case there are
         // structs that contain structs.
-        List newStructs = new java.util.ArrayList();
+        List<TypeStruct> newStructs = new java.util.ArrayList<TypeStruct>();
         // Pass 1: find the struct named "Complex".
-        for (Iterator iter = prog.getStructs().iterator(); iter.hasNext(); )
+        for (Iterator<?> iter = prog.getStructs().iterator(); iter.hasNext(); )
             {
                 TypeStruct struct = (TypeStruct)iter.next();
                 if (struct.getName().equals("Complex"))
@@ -87,11 +88,11 @@ public class ComplexToStruct extends FEReplacer
 
             }
         // Pass 2: rewrite existing structures.
-        for (Iterator iter = prog.getStructs().iterator(); iter.hasNext(); )
+        for (Iterator<?> iter = prog.getStructs().iterator(); iter.hasNext(); )
             {
                 TypeStruct struct = (TypeStruct)iter.next();
-                List newNames = new java.util.ArrayList();
-                List newTypes = new java.util.ArrayList();
+                List<?> newNames = new java.util.ArrayList<Object>();
+                List<?> newTypes = new java.util.ArrayList<Object>();
                 for (int i = 0; i < struct.getNumFields(); i++)
                     {
                         String name = struct.getField(i);
@@ -120,8 +121,8 @@ public class ComplexToStruct extends FEReplacer
     {
         // Visit the parameter list, then let FEReplacer do the
         // rest of the work.
-        List newParams = new java.util.ArrayList();
-        for (Iterator iter = func.getParams().iterator(); iter.hasNext(); )
+        List<?> newParams = new java.util.ArrayList<Object>();
+        for (Iterator<?> iter = func.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 Type type = remapType(param.getType());
@@ -153,8 +154,8 @@ public class ComplexToStruct extends FEReplacer
     {
         // Visit the parameter list, then let FEReplacer do the
         // rest of the work.
-        List newParams = new java.util.ArrayList();
-        for (Iterator iter = ss.getParams().iterator(); iter.hasNext(); )
+        List<?> newParams = new java.util.ArrayList<Object>();
+        for (Iterator<?> iter = ss.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 Type type = remapType(param.getType());

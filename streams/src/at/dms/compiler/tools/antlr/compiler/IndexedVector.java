@@ -63,7 +63,7 @@ public class IndexedVector {
     public Object elementAt(int i) {
         return elements.elementAt(i);
     }
-    public Enumeration elements() {
+    public Enumeration<?> elements() {
         return elements.elements();
     }
     public Object getElement(Object key) {

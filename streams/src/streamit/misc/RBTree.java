@@ -160,7 +160,7 @@ public class RBTree
         return lowerBound;
     }
 
-    public Pair insert(Object insertData, boolean replace)
+    public Pair<RBNode, Boolean> insert(Object insertData, boolean replace)
     {
         assert insertData != null;
 
@@ -175,7 +175,7 @@ public class RBTree
                 root.right = NULL;
 
                 size = size + 1;
-                return new Pair(root, Boolean.TRUE);
+                return new Pair<RBNode, Boolean>(root, Boolean.TRUE);
             }
 
         // not an empty tree
@@ -245,7 +245,7 @@ public class RBTree
                                         insertionPoint.nodeData = insertData;
                                     }
 
-                                return new Pair(insertionPoint, Boolean.FALSE);
+                                return new Pair<RBNode, Boolean>(insertionPoint, Boolean.FALSE);
                             }
                     }
             }
@@ -319,7 +319,7 @@ public class RBTree
             }
 
         root.black = true;
-        return new Pair(insertionPoint, Boolean.TRUE);
+        return new Pair<RBNode, Boolean>(insertionPoint, Boolean.TRUE);
     }
 
     public void erase(RBNode node)

@@ -98,7 +98,7 @@ public class FieldProp implements Constants
         if (str instanceof SIRPipeline)
             {
                 SIRPipeline pl = (SIRPipeline)str;
-                Iterator iter = pl.getChildren().iterator();
+                Iterator<?> iter = pl.getChildren().iterator();
                 while (iter.hasNext())
                     {
                         SIRStream child = (SIRStream)iter.next();
@@ -139,7 +139,7 @@ public class FieldProp implements Constants
             Unroller unroller;
             for (int i = 0; i < str.getMethods().length; i++) {
                 do {
-                    unroller = new Unroller(new Hashtable(), unrollOuterLoops);
+                    unroller = new Unroller(new Hashtable<JLocalVariable, Object>(), unrollOuterLoops);
                     str.getMethods()[i].accept(unroller);
                 } while (unroller.hasUnrolled());
             }
@@ -738,7 +738,7 @@ public class FieldProp implements Constants
         }
         // propagate into initializers and types of field declarations
         JFieldDeclaration[] fields = filter.getFields();
-        Propagator prop = new Propagator(new Hashtable());
+        Propagator prop = new Propagator(new Hashtable<JLocalVariable, Object>());
         for (int i = 0; i < fields.length; i++) {
             // the field type (propagate into static array bounds)
             CType type = fields[i].getType();
@@ -799,9 +799,9 @@ public class FieldProp implements Constants
      * @param meth
      * @return
      */
-    private Hashtable findLocals(JMethodDeclaration meth)
+    private Hashtable<JLocalVariable, ?> findLocals(JMethodDeclaration meth)
     {
-        final Hashtable yes = new Hashtable();
+        final Hashtable<JLocalVariable, ?> yes = new Hashtable<JLocalVariable, Object>();
         
         // This looks a lot like the thing we had for fields, except
         // that it looks for local variables.

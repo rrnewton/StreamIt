@@ -19,7 +19,7 @@ package streamit.library;
 
 public class Bit{
 
-    public static Class TYPE = Integer.TYPE;
+    public static Class<?> TYPE = Integer.TYPE;
     // Hacked to make FileReader/Writer<pre>bit</pre> work
     // Hacks occur in Bit.java, NodesToJava.java, FileReader.java, FileWriter.java
     final public static boolean TREAT_AS_BITS = true;

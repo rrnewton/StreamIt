@@ -285,7 +285,7 @@ public class StreamItDot implements AttributeStreamVisitor
         //print("subgraph cluster_" + getName() + " {\n label=\"" + self.getIdent() + "\";\n");
         
         // Walk through each of the elements in the pipeline.
-        Iterator iter = self.getChildren().iterator();
+        Iterator<?> iter = self.getChildren().iterator();
         while (iter.hasNext())
             {
                 SIROperator oper = (SIROperator)iter.next();

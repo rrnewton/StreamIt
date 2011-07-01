@@ -62,7 +62,7 @@ public class Table {
     public void init() {
         heads = new Hashtable[maxWordLength];
         for (int i = 0; i < maxWordLength; i++) {
-            heads[i] = new Hashtable();
+            heads[i] = new Hashtable<Object, Object>();
         }
     }
 
@@ -134,7 +134,7 @@ public class Table {
         out.println("    private static final int[][] " + tableName + " = {");
 
         for (int i = 0; i < heads.length; i++) {
-            Hashtable       items = heads[i];
+            Hashtable<?, ?>       items = heads[i];
 
             out.print("    {");
             for (char c = minCharValue; c <= maxCharValue; c++) {

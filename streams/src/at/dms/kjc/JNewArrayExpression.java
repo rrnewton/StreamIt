@@ -187,7 +187,7 @@ public class JNewArrayExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         return    p.visitNewArrayExpression(this, type.getBaseType(), dims, init);
     }
 

@@ -381,13 +381,13 @@ public class StatelessDuplicate {
         JMethodDeclaration result = (JMethodDeclaration)
             ObjectDeepCloner.deepCopy(origFilter.getInit());
         // get the parameters
-        List params = sj.getParams();
+        List<?> params = sj.getParams();
         // now build up the body as a series of calls to the sub-streams
-        LinkedList bodyList = new LinkedList();
+        LinkedList<?> bodyList = new LinkedList<Object>();
         for (ListIterator<SIRFilter> it = newFilters.listIterator(); it.hasNext(); ) {
             // build up the argument list
-            LinkedList args = new LinkedList();
-            for (ListIterator pit = params.listIterator(); pit.hasNext(); ) {
+            LinkedList<?> args = new LinkedList<Object>();
+            for (ListIterator<?> pit = params.listIterator(); pit.hasNext(); ) {
                 args.add((JExpression)pit.next());
             }
             // add the child and the argument to the parent

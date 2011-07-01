@@ -81,7 +81,7 @@ public class InstructionHandle extends AbstractInstructionAccessor implements at
     /**
      * Adds line number info stored for the instruction to the specified vector.
      */
-    public void addLineNumberInfo(Vector lineNumberInfo) {
+    public void addLineNumberInfo(Vector<Object> lineNumberInfo) {
         if (lineNumbers != null) {
             for (Enumeration<Integer> eNum = lineNumbers.elements(); eNum.hasMoreElements(); ) {
                 int line = eNum.nextElement().intValue();

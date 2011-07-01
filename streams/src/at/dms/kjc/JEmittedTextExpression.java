@@ -56,7 +56,7 @@ public class JEmittedTextExpression extends JExpression {
      * @see at.dms.kjc.JStatement#accept(at.dms.kjc.AttributeVisitor)
      */
     @Override
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         return p.visitEmittedTextExpression(this, parts);
     }
     @Override

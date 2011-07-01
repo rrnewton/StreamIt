@@ -198,7 +198,7 @@ abstract public class Joiner extends Operator
             }
         if (joinWorks[nWork] == null)
             {
-                joinWorks[nWork] = new Pair(this, new Integer(nWork));
+                joinWorks[nWork] = new Pair<Joiner, Integer>(this, new Integer(nWork));
             }
 
         return joinWorks[nWork];

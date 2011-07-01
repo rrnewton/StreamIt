@@ -137,7 +137,7 @@ public class CBadClass extends CClass {
      * look in parent hierarchy as needed
      * @param  v        method name
      */
-    public void collectInterfaceMethods(Vector v) {
+    public void collectInterfaceMethods(Vector<?> v) {
     }
 
     /**
@@ -146,7 +146,7 @@ public class CBadClass extends CClass {
      * look in parent hierarchy as needed
      * @param   v        method name
      */
-    public void collectAbstractMethods(Vector v) {
+    public void collectAbstractMethods(Vector<?> v) {
     }
 
     // ----------------------------------------------------------------------

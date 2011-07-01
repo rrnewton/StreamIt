@@ -332,13 +332,13 @@ class ShiftPipelineFusion {
         for (ListIterator<FilterInfo> it = filterInfo.listIterator(); it.hasNext(); ) {
             FilterInfo info = it.next();
             // get list of local variable definitions from <filterInfo>
-            List locals = 
+            List<JVariableDefinition> locals = 
                 init ? info.init.getVariables() : info.steady.getVariables();
             // go through locals, adding variable declaration
-            for (ListIterator loc = locals.listIterator(); loc.hasNext(); ) {
+            for (ListIterator<JVariableDefinition> loc = locals.listIterator(); loc.hasNext(); ) {
                 // get local
                 JVariableDefinition local = 
-                    (JVariableDefinition)loc.next();
+                    loc.next();
                 // add variable declaration for local
                 statements.
                     addStatement(new JVariableDeclarationStatement(null, 
@@ -397,7 +397,7 @@ class ShiftPipelineFusion {
                 FusingVisitor fuser = 
                     new FusingVisitor(curPhase, nextPhase, i!=0,
                                       i!=filterInfo.size()-1);
-                for (ListIterator it = body.getStatementIterator(); 
+                for (ListIterator<?> it = body.getStatementIterator(); 
                      it.hasNext() ; ) {
                     ((JStatement)it.next()).accept(fuser);
                 }
@@ -410,7 +410,7 @@ class ShiftPipelineFusion {
                     fuser = 
                         new FusingVisitor(curPhase, nextPhase, i!=0,
                                           i!=filterInfo.size()-1);
-                    for (ListIterator it = initBody.getStatementIterator(); 
+                    for (ListIterator<?> it = initBody.getStatementIterator(); 
                          it.hasNext() ; ) {
                         ((JStatement)it.next()).accept(fuser);
                     }
@@ -1044,7 +1044,7 @@ class ShiftPipelineFusion {
          * A list of the arguments to the init function of the fused
          * block, all of type JExpression.
          */
-        private List fusedArgs;
+        private List<?> fusedArgs;
 
         /**
          * Cached copy of the method decl for the init function.
@@ -1065,7 +1065,7 @@ class ShiftPipelineFusion {
             this.filterInfo = filterInfo;
             this.fusedBlock = new JBlock(null, new JStatement[0], null);
             this.fusedParam = new LinkedList<JFormalParameter>();
-            this.fusedArgs = new LinkedList();
+            this.fusedArgs = new LinkedList<Object>();
             this.numFused = 0;
         }
 
@@ -1084,7 +1084,7 @@ class ShiftPipelineFusion {
          * incorporate this info into the init function of the fused
          * filter.
          */
-        private void processArgs(FilterInfo info, List args) {
+        private void processArgs(FilterInfo info, List<?> args) {
             // make parameters for <args>, and build <newArgs> to pass
             // to new init function call
             JExpression[] newArgs = new JExpression[args.size()];
@@ -1146,7 +1146,7 @@ class ShiftPipelineFusion {
          * Returns the list of arguments that should be passed to init
          * function.
          */
-        public List getInitArgs() {
+        public List<?> getInitArgs() {
             return fusedArgs;
         }
     

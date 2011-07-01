@@ -197,7 +197,7 @@ public class JInterfaceDeclaration extends JTypeDeclaration {
      */
     private JInitializerDeclaration constructStaticInitializers() {
         // collect all static initializers and build a method
-        Vector  elems = new Vector();
+        Vector<Object>  elems = new Vector<Object>();
         boolean needGen = false;
 
         for (int i = 0; i < body.length; i++) {
@@ -246,7 +246,7 @@ public class JInterfaceDeclaration extends JTypeDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    public Object accept(AttributeVisitor<?> p) {
         Object trash = super.accept(p);
         return p.visitInterfaceDeclaration(this,
                                            getCClass().getModifiers(),

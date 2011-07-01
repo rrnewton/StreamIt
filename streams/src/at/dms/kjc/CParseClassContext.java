@@ -99,10 +99,10 @@ public class CParseClassContext implements DeepCloneable {
     // DATA MEMBERS
     // ----------------------------------------------------------------------
 
-    private Vector fields = new Vector();
-    private Vector methods = new Vector();
-    private Vector inners = new Vector();
-    private Vector body = new Vector();
+    private Vector<Object> fields = new Vector<Object>();
+    private Vector<Object> methods = new Vector<Object>();
+    private Vector<Object> inners = new Vector<Object>();
+    private Vector<Object> body = new Vector<Object>();
 
     private static Stack<CParseClassContext> stack = new Stack<CParseClassContext>();
 
@@ -118,10 +118,10 @@ public class CParseClassContext implements DeepCloneable {
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CParseClassContext other) {
-        other.fields = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.fields);
-        other.methods = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.methods);
-        other.inners = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.inners);
-        other.body = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
+        other.fields = (java.util.Vector<Object>)at.dms.kjc.AutoCloner.cloneToplevel(this.fields);
+        other.methods = (java.util.Vector<Object>)at.dms.kjc.AutoCloner.cloneToplevel(this.methods);
+        other.inners = (java.util.Vector<Object>)at.dms.kjc.AutoCloner.cloneToplevel(this.inners);
+        other.body = (java.util.Vector<Object>)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
