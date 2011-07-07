@@ -14,10 +14,13 @@
 
 package streamit.scheduler2.constrained;
 
+import streamit.scheduler2.iriter./* persistent. */
+    FilterIter;
+import streamit.scheduler2.iriter./* persistent. */
+    Iterator;
+
 import streamit.scheduler2.Schedule;
 import streamit.scheduler2.hierarchical.PhasingSchedule;
-import streamit.scheduler2.iriter.FilterIter;
-import streamit.scheduler2.iriter.Iterator;
 
 public class Filter
     extends streamit.scheduler2.hierarchical.Filter

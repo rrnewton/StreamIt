@@ -3,57 +3,9 @@
  */
 package at.dms.kjc.sir.lowering;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import at.dms.kjc.AutoCloner;
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CNumericType;
-import at.dms.kjc.CSourceField;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.CVectorType;
-import at.dms.kjc.CVectorTypeLow;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBinaryExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JShiftExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.StatementQueueVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRMarker;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRStream;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 import at.dms.util.Utils;
 
 /**

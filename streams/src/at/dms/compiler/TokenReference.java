@@ -21,8 +21,7 @@
 package at.dms.compiler;
 
 import java.io.File;
-import java.io.Serializable;
-
+import java.io.*;
 import at.dms.util.Utils;
 
 /**

@@ -39,7 +39,7 @@ public class SCAnon extends StreamCreator
      * @param portals  list of <code>Expression</code> giving the
      *                 portals to register the new stream with
      */
-    public SCAnon(FEContext context, StreamSpec spec, List<?> portals)
+    public SCAnon(FEContext context, StreamSpec spec, List portals)
     {
         super(context, portals);
         this.spec = spec;
@@ -56,7 +56,7 @@ public class SCAnon extends StreamCreator
      * @param portals  list of <code>Expression</code> giving the
      *                 portals to register the new stream with
      */
-    public SCAnon(FEContext context, int type, Statement init, List<?> portals)
+    public SCAnon(FEContext context, int type, Statement init, List portals)
     {
         super(context, portals);
         this.spec = new StreamSpec(context, type, null, null,

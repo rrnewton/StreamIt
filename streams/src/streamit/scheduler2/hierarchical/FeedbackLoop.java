@@ -16,9 +16,10 @@
 
 package streamit.scheduler2.hierarchical;
 
-import streamit.scheduler2.Schedule;
+import streamit.scheduler2.iriter./*persistent.*/
+    FeedbackLoopIter;
 import streamit.scheduler2.base.StreamFactory;
-import streamit.scheduler2.iriter.FeedbackLoopIter;
+import streamit.scheduler2.Schedule;
 
 /**
  * This class provides the required functions to implement a schduler

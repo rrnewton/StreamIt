@@ -4,37 +4,13 @@
  */
 package at.dms.kjc.sir.lowering;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRPipelineIter;
-import at.dms.kjc.iterator.SIRSplitJoinIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRMarker;
-import at.dms.kjc.sir.SIRNavigationUtils;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.iterator.*;
 import at.dms.kjc.sir.lowering.fusion.FusePipelines;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+
+import java.util.*;
 
 /**
  * Mung code to allow naive vectorization.

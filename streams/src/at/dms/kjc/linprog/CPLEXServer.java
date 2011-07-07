@@ -4,9 +4,9 @@
 
 package at.dms.kjc.linprog;
 
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.util.*;
+import java.rmi.*;
+import java.rmi.server.*;
 
 public class CPLEXServer extends UnicastRemoteObject implements RMISolver {
     // base name of host

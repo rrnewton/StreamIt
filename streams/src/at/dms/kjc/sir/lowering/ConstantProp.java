@@ -1,31 +1,9 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-
-import at.dms.kjc.CClassType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIREmptyVisitor;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 import at.dms.kjc.common.ArrayCopy;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRGlobal;
-import at.dms.kjc.sir.SIRInitStatement;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPortal;
-import at.dms.kjc.sir.SIRPredefinedFilter;
-import at.dms.kjc.sir.SIRRecursiveStub;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class propagates constants and unrolls loops.  Currently only
@@ -49,7 +27,7 @@ public class ConstantProp {
      */
     public static void propagateAndUnroll(SIRStream str) {
         // start at the outermost loop with an empty set of constants
-        new ConstantProp(false).propagateAndUnroll(str, new Hashtable<JLocalVariable, Object>());
+        new ConstantProp(false).propagateAndUnroll(str, new Hashtable());
     }
 
     /**
@@ -61,13 +39,13 @@ public class ConstantProp {
      */  
     public static void propagateAndUnroll(SIRStream str, boolean removeDeadFields) {
         // start at the outermost loop with an empty set of constants
-        new ConstantProp(removeDeadFields).propagateAndUnroll(str, new Hashtable<JLocalVariable, Object>());
+        new ConstantProp(removeDeadFields).propagateAndUnroll(str, new Hashtable());
     }
     /**
      * Does the work on <str>, given that <constants> maps from
      * a JLocalVariable to a JLiteral for all constants that are known.
      */
-    private void propagateAndUnroll(SIRStream str, Hashtable<JLocalVariable, ?> constants) {
+    private void propagateAndUnroll(SIRStream str, Hashtable constants) {
         Unroller unroller;
         
         do {
@@ -188,7 +166,7 @@ public class ConstantProp {
     /**
      * Recurses from <str> into all its substreams.
      */
-    private void recurseFrom(SIRContainer str, Hashtable<JLocalVariable, ?> constants) {
+    private void recurseFrom(SIRContainer str, Hashtable constants) {
         // if we're at the bottom, we're done
         if (str.getInit()==null) {
             return;
@@ -215,19 +193,19 @@ public class ConstantProp {
     }
 
     class InitPropagator extends Propagator {
-        public InitPropagator(Hashtable<JLocalVariable, ?> constants) {
+        public InitPropagator(Hashtable constants) {
             super(constants);
         }
 
-        public InitPropagator(Hashtable<JLocalVariable, ?> constants,boolean write) {
+        public InitPropagator(Hashtable constants,boolean write) {
             super(constants,write);
         }
     
-        public Propagator construct(Hashtable<JLocalVariable, ?> constants) {
+        public Propagator construct(Hashtable constants) {
             return new InitPropagator(constants);
         }
     
-        public Propagator construct(Hashtable<JLocalVariable, ?> constants,boolean write) {
+        public Propagator construct(Hashtable constants,boolean write) {
             return new InitPropagator(constants,write);
         }
     
@@ -258,7 +236,7 @@ public class ConstantProp {
      * Recurses into <str> given that it is instantiated with
      * arguments <args>, and <constants> were built for the parent.
      */
-    private void recurseInto(SIRStream str, List<?> args, Hashtable<JLocalVariable, ?> constants) {
+    private void recurseInto(SIRStream str, List args, Hashtable constants) {
         JMethodDeclaration initMethod = str.getInit();
         // if there is no init function, we're done
         //System.err.println("   Recursing into:"+str);

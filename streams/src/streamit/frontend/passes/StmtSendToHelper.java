@@ -16,12 +16,10 @@
 
 package streamit.frontend.passes;
 
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.StmtHelperCall;
-import streamit.frontend.nodes.StmtSendMessage;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.UnrecognizedVariableException;
+import streamit.frontend.nodes.*;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Replaces StmtSendMessage with HelperCalls where the receiver

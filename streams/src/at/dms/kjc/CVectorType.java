@@ -3,11 +3,10 @@
  */
 package at.dms.kjc;
 
-import java.util.HashSet;
-
 import at.dms.compiler.UnpositionedError;
-import at.dms.kjc.sir.SIRStructure;
 import at.dms.util.SimpleStringBuffer;
+import java.util.*;
+import at.dms.kjc.sir.SIRStructure;
 
 /**
  * Short vectors of base types.

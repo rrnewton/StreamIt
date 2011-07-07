@@ -1,21 +1,10 @@
 package at.dms.kjc.sir.stats;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JDoStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JWhileStatement;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+
+import java.util.*;
 
 /**
  * This class gathers statistics about stream programs in order to

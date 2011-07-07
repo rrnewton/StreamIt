@@ -16,28 +16,10 @@
 
 package streamit.frontend.passes;
 
+import streamit.frontend.nodes.*;
+
 import java.util.Iterator;
 import java.util.Map;
-
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FEReplacer;
-import streamit.frontend.nodes.FieldDecl;
-import streamit.frontend.nodes.FuncWork;
-import streamit.frontend.nodes.Function;
-import streamit.frontend.nodes.GetExprType;
-import streamit.frontend.nodes.Parameter;
-import streamit.frontend.nodes.Program;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtBlock;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.StreamType;
-import streamit.frontend.nodes.SymbolTable;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypeHelper;
-import streamit.frontend.nodes.TypeStruct;
-import streamit.frontend.nodes.TypeStructRef;
 
 /**
  * Front-end visitor pass that maintains a symbol table. 
@@ -181,7 +163,7 @@ public class SymbolTableVisitor extends FEReplacer
     {
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
-        for (Iterator<?> iter = func.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = func.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 symtab.registerVar(param.getName(),
@@ -216,7 +198,7 @@ public class SymbolTableVisitor extends FEReplacer
             TypeStruct struct = iter.next();
             structsByName.put(struct.getName(), struct);
         }
-        for (Iterator<?> iter = prog.getHelpers().iterator(); iter.hasNext();) {
+        for (Iterator iter = prog.getHelpers().iterator(); iter.hasNext();) {
             TypeHelper helper = (TypeHelper) iter.next();
             helpersByName.put(helper.getName(), helper);
         }

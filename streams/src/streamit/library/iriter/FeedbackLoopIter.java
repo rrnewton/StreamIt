@@ -17,8 +17,8 @@
 package streamit.library.iriter;
 
 import streamit.library.FeedbackLoop;
-import streamit.library.NullJoiner;
 import streamit.library.NullSplitter;
+import streamit.library.NullJoiner;
 
 
 /**

@@ -1,10 +1,7 @@
 package at.dms.kjc.iterator; 
 
-import streamit.scheduler2.iriter.Iterator;
-import streamit.scheduler2.iriter.PipelineIter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.StreamVisitor;
+import at.dms.kjc.sir.*;
+import streamit.scheduler2.iriter.*;
 
 /**
  * IterFactory uses this for SIRPipeline.

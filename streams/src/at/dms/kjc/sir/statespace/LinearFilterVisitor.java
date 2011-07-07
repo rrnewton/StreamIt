@@ -1,55 +1,8 @@
 package at.dms.kjc.sir.statespace;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Vector;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBinaryExpression;
-import at.dms.kjc.JBitwiseExpression;
-import at.dms.kjc.JBooleanLiteral;
-import at.dms.kjc.JByteLiteral;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JCharLiteral;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JConditionalExpression;
-import at.dms.kjc.JDivideExpression;
-import at.dms.kjc.JDoubleLiteral;
-import at.dms.kjc.JEqualityExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JLongLiteral;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMinusExpression;
-import at.dms.kjc.JModuloExpression;
-import at.dms.kjc.JMultExpression;
-import at.dms.kjc.JNewArrayExpression;
-import at.dms.kjc.JNullLiteral;
-import at.dms.kjc.JParenthesedExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JShiftExpression;
-import at.dms.kjc.JShortLiteral;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JStringLiteral;
-import at.dms.kjc.JUnaryExpression;
-import at.dms.kjc.JUnaryPromote;
-import at.dms.kjc.JWhileStatement;
-import at.dms.kjc.SLIREmptyAttributeVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPrintStatement;
-import at.dms.kjc.sir.SIRPushExpression;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
 
 /**

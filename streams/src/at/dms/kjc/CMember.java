@@ -20,10 +20,8 @@
 
 package at.dms.kjc;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
 import at.dms.util.InconsistencyException;
+import java.io.*;
 
 /**
  * This class represents an exported member of a class

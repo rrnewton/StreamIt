@@ -16,12 +16,7 @@
 
 package streamit.frontend.controlflow;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Abstract base class for data-flow analyses.  This provides the

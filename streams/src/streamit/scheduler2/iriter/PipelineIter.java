@@ -16,6 +16,7 @@
 
 package streamit.scheduler2.iriter;
 
+import streamit.scheduler2.iriter.Iterator;
 
 /**
  * <dl>

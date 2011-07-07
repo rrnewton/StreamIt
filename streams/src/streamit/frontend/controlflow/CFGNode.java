@@ -16,8 +16,7 @@
 
 package streamit.frontend.controlflow;
 
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.Statement;
+import streamit.frontend.nodes.*;
 
 /**
  * A single-statement or single-expression node in a control flow graph.

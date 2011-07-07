@@ -15,6 +15,7 @@ import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.common.ConvertLocalsToFields;
+import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
@@ -56,6 +57,14 @@ import at.dms.kjc.slicegraph.SimpleSlicer;
 import at.dms.kjc.slicegraph.Slice;
 import at.dms.kjc.slicegraph.Slicer;
 import at.dms.kjc.slicegraph.UnflatFilter;
+import at.dms.kjc.spacetime.AddBuffering;
+import at.dms.kjc.spacetime.BasicGenerateSteadyStateSchedule;
+import at.dms.kjc.spacetime.CalculateParams;
+import at.dms.kjc.spacetime.CompCommRatio;
+import at.dms.kjc.spacetime.DuplicateBottleneck;
+import at.dms.kjc.spacetime.GranularityAdjust;
+import at.dms.kjc.spacetime.GreedyBinPacking;
+import at.dms.kjc.spacetime.StreamlinedDuplicate;
 
 /**
  * Common passes, useful in new back ends.

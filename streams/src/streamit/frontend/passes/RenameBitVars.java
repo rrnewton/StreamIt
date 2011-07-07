@@ -16,13 +16,10 @@
 
 package streamit.frontend.passes;
 
-import java.util.List;
+import streamit.frontend.nodes.*;
 
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.SymbolTable;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypePrimitive;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Front-end visitor passes that renames variables of type

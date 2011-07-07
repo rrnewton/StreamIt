@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
+import java.io.Reader;
 
 import at.dms.compiler.tools.common.UnicodeReader;
 

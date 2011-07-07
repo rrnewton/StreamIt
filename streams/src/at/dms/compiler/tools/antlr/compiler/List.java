@@ -34,7 +34,7 @@ public interface List {
 
     Object elementAt(int index) throws NoSuchElementException;
 
-    Enumeration<?> elements();
+    Enumeration elements();
 
     boolean includes(Object o);
 

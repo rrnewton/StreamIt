@@ -20,7 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.CharFormatter;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 class JavaCharFormatter implements CharFormatter {
 

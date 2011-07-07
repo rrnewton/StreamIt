@@ -1,9 +1,7 @@
 package at.dms.kjc.sir.statespace.transform;
 
-import at.dms.kjc.sir.statespace.FilterMatrix;
-import at.dms.kjc.sir.statespace.FilterVector;
-import at.dms.kjc.sir.statespace.LinearFilterRepresentation;
-import at.dms.kjc.sir.statespace.LinearPrinter;
+import at.dms.kjc.sir.statespace.*;
+import java.util.*;
 
 
 

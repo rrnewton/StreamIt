@@ -20,10 +20,10 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.CWarning;
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
+import at.dms.compiler.CWarning;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.9: If Statement
@@ -110,7 +110,7 @@ public class JIfStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return p.visitIfStatement(this, cond, thenClause, elseClause);
     }        
 

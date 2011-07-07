@@ -16,10 +16,10 @@
 
 package streamit.library;
 
-import java.util.ListIterator;
+import java.util.*;
 
-import streamit.library.iriter.Iterator;
 import streamit.scheduler2.Scheduler;
+import streamit.library.iriter.Iterator;
 
 /**
  *  implements a pipeline - stream already has all the functionality,

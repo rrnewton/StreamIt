@@ -1,49 +1,22 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import at.dms.kjc.JClassDeclaration;
-import at.dms.kjc.JInterfaceDeclaration;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.StreamItDot;
-import at.dms.kjc.common.ConvertLocalsToFields;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.iterator.SIRPhasedFilterIter;
-import at.dms.kjc.lir.LIRToC;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRDynamicRateManager;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRGlobal;
-import at.dms.kjc.sir.SIRHelper;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRPortal;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.sir.linear.LinearAnalyzer;
-import at.dms.kjc.sir.linear.LinearAtlasReplacer;
-import at.dms.kjc.sir.linear.LinearDiagonalReplacer;
-import at.dms.kjc.sir.linear.LinearDirectReplacer;
-import at.dms.kjc.sir.linear.LinearDot;
-import at.dms.kjc.sir.linear.LinearDotSimple;
-import at.dms.kjc.sir.linear.LinearIndirectReplacer;
-import at.dms.kjc.sir.linear.LinearRedundancyAnalyzer;
-import at.dms.kjc.sir.linear.LinearRedundancyReplacer;
-import at.dms.kjc.sir.linear.frequency.FrequencyReplacer;
-import at.dms.kjc.sir.lowering.fission.FissionReplacer;
-import at.dms.kjc.sir.lowering.fusion.FuseAll;
-import at.dms.kjc.sir.lowering.fusion.Lifter;
-import at.dms.kjc.sir.lowering.partition.ManualPartition;
-import at.dms.kjc.sir.lowering.partition.SJToPipe;
-import at.dms.kjc.sir.lowering.partition.linear.LinearPartitioner;
+import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.sir.lowering.partition.linear.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.fission.*;
 import at.dms.kjc.sir.stats.StatisticsGathering;
+import at.dms.kjc.sir.linear.*;
+import at.dms.kjc.sir.linear.frequency.*; 
+import at.dms.util.IRPrinter;
+import at.dms.util.SIRPrinter;
 import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.kjc.common.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.lir.*;
+
+import java.util.*; 
 
 /**
  * This is the main class for decomposing the high SIR into
@@ -71,7 +44,7 @@ public class Flattener {
         System.err.print("Running Constant Prop and Unroll... ");
         Set<SIRGlobal> theStatics = new HashSet<SIRGlobal>();
         if (global != null) theStatics.add(global);
-        Map<?, ?> associatedGlobals = StaticsProp.propagate(str,theStatics);
+        Map associatedGlobals = StaticsProp.propagate(str,theStatics);
         ConstantProp.propagateAndUnroll(str,true);
         System.err.println("done.");
 

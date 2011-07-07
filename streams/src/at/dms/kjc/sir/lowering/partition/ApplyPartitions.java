@@ -1,20 +1,9 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.HashMap;
-
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fusion.FusePipe;
-import at.dms.kjc.sir.lowering.fusion.FuseSplit;
-import at.dms.kjc.sir.lowering.fusion.Lifter;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.fusion.*;
 
 /*
   This is the class that performs the fusion dictated by a

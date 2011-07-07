@@ -20,17 +20,12 @@
 
 package at.dms.kjc.sir;
 
-import at.dms.compiler.JavaStyleComment;
+import at.dms.kjc.*;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.CBodyContext;
-import at.dms.kjc.CodeSequence;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.compiler.JavaStyleComment;
+import at.dms.util.MessageDescription;
+import at.dms.util.InconsistencyException;
 
 /**
  * This represents a print statement, originally formulated with
@@ -116,9 +111,9 @@ public class SIRPrintStatement extends JStatement {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitPrintStatement(this,
+            return ((SLIRAttributeVisitor)p).visitPrintStatement(this,
                                                                  arg);
         } else {
             return this;

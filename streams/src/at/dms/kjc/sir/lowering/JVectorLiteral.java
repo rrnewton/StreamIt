@@ -5,6 +5,7 @@ package at.dms.kjc.sir.lowering;
 
 import at.dms.compiler.PositionedError;
 import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.AutoCloner;
 import at.dms.kjc.CExpressionContext;
 import at.dms.kjc.CNumericType;
 import at.dms.kjc.CType;
@@ -80,9 +81,9 @@ public class JVectorLiteral extends JExpression {
      * @see at.dms.kjc.JExpression#accept(at.dms.kjc.AttributeVisitor)
      */
     @Override
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitVectorLiteral(this,scalar);
+            return ((SLIRAttributeVisitor)p).visitVectorLiteral(this,scalar);
         } else {
             return this;
         }

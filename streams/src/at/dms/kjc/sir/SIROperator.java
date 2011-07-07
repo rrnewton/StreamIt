@@ -1,19 +1,12 @@
 package at.dms.kjc.sir;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import at.dms.kjc.DeepCloneable;
-import at.dms.kjc.Finalizable;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.iterator.IterFactory;
+import at.dms.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
 import at.dms.kjc.sir.lowering.LoweringConstants;
+
+import java.util.*;
+import java.io.*;
 
 /**
  * This represents an operator in the stream graph.

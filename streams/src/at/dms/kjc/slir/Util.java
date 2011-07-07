@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.InputSliceNode;
 
 public class Util {
 

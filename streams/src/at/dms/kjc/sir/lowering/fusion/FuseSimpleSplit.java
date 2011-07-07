@@ -1,53 +1,12 @@
 package at.dms.kjc.sir.lowering.fusion;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import at.dms.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.lir.*;
+import at.dms.kjc.sir.lowering.*;
 
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JMultExpression;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRTwoStageFilter;
-import at.dms.kjc.sir.lowering.InlinePhases;
-import at.dms.kjc.sir.lowering.LoweringConstants;
-import at.dms.kjc.sir.lowering.MarkFilterBoundaries;
-import at.dms.kjc.sir.lowering.RenameAll;
-import at.dms.kjc.sir.lowering.SIRScheduler;
-import at.dms.util.Utils;
+import java.util.*;
 
 /**
  * This flattens certain cases of split/joins into a single filter.
@@ -263,7 +222,7 @@ public class FuseSimpleSplit {
 
         // don't bother adding identity filters to the pipeline
         if (!(newFilter instanceof SIRIdentity)) {
-            pipe.add(newFilter, new LinkedList<Object>(sj.getParent().getParams(index)));
+            pipe.add(newFilter, new LinkedList(sj.getParent().getParams(index)));
         }
 
         // make a joinFilter only if it's not a not a null join
@@ -470,7 +429,7 @@ public class FuseSimpleSplit {
         // get total weights
         int sumOfWeights = split.getSumOfWeights();
         // make list of statements for work function
-        LinkedList<?> list = new LinkedList<Object>();
+        LinkedList list = new LinkedList();
 
         // mark beginning of splitter
         list.add(MarkFilterBoundaries.makeBeginMarker(split));
@@ -649,7 +608,7 @@ public class FuseSimpleSplit {
         // get total weights
         int sumOfWeights = join.getSumOfWeights();
         // make list of statements for work function
-        LinkedList<?> list = new LinkedList<Object>();
+        LinkedList list = new LinkedList();
 
         // mark end of splitter
         list.add(MarkFilterBoundaries.makeBeginMarker(join));
@@ -833,7 +792,7 @@ public class FuseSimpleSplit {
         // add calls to init functions
         for (int i=0; i<sj.size(); i++) {
             SIRStream child = sj.get(i);
-            List<?> params = sj.getParams(i);
+            List params = sj.getParams(i);
             if (child.needsInit()) {
                 init.addStatement(new JExpressionStatement(null,
                                                            new JMethodCallExpression(null,

@@ -22,6 +22,7 @@ package at.dms.kjc;
 
 import at.dms.compiler.TokenReference;
 import at.dms.util.InconsistencyException;
+import java.io.*;
 
 
 /**
@@ -66,7 +67,7 @@ public class JGeneratedLocalVariable extends JLocalVariable {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         throw new InconsistencyException();
     }
 

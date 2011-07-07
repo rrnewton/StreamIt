@@ -29,21 +29,7 @@ package at.dms.kjc;
 import java.util.Stack;
 import java.util.Vector;
 
-import at.dms.classfile.AccessorContainer;
-import at.dms.classfile.AccessorTransformer;
-import at.dms.classfile.BadAccessorException;
-import at.dms.classfile.ClassRefInstruction;
-import at.dms.classfile.FieldRefInstruction;
-import at.dms.classfile.HandlerInfo;
-import at.dms.classfile.Instruction;
-import at.dms.classfile.InstructionAccessor;
-import at.dms.classfile.JumpInstruction;
-import at.dms.classfile.LineNumberInfo;
-import at.dms.classfile.LocalVarInstruction;
-import at.dms.classfile.LocalVariableInfo;
-import at.dms.classfile.MethodRefInstruction;
-import at.dms.classfile.NewarrayInstruction;
-import at.dms.classfile.NoArgInstruction;
+import at.dms.classfile.*;
 import at.dms.util.InconsistencyException;
 import at.dms.util.Utils;
 
@@ -58,8 +44,8 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
      */
     private CodeSequence() {
         instructions = new Instruction[at.dms.classfile.Constants.MAX_CODE_PER_METHOD];
-        handlers = new Vector<Object>();
-        lines = new Vector<Object>();
+        handlers = new Vector();
+        lines = new Vector();
         /* LOCAL VARIABLES NOT USED
            locals = new Hashtable();
            LOCAL VARIABLES NOT USED */
@@ -504,8 +490,8 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
     // --------------------------------------------------------------------
 
     private Instruction[]           instructions;
-    private Vector<?>          handlers;
-    private Vector<?>          lines;
+    private Vector          handlers;
+    private Vector          lines;
     /* LOCAL VARIABLES NOT USED
        private Hashtable            locals;
        LOCAL VARIABLES NOT USED */
@@ -532,13 +518,13 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
     protected void deepCloneInto(at.dms.kjc.CodeSequence other) {
         super.deepCloneInto(other);
         other.instructions = (at.dms.classfile.Instruction[])at.dms.kjc.AutoCloner.cloneToplevel(this.instructions);
-        other.handlers = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.handlers);
-        other.lines = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.lines);
+        other.handlers = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.handlers);
+        other.lines = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.lines);
         other.pc = this.pc;
         other.labelAtEnd = this.labelAtEnd;
         other.lineNumber = this.lineNumber;
         other.lastLine = this.lastLine;
-        other.contexts = (java.util.Stack<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.contexts);
+        other.contexts = (java.util.Stack)at.dms.kjc.AutoCloner.cloneToplevel(this.contexts);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

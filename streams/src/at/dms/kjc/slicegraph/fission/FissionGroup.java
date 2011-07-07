@@ -1,7 +1,7 @@
 package at.dms.kjc.slicegraph.fission;
 
-import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.backendSupport.FilterInfo;
 
 public class FissionGroup {
     public Slice unfizzedSlice;

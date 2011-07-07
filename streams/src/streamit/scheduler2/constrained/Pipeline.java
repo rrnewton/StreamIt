@@ -16,14 +16,18 @@
 
 package streamit.scheduler2.constrained;
 
+import streamit.scheduler2.iriter./*persistent.*/
+    PipelineIter;
+import streamit.scheduler2.iriter./*persistent.*/
+    Iterator;
+
+import streamit.misc.Pair;
 import streamit.misc.DLList;
 import streamit.misc.OMap;
 import streamit.misc.OMapIterator;
-import streamit.misc.Pair;
-import streamit.scheduler2.SDEPData;
+
 import streamit.scheduler2.hierarchical.PhasingSchedule;
-import streamit.scheduler2.iriter.Iterator;
-import streamit.scheduler2.iriter.PipelineIter;
+import streamit.scheduler2.SDEPData;
 
 /**
  * streamit.scheduler2.constrained.Pipeline is the pipeline constrained 
@@ -158,7 +162,7 @@ public class Pipeline
                       + "!");
             }
 
-        Pair<OMapIterator, Boolean> oldSDEP = portal2sdep.insert(portal, sdep);
+        Pair oldSDEP = portal2sdep.insert(portal, sdep);
     }
 
     Restrictions restrictions;
@@ -282,7 +286,7 @@ public class Pipeline
 
         portal2restrictionPair.insert(
                                       portal,
-                                      new Pair<SteadyUpstreamRestriction, SteadyDownstreamRestriction>(upstreamRestriction, downstreamRestriction));
+                                      new Pair(upstreamRestriction, downstreamRestriction));
     }
 
     public boolean isDoneInitializing()
@@ -386,7 +390,7 @@ public class Pipeline
                      !portal2restrictionPairIter.equals(lastIter);
                      portal2restrictionPairIter.next())
                     {
-                        Pair<?, ?> pair = (Pair<?, ?>)portal2restrictionPairIter.getData();
+                        Pair pair = (Pair)portal2restrictionPairIter.getData();
                         SteadyUpstreamRestriction upstreamRestr =
                             (SteadyUpstreamRestriction)pair.getFirst();
                         SteadyDownstreamRestriction downstreamRestr =

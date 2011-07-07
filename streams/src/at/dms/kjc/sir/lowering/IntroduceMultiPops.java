@@ -1,35 +1,11 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.util.IRPrinter;
+//import at.dms.util.Utils;
+import java.util.*;
 import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CType;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JCompoundStatement;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JInterfaceDeclaration;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.sir.SIRToStreamIt;
 /**
  * Introduce multi-pops.
  * 
@@ -92,7 +68,7 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
         }
         if (str instanceof SIRPipeline) {
             SIRPipeline pl = (SIRPipeline) str;
-            Iterator<?> iter = pl.getChildren().iterator();
+            Iterator iter = pl.getChildren().iterator();
             while (iter.hasNext()) {
                 SIRStream child = (SIRStream) iter.next();
                 introduceMultiProps(child);
@@ -166,9 +142,9 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
         
         JBlock newBlock = (JBlock)super.visitBlockStatement(oldBlock,comments);
         
-        List /*<JStatement>*/<?> oldStatements = newBlock.getStatements();
-        List /*<JStatement>*/<?> simplifiedStatements = new LinkedList<Object>();
-        for (Iterator<?> i = oldStatements.iterator(); i.hasNext();) {
+        List /*<JStatement>*/ oldStatements = newBlock.getStatements();
+        List /*<JStatement>*/ simplifiedStatements = new LinkedList();
+        for (Iterator i = oldStatements.iterator(); i.hasNext();) {
             Object o = i.next();
 	    // null statments (which may not exist, just following others here)
 	    // and EmptyStatements do not go into the list of returned 

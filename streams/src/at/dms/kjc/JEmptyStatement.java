@@ -20,8 +20,8 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.6: Empty Statement.
@@ -75,7 +75,7 @@ public class JEmptyStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return p.visitEmptyStatement(this);
     }
 

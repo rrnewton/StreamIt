@@ -16,8 +16,9 @@
 
 package streamit.scheduler2.hierarchical;
 
+import streamit.scheduler2.iriter./*persistent.*/
+    FilterIter;
 import streamit.scheduler2.Schedule;
-import streamit.scheduler2.iriter.FilterIter;
 
 /**
  * This class provides the required functions to implement a schduler

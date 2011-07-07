@@ -1,12 +1,10 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStringLiteral;
 import at.dms.kjc.sir.lowering.Propagator;
+import at.dms.kjc.lir.LIRStreamType;
+import at.dms.kjc.sir.lowering.LoweringConstants;
+import at.dms.kjc.*;
+import at.dms.util.*;
 
 /**
  * This represents a StreaMIT filter that writes a file to a data source.

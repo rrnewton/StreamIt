@@ -1,10 +1,12 @@
 package at.dms.kjc.sir.lowering.fission;
 
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.linear.LinearReplacer;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.linear.*;
+import at.dms.kjc.iterator.*;
+import at.dms.compiler.*;
 
 public class FissionReplacer extends LinearReplacer {
     /**

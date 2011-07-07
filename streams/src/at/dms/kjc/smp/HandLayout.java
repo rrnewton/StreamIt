@@ -1,18 +1,19 @@
 package at.dms.kjc.smp;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.spacedynamic.RawTile;
+import at.dms.kjc.spacedynamic.SpdStaticStreamGraph;
 
 
 public class HandLayout implements Layout {

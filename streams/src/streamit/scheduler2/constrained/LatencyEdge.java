@@ -16,10 +16,9 @@
 
 package streamit.scheduler2.constrained;
 
-import java.math.BigInteger;
-
 import streamit.misc.Misc;
 import streamit.scheduler2.SDEPData;
+import java.math.BigInteger;
 
 public class LatencyEdge extends Misc implements SDEPData
 {

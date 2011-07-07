@@ -28,9 +28,12 @@ import java.util.Hashtable;
 import at.dms.classfile.ClassConstant;
 import at.dms.classfile.ClassFileFormatException;
 import at.dms.classfile.ClassInfo;
+import at.dms.classfile.CodeInfo;
 import at.dms.classfile.FieldInfo;
+import at.dms.classfile.FieldRefInstruction;
 import at.dms.classfile.InnerClassInfo;
 import at.dms.classfile.MethodInfo;
+import at.dms.compiler.Compiler;
 import at.dms.compiler.TokenReference;
 import at.dms.util.Utils;
 
@@ -87,7 +90,7 @@ public class CSourceClass extends CClass {
             return params;
         } else {
             CType[]     ret = new CType[size];
-            Enumeration<?> eNum = outers == null ? null : outers.keys();
+            Enumeration eNum = outers == null ? null : outers.keys();
             int     pos = 0;
 
             /* 15.9.5.1 The first formal parameter of the constructor of C 
@@ -119,7 +122,7 @@ public class CSourceClass extends CClass {
         //       code.plantLoadThis();
         //     }
         if (outers != null) {
-            Enumeration<?> eNum = outers.keys();
+            Enumeration eNum = outers.keys();
             while (eNum.hasMoreElements()) {
                 JLocalVariable  var = (JLocalVariable)eNum.nextElement();
 
@@ -204,7 +207,7 @@ public class CSourceClass extends CClass {
                                               getOwner().getType().getSignature());
             }
             if (outers != null) {
-                Enumeration<?> eNum = outers.keys();
+                Enumeration eNum = outers.keys();
                 while (eNum.hasMoreElements()) {
                     JLocalVariable  ovar = (JLocalVariable)eNum.nextElement();
                     var = new JGeneratedLocalVariable(null, 0, ovar.getType(), ovar.getIdent(), null);
@@ -338,7 +341,7 @@ public class CSourceClass extends CClass {
     // DATA MEMBERS
     // ----------------------------------------------------------------------
 
-    private Hashtable<?, ?>       outers;
+    private Hashtable       outers;
     private int         countSyntheticsFields;
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
@@ -354,7 +357,7 @@ public class CSourceClass extends CClass {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CSourceClass other) {
         super.deepCloneInto(other);
-        other.outers = (java.util.Hashtable<?, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.outers);
+        other.outers = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.outers);
         other.countSyntheticsFields = this.countSyntheticsFields;
     }
 

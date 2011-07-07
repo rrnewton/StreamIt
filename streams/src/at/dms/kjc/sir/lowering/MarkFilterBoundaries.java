@@ -1,14 +1,8 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
 
 /**
  * Inserts an SIRMarker at the beginning and end of every filter's

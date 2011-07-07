@@ -1,32 +1,14 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.lir.*;
 import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.JavadocComment;
+import java.lang.Math;
 import at.dms.compiler.TokenReference;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JNewArrayExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class raises Variable Declaration to the beginning
@@ -74,7 +56,7 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
         if (str instanceof SIRPipeline)
             {
                 SIRPipeline pl = (SIRPipeline)str;
-                Iterator<?> iter = pl.getChildren().iterator();
+                Iterator iter = pl.getChildren().iterator();
                 if (str.getInit()!=null) 
                     str.getInit().accept(this);
                 while (iter.hasNext())

@@ -1,10 +1,7 @@
 package at.dms.kjc;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SemanticChecker;
+import at.dms.kjc.sir.*;
+import java.lang.reflect.*;
 
 /**
  * This provides the toplevel interface for StreaMIT.
@@ -125,7 +122,7 @@ public class StreaMITMain {
         params[5] = k2s.getGlobal();
 
         Method theMethod = null;
-        Class<?> theBackend = null;
+        Class theBackend = null;
         
         try {
             paramTypes[0] = Class.forName("at.dms.kjc.sir.SIRStream");

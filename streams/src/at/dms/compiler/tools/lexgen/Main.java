@@ -28,8 +28,8 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import at.dms.compiler.tools.common.Utils;
 import at.dms.compiler.tools.jperf.JPerf;
+import at.dms.compiler.tools.common.Utils;
 
 /**
  * This class is the entry point for token file generator.
@@ -256,10 +256,10 @@ public class Main {
         String      prefix = definitions[definitions.length - 1].getPrefix();
         String      packageName = definitions[definitions.length - 1].getPackageName();
 
-        Vector<?>      keywords = new Vector<Object>();
-        Vector<?>      types = new Vector<Object>();
-        Vector<?>      header = new Vector<Object>();
-        Vector<?>      footer = new Vector<Object>();
+        Vector      keywords = new Vector();
+        Vector      types = new Vector();
+        Vector      header = new Vector();
+        Vector      footer = new Vector();
 
         // retrieve keywords to hash
         for (int i = 0; i < definitions.length; i++) {

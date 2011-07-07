@@ -1,18 +1,11 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.iterator.*;
+
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * This class converts calls "round(x)" to "floor(x+0.5)".  Oddly,

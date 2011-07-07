@@ -28,6 +28,10 @@ import java.io.PrintWriter;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import at.dms.compiler.tools.common.Message;
+import at.dms.compiler.tools.common.MessageDescription;
+import at.dms.compiler.tools.common.Utils;
+
 /**
  * This class defines the common behaviour of all KOPI compilers.
  */
@@ -111,7 +115,7 @@ public abstract class Compiler {
      * @return  a vector of files known to exist
      * @exception   UnpositionedError   at least one file does not exist
      */
-    public Vector<Object> verifyFiles(Vector<?> names) throws UnpositionedError {
+    public Vector<Object> verifyFiles(Vector names) throws UnpositionedError {
         return Utils.toVector(verifyFiles((String[])Utils.toArray(names, String.class)));
     }
 

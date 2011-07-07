@@ -20,9 +20,8 @@
 
 package at.dms.kjc;
 
-import java.io.Serializable;
-
 import at.dms.classfile.AbstractInstructionAccessor;
+import java.io.Serializable;
 
 /**
  * This class represents a position in the code array where the associated

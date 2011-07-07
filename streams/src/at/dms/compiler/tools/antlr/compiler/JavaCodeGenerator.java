@@ -20,17 +20,11 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
+import java.util.Enumeration;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 
-import at.dms.compiler.tools.antlr.runtime.BitSet;
-import at.dms.compiler.tools.antlr.runtime.CharFormatter;
-import at.dms.compiler.tools.antlr.runtime.CharStreamException;
-import at.dms.compiler.tools.antlr.runtime.RecognitionException;
-import at.dms.compiler.tools.antlr.runtime.Token;
-import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
-import at.dms.compiler.tools.antlr.runtime.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 /**
  * A Java code generator.
@@ -852,7 +846,7 @@ public class JavaCodeGenerator {
         }
         tabs--;
 
-        Enumeration<?> ids;
+        Enumeration ids;
         // Generate the setting of various generated options.
         println("caseSensitiveLiterals = " + g.caseSensitiveLiterals + ";");
         println("setCaseSensitive("+g.caseSensitive+");");
@@ -1066,7 +1060,7 @@ public class JavaCodeGenerator {
         }
 
         // Generate code for each rule in the grammar
-        Enumeration<?> ids = grammar.rules.elements();
+        Enumeration ids = grammar.rules.elements();
         int ruleNum=0;
         while ( ids.hasMoreElements() ) {
             GrammarSymbol sym = (GrammarSymbol) ids.nextElement();

@@ -16,6 +16,9 @@
 
 package streamit.library;
 
+import streamit.scheduler2.Scheduler;
+import java.util.Vector;
+import java.util.HashMap;
 
 public class NativeHelper
 {

@@ -16,36 +16,10 @@
 
 package streamit.frontend.tojava;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import streamit.frontend.nodes.*;
+import streamit.frontend.passes.*;
 
-import streamit.frontend.nodes.ExprArray;
-import streamit.frontend.nodes.ExprArrayInit;
-import streamit.frontend.nodes.ExprBinary;
-import streamit.frontend.nodes.ExprConstInt;
-import streamit.frontend.nodes.ExprField;
-import streamit.frontend.nodes.ExprFunCall;
-import streamit.frontend.nodes.ExprTypeCast;
-import streamit.frontend.nodes.ExprUnary;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FieldDecl;
-import streamit.frontend.nodes.Function;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StmtBlock;
-import streamit.frontend.nodes.StmtExpr;
-import streamit.frontend.nodes.StmtFor;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.TempVarGen;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypeArray;
-import streamit.frontend.nodes.TypePrimitive;
-import streamit.frontend.nodes.TypeStruct;
-import streamit.frontend.passes.DetectImmutable;
+import java.util.*;
 
 /**
  * Inserts statements in init functions to call member object constructors.
@@ -125,11 +99,11 @@ public class InsertInitConstructors extends InitMunger
      *              type; useful for members of multidimensional
      *              arrays
      */
-    private List<?> stmtsForConstructor(FEContext ctx, Expression name,
+    private List stmtsForConstructor(FEContext ctx, Expression name,
                                      Type type, Expression init, 
                                      boolean arrayConstructor)
     {
-        List<?> result = new java.util.ArrayList<Object>();
+        List result = new java.util.ArrayList();
 
         // If the type doesn't involve a constructor, there are no
         // generated statements.
@@ -156,7 +130,7 @@ public class InsertInitConstructors extends InitMunger
                     {
                         String tempVar = varGen.nextVar();
                         Expression varExp = new ExprVar(ctx, tempVar);
-                        List<?> elements = new ArrayList<Object>();
+                        List elements = new ArrayList();
                         Type base = type;
                         while (base instanceof TypeArray) 
                         {
@@ -279,11 +253,11 @@ public class InsertInitConstructors extends InitMunger
         if (spec.getVars().isEmpty())
             return spec;
         
-        List<?> newStmts = new ArrayList<Object>();
+        List newStmts = new ArrayList();
             
         // Walk through the variables.  If any of them are for
         // complex or non-primitive types, generate a constructor.
-        for (Iterator<?> iter = spec.getVars().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getVars().iterator(); iter.hasNext(); )
             {
                 FieldDecl field = (FieldDecl)iter.next();
                 for (int i = 0; i < field.getNumFields(); i++)
@@ -305,7 +279,7 @@ public class InsertInitConstructors extends InitMunger
             return spec;
         
         // Okay.  Prepend the new statements to the init function.
-        List<Function> newFuncs = new ArrayList<Function>(spec.getFuncs());
+        List newFuncs = new ArrayList(spec.getFuncs());
         newFuncs = replaceInitWithPrepended(spec.getContext(), newFuncs,
                                             newStmts);
         

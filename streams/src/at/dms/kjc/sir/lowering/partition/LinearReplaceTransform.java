@@ -1,15 +1,14 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.linear.LinearAnalyzer;
-import at.dms.kjc.sir.linear.LinearAtlasReplacer;
-import at.dms.kjc.sir.linear.LinearDiagonalReplacer;
-import at.dms.kjc.sir.linear.LinearDirectReplacer;
-import at.dms.kjc.sir.linear.LinearFilterRepresentation;
-import at.dms.kjc.sir.linear.LinearIndirectReplacer;
+import java.util.*;
+
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.linear.*;
+import at.dms.kjc.sir.lowering.*;
 import at.dms.kjc.sir.lowering.partition.linear.LinearPartitioner;
+import at.dms.kjc.sir.lowering.fusion.*;
 
 /**
  * LinearReplace transform on a stream graph.

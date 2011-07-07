@@ -20,8 +20,8 @@
 
 package at.dms.kjc;
 
-import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Hashtable;
 
 import at.dms.compiler.CWarning;
 import at.dms.compiler.TokenReference;
@@ -279,8 +279,8 @@ public class CBlockContext extends CBodyContext {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CBlockContext other) {
         super.deepCloneInto(other);
-        other.localClasses = (java.util.Hashtable<?, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.localClasses);
-        other.localVars = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.localVars);
+        other.localClasses = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.localClasses);
+        other.localVars = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.localVars);
         other.parentIndex = this.parentIndex;
         other.localsIndex = this.localsIndex;
         other.localsPosition = this.localsPosition;

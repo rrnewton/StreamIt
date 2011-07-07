@@ -1,7 +1,8 @@
 package at.dms.kjc.iterator;
 
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
 
 /**
  * This class is a fine-grained iterator factory.  

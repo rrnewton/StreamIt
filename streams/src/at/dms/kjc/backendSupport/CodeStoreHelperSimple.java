@@ -1,21 +1,10 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.slicegraph.*;
 import at.dms.util.Utils;
 
 /**
@@ -46,7 +35,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
      * @param node          A filter slice node to wrap code for.
      * @param backEndBits   The back end factory as a source of data and back end specific functions.
      */
-    public CodeStoreHelperSimple(FilterSliceNode node, BackEndFactory<?, ?, ?, ?> backEndBits) {
+    public CodeStoreHelperSimple(FilterSliceNode node, BackEndFactory backEndBits) {
         super(node,node.getAsFilter().getFilter(),backEndBits);
     }
 

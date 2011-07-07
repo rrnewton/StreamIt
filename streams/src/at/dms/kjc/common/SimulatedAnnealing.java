@@ -6,8 +6,6 @@ package at.dms.kjc.common;
 import java.util.HashMap;
 import java.util.Random;
 
-import at.dms.kjc.slicegraph.FilterSliceNode;
-
 /**
  * This is a abstract class that any simulated annealing assignment
  * algorithm can inherit and use. 
@@ -29,10 +27,10 @@ public abstract class SimulatedAnnealing {
     public static double TFACTR = 0.9;
     
     /** the assignment that we arrive at and use during execution */
-    protected HashMap<FilterSliceNode, ?> assignment;
+    protected HashMap assignment;
 
     protected SimulatedAnnealing() {
-        assignment = new HashMap<FilterSliceNode, Object>();
+        assignment = new HashMap();
         random = new Random(17);
     }
     
@@ -49,7 +47,7 @@ public abstract class SimulatedAnnealing {
      * anything that needs to be updated on a new assignment.
      * @param newAssign
      */
-    public abstract void setAssignment(HashMap<FilterSliceNode, ?> newAssign);
+    public abstract void setAssignment(HashMap newAssign);
     
     /**
      * Called by perturbConfiguration() to perturb the configuration.
@@ -129,7 +127,7 @@ public abstract class SimulatedAnnealing {
          
             // as a little hack, we will cache the layout with the minimum cost
             // these two hashmaps store this layout
-            HashMap<FilterSliceNode, ?> assignMin = (HashMap<FilterSliceNode, ?>) assignment.clone();
+            HashMap assignMin = (HashMap) assignment.clone();
             minCost = currentCost;
 
             if (currentCost == 0.0) {
@@ -176,7 +174,7 @@ public abstract class SimulatedAnnealing {
                         if (currentCost < minCost) { 
                             minCost = currentCost;
                             // save the layout with the minimum cost
-                            assignMin = (HashMap<FilterSliceNode, ?>)assignment.clone();
+                            assignMin = (HashMap)assignment.clone();
                         } 
                        
 
@@ -225,7 +223,7 @@ public abstract class SimulatedAnnealing {
     private final double annealMaxTemp() throws Exception {
         double T = 1.0;
         int total = 0, accepted = 0;
-        HashMap<FilterSliceNode, ?> assignInit = (HashMap<FilterSliceNode, ?>)assignment.clone();
+        HashMap assignInit = (HashMap)assignment.clone();
 
         for (int i = 0; i < MAXTEMPITERATIONS; i++) {
             T = 2.0 * T;
@@ -233,7 +231,7 @@ public abstract class SimulatedAnnealing {
             accepted = 0;
             for (int j = 0; j < 100; j++) {
                 // c_old <- c_init
-                assignment = (HashMap<FilterSliceNode, ?>)assignInit.clone();
+                assignment = (HashMap)assignInit.clone();
                 if (perturbConfiguration(T))
                     accepted++;
                 total++;
@@ -242,14 +240,14 @@ public abstract class SimulatedAnnealing {
                 break;
         }
         // c_old <- c_init
-        assignment = (HashMap<FilterSliceNode, ?>)assignInit.clone();
+        assignment = (HashMap)assignInit.clone();
         return T;
     }
 
     private final double annealMinTemp() throws Exception {
         double T = 1.0;
         int total = 0, accepted = 0;
-        HashMap<FilterSliceNode, ?> assignInit = (HashMap<FilterSliceNode, ?>)assignment.clone();
+        HashMap assignInit = (HashMap)assignment.clone();
 
         for (int i = 0; i < MINTEMPITERATIONS; i++) {
             T = 0.5 * T;
@@ -257,7 +255,7 @@ public abstract class SimulatedAnnealing {
             accepted = 0;
             for (int j = 0; j < 100; j++) {
                 // c_old <- c_init
-                assignment = (HashMap<FilterSliceNode, ?>)assignInit.clone();
+                assignment = (HashMap)assignInit.clone();
                 if (perturbConfiguration(T))
                     accepted++;
                 total++;
@@ -266,7 +264,7 @@ public abstract class SimulatedAnnealing {
                 break;
         }
         // c_old <- c_init
-        assignment = (HashMap<FilterSliceNode, ?>)assignInit.clone();
+        assignment = (HashMap)assignInit.clone();
         return T;
     }
     
@@ -283,7 +281,7 @@ public abstract class SimulatedAnnealing {
         // the cost of the new layout and the old layout
         double e_new, e_old = placementCost(false);
         //the old assignment
-        HashMap<FilterSliceNode, ?> oldAssignment = (HashMap<FilterSliceNode, ?>)assignment.clone();
+        HashMap oldAssignment = (HashMap)assignment.clone();
         // find 2 suitable nodes to swap
         while (true) {
             swapAssignment();
@@ -292,7 +290,7 @@ public abstract class SimulatedAnnealing {
 
             if (e_new < 0.0) {
                 // illegal tile assignment so revert the assignment
-                setAssignment((HashMap<FilterSliceNode, ?>)oldAssignment.clone());
+                setAssignment((HashMap)oldAssignment.clone());
                 continue;
             } else
                 // found a successful new layout

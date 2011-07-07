@@ -1,8 +1,7 @@
 package at.dms.kjc.linprog;
 
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 /**
  * A simple implementation of the LinearProgram interface; keeps track

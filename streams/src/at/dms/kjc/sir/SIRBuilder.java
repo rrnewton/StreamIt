@@ -1,22 +1,7 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.CClass;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.sir.lowering.Flattener;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.lowering.*;
 
 /**
  * This class is for building sample representations in the SIR.

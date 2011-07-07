@@ -8,11 +8,12 @@ import java.util.Set;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcOptions;
+import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.KjcOptions;
 
 /**
  * Emit c code for tiles.
@@ -311,7 +312,7 @@ public class EmitTileCode extends EmitCode {
      * @param p The CodegenPrintWriter (left open on return).
      */
     public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
-            ComputeNode<?> n, CodegenPrintWriter p, CodeGen codegen) {
+            ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
         
         // Standard final optimization of a code unit before code emission:
         // unrolling and constant prop as allowed, DCE, array destruction into scalars.

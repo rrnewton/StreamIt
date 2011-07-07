@@ -16,14 +16,15 @@
 
 package streamit.scheduler2.constrained;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.SDEPData;
+import streamit.scheduler2.Schedule;
 
 import streamit.misc.OMap;
 import streamit.misc.OMapIterator;
-import streamit.scheduler2.SDEPData;
-import streamit.scheduler2.Schedule;
-import streamit.scheduler2.iriter.Iterator;
+
+import java.util.HashSet;
+import java.util.HashMap;
 
 public class Scheduler extends streamit.scheduler2.Scheduler
 {

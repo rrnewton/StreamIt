@@ -20,9 +20,8 @@
 
 package at.dms.backend;
 
-import java.util.Stack;
 import java.util.Vector;
-
+import java.util.Stack;
 import at.dms.classfile.IincInstruction;
 import at.dms.classfile.LocalVarInstruction;
 import at.dms.classfile.PushLiteralInstruction;
@@ -154,7 +153,7 @@ class QQuadruple extends QNode implements QOrigin {
                                                BasicBlock block,
                                                InstructionHandle[] insns,
                                                QTemporary[] entryStack,
-                                               Vector<?> vect) {
+                                               Vector vect) {
         Stack<Object>   stack = new Stack<Object>();
 
         for (int i = 0; entryStack != null && i < entryStack.length; i++) {
@@ -256,7 +255,7 @@ class QQuadruple extends QNode implements QOrigin {
     }
 
     private static QOperand[] readOperands(Stack<Object> stack, int size) {
-        Vector<?>  vect = new Vector<Object>();
+        Vector  vect = new Vector();
 
         for (int i = 0; size > 0; i++) {
             QOperand    oper = (QOperand)stack.pop();

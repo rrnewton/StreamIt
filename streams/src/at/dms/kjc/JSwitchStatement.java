@@ -24,9 +24,9 @@ import java.util.Vector;
 
 import at.dms.classfile.SwitchInstruction;
 import at.dms.compiler.CWarning;
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.10: Switch Statement
@@ -161,7 +161,7 @@ public class JSwitchStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return p.visitSwitchStatement(this, expr, groups);
     }
 
@@ -175,7 +175,7 @@ public class JSwitchStatement extends JStatement {
         CodeLabel       defaultLabel = new CodeLabel();
 
         Vector<Integer>      matches = new Vector<Integer>();
-        Vector<?>      targets = new Vector<Object>();
+        Vector      targets = new Vector();
 
         for (int i = 0; i < groups.length; i++) {
             groups[i].collectLabels(defaultLabel, matches, targets);

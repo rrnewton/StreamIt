@@ -1,26 +1,12 @@
 package at.dms.kjc.smp;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
-import at.dms.kjc.JInterfaceDeclaration;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.CommonPasses;
-import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.backendSupport.GeneratePrimePump;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
-import at.dms.kjc.sir.SIRGlobal;
-import at.dms.kjc.sir.SIRHelper;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceWorkEstimate;
-import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.*;
+import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.spacetime.*;
+import java.util.*;
 
 public class SMPBackend {
     public static final boolean FAKE_IO = false;

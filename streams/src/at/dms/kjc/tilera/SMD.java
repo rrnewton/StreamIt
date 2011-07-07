@@ -1,5 +1,6 @@
 package at.dms.kjc.tilera;
 
+import at.dms.kjc.sir.*;
 import at.dms.kjc.slicegraph.SliceNode;
 
 public class SMD extends Scheduler {

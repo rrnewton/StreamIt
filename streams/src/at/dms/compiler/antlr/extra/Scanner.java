@@ -50,7 +50,7 @@ public abstract class Scanner implements TokenStream {
     protected Scanner(Compiler compiler, InputBuffer buffer) {
         this.compiler = compiler;
         this.buffer = buffer;
-        this.comments = new Vector<Object>();
+        this.comments = new Vector();
     }
 
     // --------------------------------------------------------------------
@@ -199,7 +199,7 @@ public abstract class Scanner implements TokenStream {
 
     private final Compiler      compiler;
     private final InputBuffer       buffer;
-    private final Vector<?>            comments;
+    private final Vector            comments;
 }
 
 //---  // --------------------------------------------------------------------

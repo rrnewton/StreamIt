@@ -20,10 +20,10 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
-import at.dms.compiler.tools.antlr.runtime.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 /**
  * A simple indexed vector: a normal vector except that you must
@@ -63,7 +63,7 @@ public class IndexedVector {
     public Object elementAt(int i) {
         return elements.elementAt(i);
     }
-    public Enumeration<?> elements() {
+    public Enumeration elements() {
         return elements.elements();
     }
     public Object getElement(Object key) {

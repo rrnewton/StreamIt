@@ -22,7 +22,7 @@ package at.dms.compiler.tools.antlr.compiler;
 
 import java.io.IOException;
 
-import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 /**
  * Parser-specific grammar subclass

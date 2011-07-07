@@ -1,34 +1,14 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.lir.*;
 import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.CClass;
-import at.dms.kjc.CClassNameType;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CField;
-import at.dms.kjc.CType;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRInitStatement;
-import at.dms.kjc.sir.SIRRecursiveStub;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.compiler.JavadocComment;
+import java.lang.Math;
+import at.dms.compiler.TokenReference;
 
 /**
  * This class breaks up structures as much as possible. The goal is to
@@ -193,7 +173,7 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      */
     public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
-        List<Object> statements=self.getStatements();
+        List statements=self.getStatements();
         for(int i=0;i<statements.size();i++) {
             leftF.clear(); //Reset things that should be clear before visiting each statement
             rightF=null;
@@ -206,8 +186,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
                 statements.set(i,newCur);
             if(unsafeRhs!=null) { //Pack struct if unsafe
                 List[] temp=extractFields(((CClassNameType)unsafeRhs.getType()).getCClass());
-                List<?> f=temp[0];
-                List<?> t=temp[1];
+                List f=temp[0];
+                List t=temp[1];
                 final int len=f.size();
                 for(int j=0;j<len;j++) {
                     String field=(String)f.get(j);
@@ -228,8 +208,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
             }
             if(leftF.size()>0) { //Deal with struct=struct or struct=something
                 List[] temp=extractFields(((CClassNameType)rightF.getType()).getCClass());
-                List<?> f=temp[0];
-                List<?> t=temp[1];
+                List f=temp[0];
+                List t=temp[1];
                 final int len=f.size();
                 if(!((rightF instanceof JFieldAccessExpression)||(rightF instanceof JLocalVariableExpression))) //Deal with struct=something (pop)
                     for(int j=0;j<len;j++) {
@@ -293,7 +273,7 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      */
     public Object visitInitStatement(SIRInitStatement self,
                                      SIRStream target) {
-        List<?> args=self.getArgs();
+        List args=self.getArgs();
         if(target instanceof SIRRecursiveStub) {
             target=((SIRRecursiveStub)target).expand();
             self.setTarget(target);
@@ -302,9 +282,9 @@ public class StructDestroyer extends SLIRReplacingVisitor {
         if(init!=null) { //Ignore Builtin types
             JFormalParameter[] params=init.getParameters();
             final int len=args.size();
-            ArrayList<?> newArgs=new ArrayList<Object>();
+            ArrayList newArgs=new ArrayList();
             ArrayList<JFormalParameter> newParams=new ArrayList<JFormalParameter>();
-            List<?> types=null;
+            List types=null;
             for(int i=0;i<len;i++) {
                 JExpression arg=(JExpression)args.get(i);
                 JFormalParameter param=params[i];
@@ -313,7 +293,7 @@ public class StructDestroyer extends SLIRReplacingVisitor {
                 boolean paramFinal=param.isFinal();
                 if(arg.getType() instanceof CClassNameType) { //Struct arg
                     List[] temp=extractFields(((CClassNameType)arg.getType()).getCClass()); //Break into components
-                    List<?> fields=temp[0];
+                    List fields=temp[0];
                     types=temp[1];
                     final int len2=fields.size();
                     if(arg instanceof JFieldAccessExpression) {
@@ -395,7 +375,7 @@ public class StructDestroyer extends SLIRReplacingVisitor {
             } else {
                 String prefix=fields[i].getIdent(); //Recursively add components of substruct
                 List[] temp=extractFields(((CClassNameType)fields[i].getType()).getCClass());
-                List<?> inner=temp[0];
+                List inner=temp[0];
                 final int len=inner.size();
                 for(int j=0;j<len;j++) {
                     out.add(prefix+SEP+(String)inner.get(j));

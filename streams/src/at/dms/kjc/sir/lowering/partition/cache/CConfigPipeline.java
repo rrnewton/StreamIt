@@ -1,18 +1,17 @@
 
 package at.dms.kjc.sir.lowering.partition.cache;
 
-import java.util.LinkedList;
+import java.util.*;
+import java.io.*;
 
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.partition.PartitionGroup;
-import at.dms.kjc.sir.lowering.partition.PartitionRecord;
-import at.dms.kjc.sir.lowering.partition.RefactorPipeline;
-import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import at.dms.kjc.sir.lowering.partition.*;
 
 
 class CConfigPipeline extends CConfigContainer {

@@ -1,19 +1,10 @@
 
 package at.dms.kjc.sir.lowering.fusion;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JCompoundStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
 /**
  *  Used by {@link FindVarDecls#findAndReplace(JStatement) FindVarDecls.findAndReplace}.

@@ -1,6 +1,6 @@
 package at.dms.kjc.slicegraph;
 
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.*;
 
 /**
  * Go through all the slices and create and install the schedule of distribution for the

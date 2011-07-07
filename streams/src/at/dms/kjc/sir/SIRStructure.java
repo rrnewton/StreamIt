@@ -1,11 +1,8 @@
 package at.dms.kjc.sir;
 
-import java.util.HashMap;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.lir.LIRStreamType;
+import at.dms.kjc.*;
+import java.util.HashMap;
 
 /**
  * This class represents a data structure that may be passed between

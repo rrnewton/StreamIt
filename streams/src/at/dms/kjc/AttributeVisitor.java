@@ -13,6 +13,7 @@
 
 package at.dms.kjc;
 
+import java.util.List;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
 

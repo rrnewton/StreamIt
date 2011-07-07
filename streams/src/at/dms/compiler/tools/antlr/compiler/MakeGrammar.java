@@ -21,8 +21,8 @@
 package at.dms.compiler.tools.antlr.compiler;
 
 import at.dms.compiler.tools.antlr.runtime.CommonToken;
-import at.dms.compiler.tools.antlr.runtime.SemanticException;
 import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.SemanticException;
 import at.dms.compiler.tools.antlr.runtime.Vector;
 
 public class MakeGrammar extends DefineGrammarSymbols {

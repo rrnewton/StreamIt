@@ -1,14 +1,13 @@
 package at.dms.kjc.sir;
 
+import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.kjc.lir.LIRStreamType;
+import java.util.List;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.lir.LIRStreamType;
+import java.io.*;
 
 /**
  * This represents a pipeline of stream structures, as would be

@@ -20,9 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.BitSet;
-import at.dms.compiler.tools.antlr.runtime.CharFormatter;
-import at.dms.compiler.tools.antlr.runtime.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 import at.dms.compiler.tools.common.InconsistencyException;
 
 /**

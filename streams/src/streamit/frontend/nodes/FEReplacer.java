@@ -16,14 +16,11 @@
 
 package streamit.frontend.nodes;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import streamit.frontend.tojava.ExprJavaConstructor;
-import streamit.frontend.tojava.StmtIODecl;
-import streamit.frontend.tojava.StmtSetTypes;
+import streamit.frontend.tojava.*;
+import java.util.ArrayList;
 
 /**
  * Replaces nodes in a front-end tree.  
@@ -102,7 +99,7 @@ public class FEReplacer implements FEVisitor
      * 
      * @param stmts The statements to add
      */ 
-    protected void addStatements(Collection<?> stmts)
+    protected void addStatements(Collection stmts)
     {
         newStatements.addAll(stmts);
     }
@@ -397,7 +394,7 @@ public class FEReplacer implements FEVisitor
                 newParams.add(newParam);
                 if (newParam != param) hasChanged = true;
             }
-        for (Iterator<?> iter = creator.getPortals().iterator(); iter.hasNext(); )
+        for (Iterator iter = creator.getPortals().iterator(); iter.hasNext(); )
             {
                 Expression portal = (Expression)iter.next();
                 Expression newPortal = doExpression(portal);

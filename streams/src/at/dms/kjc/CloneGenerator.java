@@ -1,12 +1,12 @@
 package at.dms.kjc;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.security.Permission;
-import java.util.HashSet;
+import at.dms.util.*;
+import at.dms.kjc.*;
 
-import at.dms.util.Utils;
+import java.security.Permission;
+import java.util.*;
+import java.lang.reflect.*;
+import java.io.IOException;
 
 /**
  * This class will generate code to clone fields that it thinks should
@@ -62,7 +62,7 @@ public class CloneGenerator {
     }
 
     private static String generateCloneMethods(String className) {
-        Class<?> c = null;
+        Class c = null;
         try {
             c = Class.forName(className);
         } catch (ClassNotFoundException e) {
@@ -75,7 +75,7 @@ public class CloneGenerator {
     /**
      * Generates a suitable deepClone() method for class <pre>c</pre>
      */
-    private static String generateClone(Class<?> c) {
+    private static String generateClone(Class c) {
         String className = c.getName();
         StringBuffer sb = new StringBuffer();
         sb.append("    /** Returns a deep clone of this object. */\n");
@@ -101,7 +101,7 @@ public class CloneGenerator {
      * Generates a suitable deepCloneInto(<c.getName> other) method
      * for class <pre>className</pre>, which copies all the fields over.
      */
-    private static String generateCloneInto(Class<?> c) {
+    private static String generateCloneInto(Class c) {
         StringBuffer sb = new StringBuffer();
         // ignore interfaces
         if (c.isInterface()) { 
@@ -129,7 +129,7 @@ public class CloneGenerator {
             field[i].setAccessible(true);
             // get the name, type of field
             String name = field[i].getName().intern();
-            Class<?> type = field[i].getType();
+            Class type = field[i].getType();
             if (Modifier.isStatic(field[i].getModifiers())) {
                 // do nothing for static fields
             } else if (// for primitives, copy them straight over
@@ -162,7 +162,7 @@ public class CloneGenerator {
      * returned.
      */
     private static final String PROHIBITED_FIELD_NAME = "DO_NOT_CLONE_THESE_FIELDS";
-    private static HashSet<String> getProhibitedFields(Class<?> c) {
+    private static HashSet<String> getProhibitedFields(Class c) {
         // prohibited fields
         HashSet<String> result = new HashSet<String>();
         // all fields
@@ -200,7 +200,7 @@ public class CloneGenerator {
      * Returns the name of the type of <pre>c</pre> in a format that you would
      * find in source code, e.g. int[][] or at.dms.kjc.Main[].
      */
-    private static String printSourceType(Class<?> c) {
+    private static String printSourceType(Class c) {
         // get encoded name -- see sun javadoc
         String name = c.getName();
         // first parse the number of array dims

@@ -3,16 +3,9 @@
  */
 package at.dms.kjc.sir.lowering;
 
-import java.util.Stack;
-
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.sir.SIRPrintStatement;
-import at.dms.kjc.sir.SIRStream;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
 /**
  * Re-write code so function arguments are either literal, local, field, 

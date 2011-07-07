@@ -16,27 +16,13 @@
 
 package streamit.frontend.tojava;
 
-import java.util.ArrayList;
+import streamit.frontend.nodes.*;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.LinkedList;
 
-import streamit.frontend.nodes.ExprTypeCast;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FieldDecl;
-import streamit.frontend.nodes.Function;
-import streamit.frontend.nodes.Parameter;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StmtBlock;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypeArray;
-import streamit.frontend.nodes.TypeStruct;
+import java.util.ArrayList;
 
 /**
  * Move stream parameters into fields, and generate constructors and
@@ -61,16 +47,16 @@ public class MoveStreamParameters extends InitMunger
                                     Collections.EMPTY_LIST);
     }
     
-    private Function addInitParams(Function init, List<?> params)
+    private Function addInitParams(Function init, List params)
     {
         FEContext context = init.getContext();
         
         // The init function should have no parameters coming in;
         // completely replace its parameter list with params.  This
         // means we just need to replace the body.
-        List<?> body = new ArrayList<Object>();
-        List<?> newParams = new ArrayList<Object>();
-        for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+        List body = new ArrayList();
+        List newParams = new ArrayList();
+        for (Iterator iter = params.iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 String pName = "_param_" + param.getName();
@@ -141,7 +127,7 @@ public class MoveStreamParameters extends InitMunger
     
     // Return a function just like init, but with params as its
     // parameter list, doing no special work.
-    private Function addInitParamsOnly(Function init, List<?> params)
+    private Function addInitParamsOnly(Function init, List params)
     {
         FEContext context = init.getContext();
 
@@ -150,9 +136,9 @@ public class MoveStreamParameters extends InitMunger
         // In that case, the parameters to the init function need
         // to be Object, and we need to make locals with the
         // right types.
-        List<?> body = new ArrayList<Object>();
-        List<?> newParams = new ArrayList<Object>();
-        for (Iterator<?> iter = params.iterator(); iter.hasNext(); )
+        List body = new ArrayList();
+        List newParams = new ArrayList();
+        for (Iterator iter = params.iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 Type type = param.getType();
@@ -185,8 +171,8 @@ public class MoveStreamParameters extends InitMunger
         
         if (spec.getParams().size() > 0)
             {
-                List<Function> newFuncs = new ArrayList<Function>(spec.getFuncs());
-                List<FieldDecl> newVars = new ArrayList<FieldDecl>(spec.getVars());
+                List newFuncs = new ArrayList(spec.getFuncs());
+                List newVars = new ArrayList(spec.getVars());
 
                 if (spec.getType() == StreamSpec.STREAM_GLOBAL) assert false: "Global should have no params";
 
@@ -197,7 +183,7 @@ public class MoveStreamParameters extends InitMunger
                         // the init function.
                         // The parameters are Parameter objects, but the variables
                         // are Statements (StmtVarDecls).  Convert.
-                        for (Iterator<?> iter = spec.getParams().iterator();
+                        for (Iterator iter = spec.getParams().iterator();
                              iter.hasNext(); )
                             {
                                 Parameter param = (Parameter)iter.next();

@@ -1,15 +1,15 @@
 package at.dms.kjc.slicegraph;
 
-import java.util.Iterator;
-
 import at.dms.kjc.CType;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.sir.SIRCodeUnit;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.*;
+import java.util.*;
+import at.dms.kjc.sir.linear.*;
 import at.dms.kjc.sir.lowering.RenameAll;
+import at.dms.kjc.spacetime.SafeFileReaderWriterPositions;
+import at.dms.kjc.tilera.CFixedPointType;
 
 /**
  * Intended to reflect all the content of a filter needed by a

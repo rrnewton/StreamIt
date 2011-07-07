@@ -5,17 +5,8 @@ package at.dms.kjc.sir.lowering;
 
 import java.util.Stack;
 
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPrintStatement;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
 /**
  * Re-write code so push, pop, and peek are separate statements, and arguments to them are

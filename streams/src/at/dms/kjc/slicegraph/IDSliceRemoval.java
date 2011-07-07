@@ -1,9 +1,9 @@
 package at.dms.kjc.slicegraph;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
-
+import java.util.HashMap;
+import java.util.Arrays;
+import at.dms.kjc.slicegraph.fission.*;
 import at.dms.kjc.backendSupport.FilterInfo;
 
 public class IDSliceRemoval {
@@ -83,7 +83,7 @@ public class IDSliceRemoval {
             indexToIndex.put(edge.getSrc(), outputs.size() - 1);
             DistributionUnroller.unroll(edge.getSrc());
         }
-        usOutputs = outputs.toArray(new OutputSliceNode[0]);
+        usOutputs = (OutputSliceNode[])outputs.toArray(new OutputSliceNode[0]);
         usOutputIndices = new int[usOutputs.length];
         Arrays.fill(usOutputIndices, -1);
         
@@ -94,7 +94,7 @@ public class IDSliceRemoval {
             indexToIndex.put(edge.getDest(), inputs.size() - 1);
             DistributionUnroller.unroll(edge.getDest());
         }
-        dsInputs = inputs.toArray(new InputSliceNode[0]);
+        dsInputs = (InputSliceNode[])inputs.toArray(new InputSliceNode[0]);
         dsInputIndices = new int[dsInputs.length];
         Arrays.fill(dsInputIndices, -1);
         

@@ -22,6 +22,8 @@ package at.dms.compiler.tools.common;
 
 import java.io.File;
 
+import at.dms.compiler.tools.common.Utils;
+
 /**
  * This class defines objets that hold a reference to a file and a position
  * in the file.

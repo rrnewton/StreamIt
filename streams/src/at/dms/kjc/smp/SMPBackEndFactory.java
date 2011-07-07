@@ -3,8 +3,6 @@
  */
 package at.dms.kjc.smp;
 
-import java.util.HashMap;
-
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.Channel;
@@ -17,6 +15,8 @@ import at.dms.kjc.slicegraph.OutputSliceNode;
 import at.dms.kjc.slicegraph.SchedulingPhase;
 import at.dms.kjc.slicegraph.Slice;
 import at.dms.kjc.slicegraph.SliceNode;
+
+import java.util.HashMap;
 
 /**
  * @author mgordon

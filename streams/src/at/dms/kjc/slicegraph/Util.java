@@ -24,10 +24,10 @@ public class Util {
      */
     public static Iterator<SliceNode> sliceNodeTraversal(List<Slice> slices) {
         LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
-        ListIterator<Slice> it = slices.listIterator();
+        ListIterator it = slices.listIterator();
     
         while (it.hasNext()) {
-            Slice slice = it.next();
+            Slice slice = (Slice) it.next();
             SliceNode sliceNode = slice.getHead();
             while (sliceNode != null) {
                 trav.add(sliceNode);

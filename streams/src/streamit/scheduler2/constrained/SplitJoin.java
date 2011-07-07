@@ -17,9 +17,13 @@
 package streamit.scheduler2.constrained;
 
 import streamit.misc.DLList;
+
+import streamit.scheduler2.iriter./*persistent.*/
+    SplitJoinIter;
+import streamit.scheduler2.iriter./*persistent.*/
+    Iterator;
+
 import streamit.scheduler2.hierarchical.PhasingSchedule;
-import streamit.scheduler2.iriter.Iterator;
-import streamit.scheduler2.iriter.SplitJoinIter;
 
 /**
  * streamit.scheduler2.constrained.Pipeline is the pipeline constrained 

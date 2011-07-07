@@ -17,10 +17,12 @@
 package streamit.library;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.util.LinkedList;
+import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * This class can tabulate profiling statistics for execution of

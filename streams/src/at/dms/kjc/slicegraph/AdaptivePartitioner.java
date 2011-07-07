@@ -5,18 +5,25 @@ package at.dms.kjc.slicegraph;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 
-import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRPredefinedFilter;
-import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.sir.lowering.partition.WorkList;
+import at.dms.kjc.spacetime.InterSliceBuffer;
+import at.dms.kjc.spacetime.LinearFission;
+import at.dms.kjc.spacetime.ScheduleModel;
+import at.dms.kjc.spacetime.SpaceTimeBackend;
+import at.dms.kjc.spacetime.SpaceTimeSchedule;
+import at.dms.kjc.spacetime.Util;
+
+import java.util.*;
 
 /**
  * Test for ASPLOS paper, no longer used.

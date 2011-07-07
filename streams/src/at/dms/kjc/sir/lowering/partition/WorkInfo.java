@@ -1,11 +1,11 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.HashMap;
-
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.spacedynamic.*;
+import at.dms.kjc.sir.*;
+import at.dms.compiler.*;
+import java.util.*;
 
 class WorkInfo {
     /**

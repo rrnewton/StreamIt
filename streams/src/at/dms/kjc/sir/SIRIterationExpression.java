@@ -44,9 +44,9 @@ public class SIRIterationExpression extends JExpression{
 		}
         
         @Override
-        public Object accept(AttributeVisitor<?> p) {
+        public Object accept(AttributeVisitor p) {
             if (p instanceof SLIRAttributeVisitor) {
-                return ((SLIRAttributeVisitor<?>)p).visitIterationExpression(this);
+                return ((SLIRAttributeVisitor)p).visitIterationExpression(this);
             } else {
                 return this;
             }

@@ -1,13 +1,10 @@
 package at.dms.kjc.sir;
 
-import java.util.HashMap;
-
-import streamit.frontend.FEIRToSIR;
-import at.dms.kjc.CType;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.Kopi2SIR;
 import at.dms.kjc.lir.LIRStreamType;
+import at.dms.kjc.*;
+import at.dms.util.Utils;
+import java.util.*;
+import streamit.frontend.FEIRToSIR;
 
 /**
  * This class represents a stub for something that was found to be

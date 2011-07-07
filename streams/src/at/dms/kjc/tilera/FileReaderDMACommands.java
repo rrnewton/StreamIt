@@ -1,9 +1,13 @@
 package at.dms.kjc.tilera;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.slicegraph.InputSliceNode;
+import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slicegraph.OutputSliceNode;
 import at.dms.kjc.slicegraph.SchedulingPhase;
 
 /**

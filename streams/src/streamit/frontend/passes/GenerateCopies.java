@@ -16,38 +16,10 @@
 
 package streamit.frontend.passes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import streamit.frontend.tojava.*;
+import streamit.frontend.nodes.*;
 
-import streamit.frontend.nodes.ExprArray;
-import streamit.frontend.nodes.ExprArrayInit;
-import streamit.frontend.nodes.ExprBinary;
-import streamit.frontend.nodes.ExprComposite;
-import streamit.frontend.nodes.ExprConstInt;
-import streamit.frontend.nodes.ExprField;
-import streamit.frontend.nodes.ExprFunCall;
-import streamit.frontend.nodes.ExprHelperCall;
-import streamit.frontend.nodes.ExprPeek;
-import streamit.frontend.nodes.ExprPop;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEReplacer;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StmtBlock;
-import streamit.frontend.nodes.StmtFor;
-import streamit.frontend.nodes.StmtPush;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.SymbolTable;
-import streamit.frontend.nodes.TempVarGen;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypeArray;
-import streamit.frontend.nodes.TypePrimitive;
-import streamit.frontend.nodes.TypeStruct;
-import streamit.frontend.nodes.TypeStructRef;
+import java.util.*;
 
 /**
  * Generate code to copy structures and arrays elementwise.  In StreamIt,
@@ -312,7 +284,7 @@ public class GenerateCopies extends SymbolTableVisitor
         boolean hasChanged = false;
         Expression result = expr;
         List<Expression> newParams = new ArrayList<Expression>();
-        for (Iterator<?> iter = expr.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = expr.getParams().iterator(); iter.hasNext(); )
             {
                 Expression param = (Expression)iter.next();
                 Expression newParam = param;

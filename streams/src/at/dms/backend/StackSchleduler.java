@@ -148,5 +148,5 @@ public class StackSchleduler extends TreeWalker {
     // --------------------------------------------------------------------
 
     private Stack<QNode>       stack = new Stack<QNode>();
-    private Hashtable<?, ?>   defs = new Hashtable<Object, Object>();
+    private Hashtable   defs = new Hashtable();
 }

@@ -13,16 +13,13 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.slicegraph.FileOutputContent;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.backendSupport.*;
 import at.dms.util.Utils;
+import at.dms.kjc.KjcOptions;
 
 public class FilterCodeGeneration extends CodeStoreHelper {
  

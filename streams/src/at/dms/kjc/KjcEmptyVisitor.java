@@ -20,10 +20,9 @@
 
 package at.dms.kjc;
 
-import java.util.ListIterator;
-
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
+import java.util.ListIterator;
 
 /**
  * This is a visitor that just recurses into children at every node.
@@ -431,7 +430,7 @@ public class KjcEmptyVisitor implements Constants, KjcVisitor {
      */
     public void visitBlockStatement(JBlock self,
                                     JavaStyleComment[] comments) {
-        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
+        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
             ((JStatement)it.next()).accept(this);
         }
     }

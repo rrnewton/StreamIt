@@ -16,61 +16,10 @@
 
 package streamit.frontend.passes;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import streamit.frontend.controlflow.*;
+import streamit.frontend.nodes.*;
 
-import streamit.frontend.controlflow.CFG;
-import streamit.frontend.controlflow.CFGBuilder;
-import streamit.frontend.controlflow.CFGNode;
-import streamit.frontend.controlflow.CountLattice;
-import streamit.frontend.controlflow.DataFlow;
-import streamit.frontend.controlflow.Lattice;
-import streamit.frontend.controlflow.StatementCounter;
-import streamit.frontend.controlflow.StrictTypeLattice;
-import streamit.frontend.nodes.ExprArray;
-import streamit.frontend.nodes.ExprArrayInit;
-import streamit.frontend.nodes.ExprBinary;
-import streamit.frontend.nodes.ExprConstInt;
-import streamit.frontend.nodes.ExprField;
-import streamit.frontend.nodes.ExprPeek;
-import streamit.frontend.nodes.ExprPop;
-import streamit.frontend.nodes.ExprTernary;
-import streamit.frontend.nodes.ExprUnary;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FENode;
-import streamit.frontend.nodes.FEReplacer;
-import streamit.frontend.nodes.FieldDecl;
-import streamit.frontend.nodes.FuncWork;
-import streamit.frontend.nodes.Function;
-import streamit.frontend.nodes.Parameter;
-import streamit.frontend.nodes.Program;
-import streamit.frontend.nodes.SCAnon;
-import streamit.frontend.nodes.SCSimple;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtAdd;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StmtBody;
-import streamit.frontend.nodes.StmtEnqueue;
-import streamit.frontend.nodes.StmtJoin;
-import streamit.frontend.nodes.StmtLoop;
-import streamit.frontend.nodes.StmtPush;
-import streamit.frontend.nodes.StmtSplit;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.StreamCreator;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.StreamType;
-import streamit.frontend.nodes.SymbolTable;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypeArray;
-import streamit.frontend.nodes.TypePrimitive;
-import streamit.frontend.nodes.TypeStruct;
-import streamit.frontend.nodes.UnrecognizedVariableException;
+import java.util.*;
 
 /**
  * Perform checks on the semantic correctness of a StreamIt program.
@@ -851,7 +800,7 @@ public class SemanticChecker
                 public Object visitExprArrayInit(ExprArrayInit expr)
                 {
                     // check for uniform length and dimensions among all children.
-                    List<?> elems = expr.getElements();
+                    List elems = expr.getElements();
             
                     // only worry about it if we have elements
                     if (elems.size()>0) {
@@ -1010,7 +959,7 @@ public class SemanticChecker
         final Set<Statement> reported = new HashSet<Statement>();
 
         // Use data flow to check the stream types.
-        Map<?, ?> inTypes = new DataFlow() {
+        Map inTypes = new DataFlow() {
                 public Lattice getInit()
                 {
                     if (st == null)
@@ -1110,7 +1059,7 @@ public class SemanticChecker
         Function init = ss.getInitFunc();
         assert init != null;
         CFG cfg = CFGBuilder.buildCFG(init);
-        Map<?, ?> typeMap = new DataFlow() {
+        Map typeMap = new DataFlow() {
                 public Lattice getInit()
                 {
                     StreamType st = ss.getStreamType();
@@ -1292,7 +1241,7 @@ public class SemanticChecker
         Function init = ss.getInitFunc();
         assert init != null;
         CFG cfg = CFGBuilder.buildCFG(init);
-        Map<?, ?> splitCounts = sc.run(cfg);
+        Map splitCounts = sc.run(cfg);
         // TODO: modularize this analysis; report the first place
         // where there's a second split/join, and/or the first place
         // where there's ambiguity (bottom).  This would be easier if
@@ -1589,7 +1538,7 @@ public class SemanticChecker
                 // long as there are array
                 // initializers to match.
                 type = ((TypeArray)type).getBase();
-                List<?> elems = ((ExprArrayInit)init).getElements();
+                List elems = ((ExprArrayInit)init).getElements();
                 if (elems.size()>0) {
                     init = (Expression)elems.get(0);
                 } else {

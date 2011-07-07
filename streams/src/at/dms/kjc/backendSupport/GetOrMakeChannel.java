@@ -1,13 +1,6 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slicegraph.*;
 
 /**
  * Create channels of appropriate type for a back end.
@@ -22,13 +15,13 @@ public class GetOrMakeChannel  {
      */
     private static boolean debug = false;
     
-    protected BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits;
+    protected BackEndFactory backEndBits;
     
     /**
      * Crete a channel selector giving it a BackEndFactory to query.
      * @param backendBits
      */
-    public GetOrMakeChannel(BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+    public GetOrMakeChannel(BackEndFactory backEndBits) {
         this.backEndBits = backEndBits;
     }
     

@@ -20,8 +20,8 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * This class represents the "package at.dms.kjc" statement
@@ -81,7 +81,7 @@ public class JPackageName extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (comments != null) {
             return p.visitComments(comments);
         }

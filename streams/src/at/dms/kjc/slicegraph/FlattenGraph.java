@@ -1,20 +1,10 @@
 package at.dms.kjc.slicegraph;
 
+import java.util.*;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.linear.FilterMatrix;
-import at.dms.kjc.sir.linear.LinearAnalyzer;
-import at.dms.kjc.sir.linear.LinearFilterRepresentation;
+import at.dms.kjc.sir.*;
 import at.dms.util.Utils;
+import at.dms.kjc.sir.linear.*;
 
 /**
  * Flatten graph with new synch removal. Removes structure and reveals
@@ -26,12 +16,12 @@ import at.dms.util.Utils;
  */
 public class FlattenGraph {
     private static ArrayList<UnflatFilter> topLevelNodes=new ArrayList<UnflatFilter>(); //List of top level nodes
-    private static HashMap<UnflatFilter, ?> nodes=new HashMap<UnflatFilter, Object>(); //Set of all nodes (value is null)
+    private static HashMap nodes=new HashMap(); //Set of all nodes (value is null)
     //Set of simple null filters (regular splitters and joiners)
-    private static HashMap<UnflatFilter, ?> simpleNull=new HashMap<UnflatFilter, Object>();
+    private static HashMap simpleNull=new HashMap();
     //Set of complex null filters
     //(split/join point with number of incoming and outgoing edges greater than one)
-    private static HashMap<UnflatFilter, ?> complexNull=new HashMap<UnflatFilter, Object>();
+    private static HashMap complexNull=new HashMap();
     private static LinearAnalyzer lfa; //LinearAnalyzer for creating linear representation
     private static HashMap[] execCounts; //Execution counts from scheduler
     
@@ -959,7 +949,7 @@ public class FlattenGraph {
             UnflatEdge[][] out=filter.out;
             {
 		//Break up incoming edges
-                HashMap<UnflatEdge, ?> visited=new HashMap<UnflatEdge, Object>();
+                HashMap visited=new HashMap();
                 for(int j=0;j<in.length;j++)
                     if(!visited.containsKey(in[j])) {
                         visited.put(in[j],null);
@@ -968,7 +958,7 @@ public class FlattenGraph {
             }
             {
 		//Break up outgoing edges
-                HashMap<UnflatEdge, ?> visited=new HashMap<UnflatEdge, Object>();
+                HashMap visited=new HashMap();
                 for(int j=0;j<out.length;j++) {
                     UnflatEdge[] inner=out[j];
                     for(int k=0;k<inner.length;k++)
@@ -1235,7 +1225,7 @@ public class FlattenGraph {
                 buf.append("\\n"+arrayPrint(filter.outWeights));
             buf.append("\"];\n");
             UnflatEdge[][] out=filter.out;
-            HashMap<UnflatEdge, ?> visited=new HashMap<UnflatEdge, Object>();
+            HashMap visited=new HashMap();
             if(out!=null)
                 for(int j=0;j<out.length;j++) {
                     UnflatEdge[] edges=out[j];
@@ -1262,7 +1252,7 @@ public class FlattenGraph {
             UnflatFilter filter=(UnflatFilter)filters[i];
             buf.append(filter+"[ label = \""+arrayPrint(filter.inWeights)+"\\nSIMPLE\\n"+arrayPrint(filter.outWeights)+"\"];\n");
             UnflatEdge[][] out=filter.out;
-            HashMap<UnflatEdge, ?> visited=new HashMap<UnflatEdge, Object>();
+            HashMap visited=new HashMap();
             for(int j=0;j<out.length;j++) {
                 UnflatEdge[] edges=out[j];
                 if(edges.length==1) {
@@ -1288,7 +1278,7 @@ public class FlattenGraph {
             UnflatFilter filter=(UnflatFilter)filters[i];
             buf.append(filter+"[ label = \""+arrayPrint(filter.inWeights)+"\\nCOMPLEX\\n"+arrayPrint(filter.outWeights)+"\"];\n");
             UnflatEdge[][] out=filter.out;
-            HashMap<UnflatEdge, ?> visited=new HashMap<UnflatEdge, Object>();
+            HashMap visited=new HashMap();
             for(int j=0;j<out.length;j++) {
                 UnflatEdge[] edges=out[j];
                 if(edges.length==1) {

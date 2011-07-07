@@ -1,6 +1,8 @@
 package at.dms.kjc.iterator; 
 
-import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.*;
+import at.dms.util.*;
+import streamit.scheduler2.iriter.*;
 
 
 /**

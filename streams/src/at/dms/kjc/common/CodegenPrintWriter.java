@@ -1,7 +1,7 @@
 package at.dms.kjc.common;
 
-import java.io.StringWriter;
 import java.io.Writer;
+import java.io.StringWriter;
 
 /**
  * A PrintWriter incorporating common functions called from our code generators

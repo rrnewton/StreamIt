@@ -3,17 +3,11 @@ package at.dms.kjc.smp;
  * 
  */
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
+import java.util.*;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.KjcOptions;
 
 /**
  * This class operates on the SpaceTimeSchedule and generates the preloop

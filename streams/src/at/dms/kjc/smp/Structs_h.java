@@ -1,8 +1,6 @@
 package at.dms.kjc.smp;
 
-import java.io.FileWriter;
-import java.io.IOException;
-
+import java.io.*;
 import at.dms.kjc.sir.SIRStructure;
 
 /**

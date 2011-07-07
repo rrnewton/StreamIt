@@ -20,8 +20,10 @@
 
 package at.dms.kjc;
 
-import java.io.IOException;
+import java.util.Vector;
+
 import java.io.ObjectOutputStream;
+import java.io.IOException;
 
 import at.dms.compiler.UnpositionedError;
 import at.dms.util.InconsistencyException;

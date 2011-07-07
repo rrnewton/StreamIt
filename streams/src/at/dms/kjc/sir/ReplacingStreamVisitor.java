@@ -1,9 +1,8 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.*;
+import java.util.List;
+import java.util.Iterator;
 
 /**
  * Visits all stream structures and replaces children with result from

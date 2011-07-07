@@ -60,11 +60,11 @@ public class OSet
         return tree.size() == 0;
     }
 
-    public Pair<OSetIterator, Boolean> insert(Object data)
+    public Pair insert(Object data)
     {
-        Pair<RBNode, Boolean> result = tree.insert(data, false);
-        return new Pair<OSetIterator, Boolean>(
-                        new OSetIterator(result.first),
+        Pair result = tree.insert(data, false);
+        return new Pair(
+                        new OSetIterator((RBNode)result.first),
                         result.second);
     }
 

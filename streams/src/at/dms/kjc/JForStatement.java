@@ -20,9 +20,9 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.11: While Statement
@@ -171,7 +171,7 @@ public class JForStatement extends JLoopStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitForStatement(this, init, cond, incr, body);
     }
 

@@ -1,6 +1,7 @@
 package at.dms.kjc.sir.statespace.transform;
 
-import at.dms.kjc.sir.statespace.LinearFilterRepresentation;
+import at.dms.kjc.sir.statespace.*;
+import java.util.*;
 
 /**
  * A LinearTransform communicates information

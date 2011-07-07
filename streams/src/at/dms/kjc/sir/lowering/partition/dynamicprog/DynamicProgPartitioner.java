@@ -1,42 +1,16 @@
 package at.dms.kjc.sir.lowering.partition.dynamicprog;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+import java.io.*;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFeedbackLoopIter;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fusion.FuseAll;
-import at.dms.kjc.sir.lowering.fusion.Lifter;
-import at.dms.kjc.sir.lowering.partition.ListPartitioner;
-import at.dms.kjc.sir.lowering.partition.PartitionDot;
-import at.dms.kjc.sir.lowering.partition.PartitionRecord;
-import at.dms.kjc.sir.lowering.partition.PartitionUtil;
-import at.dms.kjc.sir.lowering.partition.Partitioner;
-import at.dms.kjc.sir.lowering.partition.RefactorSplitJoin;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import at.dms.kjc.sir.lowering.partition.*;
 
 public class DynamicProgPartitioner extends ListPartitioner {
     /**
@@ -113,7 +87,7 @@ public class DynamicProgPartitioner extends ListPartitioner {
      * The set of splitjoins whose children are structurally
      * equivalent (and have equal amounts of work.)
      */
-    private HashSet<?> uniformSJ;
+    private HashSet uniformSJ;
 
     /**
      * Whether or not joiners need a tile.
@@ -133,7 +107,7 @@ public class DynamicProgPartitioner extends ListPartitioner {
      * Set of filters that should not be fused horizontally (e.g.,
      * because they have a dynamic rate).
      */
-    private HashSet<?> noHorizFuse;
+    private HashSet noHorizFuse;
     
     /**
      * <pre>joinersNeedTiles</pre> indicates whether or not joiners in the graph
@@ -152,13 +126,13 @@ public class DynamicProgPartitioner extends ListPartitioner {
      * (e.g., on a multicore, might benefit from more threads if
      * additional threads breakup the bottleneck.)
      */
-    public DynamicProgPartitioner(SIRStream str, WorkEstimate work, int numTiles, boolean joinersNeedTiles, boolean limitICode, boolean strict, HashSet<?> noHorizFuse) {
+    public DynamicProgPartitioner(SIRStream str, WorkEstimate work, int numTiles, boolean joinersNeedTiles, boolean limitICode, boolean strict, HashSet noHorizFuse) {
         super(str, work, numTiles);
         this.joinersNeedTiles = joinersNeedTiles;
         this.limitICode = limitICode;
         this.strict = strict;
         this.configMap = new HashMap<SIRStream, DPConfig>();
-        this.uniformSJ = new HashSet<Object>();
+        this.uniformSJ = new HashSet();
         this.noHorizFuse = noHorizFuse;
     }
     /**
@@ -534,7 +508,7 @@ public class DynamicProgPartitioner extends ListPartitioner {
     /**
      * Set of filters that should not be fused horizontally.
      */
-    public HashSet<?> getNoHorizFuse() {
+    public HashSet getNoHorizFuse() {
         return this.noHorizFuse;
     }
     

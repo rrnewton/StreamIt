@@ -21,7 +21,6 @@
 package at.dms.kjc;
 
 import java.util.Hashtable;
-
 import at.dms.compiler.Compiler;
 import at.dms.compiler.UnpositionedError;
 import at.dms.util.InconsistencyException;
@@ -285,7 +284,7 @@ public class CClassType extends CType {
 
     public static final CClassType[]        EMPTY = new CClassType[0];
 
-    private static Hashtable<?, ?>    allCClassType = new Hashtable<Object, Object>(2000);
+    private static Hashtable    allCClassType = new Hashtable(2000);
     private static final CClass BAC_CLASS = new CBadClass("<NOT YET DEFINED>");
 
     private CClass      clazz;

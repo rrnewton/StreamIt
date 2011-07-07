@@ -23,7 +23,7 @@ public class JccChannel extends Channel {
 	// The last item pushed by a dynamic rate filter's worker thread
 	protected Promise pushedItem = null;
 
-	JccChannel(Class<?> channelType) {
+	JccChannel(Class channelType) {
 		super(channelType);
 
 		if ((channelType != Integer.TYPE) && (channelType != Float.TYPE)) {

@@ -20,10 +20,12 @@
 
 package at.dms.kjc;
 
+import java.util.Vector;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-import at.dms.kjc.iterator.IterFactory;
 import at.dms.util.MessageDescription;
+import at.dms.util.Utils;
+import at.dms.kjc.iterator.*;
 
 /**
  * This class represents the root class for all elements of the parsing tree
@@ -160,7 +162,7 @@ public abstract class JPhylum extends at.dms.compiler.Phylum implements Constant
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public abstract Object accept(AttributeVisitor<?> p);
+    public abstract Object accept(AttributeVisitor p);
 
     /**
      * Sets the line number of this phylum in the code sequence.

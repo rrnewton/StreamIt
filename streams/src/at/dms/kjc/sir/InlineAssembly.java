@@ -1,14 +1,11 @@
 package at.dms.kjc.sir;
 
-import java.util.ArrayList;
-
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.CBodyContext;
-import at.dms.kjc.CodeSequence;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.*;
 import at.dms.util.Utils;
+import java.util.ArrayList;
+//import at.dms.compiler.PositionedError;
+//import at.dms.compiler.TokenReference;
+//import at.dms.compiler.JavaStyleComment;
 
 /**
  * Statement used for generating inline assembly. Leverages gcc's asm
@@ -105,7 +102,7 @@ public class InlineAssembly extends JStatement {
      * anything. InlineAssembly should be blackbox to everyone but
      * codegen.
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         //Utils.fail("accept(AttributeVisitor) not supported by InlineAssembly");
         return null;
     }

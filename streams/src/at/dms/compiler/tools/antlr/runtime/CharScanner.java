@@ -20,6 +20,7 @@
 
 package at.dms.compiler.tools.antlr.runtime;
 
+import java.io.IOException;
 import java.util.Hashtable;
 
 public abstract class CharScanner implements TokenStream {
@@ -28,7 +29,7 @@ public abstract class CharScanner implements TokenStream {
     protected ANTLRStringBuffer text; // text of current token
 
     protected boolean saveConsumedInput = true; // does consume() save characters?
-    protected Class<?> tokenObjectClass; // what kind of tokens to create?
+    protected Class tokenObjectClass; // what kind of tokens to create?
     protected boolean caseSensitive = true;
     protected boolean caseSensitiveLiterals = true;
     protected Hashtable<ANTLRHashString, Integer> literals; // set by subclass

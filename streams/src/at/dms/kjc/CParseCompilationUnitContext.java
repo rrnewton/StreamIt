@@ -20,9 +20,10 @@
 
 package at.dms.kjc;
 
-import java.util.Stack;
 import java.util.Vector;
+import java.util.Stack;
 
+import at.dms.compiler.Compiler;
 import at.dms.util.Utils;
 
 public class CParseCompilationUnitContext implements DeepCloneable {
@@ -102,9 +103,9 @@ public class CParseCompilationUnitContext implements DeepCloneable {
 
     private JPackageName        pack;
     private String      packageName;
-    private Vector<?>      packageImports = new Vector<Object>();
-    private Vector<?>      classImports = new Vector<Object>();
-    private Vector<?>      typeDeclarations = new Vector<Object>();
+    private Vector      packageImports = new Vector();
+    private Vector      classImports = new Vector();
+    private Vector      typeDeclarations = new Vector();
 
     private static Stack<CParseCompilationUnitContext>        stack = new Stack<CParseCompilationUnitContext>();
 
@@ -122,9 +123,9 @@ public class CParseCompilationUnitContext implements DeepCloneable {
     protected void deepCloneInto(at.dms.kjc.CParseCompilationUnitContext other) {
         other.pack = (at.dms.kjc.JPackageName)at.dms.kjc.AutoCloner.cloneToplevel(this.pack);
         other.packageName = (java.lang.String)at.dms.kjc.AutoCloner.cloneToplevel(this.packageName);
-        other.packageImports = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.packageImports);
-        other.classImports = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.classImports);
-        other.typeDeclarations = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.typeDeclarations);
+        other.packageImports = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.packageImports);
+        other.classImports = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.classImports);
+        other.typeDeclarations = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.typeDeclarations);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

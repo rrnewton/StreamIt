@@ -20,11 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.BitSet;
-import at.dms.compiler.tools.antlr.runtime.CharFormatter;
-import at.dms.compiler.tools.antlr.runtime.FileLineFormatter;
-import at.dms.compiler.tools.antlr.runtime.Token;
-import at.dms.compiler.tools.antlr.runtime.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 /**
  * A linear-approximate LL(k) grammar analzyer.

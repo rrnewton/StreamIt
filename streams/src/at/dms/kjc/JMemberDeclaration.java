@@ -20,9 +20,9 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.JavadocComment;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavadocComment;
+import at.dms.compiler.JavaStyleComment;
 
 
 /**
@@ -96,7 +96,7 @@ public abstract class JMemberDeclaration extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return genComments1(p);
     }
 
@@ -105,7 +105,7 @@ public abstract class JMemberDeclaration extends JPhylum {
      * It is useful to debug and tune compilation process
      * @param   p       the printwriter into the code is generated
      */
-    public Object genComments1(AttributeVisitor<?> p) {
+    public Object genComments1(AttributeVisitor p) {
         if (comments != null) {
             return p.visitComments(comments);
         }

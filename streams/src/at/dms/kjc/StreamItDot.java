@@ -1,23 +1,9 @@
 package at.dms.kjc;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Iterator;
+import at.dms.kjc.sir.*;
 
-import at.dms.kjc.sir.AttributeStreamVisitor;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRStructure;
+import java.util.*;
+import java.io.*;
 
 /**
  * This class does the front-end processing to turn a Kopi compilation
@@ -299,7 +285,7 @@ public class StreamItDot implements AttributeStreamVisitor
         //print("subgraph cluster_" + getName() + " {\n label=\"" + self.getIdent() + "\";\n");
         
         // Walk through each of the elements in the pipeline.
-        Iterator<?> iter = self.getChildren().iterator();
+        Iterator iter = self.getChildren().iterator();
         while (iter.hasNext())
             {
                 SIROperator oper = (SIROperator)iter.next();

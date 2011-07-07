@@ -1,5 +1,7 @@
 package at.dms.kjc.sir.statespace;
 
+import at.dms.util.Utils;
+import at.dms.kjc.sir.lowering.partition.linear.LinearPartitioner;
 
 /**
  * This class represents the cost (variously defined) of computing

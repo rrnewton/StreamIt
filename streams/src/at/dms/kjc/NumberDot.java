@@ -1,11 +1,8 @@
 package at.dms.kjc;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.*;
+import java.util.*;
+import java.io.*;
 
 /**
  * This class does the front-end processing to turn a Kopi compilation

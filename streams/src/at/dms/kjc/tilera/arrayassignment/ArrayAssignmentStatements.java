@@ -1,8 +1,9 @@
 package at.dms.kjc.tilera.arrayassignment;
 
-import java.util.LinkedList;
-
 import at.dms.kjc.JStatement;
+import at.dms.kjc.tilera.Util;
+
+import java.util.*;
 
 public class ArrayAssignmentStatements {
     
@@ -37,7 +38,7 @@ public class ArrayAssignmentStatements {
         
         java.util.Collections.sort(singles);
         
-        assignments = (LinkedList<?>)singles;
+        assignments = (LinkedList)singles;
     }
     
     public void compress() {

@@ -3,13 +3,8 @@ package at.dms.kjc.tilera;
 import java.util.LinkedList;
 import java.util.List;
 
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmittedTextExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.*;
+import at.dms.kjc.slicegraph.*;
 
 /**
  * This class models the rotating structure that is needed when a tile uses double buffered communication

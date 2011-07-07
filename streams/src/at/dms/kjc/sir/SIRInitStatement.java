@@ -1,17 +1,8 @@
 package at.dms.kjc.sir;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import at.dms.compiler.PositionedError;
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.CBodyContext;
-import at.dms.kjc.CodeSequence;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * Init Statement.
@@ -114,9 +105,9 @@ public class SIRInitStatement extends JStatement {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitInitStatement(this, 
+            return ((SLIRAttributeVisitor)p).visitInitStatement(this, 
                                                                 target);
         } else {
             return this;
@@ -143,7 +134,7 @@ public class SIRInitStatement extends JStatement {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.sir.SIRInitStatement other) {
         super.deepCloneInto(other);
-        other.args = (java.util.List<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.args);
+        other.args = (java.util.List)at.dms.kjc.AutoCloner.cloneToplevel(this.args);
         other.target = (at.dms.kjc.sir.SIRStream)at.dms.kjc.AutoCloner.cloneToplevel(this.target);
     }
 

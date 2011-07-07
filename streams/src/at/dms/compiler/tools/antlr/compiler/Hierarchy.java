@@ -20,13 +20,11 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Enumeration;
+import java.io.*;
 
-import at.dms.compiler.tools.antlr.runtime.ANTLRException;
-import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 public class Hierarchy {
     public Hierarchy() {
@@ -52,7 +50,7 @@ public class Hierarchy {
     }
     public void expandGrammarsInFile(String fileName) {
         GrammarFile f = getFile(fileName);
-        for (Enumeration<?> e=f.getGrammars().elements(); e.hasMoreElements(); ) {
+        for (Enumeration e=f.getGrammars().elements(); e.hasMoreElements(); ) {
             GrammarDefinition g = (GrammarDefinition)e.nextElement();
             g.expandInPlace();
         }
@@ -76,7 +74,7 @@ public class Hierarchy {
     }
     public static String optionsToString(IndexedVector options) {
         String s = "options {"+System.getProperty("line.separator");
-        for (Enumeration<?> e = options.elements() ; e.hasMoreElements() ;) {
+        for (Enumeration e = options.elements() ; e.hasMoreElements() ;) {
             s += (Option)e.nextElement()+System.getProperty("line.separator");
         }
         s += "}"+

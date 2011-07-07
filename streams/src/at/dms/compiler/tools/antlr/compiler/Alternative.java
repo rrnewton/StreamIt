@@ -20,6 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
+import java.util.Hashtable;
 
 /**
  * Intermediate data class holds information about an alternative

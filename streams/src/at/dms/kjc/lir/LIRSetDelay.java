@@ -1,8 +1,7 @@
 package at.dms.kjc.lir;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * Tell the run-time system how many items need to be pushed on

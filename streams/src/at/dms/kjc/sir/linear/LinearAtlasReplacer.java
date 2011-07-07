@@ -1,31 +1,12 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.Iterator;
-import java.util.Vector;
-
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JMinusExpression;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.util.Utils;
+import java.util.*;
+import at.dms.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.linear.*;
+import at.dms.kjc.iterator.*;
+import at.dms.compiler.*;
 
 /**
  * This replacer works by calling the matrix multiply routines in the
@@ -171,10 +152,10 @@ public class LinearAtlasReplacer extends LinearDirectReplacer implements Constan
      * }
      * </pre>
      **/
-    public Vector<?> makePushStatementVector(LinearFilterRepresentation linearRep,
+    public Vector makePushStatementVector(LinearFilterRepresentation linearRep,
                                           CType inputType,
                                           CType outputType) {
-        Vector<?> result = new Vector<Object>();
+        Vector result = new Vector();
 
         // make loop bodies and loop counters
         JVariableDefinition iVar = new JVariableDefinition(/* where */ null,  /* modifiers */ 0, /* type */ CStdType.Integer,

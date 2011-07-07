@@ -1,33 +1,21 @@
 package at.dms.kjc.tilera;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
 
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.StreamItDot;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
+import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.*;
+import java.util.LinkedList;
+import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.sir.lowering.partition.WorkList;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.LevelizeSliceGraph;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.SliceWorkEstimate;
-import at.dms.kjc.slicegraph.fission.Fissioner;
+import at.dms.kjc.slicegraph.fission.*;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * 

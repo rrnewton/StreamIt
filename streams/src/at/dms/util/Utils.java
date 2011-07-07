@@ -20,65 +20,16 @@
 
 package at.dms.util;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.math.BigInteger;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.io.*;
 
 import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.DeepCloneable;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JDivideExpression;
-import at.dms.kjc.JDoubleLiteral;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JMinusExpression;
-import at.dms.kjc.JParenthesedExpression;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JTypeNameExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.JWhileStatement;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.sir.SIRCodeUnit;
-import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.sir.SIRMarker;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.LoweringConstants;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  * This class defines severals utilities methods used in source code
@@ -725,7 +676,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @param   type        the type of the elements
      * @deprecated
      */
-    public static Object[] toArray(Vector<?> vect, Class<?> type) {
+    public static Object[] toArray(Vector vect, Class type) {
         if (vect != null && vect.size() > 0) {
             Object[]    array = (Object[])Array.newInstance(type, vect.size());
 

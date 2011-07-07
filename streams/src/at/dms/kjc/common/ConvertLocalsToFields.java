@@ -1,25 +1,9 @@
 package at.dms.kjc.common;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.iterator.*;
+import java.util.*;
 
 /**
  * This class converts certain (large) local variables into fields so
@@ -99,12 +83,12 @@ public class ConvertLocalsToFields {
         }
 
         // add the fields to the filter
-        List<JFieldDeclaration> fields = new LinkedList<JFieldDeclaration>(Arrays.asList(filter.getFields()));
+        List fields = new LinkedList(Arrays.asList(filter.getFields()));
         for (Iterator<JVariableDefinition> it = locals.iterator(); it.hasNext(); ) {
             JVariableDefinition local = it.next();
             fields.add(new JFieldDeclaration(local));
         }
-        filter.setFields(fields.toArray(new JFieldDeclaration[0]));
+        filter.setFields((JFieldDeclaration[])fields.toArray(new JFieldDeclaration[0]));
     }
 
     /**

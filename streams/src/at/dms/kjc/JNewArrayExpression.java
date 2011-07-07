@@ -21,6 +21,8 @@
 package at.dms.kjc;
 
 import at.dms.classfile.MultiarrayInstruction;
+import at.dms.classfile.ClassRefInstruction;
+import at.dms.classfile.NewarrayInstruction;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
 import at.dms.compiler.UnpositionedError;
@@ -185,7 +187,7 @@ public class JNewArrayExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitNewArrayExpression(this, type.getBaseType(), dims, init);
     }
 

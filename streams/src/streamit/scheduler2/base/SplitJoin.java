@@ -16,11 +16,12 @@
 
 package streamit.scheduler2.base;
 
+import streamit.scheduler2.iriter./*persistent.*/
+    SplitJoinIter;
 import java.math.BigInteger;
 
-import streamit.misc.Fraction;
-import streamit.scheduler2.iriter.SplitJoinIter;
 import at.dms.kjc.sir.SIRStream;
+import streamit.misc.Fraction;
 
 /**
  * Computes some basic steady state data for SplitJoins.

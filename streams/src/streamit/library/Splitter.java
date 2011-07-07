@@ -16,13 +16,13 @@
 
 package streamit.library;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
+// 1 input, many output
 
-import streamit.library.iriter.FeedbackLoopIter;
-import streamit.library.iriter.SplitJoinIter;
 import streamit.misc.Pair;
+
+import streamit.library.iriter.SplitJoinIter;
+import streamit.library.iriter.FeedbackLoopIter;
 
 abstract public class Splitter extends Operator
 {
@@ -203,7 +203,7 @@ abstract public class Splitter extends Operator
             }
         if (splitWorks[nWork] == null)
             {
-                splitWorks[nWork] = new Pair<Splitter, Integer>(this, new Integer(nWork));
+                splitWorks[nWork] = new Pair(this, new Integer(nWork));
             }
 
         return splitWorks[nWork];

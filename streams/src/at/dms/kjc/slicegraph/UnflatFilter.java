@@ -1,10 +1,8 @@
 package at.dms.kjc.slicegraph;
 
+import at.dms.kjc.sir.*;
 import java.util.HashMap;
 import java.util.HashSet;
-
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
 
 /**
  * Intermediate file used in (super) synch removal. Represents filter
@@ -46,7 +44,7 @@ public class UnflatFilter {
     /**
      * Set of all names (maps String->null) to prevent name collisions
      */
-    private static HashMap<String, ?> names=new HashMap<String, Object>();
+    private static HashMap names=new HashMap();
     /**
      * For linear filters, the A in its Ax+b representation.
      */

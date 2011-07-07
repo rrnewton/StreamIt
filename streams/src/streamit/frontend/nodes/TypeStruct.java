@@ -16,9 +16,10 @@
 
 package streamit.frontend.nodes;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import java.util.HashMap;
 
 /**
  * A hetereogeneous structure type.  This type has a name for itself,
@@ -39,8 +40,8 @@ public class TypeStruct extends Type
 {
     private FEContext context;
     private String name;
-    private List<?> fields;
-    private Map<?, ?> types;
+    private List fields;
+    private Map types;
     
     /**
      * Creates a new structured type.  The fields and ftypes lists must
@@ -54,12 +55,12 @@ public class TypeStruct extends Type
      * @param ftypes   list of <code>Type</code> containing the types of
      *                 the fields
      */
-    public TypeStruct(FEContext context, String name, List<?> fields, List<?> ftypes)
+    public TypeStruct(FEContext context, String name, List fields, List ftypes)
     {
         this.context = context;
         this.name = name;
         this.fields = fields;
-        this.types = new HashMap<Object, Object>();
+        this.types = new HashMap();
         for (int i = 0; i < fields.size(); i++)
             this.types.put(fields.get(i), ftypes.get(i));
     }

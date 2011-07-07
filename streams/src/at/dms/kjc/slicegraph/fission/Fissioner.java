@@ -1,5 +1,7 @@
 package at.dms.kjc.slicegraph.fission;
 
+import java.util.LinkedList;
+
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -19,14 +21,7 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.IDFilterContent;
-import at.dms.kjc.slicegraph.IDSliceRemoval;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.MutableStateExtractor;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.slicegraph.*;
 
 public class Fissioner {
     private static int uniqueID;

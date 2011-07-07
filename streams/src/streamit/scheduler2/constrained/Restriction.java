@@ -1,5 +1,10 @@
 package streamit.scheduler2.constrained;
 
+import streamit.misc.OMap;
+import streamit.misc.OMapIterator;
+import streamit.misc.OSet;
+import streamit.misc.OSetIterator;
+
 import streamit.scheduler2.hierarchical.PhasingSchedule;
 
 /**

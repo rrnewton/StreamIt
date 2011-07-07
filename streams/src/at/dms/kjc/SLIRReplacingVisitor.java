@@ -20,53 +20,13 @@
 package at.dms.kjc;
 
 import java.util.List;
-import java.util.ListIterator;
-
-import at.dms.kjc.lir.LIRFileReader;
-import at.dms.kjc.lir.LIRFileWriter;
-import at.dms.kjc.lir.LIRFunctionPointer;
-import at.dms.kjc.lir.LIRMainFunction;
-import at.dms.kjc.lir.LIRNode;
-import at.dms.kjc.lir.LIRSetBodyOfFeedback;
-import at.dms.kjc.lir.LIRSetChild;
-import at.dms.kjc.lir.LIRSetDecode;
-import at.dms.kjc.lir.LIRSetDelay;
-import at.dms.kjc.lir.LIRSetEncode;
-import at.dms.kjc.lir.LIRSetJoiner;
-import at.dms.kjc.lir.LIRSetLoopOfFeedback;
-import at.dms.kjc.lir.LIRSetParallelStream;
-import at.dms.kjc.lir.LIRSetPeek;
-import at.dms.kjc.lir.LIRSetPop;
-import at.dms.kjc.lir.LIRSetPush;
-import at.dms.kjc.lir.LIRSetSplitter;
-import at.dms.kjc.lir.LIRSetStreamType;
-import at.dms.kjc.lir.LIRSetTape;
-import at.dms.kjc.lir.LIRSetWork;
-import at.dms.kjc.lir.LIRStreamType;
-import at.dms.kjc.sir.SIRCreatePortal;
-import at.dms.kjc.sir.SIRDynamicToken;
-import at.dms.kjc.sir.SIRInitStatement;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRIterationExpression;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIRLatency;
-import at.dms.kjc.sir.SIRLatencyMax;
-import at.dms.kjc.sir.SIRLatencyRange;
-import at.dms.kjc.sir.SIRLatencySet;
-import at.dms.kjc.sir.SIRMarker;
-import at.dms.kjc.sir.SIRMessageStatement;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPortal;
-import at.dms.kjc.sir.SIRPrintStatement;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRRangeExpression;
-import at.dms.kjc.sir.SIRRegReceiverStatement;
-import at.dms.kjc.sir.SIRRegSenderStatement;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.JVectorLiteral;
+import at.dms.kjc.lir.*;
 import at.dms.util.Utils;
+import java.util.ListIterator;
+import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.JavadocComment;
 
 /**
  * This is just like ReplacingVisitor except for SLIR nodes, too.
@@ -84,9 +44,9 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
      */
     public Object visitInitStatement(SIRInitStatement self,
                                      SIRStream target) {
-        List<JExpression> args = self.getArgs();
+        List args = self.getArgs();
         for (int i=0; i<args.size(); i++) {
-            JExpression newExp = (JExpression)args.get(i).accept(this);
+            JExpression newExp = (JExpression)((JExpression)args.get(i)).accept(this);
             if (newExp!=null && newExp!=args.get(i)) {
                 args.set(i, newExp);
             }

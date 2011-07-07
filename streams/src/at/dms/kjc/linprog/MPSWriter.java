@@ -1,10 +1,7 @@
 package at.dms.kjc.linprog;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.LinkedList;
+import java.io.*;
+import java.util.*;
 
 /**
  * Writes an MPS representation of a linear program.  Intended to be

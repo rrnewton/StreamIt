@@ -20,6 +20,7 @@
 
 package at.dms.kjc;
 
+import at.dms.compiler.UnpositionedError;
 import at.dms.util.InconsistencyException;
 import at.dms.util.SimpleStringBuffer;
 

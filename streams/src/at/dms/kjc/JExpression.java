@@ -305,7 +305,7 @@ public abstract class JExpression extends JPhylum {
      * @param   p       the visitor
      * @return  data to pass back up
      */
-    public abstract Object accept(AttributeVisitor<?> p);
+    public abstract Object accept(AttributeVisitor p);
     /**
      * Accepts the specified expression visitor
      * @param <S> output type

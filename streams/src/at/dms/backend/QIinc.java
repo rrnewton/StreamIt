@@ -20,8 +20,8 @@
 
 package at.dms.backend;
 
-import at.dms.classfile.IincInstruction;
 import at.dms.classfile.Instruction;
+import at.dms.classfile.IincInstruction;
 import at.dms.util.InconsistencyException;
 
 /**

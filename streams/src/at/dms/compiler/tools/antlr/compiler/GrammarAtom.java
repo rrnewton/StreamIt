@@ -20,7 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 /**
  * A GrammarAtom is either a token ref, a character ref, or string.

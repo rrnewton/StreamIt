@@ -1,19 +1,14 @@
 package at.dms.kjc.backendSupport;
 
-import java.io.FileWriter;
+import java.util.*;
+import at.dms.kjc.slicegraph.*;
 
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import java.io.*;
 
 /** Dump a graph with info about slices and channels. */
 public class DumpSlicesAndChannels {
     // dump the the completed partition to a dot file
-    public static void dumpGraph(String filename, SIRSlicer slicer, BackEndFactory<?, ?, ?, ?> backendbits) {
+    public static void dumpGraph(String filename, SIRSlicer slicer, BackEndFactory backendbits) {
         StringBuffer buf = new StringBuffer();
         buf.append("digraph Flattend {\n");
         buf.append("size = \"8, 10.5\";\n");
@@ -47,7 +42,7 @@ public class DumpSlicesAndChannels {
     }
 
     /** return a string for a channel. */
-    private static  String channelName(Edge e, BackEndFactory<?, ?, ?, ?> backendbits) {
+    private static  String channelName(Edge e, BackEndFactory backendbits) {
         StringBuffer out = new StringBuffer();
         Channel channel = backendbits.getChannel(e);
         if (channel == null) {
@@ -71,7 +66,7 @@ public class DumpSlicesAndChannels {
     
     /**return a string with all of the names of the filterslicenodes
      * and blue if linear. */
-    private static  String sliceName(Slice slice, SIRSlicer slicer, BackEndFactory<?, ?, ?, ?> backendbits) {
+    private static  String sliceName(Slice slice, SIRSlicer slicer, BackEndFactory backendbits) {
         SliceNode node = slice.getHead();
 
         StringBuffer out = new StringBuffer();

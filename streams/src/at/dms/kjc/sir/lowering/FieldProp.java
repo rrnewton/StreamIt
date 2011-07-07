@@ -1,43 +1,9 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
-
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JDoubleLiteral;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRToStreamIt;
+import java.util.*;
 
 /**
  * This class propagates constant assignments to field variables from
@@ -132,7 +98,7 @@ public class FieldProp implements Constants
         if (str instanceof SIRPipeline)
             {
                 SIRPipeline pl = (SIRPipeline)str;
-                Iterator<?> iter = pl.getChildren().iterator();
+                Iterator iter = pl.getChildren().iterator();
                 while (iter.hasNext())
                     {
                         SIRStream child = (SIRStream)iter.next();
@@ -173,7 +139,7 @@ public class FieldProp implements Constants
             Unroller unroller;
             for (int i = 0; i < str.getMethods().length; i++) {
                 do {
-                    unroller = new Unroller(new Hashtable<JLocalVariable, Object>(), unrollOuterLoops);
+                    unroller = new Unroller(new Hashtable(), unrollOuterLoops);
                     str.getMethods()[i].accept(unroller);
                 } while (unroller.hasUnrolled());
             }
@@ -772,7 +738,7 @@ public class FieldProp implements Constants
         }
         // propagate into initializers and types of field declarations
         JFieldDeclaration[] fields = filter.getFields();
-        Propagator prop = new Propagator(new Hashtable<JLocalVariable, Object>());
+        Propagator prop = new Propagator(new Hashtable());
         for (int i = 0; i < fields.length; i++) {
             // the field type (propagate into static array bounds)
             CType type = fields[i].getType();
@@ -833,9 +799,9 @@ public class FieldProp implements Constants
      * @param meth
      * @return
      */
-    private Hashtable<JLocalVariable, ?> findLocals(JMethodDeclaration meth)
+    private Hashtable findLocals(JMethodDeclaration meth)
     {
-        final Hashtable<JLocalVariable, ?> yes = new Hashtable<JLocalVariable, Object>();
+        final Hashtable yes = new Hashtable();
         
         // This looks a lot like the thing we had for fields, except
         // that it looks for local variables.

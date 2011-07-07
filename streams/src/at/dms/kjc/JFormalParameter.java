@@ -23,6 +23,7 @@ package at.dms.kjc;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
 import at.dms.compiler.UnpositionedError;
+import java.io.*;
 
 /**
  * This class represents a parameter declaration in the syntax tree
@@ -115,7 +116,7 @@ public class JFormalParameter extends JLocalVariable {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitFormalParameters(this, isFinal(), getType(), getIdent());
     }
 

@@ -26,18 +26,11 @@
 
 package streamit.library;
 
-import streamit.misc.WrappableGrowableQueue;
-import streamit.misc.WrappableGrowableQueue_boolean;
-import streamit.misc.WrappableGrowableQueue_char;
-import streamit.misc.WrappableGrowableQueue_double;
-import streamit.misc.WrappableGrowableQueue_float;
-import streamit.misc.WrappableGrowableQueue_int;
-import streamit.misc.WrappableGrowableQueue_obj;
-import streamit.misc.WrappableGrowableQueue_short;
+import streamit.misc.*;
 
 public class Channel extends streamit.misc.DestroyedClass
 {
-    protected Class<?> type;
+    protected Class type;
     Operator source = null, sink = null;
 
     Integer popPushCount = null;
@@ -60,7 +53,7 @@ public class Channel extends streamit.misc.DestroyedClass
 
     // the channel should be constructed with a 0-length array
     // indicating the type that will be held in this channel.
-    void setupChannel (Class<?> channelType)
+    void setupChannel (Class channelType)
     {
         assert channelType != null;
         type = channelType;
@@ -91,12 +84,12 @@ public class Channel extends streamit.misc.DestroyedClass
         }
     }
     
-    public Channel(Class<?> channelType)
+    public Channel(Class channelType)
     {
         setupChannel (channelType);
     }
 
-    public Channel (Class<?> channelType, Rate popPush)
+    public Channel (Class channelType, Rate popPush)
     {
         setupChannel (channelType);
 
@@ -113,11 +106,11 @@ public class Channel extends streamit.misc.DestroyedClass
      * Same as above, for fixed I/O rates (and backwards compatibility
      * with old Java benchmarks)
      */
-    public Channel (Class<?> channelType, int popPush) {
+    public Channel (Class channelType, int popPush) {
         this(channelType, new RateStatic(popPush));
     }
 
-    public Channel (Class<?> channelType, Rate pop, Rate peek)
+    public Channel (Class channelType, Rate pop, Rate peek)
     {
         setupChannel (channelType);
 
@@ -135,13 +128,13 @@ public class Channel extends streamit.misc.DestroyedClass
      * Same as above, for fixed I/O rates (and backwards compatibility
      * with old Java benchmarks)
      */
-    public Channel (Class<?> channelType, int pop, int peek) {
+    public Channel (Class channelType, int pop, int peek) {
         this(channelType, new RateStatic(pop), new RateStatic(peek));
     }
-    public Channel (Class<?> channelType, Rate pop, int peek) {
+    public Channel (Class channelType, Rate pop, int peek) {
         this(channelType, pop, new RateStatic(peek));
     }
-    public Channel (Class<?> channelType, int pop, Rate peek) {
+    public Channel (Class channelType, int pop, Rate peek) {
         this(channelType, new RateStatic(pop), peek);
     }
 
@@ -671,7 +664,7 @@ public class Channel extends streamit.misc.DestroyedClass
     //                  syntax checking functions
     // ------------------------------------------------------------------
 
-    public Class<?> getType () { return type; }
+    public Class getType () { return type; }
 
     // ------------------------------------------------------------------
     //                  graph keeping functions

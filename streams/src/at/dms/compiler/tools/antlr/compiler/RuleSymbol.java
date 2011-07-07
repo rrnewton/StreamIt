@@ -20,7 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 class RuleSymbol extends GrammarSymbol {
     RuleBlock block;    // list of alternatives

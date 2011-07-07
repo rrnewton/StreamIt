@@ -1,6 +1,12 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.kjc.sir.SIRStream;
+import java.util.*;
+
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
 
 /**
  * Identity transform on a stream graph.

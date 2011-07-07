@@ -1,14 +1,9 @@
 // $ANTLR 1.5A: "Optgen.g" -> "OptgenParser.java"$
 package at.dms.compiler.tools.optgen; 
+import at.dms.compiler.tools.antlr.runtime.*;
+
 import java.util.Vector;
 
-import at.dms.compiler.tools.antlr.runtime.NoViableAltException;
-import at.dms.compiler.tools.antlr.runtime.ParserSharedInputState;
-import at.dms.compiler.tools.antlr.runtime.RecognitionException;
-import at.dms.compiler.tools.antlr.runtime.Token;
-import at.dms.compiler.tools.antlr.runtime.TokenBuffer;
-import at.dms.compiler.tools.antlr.runtime.TokenStream;
-import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
 import at.dms.compiler.tools.common.Utils;
 
 public class OptgenParser extends at.dms.compiler.tools.antlr.runtime.LLkParser
@@ -268,7 +263,7 @@ public class OptgenParser extends at.dms.compiler.tools.antlr.runtime.LLkParser
         OptionDefinition[] self = null;
         
         
-        Vector<?>      container = new Vector<Object>();
+        Vector      container = new Vector();
         OptionDefinition    def;
         
         

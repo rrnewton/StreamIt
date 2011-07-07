@@ -1,9 +1,12 @@
 package at.dms.kjc.sir.lowering.partition;
 
+import at.dms.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
 import java.util.List;
-
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class is for refactoring pipelines.
@@ -48,8 +51,8 @@ public class RefactorPipeline {
         result.setInit(SIRStream.makeEmptyInit());
 
         // get copy of list of old children, and parameters passed to them
-        List<?> children = pipe.getChildren();
-        List<?> params = pipe.getParams();
+        List children = pipe.getChildren();
+        List params = pipe.getParams();
 
         // for all the partitions...
         for(int i=0;i<partition.size();i++) {
@@ -58,7 +61,7 @@ public class RefactorPipeline {
                 // if there is only one stream in the partition, then
                 // we don't need to do anything; just add the child
                 int pos = partition.getFirst(i);
-                result.add((SIRStream)children.get(pos), (List<?>)params.get(pos));
+                result.add((SIRStream)children.get(pos), (List)params.get(pos));
             } else {
                 // the child pipeline
                 SIRPipeline childPipe = new SIRPipeline(pipe,
@@ -67,7 +70,7 @@ public class RefactorPipeline {
         
                 // move children into hierarchical pipeline
                 for(int k=0,l=partition.getFirst(i);k<partSize;k++,l++) {
-                    childPipe.add((SIRStream)children.get(l), (List<?>)params.get(l));
+                    childPipe.add((SIRStream)children.get(l), (List)params.get(l));
                 }
 
                 // update new toplevel pipeline

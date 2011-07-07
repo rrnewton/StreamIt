@@ -15,22 +15,9 @@
  */
 
 package streamit.frontend.passes;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import streamit.frontend.nodes.*;
 
-import streamit.frontend.nodes.FEReplacer;
-import streamit.frontend.nodes.Program;
-import streamit.frontend.nodes.SCAnon;
-import streamit.frontend.nodes.SCSimple;
-import streamit.frontend.nodes.StmtBody;
-import streamit.frontend.nodes.StmtLoop;
-import streamit.frontend.nodes.StreamCreator;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.StreamType;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypePrimitive;
+import java.util.*;
 
 /**
  * Pass to assign loop types to feedback loops with void input types.
@@ -155,7 +142,7 @@ public class AssignLoopTypes extends FEReplacer
                 // If so, assume it's T->T.
                 if (st == null)
                     {
-                        List<?> types = scs.getTypes();
+                        List types = scs.getTypes();
                         if (!types.isEmpty())
                             st = new StreamType(sc.getContext(),
                                                 (Type)types.get(0),

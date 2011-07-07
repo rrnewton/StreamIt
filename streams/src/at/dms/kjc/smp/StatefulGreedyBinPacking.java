@@ -1,13 +1,12 @@
 package at.dms.kjc.smp;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.GraphFlattener;
+import at.dms.kjc.flatgraph.WorkSorted;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import java.util.*;
+import at.dms.kjc.sir.lowering.partition.*;
 
 /**
  * @author mgordon

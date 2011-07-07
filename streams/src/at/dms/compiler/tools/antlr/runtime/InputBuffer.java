@@ -26,6 +26,7 @@ package at.dms.compiler.tools.antlr.runtime;
 //      subclass will define the input stream
 //      There are two subclasses to this: CharBuffer and ByteBuffer
 
+import java.io.IOException;
 
 /**
  * A Stream of characters fed to the lexer from a InputStream that can

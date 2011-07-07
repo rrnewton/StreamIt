@@ -22,8 +22,8 @@ package at.dms.classfile;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Vector;
+import java.util.Enumeration;
 
 import at.dms.util.InconsistencyException;
 

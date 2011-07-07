@@ -20,8 +20,8 @@
 
 package at.dms.backend;
 
-import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Hashtable;
 
 /**
  * This class compute the liveness of each temporaries
@@ -223,7 +223,7 @@ public class LivenessAnalysis {
         if (nodes.length == 1) {
             return nodes[0].getLivein();
         } else {
-            Vector<?>  vect = new Vector<Object>();
+            Vector  vect = new Vector();
 
             for (int i = 0; i < nodes.length; i++) {
                 QTemporary[]    tt = nodes[i].getLivein();
@@ -283,8 +283,8 @@ public class LivenessAnalysis {
     // DATA MEMBERS
     // --------------------------------------------------------------------
 
-    private Hashtable<?, ?>           hash = new Hashtable<Object, Object>(); // collects temporaries
-    private Vector<?>          vect = new Vector<Object>();
+    private Hashtable           hash = new Hashtable(); // collects temporaries
+    private Vector          vect = new Vector();
     private QTemporary[]            temps;   // List of temporaries
     private BasicBlock[]            bblocks; // List of basic blocks
     private BasicBlock[]            eblocks; // List of exception handler

@@ -20,10 +20,10 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
 import at.dms.compiler.UnpositionedError;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.19: Try Statement
@@ -169,7 +169,7 @@ public class JTryFinallyStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitTryFinallyStatement(this, tryClause, finallyClause);
     }
 

@@ -1,13 +1,8 @@
 package at.dms.kjc.iterator;
 
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRRecursiveStub;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
 
 
 /**

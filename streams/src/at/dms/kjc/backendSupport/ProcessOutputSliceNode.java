@@ -1,41 +1,9 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JBreakStatement;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JModuloExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JSwitchGroup;
-import at.dms.kjc.JSwitchLabel;
-import at.dms.kjc.JSwitchStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.SliceNode;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.slicegraph.*;
 
 /**
  * Create kopi code for an {@link at.dms.kjc.slicegraph.OutputSliceNode}.
@@ -49,10 +17,10 @@ public class ProcessOutputSliceNode {
 
     protected OutputSliceNode outputNode;
     protected SchedulingPhase whichPhase;
-    protected BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits;
+    protected BackEndFactory backEndBits;
     protected CodeStoreHelper splitter_code;
-    protected ComputeNode<ComputeCodeStore<?>> location;
-    protected ComputeCodeStore<?> codeStore;
+    protected ComputeNode location;
+    protected ComputeCodeStore codeStore;
     
     /**
      * Constructor
@@ -61,7 +29,7 @@ public class ProcessOutputSliceNode {
      * @param backEndBits  a BackEndFactory to access layout, etc.
      */
     public ProcessOutputSliceNode(OutputSliceNode outputNode, 
-            SchedulingPhase whichPhase, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+            SchedulingPhase whichPhase, BackEndFactory backEndBits) {
         this.outputNode = outputNode;
         this.whichPhase = whichPhase;
         this.backEndBits = backEndBits;
@@ -231,7 +199,7 @@ public class ProcessOutputSliceNode {
          * @return
          */
         private static void makeSplitterCode(OutputSliceNode splitter, 
-                BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits, CodeStoreHelper helper) {
+                BackEndFactory backEndBits, CodeStoreHelper helper) {
             String splitter_name = "_splitter_" + ProcessFilterSliceNode.getUid();
             String splitter_method_name =  splitter_name + splitter.getPrevFilter().getFilter().getName();
 
@@ -369,7 +337,7 @@ public class ProcessOutputSliceNode {
          * @param backEndBits
          * @return
          */
-        public static  CodeStoreHelper getSplitterCode(OutputSliceNode splitter, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+        public static  CodeStoreHelper getSplitterCode(OutputSliceNode splitter, BackEndFactory backEndBits) {
             CodeStoreHelper splitter_code = CodeStoreHelper.findHelperForSliceNode(splitter);
             if (splitter_code == null) {
                 splitter_code = backEndBits.getCodeStoreHelper(splitter);

@@ -16,6 +16,7 @@
 
 package streamit.library;
 
+import java.util.*;
 
 /**
  * Represents an I/O rate, possibly having some range of values.

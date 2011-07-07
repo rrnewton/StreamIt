@@ -1,26 +1,7 @@
 package at.dms.kjc.sir.lowering;
-import java.util.Map;
+import at.dms.kjc.*;
 
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBinaryExpression;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JDivideExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMinusExpression;
-import at.dms.kjc.JMultExpression;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
+import java.util.*;
 
 /**
  * Information about loops with fixed number of iterations.

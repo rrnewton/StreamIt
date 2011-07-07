@@ -20,11 +20,12 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.JavaStyleComment;
+import at.dms.util.*;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-import at.dms.util.InconsistencyException;
+import at.dms.compiler.JavaStyleComment;
 import at.dms.util.MessageDescription;
+import at.dms.util.InconsistencyException;
 
 /**
  * JLS 14.5: Statement
@@ -114,7 +115,7 @@ public abstract class JStatement extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public abstract Object accept(AttributeVisitor<?> p);
+    public abstract Object accept(AttributeVisitor p);
 
     /**
      * Returns the comments

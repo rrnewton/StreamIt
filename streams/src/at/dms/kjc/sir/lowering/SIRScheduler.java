@@ -1,49 +1,23 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import streamit.library.StreamIt;
-import streamit.scheduler2.Schedule;
+import streamit.scheduler2.iriter.Iterator;
 import streamit.scheduler2.Scheduler;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JClassDeclaration;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.lir.LIRFunctionPointer;
-import at.dms.kjc.lir.LIRMainFunction;
-import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFileReader;
-import at.dms.kjc.sir.SIRFileWriter;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.partition.PartitionDot;
+import streamit.scheduler2.Schedule;
+import streamit.library.StreamIt;
+
+import at.dms.util.IRPrinter;
 import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.lir.*;
+import at.dms.kjc.sir.lowering.partition.PartitionDot;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * This builds a schedule for the stream and instantiates the schedule
@@ -229,7 +203,7 @@ public class SIRScheduler implements Constants {
     private static void printExecutionCounts(HashMap[] result) {
         for (int i=0; i<2; i++) {
             System.err.println(i==0 ? "Initial counts:" : "Steady counts:");
-            for (java.util.Iterator<?> it=result[i].keySet().iterator(); it.hasNext(); ) {
+            for (java.util.Iterator it=result[i].keySet().iterator(); it.hasNext(); ) {
                 SIROperator op = (SIROperator)it.next();
                 int[] count = (int[])result[i].get(op);
                 System.err.println("  " + op.getName() + ": " + (count==null ? "empty" : "" + count[0]));

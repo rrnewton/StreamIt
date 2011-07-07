@@ -1,31 +1,11 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRTwoStageFilter;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+//import at.dms.util.*;
+import at.dms.kjc.sir.*;
+//import at.dms.kjc.lir.*;
 
 //import java.util.*;
 /**
@@ -88,8 +68,8 @@ public class PopToPeek extends EmptyStreamVisitor implements Constants {
     }
     
     /** returns a list of pop statements that are appended on the end of the work function. **/
-    public List<?> makePopStatements(int popCount, CType tapeType) {
-        LinkedList<?> popList = new LinkedList<Object>();
+    public List makePopStatements(int popCount, CType tapeType) {
+        LinkedList popList = new LinkedList();
         for (int i=0; i<popCount; i++) {
             popList.add(new JExpressionStatement(null, new SIRPopExpression(tapeType), null));
         }

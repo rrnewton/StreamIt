@@ -39,6 +39,8 @@ import at.dms.kjc.JSwitchStatement;
 import at.dms.kjc.JUnaryExpression;
 import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPrintStatement;
@@ -46,6 +48,7 @@ import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.kjc.sir.lowering.Propagator;
 import at.dms.kjc.sir.lowering.Unroller;
 import at.dms.kjc.sir.lowering.partition.WorkConstants;
+import at.dms.kjc.sir.lowering.partition.WorkEstimate.WorkVisitor;
 
 public class SliceWorkEstimate extends SLIREmptyVisitor implements
         WorkConstants {

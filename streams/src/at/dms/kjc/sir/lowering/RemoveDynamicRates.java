@@ -1,14 +1,8 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRRangeExpression;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.iterator.*;
 
 /**
  * NOTE: This class is deprecated in favor of SIRDynamicRateManager.

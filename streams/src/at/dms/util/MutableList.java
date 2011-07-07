@@ -1,9 +1,7 @@
 package at.dms.util;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 /**
  * Intended to be used in conjunction with ConstList, if one user
@@ -28,14 +26,14 @@ public class MutableList extends ConstList implements List, Cloneable, Serializa
      * the end of this list, in the order that they are returned
      * by the specified collection's iterator (optional
      * operation). */
-    public boolean addAll(Collection<?> c) {
+    public boolean addAll(Collection c) {
         return list.addAll(c);
     }
 
     /** Inserts all of the elements in the specified collection
      * into this list at the specified position (optional
      * operation). */
-    public boolean addAll(int index, Collection<?> c) {
+    public boolean addAll(int index, Collection c) {
         return list.addAll(index, c);
     }
 
@@ -59,13 +57,13 @@ public class MutableList extends ConstList implements List, Cloneable, Serializa
 
     /** Removes from this list all the elements that are contained
      * in the specified collection (optional operation). */
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(Collection c) {
         return list.removeAll(c);
     }
 
     /** Retains only the elements in this list that are contained
      * in the specified collection (optional operation). */
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(Collection c) {
         return list.retainAll(c);
     }
 

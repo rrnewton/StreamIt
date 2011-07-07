@@ -1,6 +1,16 @@
 package at.dms.kjc.sir.lowering.partition.dynamicprog;
 
-import at.dms.kjc.sir.SIRFeedbackLoop;
+import java.util.*;
+import java.io.*;
+
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import at.dms.kjc.sir.lowering.partition.*;
 
 class DPConfigFeedbackLoop extends DPConfigContainer {
     private static final int[] WIDTH = { 1, 1 };

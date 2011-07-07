@@ -16,10 +16,9 @@
 
 package streamit.scheduler2;
 
-import java.util.Vector;
-
 import streamit.misc.AssertedClass;
 import streamit.misc.Pair;
+import java.util.Vector;
 
 /**
  * <dl>
@@ -139,7 +138,7 @@ public class Schedule extends AssertedClass
         // make sure this is not a bottom schedule
         assert subScheds != null;
 
-        subScheds.add(new Pair<Object, Object>(subSchedule, new Integer(1)));
+        subScheds.add(new Pair(subSchedule, new Integer(1)));
     }
 
     /**
@@ -153,7 +152,7 @@ public class Schedule extends AssertedClass
         // make sure this is not a bottom schedule
         assert subScheds != null;
 
-        subScheds.add(new Pair<Object, Object>(subSchedule, new Integer(numExecs)));
+        subScheds.add(new Pair(subSchedule, new Integer(numExecs)));
     }
 
     /**

@@ -1,12 +1,13 @@
 package at.dms.kjc.common;
 
-import java.io.FileWriter;
-import java.util.HashSet;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import java.util.*;
+import java.io.*;
 
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStructure;
+import at.dms.kjc.flatgraph.*;
+//import at.dms.util.IRPrinter;
+//import at.dms.util.SIRPrinter;
 
 /**
  * Create structs.h and its contents.

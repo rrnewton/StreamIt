@@ -16,25 +16,20 @@
 
 package streamit.library.io;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import streamit.library.Channel;
 import streamit.library.Filter;
 import streamit.library.Stream;
+import streamit.library.Channel;
+
+import java.io.*;
 
 public class FileReader extends Filter
 {
-    Class<?> fileType;
+    Class fileType;
     File inputFile;
     String fileName;
     DataInputStream inputStream;
 
-    public FileReader (String fileName, Class<?> type, boolean TREAT_AS_BITS)
+    public FileReader (String fileName, Class type, boolean TREAT_AS_BITS)
     {
         // This is part of the hack to make FileReader/Writer<bit> work
         if (TREAT_AS_BITS)
@@ -46,7 +41,7 @@ public class FileReader extends Filter
     }
 
     // This is part of the hack to make FileReader/Writer<bit> work
-    public FileReader (String fileName, Class<?> type) {
+    public FileReader (String fileName, Class type) {
         this(fileName, type, false);
     }
 

@@ -16,23 +16,8 @@
 
 package streamit.frontend.controlflow;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import streamit.frontend.nodes.FENullVisitor;
-import streamit.frontend.nodes.Function;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtBlock;
-import streamit.frontend.nodes.StmtBreak;
-import streamit.frontend.nodes.StmtContinue;
-import streamit.frontend.nodes.StmtDoWhile;
-import streamit.frontend.nodes.StmtFor;
-import streamit.frontend.nodes.StmtIfThen;
-import streamit.frontend.nodes.StmtReturn;
-import streamit.frontend.nodes.StmtWhile;
+import streamit.frontend.nodes.*;
+import java.util.*;
 
 /**
  * Helper class to build a control-flow graph from linear code.
@@ -130,7 +115,7 @@ public class CFGBuilder extends FENullVisitor
         CFGNode current = entry;
 
         // Walk through all of the contained statements.
-        for (Iterator<?> iter = block.getStmts().iterator(); iter.hasNext(); )
+        for (Iterator iter = block.getStmts().iterator(); iter.hasNext(); )
             {
                 Statement stmt = (Statement)iter.next();
                 CFGNodePair pair = visitStatement(stmt);

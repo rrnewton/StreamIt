@@ -1,10 +1,9 @@
 package at.dms.kjc.sir;
 
-import java.util.HashMap;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.lir.LIRStreamType;
+import at.dms.kjc.*;
+import java.util.HashMap;
+import java.util.*;
 
 /**
  * This class represents a data that is available to all filters.

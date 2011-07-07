@@ -16,23 +16,8 @@
 
 package streamit.frontend.passes;
 
+import streamit.frontend.nodes.*;
 import java.util.List;
-
-import streamit.frontend.nodes.ExprPeek;
-import streamit.frontend.nodes.ExprPop;
-import streamit.frontend.nodes.ExprUnary;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FEReplacer;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StmtFor;
-import streamit.frontend.nodes.StmtIfThen;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.StmtWhile;
-import streamit.frontend.nodes.TempVarGen;
-import streamit.frontend.nodes.Type;
 
 /**
  * Give a rigid ordering to operations such as ++, --, and pop().
@@ -47,7 +32,7 @@ import streamit.frontend.nodes.Type;
 public class DisambiguateUnaries extends SymbolTableVisitor
 {
     private TempVarGen varGen;
-    private List<?> successors;
+    private List successors;
     /**
      * Whether or not we should disambiguate pops/peeks on the current
      * descent.
@@ -62,7 +47,7 @@ public class DisambiguateUnaries extends SymbolTableVisitor
     
     protected void doStatement(Statement stmt)
     {
-        successors = new java.util.ArrayList<Object>();
+        successors = new java.util.ArrayList();
         visitPopPeek = calcVisitPopPeek(stmt);
         Statement result = (Statement)stmt.accept(this);
         if (result != null)
@@ -205,7 +190,7 @@ public class DisambiguateUnaries extends SymbolTableVisitor
         // adds gets put before the loop, which is fine) and the
         // body (which should always be a StmtBlock).
         Statement newBody = (Statement)stmt.getBody().accept(this);
-        successors = new java.util.ArrayList<Object>();
+        successors = new java.util.ArrayList();
         Statement newInit = (Statement)stmt.getInit().accept(this);
         if (newInit == stmt.getInit() && newBody == stmt.getBody())
             return stmt;
@@ -217,10 +202,10 @@ public class DisambiguateUnaries extends SymbolTableVisitor
     {
         // Need to reset successors list in between visiting children.
         Statement newCons = (Statement)stmt.getCons().accept(this);
-        successors = new java.util.ArrayList<Object>();
+        successors = new java.util.ArrayList();
         Statement newAlt = stmt.getAlt();
         if (newAlt != null) newAlt = (Statement)newAlt.accept(this);
-        successors = new java.util.ArrayList<Object>();
+        successors = new java.util.ArrayList();
         Expression newCond = (Expression)stmt.getCond().accept(this);
         if (newCons == stmt.getCons() &&
             newAlt == stmt.getAlt() &&
@@ -236,7 +221,7 @@ public class DisambiguateUnaries extends SymbolTableVisitor
         // at the end of the loop body, and continue statements
         // would go in the wrong place.
         Statement newBody = (Statement)stmt.getBody().accept(this);
-        successors = new java.util.ArrayList<Object>();
+        successors = new java.util.ArrayList();
         if (newBody == stmt.getBody())
             return stmt;
         return new StmtWhile(stmt.getContext(), stmt.getCond(), newBody);

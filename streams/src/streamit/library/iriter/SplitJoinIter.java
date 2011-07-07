@@ -16,9 +16,9 @@
 
 package streamit.library.iriter;
 
-import streamit.library.NullJoiner;
-import streamit.library.NullSplitter;
 import streamit.library.SplitJoin;
+import streamit.library.NullSplitter;
+import streamit.library.NullJoiner;
 import streamit.misc.Pair;
 
 /**

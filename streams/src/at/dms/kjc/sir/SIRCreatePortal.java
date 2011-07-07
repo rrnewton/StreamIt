@@ -1,16 +1,7 @@
 package at.dms.kjc.sir;
 
-import at.dms.compiler.PositionedError;
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.CExpressionContext;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.CodeSequence;
-import at.dms.kjc.ExpressionVisitor;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * Create Portal Expression.
@@ -48,9 +39,9 @@ public class SIRCreatePortal extends JExpression {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitCreatePortalExpression(this);
+            return ((SLIRAttributeVisitor)p).visitCreatePortalExpression(this);
         } else {
             return this;
         }

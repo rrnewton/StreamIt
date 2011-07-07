@@ -16,162 +16,12 @@
 
 package streamit.frontend;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import streamit.frontend.nodes.ExprArray;
-import streamit.frontend.nodes.ExprArrayInit;
-import streamit.frontend.nodes.ExprBinary;
-import streamit.frontend.nodes.ExprComplex;
-import streamit.frontend.nodes.ExprComposite;
-import streamit.frontend.nodes.ExprConstBoolean;
-import streamit.frontend.nodes.ExprConstChar;
-import streamit.frontend.nodes.ExprConstFloat;
-import streamit.frontend.nodes.ExprConstInt;
-import streamit.frontend.nodes.ExprConstStr;
-import streamit.frontend.nodes.ExprDynamicToken;
-import streamit.frontend.nodes.ExprField;
-import streamit.frontend.nodes.ExprFunCall;
-import streamit.frontend.nodes.ExprHelperCall;
-import streamit.frontend.nodes.ExprIter;
-import streamit.frontend.nodes.ExprPeek;
-import streamit.frontend.nodes.ExprPop;
-import streamit.frontend.nodes.ExprRange;
-import streamit.frontend.nodes.ExprTernary;
-import streamit.frontend.nodes.ExprTypeCast;
-import streamit.frontend.nodes.ExprUnary;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FENode;
-import streamit.frontend.nodes.FEVisitor;
-import streamit.frontend.nodes.FieldDecl;
-import streamit.frontend.nodes.FuncWork;
-import streamit.frontend.nodes.Function;
-import streamit.frontend.nodes.GetExprType;
-import streamit.frontend.nodes.Parameter;
-import streamit.frontend.nodes.Program;
-import streamit.frontend.nodes.SCAnon;
-import streamit.frontend.nodes.SCSimple;
-import streamit.frontend.nodes.SJDuplicate;
-import streamit.frontend.nodes.SJRoundRobin;
-import streamit.frontend.nodes.SJWeightedRR;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtAdd;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StmtBlock;
-import streamit.frontend.nodes.StmtBody;
-import streamit.frontend.nodes.StmtBreak;
-import streamit.frontend.nodes.StmtContinue;
-import streamit.frontend.nodes.StmtDoWhile;
-import streamit.frontend.nodes.StmtEmpty;
-import streamit.frontend.nodes.StmtEnqueue;
-import streamit.frontend.nodes.StmtExpr;
-import streamit.frontend.nodes.StmtFor;
-import streamit.frontend.nodes.StmtHelperCall;
-import streamit.frontend.nodes.StmtIfThen;
-import streamit.frontend.nodes.StmtJoin;
-import streamit.frontend.nodes.StmtLoop;
-import streamit.frontend.nodes.StmtPush;
-import streamit.frontend.nodes.StmtReturn;
-import streamit.frontend.nodes.StmtSendMessage;
-import streamit.frontend.nodes.StmtSplit;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.StmtWhile;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.StreamType;
-import streamit.frontend.nodes.SymbolTable;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypeArray;
-import streamit.frontend.nodes.TypeHelper;
-import streamit.frontend.nodes.TypePrimitive;
-import streamit.frontend.nodes.TypeStruct;
-import streamit.frontend.nodes.TypeStructRef;
-import at.dms.compiler.TokenReference;
-import at.dms.kjc.AutoCloner;
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CClass;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CField;
-import at.dms.kjc.CMethod;
-import at.dms.kjc.CSourceClass;
-import at.dms.kjc.CSourceField;
-import at.dms.kjc.CSourceMethod;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBitwiseExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JBooleanLiteral;
-import at.dms.kjc.JBreakStatement;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JCharLiteral;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JConditionalAndExpression;
-import at.dms.kjc.JConditionalExpression;
-import at.dms.kjc.JConditionalOrExpression;
-import at.dms.kjc.JContinueStatement;
-import at.dms.kjc.JDivideExpression;
-import at.dms.kjc.JDoStatement;
-import at.dms.kjc.JDoubleLiteral;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JEqualityExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JMinusExpression;
-import at.dms.kjc.JModuloExpression;
-import at.dms.kjc.JMultExpression;
-import at.dms.kjc.JNewArrayExpression;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JReturnStatement;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JStringLiteral;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JUnaryMinusExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.JWhileStatement;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRInitStatement;
-import at.dms.kjc.sir.SIRIterationExpression;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPrintStatement;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRRecursiveStub;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRStructure;
+import java.util.*;
+import streamit.frontend.nodes.*;
+import at.dms.compiler.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.*;
+import at.dms.util.Utils;
 
 public class FEIRToSIR implements FEVisitor, Constants {
     private SIRStream topLevel;
@@ -212,11 +62,11 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitProgram(Program p) {
         /* We visit each stream and each struct */
-        List<?> feirStreams;
-        List<?> feirStructs;
+        List feirStreams;
+        List feirStructs;
         List<Object> sirStreams;
         List<SIRStructure> sirStructs;
-        Iterator<?> iter;
+        Iterator iter;
 
         theProgram = p;
         parent = null;
@@ -262,7 +112,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         if (searchList.contains(name))
             return new SIRRecursiveStub(name, this);
         // Hmm.  Is it in the top-level Program?
-        for (Iterator<?> iter = theProgram.getStreams().iterator();
+        for (Iterator iter = theProgram.getStreams().iterator();
              iter.hasNext(); )
             {
                 StreamSpec spec = (StreamSpec)iter.next();
@@ -287,7 +137,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         SIRStream current = null;
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
-        for (Iterator<?> iter = spec.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 symtab.registerVar(param.getName(), param.getType(), param,
@@ -439,7 +289,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public SIRStream visitFilterSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRFilter result = new SIRFilter();
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -457,7 +307,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -507,7 +357,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public SIRStream visitPipelineSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRPipeline result = new SIRPipeline(spec.getName());
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -522,7 +372,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -790,7 +640,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitExprFunCall(ExprFunCall exp) {
         debug("In visitExprFunCall\n");
-        List<?> params = exp.getParams();
+        List params = exp.getParams();
         JExpression[] args = new JExpression[params.size()];
         int i;
         for (i = 0; i < params.size(); i++) {
@@ -903,12 +753,12 @@ public class FEIRToSIR implements FEVisitor, Constants {
     public Object visitFunction(Function func) {
         debug("In visitFunction\n");
         int i = 0;
-        List<?> list;
+        List list;
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
         Parameter[] feirParams = new Parameter[func.getParams().size()];
         JFormalParameter[] sirParams = new JFormalParameter[feirParams.length];
-        for (Iterator<?> iter = func.getParams().iterator(); iter.hasNext(); )
+        for (Iterator iter = func.getParams().iterator(); iter.hasNext(); )
             {
                 Parameter param = (Parameter)iter.next();
                 sirParams[i] = (JFormalParameter)visitParameter(param);
@@ -964,7 +814,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitSplitJoinSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRSplitJoin result = new SIRSplitJoin((SIRContainer) parent, spec.getName());
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -979,7 +829,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -1010,7 +860,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitFeedbackLoopSpec(StreamSpec spec) {
         int i;
-        List<?> list;
+        List list;
         SIRFeedbackLoop result = new SIRFeedbackLoop((SIRContainer) parent, spec.getName());
         SIRStream oldParent = parent;
         CSourceClass cclass = specToCClass(spec);
@@ -1025,7 +875,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
         List<JMethodDeclaration> meths = new ArrayList<JMethodDeclaration>();
         List<CMethod> cmeths = new ArrayList<CMethod>();
 
-        for (Iterator<?> iter = spec.getFuncs().iterator(); iter.hasNext(); )
+        for (Iterator iter = spec.getFuncs().iterator(); iter.hasNext(); )
             {
                 Function func = (Function)iter.next();
                 JMethodDeclaration jdecl = (JMethodDeclaration)visitFunction(func);
@@ -1082,8 +932,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         debug("In visitSCSimple\n");
         /* Translate the arguments */
         int i;
-        List<?> feirP = sc.getParams();
-        List<?> sirP = new LinkedList<Object>();
+        List feirP = sc.getParams();
+        List sirP = new LinkedList();
         for (i = 0; i < feirP.size(); i++) {
             sirP.add(((Expression) feirP.get(i)).accept(this));
         }
@@ -1123,7 +973,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
 
     public Object visitSJWeightedRR(SJWeightedRR sj) { 
         debug("In visitSJWeightedRR\n");
-        List<?> weights = sj.getWeights();
+        List weights = sj.getWeights();
         JExpression[] newWeights = new JExpression[weights.size()];
         int i;
 
@@ -1180,8 +1030,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
         JBlock result = new JBlock();
-        List<?> stmts = stmt.getStmts();
-        Iterator<?> i;
+        List stmts = stmt.getStmts();
+        Iterator i;
         for (i = stmts.iterator(); i.hasNext(); ) {
             Statement s = (Statement) i.next();
             Object x = s.accept(this);

@@ -1,24 +1,7 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.ObjectDeepCloner;
+import java.util.*;
+import at.dms.kjc.*;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.slicegraph.FilterContent;
@@ -47,7 +30,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     protected SliceNode sliceNode;
     
     /** a BackEndFactory for getting information about other parts of the back end */
-    protected BackEndFactory<?, ?, ?, ?> backEndBits;
+    protected BackEndFactory backEndBits;
     
     //keep a unique integer for each filter in each trace
     //so var names do not clash
@@ -66,7 +49,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     protected JMethodDeclaration workMethod = null;
     
     /** General constructor: need to add fields and methods later. */
-    public CodeStoreHelper (SliceNode node, BackEndFactory<?, ?, ?, ?> backEndBits) {
+    public CodeStoreHelper (SliceNode node, BackEndFactory backEndBits) {
         super(new JFieldDeclaration[0], new JMethodDeclaration[0]);
         sliceNode = node;
         this.backEndBits = backEndBits;
@@ -75,7 +58,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     
     /** Constructor from a FilterContent, fills out fields, methods, initMethod, preWorkMethod, workMethod.
      * Note: clones inputs. */
-    public CodeStoreHelper(SliceNode node, FilterContent filter, BackEndFactory<?, ?, ?, ?> backEndBits) {
+    public CodeStoreHelper(SliceNode node, FilterContent filter, BackEndFactory backEndBits) {
         this(node, backEndBits);
         setFields((JFieldDeclaration[])ObjectDeepCloner.deepCopy(filter.getFields()));
         setMethods((JMethodDeclaration[])ObjectDeepCloner.deepCopy(filter.getMethods()));

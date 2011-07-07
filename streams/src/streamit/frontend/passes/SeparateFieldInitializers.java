@@ -16,19 +16,10 @@
 
 package streamit.frontend.passes;
 
-import java.util.ArrayList;
+import streamit.frontend.nodes.*;
+import java.util.Collections;
 import java.util.List;
-
-import streamit.frontend.nodes.ExprArrayInit;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FieldDecl;
-import streamit.frontend.nodes.Function;
-import streamit.frontend.nodes.Statement;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StreamSpec;
-import streamit.frontend.nodes.TypeArray;
+import java.util.ArrayList;
 
 /**
  * Separate certain initializers for FIELDS into a field declaration

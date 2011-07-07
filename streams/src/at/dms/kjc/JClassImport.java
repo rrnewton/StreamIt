@@ -22,8 +22,8 @@ package at.dms.kjc;
 
 import at.dms.compiler.CWarning;
 import at.dms.compiler.Compiler;
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 7.5.1 Single-Type-Import Declaration.
@@ -122,7 +122,7 @@ public class JClassImport extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (comments != null) {
             return p.visitComments(comments);
         }

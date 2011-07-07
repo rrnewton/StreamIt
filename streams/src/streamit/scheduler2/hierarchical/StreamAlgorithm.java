@@ -16,11 +16,10 @@
 
 package streamit.scheduler2.hierarchical;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import streamit.misc.DestroyedClass;
 import streamit.scheduler2.Schedule;
+import streamit.misc.DestroyedClass;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This class provides an implementation for StreamInterface.

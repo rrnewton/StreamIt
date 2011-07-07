@@ -1,9 +1,9 @@
 package at.dms.kjc.slicegraph;
 
 //import at.dms.kjc.sir.*;
-import java.util.HashMap;
-
 import at.dms.kjc.backendSupport.Layout;
+
+import java.util.*;
 /** 
  * A {@link SliceNode} that references a {@link FilterContent}.
  **/
@@ -56,7 +56,7 @@ public class FilterSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
         return filter.toString();   
     }
     
-    public String toString(Layout<?> layout) 
+    public String toString(Layout layout) 
     {
         return filter.toString() + " " + 
         (layout != null ? layout.getComputeNode(this) : "");   

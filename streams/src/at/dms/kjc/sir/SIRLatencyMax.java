@@ -1,11 +1,7 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.util.*;
 
 /** 
  * This represents a maximum latency for message delivery.
@@ -67,9 +63,9 @@ public class SIRLatencyMax extends SIRLatency implements Comparable {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitLatencyMax(this);
+            return ((SLIRAttributeVisitor)p).visitLatencyMax(this);
         } else {
             return this;
         }

@@ -1,15 +1,12 @@
 package at.dms.kjc.slicegraph;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-
+import java.util.*;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPredefinedFilter;
+import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.spacetime.LinearFission;
 
 /**
  * Partition the stream graph into slices where each slice is a pipeline of filters with

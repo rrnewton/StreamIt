@@ -1,5 +1,6 @@
 package at.dms.kjc.sir.linear.transform;
 
+import at.dms.kjc.sir.linear.*;
 
 /**
  * Exception that is thrown when we can't compute a transform for some reason.

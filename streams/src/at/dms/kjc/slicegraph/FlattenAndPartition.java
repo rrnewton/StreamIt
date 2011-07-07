@@ -5,20 +5,17 @@ package at.dms.kjc.slicegraph;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.sir.SIRFileReader;
-import at.dms.kjc.sir.SIRFileWriter;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRStream;
+import java.util.Iterator;
+import at.dms.kjc.flatgraph.GraphFlattener;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.RenameAll;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.flatgraph.*;
+import at.dms.kjc.*;
+import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.common.CommonUtils;
 
 /**
  * Convert SIR graph to Slice without synch removal.

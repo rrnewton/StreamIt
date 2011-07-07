@@ -21,12 +21,12 @@
 package at.dms.kjc;
 
 import java.io.Serializable;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 import at.dms.compiler.CWarning;
-import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.PositionedError;
 
 /**
  * This class represents a method context during check
@@ -176,7 +176,7 @@ public class CMethodContext extends CContext {
     // ----------------------------------------------------------------------
 
     protected   Hashtable<Serializable, CThrowableInfo>   throwables = new Hashtable<Serializable, CThrowableInfo>();
-    protected   Hashtable<?, ?>   labels;     // Hashtable<String, String>
+    protected   Hashtable   labels;     // Hashtable<String, String>
     private CMethod     self;
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
@@ -192,8 +192,8 @@ public class CMethodContext extends CContext {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CMethodContext other) {
         super.deepCloneInto(other);
-        other.throwables = (java.util.Hashtable<?, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.throwables);
-        other.labels = (java.util.Hashtable<?, ?>)at.dms.kjc.AutoCloner.cloneToplevel(this.labels);
+        other.throwables = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.throwables);
+        other.labels = (java.util.Hashtable)at.dms.kjc.AutoCloner.cloneToplevel(this.labels);
         other.self = (at.dms.kjc.CMethod)at.dms.kjc.AutoCloner.cloneToplevel(this.self);
     }
 

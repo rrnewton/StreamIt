@@ -1,7 +1,7 @@
 package at.dms.kjc.lir;
 
-import at.dms.kjc.JExpression;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * This appears at each exit from a work function.

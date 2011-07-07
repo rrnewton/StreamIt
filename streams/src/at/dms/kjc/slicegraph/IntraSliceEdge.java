@@ -1,5 +1,6 @@
 package at.dms.kjc.slicegraph;
 
+import java.util.*;
 
 /**
  * This class represents the edge that connects two slice nodes in the same 

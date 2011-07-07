@@ -2,44 +2,20 @@ package at.dms.kjc.common;
 
 //import at.dms.kjc.flatgraph.FlatNode;
 
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CType;
-import at.dms.kjc.CVectorType;
-import at.dms.kjc.CVectorTypeLow;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JArrayLengthExpression;
-import at.dms.kjc.JBinaryExpression;
-import at.dms.kjc.JBitwiseExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JConstructorCall;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JNameExpression;
-import at.dms.kjc.JNewArrayExpression;
-import at.dms.kjc.JParenthesedExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JSuperExpression;
-import at.dms.kjc.JSwitchGroup;
-import at.dms.kjc.JSwitchLabel;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIRVisitor;
-import at.dms.kjc.sir.SIRCreatePortal;
-import at.dms.kjc.sir.SIRInitStatement;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRLatency;
-import at.dms.kjc.sir.SIRLatencyMax;
-import at.dms.kjc.sir.SIRLatencyRange;
-import at.dms.kjc.sir.SIRLatencySet;
-import at.dms.kjc.sir.SIRMessageStatement;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+//import at.dms.kjc.iterator.*;
 import at.dms.util.Utils;
+//import java.util.List;
+//import java.util.ListIterator;
+//import java.util.Iterator;
+//import java.util.LinkedList;
+//import java.util.HashMap;
+//import java.io.*;
+//import at.dms.compiler.*;
+//import at.dms.kjc.sir.lowering.*;
+//import java.util.Hashtable;
+//import at.dms.util.SIRPrinter;
 
 /**
  * This class converts the Stream IR (which references the Kopi Java IR)

@@ -21,8 +21,7 @@
 package at.dms.kjc.smp;
 
 import at.dms.compiler.UnpositionedError;
-import at.dms.kjc.CContext;
-import at.dms.kjc.CType;
+import at.dms.kjc.*;
 import at.dms.util.SimpleStringBuffer;
 
 final class CVoidPtrType extends CType {

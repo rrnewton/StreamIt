@@ -1,8 +1,12 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
+import java.util.*;
+
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fission.*;
 
 /**
  * Represents a fission of a filter in a stream graph.

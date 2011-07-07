@@ -7,10 +7,8 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Vector;
 
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 
 /**
  * Extend BasicSpaceTimeSchedule by storing a slicer.

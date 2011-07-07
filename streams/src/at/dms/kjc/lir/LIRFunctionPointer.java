@@ -1,9 +1,7 @@
 package at.dms.kjc.lir;
 
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * This represents a function pointer.  (Should we include the
@@ -45,9 +43,9 @@ public class LIRFunctionPointer {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitFunctionPointer(this, name);
+            return ((SLIRAttributeVisitor)p).visitFunctionPointer(this, name);
         } else {
             return this;
         }

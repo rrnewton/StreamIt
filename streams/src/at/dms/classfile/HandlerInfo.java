@@ -21,8 +21,8 @@
 package at.dms.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
+import java.io.DataOutput;
 
 /**
  * This class represents a protected (try) portion of block with

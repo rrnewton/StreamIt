@@ -20,6 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
+import at.dms.compiler.tools.antlr.runtime.*;
 
 abstract class BlockWithImpliedExitPath extends AlternativeBlock {
     protected int exitLookaheadDepth;   // lookahead needed to handle optional path

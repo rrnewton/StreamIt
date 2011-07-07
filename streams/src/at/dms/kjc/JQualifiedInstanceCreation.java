@@ -192,7 +192,7 @@ public class JQualifiedInstanceCreation extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitQualifiedInstanceCreation(this, prefix, ident, params);
     }
 

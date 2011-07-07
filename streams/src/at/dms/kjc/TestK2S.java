@@ -13,12 +13,12 @@
 package at.dms.kjc;
 
 import java.io.File;
-
 import at.dms.compiler.CompilerMessages;
+//import at.dms.util.MessageDescription;
 import at.dms.compiler.UnpositionedError;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.util.SIRPrinter;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.iterator.*;
 
 public class TestK2S extends Main
 {

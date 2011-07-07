@@ -17,10 +17,9 @@
 package streamit.library;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Vector;
-
 import streamit.scheduler2.Scheduler;
+import java.util.Vector;
+import java.util.HashMap;
 
 // a filter is the lowest-level block of streams
 public abstract class Filter extends Stream
@@ -355,7 +354,7 @@ public abstract class Filter extends Stream
 
     // data for support of syntax in the CC paper
     int peekAmount = -1, popAmount = -1, pushAmount = -1;
-    Class<?> inputType = null, outputType = null;
+    Class inputType = null, outputType = null;
     boolean ccStyleInit = false;
     boolean stateful = false;
     public int iterationCount = 0;
@@ -379,13 +378,13 @@ public abstract class Filter extends Stream
         ccStyleInit = true;
     }
 
-    public void setOutput(Class<?> type)
+    public void setOutput(Class type)
     {
         outputType = type;
         ccStyleInit = true;
     }
 
-    public void setInput(Class<?> type)
+    public void setInput(Class type)
     {
         inputType = type;
         ccStyleInit = true;
@@ -443,14 +442,14 @@ public abstract class Filter extends Stream
      */
     PhaseInfo steadyPhasesSummary;
 
-    Class<?> inType, outType;
+    Class inType, outType;
 
     public boolean isMultiPhaseStyle()
     {
         return multiPhaseStyle;
     }
 
-    public void setIOTypes(Class<?> in, Class<?> out)
+    public void setIOTypes(Class in, Class out)
     {
         if (in != Void.TYPE)
             inType = in;
@@ -991,8 +990,8 @@ public abstract class Filter extends Stream
     public static void fillScheduleFields(Scheduler scheduler) {
         HashMap[] counts = scheduler.getExecutionCounts();
         for (int i=0; i<2; i++) {
-            java.util.Set<?> keys = counts[i].keySet();
-            for (java.util.Iterator<?> it = keys.iterator(); it.hasNext(); ) {
+            java.util.Set keys = counts[i].keySet();
+            for (java.util.Iterator it = keys.iterator(); it.hasNext(); ) {
                 Object obj = it.next();
                 if (obj instanceof Filter) {
                     int count = ((int[])counts[i].get(obj))[0];

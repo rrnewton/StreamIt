@@ -1,40 +1,11 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JMinusExpression;
-import at.dms.kjc.JModuloExpression;
-import at.dms.kjc.JMultExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+//import at.dms.kjc.sir.linear.*;
+import at.dms.kjc.iterator.*;
 
 
 /**
@@ -554,7 +525,7 @@ public class LinearRedundancyReplacer extends LinearReplacer implements Constant
             int tupleIndex = 0;
             while(tupleIter.hasNext()) {
                 Object tuple = tupleIter.next();
-                Iterator<?> useIter = tuplesToUses.get(tuple).iterator();
+                Iterator useIter = tuplesToUses.get(tuple).iterator();
                 while(useIter.hasNext()) {
                     Integer currentUse = (Integer)useIter.next();
                     Integer oldMin = (Integer)this.minUse.get(tuple);
@@ -595,7 +566,7 @@ public class LinearRedundancyReplacer extends LinearReplacer implements Constant
                 this.compMap.put(tuple, new TupleCoupling(tuple, 0));
 
                 // get an iterator over the list of uses
-                Iterator<?> useIter = tuplesToUses.get(tuple).iterator();
+                Iterator useIter = tuplesToUses.get(tuple).iterator();
                 while(useIter.hasNext()) {
                     int use = ((Integer)useIter.next()).intValue();
             

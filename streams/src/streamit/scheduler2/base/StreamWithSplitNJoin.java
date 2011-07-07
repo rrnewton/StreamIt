@@ -16,9 +16,10 @@
 
 package streamit.scheduler2.base;
 
+import streamit.scheduler2.iriter./*persistent.*/
+    SplitterNJoinerIter;
 import streamit.scheduler2.iriter.JoinerIter;
 import streamit.scheduler2.iriter.SplitterIter;
-import streamit.scheduler2.iriter.SplitterNJoinerIter;
 
 /**
  * Computes some basic steady state data for Streams that contain

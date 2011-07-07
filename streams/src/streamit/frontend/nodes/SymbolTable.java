@@ -16,10 +16,11 @@
 
 package streamit.frontend.nodes;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import java.util.HashMap;
 
 /**
  * A symbol table for StreamIt programs.  This keeps a mapping from a
@@ -54,7 +55,7 @@ public class SymbolTable
     
     private Map<String, Object> vars, fns;
     private SymbolTable parent;
-    private List<?> includedFns;
+    private List includedFns;
 
     private static class VarInfo
     {
@@ -231,7 +232,7 @@ public class SymbolTable
             }
         if (includedFns != null)
             {
-                for (Iterator<?> iter = includedFns.iterator(); iter.hasNext(); )
+                for (Iterator iter = includedFns.iterator(); iter.hasNext(); )
                     {
                         SymbolTable other = (SymbolTable)iter.next();
                         fn = other.doLookupFn(name);

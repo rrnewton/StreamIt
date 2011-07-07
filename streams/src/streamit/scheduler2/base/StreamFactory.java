@@ -16,7 +16,7 @@
 
 package streamit.scheduler2.base;
 
-import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.iriter./*persistent.*/Iterator;
 
 /**
  * The StreamFactory interface provides a factory interface for

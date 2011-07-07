@@ -1,16 +1,12 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.*;
 
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fusion.FusePipe;
-import at.dms.kjc.sir.lowering.fusion.FuseSplit;
-import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
 
 /**
  * Represents a fusion of children in a stream graph.

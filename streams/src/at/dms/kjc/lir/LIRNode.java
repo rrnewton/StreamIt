@@ -1,13 +1,8 @@
 package at.dms.kjc.lir;
 
-import at.dms.compiler.PositionedError;
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.CBodyContext;
-import at.dms.kjc.CodeSequence;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.util.*;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * This is a node in the low IR.  A low IR node appears in the init
@@ -63,7 +58,7 @@ public class LIRNode extends JStatement {
         p.visitNode(this);
     }
 
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         // no action is defined for attribute visitors on lir nodes
         return this;
     }

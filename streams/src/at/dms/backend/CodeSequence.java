@@ -20,10 +20,9 @@
 
 package at.dms.backend;
 
-import java.util.Stack;
-
-import at.dms.classfile.Instruction;
 import at.dms.classfile.JumpInstruction;
+import at.dms.classfile.Instruction;
+import java.util.Stack;
 
 /**
  * This class reconstructs the code sequence

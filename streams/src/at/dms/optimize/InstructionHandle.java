@@ -23,15 +23,16 @@ package at.dms.optimize;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import at.dms.classfile.AbstractInstructionAccessor;
 import at.dms.classfile.AccessorContainer;
-import at.dms.classfile.HandlerInfo;
+import at.dms.classfile.AbstractInstructionAccessor;
 import at.dms.classfile.Instruction;
 import at.dms.classfile.JumpInstruction;
 import at.dms.classfile.LineNumberInfo;
-import at.dms.classfile.LocalVarInstruction;
 import at.dms.classfile.NoArgInstruction;
+import at.dms.classfile.LocalVarInstruction;
 import at.dms.classfile.SwitchInstruction;
+import at.dms.classfile.HandlerInfo;
+
 import at.dms.util.InconsistencyException;
 
 /**
@@ -79,7 +80,7 @@ public class InstructionHandle extends AbstractInstructionAccessor implements at
     /**
      * Adds line number info stored for the instruction to the specified vector.
      */
-    public void addLineNumberInfo(Vector<?> lineNumberInfo) {
+    public void addLineNumberInfo(Vector lineNumberInfo) {
         if (lineNumbers != null) {
             for (Enumeration<Integer> eNum = lineNumbers.elements(); eNum.hasMoreElements(); ) {
                 int line = eNum.nextElement().intValue();

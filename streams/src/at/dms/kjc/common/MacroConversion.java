@@ -1,30 +1,12 @@
 package at.dms.kjc.common;
 
-import java.util.HashSet;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JBinaryArithmeticExpression;
-import at.dms.kjc.JBinaryExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JConditionalAndExpression;
-import at.dms.kjc.JConditionalExpression;
-import at.dms.kjc.JConditionalOrExpression;
-import at.dms.kjc.JEqualityExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JParenthesedExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JReturnStatement;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.iterator.*;
+import at.dms.util.Utils;
+import java.util.*;
+import java.io.*;
 
 /**
  * This class converts small functions to macros.

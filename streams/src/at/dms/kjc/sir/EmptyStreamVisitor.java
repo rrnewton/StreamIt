@@ -1,11 +1,8 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.iterator.SIRFeedbackLoopIter;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.iterator.SIRPhasedFilterIter;
-import at.dms.kjc.iterator.SIRPipelineIter;
-import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+import java.util.*;
 
 /**
  * This is a stream visitor that does nothing.

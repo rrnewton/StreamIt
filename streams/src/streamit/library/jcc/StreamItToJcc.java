@@ -2,7 +2,6 @@ package streamit.library.jcc;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import jcc.lang.AbortAgent;
 import jcc.lang.Agent;
 import jcc.lang.Atom;
@@ -257,7 +256,7 @@ public class StreamItToJcc {
 	 * (e.g., in feedbackloops) are pushed onto the JccChannel.
 	 */
 	protected JccChannel convertChannel(Channel channel) {
-		Class<?> type = channel.getType();
+		Class type = channel.getType();
 		assert (type == Integer.TYPE) || (type == Float.TYPE);
 		JccChannel result = new JccChannel(type);
 

@@ -1,12 +1,7 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
 /**
  * This class will search for all communication expressions outside of the work

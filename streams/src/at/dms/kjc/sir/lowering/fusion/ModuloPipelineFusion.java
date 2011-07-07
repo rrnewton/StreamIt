@@ -1,52 +1,19 @@
 package at.dms.kjc.sir.lowering.fusion;
 
 //import at.dms.util.IRPrinter;
+import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+//import at.dms.kjc.sir.lowering.partition.*;
+//import at.dms.kjc.lir.*;
+
+//import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.ListIterator;
-
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBitwiseExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.StatementQueueVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRTwoStageFilter;
-import at.dms.kjc.sir.lowering.InlinePhases;
-import at.dms.kjc.sir.lowering.RenameAll;
-import at.dms.kjc.sir.lowering.SIRScheduler;
-import at.dms.util.Utils;
 
 /**
  * This class fuses pipelines by simulating their execution in a
@@ -300,10 +267,10 @@ class ModuloPipelineFusion {
         for (ListIterator<FilterInfo> it = filterInfo.listIterator(); it.hasNext(); ) {
             FilterInfo info = it.next();
             // get list of local variable definitions from <filterInfo>
-            List<?> locals = 
+            List locals = 
                 init ? info.init.getVariables() : info.steady.getVariables();
             // go through locals, adding variable declaration
-            for (ListIterator<?> loc = locals.listIterator(); loc.hasNext(); ) {
+            for (ListIterator loc = locals.listIterator(); loc.hasNext(); ) {
                 // get local
                 JVariableDefinition local = 
                     (JVariableDefinition)loc.next();
@@ -870,7 +837,7 @@ class ModuloPipelineFusion {
          * A list of the arguments to the init function of the fused
          * block, all of type JExpression.
          */
-        private List<?> fusedArgs;
+        private List fusedArgs;
 
         /**
          * Cached copy of the method decl for the init function.
@@ -891,7 +858,7 @@ class ModuloPipelineFusion {
             this.filterInfo = filterInfo;
             this.fusedBlock = new JBlock();
             this.fusedParam = new LinkedList<JFormalParameter>();
-            this.fusedArgs = new LinkedList<Object>();
+            this.fusedArgs = new LinkedList();
             this.numFused = 0;
         }
 
@@ -910,7 +877,7 @@ class ModuloPipelineFusion {
          * incorporate this info into the init function of the fused
          * filter.
          */
-        private void processArgs(FilterInfo info, List<?> args) {
+        private void processArgs(FilterInfo info, List args) {
             // make parameters for <args>, and build <newArgs> to pass
             // to new init function call
             JExpression[] newArgs = new JExpression[args.size()];
@@ -982,7 +949,7 @@ class ModuloPipelineFusion {
          * Returns the list of arguments that should be passed to init
          * function.
          */
-        public List<?> getInitArgs() {
+        public List getInitArgs() {
             return fusedArgs;
         }
     

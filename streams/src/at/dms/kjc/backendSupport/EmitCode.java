@@ -1,46 +1,12 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.CVectorType;
-import at.dms.kjc.CVectorTypeLow;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JNewArrayExpression;
-import at.dms.kjc.JQualifiedAnonymousCreation;
-import at.dms.kjc.JQualifiedInstanceCreation;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JUnqualifiedAnonymousCreation;
-import at.dms.kjc.JUnqualifiedInstanceCreation;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIRVisitor;
-import at.dms.kjc.common.CodeGenerator;
-import at.dms.kjc.common.CodegenPrintWriter;
-import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.common.MacroConversion;
-import at.dms.kjc.common.ToC;
-import at.dms.kjc.sir.SIRCodeUnit;
-import at.dms.kjc.sir.SIRIterationExpression;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.common.*;
 
     /**
     * Takes a ComputeNode collection, a collection of Channel's, 
@@ -52,20 +18,20 @@ import at.dms.kjc.slicegraph.SliceNode;
 public class EmitCode {
     // variable name prefix for copying arrays.
     protected static final String ARRAY_COPY = "__array_copy__";
-    protected BackEndFactory<?, ?, ?, ?> backendbits;
+    protected BackEndFactory backendbits;
     protected CodeGen codegen;
 
     /**
      * Constructor.
      * @param backendbits indicates BackEndFactory containing all useful info.
      */
-    public EmitCode (BackEndFactory<?, ?, ?, ?> backendbits) {
+    public EmitCode (BackEndFactory backendbits) {
         super();
         this.backendbits = backendbits;
         codegen = null;
     }
     
-    public void emitCodeForComputeNode (ComputeNode<?> n, CodegenPrintWriter p) {
+    public void emitCodeForComputeNode (ComputeNode n, CodegenPrintWriter p) {
         codegen = new CodeGen(p);
         emitCodeForComputeNode(n, p, codegen);
     }
@@ -77,7 +43,7 @@ public class EmitCode {
      * @param n The ComputeNode to emit code for.
      * @param p The CodegenPrintWriter (left open on return).
      */
-    public void emitCodeForComputeNode (ComputeNode<?> n, 
+    public void emitCodeForComputeNode (ComputeNode n, 
             CodegenPrintWriter p, CodeGen codegen) {
         
         SIRCodeUnit fieldsAndMethods = n.getComputeCode();
@@ -85,7 +51,7 @@ public class EmitCode {
     }
     
     public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
-            ComputeNode<?> n, CodegenPrintWriter p, CodeGen codegen) {
+            ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
         
         // Standard final optimization of a code unit before code emission:
         // unrolling and constant prop as allowed, DCE, array destruction into scalars.
@@ -183,9 +149,9 @@ public class EmitCode {
      * @param n 
      * @return A collection of channels.
      */
-    private Set<Channel> getUpstreamEnds (ComputeNode<?> n) {
+    private Set<Channel> getUpstreamEnds (ComputeNode n) {
         Set<Channel> retval = new HashSet<Channel>();
-        Layout<?> l = backendbits.getLayout();
+        Layout l = backendbits.getLayout();
         Collection<Channel> channels = backendbits.getChannels();
         for (Channel c : channels) {
             SliceNode s = c.getSource();
@@ -202,9 +168,9 @@ public class EmitCode {
      * @param n 
      * @return A collection of channels.
      */
-    private Set<Channel> getDownstreamEnds (ComputeNode<?> n) {
+    private Set<Channel> getDownstreamEnds (ComputeNode n) {
         Set<Channel> retval = new HashSet<Channel>();
-        Layout<?> l = backendbits.getLayout();
+        Layout l = backendbits.getLayout();
         Collection<Channel> channels = backendbits.getChannels();
         for (Channel c : channels) {
             SliceNode s = c.getDest();

@@ -1,15 +1,9 @@
 package at.dms.kjc.iterator; 
 
-import streamit.scheduler2.iriter.Iterator;
-import streamit.scheduler2.iriter.SplitJoinIter;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.StreamVisitor;
+import at.dms.kjc.sir.*;
+import at.dms.util.*;
+import streamit.scheduler2.iriter.*;
 
 
 /**

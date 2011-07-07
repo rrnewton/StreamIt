@@ -1,19 +1,7 @@
 package at.dms.kjc.sir;
 
-import at.dms.compiler.TokenReference;
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CExpressionContext;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.CodeSequence;
-import at.dms.kjc.ExpressionVisitor;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * This represents an interface table.  This encapsulates the
@@ -136,10 +124,10 @@ public class SIRInterfaceTable extends JExpression
             }
     }
     
-    public Object accept(AttributeVisitor<?> p) 
+    public Object accept(AttributeVisitor p) 
     {
         if (p instanceof SLIRAttributeVisitor)
-            return ((SLIRAttributeVisitor<?>)p).visitInterfaceTable(this);
+            return ((SLIRAttributeVisitor)p).visitInterfaceTable(this);
         else
             return this;
     }

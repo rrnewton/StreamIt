@@ -5,140 +5,21 @@
 
 package at.dms.util;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.List;
 import java.util.ListIterator;
 
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.SLIRVisitor;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CModifier;
-import at.dms.kjc.CType;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JArrayLengthExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBinaryExpression;
-import at.dms.kjc.JBitwiseExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JBreakStatement;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JCatchClause;
-import at.dms.kjc.JClassDeclaration;
-import at.dms.kjc.JClassExpression;
-import at.dms.kjc.JClassImport;
-import at.dms.kjc.JCompilationUnit;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JCompoundStatement;
-import at.dms.kjc.JConditionalExpression;
-import at.dms.kjc.JConstructorBlock;
-import at.dms.kjc.JConstructorCall;
-import at.dms.kjc.JConstructorDeclaration;
-import at.dms.kjc.JContinueStatement;
-import at.dms.kjc.JDoStatement;
-import at.dms.kjc.JEmittedTextExpression;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JEqualityExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JInstanceofExpression;
-import at.dms.kjc.JInterfaceDeclaration;
-import at.dms.kjc.JLabeledStatement;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JNameExpression;
-import at.dms.kjc.JNewArrayExpression;
-import at.dms.kjc.JPackageImport;
-import at.dms.kjc.JPackageName;
-import at.dms.kjc.JParenthesedExpression;
-import at.dms.kjc.JPhylum;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JQualifiedAnonymousCreation;
-import at.dms.kjc.JQualifiedInstanceCreation;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JReturnStatement;
-import at.dms.kjc.JShiftExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JSuperExpression;
-import at.dms.kjc.JSwitchGroup;
-import at.dms.kjc.JSwitchLabel;
-import at.dms.kjc.JSwitchStatement;
-import at.dms.kjc.JSynchronizedStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JThrowStatement;
-import at.dms.kjc.JTryCatchStatement;
-import at.dms.kjc.JTryFinallyStatement;
-import at.dms.kjc.JTypeDeclaration;
-import at.dms.kjc.JTypeDeclarationStatement;
-import at.dms.kjc.JTypeNameExpression;
-import at.dms.kjc.JUnaryExpression;
-import at.dms.kjc.JUnaryPromote;
-import at.dms.kjc.JUnqualifiedAnonymousCreation;
-import at.dms.kjc.JUnqualifiedInstanceCreation;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.JWhileStatement;
-import at.dms.kjc.SLIRVisitor;
-import at.dms.kjc.lir.LIRFileReader;
-import at.dms.kjc.lir.LIRFileWriter;
-import at.dms.kjc.lir.LIRFunctionPointer;
-import at.dms.kjc.lir.LIRIdentity;
-import at.dms.kjc.lir.LIRMainFunction;
-import at.dms.kjc.lir.LIRNode;
-import at.dms.kjc.lir.LIRRegisterReceiver;
-import at.dms.kjc.lir.LIRSetBodyOfFeedback;
-import at.dms.kjc.lir.LIRSetChild;
-import at.dms.kjc.lir.LIRSetDecode;
-import at.dms.kjc.lir.LIRSetDelay;
-import at.dms.kjc.lir.LIRSetEncode;
-import at.dms.kjc.lir.LIRSetJoiner;
-import at.dms.kjc.lir.LIRSetLoopOfFeedback;
-import at.dms.kjc.lir.LIRSetParallelStream;
-import at.dms.kjc.lir.LIRSetPeek;
-import at.dms.kjc.lir.LIRSetPop;
-import at.dms.kjc.lir.LIRSetPush;
-import at.dms.kjc.lir.LIRSetSplitter;
-import at.dms.kjc.lir.LIRSetStreamType;
-import at.dms.kjc.lir.LIRSetTape;
-import at.dms.kjc.lir.LIRSetWork;
-import at.dms.kjc.lir.LIRStreamType;
-import at.dms.kjc.lir.LIRWorkEntry;
-import at.dms.kjc.lir.LIRWorkExit;
-import at.dms.kjc.sir.SIRCreatePortal;
-import at.dms.kjc.sir.SIRDynamicToken;
-import at.dms.kjc.sir.SIRInitStatement;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRIterationExpression;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIRLatency;
-import at.dms.kjc.sir.SIRLatencyMax;
-import at.dms.kjc.sir.SIRLatencyRange;
-import at.dms.kjc.sir.SIRLatencySet;
-import at.dms.kjc.sir.SIRMarker;
-import at.dms.kjc.sir.SIRMessageStatement;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPortal;
-import at.dms.kjc.sir.SIRPrintStatement;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRRangeExpression;
-import at.dms.kjc.sir.SIRRegReceiverStatement;
-import at.dms.kjc.sir.SIRRegSenderStatement;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.JVectorLiteral;
+import at.dms.kjc.lir.*;
 
 public class IRPrinter extends Utils implements SLIRVisitor
 {
@@ -805,7 +686,7 @@ public class IRPrinter extends Utils implements SLIRVisitor
                                     JavaStyleComment[] comments)
     {
         blockStart("BlockStatement");
-        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
+        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
             ((JStatement)it.next()).accept(this);
         }
         // comments
@@ -1551,7 +1432,7 @@ public class IRPrinter extends Utils implements SLIRVisitor
         blockStart("SIRInitStatement");
         attrPrint("target ", target.toString());
         attrStart("args");
-        List<?> args = self.getArgs();
+        List args = self.getArgs();
         for (int i=0; i<args.size(); i++) {
             ((JExpression)args.get(i)).accept(this);
         }

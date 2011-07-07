@@ -1,9 +1,12 @@
 package at.dms.kjc;
 
-import java.util.ListIterator;
-
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.lir.*;
 import at.dms.compiler.JavaStyleComment;
-import at.dms.util.Utils;
+import at.dms.compiler.JavadocComment;
 
 /**
  * This class descends through the tree, and tests if any of the
@@ -102,7 +105,7 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
      */
     public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
-        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
+        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
             JStatement oldBody = (JStatement)it.next();
             Object newBody = oldBody.accept(this);
             if (!(newBody instanceof JStatement))

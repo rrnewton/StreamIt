@@ -20,7 +20,7 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 class TokenRangeElement extends AlternativeElement {
     String label;

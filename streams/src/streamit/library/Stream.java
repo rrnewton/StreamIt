@@ -16,18 +16,15 @@
 
 package streamit.library;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Vector;
-
+import java.util.*;
 import streamit.library.jcc.StreamItToJcc;
 import streamit.misc.Pair;
-import streamit.scheduler2.Schedule;
-import streamit.scheduler2.Scheduler;
-import streamit.scheduler2.constrained.NoPathException;
 import streamit.scheduler2.iriter.Iterator;
 import streamit.scheduler2.print.PrintGraph;
+import streamit.scheduler2.Schedule;
+import streamit.scheduler2.Scheduler;
+
+import streamit.scheduler2.constrained.NoPathException;
 
 // the basic stream class (pipe's).  has 1 input and 1 output.
 public abstract class Stream extends Operator
@@ -533,7 +530,7 @@ public abstract class Stream extends Operator
     int uncompressedSize = 0;
     int totalSize = 0;
     HashMap<Object, Integer> sizeMap = new HashMap<Object, Integer>();
-    HashSet<?> usefulSet = new HashSet<Object>();
+    HashSet usefulSet = new HashSet();
     public static int totalBuffer = 0;
     boolean finegrained = false;
 
@@ -601,7 +598,7 @@ public abstract class Stream extends Operator
                 else if (oper instanceof SplitJoin)
                     {
                         assert function instanceof Pair;
-                        Pair<?, ?> pair = (Pair<?, ?>)function;
+                        Pair pair = (Pair)function;
                         assert pair.getFirst() instanceof Operator;
                         Operator sORj = (Operator)pair.getFirst();
                         int funcNum = ((Integer)pair.getSecond()).intValue();

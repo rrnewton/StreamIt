@@ -20,8 +20,8 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.io.IOException;
 import java.util.Enumeration;
+import java.io.IOException;
 
 class GrammarDefinition {
     private String name;
@@ -89,7 +89,7 @@ class GrammarDefinition {
 
         // Copy rules from supergrammar into this grammar
         IndexedVector inhRules = superG.getRules();
-        for (Enumeration<?> e = inhRules.elements(); e.hasMoreElements();) {
+        for (Enumeration e = inhRules.elements(); e.hasMoreElements();) {
             Rule r = (Rule) e.nextElement();
             inherit(r, superG);
         }
@@ -98,7 +98,7 @@ class GrammarDefinition {
         // Modify tokdef options so that they point to dir of enclosing grammar
         IndexedVector inhOptions = superG.getOptions();
         if (inhOptions != null) {
-            for (Enumeration<?> e = inhOptions.elements(); e.hasMoreElements();) {
+            for (Enumeration e = inhOptions.elements(); e.hasMoreElements();) {
                 Option o = (Option) e.nextElement();
                 inherit(o, superG);
             }

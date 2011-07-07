@@ -1,26 +1,15 @@
 package at.dms.kjc;
 
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-
+import at.dms.kjc.sir.*;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.iterator.*;
+import at.dms.util.*;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.TokenReference;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.util.ConstList;
-import at.dms.util.Utils;
+
+import java.io.*;
+import java.util.*;
+import java.lang.reflect.Array;
 
 public class AutoCloner {
     /**
@@ -204,7 +193,7 @@ public class AutoCloner {
         }
         // hashtables -- clone along with contents
         else if (o instanceof Hashtable) {
-            result = cloneHashtable((Hashtable<?, ?>)o);
+            result = cloneHashtable((Hashtable)o);
         } 
         // arrays -- need to clone children as well
         else if (o.getClass().isArray()) {
@@ -240,15 +229,15 @@ public class AutoCloner {
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o instanceof LinkedList) {
-            result = ((LinkedList<?>)o).clone();
+            result = ((LinkedList)o).clone();
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o instanceof Stack) {
-            result = ((Stack<?>)o).clone();
+            result = ((Stack)o).clone();
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o instanceof Vector) {
-            result = ((Vector<?>)o).clone();
+            result = ((Vector)o).clone();
             register(o, result);
             cloneWithinList((List<Object>)result);
         } else if (o.getClass().toString().equals("class at.dms.kjc.sir.SIRGlobal")) {
@@ -313,10 +302,10 @@ public class AutoCloner {
      * Helper function.  Should only be called as part of automatic
      * cloning process.
      */
-    static private Object cloneHashtable(Hashtable<?, ?> orig) {
+    static private Object cloneHashtable(Hashtable orig) {
         Hashtable<Object, Object> result = new Hashtable<Object, Object>();
         register(orig, result);
-        Enumeration<?> e = orig.keys();
+        Enumeration e = orig.keys();
         while (e.hasMoreElements()) {
             Object key = e.nextElement();
             Object value = orig.get(key);

@@ -1,5 +1,7 @@
 package at.dms.kjc.lir;
 
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * This sets the type of a stream.

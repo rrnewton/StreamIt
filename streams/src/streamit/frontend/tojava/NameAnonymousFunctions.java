@@ -16,9 +16,7 @@
 
 package streamit.frontend.tojava;
 
-import streamit.frontend.nodes.FEReplacer;
-import streamit.frontend.nodes.FuncWork;
-import streamit.frontend.nodes.Function;
+import streamit.frontend.nodes.*;
 
 /**
  * Pass to replace anonymous functions with named ones.  This assigns

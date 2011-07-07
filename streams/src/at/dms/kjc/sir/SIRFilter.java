@@ -1,27 +1,11 @@
 package at.dms.kjc.sir;
 
-import java.util.HashMap;
-
 import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.lir.LIRStreamType;
+import at.dms.util.Utils;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import java.util.HashMap;
 
 /**
  * This represents a basic StreamIt filter.  In this case, a filter

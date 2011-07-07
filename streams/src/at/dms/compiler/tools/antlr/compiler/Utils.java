@@ -20,8 +20,8 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.io.DataInputStream;
 import java.io.File;
+import java.io.DataInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;

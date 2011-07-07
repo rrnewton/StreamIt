@@ -16,32 +16,14 @@
 
 package streamit.frontend.tojava;
 
-import java.util.ArrayList;
+import streamit.frontend.nodes.*;
+import streamit.frontend.passes.SymbolTableVisitor;
+
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-import streamit.frontend.nodes.ComplexProp;
-import streamit.frontend.nodes.ExprArray;
-import streamit.frontend.nodes.ExprArrayInit;
-import streamit.frontend.nodes.ExprComplex;
-import streamit.frontend.nodes.ExprConstInt;
-import streamit.frontend.nodes.ExprField;
-import streamit.frontend.nodes.ExprPeek;
-import streamit.frontend.nodes.ExprPop;
-import streamit.frontend.nodes.ExprVar;
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.SCSimple;
-import streamit.frontend.nodes.StmtAssign;
-import streamit.frontend.nodes.StmtEnqueue;
-import streamit.frontend.nodes.StmtExpr;
-import streamit.frontend.nodes.StmtPush;
-import streamit.frontend.nodes.StmtReturn;
-import streamit.frontend.nodes.StmtVarDecl;
-import streamit.frontend.nodes.TempVarGen;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypePrimitive;
-import streamit.frontend.passes.SymbolTableVisitor;
+import java.util.ArrayList;
 
 /**
  * Perform constant propagation on function bodies.  This class does
@@ -159,10 +141,10 @@ public class DoComplexProp extends SymbolTableVisitor
      * of the Expressions in l, except with any ExprComplex values
      * replaced with temporary variables.
      */
-    private List<?> createListTemporaries(List<?> l)
+    private List createListTemporaries(List l)
     {
-        List<?> nl = new ArrayList<Object>();
-        for (Iterator<?> iter = l.iterator(); iter.hasNext(); )
+        List nl = new ArrayList();
+        for (Iterator iter = l.iterator(); iter.hasNext(); )
             {
                 Expression expr = (Expression)iter.next();
                 if (expr instanceof ExprComplex)

@@ -20,13 +20,11 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Enumeration;
+import java.io.IOException;
 
-import at.dms.compiler.tools.antlr.runtime.CommonToken;
-import at.dms.compiler.tools.antlr.runtime.Token;
-import at.dms.compiler.tools.antlr.runtime.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 /**
  * A Grammar holds a set of rules (which are stored
@@ -269,7 +267,7 @@ public abstract class Grammar {
      */
     public String toString() {
         StringBuffer buf = new StringBuffer(20000);
-        Enumeration<?> ids = rules.elements();
+        Enumeration ids = rules.elements();
         while ( ids.hasMoreElements() ) {
             RuleSymbol rs = (RuleSymbol)ids.nextElement();
             if (!rs.id.equals("mnextToken")) {

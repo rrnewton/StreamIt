@@ -20,11 +20,10 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
-import at.dms.compiler.tools.antlr.runtime.Token;
-import at.dms.compiler.tools.antlr.runtime.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 
 class SimpleTokenManager implements TokenManager, Cloneable {
     protected int maxToken = Token.MIN_USER_TYPE;

@@ -1,10 +1,7 @@
 package at.dms.util;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.io.*;
+import java.util.*;
 
 /**
  * This provides a constant interface to a list, where "constant"
@@ -29,7 +26,7 @@ public class ConstList implements Serializable, Cloneable {
     }
 
     /** Returns true if this list contains all of the elements of the specified collection. */
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(Collection c) {
         return list.containsAll(c);
     }
     

@@ -1,11 +1,8 @@
 package at.dms.kjc.sir;
 
+import at.dms.kjc.*;
+import java.util.List;
 import java.util.Iterator;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
 
 /**
  * This is an empty attribute stream visitor that does nothing
@@ -61,7 +58,7 @@ public class EmptyAttributeStreamVisitor implements AttributeStreamVisitor {
                                 JMethodDeclaration[] methods,
                                 JMethodDeclaration init) {
         /** visit each child. **/
-        Iterator<?> childIter = self.getChildren().iterator();
+        Iterator childIter = self.getChildren().iterator();
         while(childIter.hasNext()) {
             SIROperator currentChild = (SIROperator)childIter.next();
             currentChild.accept(this);
@@ -79,7 +76,7 @@ public class EmptyAttributeStreamVisitor implements AttributeStreamVisitor {
         // visit splitter
         self.getSplitter().accept(this);
         // visit children
-        Iterator<?> childIter = self.getParallelStreams().iterator();
+        Iterator childIter = self.getParallelStreams().iterator();
         while(childIter.hasNext()) {
             SIROperator currentChild = (SIROperator)childIter.next();
             currentChild.accept(this);

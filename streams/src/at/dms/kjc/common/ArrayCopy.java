@@ -1,22 +1,12 @@
 package at.dms.kjc.common;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
+import at.dms.kjc.*;
 
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
+import java.util.*;
 
 public class ArrayCopy {
     //Only handles rectangle multi dim arrays now
-    public static void acceptInit(JMethodDeclaration init,Hashtable<JLocalVariable, ?> constants) {
+    public static void acceptInit(JMethodDeclaration init,Hashtable constants) {
         JBlock body=init.getBody();
         JFormalParameter[] params=init.getParameters();
         for(int i=params.length-1;i>=0;i--) {

@@ -1,12 +1,19 @@
 package at.dms.kjc.sir.lowering.partition.cache;
 
-import java.util.LinkedList;
+import java.util.*;
+import java.io.*;
 
-import at.dms.kjc.sir.SIRFileReader;
-import at.dms.kjc.sir.SIRFileWriter;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.partition.PartitionRecord;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import at.dms.kjc.sir.lowering.partition.*;
+
+import at.dms.kjc.cluster.DataEstimate;
+import at.dms.kjc.cluster.CodeEstimate;
 
 class CConfigFilter extends CConfig {
     /**

@@ -1,6 +1,16 @@
 package at.dms.kjc.sir.lowering.partition.linear;
 
-import at.dms.kjc.sir.SIRSplitJoin;
+import java.util.*;
+import java.io.*;
+
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import at.dms.kjc.sir.lowering.partition.*;
 
 class LDPConfigSplitJoin extends LDPConfigContainer {
 

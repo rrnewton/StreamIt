@@ -1,26 +1,10 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
-import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.slicegraph.FileOutputContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.SliceNode;
+import java.util.*;
+import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
 /**
  * Process a FilterSliceNode creating code in the code store and buffers for connectivity.
@@ -45,11 +29,11 @@ public class ProcessFilterSliceNode {
     protected static Map<SliceNode,Boolean>  basicCodeWritten = new WeakHashMap<SliceNode,Boolean>();
     
     protected CodeStoreHelper filter_code;
-    protected ComputeCodeStore<?> codeStore;
+    protected ComputeCodeStore codeStore;
     protected FilterSliceNode filterNode;
     protected SchedulingPhase whichPhase;
-    protected BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits;
-    protected ComputeNode<ComputeCodeStore<?>> location;
+    protected BackEndFactory backEndBits;
+    protected ComputeNode location;
     
     /**
     * @param filterNode   the filterNode that needs code generated.
@@ -57,7 +41,7 @@ public class ProcessFilterSliceNode {
     * @param backEndBits  a BackEndFactory to access layout, etc.
     * */
    public ProcessFilterSliceNode(FilterSliceNode filterNode, 
-            SchedulingPhase whichPhase, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+            SchedulingPhase whichPhase, BackEndFactory backEndBits) {
         this.filterNode = filterNode;
         this.whichPhase = whichPhase;
         this.backEndBits = backEndBits;
@@ -249,7 +233,7 @@ public class ProcessFilterSliceNode {
      */
     private static CodeStoreHelper makeFilterCode(FilterSliceNode filter, 
             Channel inputChannel, Channel outputChannel,
-            BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+            BackEndFactory backEndBits) {
         
         final String peekName;
 
@@ -327,7 +311,7 @@ public class ProcessFilterSliceNode {
      * @return
      */
     public static  CodeStoreHelper getFilterCode(FilterSliceNode filter, 
-            Channel inputChannel, Channel outputChannel, BackEndFactory<?, ComputeNode<ComputeCodeStore<?>>, ?, ?> backEndBits) {
+            Channel inputChannel, Channel outputChannel, BackEndFactory backEndBits) {
         CodeStoreHelper filter_code = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filter_code == null) {
             filter_code = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);

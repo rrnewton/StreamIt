@@ -22,9 +22,9 @@ package at.dms.kjc;
 
 import java.util.Enumeration;
 
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.19: Try Statement
@@ -141,7 +141,7 @@ public class JTryCatchStatement extends JStatement {
          */
         boolean[]   catchReachable = new boolean[catchClauses.length];
 
-        Enumeration<?> eNum = tryContext.getThrowables().elements();
+        Enumeration eNum = tryContext.getThrowables().elements();
         while (eNum.hasMoreElements()) {
             CThrowableInfo  info = (CThrowableInfo)eNum.nextElement();
             CClassType  type = info.getThrowable();
@@ -212,7 +212,7 @@ public class JTryCatchStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitTryCatchStatement(this, tryClause, catchClauses);
     }
 

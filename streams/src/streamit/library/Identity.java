@@ -18,12 +18,12 @@ package streamit.library;
 
 public class Identity extends ChannelConnectFilter
 {
-    public Identity (Class<?> type)
+    public Identity (Class type)
     {
         super (type);
     }
 
-    public Identity(int i, Class<?> type) 
+    public Identity(int i, Class type) 
     {
         super(type);
     }

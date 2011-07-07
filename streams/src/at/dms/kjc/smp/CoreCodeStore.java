@@ -1,25 +1,12 @@
 package at.dms.kjc.smp;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmittedTextExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.common.ALocalVariable;
-import at.dms.kjc.slicegraph.FileOutputContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.*;
+
+import java.util.HashSet;
+import java.util.Set;
+import at.dms.kjc.slicegraph.*;
 
 public class CoreCodeStore extends ComputeCodeStore<Core> {
     /** True if this CoreCodeStore has code appended to it */

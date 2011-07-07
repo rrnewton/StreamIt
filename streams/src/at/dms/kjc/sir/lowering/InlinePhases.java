@@ -1,17 +1,10 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.LinkedList;
-import java.util.List;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRTwoStageFilter;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * This class inlines each phase (i.e., a helper function that does

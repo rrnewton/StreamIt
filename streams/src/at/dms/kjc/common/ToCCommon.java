@@ -1,57 +1,17 @@
 package at.dms.kjc.common;
 //import java.io.StringWriter;
 //import java.util.Vector;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
-
+//import java.util.HashMap;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+//import at.dms.kjc.sir.lowering.LoweringConstants;
+//import at.dms.compiler.TabbedPrintWriter;
 import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JBreakStatement;
-import at.dms.kjc.JCastExpression;
-import at.dms.kjc.JClassExpression;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JCompoundStatement;
-import at.dms.kjc.JConditionalExpression;
-import at.dms.kjc.JContinueStatement;
-import at.dms.kjc.JDoStatement;
-import at.dms.kjc.JEmittedTextExpression;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JEqualityExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JLabeledStatement;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JParenthesedExpression;
-import at.dms.kjc.JPhylum;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JReturnStatement;
-import at.dms.kjc.JShiftExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JSwitchGroup;
-import at.dms.kjc.JSwitchStatement;
-import at.dms.kjc.JTypeDeclaration;
-import at.dms.kjc.JTypeDeclarationStatement;
-import at.dms.kjc.JTypeNameExpression;
-import at.dms.kjc.JUnaryExpression;
-import at.dms.kjc.JUnaryPromote;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.JWhileStatement;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.sir.SIRMarker;
-import at.dms.kjc.sir.SIRPrintStatement;
+import at.dms.kjc.common.CommonUtils;
 /**
  * Somewhat artificial class to provide common code for 
  * at.dms.kjc.common.ToC and at.dms.kjc.lir.LIRToC
@@ -875,7 +835,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
 
     protected boolean printExp(JExpression expr) {
 
-        List<?> exps = splitForPrint(expr);
+        List exps = splitForPrint(expr);
 
         // for timing runs we want an easily recognized bit of code 
         // that can not be optimized away by gcc
@@ -883,7 +843,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
         if (ToCCommon.alternatePrintsForTiming) {
             p.newline();
             p.print("// TIMER_PRINT_CODE: ");
-            for (Iterator<?> i = exps.iterator(); i.hasNext();) {
+            for (Iterator i = exps.iterator(); i.hasNext();) {
                 JExpression exp = ((JExpression)i.next());
                 p.print("__print_sink__ += (int)(");
                 exp.accept(this);
@@ -894,7 +854,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
         
         // now print for real...
         boolean printedOK = true;
-        for (Iterator<?> i = exps.iterator(); i.hasNext();) {
+        for (Iterator i = exps.iterator(); i.hasNext();) {
             JExpression exp = ((JExpression)i.next());
             CType t = null;
             try {

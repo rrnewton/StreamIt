@@ -2,14 +2,11 @@
  */
 package at.dms.kjc.sir.lowering;
 
-import java.util.Hashtable;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.spacetime.SpaceTimeBackend;
 
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.SIRCodeUnit;
+import java.util.Hashtable;
 
 /**
  * Final agressive filter optimization before code emission.

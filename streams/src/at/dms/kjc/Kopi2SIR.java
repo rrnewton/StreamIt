@@ -13,49 +13,12 @@
 package at.dms.kjc;
 
 //import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Vector;
-
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRCreatePortal;
-import at.dms.kjc.sir.SIRDynamicToken;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFileReader;
-import at.dms.kjc.sir.SIRFileWriter;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRGlobal;
-import at.dms.kjc.sir.SIRHelper;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRInitStatement;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRIterationExpression;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRLatency;
-import at.dms.kjc.sir.SIRLatencyMax;
-import at.dms.kjc.sir.SIRLatencyRange;
-import at.dms.kjc.sir.SIRMessageStatement;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPrintStatement;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRRangeExpression;
-import at.dms.kjc.sir.SIRRecursiveStub;
-import at.dms.kjc.sir.SIRRegReceiverStatement;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.sir.SIRTwoStageFilter;
 import at.dms.util.Utils;
+import at.dms.kjc.sir.*;
+//import at.dms.util.*;
+import java.util.*;
 
 
 public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable
@@ -2459,7 +2422,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable
                     at.dms.util.Utils.fail(printLine(self) + 
                                            "Input declaration on non-Filter");
                 SIRFilter filter = (SIRFilter)parentStream;
-                Vector<?> v = (Vector<?>)right.accept(this);
+                Vector v = (Vector)right.accept(this);
                 //set the input type of the filter
                 if (v.elementAt(0) instanceof JClassExpression)
                     filter.setInputType(((JClassExpression)v.elementAt(0)).getClassType());
@@ -2494,7 +2457,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable
                     at.dms.util.Utils.fail(printLine(self) + 
                                            "Output declaration on non-Filter");
                 SIRFilter filter = (SIRFilter)parentStream;
-                Vector<?> v = (Vector<?>)right.accept(this);
+                Vector v = (Vector)right.accept(this);
                 filter.setPush((JExpression)v.elementAt(1));
                 if (v.elementAt(0) instanceof JClassExpression)
                     filter.setOutputType(((JClassExpression)v.elementAt(0)).getClassType());
@@ -2964,12 +2927,12 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable
         other.interfaceList = this.interfaceList;
         other.interfaceTableList = this.interfaceTableList;
         other.structureList = this.structureList;
-        other.helperList = (java.util.Vector<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.helperList);
+        other.helperList = (java.util.Vector)at.dms.kjc.AutoCloner.cloneToplevel(this.helperList);
         other.global = (at.dms.kjc.sir.SIRGlobal)at.dms.kjc.AutoCloner.cloneToplevel(this.global);
-        other.searchList = (java.util.LinkedList<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.searchList);
+        other.searchList = (java.util.LinkedList)at.dms.kjc.AutoCloner.cloneToplevel(this.searchList);
         other.params = (at.dms.kjc.JFormalParameter[])at.dms.kjc.AutoCloner.cloneToplevel(this.params);
         other.paramNames = (java.lang.String[])at.dms.kjc.AutoCloner.cloneToplevel(this.paramNames);
-        other.finalVars = (java.util.LinkedList<?>)at.dms.kjc.AutoCloner.cloneToplevel(this.finalVars);
+        other.finalVars = (java.util.LinkedList)at.dms.kjc.AutoCloner.cloneToplevel(this.finalVars);
         other.anonCreation = this.anonCreation;
         other.nextLatency = (at.dms.kjc.sir.SIRLatency)at.dms.kjc.AutoCloner.cloneToplevel(this.nextLatency);
         other.methodToPushRate = this.methodToPushRate;

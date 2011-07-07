@@ -17,7 +17,7 @@
 package streamit.scheduler2.base;
 
 import streamit.scheduler2.iriter.FilterIter;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.*;
 
 /**
  * Computes some basic data for Filters.

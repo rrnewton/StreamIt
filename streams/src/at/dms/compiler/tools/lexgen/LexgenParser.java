@@ -1,14 +1,8 @@
 // $ANTLR 1.5A: "Lexgen.g" -> "LexgenParser.java"$
 package at.dms.compiler.tools.lexgen; 
-import java.util.Vector;
+import at.dms.compiler.tools.antlr.runtime.*;
 
-import at.dms.compiler.tools.antlr.runtime.NoViableAltException;
-import at.dms.compiler.tools.antlr.runtime.ParserSharedInputState;
-import at.dms.compiler.tools.antlr.runtime.RecognitionException;
-import at.dms.compiler.tools.antlr.runtime.Token;
-import at.dms.compiler.tools.antlr.runtime.TokenBuffer;
-import at.dms.compiler.tools.antlr.runtime.TokenStream;
-import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
+import java.util.Vector;
 
 public class LexgenParser extends at.dms.compiler.tools.antlr.runtime.LLkParser
     implements LexgenTokenTypes
@@ -46,7 +40,7 @@ public class LexgenParser extends at.dms.compiler.tools.antlr.runtime.LLkParser
         String      prefix = null;
         String      packageName = null;
         String      vocabulary = null;
-        Vector<?>      definitions = new Vector<Object>();
+        Vector      definitions = new Vector();
         TokenDefinition def;
         
         

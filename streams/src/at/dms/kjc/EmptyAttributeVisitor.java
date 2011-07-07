@@ -21,7 +21,6 @@
 package at.dms.kjc;
 
 import java.util.ListIterator;
-
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
 
@@ -460,7 +459,7 @@ public class EmptyAttributeVisitor implements Constants, AttributeVisitor<Object
     public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
         if(forwards)
-            for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
+            for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
                 ((JStatement)it.next()).accept(this);
             }
         else {

@@ -16,8 +16,7 @@
 
 package streamit.library;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class WeightedRoundRobinJoiner extends Joiner
 {

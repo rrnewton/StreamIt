@@ -54,6 +54,7 @@ package at.dms.compiler.tools.antlr.runtime;
  * @see at.dms.compiler.tools.antlr.runtime.LLkParser
  */
 
+import java.io.IOException;
 
 public abstract class Parser {
     protected ParserSharedInputState inputState;

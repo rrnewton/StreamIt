@@ -17,8 +17,8 @@
 package streamit.scheduler2.singleappearance;
 
 import streamit.misc.DestroyedClass;
-import streamit.scheduler2.base.StreamInterface;
 import streamit.scheduler2.iriter.Iterator;
+import streamit.scheduler2.base.StreamInterface;
 
 /**
  * This class basically implements the StreamFactory interface.  In the 

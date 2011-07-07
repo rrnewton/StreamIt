@@ -1,46 +1,12 @@
 package at.dms.kjc.sir.statespace;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Vector;
-
-import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CDoubleType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JDoubleLiteral;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JMultExpression;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRTwoStageFilter;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.util.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.statespace.*;
+import at.dms.kjc.iterator.*;
+import at.dms.compiler.*;
 
 
 /**
@@ -208,7 +174,7 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
         JAssignmentExpression assign;
         JFieldAccessExpression fieldExpr;
         JLiteral litExpr;
-        Vector<?> assignStatements = new Vector<Object>();
+        Vector assignStatements = new Vector();
 
         JThisExpression thisExpr = new JThisExpression(null);
 
@@ -306,9 +272,9 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
                                       int popCount) {
         // generate the push expressions that will make up the body of the
         // new work method.
-        Vector<?> pushStatements = makePushStatementVector(representation, inputType, outputType);
+        Vector pushStatements = makePushStatementVector(representation, inputType, outputType);
         // make a vector filled with the appropriate number of pop expressions
-        Vector<?> popStatements  = new Vector<Object>();
+        Vector popStatements  = new Vector();
         SIRPopExpression popExpr = new SIRPopExpression(inputType, popCount);
         // wrap the pop expression so it is a statement.
         JExpressionStatement popWrapper = new JExpressionStatement(null, // token reference,
@@ -341,10 +307,10 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
      * SIRPushExpressions that implement (directly) the
      * matrix multiplication represented by the linear representation.
      **/
-    public Vector<?> makePushStatementVector(LinearFilterRepresentation representation,
+    public Vector makePushStatementVector(LinearFilterRepresentation representation,
                                           CType inputType,
                                           CType outputType) {
-        Vector<?> returnVector = new Vector<Object>();
+        Vector returnVector = new Vector();
 
         int popCount = representation.getPopCount();
         int pushCount = representation.getPushCount();
@@ -695,9 +661,9 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
                                           int popCount) {
         // generate the state update expressions that will make up the body of the
         // new work method.
-        Vector<?> pushStatements = makeInitPushStatementVector(representation, inputType, outputType);
+        Vector pushStatements = makeInitPushStatementVector(representation, inputType, outputType);
         // make a vector filled with the appropriate number of pop expressions
-        Vector<?> popStatements  = new Vector<Object>();
+        Vector popStatements  = new Vector();
         SIRPopExpression popExpr = new SIRPopExpression(inputType, popCount);
         // wrap the pop expression so it is a statement.
         JExpressionStatement popWrapper = new JExpressionStatement(null, // token reference,
@@ -722,10 +688,10 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
      * SIRPushExpressions that implement (directly) the
      * matrix multiplication represented by the linear representation.
      **/
-    public Vector<?> makeInitPushStatementVector(LinearFilterRepresentation representation,
+    public Vector makeInitPushStatementVector(LinearFilterRepresentation representation,
                                               CType inputType,
                                               CType outputType) {
-        Vector<?> returnVector = new Vector<Object>();
+        Vector returnVector = new Vector();
 
         int popCount = representation.getPreWorkPopCount();
         int stateCount = representation.getStateCount();
@@ -981,7 +947,7 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
             // if we don't know anything about this container, we are done, though we need
             // to do the recursion to the children
             if (!linearInformation.hasLinearRepresentation(self)) {
-                Iterator<?> childIter = self.getChildren().iterator();
+                Iterator childIter = self.getChildren().iterator();
                 while (childIter.hasNext()) {
                     ((SIROperator)childIter.next()).accept(this);
                 }
@@ -993,7 +959,7 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
 
             // calculate the cost of doing the optimal replacement of the children.
             LinearReplaceCalculator childCalculator = new LinearReplaceCalculator(linearInformation);
-            Iterator<?> childIter = self.getChildren().iterator();
+            Iterator childIter = self.getChildren().iterator();
             while(childIter.hasNext()) {
                 ((SIROperator)childIter.next()).accept(childCalculator);
             }

@@ -20,8 +20,8 @@
 
 package at.dms.compiler.tools.antlr.runtime;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * A Stream of characters fed to the lexer from a InputStream that can

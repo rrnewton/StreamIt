@@ -1,20 +1,10 @@
 package at.dms.kjc.sir;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRIterator;
 import at.dms.kjc.lir.LIRStreamType;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+import at.dms.util.Utils;
+import java.util.*;
 
 /**
  * This class represents a stream structure with one input and one

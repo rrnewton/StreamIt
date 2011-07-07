@@ -4,10 +4,8 @@
 
 package at.dms.kjc.linprog;
 
-import java.rmi.Naming;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.rmi.*;
+import java.rmi.server.*;
 
 public class CPLEXClient extends UnicastRemoteObject implements Remote {
     public CPLEXClient() throws RemoteException {

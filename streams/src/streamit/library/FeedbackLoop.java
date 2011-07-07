@@ -16,10 +16,9 @@
 
 package streamit.library;
 
-import java.util.List;
-
-import streamit.library.iriter.Iterator;
 import streamit.scheduler2.Scheduler;
+import streamit.library.iriter.Iterator;
+import java.util.List;
 
 // the feedback loop
 public class FeedbackLoop extends Stream
@@ -571,7 +570,7 @@ public class FeedbackLoop extends Stream
                 Channel feedbackChannel = loop.getOutputChannel ();
                 for (int index = 0; index < delay; index++)
                     {
-                        Class<?> type = feedbackChannel.getType ();
+                        Class type = feedbackChannel.getType ();
                         if (type == Integer.TYPE)
                             {
                                 feedbackChannel.pushInt (initPathInt (index));
@@ -602,7 +601,7 @@ public class FeedbackLoop extends Stream
                 for (java.util.Iterator<Object> iter = enqueued.iterator();
                      iter.hasNext(); )
                     {
-                        Class<?> type = feedbackChannel.getType ();
+                        Class type = feedbackChannel.getType ();
                         if (type == Integer.TYPE)
                             {
                                 Integer value = (Integer)iter.next();

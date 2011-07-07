@@ -1,12 +1,7 @@
 package at.dms.kjc.sir;
 
+import at.dms.kjc.*;
 import java.io.Serializable;
-
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.DeepCloneable;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
 
 /** 
  * This represents a latency for message delivery.  A latency can be:
@@ -42,9 +37,9 @@ public class SIRLatency implements Serializable, DeepCloneable {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitLatency(this);
+            return ((SLIRAttributeVisitor)p).visitLatency(this);
         } else {
             return this;
         }

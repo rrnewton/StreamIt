@@ -1,6 +1,6 @@
 package at.dms.kjc.sir.linear.transform;
 
-import at.dms.kjc.sir.linear.LinearFilterRepresentation;
+import at.dms.kjc.sir.linear.*;
 
 /**
  * Represents a null transform -- eg no transform to apply.

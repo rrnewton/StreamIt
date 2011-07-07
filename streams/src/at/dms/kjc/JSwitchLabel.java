@@ -128,7 +128,7 @@ public class JSwitchLabel extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitSwitchLabel(this, expr);
     }
 

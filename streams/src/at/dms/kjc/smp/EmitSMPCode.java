@@ -3,21 +3,23 @@ package at.dms.kjc.smp;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.KjcOptions;
 
 /**
  * Emit c code for tiles
@@ -458,7 +460,7 @@ public class EmitSMPCode extends EmitCode {
      * @param p The CodegenPrintWriter (left open on return).
      */
     public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
-            ComputeNode<?> n, CodegenPrintWriter p, CodeGen codegen) {
+            ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
         
         p.println("// code for core " + n.getUniqueId());
         p.println(((Core)n).getComputeCode().getGlobalText());

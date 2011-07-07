@@ -1,13 +1,8 @@
 
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
 
 public class FindTapeOps extends SLIREmptyVisitor {
 

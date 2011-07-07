@@ -1,8 +1,7 @@
 package at.dms.kjc.tilera.arrayassignment;
 
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.tilera.Util;
+import at.dms.kjc.*;
+import at.dms.kjc.tilera.*;
 
 public class LoopedAssignments implements AAStatement {
     public static final int MIN_LOOP_ITERATIONS = 10;

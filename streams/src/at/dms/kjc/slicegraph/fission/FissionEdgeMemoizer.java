@@ -1,11 +1,8 @@
 package at.dms.kjc.slicegraph.fission;
 
-import java.util.HashMap;
-
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.Slice;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.slicegraph.*;
 
 public class FissionEdgeMemoizer {
     private static HashMap<EdgeDescriptor, InterSliceEdge> edges =

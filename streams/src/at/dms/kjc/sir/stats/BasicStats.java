@@ -1,30 +1,13 @@
 package at.dms.kjc.sir.stats;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.partition.*;
 
-import at.dms.kjc.Kopi2SIR;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFeedbackLoopIter;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRPipelineIter;
-import at.dms.kjc.iterator.SIRSplitJoinIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRDynamicRateManager;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
-import at.dms.kjc.sir.lowering.fusion.Lifter;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import java.util.*;
 
 /**
  *
@@ -59,9 +42,9 @@ public class BasicStats {
     // number of filters with a multiplicity of 1 in the steady state
     int multiplicityOneFilters = 0;
     // names of stateful filters
-    List<String> stateful = new ArrayList<String>();
+    List stateful = new ArrayList();
     // names of peeking filters
-    List<String> peeking = new ArrayList<String>();
+    List peeking = new ArrayList();
     // dynamic rate filters
     List<SIRFilter> dynamicRateFilters = new ArrayList<SIRFilter>();
     // total work in the program
@@ -75,7 +58,7 @@ public class BasicStats {
     // total work in feedback loops
     long totalFeedbackWork = 0;
     // list of multiplicities of filters (in the schedule)
-    List<Integer> multiplicities = new LinkedList<Integer>();
+    List multiplicities = new LinkedList();
     // unique multiplicities of filters (in the schedule)
     HashSet<Integer> uniqueMultiplicities = new HashSet<Integer>();
 
@@ -195,7 +178,7 @@ public class BasicStats {
             }));
 
         // calculate the min, median, max multiplicity
-        Integer[] mults = multiplicities.toArray(new Integer[0]);
+        Integer[] mults = (Integer[])multiplicities.toArray(new Integer[0]);
         Arrays.sort(mults);
         int minMult = mults[0].intValue();
         int medianMult = (mults.length%2==0 ? 

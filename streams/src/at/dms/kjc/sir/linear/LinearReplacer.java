@@ -1,38 +1,11 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.HashSet;
-
-import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFeedbackLoopIter;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRPipelineIter;
-import at.dms.kjc.iterator.SIRSplitJoinIter;
-import at.dms.kjc.sir.EmptyStreamVisitor;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
+import java.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.linear.*;
+import at.dms.kjc.iterator.*;
+import at.dms.compiler.*;
 
 
 /**

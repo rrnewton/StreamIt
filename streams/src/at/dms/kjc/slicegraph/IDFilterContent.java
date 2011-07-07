@@ -1,6 +1,6 @@
 package at.dms.kjc.slicegraph;
 
-import at.dms.kjc.CType;
+import at.dms.kjc.*;
 import at.dms.kjc.sir.SIRIdentity;
 
 public class IDFilterContent extends FilterContent {

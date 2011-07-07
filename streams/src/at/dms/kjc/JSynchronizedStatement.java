@@ -20,10 +20,10 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
 import at.dms.compiler.UnpositionedError;
+import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.18: Synchronized Statement
@@ -97,7 +97,7 @@ public class JSynchronizedStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return p.visitSynchronizedStatement(this, cond, body);
     }
 

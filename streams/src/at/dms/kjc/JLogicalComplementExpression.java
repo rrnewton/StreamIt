@@ -87,7 +87,7 @@ public class JLogicalComplementExpression extends JUnaryExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return    p.visitLogicalComplementExpression(this, expr);
     }
 

@@ -1,16 +1,8 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JNameExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.*;
 
 /**
  * Contains various constants for the lowering process.

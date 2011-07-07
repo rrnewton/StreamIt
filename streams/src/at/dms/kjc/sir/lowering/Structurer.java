@@ -1,44 +1,15 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
+import at.dms.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.iterator.*;
+import at.dms.kjc.sir.*;
+
 import java.util.List;
 import java.util.ListIterator;
-
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JClassDeclaration;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JInterfaceDeclaration;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JNameExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JTypeDeclaration;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.iterator.SIRFeedbackLoopIter;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRIterator;
-import at.dms.kjc.iterator.SIRPhasedFilterIter;
-import at.dms.kjc.iterator.SIRPipelineIter;
-import at.dms.kjc.iterator.SIRSplitJoinIter;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.sir.StreamVisitor;
+import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Arrays;
 
 /**
  * This creates structures (inner classes) to encapsulate the state of
@@ -309,7 +280,7 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
                      LoweringConstants.STATE_PARAM_NAME);
         // for each statement in the method, change references
         KjcVisitor resolver = new FieldResolver();
-        ListIterator<?> statements = method.getStatementIterator();
+        ListIterator statements = method.getStatementIterator();
         while (statements.hasNext()) {
             ((JStatement)statements.next()).accept(resolver);
         }

@@ -1,60 +1,13 @@
 package at.dms.kjc.sir.lowering.fusion;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import at.dms.util.*;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+//import at.dms.kjc.lir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.partition.*;
 
-import at.dms.kjc.CArrayType;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JModuloExpression;
-import at.dms.kjc.JMultExpression;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRPeekExpression;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRTwoStageFilter;
-import at.dms.kjc.sir.lowering.InlinePhases;
-import at.dms.kjc.sir.lowering.LoweringConstants;
-import at.dms.kjc.sir.lowering.MarkFilterBoundaries;
-import at.dms.kjc.sir.lowering.RenameAll;
-import at.dms.kjc.sir.lowering.SIRScheduler;
-import at.dms.kjc.sir.lowering.partition.PartitionGroup;
-import at.dms.kjc.sir.lowering.partition.RefactorSplitJoin;
-import at.dms.util.Utils;
+import java.util.*;
 
 /**
  * This flattens any set of filters into a single splitjoin.
@@ -552,7 +505,7 @@ public class FuseSplit {
             numExec = rep.splitter;
         }
         // make list of statements for work function
-        LinkedList<?> list = new LinkedList<Object>();
+        LinkedList list = new LinkedList();
         // in initMode, don't worry about code size
         if (initMode) {
             for (int k=0; k<weights.length; k++) {
@@ -725,7 +678,7 @@ public class FuseSplit {
         int sumOfWeights = join.getSumOfWeights();
 
         // make list of statements for work function
-        LinkedList<?> list = new LinkedList<Object>();
+        LinkedList list = new LinkedList();
 
         // increment the read indices by the pop amounts
         /*
@@ -843,7 +796,7 @@ public class FuseSplit {
         // add calls to init functions
         for (int i=0; i<sj.size(); i++) {
             SIRStream child = sj.get(i);
-            List<?> params = sj.getParams(i);
+            List params = sj.getParams(i);
             if (!child.needsInit()) {
                 continue;
             }
@@ -1046,7 +999,7 @@ public class FuseSplit {
     private static JFieldDeclaration[] makeFields(SIRSplitJoin sj,
                                                   SJChildInfo[] childInfo)
     {
-        Iterator<?> childIter;
+        Iterator childIter;
         
         // Walk the list of children to get the total field length.
         int numFields = 0;

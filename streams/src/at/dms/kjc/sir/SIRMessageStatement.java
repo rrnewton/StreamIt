@@ -1,14 +1,7 @@
 package at.dms.kjc.sir;
 
-import at.dms.compiler.PositionedError;
-import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.CBodyContext;
-import at.dms.kjc.CodeSequence;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.KjcVisitor;
-import at.dms.kjc.SLIRAttributeVisitor;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * Message Sending Statement.
@@ -129,9 +122,9 @@ public class SIRMessageStatement extends JStatement {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
-            return ((SLIRAttributeVisitor<?>)p).visitMessageStatement(this,
+            return ((SLIRAttributeVisitor)p).visitMessageStatement(this,
                                                                    portal,
                                                                    iname,
                                                                    ident,

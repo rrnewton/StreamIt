@@ -1,9 +1,8 @@
 package at.dms.kjc.lir;
 
 import java.util.LinkedList;
-
-import at.dms.kjc.JStatement;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
+import at.dms.compiler.*;
 
 /**
  * This represents the contents of the main function in the low-level

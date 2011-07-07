@@ -140,7 +140,7 @@ public class JVariableDeclarationStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         return p.visitVariableDeclarationStatement(this, vars);
     }
       

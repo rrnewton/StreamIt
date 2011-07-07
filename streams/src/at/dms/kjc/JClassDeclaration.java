@@ -523,7 +523,7 @@ public class JClassDeclaration extends JTypeDeclaration {
      * @param   isStatic    class or instance initializers ?
      */
     private JInitializerDeclaration constructInitializers(boolean isStatic) {
-        Vector<?>      elems = new Vector<Object>();
+        Vector      elems = new Vector();
         boolean     needGen = false;
 
         for (int i = 0; i < body.length; i++) {
@@ -578,7 +578,7 @@ public class JClassDeclaration extends JTypeDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor<?> p) {
+    public Object accept(AttributeVisitor p) {
         Object trash = super.accept(p);
         return p.visitClassDeclaration(this,
                                        modifiers,

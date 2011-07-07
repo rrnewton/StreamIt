@@ -1,29 +1,13 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
-import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
-import at.dms.kjc.sir.SIRContainer;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.sir.SIRJoinType;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIROperator;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
-import at.dms.kjc.sir.SIRSplitType;
-import at.dms.kjc.sir.SIRSplitter;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.ConstantProp;
-import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
-import at.dms.kjc.sir.lowering.fusion.FusePipe;
-import at.dms.kjc.sir.lowering.fusion.FuseSplit;
-import at.dms.kjc.sir.lowering.fusion.Lifter;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.fission.*;
+import at.dms.kjc.flatgraph.*;
 
 public class GreedyPartitioner {
     /**

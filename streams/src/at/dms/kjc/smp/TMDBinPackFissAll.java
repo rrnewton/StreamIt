@@ -1,23 +1,23 @@
 package at.dms.kjc.smp;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fusion.FuseAll;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.SliceWorkEstimate;
+import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.slicegraph.*;
 import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.spacetime.*;
+import at.dms.kjc.*;
+import java.util.LinkedList;
+import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.HashSet;
+import java.util.List;
 
 public class TMDBinPackFissAll extends Scheduler {
 

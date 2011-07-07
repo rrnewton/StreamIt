@@ -1,7 +1,11 @@
 package at.dms.kjc.slicegraph;
 
-import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Vector;
+
+import at.dms.util.Utils;
 
 /**
  * This class generates a data flow schedule of the slice graph (but does not handle feedbackloops).

@@ -16,12 +16,14 @@
 
 package streamit.scheduler2.constrained;
 
+import streamit.scheduler2.iriter.Iterator;
+
 import streamit.misc.DLList;
-import streamit.misc.DLListIterator;
 import streamit.misc.DLList_const;
+import streamit.misc.DLListIterator;
+import streamit.misc.Pair;
 import streamit.misc.OMap;
 import streamit.misc.OMapIterator;
-import streamit.misc.Pair;
 import streamit.scheduler2.hierarchical.StreamInterfaceWithSnJ;
 
 public class LatencyNode extends streamit.misc.Misc
@@ -82,9 +84,9 @@ public class LatencyNode extends streamit.misc.Misc
 
                         // force insertion of the pair <dataNeeded, phase>
                         // into the map
-                        Pair<OMapIterator, Boolean> insertResult =
+                        Pair insertResult =
                             dataItems2numExecs[nChannel].insert(dataNeeded, phase);
-                        insertResult.getFirst().setData(phase);
+                        ((OMapIterator)insertResult.getFirst()).setData(phase);
                     }
             }
     }

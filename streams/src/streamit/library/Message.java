@@ -16,7 +16,7 @@
 
 package streamit.library;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 
 /**
  * This class represents a message that is sent from one filter to
@@ -84,7 +84,7 @@ public class Message {
                 paramTypes[i] = extractPrimitive(args[i]);
             }
             // get receiver class
-            Class<?> receiverClass = receiver.getClass();
+            Class receiverClass = receiver.getClass();
             // get receiver method
             Method receiverMeth = receiverClass.getMethod(methodName, paramTypes);
             // invoke method
@@ -100,7 +100,7 @@ public class Message {
     /**
      * If <pre>c</pre> represents a primitive type, return that primitive type.
      */
-    public Class<?> extractPrimitive(Object o) { 
+    public Class extractPrimitive(Object o) { 
         if (o instanceof Byte) {
             return Byte.TYPE;
         } else if (o instanceof Boolean) {

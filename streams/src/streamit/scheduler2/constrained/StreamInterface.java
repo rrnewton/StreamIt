@@ -16,6 +16,7 @@
 
 package streamit.scheduler2.constrained;
 
+import streamit.scheduler2.iriter.Iterator;
 import streamit.scheduler2.hierarchical.PhasingSchedule;
 
 /**

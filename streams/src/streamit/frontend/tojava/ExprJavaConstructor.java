@@ -16,10 +16,7 @@
 
 package streamit.frontend.tojava;
 
-import streamit.frontend.nodes.Expression;
-import streamit.frontend.nodes.FEContext;
-import streamit.frontend.nodes.FEVisitor;
-import streamit.frontend.nodes.Type;
+import streamit.frontend.nodes.*;
 
 /**
  * A Java constructor expression.  This appears in this package

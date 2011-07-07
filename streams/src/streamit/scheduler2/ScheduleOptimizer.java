@@ -16,12 +16,11 @@
 
 package streamit.scheduler2;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Vector;
-
 import streamit.misc.AssertedClass;
 import streamit.scheduler2.iriter.Iterator;
 
@@ -199,7 +198,7 @@ public class ScheduleOptimizer extends AssertedClass
                 return symbolicIdx2sched.get(symbolicIdx);
             }
 
-        Vector<?> self = symbolicIdx2symbolic.get(symbolicIdx);
+        Vector self = symbolicIdx2symbolic.get(symbolicIdx);
 
         if (self.size() == 1)
             {
@@ -211,7 +210,7 @@ public class ScheduleOptimizer extends AssertedClass
             {
                 Schedule newSched =
                     new Schedule(symbolicIdx2stream.get(symbolicIdx));
-                Vector<?> symbolicSched =
+                Vector symbolicSched =
                     symbolicIdx2symbolic.get(symbolicIdx);
 
                 for (int i = 0; i < symbolicSched.size(); i += 2)
@@ -249,7 +248,7 @@ public class ScheduleOptimizer extends AssertedClass
                 return symbolicIdxSubstitionsChain.get(symbolicIdx);
             }
 
-        Vector<?> symbolicSched =
+        Vector symbolicSched =
             symbolicIdx2symbolic.get(symbolicIdx);
 
         // can't do anything to leaf schedules
@@ -332,7 +331,7 @@ public class ScheduleOptimizer extends AssertedClass
                 return symbolicIdxSubstitionsChain.get(symbolicIdx);
             }
 
-        Vector<?> symbolicSched =
+        Vector symbolicSched =
             symbolicIdx2symbolic.get(symbolicIdx);
 
         // can't do anything to leaf schedules
@@ -355,7 +354,7 @@ public class ScheduleOptimizer extends AssertedClass
                 phaseSymbolicIdx =
                     liftSingles(phaseSymbolicIdx, symbolicIdxSubstitionsChain);
 
-                Vector<?> phaseSymbolicSched;
+                Vector phaseSymbolicSched;
                 phaseSymbolicSched =
                     symbolicIdx2symbolic.get(phaseSymbolicIdx);
 
@@ -418,7 +417,7 @@ public class ScheduleOptimizer extends AssertedClass
         phaseUseCount.put(phaseIdx, getInteger(1));
 
         // is this a base phase? if so, quit while I'm ahead        
-        Vector<?> symbolic = symbolicIdx2symbolic.get(phaseIdx);
+        Vector symbolic = symbolicIdx2symbolic.get(phaseIdx);
         if (symbolic.size() == 1)
             {
                 // before I quit, make sure that this phase will never have
@@ -463,7 +462,7 @@ public class ScheduleOptimizer extends AssertedClass
                 return symbolicIdxSubstitionsChain.get(symbolicIdx);
             }
 
-        Vector<?> symbolicSched =
+        Vector symbolicSched =
             symbolicIdx2symbolic.get(symbolicIdx);
 
         // can't do anything to leaf schedules
@@ -490,7 +489,7 @@ public class ScheduleOptimizer extends AssertedClass
                     == 1)
                     {
                         // yes! find the phase to inline
-                        Vector<?> phaseSymbolicSched;
+                        Vector phaseSymbolicSched;
                         phaseSymbolicSched =
                             symbolicIdx2symbolic.get(newPhaseSymbolicIdx);
 
@@ -542,7 +541,7 @@ public class ScheduleOptimizer extends AssertedClass
         
         System.out.print("$" + symbolicIdx + " = ");
 
-        Vector<?> self = symbolicIdx2symbolic.get(symbolicIdx);
+        Vector self = symbolicIdx2symbolic.get(symbolicIdx);
 
         if (self.size() == 1)
             {
@@ -555,7 +554,7 @@ public class ScheduleOptimizer extends AssertedClass
                 Integer scheds [] = new Integer [self.size () / 2];
                 System.out.print("{ ");
 
-                Vector<?> symbolicSched =
+                Vector symbolicSched =
                     symbolicIdx2symbolic.get(symbolicIdx);
 
                 for (int i = 0; i < symbolicSched.size(); i += 2)

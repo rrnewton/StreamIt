@@ -16,12 +16,8 @@
 
 package streamit.frontend.controlflow;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import streamit.frontend.nodes.*;
+import java.util.*;
 
 /**
  * A control-flow graph.  This has a set of nodes and a set of edges.
@@ -116,7 +112,7 @@ public class CFG
         for (Iterator<CFGNode> iter = edges.keySet().iterator(); iter.hasNext(); )
             {
                 CFGNode other = iter.next();
-                List<?> targets = edges.get(other);
+                List targets = edges.get(other);
                 if (targets.contains(node))
                     result.add(other);
             }
@@ -170,8 +166,8 @@ public class CFG
         for (Iterator<CFGNode> fiter = edges.keySet().iterator(); fiter.hasNext(); )
             {
                 CFGNode from = fiter.next();
-                List<?> targets = edges.get(from);
-                for (Iterator<?> titer = targets.iterator(); titer.hasNext(); )
+                List targets = edges.get(from);
+                for (Iterator titer = targets.iterator(); titer.hasNext(); )
                     {
                         CFGNode to = (CFGNode)titer.next();
                         result.append(nodeName.get(from) + " -> " +

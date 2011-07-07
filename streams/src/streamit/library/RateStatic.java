@@ -17,6 +17,7 @@
 
 package streamit.library;
 
+import java.util.*;
 
 /*
  * A RateStatic is an I/O rate that is known at compile time.  That

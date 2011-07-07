@@ -1,12 +1,11 @@
 package at.dms.kjc.iterator;
 
-import java.lang.reflect.Field;
-import java.security.Permission;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
+import at.dms.util.*;
+import at.dms.kjc.*;
 
-import at.dms.kjc.Finalizable;
+import java.security.Permission;
+import java.util.*;
+import java.lang.reflect.*;
 
 /**
  * In this implementation, an object is memoized iff it is immutable.
@@ -151,7 +150,7 @@ public class Memoizer {
             finalized.add(o);
         }
         // for all the superclasses <c> of <o>...
-        for (Class<?> c = o.getClass(); c!=null; c = c.getSuperclass()) {
+        for (Class c = o.getClass(); c!=null; c = c.getSuperclass()) {
             // for all the fields of <c>...
             Field[] field = c.getDeclaredFields();
             for (int i=0; i<field.length; i++) {
@@ -176,7 +175,7 @@ public class Memoizer {
 
     private void hashFields(Object o, Signature sig) {
         // for all the superclasses <c> of <o>...
-        for (Class<?> c = o.getClass(); c!=null; c = c.getSuperclass()) {
+        for (Class c = o.getClass(); c!=null; c = c.getSuperclass()) {
             // for all the fields of <c>...
             Field[] field = c.getDeclaredFields();
             for (int i=0; i<field.length; i++) {
@@ -205,7 +204,7 @@ public class Memoizer {
      */
     protected static boolean compareStructure(Object o1, Object o2) {
         // get the class of interest
-        Class<?> c = o1.getClass();
+        Class c = o1.getClass();
         // if <o2> is of a different class, return false
         if (c!=o2.getClass()) { return false; }
         // otherwise, iterate superclasses...

@@ -2,7 +2,6 @@ package streamit.library.jcc;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import jcc.lang.Promise;
 import x10.stream.InStream;
 import x10.stream.OutStream;

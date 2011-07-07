@@ -1,8 +1,8 @@
 package at.dms.kjc.lir;
 
-import at.dms.kjc.JExpression;
-import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.*;
 import at.dms.kjc.sir.SIRJoinType;
+import at.dms.compiler.*;
 
 /**
  * This gives the run-time system information about the joiner for

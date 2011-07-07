@@ -16,11 +16,10 @@
 
 package streamit.scheduler2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import streamit.misc.AssertedClass;
 import streamit.scheduler2.iriter.Iterator;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <dl>
@@ -261,8 +260,8 @@ abstract public class Scheduler extends AssertedClass
         // print init schedule
         for (int i=0; i<2; i++) {
             System.err.println("Repetitions in " + (i==0 ? "initial" : "steady") + " schedule:");
-            java.util.Set<?> keys = counts[i].keySet();
-            for (java.util.Iterator<?> it = keys.iterator(); it.hasNext(); ) {
+            java.util.Set keys = counts[i].keySet();
+            for (java.util.Iterator it = keys.iterator(); it.hasNext(); ) {
                 Object obj = it.next();
                 int[] reps = (int[])counts[i].get(obj);
                 System.err.println(reps[0] + " reps for " + obj + " (hashcode=" + obj.hashCode() + ")");

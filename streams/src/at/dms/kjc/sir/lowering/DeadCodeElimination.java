@@ -1,35 +1,14 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.ArrayList;
+import at.dms.kjc.*;
+import at.dms.kjc.sir.*;
+import at.dms.compiler.JavaStyleComment;
+
 import java.util.HashSet;
+import java.util.Set;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Set;
-
-import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JCompoundAssignmentExpression;
-import at.dms.kjc.JCompoundStatement;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionListStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JLiteral;
-import at.dms.kjc.JLocalVariable;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIREmptyAttributeVisitor;
-import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRCodeUnit;
-import at.dms.kjc.sir.SIRGlobal;
-import at.dms.kjc.sir.SIRStream;
 
 /**
  * Removes what dead code we can detect within a filter.  
@@ -298,7 +277,7 @@ public class DeadCodeElimination {
                     public Object visitBlockStatement(JBlock self,
                                                       JavaStyleComment[] comments) {
                         ArrayList<Object> newStatements = new ArrayList<Object>();
-                        for (ListIterator<?> it = self.getStatementIterator(); it.hasNext(); ) {
+                        for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
                             JStatement oldBody = (JStatement)it.next();
                             Object newBody = oldBody.accept(this);
                             if (newBody != null) newStatements.add(newBody);

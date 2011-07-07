@@ -21,6 +21,7 @@
 package at.dms.compiler.antlr.runtime;
 
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 public class Vector implements Cloneable {
     protected Object[] data;
@@ -69,7 +70,7 @@ public class Vector implements Cloneable {
         }
         return data[i];
     }
-    public synchronized Enumeration<?> elements() {
+    public synchronized Enumeration elements() {
         return new VectorEnumerator(this);
     }
     public synchronized void ensureCapacity(int minIndex) {

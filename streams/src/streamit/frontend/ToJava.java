@@ -15,44 +15,12 @@
  */
 
 package streamit.frontend;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Iterator;
+import java.io.*;
 import java.util.List;
-
-import streamit.frontend.nodes.MakeBodiesBlocks;
-import streamit.frontend.nodes.Program;
-import streamit.frontend.nodes.TempVarGen;
-import streamit.frontend.nodes.Type;
-import streamit.frontend.nodes.TypePrimitive;
-import streamit.frontend.nodes.TypeStruct;
-import streamit.frontend.passes.AssembleInitializers;
-import streamit.frontend.passes.AssignLoopTypes;
-import streamit.frontend.passes.DetectImmutable;
-import streamit.frontend.passes.DisambiguateUnaries;
-import streamit.frontend.passes.GenerateCopies;
-import streamit.frontend.passes.NameAnonymousStreams;
-import streamit.frontend.passes.NoRefTypes;
-import streamit.frontend.passes.RenameBitVars;
-import streamit.frontend.passes.RenameGlobals;
-import streamit.frontend.passes.SemanticChecker;
-import streamit.frontend.passes.SeparateFieldInitializers;
-import streamit.frontend.passes.SeparateInitializers;
-import streamit.frontend.passes.StmtSendToHelper;
-import streamit.frontend.passes.TrimDumbDeadCode;
-import streamit.frontend.tojava.ComplexToStruct;
-import streamit.frontend.tojava.DoComplexProp;
-import streamit.frontend.tojava.DoCompositeProp;
-import streamit.frontend.tojava.EnqueueToFunction;
-import streamit.frontend.tojava.InsertIODecls;
-import streamit.frontend.tojava.InsertInitConstructors;
-import streamit.frontend.tojava.MoveStreamParameters;
-import streamit.frontend.tojava.NameAnonymousFunctions;
-import streamit.frontend.tojava.NodesToJava;
+import java.util.Iterator;
+import streamit.frontend.nodes.*;
+import streamit.frontend.passes.*;
+import streamit.frontend.tojava.*;
 
 /**
  * Convert StreamIt programs to legal Java code.  This is the main
@@ -121,13 +89,13 @@ public class ToJava
      */
     public static Program emptyProgram()
     {
-        List<?> streams = new java.util.ArrayList<Object>();
-        List<?> structs = new java.util.ArrayList<Object>();
-        List<?> helpers = new java.util.ArrayList<Object>();
+        List streams = new java.util.ArrayList();
+        List structs = new java.util.ArrayList();
+        List helpers = new java.util.ArrayList();
         
         // Complex structure type:
-        List<?> fields = new java.util.ArrayList<Object>();
-        List<?> ftypes = new java.util.ArrayList<Object>();
+        List fields = new java.util.ArrayList();
+        List ftypes = new java.util.ArrayList();
         Type floattype = new TypePrimitive(TypePrimitive.TYPE_FLOAT);
         fields.add("real");
         ftypes.add(floattype);
@@ -138,8 +106,8 @@ public class ToJava
         structs.add(complexStruct);
 
         // float2
-        fields = new java.util.ArrayList<Object>();
-        ftypes = new java.util.ArrayList<Object>();
+        fields = new java.util.ArrayList();
+        ftypes = new java.util.ArrayList();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -147,8 +115,8 @@ public class ToJava
         structs.add(new TypeStruct(null, "float2", fields, ftypes));
 
         // float3
-        fields = new java.util.ArrayList<Object>();
-        ftypes = new java.util.ArrayList<Object>();
+        fields = new java.util.ArrayList();
+        ftypes = new java.util.ArrayList();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -158,8 +126,8 @@ public class ToJava
         structs.add(new TypeStruct(null, "float3", fields, ftypes));
 
         // float4
-        fields = new java.util.ArrayList<Object>();
-        ftypes = new java.util.ArrayList<Object>();
+        fields = new java.util.ArrayList();
+        ftypes = new java.util.ArrayList();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -170,8 +138,8 @@ public class ToJava
         ftypes.add(floattype);
         structs.add(new TypeStruct(null, "float4", fields, ftypes));
         
-        fields = new java.util.ArrayList<Object>(); 
-        ftypes = new java.util.ArrayList<Object>(); 
+        fields = new java.util.ArrayList(); 
+        ftypes = new java.util.ArrayList(); 
         TypeStruct stringStruct = new TypeStruct(null, "String", fields, ftypes);
         structs.add(stringStruct);
 
@@ -216,14 +184,14 @@ public class ToJava
                 Program pprog = parser.program();
                 if (pprog != null)
                     {
-                        List<?> newStreams, newStructs, newHelpers;
-                        newStreams = new java.util.ArrayList<Object>();
+                        List newStreams, newStructs, newHelpers;
+                        newStreams = new java.util.ArrayList();
                         newStreams.addAll(prog.getStreams());
                         newStreams.addAll(pprog.getStreams());
-                        newStructs = new java.util.ArrayList<Object>();
+                        newStructs = new java.util.ArrayList();
                         newStructs.addAll(prog.getStructs());
                         newStructs.addAll(pprog.getStructs());
-                        newHelpers = new java.util.ArrayList<Object>();
+                        newHelpers = new java.util.ArrayList();
                         newHelpers.addAll(prog.getHelpers());
                         newHelpers.addAll(pprog.getHelpers());
                         prog = new Program(null, newStreams, newStructs, newHelpers);
