@@ -10,6 +10,7 @@ import java.util.LinkedList;
 
 import at.dms.kjc.CType;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.sir.SIRFileReader;
 import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.kjc.sir.SIRFilter;

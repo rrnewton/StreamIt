@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.NumberDot;
+import at.dms.kjc.flatgraph.GraphFlattener;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRIterator;
 import at.dms.kjc.sir.EmptyStreamVisitor;

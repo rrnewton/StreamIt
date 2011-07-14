@@ -10,6 +10,7 @@ import java.util.Vector;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.StreamItDot;
+import at.dms.kjc.flatgraph.GraphFlattener;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFilterIter;
 import at.dms.kjc.iterator.SIRPipelineIter;
