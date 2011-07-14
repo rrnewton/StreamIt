@@ -5,18 +5,23 @@ package at.dms.kjc.common;
 
 import java.util.Iterator;
 
-import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
 import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.sir.SIRFeedbackLoop;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
 
 /**
  * This class will search all push expressions and if a push expression 

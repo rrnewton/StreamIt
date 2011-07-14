@@ -1,11 +1,19 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
-import java.util.HashSet;
-import java.util.Vector;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.InlineAssembly;
+import at.dms.kjc.sir.SIRCreatePortal;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.util.Utils;
 
 

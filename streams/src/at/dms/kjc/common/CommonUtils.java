@@ -1,29 +1,26 @@
 package at.dms.kjc.common;
  
 //import at.dms.kjc.CIntType;
-import at.dms.kjc.CStdType;
-//import at.dms.kjc.Constants;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.CType;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CBitType;
 import at.dms.kjc.CArrayType;
+import at.dms.kjc.CBitType;
+import at.dms.kjc.CClassType;
 import at.dms.kjc.CEmittedTextType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
 import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JClassExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.sir.SIRStructure;
+import at.dms.kjc.JExpression;
 import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRJoiner;
 import at.dms.kjc.sir.SIRSplitter;
-import java.util.*;
+import at.dms.kjc.sir.SIRStructure;
 /**
  * Some public static utility functions pulled out of other routines.
  */
@@ -259,70 +256,7 @@ public class CommonUtils {
         // SIRPortal = SIRCreatePortal
         return expr;
     }
-    /**
-     * Get the output type of a joiner in a Flatnode representation.
-     * <br/>
-     * The type of a joiner is the output type of the first filter found searching
-     * back from the joiner.  (Actually a bit more complicated: it searches back in
-     * the flat graph for a non-void input to the joiner, and returns that as the
-     * joiner type.  Only id all inputs to the joiner have output type of void, or 
-     * are null, will getJoinerType return a void type for the joiner.  This complexity
-     * is to deal with split-joins that decimiate the initial portion of the data, in which
-     * case the initial input to the joiner would be void, where some other input would
-     * be non-void.)
-     * 
-     * Edge cases: If you pass this a null joiner, you will get back void.
-     * If you pass this method a FlatNode that is not a joiner, the output
-     * and side effects are undefined.
-     * 
-     * @param joiner a joiner in a FlatNode representation
-     * @return a CType
-     */
-       public static CType getJoinerType(FlatNode joiner) 
-       {
-           if (joiner == null) {return CStdType.Void;}
-           for (int i = 0; i < joiner.inputs; i++) {
-               if (joiner.incoming[i] != null) {
-                   CType typ = getOutputType(joiner.incoming[i]);
-                   if (typ != CStdType.Void) {
-                       return typ;
-                   }
-               }
-           }
-           return CStdType.Void;
-       }
-       
-       /**
-        * Get the output type of any FlatNode element (filter, splitter, joiner).
-        *
-        * The output type of a filter is stored in the filter.
-        *
-        * The output type of a splitter is the output type of its incoming edge:
-        * If the splitter has 0 total outgoing weight then its incoming edge,
-        * if any, should be null, so return the Void type.
-        * 
-        * The output type of a joiner is that of the first filter found above the
-        * joiner.
-        *
-        * @param node a FlatNode (and not null)
-        * @return a CType
-        */
-       public static CType getOutputType(FlatNode node) {
-           if (node.contents instanceof SIRFilter)
-               return ((SIRFilter)node.contents).getOutputType();
-           else if (node.contents instanceof SIRJoiner)
-               return getJoinerType(node);
-           else if (node.contents instanceof SIRSplitter) {
-               if (node.getTotalOutgoingWeights() == 0) {
-                   return CStdType.Void;
-               }
-               return getOutputType(node.incoming[0]);
-           } else {
-               assert false: "Cannot get output type for this node";
-               return null;
-           }
-       }
-
+ 
 
     /**
      * Print a string only if compiling with --debug 
