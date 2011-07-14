@@ -1,5 +1,6 @@
 package streamit.stair.core;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -107,6 +108,7 @@ public class Block
      */
     public static Block flatten(BlockContainer container)
     {
+    	return null;
     }
     
     /**
@@ -119,6 +121,7 @@ public class Block
      */
     public BlockContainer unflatten()
     {
+    	return null;
     }
 
     /**

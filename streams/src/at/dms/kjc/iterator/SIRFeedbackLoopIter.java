@@ -1,8 +1,15 @@
 package at.dms.kjc.iterator; 
 
-import at.dms.kjc.sir.*;
-import at.dms.util.*;
-import streamit.scheduler2.iriter.*;
+import streamit.scheduler2.iriter.FeedbackLoopIter;
+import streamit.scheduler2.iriter.Iterator;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.StreamVisitor;
+import at.dms.util.Utils;
 
 /**
  * IterFactory uses this for SIRFeedbackLoop.

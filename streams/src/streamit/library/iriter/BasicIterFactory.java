@@ -20,7 +20,6 @@ import streamit.library.FeedbackLoop;
 import streamit.library.Filter;
 import streamit.library.Pipeline;
 import streamit.library.SplitJoin;
-import streamit.library.Stream;
 
 /**
  * This is a basic iterator factory that returns the most basic /

@@ -1,11 +1,12 @@
 package at.dms.kjc.slicegraph;
 
-import at.dms.util.Utils;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.LinkedList;
-import at.dms.kjc.*;
+import java.util.Set;
+
+import at.dms.kjc.CType;
 import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.util.Utils;
 
 /**
  * Each Slice is started by an InputSlice Node that is either a joiner connecting several other slices, 

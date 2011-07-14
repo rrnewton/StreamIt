@@ -20,16 +20,6 @@
 
 package at.dms.backend;
 
-import java.util.Enumeration;
-import java.util.Vector;
-import java.util.Stack;
-import at.dms.util.Utils;
-import at.dms.classfile.SwitchInstruction;
-import at.dms.classfile.HandlerInfo;
-import at.dms.classfile.AccessorContainer;
-import at.dms.classfile.AbstractInstructionAccessor;
-import at.dms.classfile.NoArgInstruction;
-import at.dms.backend.InstructionHandle;
 
 /**
  * This class performs peephole optimizations

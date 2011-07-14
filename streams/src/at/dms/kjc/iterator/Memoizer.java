@@ -1,11 +1,12 @@
 package at.dms.kjc.iterator;
 
-import at.dms.util.*;
-import at.dms.kjc.*;
-
+import java.lang.reflect.Field;
 import java.security.Permission;
-import java.util.*;
-import java.lang.reflect.*;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+
+import at.dms.kjc.Finalizable;
 
 /**
  * In this implementation, an object is memoized iff it is immutable.

@@ -1,8 +1,9 @@
 package streamit.scheduler1;
 
-import java.util.*;
-import java.math.BigInteger;
 import java.io.PrintStream;
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SchedFilter extends SchedStream
 {

@@ -1,16 +1,15 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
-import java.io.*;
-
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Records all filters, splitters, and joiners in a given stream into

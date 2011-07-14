@@ -72,6 +72,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -90,7 +91,6 @@ import org.jgraph.graph.BasicMarqueeHandler;
 import org.jgraph.graph.CellHandle;
 import org.jgraph.graph.CellView;
 import org.jgraph.graph.ConnectionSet;
-import org.jgraph.graph.DefaultGraphModel;
 import org.jgraph.graph.EdgeRenderer;
 import org.jgraph.graph.EdgeView;
 import org.jgraph.graph.GraphCell;
@@ -103,9 +103,6 @@ import org.jgraph.graph.GraphSelectionModel;
 import org.jgraph.graph.GraphTransferable;
 import org.jgraph.graph.ParentMap;
 import org.jgraph.plaf.GraphUI;
-
-// DO NOT REMOVE OR MODIFY THIS LINE!
-import javax.swing.TransferHandler; // JAVA13: org.jgraph.plaf.basic.TransferHandler;
 
 /**
  * The basic L&F for a graph data structure.

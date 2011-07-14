@@ -28,7 +28,7 @@ import at.dms.kjc.sir.SIRFilter;
  * @author Michael Gordon
  */
 
-public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisitor
+public class RemoveUnusedVars extends SLIRReplacingVisitor 
 {
     /** holds alls vars referenced in the filter
         see VariablesUsed **/
@@ -45,11 +45,6 @@ public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisito
      * @param node The top level flatnode.
      *
      */
-    public static void doit(FlatNode node) 
-    {
-        node.accept(new RemoveUnusedVars(), null, true);
-    }
-
     private RemoveUnusedVars()
     {
         varsUsed = null;
@@ -61,13 +56,6 @@ public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisito
         (new RemoveUnusedVars()).visitFilter(filter);
     }
     
-    public void visitNode(FlatNode node) 
-    {
-        if (node.isFilter()) {
-            SIRFilter filter = (SIRFilter)node.contents;
-            visitFilter(filter);
-        }
-    }
     
     public void visitFilter(SIRFilter filter)
     {

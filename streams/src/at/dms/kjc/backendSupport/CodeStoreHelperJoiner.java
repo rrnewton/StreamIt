@@ -1,9 +1,14 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.*;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.util.Utils;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.slicegraph.InputSliceNode;
+import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slicegraph.SchedulingPhase;
 
 public class CodeStoreHelperJoiner extends CodeStoreHelper {
 

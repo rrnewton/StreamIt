@@ -16,11 +16,16 @@
 
 package streamit.library.io;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import streamit.library.Channel;
 import streamit.library.Filter;
 import streamit.library.Stream;
-import streamit.library.Channel;
-
-import java.io.*;
 
 public class FileReader extends Filter
 {

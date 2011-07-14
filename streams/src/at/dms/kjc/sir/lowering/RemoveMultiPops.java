@@ -3,13 +3,19 @@
  */
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JPhylum;
 import at.dms.kjc.SLIREmptyVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRStream;
 import at.dms.util.Utils;
-import java.util.*;
 
 /**
  * Remove multi-pops.

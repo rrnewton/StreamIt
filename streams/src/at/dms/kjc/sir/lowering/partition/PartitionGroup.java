@@ -1,8 +1,10 @@
 package at.dms.kjc.sir.lowering.partition;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
 import at.dms.kjc.sir.SIRStream;
-import at.dms.util.Utils;
-import java.util.*;
 
 /**
  * This represents a partitioning of the children of a single SIR

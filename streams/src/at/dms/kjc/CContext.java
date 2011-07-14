@@ -20,11 +20,12 @@
 
 package at.dms.kjc;
 
-import at.dms.compiler.Compiler;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.UnpositionedError;
 import at.dms.util.MessageDescription;
-import java.io.*;
 
 /**
  * This class represents a local context during checkBody

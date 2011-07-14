@@ -1,9 +1,7 @@
 package streamit.stair.core;
 
-import java.util.Iterator;
-import java.util.List;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A composite type containing heterogeneous child types with explicit

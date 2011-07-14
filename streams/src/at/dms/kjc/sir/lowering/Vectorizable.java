@@ -3,14 +3,61 @@
  */
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
-import at.dms.util.GetSteadyMethods;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import at.dms.kjc.CFloatType;
+import at.dms.kjc.CIntType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBinaryExpression;
+import at.dms.kjc.JBitwiseExpression;
+import at.dms.kjc.JCastExpression;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JConditionalExpression;
+import at.dms.kjc.JDoStatement;
+import at.dms.kjc.JEqualityExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIfStatement;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JNameExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JReturnStatement;
+import at.dms.kjc.JShiftExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JSwitchGroup;
+import at.dms.kjc.JSwitchStatement;
+import at.dms.kjc.JUnaryPromote;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.JWhileStatement;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFilterIter;
-
-import java.util.*;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRLatency;
+import at.dms.kjc.sir.SIRMessageStatement;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPrintStatement;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.util.GetSteadyMethods;
 
 /**
  * Determine if code is naively vectorizable by interleaving executions of different steady states.

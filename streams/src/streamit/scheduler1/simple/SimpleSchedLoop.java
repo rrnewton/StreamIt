@@ -1,19 +1,16 @@
 package streamit.scheduler1.simple;
 
-import streamit.scheduler1.SchedLoop;
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
+
 import streamit.scheduler1.SchedJoinType;
+import streamit.scheduler1.SchedLoop;
+import streamit.scheduler1.SchedPipeline;
+import streamit.scheduler1.SchedRepSchedule;
+import streamit.scheduler1.SchedSplitJoin;
 import streamit.scheduler1.SchedSplitType;
 import streamit.scheduler1.SchedStream;
-import streamit.scheduler1.SchedRepSchedule;
-
-import java.util.List;
-import java.util.LinkedList;
-
-import java.math.BigInteger;
-
-// BUGBUG these are for my little hack of DecoderFeedback
-import streamit.scheduler1.SchedPipeline;
-import streamit.scheduler1.SchedSplitJoin;
 
 class SimpleSchedLoop extends SchedLoop implements SimpleSchedStream
 {

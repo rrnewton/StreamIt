@@ -1,8 +1,8 @@
 package streamit.scheduler2.constrained;
 
+import streamit.scheduler2.Schedule;
 import streamit.scheduler2.hierarchical.PhasingSchedule;
 import streamit.scheduler2.iriter.Iterator;
-import streamit.scheduler2.Schedule;
 
 public class P2PPortal extends streamit.misc.AssertedClass
 {

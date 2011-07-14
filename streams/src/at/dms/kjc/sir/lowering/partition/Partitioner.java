@@ -1,14 +1,22 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
+import java.util.HashSet;
 
-import at.dms.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.partition.dynamicprog.*;
-import at.dms.kjc.flatgraph.*;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.flatgraph.GraphFlattener;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRDynamicRateManager;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.fusion.FuseAll;
+import at.dms.kjc.sir.lowering.fusion.FusePipe;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
+import at.dms.kjc.sir.lowering.partition.dynamicprog.DynamicProgPartitioner;
+import at.dms.util.Utils;
 
 public class Partitioner {
     /**

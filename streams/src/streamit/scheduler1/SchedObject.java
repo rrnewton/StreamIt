@@ -1,7 +1,8 @@
 package streamit.scheduler1;
 
-import streamit.misc.AssertedClass;
 import java.io.PrintStream;
+
+import streamit.misc.AssertedClass;
 
 public abstract class SchedObject extends AssertedClass
 {

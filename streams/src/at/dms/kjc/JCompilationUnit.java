@@ -20,9 +20,9 @@
 
 package at.dms.kjc;
 
+import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.io.File;
 
 import at.dms.compiler.CWarning;
 import at.dms.compiler.Compiler;

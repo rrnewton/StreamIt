@@ -31,7 +31,7 @@
 
 package streamit.misc;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
 
 public class DestroyedClass extends Misc
 {

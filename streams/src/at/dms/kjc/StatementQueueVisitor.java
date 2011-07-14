@@ -20,11 +20,13 @@
 
 package at.dms.kjc;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.sir.SIRLatency;
+import at.dms.kjc.sir.SIRMessageStatement;
+import at.dms.kjc.sir.SIRPrintStatement;
 import at.dms.util.Utils;
-import at.dms.kjc.sir.*;
-import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.JavadocComment;
 
 /**
  * This visitor is for analyses that want to add one or more

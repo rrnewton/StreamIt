@@ -1,8 +1,9 @@
 package at.dms.kjc.iterator; 
 
-import at.dms.kjc.sir.*;
-import at.dms.util.*;
-import streamit.scheduler2.iriter.*;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * Represents the fine-grained calculations for splitters and joiners,

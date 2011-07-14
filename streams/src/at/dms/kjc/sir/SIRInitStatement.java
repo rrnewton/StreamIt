@@ -1,8 +1,17 @@
 package at.dms.kjc.sir;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.compiler.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.compiler.PositionedError;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.CBodyContext;
+import at.dms.kjc.CodeSequence;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * Init Statement.

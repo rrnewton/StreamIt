@@ -1,6 +1,5 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.JStatement;
 
 /**
  * This statement is an annotation that marks the beginning of a given

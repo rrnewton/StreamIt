@@ -1,14 +1,34 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.*;
 import java.io.FileWriter;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.sir.linear.transform.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.SIRPrinter;
-import at.dms.kjc.iterator.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRPipelineIter;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.linear.transform.LinearTransform;
+import at.dms.kjc.sir.linear.transform.LinearTransformPipeline;
+import at.dms.kjc.sir.linear.transform.LinearTransformSplitJoin;
+import at.dms.kjc.sir.linear.transform.NoTransformPossibleException;
+import at.dms.kjc.sir.lowering.Unroller;
 
 
 /**

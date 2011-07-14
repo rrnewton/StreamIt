@@ -1,14 +1,12 @@
 package at.dms.kjc.smp;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.slicegraph.Slice;
 import at.dms.kjc.slicegraph.fission.FissionGroup;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 public class FissionGroupStore {
 

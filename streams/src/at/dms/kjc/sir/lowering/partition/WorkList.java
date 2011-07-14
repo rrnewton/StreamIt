@@ -1,10 +1,15 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.compiler.*;
-import java.util.*;
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Collection;
+import java.util.Map;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * A wrapper for a linked list to save ourself a lot of casting with

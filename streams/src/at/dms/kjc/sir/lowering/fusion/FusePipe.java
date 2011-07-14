@@ -1,19 +1,19 @@
 package at.dms.kjc.sir.lowering.fusion;
 
-import at.dms.util.IRPrinter;
-import at.dms.util.Utils;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.lir.*;
-
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.LinkedList;
 import java.util.ListIterator;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.RenameAll;
+import at.dms.kjc.sir.lowering.partition.PartitionGroup;
+import at.dms.kjc.sir.lowering.partition.RefactorPipeline;
 
 /**
  * This is the high-level fusion class for pipelines.  It dispatches

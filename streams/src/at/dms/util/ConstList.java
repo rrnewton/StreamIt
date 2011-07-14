@@ -1,7 +1,10 @@
 package at.dms.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * This provides a constant interface to a list, where "constant"

@@ -22,9 +22,9 @@ package at.dms.kjc;
 
 import java.util.Enumeration;
 
+import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.19: Try Statement

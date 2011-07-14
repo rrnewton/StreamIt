@@ -1,15 +1,15 @@
 package streamit.scheduler1.simple;
 
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
 import streamit.scheduler1.SchedPipeline;
 import streamit.scheduler1.SchedRepSchedule;
 import streamit.scheduler1.SchedStream;
-
-import java.util.List;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.math.BigInteger;
 
 public class SimpleSchedPipeline extends SchedPipeline implements SimpleSchedStream
 {

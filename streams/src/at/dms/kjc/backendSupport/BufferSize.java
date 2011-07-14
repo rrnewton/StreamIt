@@ -1,8 +1,8 @@
 package at.dms.kjc.backendSupport;
 
 import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.InterSliceEdge;
 import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.InterSliceEdge;
 
 /**
  * Centralize calculation of buffer sizes

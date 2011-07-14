@@ -21,12 +21,12 @@
 package at.dms.kjc;
 
 import java.io.Serializable;
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import at.dms.compiler.CWarning;
-import at.dms.compiler.TokenReference;
 import at.dms.compiler.PositionedError;
+import at.dms.compiler.TokenReference;
 
 /**
  * This class represents a method context during check

@@ -1,9 +1,11 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
+import at.dms.kjc.JStatement;
 import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.*;
 
 /**
  * A Channel with the single purpose of holding the name of a pop() routine.

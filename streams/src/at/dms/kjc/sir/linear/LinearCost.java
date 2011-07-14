@@ -1,8 +1,7 @@
 package at.dms.kjc.sir.linear;
 
-import at.dms.util.Utils;
+import at.dms.kjc.sir.linear.frequency.LEETFrequencyReplacer;
 import at.dms.kjc.sir.lowering.partition.linear.LinearPartitioner;
-import at.dms.kjc.sir.linear.frequency.*;
 
 /**
  * This class represents the cost (variously defined) of computing

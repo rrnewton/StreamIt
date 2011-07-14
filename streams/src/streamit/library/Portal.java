@@ -16,19 +16,19 @@
 
 package streamit.library;
 
-import streamit.scheduler2.SDEPData;
-import streamit.scheduler2.constrained.LatencyEdge;
-import streamit.scheduler2.constrained.Scheduler;
-import streamit.scheduler2.constrained.NoPathException;
-import streamit.library.iriter.Iterator;
-import streamit.library.iriter.IterFactory;
-import streamit.library.iriter.BasicIterFactory;
-
 import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+
+import streamit.library.iriter.BasicIterFactory;
+import streamit.library.iriter.IterFactory;
+import streamit.library.iriter.Iterator;
+import streamit.scheduler2.SDEPData;
+import streamit.scheduler2.constrained.LatencyEdge;
+import streamit.scheduler2.constrained.NoPathException;
+import streamit.scheduler2.constrained.Scheduler;
 
 /**
  * A portal that messages can be sent to.  For the StreamIt compiler,

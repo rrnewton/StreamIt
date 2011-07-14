@@ -1,8 +1,13 @@
 package at.dms.kjc.lir;
 
-import at.dms.util.*;
-import at.dms.kjc.*;
-import at.dms.compiler.*;
+import at.dms.compiler.PositionedError;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.CBodyContext;
+import at.dms.kjc.CodeSequence;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * This is a node in the low IR.  A low IR node appears in the init

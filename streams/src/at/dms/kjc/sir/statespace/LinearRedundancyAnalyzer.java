@@ -1,7 +1,9 @@
 package at.dms.kjc.sir.statespace;
 
-import java.util.*;
-import at.dms.kjc.sir.*;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import at.dms.kjc.sir.SIRStream;
 
 
 /**

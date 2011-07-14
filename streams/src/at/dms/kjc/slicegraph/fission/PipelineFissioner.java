@@ -1,10 +1,33 @@
 package at.dms.kjc.slicegraph.fission;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Set;
+
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAddExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slicegraph.MutableStateExtractor;
+import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slicegraph.Slice;
 
 public class PipelineFissioner {
 

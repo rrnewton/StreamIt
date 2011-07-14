@@ -1,7 +1,7 @@
 package at.dms.kjc.slicegraph;
 
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class LevelizeSliceGraph {

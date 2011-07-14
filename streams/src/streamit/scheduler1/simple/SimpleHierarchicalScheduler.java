@@ -1,6 +1,14 @@
 package streamit.scheduler1.simple;
 
-import streamit.scheduler1.*;
+import streamit.scheduler1.SchedFilter;
+import streamit.scheduler1.SchedJoinType;
+import streamit.scheduler1.SchedLoop;
+import streamit.scheduler1.SchedPipeline;
+import streamit.scheduler1.SchedSplitJoin;
+import streamit.scheduler1.SchedSplitType;
+import streamit.scheduler1.SchedStream;
+import streamit.scheduler1.Schedule;
+import streamit.scheduler1.Scheduler;
 
 public class SimpleHierarchicalScheduler extends Scheduler
 {

@@ -1,7 +1,8 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
 import java.util.Stack;
+
+import at.dms.kjc.JExpression;
 
 /**
  * This class governs how dynamic rates are interpreted at a given

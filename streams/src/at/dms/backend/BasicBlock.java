@@ -21,13 +21,12 @@
 package at.dms.backend;
 
 import java.util.Vector;
+
+import at.dms.classfile.AbstractInstructionAccessor;
+import at.dms.classfile.AccessorContainer;
 import at.dms.classfile.AccessorTransformer;
 import at.dms.classfile.BadAccessorException;
-import at.dms.classfile.AccessorContainer;
-import at.dms.classfile.AbstractInstructionAccessor;
 import at.dms.classfile.SwitchInstruction;
-import at.dms.backend.InstructionHandle;
-
 import at.dms.util.InconsistencyException;
 import at.dms.util.Utils;
 

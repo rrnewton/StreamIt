@@ -1,7 +1,6 @@
 package at.dms.kjc.slicegraph;
 
 import at.dms.util.Utils;
-import java.util.ArrayList;
 
 /** 
  * Slice class models a slice (joiner, sequence of filters, splitter).

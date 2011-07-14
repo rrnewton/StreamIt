@@ -16,7 +16,8 @@
 
 package streamit.library;
 
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 import streamit.misc.DestroyedClass;
 

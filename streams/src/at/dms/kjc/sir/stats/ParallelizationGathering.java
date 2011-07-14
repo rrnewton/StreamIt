@@ -1,16 +1,30 @@
 package at.dms.kjc.sir.stats;
 
-import at.dms.kjc.*;
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.raw.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
-import java.util.*;
-import java.io.*;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.StreamItDot;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRPipelineIter;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
+import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 
 /**
  * This class gathers statistics about the parallelization potential

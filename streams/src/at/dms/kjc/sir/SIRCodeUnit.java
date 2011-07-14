@@ -1,6 +1,7 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
 
 /**
  * Interface of accessors for classes that define methods and field 

@@ -1,27 +1,26 @@
 package at.dms.kjc.sir.dynamic;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.iterator.SIRFeedbackLoopIter;
 import at.dms.kjc.iterator.SIRFilterIter;
 import at.dms.kjc.iterator.SIRPhasedFilterIter;
 import at.dms.kjc.iterator.SIRPipelineIter;
 import at.dms.kjc.iterator.SIRSplitJoinIter;
-import at.dms.kjc.sir.SIRDummySource;
 import at.dms.kjc.sir.SIRDummySink;
+import at.dms.kjc.sir.SIRDummySource;
 import at.dms.kjc.sir.SIRFeedbackLoop;
 import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRPhasedFilter;
 import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.StreamVisitor;
-
-import at.dms.kjc.CStdType;
-import at.dms.kjc.JIntLiteral;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Segmenter implements StreamVisitor {
 	

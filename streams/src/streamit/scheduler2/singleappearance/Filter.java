@@ -16,10 +16,9 @@
 
 package streamit.scheduler2.singleappearance;
 
-import streamit.scheduler2.iriter./*persistent.*/
-    FilterIter;
 import streamit.scheduler2.Schedule;
 import streamit.scheduler2.hierarchical.PhasingSchedule;
+import streamit.scheduler2.iriter.FilterIter;
 
 /**
  * This class implements a single-appearance algorithm for creating

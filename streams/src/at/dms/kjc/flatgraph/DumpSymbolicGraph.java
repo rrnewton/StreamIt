@@ -2,7 +2,6 @@ package at.dms.kjc.flatgraph;
 
 import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.cluster.CodeEstimate;
 import java.io.*;
 import java.util.*;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
@@ -135,7 +134,7 @@ public class DumpSymbolicGraph implements FlatVisitor
             boolean stateful = StatelessDuplicate.hasMutableState(filter);
             int sizeOfMutableState =  StatelessDuplicate.sizeOfMutableState(filter);
             long work = WorkEstimate.getWorkEstimate(filter).getWork(filter);
-            int codeSize = CodeEstimate.estimateCode(filter);
+            //int codeSize = CodeEstimate.estimateCode(filter);
             // the amount read or written to a file
             int input = 0, output = 0;
             if (filter instanceof SIRFileWriter) {
@@ -152,7 +151,6 @@ public class DumpSymbolicGraph implements FlatVisitor
                            "\tstate:" + (stateful ? "stateful" : "stateless") + "\n" +
                            "\tsizeOfState:" + sizeOfMutableState + "\n" + 
                            "\twork:" + mult*work + "\n" +
-                           "\tcodeSize:" + codeSize + "\n" +
                            // their "peek" is our peek-pop
                            "\tpeek:" + peekMinusPop + "\n" +
                            "\tpop:" + pop + "\n" +

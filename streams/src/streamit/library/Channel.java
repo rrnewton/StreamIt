@@ -26,7 +26,14 @@
 
 package streamit.library;
 
-import streamit.misc.*;
+import streamit.misc.WrappableGrowableQueue;
+import streamit.misc.WrappableGrowableQueue_boolean;
+import streamit.misc.WrappableGrowableQueue_char;
+import streamit.misc.WrappableGrowableQueue_double;
+import streamit.misc.WrappableGrowableQueue_float;
+import streamit.misc.WrappableGrowableQueue_int;
+import streamit.misc.WrappableGrowableQueue_obj;
+import streamit.misc.WrappableGrowableQueue_short;
 
 public class Channel extends streamit.misc.DestroyedClass
 {

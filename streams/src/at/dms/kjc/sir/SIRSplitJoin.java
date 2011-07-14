@@ -1,11 +1,15 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.lir.LIRStreamType;
 import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.lir.LIRStreamType;
+import at.dms.util.Utils;
 
 /**
  * This represents a SplitJoin construct.

@@ -1,8 +1,19 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
-import at.dms.kjc.linprog.*;
-import at.dms.kjc.sir.*;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import at.dms.kjc.linprog.CPLEXClient;
+import at.dms.kjc.linprog.CPLEXSolve;
+import at.dms.kjc.linprog.LinearProgram;
+import at.dms.kjc.linprog.LinearProgramSolver;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 public class ILPPartitioner extends ListPartitioner {
     /**

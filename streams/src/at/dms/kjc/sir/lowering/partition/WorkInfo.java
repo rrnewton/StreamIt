@@ -1,11 +1,11 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.spacedynamic.*;
-import at.dms.kjc.sir.*;
-import at.dms.compiler.*;
-import java.util.*;
+import java.util.HashMap;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
 
 class WorkInfo {
     /**
@@ -46,18 +46,9 @@ class WorkInfo {
             // if we calculated it before, reuse it 
             result.workExact = ((Long)exact).longValue();
         } else {
-            // otherwise, calculate exact work
-            if (KjcOptions.simulatework) {
-                // if simulation is enabled, then call raw simluator, call the correct work estimation pass
-                if (KjcOptions.spacedynamic || KjcOptions.spacetime)
-                    result.workExact = at.dms.kjc.spacedynamic.RawWorkEstimator.estimateWork(filter); 
-                else
-                    
-                    result.workExact = at.dms.kjc.raw.RawWorkEstimator.estimateWork(filter); 
-            } else {
-                // otherwise, just take workEstimate to be exact
-                result.workExact = workEstimate;
-            }
+           //just take workEstimate to be exact
+        	result.workExact = workEstimate;
+           
             measured.put(result, new Long(result.workExact));
         }
         return result;

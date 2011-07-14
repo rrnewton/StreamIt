@@ -16,12 +16,9 @@
 
 package streamit.scheduler2.constrained;
 
-import streamit.scheduler2.iriter./*persistent.*/
-    FeedbackLoopIter;
-import streamit.scheduler2.iriter./*persistent.*/
-    Iterator;
-
 import streamit.scheduler2.hierarchical.PhasingSchedule;
+import streamit.scheduler2.iriter.FeedbackLoopIter;
+import streamit.scheduler2.iriter.Iterator;
 
 
 /**

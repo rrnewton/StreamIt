@@ -44,23 +44,6 @@ public class VariablesDefUse extends SLIREmptyVisitor
         return used.vars;
     }
     
-    public static HashSet<Serializable> getVars(FlatNode node) 
-    {
-        VariablesDefUse used = new VariablesDefUse();
-    
-        if (node.isFilter()) {
-            SIRFilter filter = (SIRFilter)node.contents;
-        
-            for (int i = 0; i < filter.getMethods().length; i++) {
-                filter.getMethods()[i].accept(used);
-            }
-            for (int i = 0; i < filter.getFields().length; i++) {
-                filter.getFields()[i].accept(used);
-            }
-        }
-        return used.vars;
-    }
-    
 
     private VariablesDefUse() 
     {

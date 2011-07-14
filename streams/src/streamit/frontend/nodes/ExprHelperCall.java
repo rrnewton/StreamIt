@@ -19,8 +19,6 @@ package streamit.frontend.nodes;
 import java.util.Collections;
 import java.util.List;
 
-import java.util.ArrayList;
-
 /**
  * A call to a particular helper function.  
  *

@@ -1,5 +1,6 @@
 package streamit.stair.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**

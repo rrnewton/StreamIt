@@ -28,8 +28,8 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import at.dms.compiler.tools.jperf.JPerf;
 import at.dms.compiler.tools.common.Utils;
+import at.dms.compiler.tools.jperf.JPerf;
 
 /**
  * This class is the entry point for token file generator.

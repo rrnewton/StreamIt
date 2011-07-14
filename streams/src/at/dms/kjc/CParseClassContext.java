@@ -20,8 +20,8 @@
 
 package at.dms.kjc;
 
-import java.util.Vector;
 import java.util.Stack;
+import java.util.Vector;
 
 import at.dms.util.Utils;
 

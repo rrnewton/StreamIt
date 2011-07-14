@@ -1,7 +1,9 @@
 package at.dms.kjc.lir;
 
-import at.dms.kjc.*;
-import at.dms.compiler.*;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * This represents a function pointer.  (Should we include the

@@ -11,15 +11,17 @@
 
 package at.dms.kjc;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.*;
-import at.dms.compiler.JavaStyleComment;
-
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
+import java.util.HashSet;
+import java.util.LinkedList;
+
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.slicegraph.Slice;
 
 /**
  * This class implements general deep cloning using the serializable interface

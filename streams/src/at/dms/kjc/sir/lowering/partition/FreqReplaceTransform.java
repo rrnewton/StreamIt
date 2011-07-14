@@ -1,14 +1,9 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
-
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.sir.linear.frequency.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.linear.LinearAnalyzer;
+import at.dms.kjc.sir.linear.frequency.FrequencyReplacer;
 
 /**
  * FreqReplace transform on a stream graph.

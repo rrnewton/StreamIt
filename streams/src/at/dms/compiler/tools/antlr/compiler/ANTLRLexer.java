@@ -5,7 +5,23 @@ package at.dms.compiler.tools.antlr.compiler;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Hashtable;
-import at.dms.compiler.tools.antlr.runtime.*;
+
+import at.dms.compiler.tools.antlr.runtime.ANTLRHashString;
+import at.dms.compiler.tools.antlr.runtime.BitSet;
+import at.dms.compiler.tools.antlr.runtime.ByteBuffer;
+import at.dms.compiler.tools.antlr.runtime.CharBuffer;
+import at.dms.compiler.tools.antlr.runtime.CharStreamException;
+import at.dms.compiler.tools.antlr.runtime.CharStreamIOException;
+import at.dms.compiler.tools.antlr.runtime.CommonToken;
+import at.dms.compiler.tools.antlr.runtime.InputBuffer;
+import at.dms.compiler.tools.antlr.runtime.LexerSharedInputState;
+import at.dms.compiler.tools.antlr.runtime.NoViableAltForCharException;
+import at.dms.compiler.tools.antlr.runtime.RecognitionException;
+import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.TokenStream;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamIOException;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamRecognitionException;
 
 public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner implements ANTLRTokenTypes, TokenStream
 {

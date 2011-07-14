@@ -6,9 +6,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.sir.SIRFileReader;
 import at.dms.kjc.sir.SIRFileWriter;
-import at.dms.kjc.backendSupport.*;
 
 /**
  * 

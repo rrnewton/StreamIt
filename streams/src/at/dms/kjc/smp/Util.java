@@ -1,6 +1,12 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.*;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JStatement;
 
 /**
  * Some utility functions

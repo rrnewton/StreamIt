@@ -5,7 +5,6 @@ package at.dms.kjc.sir.lowering;
 
 import at.dms.compiler.PositionedError;
 import at.dms.kjc.AttributeVisitor;
-import at.dms.kjc.AutoCloner;
 import at.dms.kjc.CExpressionContext;
 import at.dms.kjc.CNumericType;
 import at.dms.kjc.CType;

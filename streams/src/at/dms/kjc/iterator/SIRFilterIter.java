@@ -1,7 +1,11 @@
 package at.dms.kjc.iterator; 
 
-import at.dms.kjc.sir.*;
-import streamit.scheduler2.iriter.*;
+import streamit.scheduler2.iriter.FilterIter;
+import streamit.scheduler2.iriter.Iterator;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.StreamVisitor;
 
 /**
  * IterFactory uses this for SIRFilter.

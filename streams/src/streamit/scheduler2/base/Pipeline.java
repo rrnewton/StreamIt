@@ -16,9 +16,10 @@
 
 package streamit.scheduler2.base;
 
-import streamit.scheduler2.iriter./*persistent.*/PipelineIter;
 import java.math.BigInteger;
-import at.dms.kjc.sir.*;
+
+import streamit.scheduler2.iriter.PipelineIter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Computes some basic data for Pipelines.

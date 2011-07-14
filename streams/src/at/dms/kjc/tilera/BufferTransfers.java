@@ -3,7 +3,8 @@ package at.dms.kjc.tilera;
 import java.util.LinkedList;
 import java.util.List;
 
-import at.dms.kjc.*;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
 import at.dms.kjc.slicegraph.InputSliceNode;
 import at.dms.kjc.slicegraph.InterSliceEdge;
 import at.dms.kjc.slicegraph.OutputSliceNode;

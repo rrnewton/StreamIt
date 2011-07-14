@@ -20,7 +20,6 @@
 
 package at.dms.compiler.antlr.runtime;
 
-import java.io.IOException;
 
 /**
  * An LL(k) parser.

@@ -1,10 +1,10 @@
 package at.dms.kjc.tilera;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.backendSupport.*;
 import java.util.HashMap;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.KjcOptions;
+
+import at.dms.kjc.backendSupport.Layout;
+import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
+import at.dms.kjc.slicegraph.SliceNode;
 
 /**
  * This class is the super class of all partitioners that act on the SIR graph to

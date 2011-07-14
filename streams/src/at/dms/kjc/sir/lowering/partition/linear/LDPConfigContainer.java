@@ -1,18 +1,31 @@
 package at.dms.kjc.sir.lowering.partition.linear;
 
-import java.util.*;
-import java.io.*;
-
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.sir.linear.frequency.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.linear.FilterMatrix;
+import at.dms.kjc.sir.linear.LinearAnalyzer;
+import at.dms.kjc.sir.linear.LinearFilterRepresentation;
+import at.dms.kjc.sir.linear.frequency.LEETFrequencyReplacer;
+import at.dms.kjc.sir.lowering.partition.FreqReplaceTransform;
+import at.dms.kjc.sir.lowering.partition.HorizontalCutTransform;
+import at.dms.kjc.sir.lowering.partition.IdentityTransform;
+import at.dms.kjc.sir.lowering.partition.LinearReplaceTransform;
+import at.dms.kjc.sir.lowering.partition.PartitionGroup;
+import at.dms.kjc.sir.lowering.partition.RefactorPipeline;
+import at.dms.kjc.sir.lowering.partition.RefactorSplitJoin;
+import at.dms.kjc.sir.lowering.partition.RemoveSyncTransform;
+import at.dms.kjc.sir.lowering.partition.StreamTransform;
+import at.dms.kjc.sir.lowering.partition.VerticalCutTransform;
+import at.dms.util.Utils;
 
 abstract class LDPConfigContainer extends LDPConfig {
     /**

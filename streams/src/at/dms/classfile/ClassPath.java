@@ -20,14 +20,20 @@
 
 package at.dms.classfile;
 
-import java.io.*;
-import java.util.Hashtable;
+import java.io.ByteArrayInputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipException;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import at.dms.util.Utils;
 

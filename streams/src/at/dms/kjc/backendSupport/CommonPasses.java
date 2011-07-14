@@ -60,14 +60,6 @@ import at.dms.kjc.slicegraph.SimpleSlicer;
 import at.dms.kjc.slicegraph.Slice;
 import at.dms.kjc.slicegraph.Slicer;
 import at.dms.kjc.slicegraph.UnflatFilter;
-import at.dms.kjc.spacetime.AddBuffering;
-import at.dms.kjc.spacetime.BasicGenerateSteadyStateSchedule;
-import at.dms.kjc.spacetime.CalculateParams;
-import at.dms.kjc.spacetime.CompCommRatio;
-import at.dms.kjc.spacetime.DuplicateBottleneck;
-import at.dms.kjc.spacetime.GranularityAdjust;
-import at.dms.kjc.spacetime.GreedyBinPacking;
-import at.dms.kjc.spacetime.StreamlinedDuplicate;
 
 /**
  * Common passes, useful in new back ends.
@@ -425,7 +417,7 @@ public class CommonPasses {
 
 		/* StaticsProp.propagateIntoFilters(str,theStatics); */
 
-		// If requiested, convert splitjoins (below top level)
+		// If requested, convert splitjoins (below top level)
 		// to pipelines of filters.
 		if (KjcOptions.sjtopipe) {
 			SJToPipe.doit(str);
@@ -492,11 +484,6 @@ public class CommonPasses {
 		double CCRatio = CompCommRatio.ratio(str, getWorkEstimate(),
 				executionCounts[1]);
 		System.out.println("Comp/Comm Ratio of SIR graph: " + CCRatio);
-
-		if (numCores > 1) {
-			// average max slice size.
-			new CalculateParams(str, CCRatio, executionCounts[1]).doit();
-		}
 
 		// Convert to SliceGraph representation.
 

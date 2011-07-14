@@ -20,9 +20,12 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.RecognitionException;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
 
 /**
  * Static implementation of the TokenManager, used for importVocab option

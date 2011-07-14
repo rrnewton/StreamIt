@@ -1,11 +1,14 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.util.Utils;
 import java.util.ArrayList;
-//import at.dms.compiler.PositionedError;
-//import at.dms.compiler.TokenReference;
-//import at.dms.compiler.JavaStyleComment;
+
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.CBodyContext;
+import at.dms.kjc.CodeSequence;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.util.Utils;
 
 /**
  * Statement used for generating inline assembly. Leverages gcc's asm

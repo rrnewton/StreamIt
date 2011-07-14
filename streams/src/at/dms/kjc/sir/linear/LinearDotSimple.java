@@ -1,8 +1,15 @@
 package at.dms.kjc.sir.linear;
 
-import java.io.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.StreamItDot;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
 
 
 /**

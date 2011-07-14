@@ -1,8 +1,8 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.util.Utils;
 import java.io.Serializable;
+
+import at.dms.kjc.DeepCloneable;
 
 /**
  * This class enumerates the types of splitters.

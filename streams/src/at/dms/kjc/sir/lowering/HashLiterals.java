@@ -1,8 +1,11 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
 import java.util.Random;
+
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Returns a hash of all the literals in a set of functions and

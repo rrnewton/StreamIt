@@ -1,7 +1,8 @@
 package streamit.scheduler1;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 public class SchedSplitType extends SchedObject
 {

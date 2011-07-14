@@ -60,7 +60,7 @@ public class VariablesUsed extends SLIREmptyVisitor
      * Return a hashset of all the variables that are used in flatnode, meaning 
      * all the variables that it is important to keep because they are not dead.
      *
-     * @param node The flatnode to visit
+     * @param node The sir node to visit
      * @param countComplexAssignments if this is true, and a variable is assigned
      * to a complex expression 
      * (assiged to something other than a literal), count the variables as used
@@ -68,15 +68,6 @@ public class VariablesUsed extends SLIREmptyVisitor
      *
      * @return the hash set of JLocalVariables or Strings (for fields)
      */
-    public static HashSet<Serializable> getVars(FlatNode node, boolean countComplexAssignments)  
-    {
-        if (node.isFilter()) {
-            return getVars((SIRFilter)node.contents, countComplexAssignments);
-        }
-    
-        return new HashSet<Serializable>();
-    }
-    
     public static HashSet<Serializable> getVars(SIRFilter filter, boolean countComplexAssignments)  
     {
         VariablesUsed used = new VariablesUsed(countComplexAssignments);

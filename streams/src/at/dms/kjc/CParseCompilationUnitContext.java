@@ -20,10 +20,9 @@
 
 package at.dms.kjc;
 
-import java.util.Vector;
 import java.util.Stack;
+import java.util.Vector;
 
-import at.dms.compiler.Compiler;
 import at.dms.util.Utils;
 
 public class CParseCompilationUnitContext implements DeepCloneable {

@@ -20,10 +20,10 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.Vector;
 
 /**
  * A simple indexed vector: a normal vector except that you must

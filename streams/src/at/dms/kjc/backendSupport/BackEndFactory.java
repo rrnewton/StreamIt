@@ -1,9 +1,15 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.*;
-import at.dms.util.Utils;
-
 import java.util.Collection;
+
+import at.dms.kjc.slicegraph.Edge;
+import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.InputSliceNode;
+import at.dms.kjc.slicegraph.OutputSliceNode;
+import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.util.Utils;
 
 /**
  * Factor out parts of back end that need matching types.

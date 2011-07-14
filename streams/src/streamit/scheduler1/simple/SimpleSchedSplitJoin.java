@@ -1,14 +1,13 @@
 package streamit.scheduler1.simple;
 
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+
+import streamit.scheduler1.SchedRepSchedule;
 import streamit.scheduler1.SchedSplitJoin;
 import streamit.scheduler1.SchedStream;
-import streamit.scheduler1.simple.SimpleSchedStream;
-import streamit.scheduler1.SchedRepSchedule;
-
-import java.util.List;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.math.BigInteger;
 
 public class SimpleSchedSplitJoin extends SchedSplitJoin implements SimpleSchedStream
 {

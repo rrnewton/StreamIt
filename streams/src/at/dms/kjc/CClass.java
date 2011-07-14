@@ -20,8 +20,6 @@
 
 package at.dms.kjc;
 
-import java.io.IOException;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;

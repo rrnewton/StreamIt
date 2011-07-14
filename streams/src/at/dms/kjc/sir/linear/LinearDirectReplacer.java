@@ -1,12 +1,40 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.iterator.*;
-import at.dms.compiler.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
+
+import at.dms.compiler.JavaStyleComment;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAddExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JDoubleLiteral;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFloatLiteral;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JMultExpression;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 
 
 /**

@@ -1,10 +1,14 @@
 package at.dms.kjc.sir.linear;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.iterator.*;
+import java.util.HashMap;
+
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JThisExpression;
 
 /**
  * Class for creating access wrappers.<br>

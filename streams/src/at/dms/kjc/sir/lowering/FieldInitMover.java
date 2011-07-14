@@ -1,10 +1,21 @@
 package at.dms.kjc.sir.lowering;
 
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
+import java.util.Vector;
 
-import java.util.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class converts joint field definition/assignment statements to a field decl

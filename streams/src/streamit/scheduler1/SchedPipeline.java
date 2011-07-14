@@ -1,8 +1,11 @@
 package streamit.scheduler1;
 
-import java.util.*;
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 public class SchedPipeline extends SchedStream
 {

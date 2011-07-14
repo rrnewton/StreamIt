@@ -1,10 +1,9 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.*;
-import java.util.*;
-import java.io.*;
+import java.io.PrintStream;
+
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
 
 /**
  * The purpose of this class it to semantic check a stream program.

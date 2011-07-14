@@ -1,6 +1,7 @@
 package at.dms.kjc.tilera;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * This class represents the structs.h file that will contain typedefs for 

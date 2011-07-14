@@ -1,10 +1,26 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRBeginMarker;
+import at.dms.kjc.sir.SIREndMarker;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.slicegraph.FileOutputContent;
+import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slicegraph.SliceNode;
 
 /**
  * Process a FilterSliceNode creating code in the code store and buffers for connectivity.

@@ -16,7 +16,7 @@
 
 package streamit.library;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
 
 /**
  * This class represents a message that is sent from one filter to

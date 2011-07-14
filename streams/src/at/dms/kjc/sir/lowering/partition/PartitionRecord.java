@@ -1,8 +1,11 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import at.dms.kjc.sir.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIROperator;
 import at.dms.util.Utils;
-import java.util.*;
 
 /**
  * This is just a structure for recording what has been assigned to a
