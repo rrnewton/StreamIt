@@ -49,5 +49,12 @@ public class Util {
         return fileOutputs;
     }
     
-    
+
+    public boolean hasFileInput() {
+        for (int i = 0; i < sources.length; i++) {
+            if (sources[i].getSrc().isFileInput())
+                return true;
+        }
+        return false;
+    }
 }
