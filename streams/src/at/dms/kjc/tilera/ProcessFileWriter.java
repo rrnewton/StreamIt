@@ -6,25 +6,25 @@ import java.util.List;
 import java.util.Set;
 
 import at.dms.kjc.JBlock;
-import at.dms.kjc.slicegraph.FileOutputContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 public class ProcessFileWriter {
     private static int totalOutputs = 0;
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     protected SchedulingPhase phase;
     protected TileraBackEndFactory factory;
     protected TileCodeStore codeStore;
     protected FileOutputContent fileOutput;
-    protected static HashMap<FilterSliceNode, Tile> allocatingTiles;
+    protected static HashMap<WorkNode, Tile> allocatingTiles;
     protected Tile allocatingTile; 
 
     static {
-        allocatingTiles = new HashMap<FilterSliceNode, Tile>();
+        allocatingTiles = new HashMap<WorkNode, Tile>();
     }
     
-    public ProcessFileWriter (FilterSliceNode filter, SchedulingPhase phase, TileraBackEndFactory factory) {
+    public ProcessFileWriter (WorkNode filter, SchedulingPhase phase, TileraBackEndFactory factory) {
         this.filterNode = filter;
         this.fileOutput = (FileOutputContent)filter.getFilter();
         this.phase = phase;
@@ -35,7 +35,7 @@ public class ProcessFileWriter {
         return totalOutputs;
     }
     
-    public static Set<FilterSliceNode> getFileWriterFilters() {
+    public static Set<WorkNode> getFileWriterFilters() {
         return allocatingTiles.keySet();
     }
     
@@ -43,7 +43,7 @@ public class ProcessFileWriter {
      * Return the tile that this file writer's buffer should be allocated on.
      * @param fo  The file writer
      */
-    public static Tile getAllocatingTile(FilterSliceNode fo) {
+    public static Tile getAllocatingTile(WorkNode fo) {
         assert fo.isFileOutput();
         
         if (!allocatingTiles.containsKey(fo)) {
@@ -83,7 +83,7 @@ public class ProcessFileWriter {
      * the file reader is allocated to off-chip memory.  We just cycle through the tiles
      * if there is more than one file reader, one reader per tile.
      */
-    private static Tile nextAllocatingTile(FilterSliceNode fo) {
+    private static Tile nextAllocatingTile(WorkNode fo) {
         List<Tile> reverseOrder = TileraBackend.chip.getAbstractTiles(); 
         Collections.reverse(reverseOrder);
         for (Tile tile : reverseOrder) {

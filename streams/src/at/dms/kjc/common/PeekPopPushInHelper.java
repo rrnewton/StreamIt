@@ -7,6 +7,7 @@ import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /**
  * This class will search for all communication expressions outside of the work
@@ -16,6 +17,24 @@ import at.dms.kjc.sir.SIRPushExpression;
  */
 public class PeekPopPushInHelper extends SLIREmptyVisitor {
     private static boolean found;
+    
+    /** returns true if we find communication statements/expressions
+     * outside of the work function (i.e. in a helper function 
+     * 
+     * @return true if we find a peek, pop, or push in a helper function
+     */
+    public static boolean check(WorkNodeContent filter) {
+        for (int i = 0; i < filter.getMethods().length; i++) {
+            if (!filter.getMethods()[i].equals(filter.getWork())) {
+                found = false;
+                filter.getMethods()[i]
+                    .accept(new PeekPopPushInHelper());
+                if (found)
+                    return true;
+            }
+        }
+        return false;
+    }
     
     /** returns true if we find communication statements/expressions
      * outside of the work function (i.e. in a helper function 

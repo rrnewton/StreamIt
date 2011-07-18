@@ -25,10 +25,10 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.util.Utils;
 
 /**
@@ -49,7 +49,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /** all the address buffers that are on the cores that feed this input buffer */
     protected SourceAddressRotation[] addressBufs;
     /** a map from source FilterSliceNode to address buf */
-    protected HashMap<FilterSliceNode, SourceAddressRotation> addrBufMap;
+    protected HashMap<WorkNode, SourceAddressRotation> addrBufMap;
     
     /** true if what feeds this inputbuffer is a file reader */
     protected boolean upstreamFileReader;
@@ -62,13 +62,13 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
     /** InputRotatingBuffers for fizzed filters will use shared constituent buffers.
      * This HashMap will store the names of the shared constituent buffers */
-    protected static HashMap<FilterSliceNode, String> sharedBufferNames;
+    protected static HashMap<WorkNode, String> sharedBufferNames;
 
     /** stores InputRotatingBuffers for file writers */
     protected static HashSet<InputRotatingBuffer> fileWriterBuffers;
 
     static {
-        sharedBufferNames = new HashMap<FilterSliceNode, String>();
+        sharedBufferNames = new HashMap<WorkNode, String>();
         fileWriterBuffers = new HashSet<InputRotatingBuffer>();
     }
     
@@ -81,12 +81,12 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * @param schedule The spacetime schedule of the slices 
      */
     public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
-        for (Slice slice : schedule.getScheduleList()) {
+        for (Filter slice : schedule.getScheduleList()) {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
 
                 FissionGroup group = FissionGroupStore.getFissionGroup(slice);
-                for(Slice fizzedSlice : group.fizzedSlices)
+                for(Filter fizzedSlice : group.fizzedSlices)
                     createInputBuffer(fizzedSlice, schedule);
             }
             else {
@@ -95,7 +95,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         }
     }
 
-    public static void createInputBuffer(Slice slice, BasicSpaceTimeSchedule schedule) {
+    public static void createInputBuffer(Filter slice, BasicSpaceTimeSchedule schedule) {
         assert slice.getNumFilters() == 1 : slice.getNumFilters();
         
         if (!slice.getHead().noInputs()) {
@@ -117,7 +117,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * 
      * @param filterNode The filternode for which to create a new input buffer.
      */
-    private InputRotatingBuffer(FilterSliceNode filterNode, Core parent) {
+    private InputRotatingBuffer(WorkNode filterNode, Core parent) {
         super(filterNode.getEdgeToPrev(), filterNode, parent);
         
         bufType = filterNode.getFilter().getInputType();
@@ -135,9 +135,9 @@ public class InputRotatingBuffer extends RotatingBuffer {
             //System.out.println(filterNode + " is fizzed");
             if(!sharedBufferNames.containsKey(filterNode)) {
                 //System.out.println("  first InputRotatingBuffer, setting base name of: " + this.getIdent());
-                Slice[] fizzedSlices = FissionGroupStore.getFizzedSlices(filterNode.getParent());
+                Filter[] fizzedSlices = FissionGroupStore.getFizzedSlices(filterNode.getParent());
 
-                for(Slice slice : fizzedSlices)
+                for(Filter slice : fizzedSlices)
                     sharedBufferNames.put(slice.getFirstFilter(), this.getIdent());
             }
         }
@@ -150,7 +150,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
             filterNode.getParent().getHead().getWidth(SchedulingPhase.STEADY) <= 1;
         }
 
-        addrBufMap = new HashMap<FilterSliceNode, SourceAddressRotation>();
+        addrBufMap = new HashMap<WorkNode, SourceAddressRotation>();
     }
 
     /**
@@ -171,7 +171,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //mults of all the sources
         int maxRotationLength = 0;
         
-        for (Slice src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+        for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
             int diff = schedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
             if (diff > maxRotationLength) {
@@ -254,10 +254,10 @@ public class InputRotatingBuffer extends RotatingBuffer {
        List<SourceAddressRotation> addressBufsList = new LinkedList<SourceAddressRotation>();
 
        int i = 0;
-       for (Slice src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+       for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
            if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(src)) {
                FissionGroup group = FissionGroupStore.getFissionGroup(src);
-               for(Slice fizzedSlice : group.fizzedSlices) {
+               for(Filter fizzedSlice : group.fizzedSlices) {
                    Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
                    SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, theEdge);
                    addressBufsList.add(rot);
@@ -290,7 +290,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * @param filterSliceNode The FilterSliceNode
      * @return the address buffer for this input buffer on the core
      */
-    public SourceAddressRotation getAddressRotation(FilterSliceNode filterSliceNode) {
+    public SourceAddressRotation getAddressRotation(WorkNode filterSliceNode) {
         return addrBufMap.get(filterSliceNode);
     }
     

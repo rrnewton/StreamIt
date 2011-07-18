@@ -5,7 +5,7 @@ import java.util.List;
 
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.SchedulingPhase;
 
 public abstract class BufferTransfers {
     protected RotatingBuffer parent;

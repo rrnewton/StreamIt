@@ -20,10 +20,10 @@ import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.slicegraph.FileOutputContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * Process a FilterSliceNode creating code in the code store.
@@ -44,11 +44,11 @@ public class ProcessFilterSliceNode {
 
     /** set of filters for which we have written basic code. */
     // uses WeakHashMap to be self-cleaning, but now have to insert some value.
-    protected static Map<SliceNode,Boolean>  basicCodeWritten = new WeakHashMap<SliceNode,Boolean>();
+    protected static Map<InternalFilterNode,Boolean>  basicCodeWritten = new WeakHashMap<InternalFilterNode,Boolean>();
     
     protected CodeStoreHelper filterCode;
     protected CoreCodeStore codeStore;
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     protected SchedulingPhase whichPhase;
     protected SMPBackEndFactory backEndBits;
     protected Core location;
@@ -58,7 +58,7 @@ public class ProcessFilterSliceNode {
     * @param whichPhase   a scheduling phase {@link SchedulingPhase}
     * @param backEndBits  a BackEndFactory to access layout, etc.
     * */
-   public ProcessFilterSliceNode(FilterSliceNode filterNode, 
+   public ProcessFilterSliceNode(WorkNode filterNode, 
             SchedulingPhase whichPhase, SMPBackEndFactory backEndBits) {
         this.filterNode = filterNode;
         this.whichPhase = whichPhase;
@@ -249,7 +249,7 @@ public class ProcessFilterSliceNode {
      * @param outputChannel  The output channel -- specifies routines to call to replace push.
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
-    private static CodeStoreHelper makeFilterCode(FilterSliceNode filter, 
+    private static CodeStoreHelper makeFilterCode(WorkNode filter, 
             Channel inputChannel, Channel outputChannel,
             SMPBackEndFactory backEndBits) {
         
@@ -328,7 +328,7 @@ public class ProcessFilterSliceNode {
      * @param backEndBits
      * @return
      */
-    public static  CodeStoreHelper getFilterCode(FilterSliceNode filter, 
+    public static  CodeStoreHelper getFilterCode(WorkNode filter, 
         Channel inputChannel, Channel outputChannel, SMPBackEndFactory backEndBits) {
         CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {

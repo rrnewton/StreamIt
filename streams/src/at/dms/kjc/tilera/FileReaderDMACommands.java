@@ -4,7 +4,7 @@ import java.util.List;
 
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.SchedulingPhase;
 
 /**
  * This currently only works for if the filter that is downstream of the filter reader has only

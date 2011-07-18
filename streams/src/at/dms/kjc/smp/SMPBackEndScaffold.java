@@ -7,10 +7,10 @@ import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.ComputeNodesI;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
 
 /**
  * @author mgordon
@@ -45,7 +45,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
      * @param input InputSliceNode to consider for to a joiner.
      * @return
      */
-    protected boolean doNotCreateJoiner(InputSliceNode input) {
+    protected boolean doNotCreateJoiner(InputNode input) {
         return false;
     }
     
@@ -62,7 +62,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
         ComputeNodesI computeNodes = resources.getComputeNodes();
         this.resources = resources;
         
-        Slice slices[];
+        Filter slices[];
 
         beforeScheduling(schedule,resources);
         
@@ -93,20 +93,20 @@ public class SMPBackEndScaffold extends BackEndScaffold {
      * @param computeNodes The collection of compute nodes.
      */
     @Override
-    protected void iterateInorder(Slice slices[], SchedulingPhase whichPhase,
+    protected void iterateInorder(Filter slices[], SchedulingPhase whichPhase,
                                        ComputeNodesI computeNodes) {
-        Slice slice;
+        Filter slice;
 
         for (int i = 0; i < slices.length; i++) {
-            slice = (Slice) slices[i];
+            slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputSliceNode)slice.getHead(),
+            resources.processInputSliceNode((InputNode)slice.getHead(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
             resources.processFilterSliceNode(slice.getFilterNodes().get(0), whichPhase, computeNodes);
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputSliceNode)slice.getTail(),
+            resources.processOutputSliceNode((OutputNode)slice.getTail(),
                     whichPhase, computeNodes);
         }
     }  

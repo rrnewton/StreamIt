@@ -19,9 +19,9 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.SchedulingPhase;
 
 public class BufferDMATransfers extends BufferTransfers {
     /** reference to head if this input buffer is shared as an output buffer */
@@ -53,8 +53,8 @@ public class BufferDMATransfers extends BufferTransfers {
 
     private void generateStatements(SchedulingPhase phase) {
         for (int w = 0; w < output.getWeights(phase).length; w++) {
-            for (InterSliceEdge edge : output.getDests(phase)[w]) {
-                InputSliceNode input = edge.getDest();
+            for (InterFilterEdge edge : output.getDests(phase)[w]) {
+                InputNode input = edge.getDest();
                 FilterInfo srcInfo = FilterInfo.getFilterInfo(output.getPrevFilter());
                 FilterInfo dstInfo = FilterInfo.getFilterInfo(input.getNextFilter());
                                 

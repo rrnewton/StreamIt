@@ -31,13 +31,13 @@ import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.smp.arrayassignment.ArrayAssignmentStatements;
 
 public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
@@ -63,7 +63,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
     protected JVariableDefinition writeHeadDefn;
     
     /** the output slice node */
-    protected OutputSliceNode output;
+    protected OutputNode output;
     
     /** true if this buffer's dest is a file writer */
     protected boolean directFileWrite = false;
@@ -134,7 +134,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         }
     }
     
-    private void debugPrint(String methodName, SchedulingPhase phase, FilterSliceNode filterNode,
+    private void debugPrint(String methodName, SchedulingPhase phase, WorkNode filterNode,
                             String valueName, int value) {
         if(debug) {
             System.out.println(methodName + ", phase: " + phase + ", filterNode: " + filterNode +
@@ -143,7 +143,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
     }
 
 
-    private void debugPrint(String methodName, SchedulingPhase phase, InterSliceEdge edge,
+    private void debugPrint(String methodName, SchedulingPhase phase, InterFilterEdge edge,
                             String valueName, int value) {
         if(debug) {
             System.out.println(methodName + ", phase: " + phase + ", edge: " + 
@@ -331,9 +331,9 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
            LoadBalancer.isLoadBalanced(parent.filterNode.getParent())) {
 
             FissionGroup group = FissionGroupStore.getFissionGroup(parent.filterNode.getParent());
-            FilterSliceNode filter = group.unfizzedSlice.getFirstFilter();
+            WorkNode filter = group.unfizzedSlice.getFirstFilter();
             FilterInfo fi = group.unfizzedFilterInfo;
-            OutputSliceNode output = filter.getParent().getTail();
+            OutputNode output = filter.getParent().getTail();
 
             // Declare variables used for transfers
             JVariableDefinition srcBaseOffsetVar =
@@ -389,8 +389,8 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                         getWriteOffsetExpr(phase))));
 
             // Iterate through dests, generate transfer code for each dest
-            for(InterSliceEdge edge : output.getDestSet(SchedulingPhase.STEADY)) {
-                InputSliceNode input = edge.getDest();
+            for(InterFilterEdge edge : output.getDestSet(SchedulingPhase.STEADY)) {
+                InputNode input = edge.getDest();
 
                 int outputWeight = output.getWeight(edge, SchedulingPhase.STEADY);
                 int inputWeight = input.getWeight(edge, SchedulingPhase.STEADY);
@@ -452,8 +452,8 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
 
                 for(int rot = 0 ; rot < outputRotsPerFrame ; rot++) {
                     for(int index = 0 ; index < output.getWeights(phase).length ; index++) {
-                        InterSliceEdge[] dests = output.getDests(phase)[index];
-                        for(InterSliceEdge dest : dests) {
+                        InterFilterEdge[] dests = output.getDests(phase)[index];
+                        for(InterFilterEdge dest : dests) {
                             if(dest.equals(edge)) {
                                 for(int item = 0 ; item < output.getWeights(phase)[index] ; item++) {
                                     srcElemOffsets[srcElemIndex++] =
@@ -491,7 +491,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                 // Get source and dest buffer names
                 String srcBuffer;
                 if(((OutputRotatingBuffer)parent).hasDirectWrite()) {
-                    FilterSliceNode directWriteFilter = 
+                    WorkNode directWriteFilter = 
                         ((OutputRotatingBuffer)parent).getDirectWriteFilter();
                     srcBuffer = 
                         ((OutputRotatingBuffer)parent).getAddressBuffer(
@@ -703,7 +703,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
             }
         }
         else {
-            FilterSliceNode filter = parent.filterNode;
+            WorkNode filter = parent.filterNode;
             FilterInfo fi = FilterInfo.getFilterInfo(filter);
             
             //no further code necessary if nothing is being produced
@@ -718,13 +718,13 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
             int writeOffset = getWriteOffsetValue(phase);       
             
             //first create an map from destinations to ints to index into the state arrays
-            HashMap<InterSliceEdge, Integer> destIndex = new HashMap<InterSliceEdge, Integer>();
+            HashMap<InterFilterEdge, Integer> destIndex = new HashMap<InterFilterEdge, Integer>();
             int index = 0;
             int numDests = output.getDestSet(phase).size();
             int[][] destIndices = new int[numDests][];
             int[] nextWriteIndex = new int[numDests];
             
-            for (InterSliceEdge edge : output.getDestSet(phase)) {
+            for (InterFilterEdge edge : output.getDestSet(phase)) {
                 destIndex.put(edge, index);
                 destIndices[index] = getDestIndices(edge, rotations, phase);
                 nextWriteIndex[index] = 0;
@@ -735,7 +735,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
             
             String srcBuffer;
             if(((OutputRotatingBuffer)parent).hasDirectWrite()) {
-                FilterSliceNode directWriteFilter = ((OutputRotatingBuffer)parent).getDirectWriteFilter();
+                WorkNode directWriteFilter = ((OutputRotatingBuffer)parent).getDirectWriteFilter();
                 srcBuffer = ((OutputRotatingBuffer)parent).getAddressBuffer(directWriteFilter.getParent().getHead()).currentWriteBufName;
             }
             else {
@@ -745,12 +745,12 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
             int items = 0;
             for (int rot = 0; rot < rotations; rot++) {
                 for (int weightIndex = 0; weightIndex < output.getWeights(phase).length; weightIndex++) {
-                    InterSliceEdge[] dests = output.getDests(phase)[weightIndex];
+                    InterFilterEdge[] dests = output.getDests(phase)[weightIndex];
                     for (int curWeight = 0; curWeight < output.getWeights(phase)[weightIndex]; curWeight++) {
                         int srcElement= rot * output.totalWeights(phase) + 
                             output.weightBefore(weightIndex, phase) + curWeight + writeOffset;
                         
-                        for (InterSliceEdge dest : dests) {
+                        for (InterFilterEdge dest : dests) {
                             int destElement = destIndices[destIndex.get(dest)][nextWriteIndex[destIndex.get(dest)]];
                             nextWriteIndex[destIndex.get(dest)]++;
                             
@@ -783,11 +783,11 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         }
     }
     
-    private int[] getDestIndices(InterSliceEdge edge, int outputRots, SchedulingPhase phase) {
+    private int[] getDestIndices(InterFilterEdge edge, int outputRots, SchedulingPhase phase) {
     	assert (parent instanceof OutputRotatingBuffer);
     	
         int[] indices = new int[outputRots * output.getWeight(edge, phase)];
-        InputSliceNode input = edge.getDest();
+        InputNode input = edge.getDest();
 
         assert indices.length % input.getWeight(edge, phase) == 0;
 
@@ -851,8 +851,8 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         assert (parent instanceof OutputRotatingBuffer);
 
         if (((OutputRotatingBuffer)parent).hasDirectWrite()) {
-            Slice srcSlice = parent.filterNode.getParent();
-            Slice destSlice = ((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent();
+            Filter srcSlice = parent.filterNode.getParent();
+            Filter destSlice = ((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent();
 
             if(FissionGroupStore.isFizzed(srcSlice))
                 srcSlice = FissionGroupStore.getUnfizzedSlice(srcSlice);
@@ -861,10 +861,10 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                 destSlice = FissionGroupStore.getUnfizzedSlice(destSlice);
 
             //find edge from source to dest slice
-        	Set<InterSliceEdge> edges = srcSlice.getTail().getDestSet(phase);
-        	InterSliceEdge edge = null;
+        	Set<InterFilterEdge> edges = srcSlice.getTail().getDestSet(phase);
+        	InterFilterEdge edge = null;
         	
-        	for(InterSliceEdge e : edges) {
+        	for(InterFilterEdge e : edges) {
         		if(e.getDest().getParent().equals(destSlice)) {
         			edge = e;
         			break;

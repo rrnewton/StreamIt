@@ -5,7 +5,7 @@ import java.util.HashMap;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 /**
  * This class is the super class of all partitioners that act on the SIR graph to
@@ -18,11 +18,11 @@ import at.dms.kjc.slicegraph.SliceNode;
 public abstract class Scheduler implements Layout<Core> {
     
     protected SpaceTimeScheduleAndSlicer graphSchedule;
-    protected HashMap<SliceNode, Core> layoutMap;
+    protected HashMap<InternalFilterNode, Core> layoutMap;
     
     public Scheduler() {
         graphSchedule = null;
-        layoutMap = new HashMap<SliceNode, Core>();
+        layoutMap = new HashMap<InternalFilterNode, Core>();
     }
 
     public boolean isSMD() {

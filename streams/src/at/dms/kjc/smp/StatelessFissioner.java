@@ -3,13 +3,13 @@ package at.dms.kjc.smp;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.MutableStateExtractor;
-import at.dms.kjc.slicegraph.Slice;
 import at.dms.kjc.slicegraph.Slicer;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
-import at.dms.kjc.slicegraph.fission.Fissioner;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.MutableStateExtractor;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.fission.FissionGroup;
+import at.dms.kjc.slir.fission.Fissioner;
 
 public class StatelessFissioner {
 
@@ -18,11 +18,11 @@ public class StatelessFissioner {
     private int myID;
 
     /** the slice we are fissing */
-    private Slice slice;
+    private Filter slice;
     /** the amount we are fizzing slice by */
     private int fizzAmount;
     /** the filter of the slice we are fissing */
-    private FilterSliceNode filter;
+    private WorkNode filter;
     /** the filter info of the filter of the slice we are fissing */
     private FilterInfo fInfo;
 
@@ -38,9 +38,9 @@ public class StatelessFissioner {
     private int sliceCopyDown;
 
     /** the fission products of the slice */
-    private Slice[] sliceClones;
+    private Filter[] sliceClones;
 
-    public static FissionGroup doit(Slice slice, Slicer slicer, int fissAmount) {
+    public static FissionGroup doit(Filter slice, Slicer slicer, int fissAmount) {
         if(!KjcOptions.sharedbufs) {
             return Fissioner.doit(slice, slicer, fissAmount);
         }
@@ -57,12 +57,12 @@ public class StatelessFissioner {
      * Return true if <slice> can be fissed, meaning it is stateless.  The method 
      * does not check that the schedule allows for fission.
      */
-    public static boolean canFizz(Slice slice, boolean debug) {
+    public static boolean canFizz(Filter slice, boolean debug) {
 
         // Get information on Slice rates
         FilterInfo.reset();
 
-        FilterSliceNode filter = slice.getFirstFilter();
+        WorkNode filter = slice.getFirstFilter();
         
         // Check to see if Slice has file reader/writer.  Don't fizz file
         // reader/writer
@@ -96,7 +96,7 @@ public class StatelessFissioner {
         return true;
     }
 
-    private StatelessFissioner(Slice slice, int fizzAmount) {
+    private StatelessFissioner(Filter slice, int fizzAmount) {
         this.slice = slice;
         this.fizzAmount = fizzAmount;
         this.filter = slice.getFirstFilter();
@@ -139,9 +139,9 @@ public class StatelessFissioner {
 
     private void createFissedSlices() {        
         // Fill array with clones of Slice
-        sliceClones = new Slice[fizzAmount];
+        sliceClones = new Filter[fizzAmount];
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x] = (Slice)ObjectDeepCloner.deepCopy(slice);
+            sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
         
         // Give each Slice clone a unique name
         String origName = slice.getFirstFilter().getFilter().getName();
@@ -194,11 +194,11 @@ public class StatelessFissioner {
 
         for(int x = 1 ; x < fizzAmount ; x++) {
             sliceClones[x].getHead().setInitWeights(new int[0]);
-            sliceClones[x].getHead().setInitSources(new InterSliceEdge[0]);
+            sliceClones[x].getHead().setInitSources(new InterFilterEdge[0]);
         }
         for(int x = 1 ; x < fizzAmount ; x++) {
             sliceClones[x].getTail().setInitWeights(new int[0]);
-            sliceClones[x].getTail().setInitDests(new InterSliceEdge[0][0]);
+            sliceClones[x].getTail().setInitDests(new InterFilterEdge[0][0]);
         }
     }
 }

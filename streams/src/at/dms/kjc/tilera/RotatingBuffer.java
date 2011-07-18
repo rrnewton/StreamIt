@@ -16,9 +16,9 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.WorkNode;
 
 
 /**
@@ -53,7 +53,7 @@ public abstract class RotatingBuffer extends Channel {
     protected JVariableDefinition firstExe;
     protected String firstExeName;
     /** the filter this buffer is associated with */   
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     /** the names of the individual buffers */
     protected String[] bufferNames;
     /** a set of all the buffer types in the application */
@@ -68,18 +68,18 @@ public abstract class RotatingBuffer extends Channel {
     protected BufferTransfers transferCommands;
     /** the address buffers that this buffer rotation uses as destinations for transfers */ 
     protected HashMap<InputRotatingBuffer, SourceAddressRotation> addressBuffers;
-    protected static HashMap<FilterSliceNode, InputRotatingBuffer> inputBuffers;
-    protected static HashMap<FilterSliceNode, RotatingBuffer> outputBuffers;
+    protected static HashMap<WorkNode, InputRotatingBuffer> inputBuffers;
+    protected static HashMap<WorkNode, RotatingBuffer> outputBuffers;
     protected final String temp = "__temp__";
         
     static {
         types = new HashSet<CType>();
-        inputBuffers = new HashMap<FilterSliceNode, InputRotatingBuffer>();
-        outputBuffers = new HashMap<FilterSliceNode, RotatingBuffer>();
+        inputBuffers = new HashMap<WorkNode, InputRotatingBuffer>();
+        outputBuffers = new HashMap<WorkNode, RotatingBuffer>();
         
     }
     
-    protected RotatingBuffer(Edge edge, FilterSliceNode fsn, Tile parent) {
+    protected RotatingBuffer(Edge edge, WorkNode fsn, Tile parent) {
         super(edge);
         this.parent = parent;
         filterNode = fsn;
@@ -146,7 +146,7 @@ public abstract class RotatingBuffer extends Channel {
      * @return the dma address rotation used to store the address of the 
      * rotation associated with this input slice node
      */
-    public SourceAddressRotation getAddressBuffer(InputSliceNode input) {
+    public SourceAddressRotation getAddressBuffer(InputNode input) {
         assert addressBuffers.containsKey(InputRotatingBuffer.getInputBuffer(input.getNextFilter())) ;
         
         return addressBuffers.get(InputRotatingBuffer.getInputBuffer(input.getNextFilter()));
@@ -162,7 +162,7 @@ public abstract class RotatingBuffer extends Channel {
         for (Tile ownerTile : TileraBackend.chip.getAbstractTiles()) {
             TileCodeStore cs = ownerTile.getComputeCode();
             
-            for (FilterSliceNode filter : cs.getFilters()) {
+            for (WorkNode filter : cs.getFilters()) {
                 //if we have a file writer then get the allocating tile
                 communicateAddressesForFilter(filter, ownerTile);
             }
@@ -172,7 +172,7 @@ public abstract class RotatingBuffer extends Channel {
         }
         
         //now handle the file writers
-        for (FilterSliceNode fileWriter : ProcessFileWriter.getFileWriterFilters()) {
+        for (WorkNode fileWriter : ProcessFileWriter.getFileWriterFilters()) {
             communicateAddressesForFilter(fileWriter, ProcessFileWriter.getAllocatingTile(fileWriter));
             TileCodeStore.addBufferInitBarrier();
         }
@@ -182,7 +182,7 @@ public abstract class RotatingBuffer extends Channel {
     }
     
     
-    private static void communicateAddressesForFilter(FilterSliceNode filter, Tile ownerTile) { 
+    private static void communicateAddressesForFilter(WorkNode filter, Tile ownerTile) { 
         //the tag for the messages that we are using to send around the address
         int tag = 0;
         TileCodeStore cs = ownerTile.getComputeCode();
@@ -348,11 +348,11 @@ public abstract class RotatingBuffer extends Channel {
         }
     }
     
-    public static void setOutputBuffer(FilterSliceNode node, RotatingBuffer buf) {
+    public static void setOutputBuffer(WorkNode node, RotatingBuffer buf) {
         outputBuffers.put(node, buf);
     }
     
-    public static void setInputBuffer(FilterSliceNode node, InputRotatingBuffer buf) {
+    public static void setInputBuffer(WorkNode node, InputRotatingBuffer buf) {
         inputBuffers.put(node, buf);
     }
     
@@ -366,11 +366,11 @@ public abstract class RotatingBuffer extends Channel {
      * @param fsn The filter node in question.
      * @return The input buffer of the filter node.
      */
-    public static InputRotatingBuffer getInputBuffer(FilterSliceNode fsn) {
+    public static InputRotatingBuffer getInputBuffer(WorkNode fsn) {
         return inputBuffers.get(fsn);
     }
   
-    public static RotatingBuffer getOutputBuffer(FilterSliceNode fsn) {
+    public static RotatingBuffer getOutputBuffer(WorkNode fsn) {
         return outputBuffers.get(fsn);
     }
     
@@ -407,7 +407,7 @@ public abstract class RotatingBuffer extends Channel {
      * 
      * @return Return the filter this buffer is associated with.
      */
-    public FilterSliceNode getFilterNode() {
+    public WorkNode getFilterNode() {
         return filterNode;
     }
     

@@ -34,14 +34,6 @@ public abstract class PredefinedContent extends WorkNodeContent implements at.dm
     public PredefinedContent(SIRPredefinedFilter filter) {
         super(filter);
     }
-
-    /**
-     * Construct PredefinedContent from UnflatFilter.
-     * @param unflat The UnflatFilter used to contruct the PredefinedContent.
-     */
-    public PredefinedContent(UnflatFilter unflat) {
-        super(unflat);
-    }
     
     /**
      * Subclasses of {@link  PredefinedContent} must be able to create their content.

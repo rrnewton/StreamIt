@@ -14,24 +14,24 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.slicegraph.FileInputContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.FileInputContent;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 public class ProcessFileReader {
     
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     protected SchedulingPhase phase;
     protected SMPBackEndFactory factory;
     protected CoreCodeStore codeStore;
     protected FileInputContent fileInput;
     protected Core allocatingCore;
-    protected OutputSliceNode fileOutput;
+    protected OutputNode fileOutput;
 
-    protected static HashMap<FilterSliceNode, Core> allocatingCores;
+    protected static HashMap<WorkNode, Core> allocatingCores;
 
     protected static HashMap<FileReaderCodeKey, FileReaderCode> fileReaderCodeStore;
     protected static HashMap<FileReaderCodeKey, JMethodDeclaration> PPMethodStore;
@@ -39,7 +39,7 @@ public class ProcessFileReader {
     protected static HashSet<String> fileNames;
     
     static {
-        allocatingCores = new HashMap<FilterSliceNode, Core>();
+        allocatingCores = new HashMap<WorkNode, Core>();
 
         fileReaderCodeStore = new HashMap<FileReaderCodeKey, FileReaderCode>();
         PPMethodStore = new HashMap<FileReaderCodeKey, JMethodDeclaration>();
@@ -47,7 +47,7 @@ public class ProcessFileReader {
         fileNames = new HashSet<String>();
     }
     
-    public ProcessFileReader (FilterSliceNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
+    public ProcessFileReader (WorkNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
         this.filterNode = filter;
         this.fileInput = (FileInputContent)filter.getFilter();
         this.phase = phase;
@@ -64,9 +64,9 @@ public class ProcessFileReader {
         }
 
         System.out.print("Generating FileReader code: ");
-        for (InterSliceEdge edge : fileOutput.getDestSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : fileOutput.getDestSet(SchedulingPhase.STEADY)) {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(edge.getDest().getParent())) {
-                for(Slice fizzedSlice : FissionGroupStore.getFizzedSlices(edge.getDest().getParent())) {
+                for(Filter fizzedSlice : FissionGroupStore.getFizzedSlices(edge.getDest().getParent())) {
                     System.out.print(".");
                     generateCode(fizzedSlice.getFirstFilter());
                 }
@@ -79,7 +79,7 @@ public class ProcessFileReader {
         System.out.println();
     }
 
-    private void generateCode(FilterSliceNode dsFilter) {
+    private void generateCode(WorkNode dsFilter) {
         InputRotatingBuffer destBuf = InputRotatingBuffer.getInputBuffer(dsFilter);
         FileReaderCodeKey frcKey = new FileReaderCodeKey(filterNode, dsFilter);
 
@@ -119,7 +119,7 @@ public class ProcessFileReader {
                         initMethod.getName(), new JExpression[0]), null));
     }
 
-    private void generatePPCode(FilterSliceNode node, FileReaderCode fileReaderCode, CoreCodeStore codeStore, 
+    private void generatePPCode(WorkNode node, FileReaderCode fileReaderCode, CoreCodeStore codeStore, 
             InputRotatingBuffer destBuf) {
 
         FileReaderCodeKey frcKey = new FileReaderCodeKey(filterNode, node);
@@ -232,10 +232,10 @@ public class ProcessFileReader {
     }
     
     private class FileReaderCodeKey {
-        public FilterSliceNode filter;
-        public FilterSliceNode dsFilter;
+        public WorkNode filter;
+        public WorkNode dsFilter;
 
-        public FileReaderCodeKey(FilterSliceNode filter, FilterSliceNode dsFilter) {
+        public FileReaderCodeKey(WorkNode filter, WorkNode dsFilter) {
             this.filter = filter;
             this.dsFilter = dsFilter;
         }

@@ -18,7 +18,7 @@ import at.dms.kjc.sir.SIRJoinType;
 import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRSplitType;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.util.ConstList;
 import at.dms.util.Utils;
 
@@ -102,7 +102,7 @@ public class AutoCloner {
      * @param slice the slice to clone
      * @return the new slice
      */
-    static public Object deepCopy (Slice slice) {
+    static public Object deepCopy (Filter slice) {
         // not sure what toBeCloned should be in this case... for now
         // make it empty.
         toBeCloned = new HashSet<DeepCloneable>();
@@ -191,8 +191,8 @@ public class AutoCloner {
             // don't clone these since they're immutable or shouldn't be copied
             result = o;
         } 
-        else if (o instanceof at.dms.kjc.slicegraph.Slice) {
-            result = cloneSlice((at.dms.kjc.slicegraph.Slice)o);
+        else if (o instanceof at.dms.kjc.slir.Filter) {
+            result = cloneSlice((at.dms.kjc.slir.Filter)o);
         }
         // other kjc classes, do deep cloning
         else if (CloneGenerator.inTargetClasses(typeName)) {
@@ -291,9 +291,9 @@ public class AutoCloner {
      * @param slice
      * @return
      */
-    static private Object cloneSlice(at.dms.kjc.slicegraph.Slice slice) {
+    static private Object cloneSlice(at.dms.kjc.slir.Filter slice) {
         Object newSlice = slice.deepClone();
-        ((Slice)newSlice).finishClone();
+        ((Filter)newSlice).finishClone();
         return newSlice;
     }
     

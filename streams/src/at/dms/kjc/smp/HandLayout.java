@@ -9,28 +9,28 @@ import java.util.LinkedList;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
 import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InternalFilterNode;
 
 
 public class HandLayout implements Layout {
     
     protected Slicer slicer;
     protected SMPMachine chip;
-    protected LinkedList<Slice> scheduleOrder;
-    protected HashMap<SliceNode, Core> assignment;    
+    protected LinkedList<Filter> scheduleOrder;
+    protected HashMap<InternalFilterNode, Core> assignment;    
         
     public HandLayout(SpaceTimeScheduleAndSlicer spaceTime, SMPMachine chip) {
         this.chip = chip;
         this.slicer = spaceTime.getSlicer();
         scheduleOrder = 
             DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
-        assignment = new HashMap<SliceNode, Core>();
+        assignment = new HashMap<InternalFilterNode, Core>();
     }
 
-    public ComputeNode getComputeNode(SliceNode node) {
+    public ComputeNode getComputeNode(InternalFilterNode node) {
         return assignment.get(node);
     }
 
@@ -39,7 +39,7 @@ public class HandLayout implements Layout {
      * for <pre>slice</pre>
      */
     private void assignFromReader(BufferedReader inputBuffer,
-                                  Slice slice) {
+                                  Filter slice) {
         // Assign a filter, joiner to a tile
         // perform some error checking.
         while (true) {
@@ -72,14 +72,14 @@ public class HandLayout implements Layout {
     }
     
     public void runLayout() {
-        Iterator<Slice> slices = scheduleOrder.iterator();
+        Iterator<Filter> slices = scheduleOrder.iterator();
                 
         System.out.println("Enter desired tile for each filter: ");
         BufferedReader inputBuffer = 
                 new BufferedReader(new InputStreamReader(System.in));
         
         while (slices.hasNext()) {
-          Slice slice = slices.next();
+          Filter slice = slices.next();
 
           assert slice.getNumFilters() == 1 : "HandLayout only works for Slices with one filter! "  + 
                slice;
@@ -88,7 +88,7 @@ public class HandLayout implements Layout {
         }
     }
 
-    public void setComputeNode(SliceNode node, ComputeNode tile) {
+    public void setComputeNode(InternalFilterNode node, ComputeNode tile) {
         assignment.put(node, (Core)tile);
     }
 

@@ -5,21 +5,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.fission.FissionGroup;
 
 public class FissionGroupStore {
 
     private static HashSet<FissionGroup> fissionGroups;
 
-    private static HashMap<Slice, FissionGroup> unfizzedToFissionGroup;
-    private static HashMap<Slice, FissionGroup> fizzedToFissionGroup;
+    private static HashMap<Filter, FissionGroup> unfizzedToFissionGroup;
+    private static HashMap<Filter, FissionGroup> fizzedToFissionGroup;
 
     static {
         fissionGroups = new HashSet<FissionGroup>();
 
-        unfizzedToFissionGroup = new HashMap<Slice, FissionGroup>();
-        fizzedToFissionGroup = new HashMap<Slice, FissionGroup>();
+        unfizzedToFissionGroup = new HashMap<Filter, FissionGroup>();
+        fizzedToFissionGroup = new HashMap<Filter, FissionGroup>();
     }
 
     public static void addFissionGroup(FissionGroup group) {
@@ -27,7 +27,7 @@ public class FissionGroupStore {
 
         unfizzedToFissionGroup.put(group.unfizzedSlice, group);
 
-        for(Slice slice : group.fizzedSlices)
+        for(Filter slice : group.fizzedSlices)
             fizzedToFissionGroup.put(slice, group);
     }
 
@@ -35,7 +35,7 @@ public class FissionGroupStore {
         return fissionGroups;
     }
 
-    public static FissionGroup getFissionGroup(Slice slice) {
+    public static FissionGroup getFissionGroup(Filter slice) {
         if(unfizzedToFissionGroup.containsKey(slice))
             return unfizzedToFissionGroup.get(slice);
 
@@ -45,20 +45,20 @@ public class FissionGroupStore {
         return null;
     }
 
-    public static boolean isFizzed(Slice slice) {
+    public static boolean isFizzed(Filter slice) {
         return unfizzedToFissionGroup.containsKey(slice) ||
             fizzedToFissionGroup.containsKey(slice);
     }
 
-    public static boolean isUnfizzedSlice(Slice slice) {
+    public static boolean isUnfizzedSlice(Filter slice) {
         return unfizzedToFissionGroup.containsKey(slice);
     }
 
-    public static boolean isFizzedSlice(Slice slice) {
+    public static boolean isFizzedSlice(Filter slice) {
         return fizzedToFissionGroup.containsKey(slice);
     }
 
-    public static Slice getUnfizzedSlice(Slice slice) {
+    public static Filter getUnfizzedSlice(Filter slice) {
         if(unfizzedToFissionGroup.containsKey(slice))
             return slice;
 
@@ -68,11 +68,11 @@ public class FissionGroupStore {
         return null;
     }
 
-    public static FilterInfo getUnfizzedFilterInfo(Slice slice) {
+    public static FilterInfo getUnfizzedFilterInfo(Filter slice) {
         return getFissionGroup(slice).unfizzedFilterInfo;
     }
 
-    public static Slice[] getFizzedSlices(Slice slice) {
+    public static Filter[] getFizzedSlices(Filter slice) {
         if(unfizzedToFissionGroup.containsKey(slice))
             return unfizzedToFissionGroup.get(slice).fizzedSlices;
 
@@ -82,7 +82,7 @@ public class FissionGroupStore {
         return null;
     }
 
-    public static int getFizzedSliceIndex(Slice slice) {
+    public static int getFizzedSliceIndex(Filter slice) {
         return getFissionGroup(slice).getFizzedSliceIndex(slice);
     }
 

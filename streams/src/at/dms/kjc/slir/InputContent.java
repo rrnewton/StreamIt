@@ -33,14 +33,6 @@ public abstract class InputContent extends PredefinedContent implements at.dms.k
     public InputContent(SIRPredefinedFilter filter) {
         super(filter);
     }
-
-    /**
-     * Construct InputContent from UnflatFilter.
-     * @param unflat The UnflatFilter used to contruct the InputContent.
-     */
-    public InputContent(UnflatFilter unflat) {
-        super(unflat);
-    }
     
     public abstract void createContent();
 

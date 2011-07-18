@@ -4,8 +4,8 @@ import java.util.List;
 
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.tilera.arrayassignment.ArrayAssignmentStatements;
 
 
@@ -32,7 +32,7 @@ public class FileReaderRemoteReads extends FileReaderCode {
         if (dstInfo.totalItemsReceived(phase) > 0) {
 
             //rotations of the output for the file reader
-            InterSliceEdge edge = input.getSingleEdge(phase);
+            InterFilterEdge edge = input.getSingleEdge(phase);
             assert edge == input.getEdgeFrom(phase, fileOutput.getPrevFilter());
             assert dstInfo.totalItemsReceived(phase) % fileOutput.getWeight(edge, phase) == 0;
             int rotations = dstInfo.totalItemsReceived(phase) / fileOutput.getWeight(edge, phase);

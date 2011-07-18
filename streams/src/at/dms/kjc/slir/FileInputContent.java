@@ -59,15 +59,6 @@ public class FileInputContent extends InputContent implements at.dms.kjc.DeepClo
     }
 
     /**
-     * Construct FileInputContent from UnflatFilter.
-     * @param unflat The UnflatFilter used to contruct the FileInputContent.
-     */
-    public FileInputContent(UnflatFilter unflat) {
-        super(unflat);
-        filename=((SIRFileReader)unflat.filter).getFileName();
-    }
-
-    /**
      * Returns filename of FileInputContent.
      */
     public String getFileName() {

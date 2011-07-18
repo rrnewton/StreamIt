@@ -21,7 +21,7 @@ import java.util.LinkedList;
 
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.Filter;
 
 /**
  * This class implements general deep cloning using the serializable interface
@@ -45,7 +45,7 @@ public class ObjectDeepCloner
      * Deep copy a slice.
      * 
      */ 
-    static public Object deepCopy(Slice oldObj) {
+    static public Object deepCopy(Filter oldObj) {
         if (!KjcOptions.clone_with_serialization) {
             return AutoCloner.deepCopy(oldObj);
         } else {

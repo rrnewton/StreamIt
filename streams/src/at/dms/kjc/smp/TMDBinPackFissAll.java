@@ -10,14 +10,14 @@ import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.fusion.FuseAll;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.SliceWorkEstimate;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.FilterWorkEstimate;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
+import at.dms.kjc.slir.fission.FissionGroup;
 
 public class TMDBinPackFissAll extends Scheduler {
 
@@ -25,28 +25,28 @@ public class TMDBinPackFissAll extends Scheduler {
 
     private double DUP_THRESHOLD;
     public static final int FISS_COMP_COMM_THRESHOLD = 10;
-    private HashMap<Slice, Integer> fizzAmount;
+    private HashMap<Filter, Integer> fizzAmount;
 
     public TMDBinPackFissAll() {
         super();
         DUP_THRESHOLD = ((double)KjcOptions.dupthresh) / 100.0;
-        fizzAmount = new HashMap<Slice, Integer>();
+        fizzAmount = new HashMap<Filter, Integer>();
     }
     
     /** Get the Core for a Slice 
-     * @param node the {@link at.dms.kjc.slicegraph.SliceNode} to look up. 
-     * @return the Core that should execute the {@link at.dms.kjc.slicegraph.SliceNode}. 
+     * @param node the {@link at.dms.kjc.slir.InternalFilterNode} to look up. 
+     * @return the Core that should execute the {@link at.dms.kjc.slir.InternalFilterNode}. 
      */
-    public Core getComputeNode(SliceNode node) {
+    public Core getComputeNode(InternalFilterNode node) {
         assert layoutMap.keySet().contains(node);
         return layoutMap.get(node);
     }
     
     /** Set the Core for a Slice 
-     * @param node         the {@link at.dms.kjc.slicegraph.SliceNode} to associate with ...
+     * @param node         the {@link at.dms.kjc.slir.InternalFilterNode} to associate with ...
      * @param core   The tile to assign the node
      */
-    public void setComputeNode(SliceNode node, Core core) {
+    public void setComputeNode(InternalFilterNode node, Core core) {
         assert node != null && core != null;
         //remember what filters each tile has mapped to it
         layoutMap.put(node, core);
@@ -62,20 +62,20 @@ public class TMDBinPackFissAll extends Scheduler {
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
         
-        LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
-        HashSet<Slice> fizzedSlices = new HashSet<Slice>();
-        HashSet<Slice> unfizzedSlices = new HashSet<Slice>();
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        HashSet<Filter> fizzedSlices = new HashSet<Filter>();
+        HashSet<Filter> unfizzedSlices = new HashSet<Filter>();
         
         // Get work estimates for all slices
-        HashMap<FilterSliceNode, Long> workEsts = new HashMap<FilterSliceNode, Long>();
-        for(Slice slice : slices) {
-        	long workEst = SliceWorkEstimate.getWork(slice);
+        HashMap<WorkNode, Long> workEsts = new HashMap<WorkNode, Long>();
+        for(Filter slice : slices) {
+        	long workEst = FilterWorkEstimate.getWork(slice);
         	workEsts.put(slice.getFirstFilter(), workEst);
         }
         
         // Categorize slices into predefined, fizzed and unfizzed slices
         // Predefined filters are automatically added to off-chip memory
-        for(Slice slice : slices) {
+        for(Filter slice : slices) {
         	if(slice.getFirstFilter().isPredefined())
         		setComputeNode(slice.getFirstFilter(), SMPBackend.chip.getOffChipMemory());
         	else if(FissionGroupStore.isFizzed(slice))
@@ -88,8 +88,8 @@ public class TMDBinPackFissAll extends Scheduler {
         System.out.println("Number of unfizzed slices: " + unfizzedSlices.size());
         
         // Sort unfizzed slices by estimated work, most work first
-        LinkedList<Slice> sortedUnfizzedSlices = new LinkedList<Slice>();
-        for(Slice slice : unfizzedSlices) {
+        LinkedList<Filter> sortedUnfizzedSlices = new LinkedList<Filter>();
+        for(Filter slice : unfizzedSlices) {
         	boolean inserted = false;
         	for(int x = 0 ; x < sortedUnfizzedSlices.size() ; x++) {
         		if(workEsts.get(slice.getFirstFilter()) >
@@ -111,7 +111,7 @@ public class TMDBinPackFissAll extends Scheduler {
         for(int x = 0 ; x < workAmounts.length ; x++)
         	workAmounts[x] = 0;
         
-        for(Slice slice : sortedUnfizzedSlices) {
+        for(Filter slice : sortedUnfizzedSlices) {
         	// Find core with minimum amount of work
         	long minWork = Long.MAX_VALUE;
         	int minCore = -1;
@@ -133,14 +133,14 @@ public class TMDBinPackFissAll extends Scheduler {
         
         // Schedule fizzed slices by assigning fizzed copies sequentially
         // across cores
-        HashSet<Slice> alreadyAssigned = new HashSet<Slice>();
-        for(Slice slice : fizzedSlices) {
+        HashSet<Filter> alreadyAssigned = new HashSet<Filter>();
+        for(Filter slice : fizzedSlices) {
             // If slice already assigned, skip it
             if(alreadyAssigned.contains(slice))
                 continue;
         	
         	// Get fizzed copies of slice
-        	Slice[] fizzedCopies = FissionGroupStore.getFizzedSlices(slice);
+        	Filter[] fizzedCopies = FissionGroupStore.getFizzedSlices(slice);
         	
         	// Assign fizzed set sequentially across cores
         	for(int x = 0 ; x < fizzedCopies.length ; x++) {
@@ -149,7 +149,7 @@ public class TMDBinPackFissAll extends Scheduler {
         	}
 
             // Mark fizzed set as assigned
-            for(Slice fizzedSlice : fizzedCopies)
+            for(Filter fizzedSlice : fizzedCopies)
                 alreadyAssigned.add(fizzedSlice);
 
             // If using shared buffers, then fission does not replace the original
@@ -176,10 +176,10 @@ public class TMDBinPackFissAll extends Scheduler {
         if (KjcOptions.dup == 1 || KjcOptions.optfile != null) {
         	System.out.println("***** Not using TMD scheduler since an SIR partitioner was used *****!");
         	//multiply steady multiplicity of each filter by KjcOptions.steadyMult
-		    LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
 
-		    for (Slice slice : slices) {
-		    	FilterContent filter = slice.getFirstFilter().getFilter();
+		    for (Filter slice : slices) {
+		    	WorkNodeContent filter = slice.getFirstFilter().getFilter();
 		    	filter.multSteadyMult(KjcOptions.steadymult);
 		    }
 
@@ -196,10 +196,10 @@ public class TMDBinPackFissAll extends Scheduler {
         System.out.println("Using fission steady multiplicity factor: " + factor);
                 
         //go through and multiply the steady multiplicity of each filter by factor        
-        LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
 
-        for (Slice slice : slices) {
-            FilterContent filter = slice.getFirstFilter().getFilter();
+        for (Filter slice : slices) {
+            WorkNodeContent filter = slice.getFirstFilter().getFilter();
             filter.multSteadyMult(factor * KjcOptions.steadymult);
          }
         
@@ -212,7 +212,7 @@ public class TMDBinPackFissAll extends Scheduler {
         int maxFission = 0;
         int i = 0;
         //go through and perform the fission
-        for (Slice slice : slices) {
+        for (Filter slice : slices) {
             if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
                 FissionGroup fissionGroup = 
                     StatelessFissioner.doit(slice, graphSchedule.getSlicer(), fizzAmount.get(slice));
@@ -244,14 +244,14 @@ public class TMDBinPackFissAll extends Scheduler {
      * filters that meet specific criteria are all fizzed by <totalTiles>
      */
     public void calculateFizzAmounts(int totalTiles) {
-    	LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+    	LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
     	
     	// Look for fizzable filters
-    	for(Slice slice : slices) {
-    		FilterSliceNode fsn = slice.getFirstFilter();
-    		FilterContent fc = fsn.getFilter();
+    	for(Filter slice : slices) {
+    		WorkNode fsn = slice.getFirstFilter();
+    		WorkNodeContent fc = fsn.getFilter();
     		
-    		long workEst = SliceWorkEstimate.getWork(slice);
+    		long workEst = FilterWorkEstimate.getWork(slice);
     		int commRate = (fc.getPushInt() + fc.getPopInt() * fc.getMult(SchedulingPhase.STEADY));
     		
     		// Predefined filters can't be fizzed, automatically skip
@@ -303,11 +303,11 @@ public class TMDBinPackFissAll extends Scheduler {
      */
     private int multiplicityFactor(int tiles) {
         int maxFactor = 1;
-        LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
         
         //find minimum steady-state multiplicity factor necessary to meet
         //copyDown and duplication constraints of fission
-        for (Slice slice : slices) {
+        for (Filter slice : slices) {
             if (slice.getFirstFilter().isPredefined())
                 continue;
             

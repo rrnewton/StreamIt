@@ -22,10 +22,10 @@ import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.tilera.arrayassignment.ArrayAssignmentStatements;
 
 public class BufferRemoteWritesTransfers extends BufferTransfers {
@@ -142,7 +142,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
     
     private void generateStatements(SchedulingPhase phase) {
      
-        FilterSliceNode filter;
+        WorkNode filter;
         //if we are directly writing, then the push method does the remote writes,
         //so no other remote writes are necessary
         if (directWrite)
@@ -184,13 +184,13 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         int rotations = fi.totalItemsSent(phase) / output.totalWeights(phase);
         
         //first create an map from destinations to ints to index into the state arrays
-        HashMap<InterSliceEdge, Integer> destIndex = new HashMap<InterSliceEdge, Integer>();
+        HashMap<InterFilterEdge, Integer> destIndex = new HashMap<InterFilterEdge, Integer>();
         int index = 0;
         int numDests = output.getDestSet(phase).size();
         int[][] destIndices = new int[numDests][];
         int[] nextWriteIndex = new int[numDests];
         
-        for (InterSliceEdge edge : output.getDestSet(phase)) {
+        for (InterFilterEdge edge : output.getDestSet(phase)) {
             destIndex.put(edge, index);
             destIndices[index] = getDestIndices(edge, rotations, phase);
             nextWriteIndex[index] = 0;
@@ -200,12 +200,12 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         int items = 0;
         for (int rot = 0; rot < rotations; rot++) {
             for (int weightIndex = 0; weightIndex < output.getWeights(phase).length; weightIndex++) {
-                InterSliceEdge[] dests = output.getDests(phase)[weightIndex];
+                InterFilterEdge[] dests = output.getDests(phase)[weightIndex];
                 for (int curWeight = 0; curWeight < output.getWeights(phase)[weightIndex]; curWeight++) {
                     int sourceElement= rot * output.totalWeights(phase) + 
                         output.weightBefore(weightIndex, phase) + curWeight + writeOffset;
                         items++;
-                        for (InterSliceEdge dest : dests) {
+                        for (InterFilterEdge dest : dests) {
                             int destElement = 
                                 destIndices[destIndex.get(dest)][nextWriteIndex[destIndex.get(dest)]];
                             nextWriteIndex[destIndex.get(dest)]++;
@@ -239,9 +239,9 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         statements.addAll(reorderStatements.toCompressedJStmts());   
     }
     
-    private int[] getDestIndices(InterSliceEdge edge, int outputRots, SchedulingPhase phase) {
+    private int[] getDestIndices(InterFilterEdge edge, int outputRots, SchedulingPhase phase) {
         int[] indices = new int[outputRots * output.getWeight(edge, phase)];
-        InputSliceNode input = edge.getDest();
+        InputNode input = edge.getDest();
         FilterInfo dsFilter = FilterInfo.getFilterInfo(input.getNextFilter());
         //System.out.println("Dest copyDown: "+dsFilter.copyDown);
         assert indices.length %  input.getWeight(edge, phase) == 0;
@@ -279,14 +279,14 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             //the weights of any inputs that are not mapped to this tile that appear before
             //the local source
             
-            InputSliceNode input = parent.filterNode.getParent().getHead();
-            FilterSliceNode localSrc = ((InputRotatingBuffer)parent).getLocalSrcFilter();
+            InputNode input = parent.filterNode.getParent().getHead();
+            WorkNode localSrc = ((InputRotatingBuffer)parent).getLocalSrcFilter();
             //the local source and dest might not communicate in the init stage, if not
             //the offset should just be zero
             if (!input.hasEdgeFrom(phase, localSrc))
                 return 0;
             
-            InterSliceEdge theEdge = input.getEdgeFrom(phase, localSrc);
+            InterFilterEdge theEdge = input.getEdgeFrom(phase, localSrc);
             int offset = input.weightBefore(theEdge, phase);
    
             //if we are not in the init, we must skip over the dest's copy down
@@ -306,7 +306,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
                 literal = getWriteOffset(phase);
         } else {
             if (directWrite) {
-                InterSliceEdge edge = output.getSingleEdge(phase);
+                InterFilterEdge edge = output.getSingleEdge(phase);
                 //if we are directly writing then we have to get the index into the remote
                 //buffer of start of this source
                 

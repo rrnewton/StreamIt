@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
 
 public abstract class FileReaderCode {
     /** the output buffer is the source */
@@ -19,13 +19,13 @@ public abstract class FileReaderCode {
     /** the code for transferring in the init */
     protected List<JStatement> commandsInit;
     /** the output slice node */
-    protected InputSliceNode input;
+    protected InputNode input;
     /** any declarations that are needed */
     protected List<JStatement> decls;
     /** the output slice node of the file */
-    protected OutputSliceNode fileOutput;
+    protected OutputNode fileOutput;
     /** the edge between the file reader and this input buffer */
-    protected InterSliceEdge edge;
+    protected InterFilterEdge edge;
     
     public FileReaderCode(InputRotatingBuffer buf) {
         parent = buf;

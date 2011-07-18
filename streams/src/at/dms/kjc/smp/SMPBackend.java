@@ -15,12 +15,12 @@ import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.sir.SIRInterfaceTable;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceWorkEstimate;
 import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.FilterWorkEstimate;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 public class SMPBackend {
     public static final boolean FAKE_IO = false;
@@ -110,12 +110,12 @@ public class SMPBackend {
         System.out.println("========================================");
         for(int x = 0 ; x < KjcOptions.smp ; x++) {
             Core core = chip.getNthComputeNode(x);
-            Set<FilterSliceNode> filters = core.getComputeCode().getFilters();
+            Set<WorkNode> filters = core.getComputeCode().getFilters();
             long totalWork = 0;
 
             System.out.println("Core " + core.getCoreID() + ": ");
-            for(FilterSliceNode filter : filters) {
-                long work = SliceWorkEstimate.getWork(filter.getParent());
+            for(WorkNode filter : filters) {
+                long work = FilterWorkEstimate.getWork(filter.getParent());
                 System.out.format("%16d | " + filter + "\n", work);
                 totalWork += work;
             }
@@ -124,18 +124,18 @@ public class SMPBackend {
 
         // calculate computation to communication ratio
         if(KjcOptions.sharedbufs) {
-            LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
-            HashSet<Slice> compProcessed = new HashSet<Slice>();
-            HashSet<Slice> commProcessed = new HashSet<Slice>();
+            LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+            HashSet<Filter> compProcessed = new HashSet<Filter>();
+            HashSet<Filter> commProcessed = new HashSet<Filter>();
             
             long comp = 0;
             long comm = 0;
             
-            for(Slice slice : slices) {
+            for(Filter slice : slices) {
                 if(compProcessed.contains(slice))
                     continue;
                 
-                comp += SliceWorkEstimate.getWork(slice);
+                comp += FilterWorkEstimate.getWork(slice);
                 compProcessed.add(slice);
             }
 
@@ -236,7 +236,7 @@ public class SMPBackend {
             */
             
             // Simple communication estimation
-            for(Slice slice : slices) {
+            for(Filter slice : slices) {
                 if(commProcessed.contains(slice))
                     continue;
                 

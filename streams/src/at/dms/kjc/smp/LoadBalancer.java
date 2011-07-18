@@ -31,13 +31,13 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.common.CodegenPrintWriter;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.fission.FissionGroup;
 
 public class LoadBalancer {
 
@@ -73,17 +73,17 @@ public class LoadBalancer {
     }
 
     private static boolean canLoadBalance(FissionGroup group) {
-        FilterSliceNode filter = group.unfizzedSlice.getFirstFilter();
+        WorkNode filter = group.unfizzedSlice.getFirstFilter();
         FilterInfo filterInfo = group.unfizzedFilterInfo;
-        OutputSliceNode output = group.unfizzedSlice.getTail();
+        OutputNode output = group.unfizzedSlice.getTail();
 
         if(filterInfo.push % output.totalWeights(SchedulingPhase.STEADY) != 0)
             return false;
 
         int numOutputRots = filterInfo.push / output.totalWeights(SchedulingPhase.STEADY);
 
-        for(InterSliceEdge edge : output.getDestSet(SchedulingPhase.STEADY)) {
-            InputSliceNode input = edge.getDest();
+        for(InterFilterEdge edge : output.getDestSet(SchedulingPhase.STEADY)) {
+            InputNode input = edge.getDest();
 
             int outputWeight = output.getWeight(edge, SchedulingPhase.STEADY);
             int inputWeight = input.getWeight(edge, SchedulingPhase.STEADY);
@@ -119,7 +119,7 @@ public class LoadBalancer {
         return loadBalancedGroups.contains(group);
     }
 
-    public static boolean isLoadBalanced(Slice slice) {
+    public static boolean isLoadBalanced(Filter slice) {
         FissionGroup group = FissionGroupStore.getFissionGroup(slice);
 
         if(group == null)
@@ -128,7 +128,7 @@ public class LoadBalancer {
         return isLoadBalanced(group);
     }
 
-    public static String getStartIterRef(FissionGroup group, Slice fizzedSlice) {
+    public static String getStartIterRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
         Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
@@ -136,7 +136,7 @@ public class LoadBalancer {
         return startItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
     }
 
-    public static String getNumItersRef(FissionGroup group, Slice fizzedSlice) {
+    public static String getNumItersRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
         Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
@@ -144,7 +144,7 @@ public class LoadBalancer {
         return numItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
     }
 
-    public static String getFilterCycleCountRef(FissionGroup group, Slice fizzedSlice) {
+    public static String getFilterCycleCountRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
         Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
@@ -477,8 +477,8 @@ public class LoadBalancer {
         }
     }
 
-    private static Slice getFizzedSliceOnCore(FissionGroup group, Core core) {
-        for(Slice slice : group.fizzedSlices) {
+    private static Filter getFizzedSliceOnCore(FissionGroup group, Core core) {
+        for(Filter slice : group.fizzedSlices) {
             if(SMPBackend.scheduler.getComputeNode(slice.getFirstFilter()).equals(core)) {
                 return slice;
             }

@@ -8,8 +8,8 @@ import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldAccessExpression;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * This class models the rotating structure that is needed when a tile uses double buffered communication
@@ -24,7 +24,7 @@ public class SourceAddressRotation extends RotatingBuffer {
     /** The InputBuffer this rotation models */
     protected InputRotatingBuffer inputBuffer;
     
-    public SourceAddressRotation(Tile tile, InputRotatingBuffer buf, FilterSliceNode dest, Edge edge) {
+    public SourceAddressRotation(Tile tile, InputRotatingBuffer buf, WorkNode dest, Edge edge) {
         super(edge, dest, tile);
         this.parent = tile;
         this.inputBuffer = buf;

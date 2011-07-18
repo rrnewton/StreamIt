@@ -11,8 +11,8 @@ import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldAccessExpression;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * This class models the rotating structure that is needed when a core uses double buffered communication
@@ -41,7 +41,7 @@ public class SourceAddressRotation extends RotatingBuffer {
     private static HashMap<InputRotatingBuffer, Integer> bufCount =
     	new HashMap<InputRotatingBuffer, Integer>();
     
-    public SourceAddressRotation(Core core, InputRotatingBuffer buf, FilterSliceNode dest, Edge edge) {
+    public SourceAddressRotation(Core core, InputRotatingBuffer buf, WorkNode dest, Edge edge) {
         super(edge, dest, core);
         this.parent = core;
         this.inputBuffer = buf;

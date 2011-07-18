@@ -11,8 +11,8 @@ import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.sir.SIRInterfaceTable;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.slicegraph.DataFlowOrder;
 import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.slir.DataFlowOrder;
 
 public class TileraBackend {
     public static final boolean FAKE_IO = true;
