@@ -22,9 +22,9 @@ public abstract class Slicer {
 
     protected HashMap[] exeCounts;
 
-    protected LinkedList<Slice> topSlices;
+    protected LinkedList<Filter> topSlices;
 
-    public Slice[] io;
+    public Filter[] io;
 
     /**
      * Create a Partitioner.
@@ -42,21 +42,21 @@ public abstract class Slicer {
         this.topFilters = topFilters;
         this.exeCounts = exeCounts;
         if (topFilters != null)
-            topSlices = new LinkedList<Slice>();
+            topSlices = new LinkedList<Filter>();
     }
 
     /**
      * Partition the stream graph into slices (slices) and return the slices.
      * @return The slices (slices) of the partitioned graph. 
      */
-    public abstract Slice[] partition();
+    public abstract Filter[] partition();
 
     /**
      * Check for I/O in slice
      * @param slice
      * @return Return true if this slice is an IO slice (file reader/writer).
      */
-    public boolean isIO(Slice slice) {
+    public boolean isIO(Filter slice) {
         for (int i = 0; i < io.length; i++) {
             if (slice == io[i])
                 return true;
@@ -67,14 +67,14 @@ public abstract class Slicer {
     /**
      * Add the slice to the list of top slices, roots of the forest.
      */
-    public void addTopSlice(Slice slice) {
+    public void addTopSlice(Filter slice) {
         topSlices.add(slice);
     }
     
     /**
      * remove this slice from the list of top slices, roots of the forest.
      */
-    public void removeTopSlice(Slice slice) {
+    public void removeTopSlice(Filter slice) {
         assert topSlices.contains(slice);
         topSlices.remove(slice);
     }
@@ -83,19 +83,19 @@ public abstract class Slicer {
      * Get all slices
      * @return All the slices of the slice graph. 
      */
-    public Slice[] getSliceGraph() {
+    public Filter[] getSliceGraph() {
         //new slices may have been added so we need to reconstruct the graph each time
-        LinkedList<Slice> sliceGraph = 
-            DataFlowOrder.getTraversal(topSlices.toArray(new Slice[topSlices.size()]));
+        LinkedList<Filter> sliceGraph = 
+            DataFlowOrder.getTraversal(topSlices.toArray(new Filter[topSlices.size()]));
         
-        return sliceGraph.toArray(new Slice[sliceGraph.size()]);
+        return sliceGraph.toArray(new Filter[sliceGraph.size()]);
     }
     
     /**
      * Return true if the slice is a top (source) slice in the forrest
      */
-    public boolean isTopSlice(Slice slice) {
-        for (Slice cur : topSlices) {
+    public boolean isTopSlice(Filter slice) {
+        for (Filter cur : topSlices) {
             if (cur == slice)
                 return true;
         }
@@ -107,9 +107,9 @@ public abstract class Slicer {
      * 
      * @return top level slices
      */
-    public Slice[] getTopSlices() {
+    public Filter[] getTopSlices() {
         assert topSlices != null;
-        return topSlices.toArray(new Slice[topSlices.size()]);
+        return topSlices.toArray(new Filter[topSlices.size()]);
     }
 
     /**
@@ -120,8 +120,8 @@ public abstract class Slicer {
      * 
      * @return True if the slice graph contains slice.
      */
-    public boolean containsSlice(Slice slice) {
-        Slice[] sliceGraph = getSliceGraph();
+    public boolean containsSlice(Filter slice) {
+        Filter[] sliceGraph = getSliceGraph();
         for (int i = 0; i < sliceGraph.length; i++) 
             if (sliceGraph[i] == slice)
                 return true;
@@ -134,18 +134,18 @@ public abstract class Slicer {
     
     // dump the the completed partition to a dot file
     public void dumpGraph(String filename, Layout layout, boolean fullInfo) {
-        Slice[] sliceGraph = getSliceGraph();
+        Filter[] sliceGraph = getSliceGraph();
         StringBuffer buf = new StringBuffer();
         buf.append("digraph Flattend {\n");
         buf.append("size = \"8, 10.5\";\n");
 
         for (int i = 0; i < sliceGraph.length; i++) {
-            Slice slice = sliceGraph[i];
+            Filter slice = sliceGraph[i];
             assert slice != null;
             buf.append(slice.hashCode() + " [ " + 
                     sliceName(slice, layout, fullInfo) + 
                     "\" ];\n");
-            Slice[] next = getNext(slice/* ,parent */, SchedulingPhase.STEADY);
+            Filter[] next = getNext(slice/* ,parent */, SchedulingPhase.STEADY);
             for (int j = 0; j < next.length; j++) {
                 assert next[j] != null;
                 buf.append(slice.hashCode() + " -> " + next[j].hashCode()
@@ -172,15 +172,15 @@ public abstract class Slicer {
     
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
-    protected Slice[] getNext(Slice slice, SchedulingPhase phase) {
+    protected Filter[] getNext(Filter slice, SchedulingPhase phase) {
         SliceNode node = slice.getHead();
-        if (node instanceof InputSliceNode)
+        if (node instanceof InputNode)
             node = node.getNext();
-        while (node != null && node instanceof FilterSliceNode) {
+        while (node != null && node instanceof WorkNode) {
             node = node.getNext();
         }
-        if (node instanceof OutputSliceNode) {
-            Edge[][] dests = ((OutputSliceNode) node).getDests(phase);
+        if (node instanceof OutputNode) {
+            Edge[][] dests = ((OutputNode) node).getDests(phase);
             ArrayList<Object> output = new ArrayList<Object>();
             for (int i = 0; i < dests.length; i++) {
                 Edge[] inner = dests[i];
@@ -191,15 +191,15 @@ public abstract class Slicer {
                         output.add(next);
                 }
             }
-            Slice[] out = new Slice[output.size()];
+            Filter[] out = new Filter[output.size()];
             output.toArray(out);
             return out;
         }
-        return new Slice[0];
+        return new Filter[0];
     }
 
-    protected FilterContent getFilterContent(UnflatFilter f) {
-        FilterContent content;
+    protected WorkNodeContent getFilterContent(UnflatFilter f) {
+        WorkNodeContent content;
 
         if (f.filter instanceof SIRFileReader)
             content = new FileInputContent(f);
@@ -207,7 +207,7 @@ public abstract class Slicer {
             content = new FileOutputContent(f);
         else {
             assert f.filter != null;
-            content = new FilterContent(f);
+            content = new WorkNodeContent(f);
         }
         
         return content;
@@ -216,13 +216,13 @@ public abstract class Slicer {
     
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
-    protected  String sliceName(Slice slice, Layout layout, boolean fullInfo) {
+    protected  String sliceName(Filter slice, Layout layout, boolean fullInfo) {
         SliceNode node = slice.getHead();
 
         StringBuffer out = new StringBuffer();
 
         //do something fancy for linear slices!!!
-        if (((FilterSliceNode)node.getNext()).getFilter().getArray() != null)
+        if (((WorkNode)node.getNext()).getFilter().getArray() != null)
             out.append("color=cornflowerblue, style=filled, ");
         
         out.append("label=\"" + slice.hashCode() + "\\n");
@@ -233,7 +233,7 @@ public abstract class Slicer {
         node = node.getNext();
         while (node != null ) {
             if (node.isFilterSlice()) {
-                FilterContent f = node.getAsFilter().getFilter();
+                WorkNodeContent f = node.getAsFilter().getFilter();
                 out.append("\\n" + node.toString() + "{"
                         + "}");
                 if (f.isTwoStage())
@@ -263,25 +263,25 @@ public abstract class Slicer {
    
     
     /**
-     * Make sure that all the {@link Slice}s are {@link SimpleSlice}s.
+     * Make sure that all the {@link Filter}s are {@link SimpleSlice}s.
      */
     
     public void ensureSimpleSlices() {
-        Slice[] sliceGraph = getSliceGraph();
+        Filter[] sliceGraph = getSliceGraph();
         // update sliceGraph, topSlices, io, sliceBNWork, bottleNeckFilter
         // Assume that topSlices, io, sliceBNWork.keys(), bottleNeckFilter.keys() 
         // are all proper subsets of sliceGraph.
         List<SimpleSlice> newSliceGraph = new LinkedList<SimpleSlice>();
-        Map<Slice,SimpleSlice> newtopSlices = new HashMap<Slice,SimpleSlice>();
-        for (Slice s : topSlices) {newtopSlices.put(s, null);}
-        Map<Slice,SimpleSlice> newIo = new HashMap<Slice,SimpleSlice>();
-        for (Slice s : io) {newIo.put(s,null);}
+        Map<Filter,SimpleSlice> newtopSlices = new HashMap<Filter,SimpleSlice>();
+        for (Filter s : topSlices) {newtopSlices.put(s, null);}
+        Map<Filter,SimpleSlice> newIo = new HashMap<Filter,SimpleSlice>();
+        for (Filter s : io) {newIo.put(s,null);}
         
         // for each slice s, derived initial simple slice ss1, following simple slices ss2 ... ssn
         // add to ss1 ... ssn to newSliceGraph,
         // replace newtopSlices: s |-> null with s -> ss1
         // replace newIo: s |-> null with s -> ss1
-        for (Slice s : sliceGraph) {
+        for (Filter s : sliceGraph) {
 //            if (s.getNumFilters() == 1) {
 //                SimpleSlice ss = new SimpleSlice(s.getHead(), s.getFilterNodes().get(0), s.getTail());
 //                newSliceGraph.add(ss);
@@ -294,18 +294,18 @@ public abstract class Slicer {
 //            } else {
                 int numFilters = s.getNumFilters();
                 assert numFilters != 0 : s;
-                List<FilterSliceNode> fs = s.getFilterNodes();
-                OutputSliceNode prevTail = null;
+                List<WorkNode> fs = s.getFilterNodes();
+                OutputNode prevTail = null;
                 for (int i = 0; i < numFilters; i++) {
-                    InputSliceNode head;
-                    OutputSliceNode tail;
-                    FilterSliceNode f = fs.get(i);
+                    InputNode head;
+                    OutputNode tail;
+                    WorkNode f = fs.get(i);
                     // first simpleSlice has a head, otherwise create a new one.
                     if (i == 0) {
                         head = s.getHead();
                     } else {
                        /* TODO weight should probably not be 1 */
-                       head = new InputSliceNode(new int[]{1});
+                       head = new InputNode(new int[]{1});
                        // Connect tail from last iteration with head from this iteration.
                        // prevTail will not be null here...
                        InterSliceEdge prevTailToHead = new InterSliceEdge(prevTail,head);
@@ -316,7 +316,7 @@ public abstract class Slicer {
                        tail = s.getTail();
                    } else {
                        /* TODO weight should probably not be 1 */
-                       tail = new OutputSliceNode(new int[]{1});
+                       tail = new OutputNode(new int[]{1});
                    }
                    prevTail = tail;
                    SimpleSlice ss = new SimpleSlice(head, f, tail);
@@ -340,8 +340,8 @@ public abstract class Slicer {
             
 //        }
         // update arrays of slices with new info.
-        Slice[] oldTopSlices = topSlices.toArray(new Slice[topSlices.size()]);
-        topSlices = new LinkedList<Slice>();
+        Filter[] oldTopSlices = topSlices.toArray(new Filter[topSlices.size()]);
+        topSlices = new LinkedList<Filter>();
         for (int i = 0; i < oldTopSlices.length; i++) {
             topSlices.add(newtopSlices.get(oldTopSlices[i]));
             assert topSlices.get(i) != null;
@@ -356,8 +356,8 @@ public abstract class Slicer {
      * Force creation of kopi methods and fields for predefined filters.
      */
     public void createPredefinedContent() {
-        for (Slice s : getSliceGraph()) {
-            for (FilterSliceNode n : s.getFilterNodes()) {
+        for (Filter s : getSliceGraph()) {
+            for (WorkNode n : s.getFilterNodes()) {
                 if (n.getFilter() instanceof PredefinedContent) {
                     ((PredefinedContent)n.getFilter()).createContent();
                 }
@@ -372,8 +372,8 @@ public abstract class Slicer {
      * @param node The node to add.
      * @param slice The slice to add the node to.
      */
-    public void addFilterToSlice(FilterSliceNode node, 
-            Slice slice) {
+    public void addFilterToSlice(WorkNode node, 
+            Filter slice) {
     }
     
 

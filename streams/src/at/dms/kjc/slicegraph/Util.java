@@ -22,12 +22,12 @@ public class Util {
      * @param slices a list of Slice's.
      * @return An Iterator over SliceNode's.
      */
-    public static Iterator<SliceNode> sliceNodeTraversal(List<Slice> slices) {
+    public static Iterator<SliceNode> sliceNodeTraversal(List<Filter> slices) {
         LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
         ListIterator it = slices.listIterator();
     
         while (it.hasNext()) {
-            Slice slice = (Slice) it.next();
+            Filter slice = (Filter) it.next();
             SliceNode sliceNode = slice.getHead();
             while (sliceNode != null) {
                 trav.add(sliceNode);
@@ -46,7 +46,7 @@ public class Util {
      * @param slices an array of Slice's.
      * @return An Iterator over SliceNodes.
      */
-    public static Iterator<SliceNode> sliceNodeTraversal(Slice[] slices) {
+    public static Iterator<SliceNode> sliceNodeTraversal(Filter[] slices) {
         LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
     
         for (int i = 0; i < slices.length; i++) {
@@ -72,8 +72,8 @@ public class Util {
      * @return an InterSliceEdge or Edge from src to dst
      */
     public static Edge srcDstToEdge(SliceNode src, SliceNode dst, SchedulingPhase phase) {
-        if (src instanceof OutputSliceNode && dst instanceof InputSliceNode) {
-            InterSliceEdge[][] edgesedges = ((OutputSliceNode)src).getDests(phase);
+        if (src instanceof OutputNode && dst instanceof InputNode) {
+            InterSliceEdge[][] edgesedges = ((OutputNode)src).getDests(phase);
             for (InterSliceEdge[] edges : edgesedges) {
                 for (InterSliceEdge edge : edges) {
                     assert edge.src == src;
@@ -82,7 +82,7 @@ public class Util {
                     }
                 }
             }
-            return new InterSliceEdge((OutputSliceNode)src,(InputSliceNode)dst);
+            return new InterSliceEdge((OutputNode)src,(InputNode)dst);
         } else {
             Edge e = src.getEdgeToNext();
             if (e == null || e.getDest() != dst) {

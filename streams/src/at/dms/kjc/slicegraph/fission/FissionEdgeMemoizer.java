@@ -2,10 +2,10 @@ package at.dms.kjc.slicegraph.fission;
 
 import java.util.HashMap;
 
-import at.dms.kjc.slicegraph.InputSliceNode;
+import at.dms.kjc.slicegraph.InputNode;
 import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slicegraph.OutputNode;
+import at.dms.kjc.slicegraph.Filter;
 
 public class FissionEdgeMemoizer {
     private static HashMap<EdgeDescriptor, InterSliceEdge> edges =
@@ -21,7 +21,7 @@ public class FissionEdgeMemoizer {
         edges.put(edgeDscr, edge);
     }
 
-    public static InterSliceEdge getEdge(OutputSliceNode src, InputSliceNode dest) {
+    public static InterSliceEdge getEdge(OutputNode src, InputNode dest) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(src, dest);      
 
         InterSliceEdge edge = edges.get(edgeDscr);
@@ -34,20 +34,20 @@ public class FissionEdgeMemoizer {
         return edge;
     }
 
-    public static InterSliceEdge getEdge(Slice src, Slice dest) {
+    public static InterSliceEdge getEdge(Filter src, Filter dest) {
         return getEdge(src.getTail(), dest.getHead());
     }
 
     private static class EdgeDescriptor {
-        public OutputSliceNode src;
-        public InputSliceNode dest;
+        public OutputNode src;
+        public InputNode dest;
 
-        public EdgeDescriptor(OutputSliceNode src, InputSliceNode dest) {
+        public EdgeDescriptor(OutputNode src, InputNode dest) {
             this.src = src;
             this.dest = dest;
         }
         
-        public EdgeDescriptor(Slice src, Slice dest) {
+        public EdgeDescriptor(Filter src, Filter dest) {
             this(src.getTail(), dest.getHead());
         }
 

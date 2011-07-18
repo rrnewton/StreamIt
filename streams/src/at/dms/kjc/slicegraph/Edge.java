@@ -63,11 +63,11 @@ public class Edge implements at.dms.kjc.DeepCloneable {
         return src;
     }
 
-    public Edge(OutputSliceNode src) {
+    public Edge(OutputNode src) {
         this.src = src;
     }
 
-    public Edge(InputSliceNode dest) {
+    public Edge(InputNode dest) {
         this.dest = dest;
     }
 
@@ -76,13 +76,13 @@ public class Edge implements at.dms.kjc.DeepCloneable {
             return type;
         }
         // inter-slice edge
-        if (src instanceof OutputSliceNode && dest instanceof InputSliceNode) {
-            FilterContent srcContent;
-            FilterContent dstContent;
+        if (src instanceof OutputNode && dest instanceof InputNode) {
+            WorkNodeContent srcContent;
+            WorkNodeContent dstContent;
             CType srcType;
             CType dstType;
-            srcContent = ((OutputSliceNode)src).getPrevFilter().getFilter();
-            dstContent = ((InputSliceNode)dest).getNextFilter().getFilter();
+            srcContent = ((OutputNode)src).getPrevFilter().getFilter();
+            dstContent = ((InputNode)dest).getNextFilter().getFilter();
             srcType = srcContent.getOutputType();
             dstType = dstContent.getInputType();
             type = dstType;
@@ -92,21 +92,21 @@ public class Edge implements at.dms.kjc.DeepCloneable {
         }
         
         // intra-slice edges:
-        if (src instanceof InputSliceNode && dest instanceof FilterSliceNode) {
-            type = ((FilterSliceNode)dest).getFilter().getInputType();
+        if (src instanceof InputNode && dest instanceof WorkNode) {
+            type = ((WorkNode)dest).getFilter().getInputType();
             return type;
         }
-        if (src instanceof FilterSliceNode && dest instanceof OutputSliceNode) {
-            type = ((FilterSliceNode)src).getFilter().getOutputType();
+        if (src instanceof WorkNode && dest instanceof OutputNode) {
+            type = ((WorkNode)src).getFilter().getOutputType();
             return type;
         }
         // only for general slices...
-        if (src instanceof FilterSliceNode
-                && dest instanceof FilterSliceNode) {
-            type = ((FilterSliceNode)src).getFilter().getOutputType();
-            assert type == ((FilterSliceNode)dest).getFilter().getInputType() 
+        if (src instanceof WorkNode
+                && dest instanceof WorkNode) {
+            type = ((WorkNode)src).getFilter().getOutputType();
+            assert type == ((WorkNode)dest).getFilter().getInputType() 
             : "Error calculating type: " + 
-            ((FilterSliceNode)src).getFilter() + " -> " + ((FilterSliceNode)dest).getFilter();
+            ((WorkNode)src).getFilter() + " -> " + ((WorkNode)dest).getFilter();
             return type;
         }
         throw new AssertionError ("Unexpected SliceNode connection " + src + " -> " + dest);
@@ -144,11 +144,11 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * @param node a FilterSliceNode or InputSliceNode
      * @return a FilterSliceNode
      */
-    private static FilterSliceNode nextFilter(SliceNode node) {
-        if (node instanceof FilterSliceNode) {
-            return (FilterSliceNode)node;
+    private static WorkNode nextFilter(SliceNode node) {
+        if (node instanceof WorkNode) {
+            return (WorkNode)node;
         } else {
-            return ((InputSliceNode)node).getNextFilter();
+            return ((InputNode)node).getNextFilter();
         }
     }
     
@@ -159,11 +159,11 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * @return a FilterSliceNode
      */
    
-    private static FilterSliceNode prevFilter(SliceNode node) {
-        if (node instanceof FilterSliceNode) {
-            return (FilterSliceNode)node;
+    private static WorkNode prevFilter(SliceNode node) {
+        if (node instanceof WorkNode) {
+            return (WorkNode)node;
         } else {
-            return ((OutputSliceNode)node).getPrevFilter();
+            return ((OutputNode)node).getPrevFilter();
         }
     }
 

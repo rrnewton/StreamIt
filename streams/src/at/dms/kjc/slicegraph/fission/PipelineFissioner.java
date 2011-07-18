@@ -23,46 +23,46 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.slicegraph.FilterSliceNode;
+import at.dms.kjc.slicegraph.WorkNode;
 import at.dms.kjc.slicegraph.InterSliceEdge;
 import at.dms.kjc.slicegraph.MutableStateExtractor;
 import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slicegraph.Filter;
 
 public class PipelineFissioner {
 
     // Stores mapping from slice to fizzed copies of the slice
     // Fizzed copies of slices are kept in a specific order since order matters
-    private static HashMap<Slice, LinkedList<Slice>> sliceToFizzedCopies =
-        new HashMap<Slice, LinkedList<Slice>>();
+    private static HashMap<Filter, LinkedList<Filter>> sliceToFizzedCopies =
+        new HashMap<Filter, LinkedList<Filter>>();
 
-    public static boolean isFizzed(Slice slice) {
+    public static boolean isFizzed(Filter slice) {
         return sliceToFizzedCopies.containsKey(slice);
     }
 
-    public static int getFizzAmount(Slice slice) {
+    public static int getFizzAmount(Filter slice) {
         if(!isFizzed(slice))
             return 1;
 
         return sliceToFizzedCopies.get(slice).size();
     }
 
-    public static int getFizzIndex(Slice slice) {
+    public static int getFizzIndex(Filter slice) {
         if(!isFizzed(slice))
             return 0;
 
         return sliceToFizzedCopies.get(slice).indexOf(slice);
     }
 
-    private static FilterSliceNode getFirstFilter(Slice slice) {
+    private static WorkNode getFirstFilter(Filter slice) {
         return slice.getFirstFilter();
     }
 
-    private static FilterSliceNode getLastFilter(Slice slice) {
-        assert (slice.getTail().getPrevious() instanceof FilterSliceNode) :
+    private static WorkNode getLastFilter(Filter slice) {
+        assert (slice.getTail().getPrevious() instanceof WorkNode) :
         "Can't get last FilterSliceNode from Slice";
 
-        return (FilterSliceNode)slice.getTail().getPrevious();
+        return (WorkNode)slice.getTail().getPrevious();
     }
 
     private static int[] toArraySingleInt(LinkedList<Integer> list) {
@@ -99,15 +99,15 @@ public class PipelineFissioner {
         return array;
     }
 
-    private static InterSliceEdge getEdge(Slice src, Slice dest) {
+    private static InterSliceEdge getEdge(Filter src, Filter dest) {
         return FissionEdgeMemoizer.getEdge(src, dest);
     }
     
-    public static boolean canFizz(Slice slice, int fizzAmount, boolean debug) {
+    public static boolean canFizz(Filter slice, int fizzAmount, boolean debug) {
         // Get information on Slice rates
         FilterInfo.reset();
 
-        FilterSliceNode filter = getFirstFilter(slice);
+        WorkNode filter = getFirstFilter(slice);
         FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
         
         int slicePeek = filterInfo.peek;
@@ -123,13 +123,13 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Slice sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Slice[0]);
-        Slice dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Slice[0]);
+        Filter sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // If sources are fizzed
         if(isFizzed(sources[0])) {
             // Make sure sources belong to the same set of fizzed Slices
-            LinkedList <Slice> fizzedCopies1 = sliceToFizzedCopies.get(sources[0]);
+            LinkedList <Filter> fizzedCopies1 = sliceToFizzedCopies.get(sources[0]);
             
             // Make sure that sources are fizzed by fizzAmount
             if(fizzedCopies1.size() != fizzAmount) {
@@ -142,7 +142,7 @@ public class PipelineFissioner {
         if(isFizzed(dests[0])) {
    
             // Make sure that dests belong to the same set of fizzed Slices
-            LinkedList <Slice> fizzedCopies1 = sliceToFizzedCopies.get(dests[0]);
+            LinkedList <Filter> fizzedCopies1 = sliceToFizzedCopies.get(dests[0]);
  
             // Make sure that dests are fizzed by fizzAmount
             if(fizzedCopies1.size() != fizzAmount) {
@@ -154,12 +154,12 @@ public class PipelineFissioner {
         return canFizz(slice, debug);
     }
 
-    public static boolean canFizz(Slice slice, boolean debug) {
+    public static boolean canFizz(Filter slice, boolean debug) {
 
         // Get information on Slice rates
         FilterInfo.reset();
 
-        FilterSliceNode filter = getFirstFilter(slice);
+        WorkNode filter = getFirstFilter(slice);
         FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
         
         int slicePeek = filterInfo.peek;
@@ -175,8 +175,8 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Slice sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Slice[0]);
-        Slice dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Slice[0]);
+        Filter sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // Check to see if Slice is a source/sink.  Don't fizz source/sink.
         if(sources.length == 0 || dests.length == 0) {
@@ -244,8 +244,8 @@ public class PipelineFissioner {
         if(isFizzed(sources[0])) {
 
             // Make sure sources belong to the same set of fizzed Slices
-            LinkedList <Slice> fizzedCopies1 = sliceToFizzedCopies.get(sources[0]);
-            LinkedList <Slice> fizzedCopies2;
+            LinkedList <Filter> fizzedCopies1 = sliceToFizzedCopies.get(sources[0]);
+            LinkedList <Filter> fizzedCopies2;
 
             for(int x = 1 ; x < sources.length ; x++) {
                 fizzedCopies2 = sliceToFizzedCopies.get(sources[x]);
@@ -260,8 +260,8 @@ public class PipelineFissioner {
         if(isFizzed(dests[0])) {
    
             // Make sure that dests belong to the same set of fizzed Slices
-            LinkedList <Slice> fizzedCopies1 = sliceToFizzedCopies.get(dests[0]);
-            LinkedList <Slice> fizzedCopies2;
+            LinkedList <Filter> fizzedCopies1 = sliceToFizzedCopies.get(dests[0]);
+            LinkedList <Filter> fizzedCopies2;
 
             for(int x = 1 ; x < dests.length ; x++) {
                 fizzedCopies2 = sliceToFizzedCopies.get(dests[x]);
@@ -317,12 +317,12 @@ public class PipelineFissioner {
      * the function proceeds to fizz the given filter, while assuming that the
      * above assumptions are met.
      */
-    public static boolean fizzSlice(Slice slice, int fizzAmount) {
+    public static boolean fizzSlice(Filter slice, int fizzAmount) {
 
         if(!canFizz(slice, fizzAmount, false))
             return false;
 
-        Slice sliceClones[] = new Slice[fizzAmount];
+        Filter sliceClones[] = new Filter[fizzAmount];
 
         LinkedList<InterSliceEdge> edgeSet;
         LinkedList<LinkedList<InterSliceEdge>> edgeSetSet;
@@ -331,7 +331,7 @@ public class PipelineFissioner {
         // Get information on Slice rates
         FilterInfo.reset();
 
-        FilterSliceNode filter = getFirstFilter(slice);
+        WorkNode filter = getFirstFilter(slice);
         FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
 
         int slicePeek = filterInfo.peek;
@@ -358,14 +358,14 @@ public class PipelineFissioner {
 
         // Get Slice sources and destinations, ordered by how they were
         // originally fizzed
-        Slice sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Slice[0]);
-        Slice dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Slice[0]);
+        Filter sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         if(sources.length > 1)
-            sources = sliceToFizzedCopies.get(sources[0]).toArray(new Slice[0]);
+            sources = sliceToFizzedCopies.get(sources[0]).toArray(new Filter[0]);
 
         if(dests.length > 1)
-            dests = sliceToFizzedCopies.get(dests[0]).toArray(new Slice[0]);
+            dests = sliceToFizzedCopies.get(dests[0]).toArray(new Filter[0]);
 
         // Clear edges memoized in previous calls to fizzSlice.  This is done
         // because we don't care about most of the previously memoized edges.
@@ -396,7 +396,7 @@ public class PipelineFissioner {
         // Fill array with clones of Slice, put original copy first in array
         sliceClones[0] = slice;
         for(int x = 1 ; x < fizzAmount ; x++)
-            sliceClones[x] = (Slice)ObjectDeepCloner.deepCopy(slice);
+            sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
 
         // Give each Slice clone a unique name
         String origName = sliceClones[0].getFirstFilter().getFilter().getName();
@@ -692,7 +692,7 @@ public class PipelineFissioner {
              */
 
             // Get information on source Slices
-            FilterSliceNode sourceLastFilter = getLastFilter(sources[0]);
+            WorkNode sourceLastFilter = getLastFilter(sources[0]);
             FilterInfo sourceLastFilterInfo = FilterInfo.getFilterInfo(sourceLastFilter);
 
             int sourcePush = sourceLastFilterInfo.push;
@@ -884,7 +884,7 @@ public class PipelineFissioner {
              */
 
             // Get information on destination Slices
-            FilterSliceNode destFirstFilter = getFirstFilter(dests[0]);
+            WorkNode destFirstFilter = getFirstFilter(dests[0]);
             FilterInfo destFirstFilterInfo = FilterInfo.getFilterInfo(destFirstFilter);
 
             int destPop = destFirstFilterInfo.pop;
@@ -1156,7 +1156,7 @@ public class PipelineFissioner {
         // cloned Slices.  This helps remember which set of cloned Slices a
         // Slice belongs to.
 
-        LinkedList<Slice> cloneList = new LinkedList<Slice>();
+        LinkedList<Filter> cloneList = new LinkedList<Filter>();
         for(int x = 0 ; x < fizzAmount ; x++)
             cloneList.add(sliceClones[x]);
 

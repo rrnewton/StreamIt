@@ -10,7 +10,7 @@ import at.dms.kjc.sir.SIRPredefinedFilter;
  * filters.
  * @author jasperln
  */
-public abstract class PredefinedContent extends FilterContent implements at.dms.kjc.DeepCloneable {
+public abstract class PredefinedContent extends WorkNodeContent implements at.dms.kjc.DeepCloneable {
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */

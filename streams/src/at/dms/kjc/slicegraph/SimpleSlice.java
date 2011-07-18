@@ -4,14 +4,14 @@
 package at.dms.kjc.slicegraph;
 
 /**
- * A SimpleSlice is a Slice with exactly one {@link FilterSliceNode}.
+ * A SimpleSlice is a Slice with exactly one {@link WorkNode}.
  * 
  * @author dimock
  *
  */
-public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
+public class SimpleSlice extends Filter implements at.dms.kjc.DeepCloneable {
 
-    protected FilterSliceNode body;
+    protected WorkNode body;
     
     /** Constructor: creates a slice with one filter and sets
      * previous parent and next links the supplied
@@ -28,25 +28,25 @@ public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
      * @param body FilterSliceNode in simple slice.
      * @param tail OutputSliceNode at tail of slice.
      */
-    public SimpleSlice(InputSliceNode head, 
-       FilterSliceNode body, OutputSliceNode tail) {
+    public SimpleSlice(InputNode head, 
+       WorkNode body, OutputNode tail) {
             if (body == null && head != null) {
-                body = (FilterSliceNode)head.getNext();
+                body = (WorkNode)head.getNext();
             }
             if (tail == null && body != null) {
-                tail = (OutputSliceNode)body.getNext();
+                tail = (OutputNode)body.getNext();
             }
             if (body == null && tail != null) {
-                body = (FilterSliceNode)tail.getPrevious();
+                body = (WorkNode)tail.getPrevious();
             }
             if (head == null && body != null) {
-                head = (InputSliceNode)body.getPrevious();
+                head = (InputNode)body.getPrevious();
             }
             if (head == null) {
-                head = new InputSliceNode();
+                head = new InputNode();
             }
             if (tail == null) {
-                tail = new OutputSliceNode();
+                tail = new OutputNode();
             }
             assert body != null : "SimpleSlice must be created with a non-null body.";
             
@@ -68,7 +68,7 @@ public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
     /**
      * @param head
      */
-    public SimpleSlice(InputSliceNode head) {
+    public SimpleSlice(InputNode head) {
         this(head,null,null);
     }
 
@@ -76,7 +76,7 @@ public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
      * @param node
      */
     public SimpleSlice(SliceNode node) {
-        this(null,(FilterSliceNode)node,null);
+        this(null,(WorkNode)node,null);
     }
 
     /**
@@ -107,7 +107,7 @@ public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
      * FilterSliceNode.
       * @return (singleton) list the filter slice nodes, in data flow order, unmodifiable.
     */
-    public java.util.List<FilterSliceNode> getFilterNodes() {
+    public java.util.List<WorkNode> getFilterNodes() {
         return java.util.Collections.singletonList(body);
     }
 
@@ -115,7 +115,7 @@ public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
      * Preferred way to access body of a SimpleSlice.
      * @return the FilterSliceNode
      */
-    public FilterSliceNode getBody() {
+    public WorkNode getBody() {
         return body;
     }
     
@@ -125,7 +125,7 @@ public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
      * or next pointers.
      * @param body a FilterSliceNode.
      */
-    public void setBody(FilterSliceNode body) {
+    public void setBody(WorkNode body) {
         this.body = body; 
         body.setParent(this);
     }
@@ -143,7 +143,7 @@ public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.slicegraph.SimpleSlice other) {
         super.deepCloneInto(other);
-        other.body = (at.dms.kjc.slicegraph.FilterSliceNode)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
+        other.body = (at.dms.kjc.slicegraph.WorkNode)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

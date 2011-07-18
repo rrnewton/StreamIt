@@ -7,16 +7,16 @@ import java.util.LinkedList;
 import at.dms.kjc.backendSupport.FilterInfo;
 
 public class IDSliceRemoval {
-    private Slice idSlice;
-    private InputSliceNode idInput;
-    private OutputSliceNode idOutput;
-    private InputSliceNode[] dsInputs;
+    private Filter idSlice;
+    private InputNode idInput;
+    private OutputNode idOutput;
+    private InputNode[] dsInputs;
     private int[] dsInputIndices;
     private HashMap<SliceNode, Integer> indexToIndex;
-    private OutputSliceNode[] usOutputs;
+    private OutputNode[] usOutputs;
     private int[] usOutputIndices;
     
-    public static void doit(Slice slice) {
+    public static void doit(Filter slice) {
         assert slice.getFirstFilter().getFilter() instanceof IDFilterContent : 
             "Trying to remove a non ID slice";
         
@@ -24,7 +24,7 @@ public class IDSliceRemoval {
         FilterInfo.reset();
     }
     
-    private IDSliceRemoval(Slice s) {
+    private IDSliceRemoval(Filter s) {
         idSlice = s;
         idInput = idSlice.getHead();
         idOutput = idSlice.getTail();
@@ -50,9 +50,9 @@ public class IDSliceRemoval {
         
         
         for (int idIndex = 0; idIndex < idSources.length; idIndex++) {
-            OutputSliceNode src = idSources[idIndex].getSrc();
+            OutputNode src = idSources[idIndex].getSrc();
             
-            InputSliceNode[] dests = new InputSliceNode[idDests[idIndex].length];
+            InputNode[] dests = new InputNode[idDests[idIndex].length];
             for (int i = 0; i < idDests[idIndex].length; i++)
                 dests[i] = idDests[idIndex][i].getDest();
 
@@ -68,33 +68,33 @@ public class IDSliceRemoval {
     }
     
     private void reroll(SchedulingPhase phase) {
-        for (OutputSliceNode output : usOutputs) 
+        for (OutputNode output : usOutputs) 
             DistributionUnroller.roll(output.getParent());
-        for (InputSliceNode input : dsInputs)
+        for (InputNode input : dsInputs)
             DistributionUnroller.roll(input.getParent());
     }
     
     private void unroll(SchedulingPhase phase) {
         indexToIndex = new HashMap<SliceNode, Integer>();
         //unroll all the upstream output slice nodes
-        LinkedList<OutputSliceNode> outputs = new LinkedList<OutputSliceNode>();
+        LinkedList<OutputNode> outputs = new LinkedList<OutputNode>();
         for (InterSliceEdge edge : idInput.getSourceSet(phase)) {
             outputs.add(edge.getSrc());
             indexToIndex.put(edge.getSrc(), outputs.size() - 1);
             DistributionUnroller.unroll(edge.getSrc());
         }
-        usOutputs = (OutputSliceNode[])outputs.toArray(new OutputSliceNode[0]);
+        usOutputs = (OutputNode[])outputs.toArray(new OutputNode[0]);
         usOutputIndices = new int[usOutputs.length];
         Arrays.fill(usOutputIndices, -1);
         
         //unroll all the downstream input slice nodes
-        LinkedList<InputSliceNode> inputs = new LinkedList<InputSliceNode>();
+        LinkedList<InputNode> inputs = new LinkedList<InputNode>();
         for (InterSliceEdge edge : idOutput.getDestSet(phase)) {
             inputs.add(edge.getDest());
             indexToIndex.put(edge.getDest(), inputs.size() - 1);
             DistributionUnroller.unroll(edge.getDest());
         }
-        dsInputs = (InputSliceNode[])inputs.toArray(new InputSliceNode[0]);
+        dsInputs = (InputNode[])inputs.toArray(new InputNode[0]);
         dsInputIndices = new int[dsInputs.length];
         Arrays.fill(dsInputIndices, -1);
         
@@ -103,7 +103,7 @@ public class IDSliceRemoval {
         DistributionUnroller.unroll(idOutput);
     }
     
-    private void replaceDest(OutputSliceNode output, InputSliceNode[] dests, 
+    private void replaceDest(OutputNode output, InputNode[] dests, 
             SchedulingPhase phase) {
         assert indexToIndex.containsKey(output);
         int index = indexToIndex.get(output);
@@ -169,7 +169,7 @@ public class IDSliceRemoval {
      * Replace the next edge from ID->input in input's join schedule with 
      * the edge from output->input. 
      */
-    private void replaceSrc(InputSliceNode input, OutputSliceNode output, 
+    private void replaceSrc(InputNode input, OutputNode output, 
             SchedulingPhase phase) {
         //find the index into the index array
         assert indexToIndex.containsKey(input);

@@ -15,10 +15,10 @@ import at.dms.kjc.backendSupport.FilterInfo;
  */
 public class DistributionUnroller {
    
-    public static void test(Slice[] slices) {
-        for (Slice slice : slices) {
-            InputSliceNode input = slice.getHead();
-            OutputSliceNode output = slice.getTail();
+    public static void test(Filter[] slices) {
+        for (Filter slice : slices) {
+            InputNode input = slice.getHead();
+            OutputNode output = slice.getTail();
             
             System.out.println(slice);
             String inBefore = "nothing";
@@ -43,8 +43,8 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of all the slices in <slices>.
      */
-    public static void roll(Slice[] slices) {
-        for (Slice slice : slices) {
+    public static void roll(Filter[] slices) {
+        for (Filter slice : slices) {
             roll(slice);
         }
     }
@@ -53,9 +53,9 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of <slice>.   
      */
-    public static void roll(Slice slice) {
-        InputSliceNode input = slice.getHead();
-        OutputSliceNode output = slice.getTail();
+    public static void roll(Filter slice) {
+        InputNode input = slice.getHead();
+        OutputNode output = slice.getTail();
         
         input.canonicalize(SchedulingPhase.STEADY);
         output.canonicalize(SchedulingPhase.STEADY);
@@ -71,8 +71,8 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of all the slices in <slices>.
      */
-    public static void unroll(Slice[] slices) {
-        for (Slice slice : slices) {
+    public static void unroll(Filter[] slices) {
+        for (Filter slice : slices) {
             unroll(slice);
         }
     }
@@ -81,14 +81,14 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of <slice>.   
      */
-    public static void unroll(Slice slice) {
-        InputSliceNode input = slice.getHead();
-        OutputSliceNode output = slice.getTail();
+    public static void unroll(Filter slice) {
+        InputNode input = slice.getHead();
+        OutputNode output = slice.getTail();
         unroll(input);
         unroll(output);
     }
     
-    public static void unroll(InputSliceNode input) {
+    public static void unroll(InputNode input) {
         FilterInfo fi = FilterInfo.getFilterInfo(input.getNextFilter());
        
         //unroll the init joining schedule
@@ -113,7 +113,7 @@ public class DistributionUnroller {
         }
     }
     
-    public static void unroll(OutputSliceNode output) {
+    public static void unroll(OutputNode output) {
         //unroll the steady splitting schedule
         FilterInfo fi = FilterInfo.getFilterInfo(output.getPrevFilter());
         

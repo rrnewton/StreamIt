@@ -3,7 +3,7 @@ package at.dms.kjc.slicegraph;
 
 /**
  * SliceNode's are a doubly-linked list with a parent pointer to a Slice.
- * They can be specialized into {@link InputSliceNode}, {@link FilterSliceNode}, or {@link OutputSliceNode}. 
+ * They can be specialized into {@link InputNode}, {@link WorkNode}, or {@link OutputNode}. 
  */
 public class SliceNode implements at.dms.kjc.DeepCloneable      {
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "toNext", "toPrev" };
@@ -11,7 +11,7 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
     private IntraSliceEdge toNext = null;  // internal to slice: remains null for OutputSliceNode
     private IntraSliceEdge toPrev = null;  // internal to slice: remains null for InputSliceNode
 
-    private Slice parent;
+    private Filter parent;
 
     public SliceNode getNext() {
         return (toNext == null)? null : toNext.getDest();
@@ -45,7 +45,7 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
      * @param prev The new previous node
      */
     public void setPrevious(SliceNode prev) {
-        assert ! (this instanceof InputSliceNode); 
+        assert ! (this instanceof InputNode); 
         toPrev = new IntraSliceEdge(prev,this);
         prev.setNextEdge(toPrev);
     }
@@ -57,7 +57,7 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
      * @param next The new next node
      */
     public void setNext(SliceNode next) {
-        assert ! (this instanceof OutputSliceNode);
+        assert ! (this instanceof OutputNode);
         toNext = new IntraSliceEdge(this, next);
         next.setPrevEdge(toNext);
     }
@@ -67,27 +67,27 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
 //    }
     
     public boolean isInputSlice() {
-        return this instanceof InputSliceNode;
+        return this instanceof InputNode;
     }
 
     public boolean isFilterSlice() {
-        return this instanceof FilterSliceNode;
+        return this instanceof WorkNode;
     }
 
     public boolean isOutputSlice() {
-        return this instanceof OutputSliceNode;
+        return this instanceof OutputNode;
     }
 
-    public InputSliceNode getAsInput() {
-        return (InputSliceNode)this;
+    public InputNode getAsInput() {
+        return (InputNode)this;
     }
     
-    public OutputSliceNode getAsOutput() {
-        return (OutputSliceNode)this;
+    public OutputNode getAsOutput() {
+        return (OutputNode)this;
     }
     
-    public FilterSliceNode getAsFilter() {
-        return (FilterSliceNode) this;
+    public WorkNode getAsFilter() {
+        return (WorkNode) this;
     }
     
     /**
@@ -98,11 +98,11 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
     protected SliceNode() {
     }
     
-    public void setParent(Slice par) {
+    public void setParent(Filter par) {
         parent = par;
     }
 
-    public Slice getParent() {
+    public Filter getParent() {
         assert parent != null : "parent not set for slice node";
         return parent;
     }
@@ -121,7 +121,7 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
     protected void deepCloneInto(at.dms.kjc.slicegraph.SliceNode other) {
         other.toNext = this.toNext;
         other.toPrev = this.toPrev;
-        other.parent = (at.dms.kjc.slicegraph.Slice)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
+        other.parent = (at.dms.kjc.slicegraph.Filter)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

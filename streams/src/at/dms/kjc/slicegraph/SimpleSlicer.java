@@ -34,16 +34,16 @@ public class SimpleSlicer extends SIRSlicer {
     public SimpleSlicer(UnflatFilter[] topFilters, HashMap[] exeCounts,
                              LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
         super(topFilters, exeCounts, lfa, work, maxPartitions);
-        workEstimation = new HashMap<FilterContent, Long>();
+        workEstimation = new HashMap<WorkNodeContent, Long>();
         TRASHOLD = (double)KjcOptions.slicethresh / (double)100.0;
         System.out.println("Slice Work Threshold: " + TRASHOLD + "(" + KjcOptions.slicethresh + ")");
     }
 
-    public Slice[] partition() {
+    public Filter[] partition() {
         LinkedList<UnflatFilter> queue = new LinkedList<UnflatFilter>();
         HashSet<UnflatFilter> visited = new HashSet<UnflatFilter>();
-        LinkedList<Slice> slices = new LinkedList<Slice>();
-        LinkedList<Slice> topSlicesList = new LinkedList<Slice>(); // slices with no
+        LinkedList<Filter> slices = new LinkedList<Filter>();
+        LinkedList<Filter> topSlicesList = new LinkedList<Filter>(); // slices with no
         // incoming dependencies
         HashSet<UnflatFilter> topUnflat = new HashSet<UnflatFilter>();
 
@@ -60,13 +60,13 @@ public class SimpleSlicer extends SIRSlicer {
             if (!visited.contains(unflatFilter)) {
                 visited.add(unflatFilter);
                 // the filter content for the new filter
-                FilterContent filterContent = getFilterContent(unflatFilter);
+                WorkNodeContent filterContent = getFilterContent(unflatFilter);
                 // remember the work estimation based on the filter content
                 long workEstimate = getWorkEstimate(unflatFilter);
                 workEstimation.put(filterContent, new Long(workEstimate));
 
                 SliceNode node;
-                Slice slice;
+                Filter slice;
                 int filtersInSlice = 1;
 
                 //System.out.println("** Creating slice with first filter = "
@@ -75,7 +75,7 @@ public class SimpleSlicer extends SIRSlicer {
                 // create the input slice node
                 if (unflatFilter.in != null && unflatFilter.in.length > 0) {
                     InterSliceEdge[] inEdges = new InterSliceEdge[unflatFilter.in.length];
-                    node = new InputSliceNode(unflatFilter.inWeights, inEdges);
+                    node = new InputNode(unflatFilter.inWeights, inEdges);
                     for (int i = 0; i < unflatFilter.in.length; i++) {
                         UnflatEdge unflatEdge = unflatFilter.in[i];
                         // get the edge
@@ -83,15 +83,15 @@ public class SimpleSlicer extends SIRSlicer {
                         // we haven't see the edge before
                         if (edge == null) { // set dest?, wouldn't this always
                                             // be the dest
-                            edge = new InterSliceEdge((InputSliceNode) node);
+                            edge = new InterSliceEdge((InputNode) node);
                             edges.put(unflatEdge, edge);
                         } else
                             // we've seen this edge before, set the dest to this
                             // node
-                            edge.setDest((InputSliceNode) node);
+                            edge.setDest((InputNode) node);
                         inEdges[i] = edge;
                     }
-                    slice = new Slice((InputSliceNode) node);
+                    slice = new Filter((InputNode) node);
 
                     if (filterContent.isLinear()) { // Jasper's linear stuff??
                         System.out
@@ -109,15 +109,15 @@ public class SimpleSlicer extends SIRSlicer {
                             if (times > maxPartitions)
                                 times = maxPartitions;
                             // fiss the filter into times elements
-                            FilterContent[] fissedFilters = LinearFission.fiss(
+                            WorkNodeContent[] fissedFilters = LinearFission.fiss(
                                                                                filterContent, times);
                             // remove the original linear filter from the work
                             // estimation
                             workEstimation.remove(filterContent);
                             // now add the fissed filters to the slice
                             for (int i = 0; i < fissedFilters.length; i++) {
-                                FilterContent fissedContent = fissedFilters[i];
-                                FilterSliceNode filterNode = new FilterSliceNode(
+                                WorkNodeContent fissedContent = fissedFilters[i];
+                                WorkNode filterNode = new WorkNode(
                                                                                  fissedContent);
                                 node.setNext(filterNode);
                                 filterNode.setPrevious(node);
@@ -127,22 +127,22 @@ public class SimpleSlicer extends SIRSlicer {
                                                                               workEstimate / times));
                             }
                         } else {
-                            FilterSliceNode filterNode = new FilterSliceNode(
+                            WorkNode filterNode = new WorkNode(
                                                                              filterContent);
                             node.setNext(filterNode);
                             filterNode.setPrevious(node);
                             node = filterNode;
                         }
                     } else {
-                        FilterSliceNode filterNode = new FilterSliceNode(
+                        WorkNode filterNode = new WorkNode(
                                                                          filterContent);
                         node.setNext(filterNode);
                         filterNode.setPrevious(node);
                         node = filterNode;
                     }
                 } else { // null incoming arcs
-                    node = new FilterSliceNode(filterContent);
-                    slice = new Slice(node);
+                    node = new WorkNode(filterContent);
+                    slice = new Filter(node);
                 }
 
                 if (topUnflat.contains(unflatFilter)) {
@@ -166,7 +166,7 @@ public class SimpleSlicer extends SIRSlicer {
                     // trying to put
                     // another filter in the slice
                     UnflatFilter downstream = unflatFilter.out[0][0].dest;
-                    FilterContent dsContent = getFilterContent(downstream);
+                    WorkNodeContent dsContent = getFilterContent(downstream);
 
                     // remember the work estimation based on the filter content
                     workEstimation.put(dsContent, new Long(
@@ -185,13 +185,13 @@ public class SimpleSlicer extends SIRSlicer {
                         if (times > 1) {
                             if (times > 16)
                                 times = 16;
-                            FilterContent[] fissedFilters = LinearFission.fiss(
+                            WorkNodeContent[] fissedFilters = LinearFission.fiss(
                                                                                dsContent, times);
                             workEstimation.remove(dsContent);
                             // create filter nodes for each row of the matrix?
                             for (int i = 0; i < fissedFilters.length; i++) {
-                                FilterContent fissedContent = fissedFilters[i];
-                                FilterSliceNode filterNode = new FilterSliceNode(
+                                WorkNodeContent fissedContent = fissedFilters[i];
+                                WorkNode filterNode = new WorkNode(
                                                                                  fissedContent);
                                 node.setNext(filterNode);
                                 filterNode.setPrevious(node);
@@ -202,7 +202,7 @@ public class SimpleSlicer extends SIRSlicer {
                                                                               workEstimate / times));
                             }
                         } else if (!(downstream.filter instanceof SIRPredefinedFilter)) {
-                            FilterSliceNode filterNode = new FilterSliceNode(
+                            WorkNode filterNode = new WorkNode(
                                                                              dsContent);
                             node.setNext(filterNode);
                             filterNode.setPrevious(node);
@@ -210,7 +210,7 @@ public class SimpleSlicer extends SIRSlicer {
                             unflatFilter = downstream;
                         }
                     } else if (!(downstream.filter instanceof SIRPredefinedFilter)) {
-                        FilterSliceNode filterNode = new FilterSliceNode(
+                        WorkNode filterNode = new WorkNode(
                                                                          dsContent);
                         node.setNext(filterNode);
                         filterNode.setPrevious(node);
@@ -224,7 +224,7 @@ public class SimpleSlicer extends SIRSlicer {
                 // we are finished the current slice, create the outputslicenode
                 if (unflatFilter.out != null && unflatFilter.out.length > 0) {
                     InterSliceEdge[][] outEdges = new InterSliceEdge[unflatFilter.out.length][];
-                    OutputSliceNode outNode = new OutputSliceNode(
+                    OutputNode outNode = new OutputNode(
                                                                   unflatFilter.outWeights, outEdges);
                     node.setNext(outNode);
                     outNode.setPrevious(node);
@@ -257,18 +257,18 @@ public class SimpleSlicer extends SIRSlicer {
     }
 
     private void setupIO() {
-        Slice[] sliceGraph = getSliceGraph();
+        Filter[] sliceGraph = getSliceGraph();
         int len = sliceGraph.length;
         int newLen = len;
         for (int i = 0; i < len; i++)
-            if (((FilterSliceNode) sliceGraph[i].getHead().getNext())
+            if (((WorkNode) sliceGraph[i].getHead().getNext())
                 .isPredefined())
                 newLen--;
-        io = new Slice[len - newLen];
+        io = new Filter[len - newLen];
         int idx = 0;
         for (int i = 0; i < len; i++) {
-            Slice slice = sliceGraph[i];
-            if (((FilterSliceNode) slice.getHead().getNext()).isPredefined()) {
+            Filter slice = sliceGraph[i];
+            if (((WorkNode) slice.getHead().getNext()).isPredefined()) {
                 io[idx++] = slice;
                 System.out.println(slice + " is i/o slice.");
             }

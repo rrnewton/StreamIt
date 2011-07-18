@@ -3,7 +3,7 @@ package at.dms.kjc.slicegraph;
 import at.dms.kjc.CType;
 import at.dms.kjc.sir.SIRIdentity;
 
-public class IDFilterContent extends FilterContent {
+public class IDFilterContent extends WorkNodeContent {
 
     public IDFilterContent() {
         my_unique_ID = unique_ID++;
@@ -74,18 +74,18 @@ public class IDFilterContent extends FilterContent {
     /**
      * Create and return a slice with a single ID filter.
      */
-    public static Slice createIDSlice() {
-        InputSliceNode input = new InputSliceNode();
-        OutputSliceNode output = new OutputSliceNode();
+    public static Filter createIDSlice() {
+        InputNode input = new InputNode();
+        OutputNode output = new OutputNode();
         IDFilterContent id = new IDFilterContent();
-        FilterSliceNode filter = new FilterSliceNode(id);
+        WorkNode filter = new WorkNode(id);
         
         input.setNext(filter);
         filter.setPrevious(input);
         filter.setNext(output);
         output.setPrevious(filter);
         
-        Slice slice = new Slice(input);
+        Filter slice = new Filter(input);
         
         slice.setTail(output);
         

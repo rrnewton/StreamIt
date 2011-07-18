@@ -6,7 +6,7 @@ import at.dms.kjc.backendSupport.FilterInfo;
 
 /**
  *  An InterSliceEdge represents an edge in the partitioned stream graph between slices.
- *  But it actually connects {@link OutputSliceNode}s to {@link InputSliceNodes}.
+ *  But it actually connects {@link OutputNode}s to {@link InputSliceNodes}.
  * 
  * @author mgordon
  *
@@ -27,7 +27,7 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
      * @param src   Source of directed edge as OutputSliceNode
      * @param dest  Destination of directed edga as InputSliceNode
      */
-    public InterSliceEdge(OutputSliceNode src, InputSliceNode dest) {
+    public InterSliceEdge(OutputNode src, InputNode dest) {
         super(src,dest);
         
         //make sure we did not create this edge before!
@@ -39,24 +39,24 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
     }
 
     /**
-     * Partial constructor: {@link #setDest(InputSliceNode)} later.
+     * Partial constructor: {@link #setDest(InputNode)} later.
      * @param src 
      */
-    public InterSliceEdge(OutputSliceNode src) {
+    public InterSliceEdge(OutputNode src) {
         super();
         this.src = src;        
     }
 
     /**
-     * Partial constructor: {@link #setSrc(OutputSliceNode)} later.
+     * Partial constructor: {@link #setSrc(OutputNode)} later.
      * @param dest
      */
-    public InterSliceEdge(InputSliceNode dest) {
+    public InterSliceEdge(InputNode dest) {
         super();
         this.dest = dest;
     }
 
-    public static InterSliceEdge getEdge(OutputSliceNode src, InputSliceNode dest) {
+    public static InterSliceEdge getEdge(OutputNode src, InputNode dest) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(src, dest);      
 
         InterSliceEdge edge = edges.get(edgeDscr);
@@ -65,22 +65,22 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
     }
     
     @Override
-    public OutputSliceNode getSrc() {
+    public OutputNode getSrc() {
         
-        return (OutputSliceNode)src;
+        return (OutputNode)src;
     }
 
     @Override
-    public InputSliceNode getDest() {
-        return (InputSliceNode)dest;
+    public InputNode getDest() {
+        return (InputNode)dest;
     }
 
     @Override
     public void setSrc(SliceNode src) {
-        assert src instanceof OutputSliceNode;
+        assert src instanceof OutputNode;
         
         //make sure we did not create this edge before!
-        EdgeDescriptor edgeDscr = new EdgeDescriptor((OutputSliceNode)src, getDest());      
+        EdgeDescriptor edgeDscr = new EdgeDescriptor((OutputNode)src, getDest());      
         InterSliceEdge edge = edges.get(edgeDscr);
         assert (edge == null) : "trying to create 2 identical edges";
         //remember this edge
@@ -91,9 +91,9 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
 
     @Override
     public void setDest(SliceNode dest) {
-        assert dest instanceof InputSliceNode;
+        assert dest instanceof InputNode;
         //make sure we did not create this edge before!
-        EdgeDescriptor edgeDscr = new EdgeDescriptor(getSrc(), (InputSliceNode)dest);      
+        EdgeDescriptor edgeDscr = new EdgeDescriptor(getSrc(), (InputNode)dest);      
         InterSliceEdge edge = edges.get(edgeDscr);
         assert (edge == null) : "trying to create 2 identical edges";
         //remember this edge
@@ -111,16 +111,16 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
     public int initItems() {
         int itemsReceived, itemsSent;
 
-        FilterInfo next = FilterInfo.getFilterInfo((FilterSliceNode) ((InputSliceNode)dest)
+        FilterInfo next = FilterInfo.getFilterInfo((WorkNode) ((InputNode)dest)
                                                    .getNext());
         
-        itemsSent = (int) ((double) next.initItemsReceived() * ((InputSliceNode)dest).ratio(this, SchedulingPhase.INIT));
+        itemsSent = (int) ((double) next.initItemsReceived() * ((InputNode)dest).ratio(this, SchedulingPhase.INIT));
         //System.out.println(next.initItemsReceived()  + " * " + ((InputSliceNode)dest).ratio(this));
         
         // calculate the items the output slice sends
-        FilterInfo prev = FilterInfo.getFilterInfo((FilterSliceNode) ((OutputSliceNode)src)
+        FilterInfo prev = FilterInfo.getFilterInfo((WorkNode) ((OutputNode)src)
                                                    .getPrevious());
-        itemsReceived = (int) ((double) prev.initItemsSent() * ((OutputSliceNode)src).ratio(this, SchedulingPhase.INIT));
+        itemsReceived = (int) ((double) prev.initItemsSent() * ((OutputNode)src).ratio(this, SchedulingPhase.INIT));
 
         if (itemsSent != itemsReceived) {
             System.out.println("*** Init: Items received != Items Sent!");
@@ -130,9 +130,9 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
             System.out.println("Push: " + prev.prePush + " " + prev.push);
             System.out.println("Pop: " + next.pop);
             System.out.println("Init items Sent * Ratio: " + prev.initItemsSent() + " * " +
-                    ((OutputSliceNode)src).ratio(this, SchedulingPhase.INIT));
+                    ((OutputNode)src).ratio(this, SchedulingPhase.INIT));
             System.out.println("Items Received: " + next.initItemsReceived(true));
-            System.out.println("Ratio received: " + ((InputSliceNode)dest).ratio(this, SchedulingPhase.INIT));
+            System.out.println("Ratio received: " + ((InputNode)dest).ratio(this, SchedulingPhase.INIT));
             
         }
         
@@ -151,15 +151,15 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
         int itemsReceived, itemsSent;
 
         // calculate the items the input slice receives
-        FilterInfo next = FilterInfo.getFilterInfo(((InputSliceNode)dest).getNextFilter());
-        itemsSent = (int) ((next.steadyMult * next.pop) * ((double) ((InputSliceNode)dest)
-                                                           .getWeight(this, SchedulingPhase.STEADY) / ((InputSliceNode)dest).totalWeights(SchedulingPhase.STEADY)));
+        FilterInfo next = FilterInfo.getFilterInfo(((InputNode)dest).getNextFilter());
+        itemsSent = (int) ((next.steadyMult * next.pop) * ((double) ((InputNode)dest)
+                                                           .getWeight(this, SchedulingPhase.STEADY) / ((InputNode)dest).totalWeights(SchedulingPhase.STEADY)));
 
         // calculate the items the output slice sends
-        FilterInfo prev = FilterInfo.getFilterInfo((FilterSliceNode) ((OutputSliceNode)src)
+        FilterInfo prev = FilterInfo.getFilterInfo((WorkNode) ((OutputNode)src)
                                                    .getPrevious());
-        itemsReceived = (int) ((prev.steadyMult * prev.push) * ((double) ((OutputSliceNode)src)
-                                                                .getWeight(this, SchedulingPhase.STEADY) / ((OutputSliceNode)src).totalWeights(SchedulingPhase.STEADY)));
+        itemsReceived = (int) ((prev.steadyMult * prev.push) * ((double) ((OutputNode)src)
+                                                                .getWeight(this, SchedulingPhase.STEADY) / ((OutputNode)src).totalWeights(SchedulingPhase.STEADY)));
 
         assert (itemsSent == itemsReceived) : "Calculating steady state: items received != items sent on buffer "
             + itemsSent + " " + itemsReceived + " " + prev + " " + next;
@@ -175,8 +175,8 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
     * @return ...
     */
     public int primePumpItems() {
-        return (int) ((double) FilterInfo.getFilterInfo(((OutputSliceNode)src).getPrevFilter())
-                      .totalItemsSent(SchedulingPhase.PRIMEPUMP) * ((OutputSliceNode)src).ratio(this, SchedulingPhase.STEADY));
+        return (int) ((double) FilterInfo.getFilterInfo(((OutputNode)src).getPrevFilter())
+                      .totalItemsSent(SchedulingPhase.PRIMEPUMP) * ((OutputNode)src).ratio(this, SchedulingPhase.STEADY));
     }
     
     /**
@@ -193,15 +193,15 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
         return 0;
     }
     private static class EdgeDescriptor {
-        public OutputSliceNode src;
-        public InputSliceNode dest;
+        public OutputNode src;
+        public InputNode dest;
 
-        public EdgeDescriptor(OutputSliceNode src, InputSliceNode dest) {
+        public EdgeDescriptor(OutputNode src, InputNode dest) {
             this.src = src;
             this.dest = dest;
         }
         
-        public EdgeDescriptor(Slice src, Slice dest) {
+        public EdgeDescriptor(Filter src, Filter dest) {
             this(src.getTail(), dest.getHead());
         }
 
