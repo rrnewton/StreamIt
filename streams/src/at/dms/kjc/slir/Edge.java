@@ -4,7 +4,7 @@ import at.dms.kjc.CType;
 
 /**
  * An Edge connects two {@link InternalFilterNode}s.
- * Edges can be differentiated into {@link InterFilterEdge}s that connect the OutputSliceNode of a slice
+ * Edges can be differentiated into {@link Channel}s that connect the OutputSliceNode of a slice
  * and the InputSliceNode of a slice, and {@link IntraFilterEdge} that connect two SliceNodes in
  * the same slice.  
  * 
@@ -24,12 +24,12 @@ public class Edge implements at.dms.kjc.DeepCloneable {
     /**
      * Source of directed edge in Slice graph
      */
-    protected InternalFilterNode src;
+    protected OutputNode src;
 
     /**
      * Destination of directed edge in Slice graph
      */
-    protected InternalFilterNode dest;
+    protected InputNode dest;
 
     /**
      * Caches type for {@link #getType()} calls
@@ -41,7 +41,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * @param src   Source assumed to be an OutputSliceNode or a FilterSliceNode.
      * @param dest  Dest assumed to be an InputSliceNode or a FilterSliceNode.
      */
-    public Edge(InternalFilterNode src, InternalFilterNode dest) {
+    public Edge(OutputNode src, InputNode dest) {
         assert src != null;
         assert dest != null;
         this.src = src;
@@ -59,7 +59,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
     /**
      * @return source SliceNode
      */
-    public InternalFilterNode getSrc() {
+    public OutputNode getSrc() {
         return src;
     }
 
@@ -81,8 +81,8 @@ public class Edge implements at.dms.kjc.DeepCloneable {
             WorkNodeContent dstContent;
             CType srcType;
             CType dstType;
-            srcContent = ((OutputNode)src).getPrevFilter().getFilter();
-            dstContent = ((InputNode)dest).getNextFilter().getFilter();
+            srcContent = ((OutputNode)src).getWorkNode().getFilter();
+            dstContent = ((InputNode)dest).getWorkNode().getFilter();
             srcType = srcContent.getOutputType();
             dstType = dstContent.getInputType();
             type = dstType;
