@@ -14,6 +14,7 @@ import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.linear.FilterMatrix;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.linear.LinearFilterRepresentation;
+import at.dms.kjc.slir.SynchRemover;
 import at.dms.util.Utils;
 
 /**

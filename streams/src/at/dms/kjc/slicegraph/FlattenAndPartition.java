@@ -20,6 +20,16 @@ import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.RenameAll;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.slir.FileInputContent;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.IDFilterContent;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /**
  * Convert SIR graph to Slice without synch removal.
@@ -31,7 +41,7 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 public class FlattenAndPartition extends SIRSlicer {
     private SIRToSliceNodes sliceNodes;
 
-    private HashMap<OutputNode, HashMap<InputNode, InterSliceEdge>> edges;
+    private HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>> edges;
 
     private Filter topSlice;
 
@@ -61,7 +71,7 @@ public class FlattenAndPartition extends SIRSlicer {
         sliceList = new LinkedList<Filter>();
         ioList = new LinkedList<Filter>();
         work = WorkEstimate.getWorkEstimate(str);
-        edges = new HashMap<OutputNode, HashMap<InputNode, InterSliceEdge>>();
+        edges = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
 
         flattenInternal(fg.top);
 
@@ -106,13 +116,13 @@ public class FlattenAndPartition extends SIRSlicer {
                 
                 // set up the i/o arcs
                 // set up the splitting...
-                LinkedList<InterSliceEdge> outEdges = new LinkedList<InterSliceEdge>();
+                LinkedList<InterFilterEdge> outEdges = new LinkedList<InterFilterEdge>();
                 LinkedList<Integer> outWeights = new LinkedList<Integer>();
-                HashMap<InputNode, InterSliceEdge> newEdges = new HashMap<InputNode, InterSliceEdge>();
+                HashMap<InputNode, InterFilterEdge> newEdges = new HashMap<InputNode, InterFilterEdge>();
                 for (int i = 0; i < node.ways; i++) {
                     if (node.weights[i] == 0)
                         continue;
-                    InterSliceEdge edge = new InterSliceEdge(output, sliceNodes.inputNodes
+                    InterFilterEdge edge = new InterFilterEdge(output, sliceNodes.inputNodes
                             .get(node.getEdges()[i].contents));
                     newEdges.put(sliceNodes.inputNodes
                             .get(node.getEdges()[i].contents), edge);
@@ -121,14 +131,14 @@ public class FlattenAndPartition extends SIRSlicer {
                 }
                 edges.put(output, newEdges);
                 
-                LinkedList<LinkedList<InterSliceEdge>>translatedEdges = new LinkedList<LinkedList<InterSliceEdge>>();
+                LinkedList<LinkedList<InterFilterEdge>>translatedEdges = new LinkedList<LinkedList<InterFilterEdge>>();
                 if (node.isDuplicateSplitter()) {
                     outWeights = new LinkedList<Integer>();
                     outWeights.add(new Integer(1));
                     translatedEdges.add(outEdges);
                 } else {
                     for (int i = 0; i < outEdges.size(); i++) {
-                        LinkedList<InterSliceEdge> link = new LinkedList<InterSliceEdge>();
+                        LinkedList<InterFilterEdge> link = new LinkedList<InterFilterEdge>();
                         link.add(outEdges.get(i));
                         translatedEdges.add(link);
                     }
@@ -138,13 +148,13 @@ public class FlattenAndPartition extends SIRSlicer {
             } else {
                 // no outputs
                 output.setWeights(new int[0]);
-                output.setDests(new InterSliceEdge[0][0]);
+                output.setDests(new InterFilterEdge[0][0]);
             }
 
             if (node.isFilter()) {
                 if (node.getFilter().getPushInt() == 0) {
                     output.setWeights(new int[0]);
-                    output.setDests(new InterSliceEdge[0][0]);
+                    output.setDests(new InterFilterEdge[0][0]);
                 }
             }
             
@@ -155,7 +165,7 @@ public class FlattenAndPartition extends SIRSlicer {
                         && node.inputs == node.incomingWeights.length;
 
                 LinkedList<Integer> inWeights = new LinkedList<Integer>();
-                LinkedList<InterSliceEdge> inEdges = new LinkedList<InterSliceEdge>();
+                LinkedList<InterFilterEdge> inEdges = new LinkedList<InterFilterEdge>();
                 for (int i = 0; i < node.inputs; i++) {
                     if (node.incomingWeights[i] == 0)
                         continue;
@@ -167,12 +177,12 @@ public class FlattenAndPartition extends SIRSlicer {
                 input.set(inWeights, inEdges, SchedulingPhase.STEADY);
             } else {
                 input.setWeights(new int[0]);
-                input.setSources(new InterSliceEdge[0]);
+                input.setSources(new InterFilterEdge[0]);
             }
 
             if (node.isFilter() && node.getFilter().getPopInt() == 0) {
                 input.setWeights(new int[0]);
-                input.setSources(new InterSliceEdge[0]);
+                input.setSources(new InterFilterEdge[0]);
             }
             
             // set up the work hashmaps

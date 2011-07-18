@@ -3,6 +3,12 @@
  */
 package at.dms.kjc.slicegraph;
 
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.WorkNode;
+
 /**
  * A SimpleSlice is a Slice with exactly one {@link WorkNode}.
  * 
@@ -75,7 +81,7 @@ public class SimpleSlice extends Filter implements at.dms.kjc.DeepCloneable {
     /**
      * @param node
      */
-    public SimpleSlice(SliceNode node) {
+    public SimpleSlice(InternalFilterNode node) {
         this(null,(WorkNode)node,null);
     }
 
@@ -143,7 +149,7 @@ public class SimpleSlice extends Filter implements at.dms.kjc.DeepCloneable {
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.slicegraph.SimpleSlice other) {
         super.deepCloneInto(other);
-        other.body = (at.dms.kjc.slicegraph.WorkNode)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
+        other.body = (at.dms.kjc.slir.WorkNode)at.dms.kjc.AutoCloner.cloneToplevel(this.body);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

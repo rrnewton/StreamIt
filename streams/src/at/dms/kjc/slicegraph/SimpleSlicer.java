@@ -10,6 +10,13 @@ import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRPredefinedFilter;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /**
  * Partition the stream graph into slices where each slice is a pipeline of filters with
@@ -48,7 +55,7 @@ public class SimpleSlicer extends SIRSlicer {
         HashSet<UnflatFilter> topUnflat = new HashSet<UnflatFilter>();
 
         // map unflatEdges -> Edge?
-        HashMap<UnflatEdge, InterSliceEdge> edges = new HashMap<UnflatEdge, InterSliceEdge>();
+        HashMap<UnflatEdge, InterFilterEdge> edges = new HashMap<UnflatEdge, InterFilterEdge>();
         // add the top filters to the queue
         for (int i = 0; i < topFilters.length; i++) {
             topUnflat.add(topFilters[i]);
@@ -65,7 +72,7 @@ public class SimpleSlicer extends SIRSlicer {
                 long workEstimate = getWorkEstimate(unflatFilter);
                 workEstimation.put(filterContent, new Long(workEstimate));
 
-                SliceNode node;
+                InternalFilterNode node;
                 Filter slice;
                 int filtersInSlice = 1;
 
@@ -74,16 +81,16 @@ public class SimpleSlicer extends SIRSlicer {
 
                 // create the input slice node
                 if (unflatFilter.in != null && unflatFilter.in.length > 0) {
-                    InterSliceEdge[] inEdges = new InterSliceEdge[unflatFilter.in.length];
+                    InterFilterEdge[] inEdges = new InterFilterEdge[unflatFilter.in.length];
                     node = new InputNode(unflatFilter.inWeights, inEdges);
                     for (int i = 0; i < unflatFilter.in.length; i++) {
                         UnflatEdge unflatEdge = unflatFilter.in[i];
                         // get the edge
-                        InterSliceEdge edge = edges.get(unflatEdge);
+                        InterFilterEdge edge = edges.get(unflatEdge);
                         // we haven't see the edge before
                         if (edge == null) { // set dest?, wouldn't this always
                                             // be the dest
-                            edge = new InterSliceEdge((InputNode) node);
+                            edge = new InterFilterEdge((InputNode) node);
                             edges.put(unflatEdge, edge);
                         } else
                             // we've seen this edge before, set the dest to this
@@ -223,14 +230,14 @@ public class SimpleSlicer extends SIRSlicer {
 
                 // we are finished the current slice, create the outputslicenode
                 if (unflatFilter.out != null && unflatFilter.out.length > 0) {
-                    InterSliceEdge[][] outEdges = new InterSliceEdge[unflatFilter.out.length][];
+                    InterFilterEdge[][] outEdges = new InterFilterEdge[unflatFilter.out.length][];
                     OutputNode outNode = new OutputNode(
                                                                   unflatFilter.outWeights, outEdges);
                     node.setNext(outNode);
                     outNode.setPrevious(node);
                     for (int i = 0; i < unflatFilter.out.length; i++) {
                         UnflatEdge[] inner = unflatFilter.out[i];
-                        InterSliceEdge[] innerEdges = new InterSliceEdge[inner.length];
+                        InterFilterEdge[] innerEdges = new InterFilterEdge[inner.length];
                         outEdges[i] = innerEdges;
                         for (int j = 0; j < inner.length; j++) {
                             UnflatEdge unflatEdge = inner[j];
@@ -238,9 +245,9 @@ public class SimpleSlicer extends SIRSlicer {
                             // if we didn't visit one of the dests, add it
                             if (!visited.contains(dest))
                                 queue.add(dest);
-                            InterSliceEdge edge = edges.get(unflatEdge);
+                            InterFilterEdge edge = edges.get(unflatEdge);
                             if (edge == null) {
-                                edge = new InterSliceEdge(outNode);
+                                edge = new InterFilterEdge(outNode);
                                 edges.put(unflatEdge, edge);
                             } else
                                 edge.setSrc(outNode);

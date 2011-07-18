@@ -10,6 +10,19 @@ import java.util.Map;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.sir.SIRFileReader;
 import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.FileInputContent;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.PredefinedContent;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /**
  * 
@@ -173,7 +186,7 @@ public abstract class Slicer {
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
     protected Filter[] getNext(Filter slice, SchedulingPhase phase) {
-        SliceNode node = slice.getHead();
+        InternalFilterNode node = slice.getHead();
         if (node instanceof InputNode)
             node = node.getNext();
         while (node != null && node instanceof WorkNode) {
@@ -217,7 +230,7 @@ public abstract class Slicer {
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
     protected  String sliceName(Filter slice, Layout layout, boolean fullInfo) {
-        SliceNode node = slice.getHead();
+        InternalFilterNode node = slice.getHead();
 
         StringBuffer out = new StringBuffer();
 
@@ -308,9 +321,9 @@ public abstract class Slicer {
                        head = new InputNode(new int[]{1});
                        // Connect tail from last iteration with head from this iteration.
                        // prevTail will not be null here...
-                       InterSliceEdge prevTailToHead = new InterSliceEdge(prevTail,head);
-                       head.setSources(new InterSliceEdge[]{prevTailToHead});
-                       prevTail.setDests(new InterSliceEdge[][]{{prevTailToHead}});
+                       InterFilterEdge prevTailToHead = new InterFilterEdge(prevTail,head);
+                       head.setSources(new InterFilterEdge[]{prevTailToHead});
+                       prevTail.setDests(new InterFilterEdge[][]{{prevTailToHead}});
                     }
                    if (i == numFilters - 1) {
                        tail = s.getTail();
