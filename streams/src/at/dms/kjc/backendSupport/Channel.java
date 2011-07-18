@@ -16,10 +16,10 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.Util;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Util;
 import at.dms.util.Utils;
 
 /**
@@ -79,7 +79,7 @@ public class Channel {
      * @param src
      * @param dst
      */
-    protected Channel(SliceNode src, SliceNode dst) {
+    protected Channel(InternalFilterNode src, InternalFilterNode dst) {
         this(Util.srcDstToEdge(src, dst, SchedulingPhase.STEADY));
     }
     
@@ -156,14 +156,14 @@ public class Channel {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#getSource()
      */
-    public SliceNode getSource() {
+    public InternalFilterNode getSource() {
         return theEdge.getSrc();
     }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#getDest()
      */
-    public SliceNode getDest() {
+    public InternalFilterNode getDest() {
         return theEdge.getDest();
     }
 

@@ -2,13 +2,13 @@ package at.dms.kjc.backendSupport;
 
 import java.io.FileWriter;
 
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
 import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /** Dump a graph with info about slices and channels. */
 public class DumpSlicesAndChannels {
@@ -19,7 +19,7 @@ public class DumpSlicesAndChannels {
         buf.append("size = \"8, 10.5\";\n");
 
         for (int i = 0; i < slicer.getSliceGraph().length; i++) {
-            Slice slice = slicer.getSliceGraph()[i];
+            Filter slice = slicer.getSliceGraph()[i];
             assert slice != null;
             buf.append(slice.hashCode() + " [ " + 
                     sliceName(slice, slicer, backendbits) + 
@@ -27,7 +27,7 @@ public class DumpSlicesAndChannels {
             Edge[] outgoing = slice.getTail().getDestList(SchedulingPhase.STEADY);
             for (Edge e : outgoing) {
                 assert e != null && e.getDest() != null;
-                Slice next = e.getDest().getParent();
+                Filter next = e.getDest().getParent();
                 buf.append(slice.hashCode() + " -> " + next.hashCode()
                             + " [label=\""
                             + channelName(e,backendbits)
@@ -71,13 +71,13 @@ public class DumpSlicesAndChannels {
     
     /**return a string with all of the names of the filterslicenodes
      * and blue if linear. */
-    private static  String sliceName(Slice slice, SIRSlicer slicer, BackEndFactory backendbits) {
-        SliceNode node = slice.getHead();
+    private static  String sliceName(Filter slice, SIRSlicer slicer, BackEndFactory backendbits) {
+        InternalFilterNode node = slice.getHead();
 
         StringBuffer out = new StringBuffer();
 
         //do something fancy for linear slices!!!
-        if (((FilterSliceNode)node.getNext()).getFilter().getArray() != null)
+        if (((WorkNode)node.getNext()).getFilter().getArray() != null)
             out.append("color=cornflowerblue, style=filled, ");
         
         out.append("label=\"" + node.getAsInput().debugString(true));//toString());
@@ -89,7 +89,7 @@ public class DumpSlicesAndChannels {
         node = node.getNext();
         while (node != null ) {
             if (node.isFilterSlice()) {
-                FilterContent f = node.getAsFilter().getFilter();
+                WorkNodeContent f = node.getAsFilter().getFilter();
                 out.append("\\n" + node.toString() + "{"
                         + slicer.getFilterWork(node.getAsFilter())
                         + "}");
@@ -101,7 +101,7 @@ public class DumpSlicesAndChannels {
                 out.append("\\nMult: init " + f.getInitMult() + ", steady " + f.getSteadyMult());
                 out.append("\\n *** ");
 
-                if (node.getNext() instanceof FilterSliceNode || backendbits.sliceHasDownstreamChannel(node.getParent())) {
+                if (node.getNext() instanceof WorkNode || backendbits.sliceHasDownstreamChannel(node.getParent())) {
                     out.append("  via " + channelName(node.getEdgeToNext(), backendbits) + "\\n");
                 }
             }

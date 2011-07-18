@@ -40,7 +40,7 @@ import at.dms.kjc.sir.SIRIterationExpression;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
     /**
     * Takes a ComputeNode collection, a collection of Channel's, 
@@ -188,7 +188,7 @@ public class EmitCode {
         Layout l = backendbits.getLayout();
         Collection<Channel> channels = backendbits.getChannels();
         for (Channel c : channels) {
-            SliceNode s = c.getSource();
+            InternalFilterNode s = c.getSource();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
             }
@@ -207,7 +207,7 @@ public class EmitCode {
         Layout l = backendbits.getLayout();
         Collection<Channel> channels = backendbits.getChannels();
         for (Channel c : channels) {
-            SliceNode s = c.getDest();
+            InternalFilterNode s = c.getDest();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
             }

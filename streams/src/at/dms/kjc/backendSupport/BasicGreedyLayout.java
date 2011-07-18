@@ -10,14 +10,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
 import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.CompareSliceBNWork;
+import at.dms.kjc.slir.CompareFilterBNWork;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.WorkNode;
 
 
 
@@ -27,10 +27,10 @@ import at.dms.kjc.slicegraph.CompareSliceBNWork;
  *
  */
 public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
-    private HashMap<SliceNode, T> assignment;
+    private HashMap<InternalFilterNode, T> assignment;
     private SpaceTimeScheduleAndSlicer spaceTime;
     private int numBins;
-    private LinkedList<SliceNode>[] bins;
+    private LinkedList<InternalFilterNode>[] bins;
     private int[] binWeight;
     //private int[] searchOrder;
     private int totalWork;
@@ -51,25 +51,25 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         bins = new LinkedList[numBins];
         binWeight = new int[numBins];
         for (int i = 0; i < numBins; i++) {
-            bins[i] = new LinkedList<SliceNode>();
+            bins[i] = new LinkedList<InternalFilterNode>();
             binWeight[i] = 0;
         }
     }
     
-    public HashMap<SliceNode, T> getAssignment() {
+    public HashMap<InternalFilterNode, T> getAssignment() {
         return assignment;
     }
     
     
-    public T getComputeNode(SliceNode node) {
+    public T getComputeNode(InternalFilterNode node) {
         return assignment.get(node);
     }
    
-    public void setComputeNode(SliceNode node, T tile) {
+    public void setComputeNode(InternalFilterNode node, T tile) {
         assignment.put(node, tile);
     }
     public void runLayout() {
-        assignment = new HashMap<SliceNode, T>();
+        assignment = new HashMap<InternalFilterNode, T>();
         pack();
 
         System.out.println("IdealWork = " + totalWork / numBins);
@@ -78,8 +78,8 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
     
     private void pack() {
         //now sort the filters by work
-        LinkedList<SliceNode> sortedList = new LinkedList<SliceNode>();
-        LinkedList<Slice> scheduleOrder;
+        LinkedList<InternalFilterNode> sortedList = new LinkedList<InternalFilterNode>();
+        LinkedList<Filter> scheduleOrder;
         
         //get the schedule order of the graph!
         if (KjcOptions.noswpipe) {
@@ -88,27 +88,27 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
             scheduleOrder = DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
         } else {
             //if we are software pipelining then sort the traces by work
-            Slice[] tempArray = (Slice[]) spaceTime.getSlicer().getSliceGraph().clone();
-            Arrays.sort(tempArray, new CompareSliceBNWork(slicer));
-            scheduleOrder = new LinkedList<Slice>(Arrays.asList(tempArray));
+            Filter[] tempArray = (Filter[]) spaceTime.getSlicer().getSliceGraph().clone();
+            Arrays.sort(tempArray, new CompareFilterBNWork(slicer));
+            scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
             //reverse the list, we want the list in descending order!
             Collections.reverse(scheduleOrder);
         }
 
         
         for (int i = 0; i < scheduleOrder.size(); i++) {
-            Slice slice = scheduleOrder.get(i);
+            Filter slice = scheduleOrder.get(i);
             assert slice.getNumFilters() == 1 : "The greedy partitioner only works for Time!";
             sortedList.add(slice.getHead().getNextFilter());
         }
         
-        Iterator<SliceNode> sorted = sortedList.iterator();
+        Iterator<InternalFilterNode> sorted = sortedList.iterator();
         
         //perform the packing
         while (sorted.hasNext()) {
-            SliceNode snode = sorted.next();
-            if (snode instanceof FilterSliceNode) {
-                FilterSliceNode fnode = (FilterSliceNode) snode;
+            InternalFilterNode snode = sorted.next();
+            if (snode instanceof WorkNode) {
+                WorkNode fnode = (WorkNode) snode;
                 int bin = findMinBin();
 
                 bins[bin].add(fnode);
@@ -123,10 +123,10 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
                         + slicer.getFilterWorkSteadyMult(
                                 fnode) + " on bin " + bin + ", bin work = "
                         + binWeight[bin]);
-                if (snode.getPrevious() instanceof InputSliceNode) {
+                if (snode.getPrevious() instanceof InputNode) {
                     assignment.put(snode.getPrevious(),nodes[bin]);
                 }
-                if (snode.getNext() instanceof OutputSliceNode) {
+                if (snode.getNext() instanceof OutputNode) {
                     assignment.put(snode.getNext(),nodes[bin]);
                 }
             

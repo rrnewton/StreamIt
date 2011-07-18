@@ -1,13 +1,13 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * Create channels of appropriate type for a back end.
@@ -45,11 +45,11 @@ public class GetOrMakeChannel  {
         if (c != null) {
             return c;
         }
-        SliceNode src = e.getSrc();
-        SliceNode dst = e.getDest();
+        InternalFilterNode src = e.getSrc();
+        InternalFilterNode dst = e.getDest();
 
-        if (src instanceof OutputSliceNode && dst instanceof InputSliceNode) {
-            c = makeInterSliceChannel((InterSliceEdge)e);
+        if (src instanceof OutputNode && dst instanceof InputNode) {
+            c = makeInterSliceChannel((InterFilterEdge)e);
         } else {
             c = makeIntraSliceChannel(e);
         }
@@ -59,26 +59,26 @@ public class GetOrMakeChannel  {
             // dump channel type, and if array then capacity.
             System.err.print("(Channel ");
             System.err.print(c.getClass().getSimpleName());
-            if (src instanceof FilterSliceNode) {
+            if (src instanceof WorkNode) {
                 System.err.print(" " + src.getAsFilter().getFilter().getName());
-            } else if (src instanceof InputSliceNode) {
+            } else if (src instanceof InputNode) {
                 System.err.print(" " + "joiner_"
                         + src.getNext().getAsFilter().getFilter().getName());
             } else {
-                assert src instanceof OutputSliceNode;
+                assert src instanceof OutputNode;
                 System.err
                         .print(" "
                                 + "splitter_"
                                 + src.getPrevious().getAsFilter().getFilter()
                                         .getName());
             }
-            if (dst instanceof FilterSliceNode) {
+            if (dst instanceof WorkNode) {
                 System.err.print(" " + dst.getAsFilter().getFilter().getName());
-            } else if (dst instanceof InputSliceNode) {
+            } else if (dst instanceof InputNode) {
                 System.err.print(" " + "joiner_"
                         + dst.getNext().getAsFilter().getFilter().getName());
             } else {
-                assert dst instanceof OutputSliceNode;
+                assert dst instanceof OutputNode;
                 System.err
                         .print(" "
                                 + "splitter_"
@@ -111,15 +111,15 @@ public class GetOrMakeChannel  {
      * @return a channel that implements the edge or <b>null</b> if no data passes over the edge.
      */
     protected Channel makeIntraSliceChannel(Edge e) {
-        SliceNode src = e.getSrc();
-        SliceNode dst = e.getDest();
+        InternalFilterNode src = e.getSrc();
+        InternalFilterNode dst = e.getDest();
 
         Channel c;
                 
-        if (src instanceof InputSliceNode) {
-            assert dst instanceof FilterSliceNode;
+        if (src instanceof InputNode) {
+            assert dst instanceof WorkNode;
             // input -> filter
-            Slice s = dst.getParent();
+            Filter s = dst.getParent();
             // implicit assumption here: 
             // ! sliceNeedsPeekBuffer(s) -> ! sliceNeedsJoinerWorkFunction(s)
             // so either connect to joiner code using an unbufferred channel
@@ -129,16 +129,16 @@ public class GetOrMakeChannel  {
                 if (backEndBits.sliceNeedsJoinerCode(s)) {
                     // joiner code connected directly to filter via a channel
                     // containing no storage
-                    String popName = ProcessInputSliceNode.getJoinerCode(
-                            (InputSliceNode) src, backEndBits)
+                    String popName = ProcessInputNode.getJoinerCode(
+                            (InputNode) src, backEndBits)
                             .getMethods()[0].getName();
                     c = UnbufferredPopChannel.getChannel(e, popName);
-                    for (InterSliceEdge joiner_edge : ((InputSliceNode) src).getSourceList(SchedulingPhase.STEADY)) {
+                    for (InterFilterEdge joiner_edge : ((InputNode) src).getSourceList(SchedulingPhase.STEADY)) {
                         ((UnbufferredPopChannel)c).addChannelForHeaders(getOrMakeChannel(joiner_edge));
                     }
                 } else if (backEndBits.sliceHasUpstreamChannel(s)) {
                     // no joiner at all: delegate to the channel for InputSliceNode.
-                    Channel upstream = getOrMakeChannel(((InputSliceNode) src)
+                    Channel upstream = getOrMakeChannel(((InputNode) src)
                             .getSingleEdge(SchedulingPhase.STEADY));
                     c = DelegatingChannel.getChannel(e, upstream);
                 } else {
@@ -147,7 +147,7 @@ public class GetOrMakeChannel  {
                 }
             } else {
                 // make peek buffer as a channel
-                if (FilterInfo.getFilterInfo((FilterSliceNode) dst).isSimple()) {
+                if (FilterInfo.getFilterInfo((WorkNode) dst).isSimple()) {
                     // no items remain in channel between steady states.
                     c = ChannelAsArray.getChannel(e);
                 } else {
@@ -156,10 +156,10 @@ public class GetOrMakeChannel  {
                     c = ChannelAsCircularArray.getChannel(e);
                 }
             }
-        } else if (dst instanceof OutputSliceNode) {
-            assert src instanceof FilterSliceNode;
+        } else if (dst instanceof OutputNode) {
+            assert src instanceof WorkNode;
             // filter --> output
-            Slice s = dst.getParent();
+            Filter s = dst.getParent();
             // assumes slice does not need a work function to drive splitter:
             // splitter code can be connected directly to filter via an unbufferred channel
             // or bypass non-existent splitter code delegating to interslice channel.
@@ -167,16 +167,16 @@ public class GetOrMakeChannel  {
                 // the channel just needs to provide the name of the splitter entry point
                 // for push() from the filter.
                 String pushName = 
-                    ProcessOutputSliceNode.getSplitterCode((OutputSliceNode)dst,backEndBits).
+                    ProcessOutputNode.getSplitterCode((OutputNode)dst,backEndBits).
                         getMethods()[0].getName();
                 c = UnbufferredPushChannel.getChannel(e,pushName);
-                for (InterSliceEdge joiner_edge : ((OutputSliceNode) dst).getDestSequence(SchedulingPhase.STEADY)) {
+                for (InterFilterEdge joiner_edge : ((OutputNode) dst).getDestSequence(SchedulingPhase.STEADY)) {
                     ((UnbufferredPushChannel)c).addChannelForHeaders(getOrMakeChannel(joiner_edge));
                 }
             } else if (backEndBits.sliceHasDownstreamChannel(s)) {
                 // there is no splitter code, this channel has no effect except delegating
                 // to downstream channel.
-                Channel downstream = getOrMakeChannel(((OutputSliceNode)dst).getDests(SchedulingPhase.STEADY)[0][0]);
+                Channel downstream = getOrMakeChannel(((OutputNode)dst).getDests(SchedulingPhase.STEADY)[0][0]);
                 c = DelegatingChannel.getChannel(e, downstream);
             } else {
                 c = null;
@@ -198,7 +198,7 @@ public class GetOrMakeChannel  {
      * </p>
      */
     
-    protected Channel makeInterSliceChannel(InterSliceEdge e) {
+    protected Channel makeInterSliceChannel(InterFilterEdge e) {
         Channel c;
         if (e.initItems() > e.steadyItems()) {
             // items left on channel between steady states

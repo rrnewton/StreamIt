@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.Edge;
+import at.dms.kjc.slir.Edge;
 /**
  * A Channel with the single purpose of holding the name of a push() routine.
  * Such a channel is used to connect a filter to a splitter

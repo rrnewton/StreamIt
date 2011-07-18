@@ -21,7 +21,7 @@ import at.dms.kjc.JReturnStatement;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.Edge;
+import at.dms.kjc.slir.Edge;
 
 /**
  * Implement a channel as a circular array.

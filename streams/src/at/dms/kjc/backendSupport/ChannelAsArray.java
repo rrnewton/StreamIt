@@ -25,8 +25,8 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.InternalFilterNode;
 
 /**
  * Channel implementation as an array.
@@ -128,7 +128,7 @@ public class ChannelAsArray extends Channel {
 
     /** Obsolete constructor, don't use. */
     @Deprecated
-    public ChannelAsArray(SliceNode src, SliceNode dst) {
+    public ChannelAsArray(InternalFilterNode src, InternalFilterNode dst) {
         super(src, dst);
         throw new AssertionError("Creating ChannelAsArray from src, dst not supported.");
     }

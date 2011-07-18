@@ -1,11 +1,10 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.ProcElement;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 /**
  * This abstract class represents a device that can perform computation.
- * For such a device, it makes sense to associate {@link SliceNode SliceNode}s
+ * For such a device, it makes sense to associate {@link InternalFilterNode SliceNode}s
  * with the device, and to create ComputeCode for the SliceNodes.
  * @author gordon / dimock
  * @param <StoreType> A recursive type: ComputeCodeStore's and ComputeNode's refer to each other and may be extended...

@@ -21,8 +21,8 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.util.Utils;
 
 /**
@@ -44,7 +44,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     public static boolean INLINE_WORK = true;
     
     /** The slice node that we are generating helper code for */
-    protected SliceNode sliceNode;
+    protected InternalFilterNode sliceNode;
     
     /** a BackEndFactory for getting information about other parts of the back end */
     protected BackEndFactory backEndBits;
@@ -66,7 +66,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     protected JMethodDeclaration workMethod = null;
     
     /** General constructor: need to add fields and methods later. */
-    public CodeStoreHelper (SliceNode node, BackEndFactory backEndBits) {
+    public CodeStoreHelper (InternalFilterNode node, BackEndFactory backEndBits) {
         super(new JFieldDeclaration[0], new JMethodDeclaration[0]);
         sliceNode = node;
         this.backEndBits = backEndBits;
@@ -75,7 +75,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     
     /** Constructor from a FilterContent, fills out fields, methods, initMethod, preWorkMethod, workMethod.
      * Note: clones inputs. */
-    public CodeStoreHelper(SliceNode node, FilterContent filter, BackEndFactory backEndBits) {
+    public CodeStoreHelper(InternalFilterNode node, WorkNodeContent filter, BackEndFactory backEndBits) {
         this(node, backEndBits);
         setFields((JFieldDeclaration[])ObjectDeepCloner.deepCopy(filter.getFields()));
         setMethods((JMethodDeclaration[])ObjectDeepCloner.deepCopy(filter.getMethods()));
@@ -123,14 +123,14 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     }
     
     
-    static private Map<SliceNode,CodeStoreHelper> sliceNodeToHelper = new HashMap<SliceNode,CodeStoreHelper>() ;
+    static private Map<InternalFilterNode,CodeStoreHelper> sliceNodeToHelper = new HashMap<InternalFilterNode,CodeStoreHelper>() ;
     /**
      * Use {@link #findCodeForSlice}, {@link #addCodeForSlice} to keep track of whether a SIRCodeUnit of code has been
      * generated already for a SliceNode.
      * @param s  A SliceNode
      * @return  The CodeStoreHelper added for the SliceNode by {@link #addCodeForSlice}.
      */
-    public static CodeStoreHelper findHelperForSliceNode(SliceNode s) {
+    public static CodeStoreHelper findHelperForSliceNode(InternalFilterNode s) {
         return sliceNodeToHelper.get(s);
     }
    
@@ -140,7 +140,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
      * @param s a SliceNode
      * @param u a CodeStoreHelper
      */
-    public static void addHelperForSliceNode(SliceNode s, CodeStoreHelper u) {
+    public static void addHelperForSliceNode(InternalFilterNode s, CodeStoreHelper u) {
         sliceNodeToHelper.put(s, u);
     }
    
@@ -148,7 +148,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
      * Clean up static data.
      */
     public void reset() {
-        sliceNodeToHelper = new HashMap<SliceNode,CodeStoreHelper>() ;
+        sliceNodeToHelper = new HashMap<InternalFilterNode,CodeStoreHelper>() ;
     }
    /** @return all fields that are needed in the ComputeCodeStore: 
      * both those from underlying code and those generated in this class */

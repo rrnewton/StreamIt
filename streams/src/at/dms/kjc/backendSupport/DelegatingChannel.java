@@ -5,8 +5,8 @@ import java.util.List;
 import at.dms.kjc.CType;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.InternalFilterNode;
 
 /**
  * A Channel that delegates all useful work to another channel.
@@ -135,12 +135,12 @@ public class DelegatingChannel extends Channel {
     /* } RMR */
     
     @Override
-    public SliceNode getDest() {
+    public InternalFilterNode getDest() {
         return theEdge.getDest();
     }
 
     @Override
-    public SliceNode getSource() {
+    public InternalFilterNode getSource() {
         return theEdge.getSrc();
     }
 

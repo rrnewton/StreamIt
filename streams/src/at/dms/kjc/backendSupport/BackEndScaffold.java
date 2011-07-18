@@ -6,16 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
 import at.dms.kjc.slicegraph.SimpleSlice;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
 
 
 /**
- * Create code for a partitioning of {@link at.dms.kjc.slicegraph.Slice Slice}s 
+ * Create code for a partitioning of {@link at.dms.kjc.slir.Filter Slice}s 
  * on a collection of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s.
  * Connections between the ComputeNode s are returned as 
  * {@link at.dms.kjc.backendSupport.Channel Buffer}s.
@@ -67,7 +67,7 @@ public class BackEndScaffold  {
      * @param input InputSliceNode to consider for to a joiner.
      * @return
      */
-    protected boolean doNotCreateJoiner(InputSliceNode input) {
+    protected boolean doNotCreateJoiner(InputNode input) {
         return false;
     }
     
@@ -83,7 +83,7 @@ public class BackEndScaffold  {
         ComputeNodesI computeNodes = resources.getComputeNodes();
         this.resources = resources;
         
-        Slice slices[];
+        Filter slices[];
 
         beforeScheduling(schedule,resources);
         
@@ -123,20 +123,20 @@ public class BackEndScaffold  {
      * @param whichPhase True if the init stage.
      * @param computeNodes The collection of compute nodes.
      */
-    protected void iterateInorder(Slice slices[], SchedulingPhase whichPhase,
+    protected void iterateInorder(Filter slices[], SchedulingPhase whichPhase,
                                        ComputeNodesI computeNodes) {
-        Slice slice;
+        Filter slice;
 
         for (int i = 0; i < slices.length; i++) {
-            slice = (Slice) slices[i];
+            slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputSliceNode)slice.getHead(),
+            resources.processInputSliceNode((InputNode)slice.getHead(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
             resources.processFilterSliceNode(slice.getFilterNodes().get(0), whichPhase, computeNodes);
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputSliceNode)slice.getTail(),
+            resources.processOutputSliceNode((OutputNode)slice.getTail(),
                     whichPhase, computeNodes);
             
         }
@@ -152,18 +152,18 @@ public class BackEndScaffold  {
      * @param whichPhase True if the init stage.
      * @param rawChip The raw chip
      */
-    private void iterateJoinFiltersSplit(Slice slices[], SchedulingPhase whichPhase,
+    private void iterateJoinFiltersSplit(Filter slices[], SchedulingPhase whichPhase,
                                                 ComputeNodesI computeNodes) {
-        Slice slice;
+        Filter slice;
 
         for (int i = 0; i < slices.length; i++) {
-            slice = (Slice) slices[i];
+            slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputSliceNode)slice.getHead(),
+            resources.processInputSliceNode((InputNode)slice.getHead(),
                     whichPhase, computeNodes);
         }
         for (int i = 0; i < slices.length; i++) {
-            slice = (Slice) slices[i];
+            slice = (Filter) slices[i];
             //create the compute code and the communication code for the
             //filters of the trace
             if (slice instanceof SimpleSlice) {
@@ -173,27 +173,27 @@ public class BackEndScaffold  {
             }
         }
         for (int i = 0; i < slices.length; i++) {
-            slice = (Slice) slices[i];
+            slice = (Filter) slices[i];
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputSliceNode)slice.getTail(),
+            resources.processOutputSliceNode((OutputNode)slice.getTail(),
                     whichPhase, computeNodes);
         }
     }
     
     /** Special scheduling for --spacetime --noswpipe */
-    private void iterateNoSWPipe(List<Slice> scheduleList, SchedulingPhase whichPhase,
+    private void iterateNoSWPipe(List<Filter> scheduleList, SchedulingPhase whichPhase,
             ComputeNodesI computeNodes) {
-        HashSet<OutputSliceNode> hasBeenSplit = new HashSet<OutputSliceNode>();
-        HashSet<InputSliceNode> hasBeenJoined = new HashSet<InputSliceNode>();
-        LinkedList<Slice> scheduled = new LinkedList<Slice>();
-        LinkedList<Slice> needToSchedule = new LinkedList<Slice>();
+        HashSet<OutputNode> hasBeenSplit = new HashSet<OutputNode>();
+        HashSet<InputNode> hasBeenJoined = new HashSet<InputNode>();
+        LinkedList<Filter> scheduled = new LinkedList<Filter>();
+        LinkedList<Filter> needToSchedule = new LinkedList<Filter>();
         needToSchedule.addAll(scheduleList);
         
         
         while (needToSchedule.size() != 0) {
             //join everyone that can be joined
             for (int n = 0; n < needToSchedule.size(); n++) {
-                Slice notSched = needToSchedule.get(n);
+                Filter notSched = needToSchedule.get(n);
 
                 // a joiner with 0 inputs does not create code.
                 // presumably followed by a filter with 0 inputs that
@@ -215,7 +215,7 @@ public class BackEndScaffold  {
                 // feeding the joiner have all been created.
                 // XXX WTF: Precludes feedback loops.
                 boolean canJoin = true;
-                for (InterSliceEdge inEdge : notSched.getHead().getSourceSet(whichPhase)) {
+                for (InterFilterEdge inEdge : notSched.getHead().getSourceSet(whichPhase)) {
                     if (!hasBeenSplit.contains(inEdge.getSrc())) {
                         canJoin = false;
                         break;
@@ -234,7 +234,7 @@ public class BackEndScaffold  {
             //create the compute code and the communication code for the
             //filters of the trace after joiner has been processed.
             while (needToSchedule.size() != 0) {
-                Slice slice = needToSchedule.get(0);
+                Filter slice = needToSchedule.get(0);
                 if (hasBeenJoined.contains(slice.getHead())) {
                     scheduled.add(slice);
                     if (slice instanceof SimpleSlice) {
@@ -255,7 +255,7 @@ public class BackEndScaffold  {
         if (hasBeenSplit.size() != scheduled.size()) {
             for (int t = 0; t < scheduled.size(); t++) {
                 if (!hasBeenSplit.contains(scheduled.get(t).getTail())) {
-                    OutputSliceNode output = 
+                    OutputNode output = 
                         scheduled.get(t).getTail();
                     //System.out.println("Scheduling split of " + output.getPrevFilter()); 
                     resources.processOutputSliceNode(output,
@@ -270,7 +270,7 @@ public class BackEndScaffold  {
         if (hasBeenJoined.size() != scheduled.size()) {
             for (int t = 0; t < scheduled.size(); t++) {
                 if (!hasBeenJoined.contains(scheduled.get(t).getHead())) {
-                    InputSliceNode input  = 
+                    InputNode input  = 
                         scheduled.get(t).getHead();
                     //System.out.println("Scheduling join of " + input.getNextFilter()); 
                     resources.processInputSliceNode(input,

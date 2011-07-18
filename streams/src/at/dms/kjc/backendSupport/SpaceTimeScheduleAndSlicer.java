@@ -7,10 +7,10 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Vector;
 
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
 import at.dms.kjc.slicegraph.Slicer;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * Extend BasicSpaceTimeSchedule by storing a slicer.
@@ -48,13 +48,13 @@ public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
         int outputs = 0;
         
         //get all the file writers
-        Vector<Slice> fileWriters = new Vector<Slice>();
+        Vector<Filter> fileWriters = new Vector<Filter>();
         for (int i = 0; i < getSlicer().io.length; i++) 
             if (getSlicer().io[i].getHead().isFileOutput())
                 fileWriters.add(getSlicer().io[i]);
         
         for (int i = 0; i < fileWriters.size(); i++) {
-            FilterSliceNode node = (FilterSliceNode)fileWriters.get(i).getHead().getNext();
+            WorkNode node = (WorkNode)fileWriters.get(i).getHead().getNext();
             FilterInfo fi = FilterInfo.getFilterInfo(node);
             assert node.getFilter().getInputType().isNumeric() :
                 "non-numeric type for input to filewriter";

@@ -11,15 +11,15 @@ import java.util.Random;
 import java.util.Set;
 
 import at.dms.kjc.common.SimulatedAnnealing;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
 import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * @author mgordon
@@ -29,33 +29,33 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     
     protected SIRSlicer slicer;
     protected Ts chip;
-    protected LinkedList<Slice> scheduleOrder;
-    protected LinkedList<SliceNode> assignedFilters;
+    protected LinkedList<Filter> scheduleOrder;
+    protected LinkedList<InternalFilterNode> assignedFilters;
     protected Random rand;
     
     /** from assignment when done with simulated annealing */
-    private HashMap<SliceNode, T> layout;
+    private HashMap<InternalFilterNode, T> layout;
     
     public NoSWPipeLayout(SpaceTimeScheduleAndSlicer spaceTime, Ts chip) {
         this.chip = chip;
         this.slicer = (SIRSlicer)spaceTime.getSlicer();
         scheduleOrder = 
             DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
-        assignedFilters = new LinkedList<SliceNode>();
+        assignedFilters = new LinkedList<InternalFilterNode>();
         rand = new Random(17);
     }
     
     /**
      * only valid after run();
      */
-    public T getComputeNode(SliceNode node) {
+    public T getComputeNode(InternalFilterNode node) {
         return layout.get(node);
     }
     
     /**
      * only valid after run()
      */
-    public void setComputeNode(SliceNode node, T tile) {
+    public void setComputeNode(InternalFilterNode node, T tile) {
         layout.put(node, tile);
     }
     
@@ -75,7 +75,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * The assignment should contain only {@link at.dms.kjc.slicegraphFilterSliceNode FilterSliceNode}s when this is called.
      */
     public void swapAssignment() {
-        FilterSliceNode filter1 = (FilterSliceNode)assignedFilters.get(rand.nextInt(assignedFilters.size()));
+        WorkNode filter1 = (WorkNode)assignedFilters.get(rand.nextInt(assignedFilters.size()));
         assignment.put(filter1, chip.getNthComputeNode(rand.nextInt(chip.size())));
     }
     
@@ -83,11 +83,11 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * Random initial assignment.
      */
     public void initialPlacement() {
-        Iterator<Slice> slices = scheduleOrder.iterator();
+        Iterator<Filter> slices = scheduleOrder.iterator();
         int tile = 0;
         while (slices.hasNext()) {
             
-          Slice slice = slices.next();
+          Filter slice = slices.next();
           //System.out.println(trace.getHead().getNextFilter());
           //if (spaceTime.partitioner.isIO(trace))
           //    continue;
@@ -112,10 +112,10 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     public double placementCost(boolean debug) {
         double tileCosts[] = new double[chip.size()];
         
-        Iterator<Slice> slices = scheduleOrder.iterator();
-        HashMap<FilterSliceNode, Double> endTime = new HashMap<FilterSliceNode, Double>();
+        Iterator<Filter> slices = scheduleOrder.iterator();
+        HashMap<WorkNode, Double> endTime = new HashMap<WorkNode, Double>();
         while (slices.hasNext()) {
-            Slice slice = slices.next();
+            Filter slice = slices.next();
             //System.err.println(slice.toString());
             T tile = (T)assignment.get(slice.getHead().getNextFilter());
             double traceWork = slicer.getSliceBNWork(slice); 
@@ -124,13 +124,13 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
             
             //find the max end times of all the traces that this trace depends on
             double maxDepStartTime = 0;
-            InputSliceNode input = slice.getHead();
-            Iterator<InterSliceEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
+            InputNode input = slice.getHead();
+            Iterator<InterFilterEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
             while (inEdges.hasNext()) {
-                InterSliceEdge edge = inEdges.next();
+                InterFilterEdge edge = inEdges.next();
                 if (slicer.isIO(edge.getSrc().getParent()))
                     continue;
-                FilterSliceNode upStream = edge.getSrc().getPrevFilter();
+                WorkNode upStream = edge.getSrc().getPrevFilter();
                 
                 ComputeNode upTile = (T)assignment.get(upStream);
                 assert endTime.containsKey(upStream); // TODO: assertion fails on fedback loop.
@@ -185,17 +185,17 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
 
         // set assignments for all SliceNodes in layout
         Set<Map.Entry> entries = assignment.entrySet();
-        layout = new HashMap<SliceNode, T>();
-        for (Map.Entry<SliceNode, T> snode_cnode : entries) {
+        layout = new HashMap<InternalFilterNode, T>();
+        for (Map.Entry<InternalFilterNode, T> snode_cnode : entries) {
             T cnode = snode_cnode.getValue();
-            SliceNode snode = snode_cnode.getKey();
+            InternalFilterNode snode = snode_cnode.getKey();
             
-            if (snode instanceof FilterSliceNode) {
+            if (snode instanceof WorkNode) {
                 setComputeNode(snode,cnode);
-                if (snode.getPrevious() instanceof InputSliceNode) {
+                if (snode.getPrevious() instanceof InputNode) {
                     setComputeNode(snode.getPrevious(),cnode);
                 }
-                if (snode.getNext() instanceof OutputSliceNode) {
+                if (snode.getNext() instanceof OutputNode) {
                     setComputeNode(snode.getNext(),cnode);
                 }
             }

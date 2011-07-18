@@ -49,31 +49,23 @@ import at.dms.kjc.sir.lowering.fusion.Lifter;
 import at.dms.kjc.sir.lowering.partition.ManualPartition;
 import at.dms.kjc.sir.lowering.partition.SJToPipe;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.slicegraph.AdaptivePartitioner;
-import at.dms.kjc.slicegraph.DataFlowOrder;
 import at.dms.kjc.slicegraph.FlattenAndPartition;
 import at.dms.kjc.slicegraph.FlattenGraph;
-import at.dms.kjc.slicegraph.InstallInitDistributions;
 import at.dms.kjc.slicegraph.OneFilterSlicer;
 import at.dms.kjc.slicegraph.SIRSlicer;
 import at.dms.kjc.slicegraph.SimpleSlicer;
-import at.dms.kjc.slicegraph.Slice;
 import at.dms.kjc.slicegraph.Slicer;
 import at.dms.kjc.slicegraph.UnflatFilter;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InstallInitDistributions;
 import at.dms.kjc.slir.SIRToSLIR;
-import at.dms.kjc.spacetime.AddBuffering;
-import at.dms.kjc.spacetime.BasicGenerateSteadyStateSchedule;
-import at.dms.kjc.spacetime.CalculateParams;
-import at.dms.kjc.spacetime.CompCommRatio;
-import at.dms.kjc.spacetime.DuplicateBottleneck;
-import at.dms.kjc.spacetime.GranularityAdjust;
-import at.dms.kjc.spacetime.GreedyBinPacking;
-import at.dms.kjc.spacetime.StreamlinedDuplicate;
+
 
 /**
  * Common passes, useful in new back ends.
  * 
- * @author dimock
+ * @author dimock, mgordon, rsoule
  * 
  */
 public class CommonPasses {
@@ -133,9 +125,9 @@ public class CommonPasses {
 	 *            use in partitioning.
 	 * 
 	 * @return a slice graph: the optimized program in
-	 *         {@link at.dms.kjc.slicegraph.Slice Slice} representation.
+	 *         {@link at.dms.kjc.slir.Filter Slice} representation.
 	 */
-	public Slice[] run(SIRStream str, JInterfaceDeclaration[] interfaces,
+	public Filter[] run(SIRStream str, JInterfaceDeclaration[] interfaces,
 			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
 			SIRHelper[] helpers, SIRGlobal global, int numCores) {
 
@@ -393,16 +385,6 @@ public class CommonPasses {
 		// Print stream graph after fissing and fusing.
 		StreamItDot.printGraph(str, "canonical-graph.dot");
 
-		// Use the partition_greedier flag to enable the Granularity Adjustment
-		// phase, it will try to partition more as long as the critical path
-		// is not affected (see asplos 06).
-		if (KjcOptions.partition_greedier) {
-			StreamItDot.printGraph(str, "before-granularity-adjust.dot");
-			str = GranularityAdjust.doit(str, numCores);
-			StreamItDot.printGraph(str, "after-granularity-adjust.dot");
-
-		}
-
 		// this must run before vertical fission
 		str = Flattener.doLinearAnalysis(str);
 		str = Flattener.doStateSpaceAnalysis(str);
@@ -514,11 +496,13 @@ public class CommonPasses {
 		// we want to convert to the StreamGraph
 		new SIRToSLIR().translate(segmentedGraph);
 
+
 		System.out.println("*********** SIRToSlir is done **************");
 		
 		System.exit(0);
 		
-		Slice[] sliceGraph = null;
+		Filter[] sliceGraph = null;
+
 
 		setSlicer(null);
 		if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {
@@ -533,14 +517,6 @@ public class CommonPasses {
 						executionCounts);
 			}
 		} else {
-			if (KjcOptions.autoparams) {
-				GreedyBinPacking greedyBinPacking = new GreedyBinPacking(str,
-						numCores, getWorkEstimate());
-				greedyBinPacking.pack();
-
-				setSlicer(new AdaptivePartitioner(topNodes, executionCounts,
-						lfa, getWorkEstimate(), numCores, greedyBinPacking));
-			}
 			if (KjcOptions.nopartition) {
 				setSlicer(new FlattenAndPartition(topNodes, executionCounts,
 						lfa, getWorkEstimate(), numCores));

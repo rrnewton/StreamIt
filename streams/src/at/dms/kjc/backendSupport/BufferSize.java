@@ -1,8 +1,8 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * Centralize calculation of buffer sizes
@@ -23,14 +23,14 @@ public class BufferSize {
         if (theEdge.getSrc().isFilterSlice()) {  // filter->filter, filter->output
             // the init size is the max of the multiplicities for init and prime-pump
             // times the push rate
-            FilterInfo fi = FilterInfo.getFilterInfo((FilterSliceNode) theEdge.getSrc());
+            FilterInfo fi = FilterInfo.getFilterInfo((WorkNode) theEdge.getSrc());
             int maxItems = Math.max(initPush(fi), steadyPush(fi));
             // steady is just pop * mult
             return maxItems;
         } else if (theEdge.getDest().isFilterSlice()) { // joiner->filter
             // calculate the maximum number of elements that we may need 
             // upstream of a filter.
-            FilterInfo fi = FilterInfo.getFilterInfo((FilterSliceNode) theEdge.getDest());
+            FilterInfo fi = FilterInfo.getFilterInfo((WorkNode) theEdge.getDest());
             // on init: have calculation:
             int initSize = fi.initItemsReceived();
             // in steady state: max(peek, pop+remaining) if multiplicity == 1
@@ -41,9 +41,9 @@ public class BufferSize {
             int maxSize = Math.max(initSize, steadySize);
             return maxSize;
         } else {
-            assert theEdge instanceof InterSliceEdge;
-            int maxItems = Math.max(((InterSliceEdge)theEdge).initItems(), 
-                    ((InterSliceEdge)theEdge).steadyItems());
+            assert theEdge instanceof InterFilterEdge;
+            int maxItems = Math.max(((InterFilterEdge)theEdge).initItems(), 
+                    ((InterFilterEdge)theEdge).steadyItems());
             return maxItems;
         }
     }
