@@ -62,16 +62,6 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
     }
 
     /**
-     * Construct FileInputContent from UnflatFilter.
-     * @param unflat The UnflatFilter used to contruct the FileInputContent.
-     */
-    public FileOutputContent(UnflatFilter unflat) {
-        super(unflat);
-        outputs = -1;
-        filename=((SIRFileWriter)unflat.filter).getFileName();
-    }
-
-    /**
      * Returns expected number of outputs.
      */
     public int getOutputs() 
