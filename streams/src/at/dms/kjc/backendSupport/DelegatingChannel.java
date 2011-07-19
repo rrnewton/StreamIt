@@ -22,20 +22,20 @@ import at.dms.kjc.slir.InternalFilterNode;
  *  
  * @author dimock
  */
-public class DelegatingChannel extends Channel {
+public class DelegatingChannel extends Buffer {
     
-    private Channel other;
+    private Buffer other;
     /**
      * Make a new Channel or return an already-made channel.
      * @param edge     The edge that this channel implements.
      * @param other    The channel that this delegates to.
      * @return A channel for this edge, that 
      */
-    public static DelegatingChannel getChannel(Edge edge, Channel other) {
-        Channel oldChan = Channel.bufferStore.get(edge);
+    public static DelegatingChannel getChannel(Edge edge, Buffer other) {
+        Buffer oldChan = Buffer.bufferStore.get(edge);
         if (oldChan == null) {
             DelegatingChannel chan = new DelegatingChannel(edge, other);
-            Channel.bufferStore.put(edge, chan);
+            Buffer.bufferStore.put(edge, chan);
             return chan;
        } else {
             assert oldChan instanceof DelegatingChannel; 
@@ -43,7 +43,7 @@ public class DelegatingChannel extends Channel {
         }
     }
     
-    private DelegatingChannel(Edge edge, Channel other) {
+    private DelegatingChannel(Edge edge, Buffer other) {
         super(edge);
         this.other = other;
     }
@@ -136,17 +136,17 @@ public class DelegatingChannel extends Channel {
     
     @Override
     public InternalFilterNode getDest() {
-        return theEdge.getDest();
+        return theChannel.getDest();
     }
 
     @Override
     public InternalFilterNode getSource() {
-        return theEdge.getSrc();
+        return theChannel.getSrc();
     }
 
     @Override
     public CType getType() {
-        return theEdge.getType();
+        return theChannel.getType();
     }
 
     @Override

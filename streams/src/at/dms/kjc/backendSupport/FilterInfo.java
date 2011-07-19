@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.Channel;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeContent;
@@ -169,7 +169,7 @@ public class FilterInfo {
 
             // add all the upstream filters items that reach this filter
             for (int i = 0; i < in.getWeights(SchedulingPhase.INIT).length; i++) {
-                InterFilterEdge incoming = in.getSources(SchedulingPhase.INIT)[i];
+                Channel incoming = in.getSources(SchedulingPhase.INIT)[i];
                 WorkNodeContent filterC = ((WorkNode) incoming.getSrc()
                                          .getPrevious()).getFilter();
                 // calculate the init items sent by the upstream filter
@@ -288,9 +288,9 @@ public class FilterInfo {
             if (debug)
                 System.out.println(" Upstream input node:");
             // add all the upstream filters items that reach this filter
-            Iterator<InterFilterEdge> edges = in.getSourceSet(SchedulingPhase.INIT).iterator();
+            Iterator<Channel> edges = in.getSourceSet(SchedulingPhase.INIT).iterator();
             while (edges.hasNext()) {
-                InterFilterEdge incoming = edges.next();
+                Channel incoming = edges.next();
                 upStreamItems += 
                     (int) 
                     ((double)FilterInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())

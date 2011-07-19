@@ -50,11 +50,11 @@ public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
         //get all the file writers
         Vector<Filter> fileWriters = new Vector<Filter>();
         for (int i = 0; i < getSlicer().io.length; i++) 
-            if (getSlicer().io[i].getHead().isFileOutput())
+            if (getSlicer().io[i].getInputNode().isFileOutput())
                 fileWriters.add(getSlicer().io[i]);
         
         for (int i = 0; i < fileWriters.size(); i++) {
-            WorkNode node = (WorkNode)fileWriters.get(i).getHead().getNext();
+            WorkNode node = (WorkNode)fileWriters.get(i).getInputNode().getNext();
             FilterInfo fi = FilterInfo.getFilterInfo(node);
             assert node.getFilter().getInputType().isNumeric() :
                 "non-numeric type for input to filewriter";

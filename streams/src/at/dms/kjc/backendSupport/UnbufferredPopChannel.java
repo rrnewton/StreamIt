@@ -16,7 +16,7 @@ import at.dms.kjc.slir.Edge;
  * @author dimock
  *
  */
-public class UnbufferredPopChannel extends Channel {
+public class UnbufferredPopChannel extends Buffer {
 
     private String popName;
     
@@ -27,10 +27,10 @@ public class UnbufferredPopChannel extends Channel {
      * @return A channel for the passed edge with a where popMethodName() returns <b>popName</b>.
      */
     public static UnbufferredPopChannel getChannel(Edge edge, String popName) {
-        Channel chan = Channel.bufferStore.get(edge);
+        Buffer chan = Buffer.bufferStore.get(edge);
         if (chan == null) {
             chan = new UnbufferredPopChannel(edge, popName);
-            Channel.bufferStore.put(edge, chan);
+            Buffer.bufferStore.put(edge, chan);
         } else {
             assert chan instanceof UnbufferredPopChannel
                     && chan.popMethodName().equals(popName);
@@ -43,13 +43,13 @@ public class UnbufferredPopChannel extends Channel {
         this.popName = popName;
     }
     
-    private Collection<Channel> produceReadHeadersFor = new LinkedList<Channel>();
+    private Collection<Buffer> produceReadHeadersFor = new LinkedList<Buffer>();
 
     /** 
      * Add a channel to produce upstream (write) headers for:
      * @param c  a Channel connected to the splitter that this channel calls.
      */
-    public void addChannelForHeaders(Channel c) {
+    public void addChannelForHeaders(Buffer c) {
         produceReadHeadersFor.add(c);
     }
 
@@ -67,7 +67,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> beginInitRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (Buffer c : produceReadHeadersFor) {
             retval.addAll(c.beginInitRead());
         }
         return retval;
@@ -78,7 +78,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
    public List<JStatement> postPreworkInitRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (Buffer c : produceReadHeadersFor) {
             retval.addAll(c.postPreworkInitRead());
         }
         return retval;
@@ -90,7 +90,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> endInitRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (Buffer c : produceReadHeadersFor) {
             retval.addAll(c.endInitRead());
         }
         return retval;
@@ -102,7 +102,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> beginSteadyRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (Buffer c : produceReadHeadersFor) {
             retval.addAll(c.beginSteadyRead());
         }
         return retval;
@@ -114,7 +114,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> endSteadyRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (Buffer c : produceReadHeadersFor) {
             retval.addAll(c.endSteadyRead());
         }
         return retval;
@@ -126,7 +126,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> topOfWorkSteadyRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (Buffer c : produceReadHeadersFor) {
             retval.addAll(c.topOfWorkSteadyRead());
         }
         return retval;

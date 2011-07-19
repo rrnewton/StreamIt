@@ -4,6 +4,7 @@
 package at.dms.kjc.backendSupport;
 
 import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * A Layout makes the association between a {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode} and a {@link at.dms.kjc.slir.InternalFilterNode}.

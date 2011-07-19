@@ -98,8 +98,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         
         for (int i = 0; i < scheduleOrder.size(); i++) {
             Filter slice = scheduleOrder.get(i);
-            assert slice.getNumFilters() == 1 : "The greedy partitioner only works for Time!";
-            sortedList.add(slice.getHead().getNextFilter());
+            sortedList.add(slice.getInputNode().getWorkNode());
         }
         
         Iterator<InternalFilterNode> sorted = sortedList.iterator();
@@ -123,12 +122,11 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
                         + slicer.getFilterWorkSteadyMult(
                                 fnode) + " on bin " + bin + ", bin work = "
                         + binWeight[bin]);
-                if (snode.getPrevious() instanceof InputNode) {
-                    assignment.put(snode.getPrevious(),nodes[bin]);
-                }
-                if (snode.getNext() instanceof OutputNode) {
-                    assignment.put(snode.getNext(),nodes[bin]);
-                }
+                
+                assignment.put(snode.getParent().getInputNode(),nodes[bin]);
+                
+               
+                assignment.put(snode.getParent().getOutputNode(),nodes[bin]);
             
             }
 

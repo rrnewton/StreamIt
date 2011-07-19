@@ -38,7 +38,7 @@ import at.dms.kjc.slir.InternalFilterNode;
  * @author dimock
  *
  */
-public class ChannelAsArray extends Channel {
+public class ChannelAsArray extends Buffer {
 
     /** array size in elements */
     protected int bufSize;
@@ -91,10 +91,10 @@ public class ChannelAsArray extends Channel {
      * @return A channel for this edge, that 
      */
     public static ChannelAsArray getChannel(Edge edge) {
-        Channel oldChan = Channel.bufferStore.get(edge);
+        Buffer oldChan = Buffer.bufferStore.get(edge);
         if (oldChan == null) {
             ChannelAsArray chan = new ChannelAsArray(edge);
-            Channel.bufferStore.put(edge, chan);
+            Buffer.bufferStore.put(edge, chan);
             return chan;
        } else {
             assert oldChan instanceof ChannelAsArray; 
@@ -139,7 +139,7 @@ public class ChannelAsArray extends Channel {
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
                 /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
-                theEdge.getType(),
+                theChannel.getType(),
                 popMethodName(),
                 new JFormalParameter[0],
                 CClassType.EMPTY,
@@ -207,7 +207,7 @@ public class ChannelAsArray extends Channel {
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
                 /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
-                theEdge.getType(),
+                theChannel.getType(),
                 peekMethodName(),
                 new JFormalParameter[]{offset},
                 CClassType.EMPTY,
@@ -250,7 +250,7 @@ public class ChannelAsArray extends Channel {
     public JMethodDeclaration pushMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
-                theEdge.getType(),
+                theChannel.getType(),
                 valName);
         JLocalVariableExpression valRef = new JLocalVariableExpression(val);
         JBlock body = new JBlock();

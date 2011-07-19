@@ -14,7 +14,7 @@ import at.dms.kjc.slir.Edge;
  * @author dimock
  *
  */
-public class UnbufferredPushChannel extends Channel {
+public class UnbufferredPushChannel extends Buffer {
 
     private String pushName;
     
@@ -25,10 +25,10 @@ public class UnbufferredPushChannel extends Channel {
      * @return A channel for the passed edge with a where pushMethodName() returns <b>pushName</b>.
      */
     public static UnbufferredPushChannel getChannel(Edge edge, String pushName) {
-        Channel oldChan = Channel.bufferStore.get(edge);
+        Buffer oldChan = Buffer.bufferStore.get(edge);
         if (oldChan == null) {
             UnbufferredPushChannel chan = new UnbufferredPushChannel(edge, pushName);
-            Channel.bufferStore.put(edge, chan);
+            Buffer.bufferStore.put(edge, chan);
             return chan;
        } else {
             assert oldChan instanceof UnbufferredPushChannel 
@@ -37,13 +37,13 @@ public class UnbufferredPushChannel extends Channel {
         }
     }
     
-    private Collection<Channel> produceWriteHeadersFor = new LinkedList<Channel>();
+    private Collection<Buffer> produceWriteHeadersFor = new LinkedList<Buffer>();
 
     /** 
      * Add a channel to produce upstream (write) headers for:
      * @param c  a Channel connected to the splitter that this channel calls.
      */
-    public void addChannelForHeaders(Channel c) {
+    public void addChannelForHeaders(Buffer c) {
         produceWriteHeadersFor.add(c);
     }
     
@@ -66,7 +66,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> beginInitWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (Buffer c : produceWriteHeadersFor) {
             retval.addAll(c.beginInitWrite());
         }
         return retval;
@@ -78,7 +78,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> endInitWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (Buffer c : produceWriteHeadersFor) {
             retval.addAll(c.endInitWrite());
         }
         return retval;
@@ -90,7 +90,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> beginSteadyWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (Buffer c : produceWriteHeadersFor) {
             retval.addAll(c.beginSteadyWrite());
         }
         return retval;
@@ -102,7 +102,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> endSteadyWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (Buffer c : produceWriteHeadersFor) {
             retval.addAll(c.endSteadyWrite());
         }
         return retval;
@@ -114,7 +114,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> topOfWorkSteadyWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (Buffer c : produceWriteHeadersFor) {
             retval.addAll(c.topOfWorkSteadyWrite());
         }
         return retval;

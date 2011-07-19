@@ -3,7 +3,7 @@ package at.dms.kjc.backendSupport;
 import at.dms.kjc.slir.Edge;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.Channel;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
@@ -49,7 +49,7 @@ public class GetOrMakeChannel  {
         InternalFilterNode dst = e.getDest();
 
         if (src instanceof OutputNode && dst instanceof InputNode) {
-            c = makeInterSliceChannel((InterFilterEdge)e);
+            c = makeInterSliceChannel((Channel)e);
         } else {
             c = makeIntraSliceChannel(e);
         }
@@ -133,7 +133,7 @@ public class GetOrMakeChannel  {
                             (InputNode) src, backEndBits)
                             .getMethods()[0].getName();
                     c = UnbufferredPopChannel.getChannel(e, popName);
-                    for (InterFilterEdge joiner_edge : ((InputNode) src).getSourceList(SchedulingPhase.STEADY)) {
+                    for (Channel joiner_edge : ((InputNode) src).getSourceList(SchedulingPhase.STEADY)) {
                         ((UnbufferredPopChannel)c).addChannelForHeaders(getOrMakeChannel(joiner_edge));
                     }
                 } else if (backEndBits.sliceHasUpstreamChannel(s)) {
@@ -170,7 +170,7 @@ public class GetOrMakeChannel  {
                     ProcessOutputNode.getSplitterCode((OutputNode)dst,backEndBits).
                         getMethods()[0].getName();
                 c = UnbufferredPushChannel.getChannel(e,pushName);
-                for (InterFilterEdge joiner_edge : ((OutputNode) dst).getDestSequence(SchedulingPhase.STEADY)) {
+                for (Channel joiner_edge : ((OutputNode) dst).getDestSequence(SchedulingPhase.STEADY)) {
                     ((UnbufferredPushChannel)c).addChannelForHeaders(getOrMakeChannel(joiner_edge));
                 }
             } else if (backEndBits.sliceHasDownstreamChannel(s)) {
@@ -198,7 +198,7 @@ public class GetOrMakeChannel  {
      * </p>
      */
     
-    protected Channel makeInterSliceChannel(InterFilterEdge e) {
+    protected Channel makeInterSliceChannel(Channel e) {
         Channel c;
         if (e.initItems() > e.steadyItems()) {
             // items left on channel between steady states

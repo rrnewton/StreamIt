@@ -15,7 +15,7 @@ import at.dms.kjc.slicegraph.SIRSlicer;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.Channel;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
@@ -94,8 +94,8 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
           assert slice.getNumFilters() == 1 : "NoSWPipeLayout only works for Time! "  + 
                slice;
           //System.out.println("init assiging " + trace.getHead().getNextFilter() + " to " + tile);
-          assignment.put(slice.getHead().getNextFilter(), chip.getNthComputeNode(tile++));
-          assignedFilters.add(slice.getHead().getNextFilter());
+          assignment.put(slice.getInputNode().getNextFilter(), chip.getNthComputeNode(tile++));
+          assignedFilters.add(slice.getInputNode().getNextFilter());
           tile = tile % chip.size();
           
         }
@@ -117,17 +117,17 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
         while (slices.hasNext()) {
             Filter slice = slices.next();
             //System.err.println(slice.toString());
-            T tile = (T)assignment.get(slice.getHead().getNextFilter());
+            T tile = (T)assignment.get(slice.getInputNode().getNextFilter());
             double traceWork = slicer.getSliceBNWork(slice); 
             double startTime = 0;
             //now find the start time
             
             //find the max end times of all the traces that this trace depends on
             double maxDepStartTime = 0;
-            InputNode input = slice.getHead();
-            Iterator<InterFilterEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
+            InputNode input = slice.getInputNode();
+            Iterator<Channel> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
             while (inEdges.hasNext()) {
-                InterFilterEdge edge = inEdges.next();
+                Channel edge = inEdges.next();
                 if (slicer.isIO(edge.getSrc().getParent()))
                     continue;
                 WorkNode upStream = edge.getSrc().getPrevFilter();
@@ -142,7 +142,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
             
             //add the start time to the trace work (one filter)!
             tileCosts[tile.getUniqueId()] = startTime + traceWork;
-            endTime.put(slice.getHead().getNextFilter(), tileCosts[tile.getUniqueId()]);
+            endTime.put(slice.getInputNode().getNextFilter(), tileCosts[tile.getUniqueId()]);
         }
         
         

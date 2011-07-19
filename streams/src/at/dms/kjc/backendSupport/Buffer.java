@@ -16,20 +16,21 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.Channel;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Util;
 import at.dms.util.Utils;
 
 /**
- * A Channel is an implementation of an Edge in a back end.
+ * A buffer is an implementation of an Edge in a back end.
  * It refers to nodes in a slice graph like an edge does, but a Buffer also
  * contains code that a back end can emit to pass data between nodes in the slice graph.
  * 
  * @author dimock
  */
-public class Channel {
+public class Buffer {
 
     /**
      * Technical note: a Buffer in a backend implements an Edge in a slice graph
@@ -40,7 +41,7 @@ public class Channel {
      * and wanting to change source and dest,
      * presumably without changing slice graph. 
      */
-    protected Edge theEdge;
+    protected Channel theChannel;
     /** unique ident for the buffer */
     protected String ident;
     /** used to make sure ident is unique */
@@ -48,7 +49,7 @@ public class Channel {
     private static int unique_id_generator;
     /** the store for all Buffers, indexed by edge.
      */
-    protected static HashMap<Edge, Channel> bufferStore;
+    protected static HashMap<Channel, Buffer> bufferStore;
     /** the rotation length of this buffer for software pipelining 
      * Includes any length from extraLength field. **/
     protected int rotationLength;
@@ -57,7 +58,7 @@ public class Channel {
 
     static {
         unique_id_generator = 0;
-        bufferStore = new HashMap<Edge, Channel>();
+        bufferStore = new HashMap<Channel, Buffer>();
     }
 
     /**
@@ -65,9 +66,9 @@ public class Channel {
      * Subclasses should provide factories for their channel types.
      * @param edge
      */
-    protected Channel(Edge edge) {
+    protected Buffer(Channel edge) {
         assert edge != null;
-        theEdge = edge;
+        theChannel = edge;
         edge.getType(); // side effect of catching error if source and dest types not the same
         unique_id = unique_id_generator++;
         ident = "__chan__" + unique_id + "__";
@@ -79,7 +80,7 @@ public class Channel {
      * @param src
      * @param dst
      */
-    protected Channel(InternalFilterNode src, InternalFilterNode dst) {
+    protected Buffer(Filter src, Filter dst) {
         this(Util.srcDstToEdge(src, dst, SchedulingPhase.STEADY));
     }
     
@@ -89,7 +90,7 @@ public class Channel {
      * @param edge  Edge that the channel should implement
      * @return an existing channel if there is one, else null.
      */
-    public static Channel findChannel(Edge edge) {
+    public static Buffer findChannel(Channel edge) {
         return bufferStore.get(edge);
     }
 
@@ -97,8 +98,8 @@ public class Channel {
      * Add a Channel to our collection of channels.
      * @param c Channel to add to our collection of channels. 
      */
-    public static void addChannel(Channel c) {
-        bufferStore.put(c.theEdge, c);
+    public static void addChannel(Buffer c) {
+        bufferStore.put(c.theChannel, c);
     }
     
     /**
@@ -107,14 +108,14 @@ public class Channel {
      */
     public static void reset() {
         unique_id_generator = 0;
-        bufferStore = new HashMap<Edge, Channel>();
+        bufferStore = new HashMap<Channel, Buffer>();
     }
     
     /**
      * For debugging.
      */
     public static void printBuffers() {
-        for (Channel buf : bufferStore.values()) {
+        for (Buffer buf : bufferStore.values()) {
             System.out.println(buf);
         }
     }
@@ -127,7 +128,7 @@ public class Channel {
     }
     
     /** @return of the buffers of this stream program */
-    public static Collection<Channel> getBuffers() {
+    public static Collection<Buffer> getBuffers() {
         return bufferStore.values();
     }
 
@@ -135,7 +136,7 @@ public class Channel {
      * @see at.dms.kjc.backendSupport.ChannelI#getType()
      */
     public CType getType() {
-        return theEdge.getType();
+        return theChannel.getType();
     }
 
 
@@ -156,15 +157,15 @@ public class Channel {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#getSource()
      */
-    public InternalFilterNode getSource() {
-        return theEdge.getSrc();
+    public Filter getSource() {
+        return theChannel.getSrc();
     }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#getDest()
      */
-    public InternalFilterNode getDest() {
-        return theEdge.getDest();
+    public Filter getDest() {
+        return theChannel.getDest();
     }
 
     /**
@@ -173,7 +174,7 @@ public class Channel {
      * @param sched BasicSpaceTimeSchedule gives primePump multiplicities.
      */
     public static void setRotationLengths(BasicSpaceTimeSchedule sched) {
-        for (Channel buf : getBuffers()) {
+        for (Buffer buf : getBuffers()) {
             setRotationLength(buf, sched);
         }
     }
@@ -185,9 +186,9 @@ public class Channel {
      * 
      * @param buffer
      */
-    private static void setRotationLength(Channel buffer, BasicSpaceTimeSchedule spaceTimeSchedule) {
-        int sourceMult = spaceTimeSchedule.getPrimePumpMult(buffer.getSource().getParent());
-        int destMult = spaceTimeSchedule.getPrimePumpMult(buffer.getDest().getParent());
+    private static void setRotationLength(Buffer buffer, BasicSpaceTimeSchedule spaceTimeSchedule) {
+        int sourceMult = spaceTimeSchedule.getPrimePumpMult(buffer.getSource());
+        int destMult = spaceTimeSchedule.getPrimePumpMult(buffer.getDest());
 
         // if source run more often than dest, then need extra space.
         if (sourceMult > destMult) {

@@ -14,7 +14,7 @@ import at.dms.kjc.sir.lowering.RenameAll;
 import at.dms.kjc.slicegraph.SIRSlicer;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.Channel;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
@@ -74,9 +74,9 @@ public class MultiLevelSplitsJoins {
            
             //see if the width of the joiner is too wide and 
             //keep breaking it up until it is, adding new levels...
-            while (slice.getHead().getWidth(SchedulingPhase.STEADY) > maxWidth) {
-                System.out.println("Breaking up " + slice.getHead() + 
-                        " width is " + slice.getHead().getWidth(SchedulingPhase.STEADY));
+            while (slice.getInputNode().getWidth(SchedulingPhase.STEADY) > maxWidth) {
+                System.out.println("Breaking up " + slice.getInputNode() + 
+                        " width is " + slice.getInputNode().getWidth(SchedulingPhase.STEADY));
                 breakUpJoin(slice, slices);
             }
             
@@ -84,9 +84,9 @@ public class MultiLevelSplitsJoins {
             slices.add(slice);
             
             //see if the width of the splitter is too wide
-            while (slice.getTail().getWidth(SchedulingPhase.STEADY) > maxWidth) {
-                System.out.println("Breaking up " + slice.getTail() + 
-                        " width is " + slice.getTail().getWidth(SchedulingPhase.STEADY));
+            while (slice.getOutputNode().getWidth(SchedulingPhase.STEADY) > maxWidth) {
+                System.out.println("Breaking up " + slice.getOutputNode() + 
+                        " width is " + slice.getOutputNode().getWidth(SchedulingPhase.STEADY));
                 breakUpSplit(slice, slices);
             }
             
@@ -111,7 +111,7 @@ public class MultiLevelSplitsJoins {
      */
     private void breakUpJoin(Filter slice, LinkedList<Filter> slices) {
         //the old input trace node, it will get replaced!
-        InputNode input = slice.getHead();
+        InputNode input = slice.getInputNode();
         //nothing to do, so return...
         if (input.getWidth(SchedulingPhase.STEADY) <= maxWidth)
             return;
@@ -129,8 +129,8 @@ public class MultiLevelSplitsJoins {
         
         //now assign each of the original edges to one of the new 
         //input trace nodes
-        HashMap<InterFilterEdge, Integer> assignment = new HashMap<InterFilterEdge, Integer>();
-        Iterator<InterFilterEdge> sources = input.getSourceSequence(SchedulingPhase.STEADY).iterator();
+        HashMap<Channel, Integer> assignment = new HashMap<Channel, Integer>();
+        Iterator<Channel> sources = input.getSourceSequence(SchedulingPhase.STEADY).iterator();
         for (int i = 0; i < numNewSlices; i++) {
             int count = maxWidth;
             //account for remainder
@@ -138,7 +138,7 @@ public class MultiLevelSplitsJoins {
                     i == (numNewSlices - 1))
                 count = input.getWidth(SchedulingPhase.STEADY) % maxWidth;
             for (int j = 0; j < count; j++) { 
-                InterFilterEdge edge = sources.next();
+                Channel edge = sources.next();
                 //System.out.println("Assignment: " + edge + " " + i);
                 assignment.put(edge, new Integer(i));
             }
@@ -149,10 +149,10 @@ public class MultiLevelSplitsJoins {
         //the weights array of each new inputs trace node
         LinkedList<Integer>[] newInputsWeights = new LinkedList[numNewSlices];
         //the source array of each new input trace node
-        LinkedList<InterFilterEdge>[] newInputsSources = new LinkedList[numNewSlices];
+        LinkedList<Channel>[] newInputsSources = new LinkedList[numNewSlices];
         for (int i = 0; i < numNewSlices; i++) {
             newInputsWeights[i] = new LinkedList<Integer>();
-            newInputsSources[i] = new LinkedList<InterFilterEdge>();
+            newInputsSources[i] = new LinkedList<Channel>();
          }
             
         //the weights array of the new input trace node of the orignal trace
@@ -194,19 +194,19 @@ public class MultiLevelSplitsJoins {
         
         //now we can create the pattern of source edges from the index list
         //we built above
-        LinkedList<InterFilterEdge> origSliceInputEdges = new LinkedList<InterFilterEdge>();
+        LinkedList<Channel> origSliceInputEdges = new LinkedList<Channel>();
         for (int i = 0; i < origSliceInputSources.size(); i++) {
             Filter source = newSlices[origSliceInputSources.get(i).intValue()];
-            origSliceInputEdges.add(source.getTail().getSingleEdge(SchedulingPhase.STEADY));
+            origSliceInputEdges.add(source.getOutputNode().getSingleEdge(SchedulingPhase.STEADY));
         }
         //set the pattern of the new input trace
         newInput.set(origSliceInputWeights, origSliceInputEdges, SchedulingPhase.STEADY);
         newInput.canonicalize(SchedulingPhase.STEADY);
         //now install the new input trace node in the old trace
-        newInput.setNext(slice.getHead().getNext());
-        slice.getHead().getNext().setPrevious(newInput);
+        newInput.setNext(slice.getInputNode().getNext());
+        slice.getInputNode().getNext().setPrevious(newInput);
         newInput.setParent(slice);
-        slice.setHead(newInput);
+        slice.setInputNode(newInput);
         
         //set the multiplicities of the new identities of the new traces
         setMultiplicitiesJoin(newSlices);
@@ -241,9 +241,9 @@ public class MultiLevelSplitsJoins {
             new WorkNode(new WorkNodeContent(identity));
         
         //create the outputSliceNode
-        InterFilterEdge edge = new InterFilterEdge(dest);
+        Channel edge = new Channel(dest);
         OutputNode output = new OutputNode(new int[]{1}, 
-                new InterFilterEdge[][]{{edge}});
+                new Channel[][]{{edge}});
         edge.setSrc(output);
 
         //set the intra trace connections
@@ -268,7 +268,7 @@ public class MultiLevelSplitsJoins {
      */
     private void setMultiplicitiesJoin(Filter[] traces) {
         for (int i = 0; i < traces.length; i++) {
-            InterFilterEdge downEdge = traces[i].getTail().getSingleEdge(SchedulingPhase.STEADY);
+            Channel downEdge = traces[i].getOutputNode().getSingleEdge(SchedulingPhase.STEADY);
             
             //the downstream filter
             WorkNodeContent next = downEdge.getDest().getNextFilter().getFilter();
@@ -282,22 +282,22 @@ public class MultiLevelSplitsJoins {
                     
             //System.out.println("Setting steady items " + steadyItems + " " + 
             //        traces[i].getHead().getNextFilter().getFilter());
-            traces[i].getHead().getNextFilter().getFilter().setSteadyMult(steadyItems);
+            traces[i].getInputNode().getNextFilter().getFilter().setSteadyMult(steadyItems);
             
             int initItems = 0;
             int steadyItemsOther = 0;
             //set the init items baed on the number each of the upstream 
             //filters push on to each incoming edge
-            InputNode input = traces[i].getHead();
+            InputNode input = traces[i].getInputNode();
             for (int s = 0; s < input.getSources(SchedulingPhase.STEADY).length; s++) {
-                InterFilterEdge upEdge = input.getSources(SchedulingPhase.STEADY)[s];
+                Channel upEdge = input.getSources(SchedulingPhase.STEADY)[s];
                WorkNodeContent prev = upEdge.getSrc().getPrevFilter().getFilter();
                initItems += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
                        ((double)prev.initItemsPushed()));
                steadyItemsOther += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
                        ((double)(prev.getPushInt() * prev.getSteadyMult())));
             }
-            traces[i].getHead().getNextFilter().getFilter().setInitMult(initItems);
+            traces[i].getInputNode().getNextFilter().getFilter().setInitMult(initItems);
             
             //this has to be greater than the requirement for the downstream filter
             //on this edge
@@ -318,7 +318,7 @@ public class MultiLevelSplitsJoins {
      * @param slices
      */
     private void breakUpSplit(Filter slice, LinkedList<Filter> slices) {
-        OutputNode output = slice.getTail();
+        OutputNode output = slice.getOutputNode();
        
         //do nothing if we have less than maxwidth connections
         if (output.getWidth(SchedulingPhase.STEADY) <= maxWidth)
@@ -333,12 +333,12 @@ public class MultiLevelSplitsJoins {
         //each new trace's output trace node
         LinkedList<Integer>[] newOutputsWeights = 
             new LinkedList[numNewSlices];
-        LinkedList<LinkedList<InterFilterEdge>>[] newOutputsDests = 
+        LinkedList<LinkedList<Channel>>[] newOutputsDests = 
             new LinkedList[numNewSlices];
         //now init them
         for (int i = 0; i < numNewSlices; i++) {
             newOutputsWeights[i] = new LinkedList<Integer>();
-            newOutputsDests[i] = new LinkedList<LinkedList<InterFilterEdge>>();
+            newOutputsDests[i] = new LinkedList<LinkedList<Channel>>();
         }
         
         
@@ -353,9 +353,9 @@ public class MultiLevelSplitsJoins {
         
         //assign the unique edges (dests) of the original outputtrace
         //to the new outputtraces
-        HashMap<InterFilterEdge, Integer> assignment = new HashMap<InterFilterEdge, Integer>();
+        HashMap<Channel, Integer> assignment = new HashMap<Channel, Integer>();
         System.out.println(output.getDestSequence(SchedulingPhase.STEADY).size() + " ?= " + output.getWidth(SchedulingPhase.STEADY));
-        Iterator<InterFilterEdge> dests = output.getDestSequence(SchedulingPhase.STEADY).iterator();
+        Iterator<Channel> dests = output.getDestSequence(SchedulingPhase.STEADY).iterator();
         for (int i = 0; i < numNewSlices; i++) {
             int count = maxWidth;
             //account for remainder if there is one
@@ -363,7 +363,7 @@ public class MultiLevelSplitsJoins {
                     i == (numNewSlices - 1))
                 count = output.getWidth(SchedulingPhase.STEADY) % maxWidth;
             for (int j = 0; j < count; j++) { 
-                InterFilterEdge edge = dests.next();
+                Channel edge = dests.next();
                 //System.out.println("Assignment: " + edge + " " + i);
                 assignment.put(edge, new Integer(i));
             }
@@ -378,14 +378,14 @@ public class MultiLevelSplitsJoins {
         for (int i = 0; i < output.getDests(SchedulingPhase.STEADY).length; i++) {
             //store the distribution of edges of this port to the new output
             //traces here
-            HashMap<Integer, LinkedList<InterFilterEdge>> newEdges = 
-                new HashMap<Integer, LinkedList<InterFilterEdge>>();
+            HashMap<Integer, LinkedList<Channel>> newEdges = 
+                new HashMap<Integer, LinkedList<Channel>>();
             //the port as we construct it for the new output trace node
             //of the original trace
             LinkedList<Integer> origSlicePort = new LinkedList<Integer>();
                         
             for (int j = 0; j < output.getDests(SchedulingPhase.STEADY)[i].length; j++) {
-                InterFilterEdge edge = output.getDests(SchedulingPhase.STEADY)[i][j];
+                Channel edge = output.getDests(SchedulingPhase.STEADY)[i][j];
                 Integer index = assignment.get(edge);
                 if (newEdges.containsKey(index)) {
                     //add to the existing linked list
@@ -393,7 +393,7 @@ public class MultiLevelSplitsJoins {
                 }
                 else {
                     //create a new linked list
-                    LinkedList<InterFilterEdge> newlist = new LinkedList<InterFilterEdge>();
+                    LinkedList<Channel> newlist = new LinkedList<Channel>();
                     newlist.add(edge);
                     newEdges.put(index, newlist);
                 }
@@ -430,16 +430,16 @@ public class MultiLevelSplitsJoins {
         
         //fix the outgoing edges of the trace node by creating 
         //a new output trace node
-        LinkedList<LinkedList<InterFilterEdge>> origSliceNewEdges = 
-            new LinkedList<LinkedList<InterFilterEdge>>();
+        LinkedList<LinkedList<Channel>> origSliceNewEdges = 
+            new LinkedList<LinkedList<Channel>>();
         for (int i = 0; i < origSliceNewDests.size(); i++) {
-            LinkedList<InterFilterEdge> port = new LinkedList<InterFilterEdge>();
+            LinkedList<Channel> port = new LinkedList<Channel>();
             for (int j = 0; j < origSliceNewDests.get(i).size(); j++) {
                 //convert the index into the new trace array 
                 //into the single incoming edge of the new trace
                 //so that it connects to the original trace
                 port.add(newSlices[origSliceNewDests.get(i).get(j).intValue()].
-                        getHead().getSingleEdge(SchedulingPhase.STEADY));
+                        getInputNode().getSingleEdge(SchedulingPhase.STEADY));
             }
             //add the port the pattern of output of the original trace
             origSliceNewEdges.add(port);
@@ -450,7 +450,7 @@ public class MultiLevelSplitsJoins {
         newOutput.setPrevious(output.getPrevious());
         newOutput.getPrevious().setNext(newOutput);
         newOutput.setParent(slice);
-        slice.setTail(newOutput);
+        slice.setOutputNode(newOutput);
 
         
         //set the multiplicities of the identity filter of the new trace
@@ -466,7 +466,7 @@ public class MultiLevelSplitsJoins {
     private void setMultiplicitiesSplit(Filter[] slices) {
         
         for (int i = 0; i < slices.length; i++) {
-            InterFilterEdge edge = slices[i].getHead().getSingleEdge(SchedulingPhase.STEADY);
+            Channel edge = slices[i].getInputNode().getSingleEdge(SchedulingPhase.STEADY);
      
             //the last filter of the prev (original) trace 
             WorkNodeContent prev = 
@@ -478,7 +478,7 @@ public class MultiLevelSplitsJoins {
             //trace in the init stage
             int initItems = 
                 (int) (((double) prev.initItemsPushed()) * edge.getSrc().ratio(edge, SchedulingPhase.STEADY));
-            slices[i].getHead().getNextFilter().getFilter().setInitMult(initItems);
+            slices[i].getInputNode().getNextFilter().getFilter().setInitMult(initItems);
             
             //calc the number of steady items
             int steadyItems = (int) ((((double)prev.getSteadyMult()) * ((double)prev.getPushInt())) * 
@@ -486,7 +486,7 @@ public class MultiLevelSplitsJoins {
             
             //System.out.println("Setting Steady Items: " + steadyItems + " " + 
             //        traces[i].getHead().getNextFilter().getFilter());
-            slices[i].getHead().getNextFilter().getFilter().setSteadyMult(steadyItems);
+            slices[i].getInputNode().getNextFilter().getFilter().setSteadyMult(steadyItems);
         }
         
     }
@@ -503,15 +503,15 @@ public class MultiLevelSplitsJoins {
      * @param type The type of the identity filter of the trace.
      */
     private Filter fixEdgesAndCreateSlice(LinkedList<Integer> weights,
-            LinkedList<LinkedList<InterFilterEdge>> dests,
+            LinkedList<LinkedList<Channel>> dests,
             OutputNode src, CType type) {
         //create the output trace node base on the calculated pattern
         OutputNode output = new OutputNode(weights, dests);
                 //create the input trace node that just receive from the 
         //original trace
         InputNode input = new InputNode(new int[]{1});
-        InterFilterEdge edge = new InterFilterEdge(src, input);
-        input.setSources(new InterFilterEdge[]{edge});
+        Channel edge = new Channel(src, input);
+        input.setSources(new Channel[]{edge});
         
         //make sure that all of the edges of this output trace node have
         //it as their source

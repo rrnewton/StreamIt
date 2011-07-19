@@ -103,23 +103,23 @@ public class EmitCode {
         codegen.setDeclOnly(false);
 
         // generate code for ends of channels that connect to code on this ComputeNode
-        Set<Channel> upstreamEnds = getUpstreamEnds(n);
-        Set<Channel> downstreamEnds = getDownstreamEnds(n);
+        Set<Buffer> upstreamEnds = getUpstreamEnds(n);
+        Set<Buffer> downstreamEnds = getDownstreamEnds(n);
         
         // externs
-        for (Channel c : upstreamEnds) {
+        for (Buffer c : upstreamEnds) {
             if (c.writeDeclsExtern() != null) {
                 for (JStatement d : c.writeDeclsExtern()) { d.accept(codegen); }
             }
         }
        
-        for (Channel c : downstreamEnds) {
+        for (Buffer c : downstreamEnds) {
             if (c.readDeclsExtern() != null) {
                 for (JStatement d : c.readDeclsExtern()) { d.accept(codegen); }
             }
         }
 
-        for (Channel c : upstreamEnds) {
+        for (Buffer c : upstreamEnds) {
             if (c.dataDecls() != null) {
                 // wrap in #ifndef for case where different ends have
                 // are in different files that eventually get concatenated.
@@ -132,7 +132,7 @@ public class EmitCode {
             }
         }
         
-        for (Channel c : downstreamEnds) {
+        for (Buffer c : downstreamEnds) {
             if (c.dataDecls() != null && ! upstreamEnds.contains(c)) {
                 p.println("#ifndef " + c.getIdent() + "_CHANNEL_DATA");
                 for (JStatement d : c.dataDecls()) { d.accept(codegen); }
@@ -142,7 +142,7 @@ public class EmitCode {
             }
         }
 
-        for (Channel c : upstreamEnds) {
+        for (Buffer c : upstreamEnds) {
             p.println("/* upstream end of " + c + "(" + c.getIdent() + ") */");
             p.println("/* " + upstreamDescription(c) + " -> " + downstreamDescription(c) + " */");
             if (c.writeDecls() != null) {
@@ -151,7 +151,7 @@ public class EmitCode {
             if (c.pushMethod() != null) { c.pushMethod().accept(codegen); }
         }
 
-        for (Channel c : downstreamEnds) {
+        for (Buffer c : downstreamEnds) {
             p.println("/* downstream end of " + c + "(" + c.getIdent() + ") */");
             p.println("/* " + upstreamDescription(c) + " -> " + downstreamDescription(c) + " */");
             if (c.readDecls() != null) {
@@ -183,11 +183,11 @@ public class EmitCode {
      * @param n 
      * @return A collection of channels.
      */
-    private Set<Channel> getUpstreamEnds (ComputeNode n) {
-        Set<Channel> retval = new HashSet<Channel>();
+    private Set<Buffer> getUpstreamEnds (ComputeNode n) {
+        Set<Buffer> retval = new HashSet<Buffer>();
         Layout l = backendbits.getLayout();
-        Collection<Channel> channels = backendbits.getChannels();
-        for (Channel c : channels) {
+        Collection<Buffer> channels = backendbits.getChannels();
+        for (Buffer c : channels) {
             InternalFilterNode s = c.getSource();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
@@ -202,11 +202,11 @@ public class EmitCode {
      * @param n 
      * @return A collection of channels.
      */
-    private Set<Channel> getDownstreamEnds (ComputeNode n) {
-        Set<Channel> retval = new HashSet<Channel>();
+    private Set<Buffer> getDownstreamEnds (ComputeNode n) {
+        Set<Buffer> retval = new HashSet<Buffer>();
         Layout l = backendbits.getLayout();
-        Collection<Channel> channels = backendbits.getChannels();
-        for (Channel c : channels) {
+        Collection<Buffer> channels = backendbits.getChannels();
+        for (Buffer c : channels) {
             InternalFilterNode s = c.getDest();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
@@ -216,12 +216,12 @@ public class EmitCode {
     }
     
     /** representation of upstream end of channel for debugging */
-    private String upstreamDescription(Channel c) {
+    private String upstreamDescription(Buffer c) {
         return c.getSource().toString();
     }
     
     /** representation of downstream end of channel for debugging */
-    private String downstreamDescription(Channel c) {
+    private String downstreamDescription(Buffer c) {
         return c.getDest().toString();
     }
     

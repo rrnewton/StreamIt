@@ -2,7 +2,7 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Collection;
 
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.Channel;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InternalFilterNode;
@@ -132,8 +132,8 @@ public abstract class BackEndFactory<
      * This function should return that collection of channels.
      * @return some collection of Channel s for the code emitter's use.
      */
-    public Collection<Channel> getChannels() {
-        return Channel.getBuffers();
+    public Collection<Buffer> getBuffers() {
+        return Buffer.getBuffers();
     }
         
     /**
@@ -143,7 +143,7 @@ public abstract class BackEndFactory<
      * @return a channel: preexisting or newly created.
      */
     
-    public abstract Channel getChannel(Edge e);
+    public abstract Buffer getBuffer(Channel e);
     
     /**
      * Back end needs to generate subclasses of channel.
@@ -152,7 +152,7 @@ public abstract class BackEndFactory<
      * @param dst
      * @return a channel: preexisting or newly created.
      */
-    public abstract Channel getChannel(InternalFilterNode src, InternalFilterNode dst);
+    public abstract Buffer getBuffer(InternalFilterNode src, InternalFilterNode dst);
 
     /**
      * Select a CodeStoreHelper subclass given a SliceNode.
@@ -186,7 +186,7 @@ public abstract class BackEndFactory<
             // first filter on a slice with no input
             return false;
         }
-        WorkNode filter = s.getFilterNodes().get(0);
+        WorkNode filter = s.getWorkNode();
         FilterInfo info = FilterInfo.getFilterInfo(filter);
         if (info.noBuffer()) {
             // a filter with a 0 peek rate does not need
@@ -207,14 +207,14 @@ public abstract class BackEndFactory<
      * May want to set false if upstream channel is to off-chip device and code for a filter controls that
      * device, but this implementation seems a good default. */
     public boolean sliceHasUpstreamChannel(Filter s) {
-        return s.getHead().getWidth(SchedulingPhase.STEADY) > 0;
+        return s.getInputNode().getWidth(SchedulingPhase.STEADY) > 0;
     }
 
     /** @return true if slice has a downstream channel that it needs to send data to, false otherwise 
      * May want to set false if downstream channel is to off-chip device and code for a filter controls that
      * device, but this implementation seems a good default. */
     public boolean sliceHasDownstreamChannel(Filter s) {
-        return s.getTail().getWidth(SchedulingPhase.STEADY) > 0;
+        return s.getOutputNode().getWidth(SchedulingPhase.STEADY) > 0;
     }
 
     /**
@@ -223,7 +223,7 @@ public abstract class BackEndFactory<
      * @return 
      */
     public boolean sliceNeedsJoinerCode(Filter s) {
-        return s.getHead().getWidth(SchedulingPhase.STEADY) > 1;
+        return s.getInputNode().getWidth(SchedulingPhase.STEADY) > 1;
     }
 
     /**
@@ -246,7 +246,7 @@ public abstract class BackEndFactory<
      * @return
      */
     public boolean sliceNeedsSplitterCode(Filter s) {
-        return s.getTail().getWidth(SchedulingPhase.STEADY) > 1;
+        return s.getOutputNode().getWidth(SchedulingPhase.STEADY) > 1;
     }
 
     /**

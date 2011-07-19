@@ -1,7 +1,7 @@
 package at.dms.kjc.backendSupport;
 
 import at.dms.kjc.slir.Edge;
-import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.Channel;
 import at.dms.kjc.slir.WorkNode;
 
 /**
@@ -41,9 +41,9 @@ public class BufferSize {
             int maxSize = Math.max(initSize, steadySize);
             return maxSize;
         } else {
-            assert theEdge instanceof InterFilterEdge;
-            int maxItems = Math.max(((InterFilterEdge)theEdge).initItems(), 
-                    ((InterFilterEdge)theEdge).steadyItems());
+            assert theEdge instanceof Channel;
+            int maxItems = Math.max(((Channel)theEdge).initItems(), 
+                    ((Channel)theEdge).steadyItems());
             return maxItems;
         }
     }
