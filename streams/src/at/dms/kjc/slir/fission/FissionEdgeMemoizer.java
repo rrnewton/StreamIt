@@ -4,38 +4,38 @@ import java.util.HashMap;
 
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.Channel;
 import at.dms.kjc.slir.OutputNode;
 
 public class FissionEdgeMemoizer {
-    private static HashMap<EdgeDescriptor, InterFilterEdge> edges =
-        new HashMap<EdgeDescriptor, InterFilterEdge>();
+    private static HashMap<EdgeDescriptor, Channel> edges =
+        new HashMap<EdgeDescriptor, Channel>();
 
     public static void reset() {
         edges.clear();
     }
 
-    public static void addEdge(InterFilterEdge edge) {
+    public static void addEdge(Channel edge) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(edge);
 
         edges.put(edgeDscr, edge);
     }
 
-    public static InterFilterEdge getEdge(OutputNode src, InputNode dest) {
+    public static Channel getEdge(OutputNode src, InputNode dest) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(src, dest);      
 
-        InterFilterEdge edge = edges.get(edgeDscr);
+        Channel edge = edges.get(edgeDscr);
 
         if(edge == null) {
-            edge = new InterFilterEdge(src, dest);
+            edge = new Channel(src.getParent(), dest.getParent());
             edges.put(edgeDscr, edge);
         }
 
         return edge;
     }
 
-    public static InterFilterEdge getEdge(Filter src, Filter dest) {
-        return getEdge(src.getTail(), dest.getHead());
+    public static Channel getEdge(Filter src, Filter dest) {
+        return getEdge(src.getOutputNode(), dest.getInputNode());
     }
 
     private static class EdgeDescriptor {
@@ -48,10 +48,10 @@ public class FissionEdgeMemoizer {
         }
         
         public EdgeDescriptor(Filter src, Filter dest) {
-            this(src.getTail(), dest.getHead());
+            this(src.getOutputNode(), dest.getInputNode());
         }
 
-        public EdgeDescriptor(InterFilterEdge edge) {
+        public EdgeDescriptor(Channel edge) {
             this(edge.getSrc(), edge.getDest());
         }
         
