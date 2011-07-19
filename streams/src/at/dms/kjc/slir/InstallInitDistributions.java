@@ -19,25 +19,25 @@ public class InstallInitDistributions {
      */  
     public static void doit(Filter[] slices) {
         for (Filter slice : slices) {
-            FilterInfo fi = FilterInfo.getFilterInfo(slice.getFirstFilter());
+            FilterInfo fi = FilterInfo.getFilterInfo(slice.getWorkNode());
             //do input slice node
             if (fi.totalItemsReceived(SchedulingPhase.INIT) > 0) {
-                slice.getHead().setInitWeights(slice.getHead().getWeights(SchedulingPhase.STEADY).clone());
-                slice.getHead().setInitSources(slice.getHead().getSources(SchedulingPhase.STEADY).clone());
+                slice.getInputNode().setInitWeights(slice.getInputNode().getWeights(SchedulingPhase.STEADY).clone());
+                slice.getInputNode().setInitSources(slice.getInputNode().getSources(SchedulingPhase.STEADY).clone());
             } else {
                 //nothing done by input
-                slice.getHead().setInitWeights(new int[0]);
-                slice.getHead().setInitSources(new InterFilterEdge[0]);
+                slice.getInputNode().setInitWeights(new int[0]);
+                slice.getInputNode().setInitSources(new Channel[0]);
             }
             
             //do output slice
             if (fi.totalItemsSent(SchedulingPhase.INIT) > 0) {
-                slice.getTail().setInitDests(slice.getTail().getDests(SchedulingPhase.STEADY).clone());
-                slice.getTail().setInitWeights(slice.getTail().getWeights(SchedulingPhase.STEADY).clone());
+                slice.getOutputNode().setInitDests(slice.getOutputNode().getDests(SchedulingPhase.STEADY).clone());
+                slice.getOutputNode().setInitWeights(slice.getOutputNode().getWeights(SchedulingPhase.STEADY).clone());
             } else {
                 //nothing done by output
-                slice.getTail().setInitDests(new InterFilterEdge[0][0]);
-                slice.getTail().setInitWeights(new int[0]);
+                slice.getOutputNode().setInitDests(new Channel[0][0]);
+                slice.getOutputNode().setInitWeights(new int[0]);
             }
         }
     }

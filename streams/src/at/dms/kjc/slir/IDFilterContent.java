@@ -78,20 +78,15 @@ public class IDFilterContent extends WorkNodeContent {
         InputNode input = new InputNode();
         OutputNode output = new OutputNode();
         IDFilterContent id = new IDFilterContent();
-        WorkNode filter = new WorkNode(id);
+        WorkNode wn = new WorkNode(id);
         
-        input.setNext(filter);
-        filter.setPrevious(input);
-        filter.setNext(output);
-        output.setPrevious(filter);
+        Filter filter = new Filter(input);
         
-        Filter slice = new Filter(input);
+        filter.setOutputNode(output);
         
-        slice.setTail(output);
+        filter.setWorkNode(wn);
         
-        slice.finish();
-        
-        return slice;
+        return filter;
     }
     
 }

@@ -30,7 +30,7 @@ public class Util {
     
         while (it.hasNext()) {
             Filter slice = (Filter) it.next();
-            InternalFilterNode sliceNode = slice.getHead();
+            InternalFilterNode sliceNode = slice.getInputNode();
             while (sliceNode != null) {
                 trav.add(sliceNode);
                 sliceNode = sliceNode.getNext();
@@ -52,7 +52,7 @@ public class Util {
         LinkedList<InternalFilterNode> trav = new LinkedList<InternalFilterNode>();
     
         for (int i = 0; i < slices.length; i++) {
-            InternalFilterNode sliceNode = slices[i].getHead();
+            InternalFilterNode sliceNode = slices[i].getInputNode();
             while (sliceNode != null) {
                 trav.add(sliceNode);
                 sliceNode = sliceNode.getNext();
@@ -75,16 +75,16 @@ public class Util {
      */
     public static Edge srcDstToEdge(InternalFilterNode src, InternalFilterNode dst, SchedulingPhase phase) {
         if (src instanceof OutputNode && dst instanceof InputNode) {
-            InterFilterEdge[][] edgesedges = ((OutputNode)src).getDests(phase);
-            for (InterFilterEdge[] edges : edgesedges) {
-                for (InterFilterEdge edge : edges) {
+            Channel[][] edgesedges = ((OutputNode)src).getDests(phase);
+            for (Channel[] edges : edgesedges) {
+                for (Channel edge : edges) {
                     assert edge.src == src;
                     if (edge.dest == dst) {
                         return edge;
                     }
                 }
             }
-            return new InterFilterEdge((OutputNode)src,(InputNode)dst);
+            return new Channel((OutputNode)src,(InputNode)dst);
         } else {
             Edge e = src.getEdgeToNext();
             if (e == null || e.getDest() != dst) {

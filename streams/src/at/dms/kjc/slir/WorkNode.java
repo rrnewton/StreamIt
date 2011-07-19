@@ -9,10 +9,11 @@ import at.dms.kjc.backendSupport.Layout;
  **/
 public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepCloneable
 {
-    private WorkNodeContent filter;
+    private WorkNodeContent content;
    
     private boolean predefined;
     private boolean laidout;
+  
 
     private static HashMap<WorkNodeContent, WorkNode> contentToNode;
     
@@ -29,12 +30,12 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
 
     public WorkNode(WorkNodeContent filter) {
         predefined = (filter instanceof PredefinedContent);
-        this.filter = filter;
+        this.content = filter;
         laidout = false;
         contentToNode.put(filter, this);
     }
     
-    public static WorkNode getFilterNode(WorkNodeContent f) {
+    public static WorkNode getContent(WorkNodeContent f) {
         return contentToNode.get(f);
     }
     
@@ -49,28 +50,28 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
     }
 
     public WorkNodeContent getFilter() {
-        return filter;
+        return content;
     }
 
     public String toString() {
-        return filter.toString();   
+        return content.toString();   
     }
     
     public String toString(Layout layout) 
     {
-        return filter.toString() + " " + 
+        return content.toString() + " " + 
         (layout != null ? layout.getComputeNode(this) : "");   
     }
     
     
     public boolean isFileInput()
     {
-        return (filter instanceof FileInputContent);
+        return (content instanceof FileInputContent);
     }
     
     public boolean isFileOutput() 
     {
-        return (filter instanceof FileOutputContent);
+        return (content instanceof FileOutputContent);
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
@@ -85,8 +86,7 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.slir.WorkNode other) {
-        super.deepCloneInto(other);
-        other.filter = (at.dms.kjc.slir.WorkNodeContent)at.dms.kjc.AutoCloner.cloneToplevel(this.filter);
+        other.content = (at.dms.kjc.slir.WorkNodeContent)at.dms.kjc.AutoCloner.cloneToplevel(this.content);
         other.predefined = this.predefined;
         other.laidout = this.laidout;
     }

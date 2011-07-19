@@ -14,7 +14,7 @@ import at.dms.util.Utils;
  * a different schedule for the initialization stage. This is not the common case, so most methods 
  * assume there is not a separate schedule and use the single (steady and init) weights/sources.
  * 
- * Has an array of weights and corresponding {@link InterFilterEdge}s.
+ * Has an array of weights and corresponding {@link Channel}s.
  */
 public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepCloneable {
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = 
@@ -27,11 +27,11 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     /** the sources that correspond to the weights for the steady and for init if initWeights/initSources
      * are null
      */
-    private InterFilterEdge[] sources;
+    private Channel[] sources;
     /** if this inputslicenode requires a different joiner pattern for init, this will encode the weights */
     private int[] initWeights;
     /** if this inputslicenode requires a different joiner patter for init, this will encode the sources */
-    private InterFilterEdge[] initSources;
+    private Channel[] initSources;
     /** used to construct a unique identifier */
     private static int unique = 0;
     /** unique identifier */
@@ -39,10 +39,10 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     /** used if no joining is performed* */
     private static int[] EMPTY_WEIGHTS = new int[0];
     /** used if no joining is performed */
-    private static InterFilterEdge[] EMPTY_SRCS = new InterFilterEdge[0];
+    private static Channel[] EMPTY_SRCS = new Channel[0];
 
     /** Creator */
-    public InputNode(int[] weights, InterFilterEdge[] sources) {
+    public InputNode(int[] weights, Channel[] sources) {
         // this.parent = parent;
         if (weights.length != sources.length)
             Utils.fail("Add comment later");
@@ -61,9 +61,9 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
         if (weights.length != sources.length)
             Utils.fail("Add comment later");
         // this.sources = sources;
-        this.sources = new InterFilterEdge[sources.length];
+        this.sources = new Channel[sources.length];
         for (int i = 0; i < sources.length; i++)
-            this.sources[i] = new InterFilterEdge(sources[i], this);
+            this.sources[i] = new Channel(sources[i].getParent(), this.getParent());
         
         if (weights.length == 1)
             this.weights = new int[]{1};
@@ -106,7 +106,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
             return;
 
         int[] weights = new int[getWeights(phase).length];
-        InterFilterEdge[] edges = new InterFilterEdge[getWeights(phase).length];
+        Channel[] edges = new Channel[getWeights(phase).length];
         int curPort = 0;
 
         //add the first port to the new edges and weights
@@ -124,7 +124,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
             }
         }
 
-        InterFilterEdge[] newEdges = new InterFilterEdge[curPort + 1];
+        Channel[] newEdges = new Channel[curPort + 1];
         int[] newWeights = new int[curPort + 1];
 
         System.arraycopy(edges, 0, newEdges, 0, curPort + 1);
@@ -168,7 +168,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     
     /** InputSliceNode is FileOutput if FilterSliceNode is FileOutput.*/
     public boolean isFileOutput() {
-        return ((WorkNode) getNext()).isFileOutput();
+        return parent.getWorkNode().isFileOutput();
     }
 
     /** Returns unique string identifying slice. */
@@ -191,8 +191,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * Return true if this input slice node has an incoming edge from <node> in <phase>.
      */
     public boolean hasEdgeFrom(SchedulingPhase phase, WorkNode node) {
-        for (InterFilterEdge edge : getSourceSet(phase)) {
-            if (edge.getSrc().getPrevFilter() == node) {
+        for (Channel edge : getSourceSet(phase)) {
+            if (edge.getSrc().getWorkNode() == node) {
                 return true;
             }
         }
@@ -203,11 +203,11 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * return the edge that goes from node's outputslicenode to this inputslicenode
      * 
      */
-    public InterFilterEdge getEdgeFrom(SchedulingPhase phase, WorkNode node) {
-        InterFilterEdge ret = null;
+    public Channel getEdgeFrom(SchedulingPhase phase, WorkNode node) {
+        Channel ret = null;
         
-        for (InterFilterEdge edge : getSourceSet(phase)) {
-            if (edge.getSrc().getPrevFilter() == node) {
+        for (Channel edge : getSourceSet(phase)) {
+            if (edge.getSrc().getWorkNode() == node) {
                 assert ret == null;
                 ret = edge;
             }
@@ -238,7 +238,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * 
      * @return the sum of the weights before edge
      */
-    public int weightBefore(InterFilterEdge edge, SchedulingPhase phase) {
+    public int weightBefore(Channel edge, SchedulingPhase phase) {
         assert singleAppearance(phase);
         
         int total = 0;
@@ -270,7 +270,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * @param edge The edge to query.
      * @return The number of items passing on the edge.
      */
-    public int getItems(InterFilterEdge edge, SchedulingPhase phase) {
+    public int getItems(Channel edge, SchedulingPhase phase) {
         int items = 0;
         
         for (int i = 0; i < getSources(phase).length; i++) {
@@ -291,7 +291,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
 
     /** @return array of edges */
-    public InterFilterEdge[] getSources(SchedulingPhase phase) {
+    public Channel[] getSources(SchedulingPhase phase) {
         if (phase == SchedulingPhase.INIT && initSources != null)
             return initSources;
         
@@ -305,7 +305,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
 
     /** @return array of edges for the init schedule*/
-    public InterFilterEdge[] getInitSources() {
+    public Channel[] getInitSources() {
         return initSources;
     }
 
@@ -318,17 +318,17 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * @param edges The list of edges.
      */
     public void set(LinkedList<Integer> weights, 
-            LinkedList<InterFilterEdge> edges, SchedulingPhase phase) {
+            LinkedList<Channel> edges, SchedulingPhase phase) {
         int[] intArr = new int[weights.size()]; 
         
         for (int i = 0; i < weights.size(); i++)
             intArr[i] = weights.get(i).intValue();
         if (SchedulingPhase.INIT == phase) {
             setInitWeights(intArr);
-            setInitSources(edges.toArray(new InterFilterEdge[edges.size()]));
+            setInitSources(edges.toArray(new Channel[edges.size()]));
         } else {
             setWeights(intArr);
-            setSources(edges.toArray(new InterFilterEdge[edges.size()]));
+            setSources(edges.toArray(new Channel[edges.size()]));
         }
     }
 
@@ -339,7 +339,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * @param weights The array of weights (integer).
      * @param edges The array of edges.
      */
-    public void set(int[] weights, InterFilterEdge[] edges, SchedulingPhase phase) {
+    public void set(int[] weights, Channel[] edges, SchedulingPhase phase) {
         if (SchedulingPhase.INIT == phase) {
             setInitWeights(weights);
             setInitSources(edges);
@@ -375,7 +375,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
     
     /** Set the source edges. (shares, does not copy.) */
-    public void setSources(InterFilterEdge[] sources) {
+    public void setSources(Channel[] sources) {
         this.sources = sources;
     }
 
@@ -385,7 +385,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * 
      * @param newSrcs The new sources.
      */
-    public void setInitSources(InterFilterEdge[] newSrcs) {
+    public void setInitSources(Channel[] newSrcs) {
         this.initSources = newSrcs;
     }
     
@@ -399,7 +399,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
 
     /** @return total weight on all connections to a single Edge. 
      * @param out The Edge that we are interested in*/
-    public int getWeight(Edge out, SchedulingPhase phase) {
+    public int getWeight(Channel out, SchedulingPhase phase) {
         int sum = 0;
 
         for (int i = 0; i < getSources(phase).length; i++)
@@ -435,7 +435,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * Must have only one input in sources.
      * @return the edge, or throw AssertionError
      */
-    public InterFilterEdge getSingleEdge(SchedulingPhase phase) {
+    public Channel getSingleEdge(SchedulingPhase phase) {
         assert oneInput(phase) : "Calling getSingeEdge() on InputSlice with less/more than one input";
         return getSources(phase)[0];
     }
@@ -444,8 +444,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * Get the following FilterSliceNode.
      * @return
      */
-    public WorkNode getNextFilter() {
-        return (WorkNode) getNext();
+    public WorkNode getWorkNode() {
+        return parent.getWorkNode();
     }
 
     /** Are there no inputs?
@@ -460,8 +460,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
         return noInputs(SchedulingPhase.INIT) && noInputs(SchedulingPhase.STEADY);
     }
 
-    public int itemsReceivedOn(InterFilterEdge edge, SchedulingPhase phase) {
-        double totalItems = FilterInfo.getFilterInfo(getNextFilter()).totalItemsReceived(phase);
+    public int itemsReceivedOn(Channel edge, SchedulingPhase phase) {
+        double totalItems = FilterInfo.getFilterInfo(getWorkNode()).totalItemsReceived(phase);
         
         double items = totalItems * ratio(edge, phase);
         assert items == Math.floor(items);
@@ -474,7 +474,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * @param edge
      * @return  0.0 if totalWeights() == 0, else ratio.
      */
-    public double ratio(Edge edge, SchedulingPhase phase) {
+    public double ratio(Channel edge, SchedulingPhase phase) {
         if (totalWeights(phase) == 0)
             return 0.0;
         return ((double) getWeight(edge, phase) / (double) totalWeights(phase));
@@ -487,8 +487,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * 
      * @return The list.
      */
-    public LinkedList<InterFilterEdge> getSourceSequence(SchedulingPhase phase) {
-        LinkedList<InterFilterEdge> list = new LinkedList<InterFilterEdge>();
+    public LinkedList<Channel> getSourceSequence(SchedulingPhase phase) {
+        LinkedList<Channel> list = new LinkedList<Channel>();
         for (int i = 0; i < getSources(phase).length; i++) {
             if (!list.contains(getSources(phase)[i]))
                 list.add(getSources(phase)[i]);
@@ -503,8 +503,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      */
     public Set<Filter> getSourceSlices(SchedulingPhase phase) {
         HashSet<Filter> slices = new HashSet<Filter>();
-        for (InterFilterEdge edge : getSourceList(phase)) {
-            slices.add(edge.getSrc().getParent());
+        for (Channel edge : getSourceList(phase)) {
+            slices.add(edge.getSrc());
         }
         return slices;
     }
@@ -514,15 +514,15 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * 
      * @return The linked list of the sources pattern.
      */
-    public LinkedList<InterFilterEdge> getSourceList(SchedulingPhase phase) {
-       LinkedList<InterFilterEdge> list = new LinkedList<InterFilterEdge>();
+    public LinkedList<Channel> getSourceList(SchedulingPhase phase) {
+       LinkedList<Channel> list = new LinkedList<Channel>();
        for (int i = 0; i < getSources(phase).length; i++)
            list.add(getSources(phase)[i]);
        return list;
     }
     
-    public Set<InterFilterEdge> getSourceSet(SchedulingPhase phase) {
-        HashSet<InterFilterEdge> set = new HashSet<InterFilterEdge>();
+    public Set<Channel> getSourceSet(SchedulingPhase phase) {
+        HashSet<Channel> set = new HashSet<Channel>();
         for (int i = 0; i < getSources(phase).length; i++)
             set.add(getSources(phase)[i]);
         return set;
@@ -563,7 +563,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
 
     public boolean hasFileInput() {
         for (int i = 0; i < sources.length; i++) {
-            if (sources[i].getSrc().isFileInput())
+            if (sources[i].getSrc().getOutputNode().isFileInput())
                 return true;
         }
         return false;
@@ -576,7 +576,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * @param oldEdge The edge to replace.
      * @param newEdge The edge to install.
      */
-    public void replaceEdge(InterFilterEdge oldEdge, InterFilterEdge newEdge, SchedulingPhase phase) {
+    public void replaceEdge(Channel oldEdge, Channel newEdge, SchedulingPhase phase) {
         if (phase == SchedulingPhase.INIT) {
             for (int i = 0; i < initSources.length; i++) {
                 if (initSources[i] == oldEdge)
@@ -593,7 +593,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
 
     public CType getType() {
-        return getNextFilter().getFilter().getInputType();
+        return getWorkNode().getFilter().getInputType();
     }
 
 

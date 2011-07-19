@@ -17,8 +17,8 @@ public class DistributionUnroller {
    
     public static void test(Filter[] slices) {
         for (Filter slice : slices) {
-            InputNode input = slice.getHead();
-            OutputNode output = slice.getTail();
+            InputNode input = slice.getInputNode();
+            OutputNode output = slice.getOutputNode();
             
             System.out.println(slice);
             String inBefore = "nothing";
@@ -54,8 +54,8 @@ public class DistributionUnroller {
      * of <slice>.   
      */
     public static void roll(Filter slice) {
-        InputNode input = slice.getHead();
-        OutputNode output = slice.getTail();
+        InputNode input = slice.getInputNode();
+        OutputNode output = slice.getOutputNode();
         
         input.canonicalize(SchedulingPhase.STEADY);
         output.canonicalize(SchedulingPhase.STEADY);
@@ -82,18 +82,18 @@ public class DistributionUnroller {
      * of <slice>.   
      */
     public static void unroll(Filter slice) {
-        InputNode input = slice.getHead();
-        OutputNode output = slice.getTail();
+        InputNode input = slice.getInputNode();
+        OutputNode output = slice.getOutputNode();
         unroll(input);
         unroll(output);
     }
     
     public static void unroll(InputNode input) {
-        FilterInfo fi = FilterInfo.getFilterInfo(input.getNextFilter());
+        FilterInfo fi = FilterInfo.getFilterInfo(input.getWorkNode());
        
         //unroll the init joining schedule
-        InterFilterEdge[] initSrcs = 
-            new InterFilterEdge[fi.totalItemsReceived(SchedulingPhase.INIT)];
+        Channel[] initSrcs = 
+            new Channel[fi.totalItemsReceived(SchedulingPhase.INIT)];
         unrollHelperInput(input.getSources(SchedulingPhase.INIT), 
                 input.getWeights(SchedulingPhase.INIT), 
                 initSrcs);
@@ -103,8 +103,8 @@ public class DistributionUnroller {
         
         //unroll the steady joining schedule
         if (input.getSources(SchedulingPhase.STEADY).length > 0) {
-            InterFilterEdge[] srcs = 
-                new InterFilterEdge[fi.totalItemsReceived(SchedulingPhase.STEADY)];
+            Channel[] srcs = 
+                new Channel[fi.totalItemsReceived(SchedulingPhase.STEADY)];
             unrollHelperInput(input.getSources(SchedulingPhase.STEADY), 
                     input.getWeights(SchedulingPhase.STEADY), 
                     srcs);
@@ -115,11 +115,11 @@ public class DistributionUnroller {
     
     public static void unroll(OutputNode output) {
         //unroll the steady splitting schedule
-        FilterInfo fi = FilterInfo.getFilterInfo(output.getPrevFilter());
+        FilterInfo fi = FilterInfo.getFilterInfo(output.getWorkNode());
         
 
-        InterFilterEdge[][] initDests = 
-            new InterFilterEdge[fi.totalItemsSent(SchedulingPhase.INIT)][];
+        Channel[][] initDests = 
+            new Channel[fi.totalItemsSent(SchedulingPhase.INIT)][];
         unrollHelperOutput(output.getDests(SchedulingPhase.INIT),
                 output.getWeights(SchedulingPhase.INIT),
                 initDests);
@@ -129,8 +129,8 @@ public class DistributionUnroller {
 
        
         if (output.getDests(SchedulingPhase.STEADY).length > 0) {
-            InterFilterEdge[][] dests = 
-                new InterFilterEdge[fi.totalItemsSent(SchedulingPhase.STEADY)][];
+            Channel[][] dests = 
+                new Channel[fi.totalItemsSent(SchedulingPhase.STEADY)][];
             unrollHelperOutput(output.getDests(SchedulingPhase.STEADY),
                     output.getWeights(SchedulingPhase.STEADY),
                     dests);
@@ -148,8 +148,8 @@ public class DistributionUnroller {
     /**
      * Fill in <unrolled> with the unrolled <src> and <weights>.
      */
-    private static void unrollHelperInput(InterFilterEdge[] src, int weights[], 
-            InterFilterEdge[] unrolled) {
+    private static void unrollHelperInput(Channel[] src, int weights[], 
+            Channel[] unrolled) {
         assert src.length == weights.length;
         
         int weightsSum = 0;
@@ -164,7 +164,7 @@ public class DistributionUnroller {
         
         for (int rep = 0; rep < unrolled.length / weightsSum; rep++) {
             for (int w = 0; w < weights.length; w++) {
-                InterFilterEdge obj = src[w];
+                Channel obj = src[w];
                 for (int i = 0; i < weights[w]; i++) {
                     unrolled[index++] = obj; 
                 }                 
@@ -177,8 +177,8 @@ public class DistributionUnroller {
     /**
      * Fill in <unrolled> with the unrolled <src> and <weights>.
      */
-    private static void unrollHelperOutput(InterFilterEdge[][] src, int weights[], 
-            InterFilterEdge[][] unrolled) {
+    private static void unrollHelperOutput(Channel[][] src, int weights[], 
+            Channel[][] unrolled) {
         assert src.length == weights.length;
         
         int weightsSum = 0;
@@ -194,7 +194,7 @@ public class DistributionUnroller {
         
         for (int rep = 0; rep < unrolled.length / weightsSum; rep++) {
             for (int w = 0; w < weights.length; w++) {
-                InterFilterEdge[] obj = src[w].clone();
+                Channel[] obj = src[w].clone();
                 for (int i = 0; i < weights[w]; i++) {
                     unrolled[index++] = obj; 
                 }                 

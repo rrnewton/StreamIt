@@ -12,12 +12,12 @@ public class IDSliceRemoval {
     private OutputNode idOutput;
     private InputNode[] dsInputs;
     private int[] dsInputIndices;
-    private HashMap<InternalFilterNode, Integer> indexToIndex;
+    private HashMap<Object, Integer> indexToIndex;
     private OutputNode[] usOutputs;
     private int[] usOutputIndices;
     
     public static void doit(Filter slice) {
-        assert slice.getFirstFilter().getFilter() instanceof IDFilterContent : 
+        assert slice.getWorkNode().getFilter() instanceof IDFilterContent : 
             "Trying to remove a non ID slice";
         
         IDSliceRemoval remover = new IDSliceRemoval(slice);
@@ -26,8 +26,8 @@ public class IDSliceRemoval {
     
     private IDSliceRemoval(Filter s) {
         idSlice = s;
-        idInput = idSlice.getHead();
-        idOutput = idSlice.getTail();
+        idInput = idSlice.getInputNode();
+        idOutput = idSlice.getOutputNode();
         
         removeID(SchedulingPhase.INIT);
         removeID(SchedulingPhase.STEADY);
@@ -45,16 +45,16 @@ public class IDSliceRemoval {
     private void remove(SchedulingPhase phase) {
         assert idInput.getSources(phase).length == idOutput.getDests(phase).length : phase + " " +
             "input: " + idInput.getSources(phase).length + " output: " + idOutput.getDests(phase).length;
-        InterFilterEdge[] idSources = idInput.getSources(phase);
-        InterFilterEdge[][] idDests = idOutput.getDests(phase);
+        Channel[] idSources = idInput.getSources(phase);
+        Channel[][] idDests = idOutput.getDests(phase);
         
         
         for (int idIndex = 0; idIndex < idSources.length; idIndex++) {
-            OutputNode src = idSources[idIndex].getSrc();
+            OutputNode src = idSources[idIndex].getSrc().getOutputNode();
             
             InputNode[] dests = new InputNode[idDests[idIndex].length];
             for (int i = 0; i < idDests[idIndex].length; i++)
-                dests[i] = idDests[idIndex][i].getDest();
+                dests[i] = idDests[idIndex][i].getDest().getInputNode();
 
             //replace the ref to the id in the inputslicenodes with the src
             for (int i = 0; i < dests.length; i++) {
@@ -75,11 +75,11 @@ public class IDSliceRemoval {
     }
     
     private void unroll(SchedulingPhase phase) {
-        indexToIndex = new HashMap<InternalFilterNode, Integer>();
+        indexToIndex = new HashMap<Object, Integer>();
         //unroll all the upstream output slice nodes
         LinkedList<OutputNode> outputs = new LinkedList<OutputNode>();
-        for (InterFilterEdge edge : idInput.getSourceSet(phase)) {
-            outputs.add(edge.getSrc());
+        for (Channel edge : idInput.getSourceSet(phase)) {
+            outputs.add(edge.getSrc().getOutputNode());
             indexToIndex.put(edge.getSrc(), outputs.size() - 1);
             DistributionUnroller.unroll(edge.getSrc());
         }
@@ -89,8 +89,8 @@ public class IDSliceRemoval {
         
         //unroll all the downstream input slice nodes
         LinkedList<InputNode> inputs = new LinkedList<InputNode>();
-        for (InterFilterEdge edge : idOutput.getDestSet(phase)) {
-            inputs.add(edge.getDest());
+        for (Channel edge : idOutput.getDestSet(phase)) {
+            inputs.add(edge.getDest().getInputNode());
             indexToIndex.put(edge.getDest(), inputs.size() - 1);
             DistributionUnroller.unroll(edge.getDest());
         }
@@ -107,14 +107,14 @@ public class IDSliceRemoval {
             SchedulingPhase phase) {
         assert indexToIndex.containsKey(output);
         int index = indexToIndex.get(output);
-        InterFilterEdge[][] schedule = output.getDests(phase);
+        Channel[][] schedule = output.getDests(phase);
         
         //create all the edges
-        InterFilterEdge[] destEdges = new InterFilterEdge[dests.length];
+        Channel[] destEdges = new Channel[dests.length];
         for (int i = 0; i < dests.length; i++) {
-            InterFilterEdge edge = InterFilterEdge.getEdge(output, dests[i]);
+            Channel edge = Channel.getEdge(output, dests[i]);
             if (edge == null)
-                edge = new InterFilterEdge(output, dests[i]);
+                edge = new Channel(output.getParent(), dests[i].getParent());
             destEdges[i] = edge;
         }
         
@@ -132,14 +132,14 @@ public class IDSliceRemoval {
         assert false : "Error in ID removal";
     }
     
-    private InterFilterEdge[] replaceIDEdge(InterFilterEdge[] oldDests, InterFilterEdge[] toAdd) {
+    private Channel[] replaceIDEdge(Channel[] oldDests, Channel[] toAdd) {
         assert containsIDDest(oldDests);
-        InterFilterEdge[] newEdges = new InterFilterEdge[oldDests.length + toAdd.length - 1]; 
+        Channel[] newEdges = new Channel[oldDests.length + toAdd.length - 1]; 
         int index = 0;
         
         //copy over all the edges except the one to the ID
         for (int i = 0; i < oldDests.length; i++) {
-            if (oldDests[i].getDest() == idInput) 
+            if (oldDests[i].getDest().getInputNode() == idInput) 
                 continue;
             newEdges[index++] = oldDests[i];
         }
@@ -156,9 +156,9 @@ public class IDSliceRemoval {
     /**
      * return true if any of the edges has the ID's input node as a dest.
      */
-    private boolean containsIDDest(InterFilterEdge[] edges) {
-        for (InterFilterEdge edge : edges) {
-            if (edge.getDest() == idInput) 
+    private boolean containsIDDest(Channel[] edges) {
+        for (Channel edge : edges) {
+            if (edge.getDest().getInputNode() == idInput) 
                 return true;
         }
         return false;
@@ -174,13 +174,13 @@ public class IDSliceRemoval {
         //find the index into the index array
         assert indexToIndex.containsKey(input);
         int index = indexToIndex.get(input);
-        InterFilterEdge[] srcs = input.getSources(phase);
+        Channel[] srcs = input.getSources(phase);
         //we might have created this edge before, so let's check
-        InterFilterEdge newEdge = InterFilterEdge.getEdge(output, input);
+        Channel newEdge = Channel.getEdge(output, input);
         if (newEdge == null)  //if not, create it
-            newEdge = new InterFilterEdge(output, input);
+            newEdge = new Channel(output.getParent(), input.getParent());
         
-        InterFilterEdge oldEdge = InterFilterEdge.getEdge(idOutput, input);
+        Channel oldEdge = Channel.getEdge(idOutput, input);
         
         int current = dsInputIndices[index] + 1;
         //find the next index into the input node that received from the ID

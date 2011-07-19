@@ -50,20 +50,20 @@ public class LevelizeSSG {
             Filter slice = queue.removeFirst();
             if (!visited.contains(slice)) {
                 visited.add(slice);
-                for (Edge destEdge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
-                    Filter current = destEdge.getDest().getParent();
+                for (Channel destEdge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
+                    Filter current = destEdge.getDest();
                     if (!visited.contains(current)) {
                         // only add if all sources has been visited
                         boolean addMe = true;
                         int maxParentLevel = 0;
-                        for (Edge sourceEdge : current.getHead().getSourceSet(SchedulingPhase.STEADY)) {
-                            if (!visited.contains(sourceEdge.getSrc().getParent())) {
+                        for (Channel sourceEdge : current.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+                            if (!visited.contains(sourceEdge.getSrc())) {
                                 addMe = false;
                                 break;
                             }
                             //remember the max parent level
-                            if (levelMap.get(sourceEdge.getSrc().getParent()).intValue() > maxParentLevel)
-                                maxParentLevel = levelMap.get(sourceEdge.getSrc().getParent()).intValue();
+                            if (levelMap.get(sourceEdge.getSrc()).intValue() > maxParentLevel)
+                                maxParentLevel = levelMap.get(sourceEdge.getSrc()).intValue();
                         }   
                         if (addMe) {
                             levelMap.put(current, maxParentLevel + 1);
