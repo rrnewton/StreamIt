@@ -35,7 +35,7 @@ public class DataFlowOrder {
                 if (!visited.contains(slice)) {
                     visited.add(slice);
                     for (Channel destEdge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
-                        Filter current = destEdge.getDest();
+                        Filter current = destEdge.getDest().getParent();
                         if (!visited.contains(current)) {
                             // only add if all sources has been visited
                             boolean addMe = true;

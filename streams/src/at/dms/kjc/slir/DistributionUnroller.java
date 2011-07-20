@@ -92,8 +92,8 @@ public class DistributionUnroller {
         FilterInfo fi = FilterInfo.getFilterInfo(input.getWorkNode());
        
         //unroll the init joining schedule
-        Channel[] initSrcs = 
-            new Channel[fi.totalItemsReceived(SchedulingPhase.INIT)];
+        InterFilterChannel[] initSrcs = 
+            new InterFilterChannel[fi.totalItemsReceived(SchedulingPhase.INIT)];
         unrollHelperInput(input.getSources(SchedulingPhase.INIT), 
                 input.getWeights(SchedulingPhase.INIT), 
                 initSrcs);
@@ -103,8 +103,8 @@ public class DistributionUnroller {
         
         //unroll the steady joining schedule
         if (input.getSources(SchedulingPhase.STEADY).length > 0) {
-            Channel[] srcs = 
-                new Channel[fi.totalItemsReceived(SchedulingPhase.STEADY)];
+        	InterFilterChannel[] srcs = 
+                new InterFilterChannel[fi.totalItemsReceived(SchedulingPhase.STEADY)];
             unrollHelperInput(input.getSources(SchedulingPhase.STEADY), 
                     input.getWeights(SchedulingPhase.STEADY), 
                     srcs);
@@ -118,8 +118,8 @@ public class DistributionUnroller {
         FilterInfo fi = FilterInfo.getFilterInfo(output.getWorkNode());
         
 
-        Channel[][] initDests = 
-            new Channel[fi.totalItemsSent(SchedulingPhase.INIT)][];
+        InterFilterChannel[][] initDests = 
+            new InterFilterChannel[fi.totalItemsSent(SchedulingPhase.INIT)][];
         unrollHelperOutput(output.getDests(SchedulingPhase.INIT),
                 output.getWeights(SchedulingPhase.INIT),
                 initDests);
@@ -129,8 +129,8 @@ public class DistributionUnroller {
 
        
         if (output.getDests(SchedulingPhase.STEADY).length > 0) {
-            Channel[][] dests = 
-                new Channel[fi.totalItemsSent(SchedulingPhase.STEADY)][];
+        	InterFilterChannel[][] dests = 
+                new InterFilterChannel[fi.totalItemsSent(SchedulingPhase.STEADY)][];
             unrollHelperOutput(output.getDests(SchedulingPhase.STEADY),
                     output.getWeights(SchedulingPhase.STEADY),
                     dests);

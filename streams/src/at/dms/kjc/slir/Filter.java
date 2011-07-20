@@ -56,7 +56,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         Filter[] depends = new Filter[inputNode.getSources(phase).length];
         
         for (int i = 0; i < depends.length; i++)
-            depends[i] = inputNode.getSources(phase)[i].getSrc();
+            depends[i] = inputNode.getSources(phase)[i].getSrc().getParent();
         
         return depends;
     }

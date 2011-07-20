@@ -35,11 +35,11 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * A round-robin splitter of size n would be an Edge[n][1]
      * A duplicate splitter of size n would be an Edge[1][n]
      */
-    private Channel[][] dests;
+    private InterFilterChannel[][] dests;
     /** the weights for init if this node requires a different init splitting pattern */
     private int[] initWeights;
     /** the dest array for init if this node requires a differnt init splitting pattern */
-    private Channel[][] initDests; 
+    private InterFilterChannel[][] initDests; 
         /** unique identifier for this node */
     private String ident;
     /** used to generate unique id */
@@ -47,7 +47,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
     /** used to initialize the weights array */
     private static int[] EMPTY_WEIGHTS = new int[0];
     /** used to initialize the weights array */
-    private static Channel[][] EMPTY_DESTS = new Channel[0][0];
+    private static InterFilterChannel[][] EMPTY_DESTS = new InterFilterChannel[0][0];
   
     
     /**
@@ -58,7 +58,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * @param dests The array of dests.
      */
 
-    public OutputNode(int[] weights, Channel[][] dests) {
+    public OutputNode(int[] weights, InterFilterChannel[][] dests) {
         // this.parent = parent;
         assert weights.length == dests.length : "weights must equal sources";
         ident = "output" + unique;
@@ -78,7 +78,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * @param dests The list of dests.
      */
     public OutputNode(LinkedList<Integer> weights, 
-            LinkedList<LinkedList<Channel>> dests) {
+            LinkedList<LinkedList<InterFilterChannel>> dests) {
         assert weights.size() == dests.size();
         ident = "output" + unique++;
         //convert the weights list
@@ -135,9 +135,9 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * @param dests List of Lists of Edge for splitting pattern.
      */
     public void set(LinkedList<Integer> weights, 
-            LinkedList<LinkedList<Channel>> dests, SchedulingPhase phase) {
+            LinkedList<LinkedList<InterFilterChannel>> dests, SchedulingPhase phase) {
         int[] newWeights;
-        Channel[][] newDests;
+        InterFilterChannel[][] newDests;
 
         if (weights.size() == 1) 
             newWeights = new int[]{1};
@@ -149,9 +149,9 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
 
         //convert the dests list
         int i = 0;
-        newDests = new Channel[dests.size()][];
-        for(LinkedList<Channel> dest : dests)
-            newDests[i++] = dest.toArray(new Channel[0]);
+        newDests = new InterFilterChannel[dests.size()][];
+        for(LinkedList<InterFilterChannel> dest : dests)
+            newDests[i++] = dest.toArray(new InterFilterChannel[0]);
 
         if (SchedulingPhase.INIT == phase) {
             setInitWeights(newWeights);
@@ -169,7 +169,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * @param weights Array of integer weights
      * @param dests Array of Edge arrays for splitting pattern.
      */
-    public void set(int[] weights, Channel[][] dests, SchedulingPhase phase) {
+    public void set(int[] weights, InterFilterChannel[][] dests, SchedulingPhase phase) {
         if (SchedulingPhase.INIT == phase) {
             setInitWeights(weights);
             setInitDests(dests);
@@ -204,14 +204,14 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
     }
 
     /** @return dests */
-    public Channel[][] getDests(SchedulingPhase phase) {
+    public InterFilterChannel[][] getDests(SchedulingPhase phase) {
         if (phase == SchedulingPhase.INIT && initDests != null)
             return initDests;
         return dests;
     }
 
     /** Set dests */
-    public void setDests(Channel[][] dests) {
+    public void setDests(InterFilterChannel[][] dests) {
         this.dests = dests;
     }
 
@@ -220,14 +220,14 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * if the pattern is the same as the steady pattern. 
      * @return dests 
      */
-    public Channel[][] getInitDests() {
+    public InterFilterChannel[][] getInitDests() {
         return initDests;
     }
 
     /** 
      * Set the initialization pattern for splitting.
      */
-    public void setInitDests(Channel[][] newDests) {
+    public void setInitDests(InterFilterChannel[][] newDests) {
         this.initDests = newDests;
     }
 
@@ -256,7 +256,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
             return;
 
         int[] weights = new int[getWeights(phase).length];
-        Channel[][] edges = new Channel[getWeights(phase).length][];
+        InterFilterChannel[][] edges = new InterFilterChannel[getWeights(phase).length][];
         int curPort = 0;
 
         //add the first port to the new edges and weights
@@ -274,7 +274,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
             }
         }
 
-        Channel[][] newEdges = new Channel[curPort + 1][];
+        InterFilterChannel[][] newEdges = new InterFilterChannel[curPort + 1][];
         int[] newWeights = new int[curPort + 1];
 
         System.arraycopy(edges, 0, newEdges, 0, curPort + 1);
@@ -334,8 +334,8 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
     /**
      * Return true if the weight duplicates to edge during the scheduling phase.
      */
-    public boolean weightDuplicatesTo(int weight, Channel edge, SchedulingPhase phase) {
-        Channel[][] dests = getDests(phase);
+    public boolean weightDuplicatesTo(int weight, InterFilterChannel edge, SchedulingPhase phase) {
+    	InterFilterChannel[][] dests = getDests(phase);
         
         for (int d = 0; d < dests[weight].length; d++) {
             if (dests[weight][d] == edge)
@@ -351,9 +351,9 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * 
      * @return The list.
      */
-    public LinkedList<Channel> getDestSequence(SchedulingPhase phase) {
+    public LinkedList<InterFilterChannel> getDestSequence(SchedulingPhase phase) {
         
-        LinkedList<Channel> list = new LinkedList<Channel>();
+        LinkedList<InterFilterChannel> list = new LinkedList<InterFilterChannel>();
         for (int i = 0; i < getDests(phase).length; i++) {
             for (int j = 0; j < getDests(phase)[i].length; j++) 
                 if (!list.contains(getDests(phase)[i][j]))
@@ -365,7 +365,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
     /**
      * return the number of items sent by this output slice node on all instances of a particular edge.
      */
-    public int getWeight(Channel in, SchedulingPhase phase) {
+    public int getWeight(InterFilterChannel in, SchedulingPhase phase) {
         int sum = 0;
 
         for (int i = 0; i < getDests(phase).length; i++) {
@@ -389,11 +389,11 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * 
      * @return a set of all the destination slices of this output slice node.
      */
-    public Set<Filter> getDestSlices(SchedulingPhase phase) {
+    public Set<Filter> getDestFilters(SchedulingPhase phase) {
         HashSet<Filter> dests = new HashSet<Filter>();
         
-        for (Channel edge : getDestSet(phase)) {
-            dests.add(edge.getDest());
+        for (InterFilterChannel edge : getDestSet(phase)) {
+            dests.add(edge.getDest().getParent());
         }
         
         return dests;
@@ -406,14 +406,14 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * @return A list of the dests in round-robin order flattening
      * the duplicates.  
      */ 
-    public Channel[] getDestList(SchedulingPhase phase) {
+    public InterFilterChannel[] getDestList(SchedulingPhase phase) {
         
-        LinkedList<Channel> edges = new LinkedList<Channel>();
+        LinkedList<InterFilterChannel> edges = new LinkedList<InterFilterChannel>();
         for (int i = 0; i < getDests(phase).length; i++) {
             for (int j = 0; j < getDests(phase)[i].length; j++)
                 edges.add(getDests(phase)[i][j]);
         }
-        return edges.toArray(new Channel[edges.size()]);
+        return edges.toArray(new InterFilterChannel[edges.size()]);
     }
     
     /**
@@ -421,8 +421,8 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * 
      * @return The set of the outgoing edges of this OutputSliceNode.
      */
-    public Set<Channel> getDestSet(SchedulingPhase phase) {
-        HashSet<Channel> set = new HashSet<Channel>();
+    public Set<InterFilterChannel> getDestSet(SchedulingPhase phase) {
+        HashSet<InterFilterChannel> set = new HashSet<InterFilterChannel>();
         for (int i = 0; i < getDests(phase).length; i++) {
             for (int j = 0; j < getDests(phase)[i].length; j++)
                 set.add(getDests(phase)[i][j]);
@@ -459,7 +459,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
         return false;
     }
 
-    public Channel getSingleEdge(SchedulingPhase phase) {
+    public InterFilterChannel getSingleEdge(SchedulingPhase phase) {
         assert oneOutput(phase) : "Calling getSingleEdge() on OutputSlice with less/more than one output";
         //System.out.println(getParent() + " " + phase);
         return getDests(phase)[0][0];
@@ -489,20 +489,20 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * return an iterator that iterates over the inputslicenodes in descending
      * order of the number of items sent to the inputslicenode
      */
-    public List<Channel> getSortedOutputs(SchedulingPhase phase) {
-        LinkedList<Channel>sortedOutputs = new LinkedList<Channel>();  
+    public List<InterFilterChannel> getSortedOutputs(SchedulingPhase phase) {
+        LinkedList<InterFilterChannel>sortedOutputs = new LinkedList<InterFilterChannel>();  
         // if there are no dest just return an empty iterator
         if (weights.length == 0) {
             return sortedOutputs;
         }
         // just do a simple linear insert over the dests
         // only has to be done once
-        Vector<Channel> sorted = new Vector<Channel>();
-        Iterator<Channel> destsIt = getDestSet(phase).iterator();
+        Vector<InterFilterChannel> sorted = new Vector<InterFilterChannel>();
+        Iterator<InterFilterChannel> destsIt = getDestSet(phase).iterator();
         // add one element
         sorted.add(destsIt.next());
         while (destsIt.hasNext()) {
-            Channel current = destsIt.next();
+        	InterFilterChannel current = destsIt.next();
             // add to end if it is less then everything
             if (getWeight(current, phase) <= getWeight(sorted.get(sorted
                     .size() - 1), phase))
@@ -520,7 +520,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
         }
         assert sorted.size() == getDestSet(phase).size() : "error "
             + sorted.size() + "!= " + getDestSet(phase).size();
-        sortedOutputs = (LinkedList<Channel>)sorted.subList(0, sorted.size());
+        sortedOutputs = (LinkedList<InterFilterChannel>)sorted.subList(0, sorted.size());
 
         return sortedOutputs;
     }
@@ -528,7 +528,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
     /**
      * Return the number of items that are sent along the <edge> in <phase>.
      */
-    public int itemsSentOn(Channel edge, SchedulingPhase phase) {
+    public int itemsSentOn(InterFilterChannel edge, SchedulingPhase phase) {
         int totalItems = FilterInfo.getFilterInfo(parent.getWorkNode()).totalItemsSent(phase);
         
         double items = totalItems * ratio(edge, phase);
@@ -537,7 +537,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
         return (int)(items);
     }
     
-    public double ratio(Channel edge, SchedulingPhase phase) {
+    public double ratio(InterFilterChannel edge, SchedulingPhase phase) {
         if (totalWeights(phase) == 0)
             return 0.0;
         return ((double) getWeight(edge, phase) / (double) totalWeights(phase));
@@ -567,7 +567,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
     public boolean hasFileOutput() {
         Iterator dests = getDestSet(SchedulingPhase.STEADY).iterator();
         while (dests.hasNext()) {
-            if (((Channel) dests.next()).getDest().getInputNode().isFileOutput())
+            if (((InterFilterChannel) dests.next()).getDest().isFileOutput())
                 return true;
         }
         return false;
@@ -577,9 +577,9 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
         HashSet<InputNode> fileOutputs = new HashSet<InputNode>();
         Iterator dests = getDestSet(SchedulingPhase.STEADY).iterator();
         while (dests.hasNext()) {
-            Channel edge = (Channel) dests.next();
-            if (edge.getDest().getInputNode().isFileOutput())
-                fileOutputs.add(edge.getDest().getInputNode());
+        	InterFilterChannel edge = (InterFilterChannel) dests.next();
+            if (edge.getDest().isFileOutput())
+                fileOutputs.add(edge.getDest());
         }
         return fileOutputs;
     }
@@ -632,7 +632,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * @param edge The edge in question
      * @return The total weights before edge
      */
-    public int weightBefore(Channel edge, SchedulingPhase phase) {
+    public int weightBefore(InterFilterChannel edge, SchedulingPhase phase) {
         assert singleAppearance();
         int total = 0;
         

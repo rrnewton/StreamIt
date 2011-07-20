@@ -30,12 +30,9 @@ public class Util {
     
         while (it.hasNext()) {
             Filter slice = (Filter) it.next();
-            InternalFilterNode sliceNode = slice.getInputNode();
-            while (sliceNode != null) {
-                trav.add(sliceNode);
-                sliceNode = sliceNode.getNext();
-            }
-    
+          	trav.add(slice.getInputNode());
+        	trav.add(slice.getWorkNode());
+        	trav.add(slice.getOutputNode());
         }
     
         return trav.listIterator();
@@ -52,12 +49,9 @@ public class Util {
         LinkedList<InternalFilterNode> trav = new LinkedList<InternalFilterNode>();
     
         for (int i = 0; i < slices.length; i++) {
-            InternalFilterNode sliceNode = slices[i].getInputNode();
-            while (sliceNode != null) {
-                trav.add(sliceNode);
-                sliceNode = sliceNode.getNext();
-            }
-    
+        	trav.add(slices[i].getInputNode());
+        	trav.add(slices[i].getWorkNode());
+        	trav.add(slices[i].getOutputNode());
         }
     
         return trav.listIterator();
@@ -73,25 +67,19 @@ public class Util {
      * @param dst  Destination SliceNode for Edge
      * @return an InterSliceEdge or Edge from src to dst
      */
-    public static Edge srcDstToEdge(InternalFilterNode src, InternalFilterNode dst, SchedulingPhase phase) {
-        if (src instanceof OutputNode && dst instanceof InputNode) {
-            Channel[][] edgesedges = ((OutputNode)src).getDests(phase);
-            for (Channel[] edges : edgesedges) {
-                for (Channel edge : edges) {
-                    assert edge.src == src;
-                    if (edge.dest == dst) {
-                        return edge;
-                    }
-                }
-            }
-            return new Channel((OutputNode)src,(InputNode)dst);
-        } else {
-            Edge e = src.getEdgeToNext();
-            if (e == null || e.getDest() != dst) {
-                e = new Edge(src,dst);
-            }
-            return e;
-        }
+    public static InterFilterChannel srcDstToEdge(Filter src, Filter dst, SchedulingPhase phase) {
+
+    	InterFilterChannel[][] edgesedges = src.getOutputNode().getDests(phase);
+    	for (InterFilterChannel[] edges : edgesedges) {
+    		for (InterFilterChannel edge : edges) {
+    			assert edge.src.getParent() == src;
+    			if (edge.dest.getParent() == dst) {
+    				return edge;
+    			}
+    		}
+    	}
+    	return new InterFilterChannel(src.getOutputNode(), dst.getInputNode());
+
     }
     
     /**                                                                                                                                    

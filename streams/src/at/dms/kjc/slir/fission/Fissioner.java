@@ -552,7 +552,7 @@ public class Fissioner {
     }
     
     private Channel getEdge(Filter s1, Filter s2) {
-        Channel edge = Channel.getEdge(s1.getOutputNode(), s2.getInputNode());
+        Channel edge = Channel.getChannel(s1.getOutputNode(), s2.getInputNode());
         if (edge == null)
             edge = new Channel(s1.getOutputNode().getParent(), s2.getInputNode().getParent());
         
@@ -663,7 +663,7 @@ public class Fissioner {
         //set the init mult of the id
         int items = 0;
         for (int i = 0; i < inputsInit.length; i++) {
-            Channel edge = Channel.getEdge(inputsInit[i].getOutputNode(), slice.getInputNode());
+            Channel edge = Channel.getChannel(inputsInit[i].getOutputNode(), slice.getInputNode());
             items += inputsInit[i].getOutputNode().itemsSentOn(edge, SchedulingPhase.INIT);
         }
         idInput.getWorkNode().getFilter().setInitMult(items);
@@ -677,7 +677,7 @@ public class Fissioner {
         //check to make sure that we pop all we receive in the steady
         int totalItemsReceived = 0;
         for (int i = 0; i < inputsSteady.length; i++) {
-            Channel edge = Channel.getEdge(inputsSteady[i].getOutputNode(), slice.getInputNode());
+            Channel edge = Channel.getChannel(inputsSteady[i].getOutputNode(), slice.getInputNode());
             totalItemsReceived += inputsSteady[i].getOutputNode().itemsSentOn(edge, SchedulingPhase.STEADY);
         }
         assert fInfo.steadyMult * fInfo.pop == totalItemsReceived;

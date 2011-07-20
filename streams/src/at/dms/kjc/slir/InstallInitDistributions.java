@@ -27,7 +27,7 @@ public class InstallInitDistributions {
             } else {
                 //nothing done by input
                 slice.getInputNode().setInitWeights(new int[0]);
-                slice.getInputNode().setInitSources(new Channel[0]);
+                slice.getInputNode().setInitSources(new InterFilterChannel[0]);
             }
             
             //do output slice
@@ -36,7 +36,7 @@ public class InstallInitDistributions {
                 slice.getOutputNode().setInitWeights(slice.getOutputNode().getWeights(SchedulingPhase.STEADY).clone());
             } else {
                 //nothing done by output
-                slice.getOutputNode().setInitDests(new Channel[0][0]);
+                slice.getOutputNode().setInitDests(new InterFilterChannel[0][0]);
                 slice.getOutputNode().setInitWeights(new int[0]);
             }
         }

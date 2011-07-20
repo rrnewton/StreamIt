@@ -25,8 +25,8 @@ public class SynchRemover {
     private final LinkedList<Filter> identities = new LinkedList<Filter>();
     
     // Maps each output edge to its steady-state sequence of outputs
-    private final HashMap<Channel,SSSequence> outMap = 
-        new HashMap<Channel,SSSequence>();
+    private final HashMap<InterFilterChannel,SSSequence> outMap = 
+        new HashMap<InterFilterChannel,SSSequence>();
     
     /**
      * Constructs a new <tt>SynchRemover</tt>.
@@ -92,7 +92,7 @@ public class SynchRemover {
         int index = 1;
         int sumweights = current.getOutputNode().totalWeights(SchedulingPhase.STEADY);
         int[] weights = current.getOutputNode().getWeights(SchedulingPhase.STEADY);
-        Channel[][] outputs = current.getOutputNode().getDests(SchedulingPhase.STEADY);
+        InterFilterChannel[][] outputs = current.getOutputNode().getDests(SchedulingPhase.STEADY);
         // outer loop loops over duplicate copies
         for (int i=0; i<outputs.length; i++) {
             int weight = weights[i];
@@ -110,7 +110,7 @@ public class SynchRemover {
     private void removeSynch() {
         System.out.println("Total of " + identities.size() + " identity slices");
         while (!identities.isEmpty()) {
-            HashMap<Channel,SSSequence> inMap = new HashMap<Channel,SSSequence>();
+            HashMap<InterFilterChannel,SSSequence> inMap = new HashMap<InterFilterChannel,SSSequence>();
             
             Filter id = identities.removeFirst();
             Filter[] parents = id.getDependencies(SchedulingPhase.STEADY);
@@ -120,7 +120,7 @@ public class SynchRemover {
             // Array to store output SSSequences of each parent slice 
             SSSequence[] parentOutputSeqs = new SSSequence[parents.length];
             // Array to store edge between each parent and current slice
-            Channel[] edges = new Channel[parents.length];
+            InterFilterChannel[] edges = new InterFilterChannel[parents.length];
             
             // If any parents are identities and haven't yet been processed,
             // add this slice back to the end of the list and loop again
@@ -140,7 +140,7 @@ public class SynchRemover {
                 Filter parent = parents[i];
                 
                 // Find output SSSequence from the InterSliceEdge
-                Channel e = getEdgeBetween(parent, id);
+                InterFilterChannel e = getEdgeBetween(parent, id);
                 if (e != null) System.out.println("Found edge!");
                 else System.out.println("Didn't find edge!");
                 SSSequence output = outMap.get(e);
@@ -165,7 +165,7 @@ public class SynchRemover {
             for (int i=0; i<parents.length; i++) {
                 // retrieve information for ith parent
                 Filter parent = parents[i];
-                Channel[][] parentOutEdges = parent.getOutputNode().getDests(SchedulingPhase.STEADY);
+                InterFilterChannel[][] parentOutEdges = parent.getOutputNode().getDests(SchedulingPhase.STEADY);
                 int[] weights = parent.getOutputNode().getWeights(SchedulingPhase.STEADY);
                 
                 // calculate number of times this parent's outputs have to be
@@ -176,7 +176,7 @@ public class SynchRemover {
                 // iterate through all of parent's outgoing edges
                 for (int j=0; j<parentOutEdges.length; j++) {
                     int weight = weights[j];
-                    Channel[] dupes = parentOutEdges[j];
+                    InterFilterChannel[] dupes = parentOutEdges[j];
                     // All SSSequences for duplicates should be the same --
                     // just get the first one
                     SSSequence outseq = outMap.get(dupes[0]);
@@ -199,7 +199,7 @@ public class SynchRemover {
             ArrayList<SSElement> out = new ArrayList<SSElement>();
             for (int i=0; i<inmult; i++) {
                 for (int j=0; j<parents.length; j++) {
-                    Channel e = edges[j];
+                    InterFilterChannel e = edges[j];
                     SSSequence in = inMap.get(e);
                     for (int k=0; k<inweights[j]; k++) {
                         out.add(in.getNext());
@@ -209,7 +209,7 @@ public class SynchRemover {
             Iterator<SSElement> iter = out.iterator();
             
             // Distribute single sequence over all of the output Slices
-            Channel[][] outedges = id.getOutputNode().getDests(SchedulingPhase.STEADY);
+            InterFilterChannel[][] outedges = id.getOutputNode().getDests(SchedulingPhase.STEADY);
             SSSequence[] outseqs = new SSSequence[outedges.length];
             int[] outweights = id.getOutputNode().getWeights(SchedulingPhase.STEADY);
             
@@ -233,10 +233,10 @@ public class SynchRemover {
             // create new outgoing edges for all of the parent slices
             for (int i=0; i<parents.length; i++) {
                 Filter parent = parents[i];
-                Channel[][] parentOutEdges = parent.getOutputNode().getDests(SchedulingPhase.STEADY);
+                InterFilterChannel[][] parentOutEdges = parent.getOutputNode().getDests(SchedulingPhase.STEADY);
                 int[] weights = parent.getOutputNode().getWeights(SchedulingPhase.STEADY);
-                HashMap<Integer,LinkedList<Channel>> newEdgesMap = 
-                    new HashMap<Integer,LinkedList<Channel>>();
+                HashMap<Integer,LinkedList<InterFilterChannel>> newEdgesMap = 
+                    new HashMap<Integer,LinkedList<InterFilterChannel>>();
                 System.out.println("creating new outgoing edges for parents");
                 for (int j=0; j<parentOutEdges.length; j++) {
                     for (int k=0; k<parentOutEdges[j].length; k++) {
@@ -248,17 +248,17 @@ public class SynchRemover {
                             System.out.println("ee" + elt.num);
                             if (!newEdgesMap.containsKey(elt.num)) {
                                 System.out.println("adding: " + elt.num);
-                                newEdgesMap.put(elt.num, new LinkedList<Channel>());
+                                newEdgesMap.put(elt.num, new LinkedList<InterFilterChannel>());
                             }
-                            LinkedList<Channel> array = newEdgesMap.get(elt.num);
-                            Channel newedge = new Channel(parent.getOutputNode(), parentOutEdges[j][k].getDest());
+                            LinkedList<InterFilterChannel> array = newEdgesMap.get(elt.num);
+                            InterFilterChannel newedge = new InterFilterChannel(parent.getOutputNode(), (InputNode)parentOutEdges[j][k].getDest());
                             array.add(newedge);
                         }
                     }
                 }
                 for (int j=0; j<outedges.length; j++) {
                     for (int k=0; k<outedges[j].length; k++) {
-                        Channel outedge = outedges[j][k];
+                        InterFilterChannel outedge = outedges[j][k];
                         SSSequence seq = inMap.get(outedge);
                         for (int l=0; l<seq.length(); l++) {
                             SSElement elt = seq.getNext();
@@ -267,10 +267,10 @@ public class SynchRemover {
                             System.out.println(elt.num);
                             if (!newEdgesMap.containsKey(elt.num)) {
                                 System.out.println("adding: " + elt.num);
-                                newEdgesMap.put(elt.num, new LinkedList<Channel>());
+                                newEdgesMap.put(elt.num, new LinkedList<InterFilterChannel>());
                             }
-                            LinkedList<Channel> array = newEdgesMap.get(elt.num);
-                            Channel newedge = new Channel(parent.getOutputNode(), outedge.getDest());
+                            LinkedList<InterFilterChannel> array = newEdgesMap.get(elt.num);
+                            InterFilterChannel newedge = new InterFilterChannel(parent.getOutputNode(), outedge.getDest());
                             array.add(newedge);
                         }
                     }
@@ -280,8 +280,8 @@ public class SynchRemover {
                     newweights.add(new Integer(1));
                 }
                 
-                LinkedList<LinkedList<Channel>> newedges =
-                    new LinkedList<LinkedList<Channel>>();
+                LinkedList<LinkedList<InterFilterChannel>> newedges =
+                    new LinkedList<LinkedList<InterFilterChannel>>();
                 for (int j=1; j<=newEdgesMap.size(); j++) {
                     assert newEdgesMap.containsKey(j);
                     System.out.println(j + newEdgesMap.get(j).toString());
@@ -290,9 +290,9 @@ public class SynchRemover {
                 parent.getOutputNode().set(newweights, newedges, SchedulingPhase.STEADY);
             }
             
-            id.getInputNode().setSources(new Channel[0]);
+            id.getInputNode().setSources(new InterFilterChannel[0]);
             id.getInputNode().setWeights(new int[0]);
-            id.getOutputNode().setDests(new Channel[0][]);
+            id.getOutputNode().setDests(new InterFilterChannel[0][]);
             id.getOutputNode().setWeights(new int[0]);
             System.out.println("Removed sync for slice: " + id.toString() + "\n");
         }
@@ -312,16 +312,12 @@ public class SynchRemover {
         else return gcd(b, a%b);
     }
     
-    private static boolean isIdentity(Filter slice) {
-        for (WorkNode fn : slice.getFilterNodes()) {
-            if (!fn.getFilter().getName().startsWith("Identity"))
-                return false;
-        }
-        return true;
-    }
+    private static boolean isIdentity(Filter filter) {
+    	return filter.getWorkNode().getFilter().getName().startsWith("Identity");
+    }	
 
-    private static Channel getEdgeBetween(Filter from, Filter to) {
-        for (Channel e : from.getOutputNode().getDestSequence(SchedulingPhase.STEADY)) {
+    private static InterFilterChannel getEdgeBetween(Filter from, Filter to) {
+        for (InterFilterChannel e : from.getOutputNode().getDestSequence(SchedulingPhase.STEADY)) {
             if (e.getDest() == to.getInputNode())
                 return e;
         }
@@ -457,21 +453,21 @@ public class SynchRemover {
      * @param isRR
      * @return
      */
-    private static LinkedList<LinkedList<Channel>> createNewOutgoingEdges(
+    private static LinkedList<LinkedList<InterFilterChannel>> createNewOutgoingEdges(
             OutputNode slice, LinkedList<Filter> outputs, boolean isRR) {
-        LinkedList<LinkedList<Channel>> newEdges = new LinkedList<LinkedList<Channel>>();
+        LinkedList<LinkedList<InterFilterChannel>> newEdges = new LinkedList<LinkedList<InterFilterChannel>>();
         
         if (isRR) {
             for (Filter output : outputs) {
-                LinkedList<Channel> temp = new LinkedList<Channel>();
-                Channel e = new Channel(slice, output.getInputNode());
+                LinkedList<InterFilterChannel> temp = new LinkedList<InterFilterChannel>();
+                InterFilterChannel e = new InterFilterChannel(slice, output.getInputNode());
                 temp.add(e);
                 newEdges.add(temp);
             }
         } else {
-            LinkedList<Channel> temp = new LinkedList<Channel>();
+            LinkedList<InterFilterChannel> temp = new LinkedList<InterFilterChannel>();
             for (Filter output : outputs) {
-                Channel e = new Channel(slice, output.getInputNode());
+            	InterFilterChannel e = new InterFilterChannel(slice, output.getInputNode());
                 temp.add(e);
             }
             newEdges.add(temp);
@@ -487,12 +483,12 @@ public class SynchRemover {
      * @param inputs
      * @return
      */
-    private static LinkedList<Channel> createNewIncomingEdges(InputNode slice,
+    private static LinkedList<InterFilterChannel> createNewIncomingEdges(InputNode slice,
             LinkedList<Filter> inputs) {
-        LinkedList<Channel> newEdges = new LinkedList<Channel>();
+        LinkedList<InterFilterChannel> newEdges = new LinkedList<InterFilterChannel>();
         
         for (Filter input : inputs) {
-            Channel e = new Channel(input.getOutputNode(), slice);
+        	InterFilterChannel e = new InterFilterChannel(input.getOutputNode(), slice);
             newEdges.add(e);
         }
         
@@ -506,9 +502,9 @@ public class SynchRemover {
      */
     private static Filter[] getParentSlices(Filter slice) {
         LinkedList<Filter> parents = new LinkedList<Filter>();
-        LinkedList<Channel> inEdges = slice.getInputNode().getSourceList(SchedulingPhase.STEADY);
+        LinkedList<InterFilterChannel> inEdges = slice.getInputNode().getSourceList(SchedulingPhase.STEADY);
         
-        for (Channel e : inEdges) {
+        for (InterFilterChannel e : inEdges) {
             Filter parent = e.getSrc().getParent();
             parents.add(parent);
         }
@@ -523,7 +519,7 @@ public class SynchRemover {
      */
     private static Filter[] getChildSlices(Filter slice) {
         LinkedList<Filter> children = new LinkedList<Filter>();
-        Channel[] outEdges = slice.getOutputNode().getDestList(SchedulingPhase.STEADY);
+        InterFilterChannel[] outEdges = slice.getOutputNode().getDestList(SchedulingPhase.STEADY);
         
         for (int i=0; i<outEdges.length; i++) {
             Filter child = outEdges[i].getDest().getParent();

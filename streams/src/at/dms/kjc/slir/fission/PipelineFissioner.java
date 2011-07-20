@@ -118,8 +118,8 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
-        Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getOutputNode().getDestFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // If sources are fizzed
         if(isFizzed(sources[0])) {
@@ -170,8 +170,8 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
-        Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getOutputNode().getDestFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // Check to see if Slice is a source/sink.  Don't fizz source/sink.
         if(sources.length == 0 || dests.length == 0) {
@@ -203,7 +203,7 @@ public class PipelineFissioner {
         
         // Make sure that sources only push to this Slice
         for(int x = 0 ; x < sources.length ; x++) {
-            if(sources[x].getOutputNode().getDestSlices(SchedulingPhase.STEADY).size() > 1) {
+            if(sources[x].getOutputNode().getDestFilters(SchedulingPhase.STEADY).size() > 1) {
                 if(debug) System.out.println("Can't fizz: Sources for Slice send to other Slices");
                 return false;
             }
@@ -211,7 +211,7 @@ public class PipelineFissioner {
 
         // Make sure that dests only pop from this Slice
         for(int x = 0 ; x < dests.length ; x++) {
-            if(dests[x].getInputNode().getSourceSlices(SchedulingPhase.STEADY).size() > 1) {
+            if(dests[x].getInputNode().getSourceFilters(SchedulingPhase.STEADY).size() > 1) {
                 if(debug) System.out.println("Can't fizz: Dests for Slice receives from other Slices");
                 return false;
             }
@@ -347,8 +347,8 @@ public class PipelineFissioner {
 
         // Get Slice sources and destinations, ordered by how they were
         // originally fizzed
-        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
-        Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getOutputNode().getDestFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         if(sources.length > 1)
             sources = sliceToFizzedCopies.get(sources[0]).toArray(new Filter[0]);
