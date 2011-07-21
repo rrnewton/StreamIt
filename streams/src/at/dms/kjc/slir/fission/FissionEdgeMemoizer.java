@@ -5,36 +5,37 @@ import java.util.HashMap;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.Channel;
+import at.dms.kjc.slir.InterFilterChannel;
 import at.dms.kjc.slir.OutputNode;
 
 public class FissionEdgeMemoizer {
-    private static HashMap<EdgeDescriptor, Channel> edges =
-        new HashMap<EdgeDescriptor, Channel>();
+    private static HashMap<EdgeDescriptor, InterFilterChannel> edges =
+        new HashMap<EdgeDescriptor, InterFilterChannel>();
 
     public static void reset() {
         edges.clear();
     }
 
-    public static void addEdge(Channel edge) {
+    public static void addEdge(InterFilterChannel edge) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(edge);
 
         edges.put(edgeDscr, edge);
     }
 
-    public static Channel getEdge(OutputNode src, InputNode dest) {
+    public static InterFilterChannel getEdge(OutputNode src, InputNode dest) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(src, dest);      
 
-        Channel edge = edges.get(edgeDscr);
+        InterFilterChannel edge = edges.get(edgeDscr);
 
         if(edge == null) {
-            edge = new Channel(src.getParent(), dest.getParent());
+            edge = new InterFilterChannel(src, dest);
             edges.put(edgeDscr, edge);
         }
 
         return edge;
     }
 
-    public static Channel getEdge(Filter src, Filter dest) {
+    public static InterFilterChannel getEdge(Filter src, Filter dest) {
         return getEdge(src.getOutputNode(), dest.getInputNode());
     }
 
@@ -51,7 +52,7 @@ public class FissionEdgeMemoizer {
             this(src.getOutputNode(), dest.getInputNode());
         }
 
-        public EdgeDescriptor(Channel edge) {
+        public EdgeDescriptor(InterFilterChannel edge) {
             this(edge.getSrc(), edge.getDest());
         }
         

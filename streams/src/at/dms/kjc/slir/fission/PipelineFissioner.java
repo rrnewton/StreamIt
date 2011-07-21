@@ -24,7 +24,7 @@ import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.Channel;
+import at.dms.kjc.slir.InterFilterChannel;
 import at.dms.kjc.slir.MutableStateExtractor;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
@@ -69,8 +69,8 @@ public class PipelineFissioner {
         return array;
     }
 
-    private static Channel[] toArraySingle(LinkedList<Channel> list) {
-        Channel[] array = new Channel[list.size()];
+    private static InterFilterChannel[] toArraySingle(LinkedList<InterFilterChannel> list) {
+        InterFilterChannel[] array = new InterFilterChannel[list.size()];
 
         for(int x = 0 ; x < array.length ; x++)
             array[x] = list.get(x);
@@ -78,14 +78,14 @@ public class PipelineFissioner {
         return array;
     }
 
-    private static Channel[][] toArrayDouble(LinkedList<LinkedList<Channel>> list) {
-        Channel[][] array = new Channel[list.size()][];
+    private static InterFilterChannel[][] toArrayDouble(LinkedList<LinkedList<InterFilterChannel>> list) {
+        InterFilterChannel[][] array = new InterFilterChannel[list.size()][];
 
-        LinkedList<Channel> tempList;
+        LinkedList<InterFilterChannel> tempList;
         for(int x = 0 ; x < array.length ; x++) {
             tempList = list.get(x);
 
-            array[x] = new Channel[tempList.size()];
+            array[x] = new InterFilterChannel[tempList.size()];
             for(int y = 0 ; y < array[x].length ; y++) {
                 array[x][y] = tempList.get(y);
             }
@@ -94,7 +94,7 @@ public class PipelineFissioner {
         return array;
     }
 
-    private static Channel getEdge(Filter src, Filter dest) {
+    private static InterFilterChannel getEdge(Filter src, Filter dest) {
         return FissionEdgeMemoizer.getEdge(src, dest);
     }
     
@@ -313,8 +313,8 @@ public class PipelineFissioner {
 
         Filter sliceClones[] = new Filter[fizzAmount];
 
-        LinkedList<Channel> edgeSet;
-        LinkedList<LinkedList<Channel>> edgeSetSet;
+        LinkedList<InterFilterChannel> edgeSet;
+        LinkedList<LinkedList<InterFilterChannel>> edgeSetSet;
         LinkedList<Integer> weights;
 
         // Get information on Slice rates
@@ -364,22 +364,22 @@ public class PipelineFissioner {
 
         // Add edges surrounding the Slice to the edge memoizer, so that they 
         // can be reused later in fission
-        Set<Channel> origEdges;
+        Set<InterFilterChannel> origEdges;
         
         origEdges = slice.getInputNode().getSourceSet(SchedulingPhase.INIT);
-        for(Channel edge : origEdges)
+        for(InterFilterChannel edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
         origEdges = slice.getInputNode().getSourceSet(SchedulingPhase.STEADY);
-        for(Channel edge : origEdges)
+        for(InterFilterChannel edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
         origEdges = slice.getOutputNode().getDestSet(SchedulingPhase.INIT);
-        for(Channel edge : origEdges)
+        for(InterFilterChannel edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
         origEdges = slice.getOutputNode().getDestSet(SchedulingPhase.STEADY);
-        for(Channel edge : origEdges)
+        for(InterFilterChannel edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
         // Fill array with clones of Slice, put original copy first in array
@@ -512,10 +512,10 @@ public class PipelineFissioner {
         // Setup the splitter-joiner schedules to reflect that only the first
         // source Slice transmits and that only the first Slice clone receives.
  
-        edgeSetSet = new LinkedList<LinkedList<Channel>>();
+        edgeSetSet = new LinkedList<LinkedList<InterFilterChannel>>();
         weights = new LinkedList<Integer>();
 	
-        edgeSet = new LinkedList<Channel>();
+        edgeSet = new LinkedList<InterFilterChannel>();
         edgeSet.add(getEdge(sources[0], sliceClones[0]));
         edgeSetSet.add(edgeSet);
         weights.add(new Integer(1));
@@ -546,10 +546,10 @@ public class PipelineFissioner {
         // Setup the splitter-joiner schedules to reflect that only the first
         // Slice clone transmits and that only the first dest Slice receives.
 
-        edgeSetSet = new LinkedList<LinkedList<Channel>>();
+        edgeSetSet = new LinkedList<LinkedList<InterFilterChannel>>();
         weights = new LinkedList<Integer>();
 	
-        edgeSet = new LinkedList<Channel>();
+        edgeSet = new LinkedList<InterFilterChannel>();
         edgeSet.add(getEdge(sliceClones[0], dests[0]));
         edgeSetSet.add(edgeSet);
         weights.add(new Integer(1));
@@ -613,12 +613,12 @@ public class PipelineFissioner {
             int numSingle = (sliceSteadyMult * slicePop) - (slicePeek - slicePop);
 
             // Generate steady-state splitter schedule for source Slice
-            edgeSetSet = new LinkedList<LinkedList<Channel>>();
+            edgeSetSet = new LinkedList<LinkedList<InterFilterChannel>>();
             weights = new LinkedList<Integer>();
 
             for(int x = 0 ; x < fizzAmount ; x++) {
                 if(numDup > 0) {
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sources[0], sliceClones[(x + fizzAmount - 1) % fizzAmount]));
                     edgeSet.add(getEdge(sources[0], sliceClones[x]));
                     edgeSetSet.add(edgeSet);
@@ -626,7 +626,7 @@ public class PipelineFissioner {
                 }
 
                 if(numSingle > 0) {
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sources[0], sliceClones[x]));
                     edgeSetSet.add(edgeSet);
                     weights.add(new Integer(numSingle));
@@ -646,8 +646,8 @@ public class PipelineFissioner {
                     weights.addFirst(new Integer(weights.removeFirst().intValue() -
                                                  rotateAmount));
 
-                    edgeSet = new LinkedList<Channel>();
-                    for(Channel edge : edgeSetSet.getFirst())
+                    edgeSet = new LinkedList<InterFilterChannel>();
+                    for(InterFilterChannel edge : edgeSetSet.getFirst())
                         edgeSet.add(edge);
 
                     weights.add(new Integer(rotateAmount));
@@ -662,7 +662,7 @@ public class PipelineFissioner {
 
             // Generate steady-state joiner schedules for Slices clones
             for(int x = 0 ; x < fizzAmount ; x++) {
-                edgeSet = new LinkedList<Channel>();
+                edgeSet = new LinkedList<InterFilterChannel>();
                 weights = new LinkedList<Integer>();
 
                 edgeSet.add(getEdge(sources[0], sliceClones[x]));
@@ -729,7 +729,7 @@ public class PipelineFissioner {
             for(int x = 0 ; x < fizzAmount ; x++) {
                 //System.out.println("Source slice #" + x);
 
-                edgeSetSet = new LinkedList<LinkedList<Channel>>();
+                edgeSetSet = new LinkedList<LinkedList<InterFilterChannel>>();
                 weights = new LinkedList<Integer>();
 
                 if(numDup1 > 0) {
@@ -737,7 +737,7 @@ public class PipelineFissioner {
                     System.out.println("    Edge: " + x + " -> " + (x + fizzAmount - 1) % fizzAmount);
                     System.out.println("    Edge: " + x + " -> " + x);
                     System.out.println("    Weight: " + numDup1);*/
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sources[x], sliceClones[(x + fizzAmount - 1) % fizzAmount]));
                     edgeSet.add(getEdge(sources[x], sliceClones[x]));
                     edgeSetSet.add(edgeSet);
@@ -748,7 +748,7 @@ public class PipelineFissioner {
                     /*System.out.println("  EdgeSet");
                     System.out.println("    Edge: " + x + " -> " + x);
                     System.out.println("    Weight: " + numSingle1);*/
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sources[x], sliceClones[x]));
                     edgeSetSet.add(edgeSet);
                     weights.add(new Integer(numSingle1));
@@ -759,7 +759,7 @@ public class PipelineFissioner {
                     System.out.println("    Edge: " + x + " -> " + x);
                     System.out.println("    Edge: " + x + " -> " + (x + 1) % fizzAmount);
                     System.out.println("    Weight: " + numDup2);*/
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sources[x], sliceClones[x]));
                     edgeSet.add(getEdge(sources[x], sliceClones[(x + 1) % fizzAmount]));
                     edgeSetSet.add(edgeSet);
@@ -770,7 +770,7 @@ public class PipelineFissioner {
                     /*System.out.println("  EdgeSet");
                     System.out.println("    Edge: " + x + " -> " + (x + 1) % fizzAmount);
                     System.out.println("    Weight: " + numSingle2);*/
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sources[x], sliceClones[(x + 1) % fizzAmount]));
                     edgeSetSet.add(edgeSet);
                     weights.add(new Integer(numSingle2));
@@ -781,7 +781,7 @@ public class PipelineFissioner {
             }
     
             // Generate steady-state joiner schedules for Slice clones
-            edgeSet = new LinkedList<Channel>();
+            edgeSet = new LinkedList<InterFilterChannel>();
             weights = new LinkedList<Integer>();
 
             if((sliceSteadyMult * slicePop) + (slicePeek - slicePop) - sliceCopyDown > 0) {
@@ -800,7 +800,7 @@ public class PipelineFissioner {
             sliceClones[0].getInputNode().setSources(toArraySingle(edgeSet));
 
             for(int x = 1 ; x < fizzAmount ; x++) {
-                edgeSet = new LinkedList<Channel>();
+                edgeSet = new LinkedList<InterFilterChannel>();
                 weights = new LinkedList<Integer>();
 
                 if(sliceCopyDown > 0) {
@@ -840,10 +840,10 @@ public class PipelineFissioner {
 
             // Generate steady-state splitter schedules for Slice clones
             for(int x = 0 ; x < fizzAmount ; x++) {
-                edgeSetSet = new LinkedList<LinkedList<Channel>>();
+                edgeSetSet = new LinkedList<LinkedList<InterFilterChannel>>();
                 weights = new LinkedList<Integer>();
 
-                edgeSet = new LinkedList<Channel>();
+                edgeSet = new LinkedList<InterFilterChannel>();
                 edgeSet.add(getEdge(sliceClones[x], dests[0]));
                 edgeSetSet.add(edgeSet);
                 weights.add(new Integer(1));
@@ -853,7 +853,7 @@ public class PipelineFissioner {
             }
 
             // Generate steady-state joiner schedule for destination Slice
-            edgeSet = new LinkedList<Channel>();
+            edgeSet = new LinkedList<InterFilterChannel>();
             weights = new LinkedList<Integer>();
 
             for(int x = 0 ; x < fizzAmount ; x++) {
@@ -918,11 +918,11 @@ public class PipelineFissioner {
 
             // Generate steady-state splitter schedules for Slices clones
             for(int x = 0 ; x < fizzAmount ; x++) {
-                edgeSetSet = new LinkedList<LinkedList<Channel>>();
+                edgeSetSet = new LinkedList<LinkedList<InterFilterChannel>>();
                 weights = new LinkedList<Integer>();
 
                 if(numDup1 > 0) {
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sliceClones[x], dests[(x + fizzAmount - 1) % fizzAmount]));
                     edgeSet.add(getEdge(sliceClones[x], dests[x]));
                     edgeSetSet.add(edgeSet);
@@ -930,14 +930,14 @@ public class PipelineFissioner {
                 }
 
                 if(numSingle1 > 0) {
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sliceClones[x], dests[x]));
                     edgeSetSet.add(edgeSet);
                     weights.add(new Integer(numSingle1));
                 }
 
                 if(numDup2 > 0) {
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sliceClones[x], dests[x]));
                     edgeSet.add(getEdge(sliceClones[x], dests[(x + 1) % fizzAmount]));
                     edgeSetSet.add(edgeSet);
@@ -945,7 +945,7 @@ public class PipelineFissioner {
                 }
 
                 if(numSingle2 > 0) {
-                    edgeSet = new LinkedList<Channel>();
+                    edgeSet = new LinkedList<InterFilterChannel>();
                     edgeSet.add(getEdge(sliceClones[x], dests[(x + 1) % fizzAmount]));
                     edgeSetSet.add(edgeSet);
                     weights.add(new Integer(numSingle2));
@@ -956,7 +956,7 @@ public class PipelineFissioner {
             }
 
             // Generate steady-state joiner schedule for destination Slice
-            edgeSet = new LinkedList<Channel>();
+            edgeSet = new LinkedList<InterFilterChannel>();
             weights = new LinkedList<Integer>();
 
             edgeSet.add(getEdge(sliceClones[0], dests[0]));
@@ -971,7 +971,7 @@ public class PipelineFissioner {
             sliceClones[0].getInputNode().setSources(toArraySingle(edgeSet));
 
             for(int x = 1 ; x < fizzAmount ; x++) {
-                edgeSet = new LinkedList<Channel>();
+                edgeSet = new LinkedList<InterFilterChannel>();
                 weights = new LinkedList<Integer>();
 
                 if(destCopyDown > 0) {
