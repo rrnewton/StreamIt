@@ -201,7 +201,7 @@ public class InterSliceEdge extends Edge implements at.dms.kjc.DeepCloneable, Co
             this.dest = dest;
         }
         
-        public EdgeDescriptor(Slice src, Slice dest) {
+        public EdgeDescriptor(Filter src, Filter dest) {
             this(src.getTail(), dest.getHead());
         }
 

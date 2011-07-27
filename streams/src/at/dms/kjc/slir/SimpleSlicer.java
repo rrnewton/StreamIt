@@ -36,11 +36,11 @@ public class SimpleSlicer extends SIRSlicer {
         System.out.println("Slice Work Threshold: " + TRASHOLD + "(" + KjcOptions.slicethresh + ")");
     }
 
-    public Slice[] partition() {
+    public Filter[] partition() {
         LinkedList<UnflatFilter> queue = new LinkedList<UnflatFilter>();
         HashSet<UnflatFilter> visited = new HashSet<UnflatFilter>();
-        LinkedList<Slice> slices = new LinkedList<Slice>();
-        LinkedList<Slice> topSlicesList = new LinkedList<Slice>(); // slices with no
+        LinkedList<Filter> slices = new LinkedList<Filter>();
+        LinkedList<Filter> topSlicesList = new LinkedList<Filter>(); // slices with no
         // incoming dependencies
         HashSet<UnflatFilter> topUnflat = new HashSet<UnflatFilter>();
 
@@ -63,7 +63,7 @@ public class SimpleSlicer extends SIRSlicer {
                 workEstimation.put(filterContent, new Long(workEstimate));
 
                 SliceNode node;
-                Slice slice;
+                Filter slice;
                 int filtersInSlice = 1;
 
                 //System.out.println("** Creating slice with first filter = "
@@ -88,7 +88,7 @@ public class SimpleSlicer extends SIRSlicer {
                             edge.setDest((InputSliceNode) node);
                         inEdges[i] = edge;
                     }
-                    slice = new Slice((InputSliceNode) node);
+                    slice = new Filter((InputSliceNode) node);
 
                     if (filterContent.isLinear()) { // Jasper's linear stuff??
                         System.out
@@ -139,7 +139,7 @@ public class SimpleSlicer extends SIRSlicer {
                     }
                 } else { // null incoming arcs
                     node = new FilterSliceNode(filterContent);
-                    slice = new Slice(node);
+                    slice = new Filter(node);
                 }
 
                 if (topUnflat.contains(unflatFilter)) {
@@ -254,17 +254,17 @@ public class SimpleSlicer extends SIRSlicer {
     }
 
     private void setupIO() {
-        Slice[] sliceGraph = getSliceGraph();
+        Filter[] sliceGraph = getSliceGraph();
         int len = sliceGraph.length;
         int newLen = len;
         for (int i = 0; i < len; i++)
             if (((FilterSliceNode) sliceGraph[i].getHead().getNext())
                 .isPredefined())
                 newLen--;
-        io = new Slice[len - newLen];
+        io = new Filter[len - newLen];
         int idx = 0;
         for (int i = 0; i < len; i++) {
-            Slice slice = sliceGraph[i];
+            Filter slice = sliceGraph[i];
             if (((FilterSliceNode) slice.getHead().getNext()).isPredefined()) {
                 io[idx++] = slice;
                 System.out.println(slice + " is i/o slice.");

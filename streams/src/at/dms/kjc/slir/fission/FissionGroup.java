@@ -1,21 +1,21 @@
 package at.dms.kjc.slir.fission;
 
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.backendSupport.FilterInfo;
 
 public class FissionGroup {
-    public Slice unfizzedSlice;
+    public Filter unfizzedSlice;
     public FilterInfo unfizzedFilterInfo;
 
-    public Slice[] fizzedSlices;
+    public Filter[] fizzedSlices;
 
-    public FissionGroup(Slice unfizzedSlice, FilterInfo unfizzedFilterInfo, Slice[] fizzedSlices) {
+    public FissionGroup(Filter unfizzedSlice, FilterInfo unfizzedFilterInfo, Filter[] fizzedSlices) {
         this.unfizzedSlice = unfizzedSlice;
         this.unfizzedFilterInfo = unfizzedFilterInfo;
         this.fizzedSlices = fizzedSlices;
     }
 
-    public Slice getUnfizzedSlice() {
+    public Filter getUnfizzedSlice() {
         return unfizzedSlice;
     }
 
@@ -23,11 +23,11 @@ public class FissionGroup {
         return unfizzedFilterInfo;
     }
 
-    public Slice[] getFizzedSlices() {
+    public Filter[] getFizzedSlices() {
         return fizzedSlices;
     }
 
-    public int getFizzedSliceIndex(Slice slice) {
+    public int getFizzedSliceIndex(Filter slice) {
         int index = -1;
         for(int x = 0 ; x < fizzedSlices.length ; x++) {
             if(fizzedSlices[x].equals(slice)) {

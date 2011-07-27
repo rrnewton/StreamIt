@@ -29,11 +29,11 @@ public class FlattenAndPartition extends SIRSlicer {
 
     private HashMap<OutputSliceNode, HashMap<InputSliceNode, InterSliceEdge>> edges;
 
-    private Slice topSlice;
+    private Filter topSlice;
 
-    private LinkedList<Slice> sliceList;
+    private LinkedList<Filter> sliceList;
 
-    private LinkedList<Slice> ioList;
+    private LinkedList<Filter> ioList;
     
     public HashSet<FilterSliceNode> generatedIds;
 
@@ -43,8 +43,8 @@ public class FlattenAndPartition extends SIRSlicer {
         workEstimation = new HashMap<FilterContent, Long>();
     }
 
-    public Slice[] partition() {
-        Slice[] sliceGraph = getSliceGraph();
+    public Filter[] partition() {
+        Filter[] sliceGraph = getSliceGraph();
         return sliceGraph;
     }
 
@@ -54,8 +54,8 @@ public class FlattenAndPartition extends SIRSlicer {
         GraphFlattener fg = new GraphFlattener(str);
         sliceNodes = new SIRToSliceNodes();
         sliceNodes.createNodes(fg.top, exeCounts);
-        sliceList = new LinkedList<Slice>();
-        ioList = new LinkedList<Slice>();
+        sliceList = new LinkedList<Filter>();
+        ioList = new LinkedList<Filter>();
         work = WorkEstimate.getWorkEstimate(str);
         edges = new HashMap<OutputSliceNode, HashMap<InputSliceNode, InterSliceEdge>>();
 
@@ -64,7 +64,7 @@ public class FlattenAndPartition extends SIRSlicer {
         //System.out.println("Slices: " + sliceList.size());
         //sliceGraph = sliceList.toArray(new Slice[sliceList.size()]);
                 
-        io = ioList.toArray(new Slice[ioList.size()]);
+        io = ioList.toArray(new Filter[ioList.size()]);
         //for (FilterSliceNode id : sliceNodes.generatedIds) {
         //	IDSliceRemoval.doit(id.getParent());
         //}
@@ -86,7 +86,7 @@ public class FlattenAndPartition extends SIRSlicer {
             assert input != null && output != null && filterNode != null;
 
             // set up the slice
-            Slice slice = new Slice(input);
+            Filter slice = new Filter(input);
             input.setNext(filterNode);
             filterNode.setPrevious(input);
             filterNode.setNext(output);
@@ -195,7 +195,7 @@ public class FlattenAndPartition extends SIRSlicer {
                 topSlice = slice;
             sliceList.add(slice);
         }
-        topSlices = new LinkedList<Slice>();
+        topSlices = new LinkedList<Filter>();
         topSlices.add(topSlice); 
         System.out.println(topSlices);
     }

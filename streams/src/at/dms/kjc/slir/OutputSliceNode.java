@@ -386,8 +386,8 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * 
      * @return a set of all the destination slices of this output slice node.
      */
-    public Set<Slice> getDestSlices(SchedulingPhase phase) {
-        HashSet<Slice> dests = new HashSet<Slice>();
+    public Set<Filter> getDestSlices(SchedulingPhase phase) {
+        HashSet<Filter> dests = new HashSet<Filter>();
         
         for (InterSliceEdge edge : getDestSet(phase)) {
             dests.add(edge.getDest().getParent());

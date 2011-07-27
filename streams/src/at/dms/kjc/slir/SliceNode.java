@@ -11,7 +11,7 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
     private IntraSliceEdge toNext = null;  // internal to slice: remains null for OutputSliceNode
     private IntraSliceEdge toPrev = null;  // internal to slice: remains null for InputSliceNode
 
-    private Slice parent;
+    private Filter parent;
 
     public SliceNode getNext() {
         return (toNext == null)? null : toNext.getDest();
@@ -98,11 +98,11 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
     protected SliceNode() {
     }
     
-    public void setParent(Slice par) {
+    public void setParent(Filter par) {
         parent = par;
     }
 
-    public Slice getParent() {
+    public Filter getParent() {
         assert parent != null : "parent not set for slice node";
         return parent;
     }
@@ -121,7 +121,7 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
     protected void deepCloneInto(at.dms.kjc.slir.SliceNode other) {
         other.toNext = this.toNext;
         other.toPrev = this.toPrev;
-        other.parent = (at.dms.kjc.slir.Slice)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
+        other.parent = (at.dms.kjc.slir.Filter)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

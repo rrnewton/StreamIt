@@ -22,12 +22,12 @@ public class Util {
      * @param slices a list of Slice's.
      * @return An Iterator over SliceNode's.
      */
-    public static Iterator<SliceNode> sliceNodeTraversal(List<Slice> slices) {
+    public static Iterator<SliceNode> sliceNodeTraversal(List<Filter> slices) {
         LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
         ListIterator it = slices.listIterator();
     
         while (it.hasNext()) {
-            Slice slice = (Slice) it.next();
+            Filter slice = (Filter) it.next();
             SliceNode sliceNode = slice.getHead();
             while (sliceNode != null) {
                 trav.add(sliceNode);
@@ -46,7 +46,7 @@ public class Util {
      * @param slices an array of Slice's.
      * @return An Iterator over SliceNodes.
      */
-    public static Iterator<SliceNode> sliceNodeTraversal(Slice[] slices) {
+    public static Iterator<SliceNode> sliceNodeTraversal(Filter[] slices) {
         LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
     
         for (int i = 0; i < slices.length; i++) {

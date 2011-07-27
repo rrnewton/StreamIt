@@ -17,8 +17,8 @@ public class InstallInitDistributions {
      * init schedule for input and output slice nodes by setting to empty if nothing done or
      * setting to init if something done. 
      */  
-    public static void doit(Slice[] slices) {
-        for (Slice slice : slices) {
+    public static void doit(Filter[] slices) {
+        for (Filter slice : slices) {
             FilterInfo fi = FilterInfo.getFilterInfo(slice.getFirstFilter());
             //do input slice node
             if (fi.totalItemsReceived(SchedulingPhase.INIT) > 0) {

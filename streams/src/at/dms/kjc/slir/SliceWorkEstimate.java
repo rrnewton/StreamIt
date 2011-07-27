@@ -59,15 +59,15 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
      */
     private long work;
     
-    private Slice slice;
+    private Filter slice;
     
-    private SliceWorkEstimate(Slice slice) {
+    private SliceWorkEstimate(Filter slice) {
         this.work = 0;
         this.slice = slice;
         methodsBeingProcessed = new HashSet<JMethodDeclaration>();
     }
     
-    private SliceWorkEstimate(Slice slice, Set<JMethodDeclaration> methodsBeingProcessed) {
+    private SliceWorkEstimate(Filter slice, Set<JMethodDeclaration> methodsBeingProcessed) {
         this.work = 0;
         this.slice = slice;
         this.methodsBeingProcessed = methodsBeingProcessed;
@@ -78,7 +78,7 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
      * Returns estimate of work function in <pre>filter</pre> multiplied by the steady-state
      * multiplicity.
      */
-    public static long getWork(Slice slice) {
+    public static long getWork(Filter slice) {
         // if no work function (e.g., identity filters?) return 0
         if (slice.getFirstFilter().isPredefined()) {
             return 0;
@@ -98,7 +98,7 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
     /**
      * Returns estimate of work in <pre>node</pre> of <pre>filter</pre>, use on first call only.
      */
-    private static long getWork(Slice slice, JPhylum node) {
+    private static long getWork(Filter slice, JPhylum node) {
         SliceWorkEstimate visitor = new SliceWorkEstimate(slice);
         node.accept(visitor);
         return visitor.work;
@@ -107,7 +107,7 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
     /**
      * Returns estimate of work in <pre>node</pre> of <pre>filter</pre>, use on internal calls.
      */
-    private static long getWork(Slice slice, JPhylum node, Set<JMethodDeclaration> methodsBeingProcessed ) {
+    private static long getWork(Filter slice, JPhylum node, Set<JMethodDeclaration> methodsBeingProcessed ) {
         SliceWorkEstimate visitor = new SliceWorkEstimate(slice, methodsBeingProcessed);
         node.accept(visitor);
         return visitor.work;

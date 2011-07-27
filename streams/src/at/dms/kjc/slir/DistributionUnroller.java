@@ -15,8 +15,8 @@ import java.util.ArrayList;
  */
 public class DistributionUnroller {
    
-    public static void test(Slice[] slices) {
-        for (Slice slice : slices) {
+    public static void test(Filter[] slices) {
+        for (Filter slice : slices) {
             InputSliceNode input = slice.getHead();
             OutputSliceNode output = slice.getTail();
             
@@ -43,8 +43,8 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of all the slices in <slices>.
      */
-    public static void roll(Slice[] slices) {
-        for (Slice slice : slices) {
+    public static void roll(Filter[] slices) {
+        for (Filter slice : slices) {
             roll(slice);
         }
     }
@@ -53,7 +53,7 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of <slice>.   
      */
-    public static void roll(Slice slice) {
+    public static void roll(Filter slice) {
         InputSliceNode input = slice.getHead();
         OutputSliceNode output = slice.getTail();
         
@@ -71,8 +71,8 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of all the slices in <slices>.
      */
-    public static void unroll(Slice[] slices) {
-        for (Slice slice : slices) {
+    public static void unroll(Filter[] slices) {
+        for (Filter slice : slices) {
             unroll(slice);
         }
     }
@@ -81,7 +81,7 @@ public class DistributionUnroller {
      * Unroll the distribution pattern for the input and output slice nodes
      * of <slice>.   
      */
-    public static void unroll(Slice slice) {
+    public static void unroll(Filter slice) {
         InputSliceNode input = slice.getHead();
         OutputSliceNode output = slice.getTail();
         unroll(input);

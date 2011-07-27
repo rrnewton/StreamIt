@@ -30,7 +30,7 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
  */
 public abstract class SIRSlicer extends Slicer {
     // Slice->Long for bottleNeck work estimation
-    protected HashMap<Slice, Long> sliceBNWork;
+    protected HashMap<Filter, Long> sliceBNWork;
 
     /** The startup cost of a filter when starting a slice */
     protected HashMap<FilterSliceNode, Integer> filterStartupCost;
@@ -49,7 +49,7 @@ public abstract class SIRSlicer extends Slicer {
     /** This hashmap maps a Slice to the FilterSliceNode that
      * has the most work;
      */ 
-    protected HashMap<Slice, FilterSliceNode> bottleNeckFilter;
+    protected HashMap<Filter, FilterSliceNode> bottleNeckFilter;
     
     /**
      * This hashmap store the filters work plus any blocking that is
@@ -85,11 +85,11 @@ public abstract class SIRSlicer extends Slicer {
         this.lfa = lfa;
         this.work = work;
         if (topFilters != null)
-            topSlices = new LinkedList<Slice>();
-        sliceBNWork = new HashMap<Slice, Long>();
+            topSlices = new LinkedList<Filter>();
+        sliceBNWork = new HashMap<Filter, Long>();
         steadyMult = KjcOptions.steadymult;
         filterStartupCost = new HashMap<FilterSliceNode, Integer>();
-        bottleNeckFilter = new HashMap<Slice, FilterSliceNode>();
+        bottleNeckFilter = new HashMap<Filter, FilterSliceNode>();
         filterOccupancy = new HashMap<FilterSliceNode, Long>();
         genIdWorks = new HashMap<SIRFilter, Integer>();
         sirToContent = new HashMap<SIRFilter, FilterContent>();
@@ -99,14 +99,14 @@ public abstract class SIRSlicer extends Slicer {
      * Partition the stream graph into slices (slices) and return the slices.
      * @return The slices (slices) of the partitioned graph. 
      */
-    public abstract Slice[] partition();
+    public abstract Filter[] partition();
 
     /**
      * Check for I/O in slice
      * @param slice
      * @return Return true if this slice is an IO slice (file reader/writer).
      */
-    public boolean isIO(Slice slice) {
+    public boolean isIO(Filter slice) {
         for (int i = 0; i < io.length; i++) {
             if (slice == io[i])
                 return true;
@@ -118,9 +118,9 @@ public abstract class SIRSlicer extends Slicer {
      *  Get just top level slices in the slice graph.
      * @return top level slices
      */
-    public Slice[] getTopSlices() {
+    public Filter[] getTopSlices() {
         assert topSlices != null;
-        return topSlices.toArray(new Slice[topSlices.size()]);
+        return topSlices.toArray(new Filter[topSlices.size()]);
     }
 
     /**
@@ -128,7 +128,7 @@ public abstract class SIRSlicer extends Slicer {
      * 
      * @param slices The slice list to install as the new slice graph.
      */
-    private void setSliceGraph(Slice[] slices) {
+    private void setSliceGraph(Filter[] slices) {
         
         //perform some checks on the slice graph...
         for (int i = 0; i < slices.length; i++) {
@@ -149,8 +149,8 @@ public abstract class SIRSlicer extends Slicer {
      * 
      * @return True if the slice graph contains slice.
      */
-    public boolean containsSlice(Slice slice) {
-        Slice[] sliceGraph = getSliceGraph();
+    public boolean containsSlice(Filter slice) {
+        Filter[] sliceGraph = getSliceGraph();
         for (int i = 0; i < sliceGraph.length; i++) 
             if (sliceGraph[i] == slice)
                 return true;
@@ -172,7 +172,7 @@ public abstract class SIRSlicer extends Slicer {
      * @param slice The slice to add the node to.
      */
     public void addFilterToSlice(FilterSliceNode node, 
-            Slice slice) {
+            Filter slice) {
         long workEst = workEst(node);
         
         //add the node to the work estimation
@@ -192,7 +192,7 @@ public abstract class SIRSlicer extends Slicer {
      *  
      * @param slices The new slice graph.
      */
-    public void setSliceGraphNewIds(Slice[] slices) {
+    public void setSliceGraphNewIds(Filter[] slices) {
         //add the new filters to the necessary structures...
         for (int i = 0; i < slices.length; i++) {
             if (!containsSlice(slices[i])) {
@@ -248,7 +248,7 @@ public abstract class SIRSlicer extends Slicer {
      * @return The work estimation for the slice (the estimation for the filter that does the
      * most work for one steady-state mult of the filter multipled by the steady state multiplier.
      */
-    public long getSliceBNWork(Slice slice) {
+    public long getSliceBNWork(Filter slice) {
         assert sliceBNWork.containsKey(slice);
         return sliceBNWork.get(slice).longValue() * steadyMult;
     }
@@ -267,7 +267,7 @@ public abstract class SIRSlicer extends Slicer {
      * @param slice
      * @return Return the filter of slice that does the most work. 
      */
-    public FilterSliceNode getSliceBNFilter(Slice slice) {
+    public FilterSliceNode getSliceBNFilter(Filter slice) {
         assert bottleNeckFilter.containsKey(slice);
         return (FilterSliceNode)bottleNeckFilter.get(slice);
     }
@@ -279,9 +279,9 @@ public abstract class SIRSlicer extends Slicer {
     }
 
     private void calcOccupancy() {
-        Slice[] slices = getSliceGraph();
+        Filter[] slices = getSliceGraph();
         for (int i = 0; i < slices.length; i++) {
-            Slice slice = slices[i];
+            Filter slice = slices[i];
             //start off with the first filter
             //and go forwards to find pipelining effects
             
@@ -377,7 +377,7 @@ public abstract class SIRSlicer extends Slicer {
      *
      */
     private void calcStartupCost() {
-        Slice[] slices = getSliceGraph();
+        Filter[] slices = getSliceGraph();
         for (int i = 0; i < slices.length; i++) {
             long maxWork;
             FilterSliceNode maxFilter;
@@ -424,18 +424,18 @@ public abstract class SIRSlicer extends Slicer {
     }
     // dump the the completed partition to a dot file
     public void dumpGraph(String filename) {
-        Slice[] sliceGraph = getSliceGraph();
+        Filter[] sliceGraph = getSliceGraph();
         StringBuffer buf = new StringBuffer();
         buf.append("digraph Flattend {\n");
         buf.append("size = \"8, 10.5\";\n");
 
         for (int i = 0; i < sliceGraph.length; i++) {
-            Slice slice = sliceGraph[i];
+            Filter slice = sliceGraph[i];
             assert slice != null;
             buf.append(slice.hashCode() + " [ " + 
                     sliceName(slice) + 
                     "\" ];\n");
-            Slice[] next = getNext(slice/* ,parent */);
+            Filter[] next = getNext(slice/* ,parent */);
             for (int j = 0; j < next.length; j++) {
                 assert next[j] != null;
                 buf.append(slice.hashCode() + " -> " + next[j].hashCode()
@@ -456,7 +456,7 @@ public abstract class SIRSlicer extends Slicer {
     
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
-    protected Slice[] getNext(Slice slice) {
+    protected Filter[] getNext(Filter slice) {
         SliceNode node = slice.getHead();
         if (node instanceof InputSliceNode)
             node = node.getNext();
@@ -475,11 +475,11 @@ public abstract class SIRSlicer extends Slicer {
                         output.add(next);
                 }
             }
-            Slice[] out = new Slice[output.size()];
+            Filter[] out = new Filter[output.size()];
             output.toArray(out);
             return out;
         }
-        return new Slice[0];
+        return new Filter[0];
     }
 
     protected FilterContent getFilterContent(UnflatFilter f) {
@@ -511,7 +511,7 @@ public abstract class SIRSlicer extends Slicer {
     
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
-    protected  String sliceName(Slice slice) {
+    protected  String sliceName(Filter slice) {
         SliceNode node = slice.getHead();
 
         StringBuffer out = new StringBuffer();
@@ -576,7 +576,7 @@ public abstract class SIRSlicer extends Slicer {
     }
     
     /**
-     * Make sure that all the {@link Slice}s are {@link SimpleSlice}s.
+     * Make sure that all the {@link Filter}s are {@link SimpleSlice}s.
      */
     
     public void ensureSimpleSlices() {
@@ -584,17 +584,17 @@ public abstract class SIRSlicer extends Slicer {
         // Assume that topSlices, io, sliceBNWork.keys(), bottleNeckFilter.keys() 
         // are all proper subsets of sliceGraph.
         List<SimpleSlice> newSliceGraph = new LinkedList<SimpleSlice>();
-        Map<Slice,SimpleSlice> newtopSlices = new HashMap<Slice,SimpleSlice>();
-        for (Slice s : topSlices) {newtopSlices.put(s, null);}
-        Map<Slice,SimpleSlice> newIo = new HashMap<Slice,SimpleSlice>();
-        for (Slice s : io) {newIo.put(s,null);}
+        Map<Filter,SimpleSlice> newtopSlices = new HashMap<Filter,SimpleSlice>();
+        for (Filter s : topSlices) {newtopSlices.put(s, null);}
+        Map<Filter,SimpleSlice> newIo = new HashMap<Filter,SimpleSlice>();
+        for (Filter s : io) {newIo.put(s,null);}
         
         // for each slice s, derived initial simple slice ss1, following simple slices ss2 ... ssn
         // add to ss1 ... ssn to newSliceGraph,
         // replace newtopSlices: s |-> null with s -> ss1
         // replace newIo: s |-> null with s -> ss1
-        Slice[] sliceGraph = getSliceGraph();
-        for (Slice s : sliceGraph) {
+        Filter[] sliceGraph = getSliceGraph();
+        for (Filter s : sliceGraph) {
 //            if (s.getNumFilters() == 1) {
 //                SimpleSlice ss = new SimpleSlice(s.getHead(), s.getFilterNodes().get(0), s.getTail());
 //                newSliceGraph.add(ss);
@@ -652,8 +652,8 @@ public abstract class SIRSlicer extends Slicer {
             }
             
 //        }
-        Slice[] oldTopSlices = topSlices.toArray(new Slice[topSlices.size()]);
-        topSlices = new LinkedList<Slice>();
+        Filter[] oldTopSlices = topSlices.toArray(new Filter[topSlices.size()]);
+        topSlices = new LinkedList<Filter>();
         for (int i = 0; i < oldTopSlices.length; i++) {
             topSlices.add(newtopSlices.get(oldTopSlices[i]));
             assert topSlices.get(i) != null;
@@ -663,9 +663,9 @@ public abstract class SIRSlicer extends Slicer {
             assert io[i] != null;
         }
         // update bottleNeckFilter, sliceBNWork.
-        bottleNeckFilter = new HashMap<Slice, FilterSliceNode>();
-        sliceBNWork = new HashMap<Slice, Long>();
-        for (Slice s : sliceGraph) {
+        bottleNeckFilter = new HashMap<Filter, FilterSliceNode>();
+        sliceBNWork = new HashMap<Filter, Long>();
+        for (Filter s : sliceGraph) {
             SimpleSlice ss = (SimpleSlice)s;
             long workEst = workEst(ss.getBody());
             sliceBNWork.put(ss, workEst);
@@ -677,7 +677,7 @@ public abstract class SIRSlicer extends Slicer {
      * Force creation of kopi methods and fields for predefined filters.
      */
     public void createPredefinedContent() {
-        for (Slice s : getSliceGraph()) {
+        for (Filter s : getSliceGraph()) {
             for (FilterSliceNode n : s.getFilterNodes()) {
                 if (n.getFilter() instanceof PredefinedContent) {
                     ((PredefinedContent)n.getFilter()).createContent();

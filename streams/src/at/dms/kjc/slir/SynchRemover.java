@@ -16,14 +16,14 @@ import at.dms.kjc.flatgraph.DataFlowTraversal;
 public class SynchRemover {
 
     // The topmost slice of the graph
-    private Slice topSlice;
+    private Filter topSlice;
     
-    private LinkedList<Slice> slicelist;
+    private LinkedList<Filter> slicelist;
     
     // List of all identity filters (including splitters and joiners) found
     // during the first pass through the stream graph. These will be processed
     // in the removeSynch() method
-    private final LinkedList<Slice> identities = new LinkedList<Slice>();
+    private final LinkedList<Filter> identities = new LinkedList<Filter>();
     
     // Maps each output edge to its steady-state sequence of outputs
     private final HashMap<InterSliceEdge,SSSequence> outMap = 
@@ -33,9 +33,9 @@ public class SynchRemover {
      * Constructs a new <tt>SynchRemover</tt>.
      * @param topSlice The root slice of the stream graph
      */
-    public SynchRemover(Slice topSlice) {
+    public SynchRemover(Filter topSlice) {
         this.topSlice = topSlice;
-        slicelist = DataFlowOrder.getTraversal(new Slice[]{topSlice});
+        slicelist = DataFlowOrder.getTraversal(new Filter[]{topSlice});
     }
     
     /**
@@ -49,8 +49,8 @@ public class SynchRemover {
         System.out.println("SynchRemover done!\n");
     }
     
-    public Slice[] getSliceGraph() {
-        return slicelist.toArray(new Slice[slicelist.size()]);
+    public Filter[] getSliceGraph() {
+        return slicelist.toArray(new Filter[slicelist.size()]);
     }
     
     /**
@@ -63,7 +63,7 @@ public class SynchRemover {
      * @param current
      */
     private void createSSSequences() {
-        for (Slice current : slicelist) {
+        for (Filter current : slicelist) {
 
             System.out.println(current.toString());
 
@@ -88,7 +88,7 @@ public class SynchRemover {
      * for all of the outgoing InterSliceEdges. 
      * @param current
      */
-    private void createSSOutput(Slice current) {
+    private void createSSOutput(Filter current) {
         // index to keep track of the output
         int index = 1;
         int sumweights = current.getTail().totalWeights(SchedulingPhase.STEADY);
@@ -113,8 +113,8 @@ public class SynchRemover {
         while (!identities.isEmpty()) {
             HashMap<InterSliceEdge,SSSequence> inMap = new HashMap<InterSliceEdge,SSSequence>();
             
-            Slice id = identities.removeFirst();
-            Slice[] parents = id.getDependencies(SchedulingPhase.STEADY);
+            Filter id = identities.removeFirst();
+            Filter[] parents = id.getDependencies(SchedulingPhase.STEADY);
             int[] inweights = id.getHead().getWeights(SchedulingPhase.STEADY);
             int inweightsum = id.getHead().totalWeights(SchedulingPhase.STEADY);
             
@@ -138,7 +138,7 @@ public class SynchRemover {
             // Go through parents to calculate lcm's and extract output SSSequences
             // from the HashMap of InterSliceEdges
             for (int i=0; i<parents.length; i++) {
-                Slice parent = parents[i];
+                Filter parent = parents[i];
                 
                 // Find output SSSequence from the InterSliceEdge
                 InterSliceEdge e = getEdgeBetween(parent, id);
@@ -165,7 +165,7 @@ public class SynchRemover {
             // in inMap, keyed by the edge
             for (int i=0; i<parents.length; i++) {
                 // retrieve information for ith parent
-                Slice parent = parents[i];
+                Filter parent = parents[i];
                 InterSliceEdge[][] parentOutEdges = parent.getTail().getDests(SchedulingPhase.STEADY);
                 int[] weights = parent.getTail().getWeights(SchedulingPhase.STEADY);
                 
@@ -233,7 +233,7 @@ public class SynchRemover {
             
             // create new outgoing edges for all of the parent slices
             for (int i=0; i<parents.length; i++) {
-                Slice parent = parents[i];
+                Filter parent = parents[i];
                 InterSliceEdge[][] parentOutEdges = parent.getTail().getDests(SchedulingPhase.STEADY);
                 int[] weights = parent.getTail().getWeights(SchedulingPhase.STEADY);
                 HashMap<Integer,LinkedList<InterSliceEdge>> newEdgesMap = 
@@ -313,7 +313,7 @@ public class SynchRemover {
         else return gcd(b, a%b);
     }
     
-    private static boolean isIdentity(Slice slice) {
+    private static boolean isIdentity(Filter slice) {
         for (FilterSliceNode fn : slice.getFilterNodes()) {
             if (!fn.getFilter().getName().startsWith("Identity"))
                 return false;
@@ -321,7 +321,7 @@ public class SynchRemover {
         return true;
     }
 
-    private static InterSliceEdge getEdgeBetween(Slice from, Slice to) {
+    private static InterSliceEdge getEdgeBetween(Filter from, Filter to) {
         for (InterSliceEdge e : from.getTail().getDestSequence(SchedulingPhase.STEADY)) {
             if (e.getDest() == to.getHead())
                 return e;
@@ -336,7 +336,7 @@ public class SynchRemover {
      * @param parents
      * @return
      */
-    private static boolean listContainsAny(LinkedList<Slice> identities, Slice[] parents) {
+    private static boolean listContainsAny(LinkedList<Filter> identities, Filter[] parents) {
         for (int i=0; i<parents.length; i++) {
             if (identities.contains(parents[i]))
                 return true;
@@ -352,7 +352,7 @@ public class SynchRemover {
      * @param sumweights The total sum of weights coming out of this Slice
      * @return
      */
-    private static SSSequence createSSSequence(Slice current, int index, int weight, int sumweights) {
+    private static SSSequence createSSSequence(Filter current, int index, int weight, int sumweights) {
         ArrayList<SSElement> list = new ArrayList<SSElement>();
         for (int i=0; i<weight; i++) {
             SSElement elt = new SSElement(current, index, sumweights);
@@ -377,9 +377,9 @@ public class SynchRemover {
      * @param mult The number of times to repeat the entire array
      * @return
      */
-    private static Slice[] makeRepeatedArray(Slice[] slices, int[] weights,
+    private static Filter[] makeRepeatedArray(Filter[] slices, int[] weights,
             int sumWeights, int mult) {
-        Slice[] repeatedArray = new Slice[sumWeights*mult];
+        Filter[] repeatedArray = new Filter[sumWeights*mult];
         int l = 0;
         for (int i=0; i<mult; i++) {
             for (int j=0; j<slices.length; j++) {
@@ -392,9 +392,9 @@ public class SynchRemover {
         return repeatedArray;
     }
     
-    private static ArrayList<Slice> makeRepeatedList(Slice[] slices, int[] weights,
+    private static ArrayList<Filter> makeRepeatedList(Filter[] slices, int[] weights,
             int mult) {
-        ArrayList<Slice> list = new ArrayList<Slice>();
+        ArrayList<Filter> list = new ArrayList<Filter>();
         for (int i=0; i<mult; i++) {
             for (int j=0; j<slices.length; j++) {
                 for (int k=0; k<weights[j]; k++) {
@@ -405,7 +405,7 @@ public class SynchRemover {
         return list;
     }
     
-    private static ArrayList<Slice> makeRepeatedOutputList(Slice s, int mult) {
+    private static ArrayList<Filter> makeRepeatedOutputList(Filter s, int mult) {
         return makeRepeatedList(getChildSlices(s), s.getTail().getWeights(SchedulingPhase.STEADY), mult);
     }
 
@@ -419,18 +419,18 @@ public class SynchRemover {
      * @param newWeights The list to store the condensed weights
      * @param newSlices The list to store the condensed slices
      */
-    private static void createNewSlicesWeightsLists(Slice[] repeatedOutput,
-            LinkedList<Integer> newWeights, LinkedList<Slice> newSlices) {
+    private static void createNewSlicesWeightsLists(Filter[] repeatedOutput,
+            LinkedList<Integer> newWeights, LinkedList<Filter> newSlices) {
         
         if (repeatedOutput == null || repeatedOutput.length == 0)
             return;
                 
         // Keeps track of the previous slice in order to count the number of
         // repeated slices
-        Slice prev = repeatedOutput[0];
+        Filter prev = repeatedOutput[0];
         int count = 0;
         for (int i=0; i<repeatedOutput.length; i++) {
-            Slice curr = repeatedOutput[i];
+            Filter curr = repeatedOutput[i];
             // If the current slice is the same as the previous, increment count
             if (curr == prev) {
                 count++;
@@ -459,11 +459,11 @@ public class SynchRemover {
      * @return
      */
     private static LinkedList<LinkedList<InterSliceEdge>> createNewOutgoingEdges(
-            OutputSliceNode slice, LinkedList<Slice> outputs, boolean isRR) {
+            OutputSliceNode slice, LinkedList<Filter> outputs, boolean isRR) {
         LinkedList<LinkedList<InterSliceEdge>> newEdges = new LinkedList<LinkedList<InterSliceEdge>>();
         
         if (isRR) {
-            for (Slice output : outputs) {
+            for (Filter output : outputs) {
                 LinkedList<InterSliceEdge> temp = new LinkedList<InterSliceEdge>();
                 InterSliceEdge e = new InterSliceEdge(slice, output.getHead());
                 temp.add(e);
@@ -471,7 +471,7 @@ public class SynchRemover {
             }
         } else {
             LinkedList<InterSliceEdge> temp = new LinkedList<InterSliceEdge>();
-            for (Slice output : outputs) {
+            for (Filter output : outputs) {
                 InterSliceEdge e = new InterSliceEdge(slice, output.getHead());
                 temp.add(e);
             }
@@ -489,10 +489,10 @@ public class SynchRemover {
      * @return
      */
     private static LinkedList<InterSliceEdge> createNewIncomingEdges(InputSliceNode slice,
-            LinkedList<Slice> inputs) {
+            LinkedList<Filter> inputs) {
         LinkedList<InterSliceEdge> newEdges = new LinkedList<InterSliceEdge>();
         
-        for (Slice input : inputs) {
+        for (Filter input : inputs) {
             InterSliceEdge e = new InterSliceEdge(input.getTail(), slice);
             newEdges.add(e);
         }
@@ -505,16 +505,16 @@ public class SynchRemover {
      * @param slice The current slice
      * @return Array of parent slices
      */
-    private static Slice[] getParentSlices(Slice slice) {
-        LinkedList<Slice> parents = new LinkedList<Slice>();
+    private static Filter[] getParentSlices(Filter slice) {
+        LinkedList<Filter> parents = new LinkedList<Filter>();
         LinkedList<InterSliceEdge> inEdges = slice.getHead().getSourceList(SchedulingPhase.STEADY);
         
         for (InterSliceEdge e : inEdges) {
-            Slice parent = e.getSrc().getParent();
+            Filter parent = e.getSrc().getParent();
             parents.add(parent);
         }
         
-        return parents.toArray(new Slice[0]);
+        return parents.toArray(new Filter[0]);
     }
     
     /**
@@ -522,16 +522,16 @@ public class SynchRemover {
      * @param slice The current slice
      * @return Array of child slices
      */
-    private static Slice[] getChildSlices(Slice slice) {
-        LinkedList<Slice> children = new LinkedList<Slice>();
+    private static Filter[] getChildSlices(Filter slice) {
+        LinkedList<Filter> children = new LinkedList<Filter>();
         InterSliceEdge[] outEdges = slice.getTail().getDestList(SchedulingPhase.STEADY);
         
         for (int i=0; i<outEdges.length; i++) {
-            Slice child = outEdges[i].getDest().getParent();
+            Filter child = outEdges[i].getDest().getParent();
             children.add(child);
         }
         
-        return children.toArray(new Slice[0]);
+        return children.toArray(new Filter[0]);
     }
 }
 
@@ -624,23 +624,23 @@ class SSSequence {
 }
 
 class SSElement {
-    Slice slice;
+    Filter slice;
     int num;
     int repeat;
     
-    SSElement(Slice slice, int num) {
+    SSElement(Filter slice, int num) {
         this.slice = slice;
         this.num = num;
         this.repeat = 1;
     }
     
-    SSElement(Slice slice, int num, int repeat) {
+    SSElement(Filter slice, int num, int repeat) {
         this.slice = slice;
         this.num = num;
         this.repeat = repeat;
     }
     
-    Slice getSlice() {
+    Filter getSlice() {
         return slice;
     }
     

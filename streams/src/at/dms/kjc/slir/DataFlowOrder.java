@@ -27,18 +27,18 @@ public class DataFlowOrder {
      * @param topSlices The slice forest.
      * @return A LinkedList of slices in data-flow order
      */
-    public static LinkedList<Slice> getTraversal(Slice[] topSlices) {
-        LinkedList<Slice> schedule = new LinkedList<Slice>();
-        HashSet<Slice> visited = new HashSet<Slice>();
-        LinkedList<Slice> queue = new LinkedList<Slice>();
+    public static LinkedList<Filter> getTraversal(Filter[] topSlices) {
+        LinkedList<Filter> schedule = new LinkedList<Filter>();
+        HashSet<Filter> visited = new HashSet<Filter>();
+        LinkedList<Filter> queue = new LinkedList<Filter>();
         for (int i = 0; i < topSlices.length; i++) {
             queue.add(topSlices[i]);
             while (!queue.isEmpty()) {
-                Slice slice = queue.removeFirst();
+                Filter slice = queue.removeFirst();
                 if (!visited.contains(slice)) {
                     visited.add(slice);
                     for (Edge destEdge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
-                        Slice current = destEdge.getDest().getParent();
+                        Filter current = destEdge.getDest().getParent();
                         if (!visited.contains(current)) {
                             // only add if all sources has been visited
                             boolean addMe = true;

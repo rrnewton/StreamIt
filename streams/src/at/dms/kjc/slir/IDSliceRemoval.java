@@ -8,7 +8,7 @@ import at.dms.kjc.slir.fission.*;
 import at.dms.kjc.backendSupport.FilterInfo;
 
 public class IDSliceRemoval {
-    private Slice idSlice;
+    private Filter idSlice;
     private InputSliceNode idInput;
     private OutputSliceNode idOutput;
     private InputSliceNode[] dsInputs;
@@ -17,7 +17,7 @@ public class IDSliceRemoval {
     private OutputSliceNode[] usOutputs;
     private int[] usOutputIndices;
     
-    public static void doit(Slice slice) {
+    public static void doit(Filter slice) {
         assert slice.getFirstFilter().getFilter() instanceof IDFilterContent : 
             "Trying to remove a non ID slice";
         
@@ -25,7 +25,7 @@ public class IDSliceRemoval {
         FilterInfo.reset();
     }
     
-    private IDSliceRemoval(Slice s) {
+    private IDSliceRemoval(Filter s) {
         idSlice = s;
         idInput = idSlice.getHead();
         idOutput = idSlice.getTail();

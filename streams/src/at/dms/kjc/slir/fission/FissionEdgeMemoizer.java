@@ -31,7 +31,7 @@ public class FissionEdgeMemoizer {
         return edge;
     }
 
-    public static InterSliceEdge getEdge(Slice src, Slice dest) {
+    public static InterSliceEdge getEdge(Filter src, Filter dest) {
         return getEdge(src.getTail(), dest.getHead());
     }
 
@@ -44,7 +44,7 @@ public class FissionEdgeMemoizer {
             this.dest = dest;
         }
         
-        public EdgeDescriptor(Slice src, Slice dest) {
+        public EdgeDescriptor(Filter src, Filter dest) {
             this(src.getTail(), dest.getHead());
         }
 

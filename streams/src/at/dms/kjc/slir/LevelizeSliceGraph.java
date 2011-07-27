@@ -5,24 +5,24 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class LevelizeSliceGraph {
-    private Slice[] topSlices;
-    private HashMap<Slice, Integer> levelMap;
-    private Slice[][] levels;
+    private Filter[] topSlices;
+    private HashMap<Filter, Integer> levelMap;
+    private Filter[][] levels;
     
-    public LevelizeSliceGraph(Slice[] topSlices) {
+    public LevelizeSliceGraph(Filter[] topSlices) {
         this.topSlices = topSlices;
-        levelMap = new HashMap<Slice, Integer>();
+        levelMap = new HashMap<Filter, Integer>();
         calcLevels();
     }
     
-    public Slice[][] getLevels() {
+    public Filter[][] getLevels() {
         return levels;
     }
     
     /**
      * Return the level this slice occupies.
      */
-    public int getLevel(Slice slice) {
+    public int getLevel(Filter slice) {
         return levelMap.get(slice);
     }
     
@@ -30,14 +30,14 @@ public class LevelizeSliceGraph {
      * Return the size of the level for this slice.  The total number of tiles
      * occupied by the level.
      */
-    public int levelSize(Slice slice) {
+    public int levelSize(Filter slice) {
         return levels[levelMap.get(slice)].length;
     }
     
     private void calcLevels() {
-        LinkedList<LinkedList<Slice>> levelsList = new LinkedList<LinkedList<Slice>>();
-        HashSet<Slice> visited = new HashSet<Slice>();
-        LinkedList<Slice> queue = new LinkedList<Slice>();
+        LinkedList<LinkedList<Filter>> levelsList = new LinkedList<LinkedList<Filter>>();
+        HashSet<Filter> visited = new HashSet<Filter>();
+        LinkedList<Filter> queue = new LinkedList<Filter>();
         
         //add the top slices and set their level
         for (int i = 0; i < topSlices.length; i++) {
@@ -46,11 +46,11 @@ public class LevelizeSliceGraph {
         }
         
         while (!queue.isEmpty()) {
-            Slice slice = queue.removeFirst();
+            Filter slice = queue.removeFirst();
             if (!visited.contains(slice)) {
                 visited.add(slice);
                 for (Edge destEdge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
-                    Slice current = destEdge.getDest().getParent();
+                    Filter current = destEdge.getDest().getParent();
                     if (!visited.contains(current)) {
                         // only add if all sources has been visited
                         boolean addMe = true;
@@ -75,16 +75,16 @@ public class LevelizeSliceGraph {
                 if (levelsList.size() <= sliceLevel) {
                     int levelsToAdd = sliceLevel - levelsList.size() + 1;
                     for (int i = 0; i < levelsToAdd; i++);
-                        levelsList.add(new LinkedList<Slice>());
+                        levelsList.add(new LinkedList<Filter>());
                 }
                 levelsList.get(sliceLevel).add(slice);
             }
         }
         
         //set the multi-dim array for the levels from the linkedlist of lists 
-        levels = new Slice[levelsList.size()][];
+        levels = new Filter[levelsList.size()][];
         for (int i = 0; i < levels.length; i++) {
-            levels[i] = new Slice[levelsList.get(i).size()];
+            levels[i] = new Filter[levelsList.get(i).size()];
             for (int j = 0; j < levels[i].length; j++) 
                 levels[i][j] = levelsList.get(i).get(j);
         }

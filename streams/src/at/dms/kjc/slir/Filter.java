@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *  
  * @author mgordon
  */
-public class Slice implements at.dms.kjc.DeepCloneable {
+public class Filter implements at.dms.kjc.DeepCloneable {
         
     //The head of the slice.
     protected InputSliceNode head;
@@ -37,7 +37,7 @@ public class Slice implements at.dms.kjc.DeepCloneable {
      * @{link {@link #finish() finish} } will tack on an OutputSliceNode if missing.
      * @param head  the InputSliceNode
      */
-    public Slice(InputSliceNode head) {
+    public Filter(InputSliceNode head) {
         this.head = head;
         head.setParent(this);
         len = -1;
@@ -48,7 +48,7 @@ public class Slice implements at.dms.kjc.DeepCloneable {
      * Creates an InputSliceNode automatically and links it with the FilterSliceNode.
      * @param node
      */
-    public Slice(SliceNode node) {
+    public Filter(SliceNode node) {
         if (!(node instanceof FilterSliceNode))
             Utils.fail("FilterSliceNode expected: " + node);
         head = new InputSliceNode();
@@ -58,7 +58,7 @@ public class Slice implements at.dms.kjc.DeepCloneable {
         len = -1;
     }
 
-    protected Slice() {
+    protected Filter() {
     }
     
     /**
@@ -137,8 +137,8 @@ public class Slice implements at.dms.kjc.DeepCloneable {
     /**
      * @return The incoming Slices (Slices) in the partitioned stream graph for this slice (slice). 
      */
-    public Slice[] getDependencies(SchedulingPhase phase) {
-        Slice[] depends = new Slice[head.getSources(phase).length];
+    public Filter[] getDependencies(SchedulingPhase phase) {
+        Filter[] depends = new Filter[head.getSources(phase).length];
         
         for (int i = 0; i < depends.length; i++)
             depends[i] = head.getSources(phase)[i].getSrc().getParent();
@@ -241,14 +241,14 @@ public class Slice implements at.dms.kjc.DeepCloneable {
 
     /** Returns a deep clone of this object. */
     public Object deepClone() {
-        at.dms.kjc.slir.Slice other = new at.dms.kjc.slir.Slice();
+        at.dms.kjc.slir.Filter other = new at.dms.kjc.slir.Filter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);
         return other;
     }
 
     /** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.Slice other) {
+    protected void deepCloneInto(at.dms.kjc.slir.Filter other) {
         other.head = (at.dms.kjc.slir.InputSliceNode)at.dms.kjc.AutoCloner.cloneToplevel(this.head);
         other.tail = (at.dms.kjc.slir.OutputSliceNode)at.dms.kjc.AutoCloner.cloneToplevel(this.tail);
         other.len = this.len;

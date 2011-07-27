@@ -9,7 +9,7 @@ package at.dms.kjc.slir;
  * @author dimock
  *
  */
-public class SimpleSlice extends Slice implements at.dms.kjc.DeepCloneable {
+public class SimpleSlice extends Filter implements at.dms.kjc.DeepCloneable {
 
     protected FilterSliceNode body;
     

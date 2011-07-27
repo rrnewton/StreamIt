@@ -500,8 +500,8 @@ public class InputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneabl
      * 
      * @return a set of all the slices that are inputs to this slice.
      */
-    public Set<Slice> getSourceSlices(SchedulingPhase phase) {
-        HashSet<Slice> slices = new HashSet<Slice>();
+    public Set<Filter> getSourceSlices(SchedulingPhase phase) {
+        HashSet<Filter> slices = new HashSet<Filter>();
         for (InterSliceEdge edge : getSourceList(phase)) {
             slices.add(edge.getSrc().getParent());
         }
