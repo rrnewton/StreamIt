@@ -11,7 +11,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRTwoStageFilter;
-import at.dms.kjc.slicegraph.FilterContent;
+import at.dms.kjc.slir.FilterContent;
 
 /**
  * Pulled out of lowering.fission.StatelessMethodDublicate for general use:
