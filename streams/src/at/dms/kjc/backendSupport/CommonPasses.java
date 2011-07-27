@@ -46,7 +46,6 @@ import at.dms.kjc.sir.lowering.fusion.Lifter;
 import at.dms.kjc.sir.lowering.partition.ManualPartition;
 import at.dms.kjc.sir.lowering.partition.SJToPipe;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.slir.AdaptivePartitioner;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.FlattenAndPartition;
 import at.dms.kjc.slir.FlattenGraph;
@@ -416,14 +415,6 @@ public class CommonPasses {
             }
         }
         else {
-            if (KjcOptions.autoparams) {
-                GreedyBinPacking greedyBinPacking = new GreedyBinPacking(str,
-                        numCores, getWorkEstimate());
-                greedyBinPacking.pack();
-
-                setSlicer(new AdaptivePartitioner(topNodes, executionCounts,
-                        lfa, getWorkEstimate(), numCores, greedyBinPacking));
-            }
             if (KjcOptions.nopartition) {
                 setSlicer(new FlattenAndPartition(topNodes,
                         executionCounts, lfa, getWorkEstimate(), numCores));
