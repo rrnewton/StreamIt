@@ -3,8 +3,10 @@
  */
 package at.dms.kjc.backendSupport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,9 +22,13 @@ import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.sir.SIRInterfaceTable;
+import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPortal;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
+import at.dms.kjc.sir.SemanticChecker;
+import at.dms.kjc.sir.lowering.SegmentedGraph;
+import at.dms.kjc.sir.lowering.Segmenter;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.ArrayInitExpander;
 import at.dms.kjc.sir.lowering.ConstantProp;
@@ -52,6 +58,7 @@ import at.dms.kjc.slir.FlattenGraph;
 import at.dms.kjc.slir.InstallInitDistributions;
 import at.dms.kjc.slir.OneFilterSlicer;
 import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.SimpleSlicer;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.Slicer;
@@ -91,6 +98,15 @@ public class CommonPasses {
      * e.g. __tmp2__7.a[1] */
     
     private boolean vectorizedEarly = false;
+
+    /**
+	 * Abstracts away printlns. Should change to log4j or some other logger.
+	 * @param str
+	 */
+	private void log(String str) {
+		boolean debug = false;
+		if (debug) System.out.println(str);			
+	}
     
     /**
      * Top level method for executing passes common to some current and all future StreamIt compilers.
@@ -174,6 +190,12 @@ public class CommonPasses {
         // done after fusion, and should not affect fusable
         // pipelines, so do it here.
         Lifter.liftAggressiveSync(str);
+        
+        
+         // TODO: soule- This is where I am adding the code to partition the 
+        // application with dynamic rates into static filters.
+        // SegmentedGraph segmentedGraph = runSegmenter(str);
+     	
         
         // Checks that all filters with mutable states are labeled with
         // stateful keyword
@@ -399,8 +421,14 @@ public class CommonPasses {
                 CommonUtils.println_debugging(topNodes[i].toString());
         }    
 
-        Filter[] sliceGraph = null; 
+
+    	// TODO: soule- Rather than converting to the slice graph here, I think 
+		// we want to convert to the StreamGraph
+		//new SIRToSLIR().translate(segmentedGraph);
+		//System.out.println("*********** SIRToSlir is done **************");		
+		//System.exit(0);
         
+        Filter[] sliceGraph = null;         
         setSlicer(null);
         if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {
             if (!KjcOptions.nopartition) {
@@ -432,7 +460,46 @@ public class CommonPasses {
         return sliceGraph;
     }
 
+	// TODO: move this out of here, and fold into common passes run
+	private SegmentedGraph runSegmenter(SIRStream str) {
+		boolean runOld = true;
+		if (runOld) {
+			List<SIRStream> list = new ArrayList<SIRStream>();
+			list.add(str);
+			return new SegmentedGraph(list, null);			
+		}
+		// at.dms.util.SIRPrinter p = new at.dms.util.SIRPrinter("trace.txt");
+		Segmenter segmenter = new Segmenter();
+		SegmentedGraph segmentedGraph = segmenter.partition(str);
+		List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();
+		int j = 0; 
+		for (SIRStream ssg : subgraphs) {
+			log("at.dms.kjc.backendSupport.compile "
+					+ "printing ssg " + j + "name=" + ssg.getName());
+			at.dms.util.SIRPrinter printer = new at.dms.util.SIRPrinter("ssg_"
+					+ j + ".txt");
+			IterFactory.createFactory().createIter(ssg).accept(printer);
+			j++;
 
+			if (ssg instanceof SIRPipeline) {
+				log("at.dms.kjc.backendSupport.compile "
+						+ "ssg is a pipeline");
+				log("at.dms.kjc.backendSupport.compile "
+						+ "((SIRPipeline)ssg).getChildren().size()= "
+						+ ((SIRPipeline) ssg).getChildren().size());
+			}
+		}		
+		for (SIRStream ssg : subgraphs) {
+			log("at.dms.kjc.backendSupport.compile "
+					+ "performing semantic analysis on ssg " + j);
+			SemanticChecker.doCheck(ssg);
+		}					
+		return new SegmentedGraph(subgraphs, null);
+	}
+	
+	
+    
+    
     /**
      * This method performs some standard cleanup on the slice graph.
      * On return, file readers and file writers are expanded to contain
