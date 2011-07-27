@@ -23,7 +23,7 @@ import at.dms.kjc.backendSupport.EmitCode;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.common.MacroConversion;
 import at.dms.kjc.sir.SIRCodeUnit;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.util.Utils;
 
 public class EmitCellCode extends EmitCode {

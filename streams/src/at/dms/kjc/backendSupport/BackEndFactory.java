@@ -1,6 +1,6 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.util.Utils;
 
 import java.util.Collection;
@@ -105,7 +105,7 @@ public abstract class BackEndFactory<
     protected Layout<ComputeNodeType> layout;
 
     /**
-     * Keep a copy of the {@link Layout}: the mapping from {@link at.dms.kjc.slicegraph.SliceNode SliceNode} to 
+     * Keep a copy of the {@link Layout}: the mapping from {@link at.dms.kjc.slir.SliceNode SliceNode} to 
      * {@link ComputeNode}.
      * @param layout
      */

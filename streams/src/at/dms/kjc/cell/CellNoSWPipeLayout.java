@@ -2,7 +2,7 @@ package at.dms.kjc.cell;
 
 import at.dms.kjc.backendSupport.*;
 //import java.util.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 /**
  * Subclass of NoSWPipeLayout that keeps all I/O filters on PPU and all non-I/O filtrers on SPUs

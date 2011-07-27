@@ -5,9 +5,9 @@ import java.util.*;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.Slice;
 
 /**
  * This class represents the space/time schedule for the application, 

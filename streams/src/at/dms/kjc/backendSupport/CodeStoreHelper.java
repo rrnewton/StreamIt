@@ -4,8 +4,8 @@ import java.util.*;
 import at.dms.kjc.*;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.SliceNode;
 import at.dms.util.Utils;
 
 /**

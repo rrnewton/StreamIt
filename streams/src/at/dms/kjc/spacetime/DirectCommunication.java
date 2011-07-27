@@ -17,13 +17,14 @@ import java.util.HashSet;
 import java.io.*;
 import at.dms.compiler.*;
 import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
 
 import java.util.Hashtable;
 import java.math.BigInteger;
-import at.dms.kjc.slicegraph.FilterContent;
+
+import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.util.SIRPrinter;
 
 /**
@@ -86,7 +87,7 @@ public class DirectCommunication extends RawExecutionCode
             return false;
         }
         
-        if (!dynamicInput && at.dms.kjc.slicegraph.PeekPopPushInHelper.check(fi.filter))
+        if (!dynamicInput && at.dms.kjc.slir.PeekPopPushInHelper.check(fi.filter))
             return false;
         
         // for a filter with dynamic input we don't care if the pushes and

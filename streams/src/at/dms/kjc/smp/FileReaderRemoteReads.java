@@ -8,8 +8,8 @@ import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.slicegraph.fission.*;
+import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.fission.*;
 
 
 public class FileReaderRemoteReads extends FileReaderCode {

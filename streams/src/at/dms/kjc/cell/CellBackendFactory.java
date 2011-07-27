@@ -10,13 +10,13 @@ import at.dms.kjc.backendSupport.CodeStoreHelperJoiner;
 import at.dms.kjc.backendSupport.CodeStoreHelperSimple;
 import at.dms.kjc.backendSupport.CodeStoreHelperSplitter;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
 
 public class CellBackendFactory 
     extends BackEndFactory<CellChip, CellPU, CellComputeCodeStore, Integer> {

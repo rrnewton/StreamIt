@@ -6,7 +6,7 @@ import at.dms.kjc.JExpression;
 import at.dms.kjc.JFieldAccessExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 import java.util.LinkedList;
 import at.dms.kjc.spacetime.*;

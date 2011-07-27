@@ -1,7 +1,8 @@
 package at.dms.kjc.spacetime;
 
 import at.dms.util.Utils;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
+
 import java.util.LinkedList;
 import java.util.Iterator;
 

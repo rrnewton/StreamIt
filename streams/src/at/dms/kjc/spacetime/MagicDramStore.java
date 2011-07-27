@@ -1,10 +1,7 @@
 package at.dms.kjc.spacetime;
 
 import at.dms.util.Utils;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
+import at.dms.kjc.slir.*;
 
 public class MagicDramStore extends MagicDramInstruction 
 {

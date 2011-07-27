@@ -6,7 +6,7 @@ package at.dms.kjc.tilera;
 import java.util.*;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.kjc.KjcOptions;
 
 /**

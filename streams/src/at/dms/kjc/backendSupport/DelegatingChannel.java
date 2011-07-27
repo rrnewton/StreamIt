@@ -6,7 +6,7 @@ import at.dms.kjc.CType;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 /**
  * A Channel that delegates all useful work to another channel.

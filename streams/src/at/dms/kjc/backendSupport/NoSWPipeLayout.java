@@ -6,7 +6,7 @@ package at.dms.kjc.backendSupport;
 import java.util.*;
 
 import at.dms.kjc.common.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 /**
  * @author mgordon

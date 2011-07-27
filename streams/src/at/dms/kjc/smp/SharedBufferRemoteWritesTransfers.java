@@ -3,8 +3,8 @@ package at.dms.kjc.smp;
 import at.dms.util.*;
 import at.dms.kjc.*;
 import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.slicegraph.fission.*;
+import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.fission.*;
 import at.dms.kjc.smp.arrayassignment.*;
 
 import java.util.HashMap;

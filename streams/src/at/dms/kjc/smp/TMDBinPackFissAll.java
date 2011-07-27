@@ -5,8 +5,8 @@ import java.util.HashMap;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.fusion.*;
 import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.spacetime.*;
 import at.dms.kjc.*;
 import java.util.LinkedList;
@@ -34,8 +34,8 @@ public class TMDBinPackFissAll extends Scheduler {
     }
     
     /** Get the Core for a Slice 
-     * @param node the {@link at.dms.kjc.slicegraph.SliceNode} to look up. 
-     * @return the Core that should execute the {@link at.dms.kjc.slicegraph.SliceNode}. 
+     * @param node the {@link at.dms.kjc.slir.SliceNode} to look up. 
+     * @return the Core that should execute the {@link at.dms.kjc.slir.SliceNode}. 
      */
     public Core getComputeNode(SliceNode node) {
         assert layoutMap.keySet().contains(node);
@@ -43,7 +43,7 @@ public class TMDBinPackFissAll extends Scheduler {
     }
     
     /** Set the Core for a Slice 
-     * @param node         the {@link at.dms.kjc.slicegraph.SliceNode} to associate with ...
+     * @param node         the {@link at.dms.kjc.slir.SliceNode} to associate with ...
      * @param core   The tile to assign the node
      */
     public void setComputeNode(SliceNode node, Core core) {

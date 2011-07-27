@@ -1,6 +1,6 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 import java.util.HashMap;
 import java.util.Set;

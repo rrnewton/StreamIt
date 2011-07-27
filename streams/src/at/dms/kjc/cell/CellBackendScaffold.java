@@ -13,9 +13,9 @@ import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ComputeNodesI;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
 import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 import at.dms.util.Utils;
 

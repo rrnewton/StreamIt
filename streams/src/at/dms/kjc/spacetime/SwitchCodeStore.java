@@ -4,7 +4,8 @@ import java.util.Vector;
 
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.spacetime.switchIR.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
+
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.HashMap;

@@ -6,9 +6,9 @@ package at.dms.kjc.spacetime;
 import java.util.Iterator;
 
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
 
 /**
  * Determine the number of read and write commands that each 

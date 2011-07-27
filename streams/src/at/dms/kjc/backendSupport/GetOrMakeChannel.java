@@ -1,6 +1,6 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 /**
  * Create channels of appropriate type for a back end.

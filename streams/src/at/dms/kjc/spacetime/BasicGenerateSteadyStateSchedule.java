@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SIRSlicer;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.Slice;
 import at.dms.kjc.KjcOptions;
 
 /**

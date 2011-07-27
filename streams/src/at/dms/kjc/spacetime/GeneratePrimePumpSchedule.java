@@ -6,9 +6,9 @@ package at.dms.kjc.spacetime;
 import java.util.*;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
 import at.dms.kjc.KjcOptions;
 
 /**

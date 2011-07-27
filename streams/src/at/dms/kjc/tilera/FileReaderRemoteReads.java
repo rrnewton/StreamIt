@@ -4,7 +4,7 @@ import java.util.List;
 import at.dms.kjc.tilera.arrayassignment.*;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 
 

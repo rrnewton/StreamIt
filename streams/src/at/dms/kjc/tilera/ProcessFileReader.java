@@ -1,6 +1,6 @@
 package at.dms.kjc.tilera;
 
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.kjc.backendSupport.*;
 import java.io.File;
 

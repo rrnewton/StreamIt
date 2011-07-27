@@ -8,8 +8,8 @@ import java.util.*;
 
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.Slice;
 
 /**
  * This class will create a 3D representation of the Space-Time 

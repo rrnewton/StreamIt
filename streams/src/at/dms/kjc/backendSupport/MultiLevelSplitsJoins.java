@@ -6,17 +6,10 @@ package at.dms.kjc.backendSupport;
 import java.util.*;
 
 import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.slicegraph.*;
 import at.dms.kjc.*; 
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.*;
 import at.dms.kjc.spacetime.RawProcElements;
 
 /**

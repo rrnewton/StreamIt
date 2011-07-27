@@ -16,8 +16,8 @@ import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.backendSupport.ProcessOutputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
 
 public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
 

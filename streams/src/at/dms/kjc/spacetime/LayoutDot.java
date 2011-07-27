@@ -7,9 +7,9 @@ import java.util.HashMap;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.Util;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.Util;
 
 /**
  * This class generates a dot graph of the layout and for each tile the

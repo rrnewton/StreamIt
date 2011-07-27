@@ -8,13 +8,11 @@ import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.MultiLevelSplitsJoins;
 import at.dms.kjc.backendSupport.NoSWPipeLayout;
 import at.dms.kjc.common.ConvertLonelyPops;
-import at.dms.kjc.slicegraph.*;
 import at.dms.kjc.backendSupport.CommonPasses;
 import at.dms.kjc.sir.lowering.*;
 import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.*;
+
 import java.util.*;
 
 /**

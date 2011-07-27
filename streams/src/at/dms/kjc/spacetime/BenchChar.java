@@ -7,10 +7,10 @@ import java.util.*;
 
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
 
 /**
  * Calculate and print some characteristics of the application.

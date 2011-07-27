@@ -1,7 +1,6 @@
 package at.dms.kjc.spacetime;
 
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.slicegraph.Util;
+import at.dms.kjc.slir.*;
 
 import java.util.LinkedList;
 import java.util.Iterator;
@@ -18,7 +17,7 @@ public class MultiplySteadyState {
                 .multSteadyMult(KjcOptions.steadymult);
         }
         */
-        Iterator<SliceNode> sliceNodes = Util.sliceNodeTraversal(traces);
+        Iterator<SliceNode> sliceNodes = at.dms.kjc.slir.Util.sliceNodeTraversal(traces);
         while (sliceNodes.hasNext()) {
             SliceNode sliceNode = sliceNodes.next();
             if (sliceNode.isFilterSlice()) {

@@ -1,7 +1,8 @@
 package at.dms.kjc.backendSupport;
 
 import java.util.*;
-import at.dms.kjc.slicegraph.*;
+
+import at.dms.kjc.slir.*;
 /**
  * A ComputeNodes is a collection of {@link ComputeNode}s.
  * Each node has a unique id corresponding to its order of creation.

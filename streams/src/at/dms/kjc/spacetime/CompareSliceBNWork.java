@@ -5,8 +5,8 @@ package at.dms.kjc.spacetime;
 
 import java.util.Comparator;
 
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.Slice;
 
 /**
  * A Comparator for the work estimation of slices that compares slices

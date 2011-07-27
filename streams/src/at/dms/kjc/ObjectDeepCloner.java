@@ -12,7 +12,7 @@
 package at.dms.kjc;
 
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.kjc.iterator.*;
 import at.dms.util.*;
 import at.dms.compiler.JavaStyleComment;

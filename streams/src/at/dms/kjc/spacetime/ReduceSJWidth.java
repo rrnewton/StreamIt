@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Arrays;
 import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 import java.util.HashSet;
 import java.util.Vector;

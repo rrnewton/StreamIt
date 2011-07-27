@@ -4,7 +4,7 @@ import java.util.*;
 import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.util.Utils;
 
 /**

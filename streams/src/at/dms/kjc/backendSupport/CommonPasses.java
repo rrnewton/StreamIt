@@ -46,17 +46,17 @@ import at.dms.kjc.sir.lowering.fusion.Lifter;
 import at.dms.kjc.sir.lowering.partition.ManualPartition;
 import at.dms.kjc.sir.lowering.partition.SJToPipe;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.slicegraph.AdaptivePartitioner;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FlattenAndPartition;
-import at.dms.kjc.slicegraph.FlattenGraph;
-import at.dms.kjc.slicegraph.InstallInitDistributions;
-import at.dms.kjc.slicegraph.OneFilterSlicer;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.SimpleSlicer;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.Slicer;
-import at.dms.kjc.slicegraph.UnflatFilter;
+import at.dms.kjc.slir.AdaptivePartitioner;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.FlattenAndPartition;
+import at.dms.kjc.slir.FlattenGraph;
+import at.dms.kjc.slir.InstallInitDistributions;
+import at.dms.kjc.slir.OneFilterSlicer;
+import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.SimpleSlicer;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Slicer;
+import at.dms.kjc.slir.UnflatFilter;
 import at.dms.kjc.spacetime.AddBuffering;
 import at.dms.kjc.spacetime.BasicGenerateSteadyStateSchedule;
 import at.dms.kjc.spacetime.CalculateParams;
@@ -103,7 +103,7 @@ public class CommonPasses {
      * @param global            SIRGlobal from  {@link at.dms.kjc.Kopi2SIR}
      * @param numCores          Number of {@link at.dms.kjc.backendSupport.ComputeNode}'s to use in partitioning. 
      *
-     * @return a slice graph: the optimized program in {@link at.dms.kjc.slicegraph.Slice Slice} representation.
+     * @return a slice graph: the optimized program in {@link at.dms.kjc.slir.Slice Slice} representation.
      */
     public Slice[] run(SIRStream str,
             JInterfaceDeclaration[] interfaces,

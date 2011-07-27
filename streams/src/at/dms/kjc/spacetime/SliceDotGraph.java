@@ -5,14 +5,9 @@ import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
 import at.dms.kjc.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
+
 import java.io.FileWriter;
 import java.util.LinkedList;
 import java.util.List;

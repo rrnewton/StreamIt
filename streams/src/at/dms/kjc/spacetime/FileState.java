@@ -1,6 +1,6 @@
 package at.dms.kjc.spacetime;
 
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 public class FileState 
 {

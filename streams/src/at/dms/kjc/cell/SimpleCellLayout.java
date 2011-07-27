@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
 
 public class SimpleCellLayout implements Layout<CellPU> {
 

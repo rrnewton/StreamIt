@@ -6,7 +6,8 @@ import at.dms.kjc.*;
 
 import java.util.HashSet;
 import java.util.Set;
-import at.dms.kjc.slicegraph.*;
+
+import at.dms.kjc.slir.*;
 
 public class CoreCodeStore extends ComputeCodeStore<Core> {
     /** True if this CoreCodeStore has code appended to it */

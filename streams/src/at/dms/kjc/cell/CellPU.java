@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import at.dms.kjc.backendSupport.ComputeNode;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.SliceNode;
 
 public abstract class CellPU extends ComputeNode<CellComputeCodeStore> {
 

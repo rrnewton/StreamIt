@@ -3,10 +3,10 @@ package at.dms.kjc.backendSupport;
 import java.util.*;
 import at.dms.kjc.*;
 import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 /**
- * Create kopi code for an {@link at.dms.kjc.slicegraph.OutputSliceNode}.
+ * Create kopi code for an {@link at.dms.kjc.slir.OutputSliceNode}.
  * @author dimock
  *
  */

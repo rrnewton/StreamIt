@@ -22,14 +22,14 @@ import at.dms.kjc.sir.SIRPopExpression;
 
 import at.dms.kjc.backendSupport.FilterInfo;
 
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.MutableStateExtractor;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.Slicer;
 
-import at.dms.kjc.slicegraph.fission.Fissioner;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.MutableStateExtractor;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Slicer;
+import at.dms.kjc.slir.fission.FissionGroup;
+import at.dms.kjc.slir.fission.Fissioner;
 
 public class StatelessFissioner {
 

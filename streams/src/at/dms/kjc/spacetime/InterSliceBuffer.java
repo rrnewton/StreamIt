@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import at.dms.kjc.*;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.OutputSliceNode;
 
 /**
  * This class represents a buffer between two traces. The rotating register abstraction 

@@ -16,7 +16,7 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.kjc.backendSupport.*;
 import at.dms.util.Utils;
 import at.dms.kjc.KjcOptions;

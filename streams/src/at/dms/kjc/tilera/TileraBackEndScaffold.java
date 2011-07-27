@@ -11,12 +11,12 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.ComputeNodesI;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.SimpleSlice;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.SimpleSlice;
+import at.dms.kjc.slir.Slice;
 import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 
 /**

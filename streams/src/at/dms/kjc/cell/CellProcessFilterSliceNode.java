@@ -11,13 +11,13 @@ import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
-import at.dms.kjc.slicegraph.FileOutputContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.SliceNode;
 
 public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
     

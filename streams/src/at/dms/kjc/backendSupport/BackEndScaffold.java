@@ -3,13 +3,13 @@ package at.dms.kjc.backendSupport;
 
 import java.util.*;
 
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 import at.dms.kjc.KjcOptions;
 
 
 /**
- * Create code for a partitioning of {@link at.dms.kjc.slicegraph.Slice Slice}s 
+ * Create code for a partitioning of {@link at.dms.kjc.slir.Slice Slice}s 
  * on a collection of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s.
  * Connections between the ComputeNode s are returned as 
  * {@link at.dms.kjc.backendSupport.Channel Buffer}s.

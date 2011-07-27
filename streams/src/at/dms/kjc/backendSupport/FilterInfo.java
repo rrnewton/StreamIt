@@ -6,11 +6,11 @@ package at.dms.kjc.backendSupport;
 import java.util.Iterator;
 import java.util.HashMap;
 
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.SchedulingPhase;
 
 /**
  * A class to hold all the various information for a filter.  Be careful, 

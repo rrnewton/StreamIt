@@ -3,9 +3,9 @@ package at.dms.kjc.spacetime;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.*;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
 
 /**
  * This abstract class defines an interface for filter code generators.  

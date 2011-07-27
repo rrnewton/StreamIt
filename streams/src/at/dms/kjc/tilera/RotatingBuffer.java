@@ -10,7 +10,7 @@ import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 import java.util.LinkedList;
 import at.dms.kjc.spacetime.*;

@@ -4,14 +4,15 @@ import java.util.Iterator;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.*;
 import at.dms.kjc.sir.lowering.partition.*; 
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.Util;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.Util;
+
 import java.lang.*;
 
 import java.util.*;

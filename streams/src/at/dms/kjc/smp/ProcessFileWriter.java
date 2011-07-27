@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 public class ProcessFileWriter {
     private static int totalOutputs = 0;

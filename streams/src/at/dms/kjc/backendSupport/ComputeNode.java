@@ -1,7 +1,7 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slicegraph.ProcElement;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.ProcElement;
+import at.dms.kjc.slir.SliceNode;
 
 /**
  * This abstract class represents a device that can perform computation.

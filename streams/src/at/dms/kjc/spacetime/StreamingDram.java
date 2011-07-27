@@ -3,7 +3,8 @@ package at.dms.kjc.spacetime;
 import at.dms.util.Utils;
 import java.util.HashSet;
 import java.util.Iterator;
-import at.dms.kjc.slicegraph.*;
+
+import at.dms.kjc.slir.*;
 
 /**
  * This class represents a streaming dram (SDRAM) that can be attached

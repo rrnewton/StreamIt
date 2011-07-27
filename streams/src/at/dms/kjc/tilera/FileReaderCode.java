@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
 
 public abstract class FileReaderCode {
     /** the output buffer is the source */

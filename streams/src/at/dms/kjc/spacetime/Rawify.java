@@ -8,13 +8,6 @@ import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
 import at.dms.kjc.*;
 import at.dms.kjc.spacetime.switchIR.*;
 import at.dms.util.Utils;
@@ -24,7 +17,8 @@ import java.util.LinkedList;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Vector;
-import at.dms.kjc.slicegraph.*;
+
+import at.dms.kjc.slir.*;
 
 /**
  * This class will rawify the SIR code and it creates the switch code. It does

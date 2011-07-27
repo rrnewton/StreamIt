@@ -2,7 +2,7 @@ package at.dms.kjc.backendSupport;
 
 import java.util.*;
 
-import at.dms.kjc.slicegraph.Edge;
+import at.dms.kjc.slir.Edge;
 import at.dms.kjc.*;
 
 /**

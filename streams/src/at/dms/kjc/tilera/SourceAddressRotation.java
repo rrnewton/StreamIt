@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 /**
  * This class models the rotating structure that is needed when a tile uses double buffered communication

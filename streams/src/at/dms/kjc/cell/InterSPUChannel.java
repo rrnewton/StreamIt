@@ -10,7 +10,7 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JReturnStatement;
 import at.dms.kjc.backendSupport.Channel;
-import at.dms.kjc.slicegraph.Edge;
+import at.dms.kjc.slir.Edge;
 
 public class InterSPUChannel extends Channel {
 

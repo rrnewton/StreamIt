@@ -1,8 +1,8 @@
 package at.dms.kjc.smp;
 
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.fission.FissionGroup;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.fission.FissionGroup;
 
 import java.util.HashMap;
 import java.util.HashSet;

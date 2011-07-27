@@ -7,10 +7,10 @@ import java.util.*;
 
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.Slice;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
 
 
 /**

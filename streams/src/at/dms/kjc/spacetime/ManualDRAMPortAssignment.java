@@ -6,16 +6,17 @@ package at.dms.kjc.spacetime;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Iterator;
-import at.dms.kjc.slicegraph.FileInputContent;
-import at.dms.kjc.slicegraph.FileOutputContent;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
-import at.dms.kjc.slicegraph.Util;
+
+import at.dms.kjc.slir.FileInputContent;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.Util;
 
 /**
  * This class asks the user to assign the input and output of each slice (trace) to a DRAM a

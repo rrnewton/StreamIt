@@ -4,8 +4,8 @@ import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.*;
 import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.common.CodegenPrintWriter;
-import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.slicegraph.fission.*;
+import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.fission.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

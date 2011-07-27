@@ -11,8 +11,9 @@ import at.dms.kjc.sir.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import at.dms.kjc.slicegraph.FilterContent;
-import at.dms.kjc.slicegraph.SchedulingPhase;
+
+import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.SchedulingPhase;
 
 /**
  * 

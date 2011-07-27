@@ -1,6 +1,6 @@
 package at.dms.kjc.spacetime;
 
-import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slir.InterSliceEdge;
 
 /**
  * This class encapsulates the port plus the distance of this port to the

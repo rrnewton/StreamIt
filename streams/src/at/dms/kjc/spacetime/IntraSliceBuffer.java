@@ -1,7 +1,7 @@
 package at.dms.kjc.spacetime;
 
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 /**
  * This class represents the buffer between the sink filter of a slice
  * and outputslicenode or between the inputslicenode and the source filter of a
@@ -25,7 +25,7 @@ public class IntraSliceBuffer extends OffChipBuffer {
     }
     
     private static IntraSliceBuffer getBufferSrcDst(SliceNode src, SliceNode dst) {
-        Edge e = at.dms.kjc.slicegraph.Util.srcDstToEdge(src, dst, SchedulingPhase.STEADY);
+        Edge e = at.dms.kjc.slir.Util.srcDstToEdge(src, dst, SchedulingPhase.STEADY);
         if (!bufferStore.containsKey(e)) {
             //System.out.println("Creating Buffer from " + src + " to " + dst);
             bufferStore.put(e, new IntraSliceBuffer(e));

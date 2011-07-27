@@ -2,8 +2,8 @@ package at.dms.kjc.cell;
 
 import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.GetOrMakeChannel;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.InterSliceEdge;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.InterSliceEdge;
 
 public class GetOrMakeCellChannel extends GetOrMakeChannel {
 

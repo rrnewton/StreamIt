@@ -6,7 +6,8 @@ import at.dms.kjc.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import at.dms.kjc.slicegraph.*;
+
+import at.dms.kjc.slir.*;
 
 public class TileCodeStore extends ComputeCodeStore<Tile> {
     /** True if this tile code store has code appended to it */

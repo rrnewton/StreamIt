@@ -3,7 +3,7 @@ package at.dms.kjc.spacetime;
 import java.util.Vector;
 
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 
 
 /**

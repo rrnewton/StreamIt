@@ -6,14 +6,14 @@ import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slicegraph.Edge;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
 
 /**
  * Factor out parts of RAW (at.dms.kjc.spacetime) back end that need matching types.
@@ -135,7 +135,7 @@ public class RawBackEndFactory extends BackEndFactory<RawChip, RawTile, RawCompu
     // place to keep Layout.
     private Layout<RawTile> layout;
     /**
-     * Keep a copy of the {@link Layout}: the mapping from {@link at.dms.kjc.slicegraph.SliceNode SliceNode} to 
+     * Keep a copy of the {@link Layout}: the mapping from {@link at.dms.kjc.slir.SliceNode SliceNode} to 
      * {@link ComputeNode}.
      * @param layout
      */

@@ -2,7 +2,8 @@ package at.dms.kjc.tilera;
 
 import java.util.LinkedList;
 import java.util.List;
-import at.dms.kjc.slicegraph.*;
+
+import at.dms.kjc.slir.*;
 import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.*;
 

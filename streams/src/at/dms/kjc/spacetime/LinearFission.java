@@ -1,6 +1,6 @@
 package at.dms.kjc.spacetime;
 
-import at.dms.kjc.slicegraph.FilterContent;
+import at.dms.kjc.slir.FilterContent;
 import at.dms.util.Utils;
 
 /**

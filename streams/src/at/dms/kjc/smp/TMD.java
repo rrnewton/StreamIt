@@ -5,13 +5,13 @@ import java.util.HashMap;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.slicegraph.*;
 import at.dms.kjc.*;
 import java.util.LinkedList;
 import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.slicegraph.fission.*;
+import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.fission.*;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -42,8 +42,8 @@ public class TMD extends Scheduler {
     }
     
     /** Get the Core for a Slice 
-     * @param node the {@link at.dms.kjc.slicegraph.SliceNode} to look up. 
-     * @return the Core that should execute the {@link at.dms.kjc.slicegraph.SliceNode}. 
+     * @param node the {@link at.dms.kjc.slir.SliceNode} to look up. 
+     * @return the Core that should execute the {@link at.dms.kjc.slir.SliceNode}. 
      */
     public Core getComputeNode(SliceNode node) {
         assert layoutMap.keySet().contains(node);
@@ -52,7 +52,7 @@ public class TMD extends Scheduler {
     
     
     /** Set the Core for a Slice 
-     * @param node         the {@link at.dms.kjc.slicegraph.SliceNode} to associate with ...
+     * @param node         the {@link at.dms.kjc.slir.SliceNode} to associate with ...
      * @param core   The tile to assign the node
      */
     public void setComputeNode(SliceNode node, Core core) {

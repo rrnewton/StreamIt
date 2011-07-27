@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import at.dms.kjc.slicegraph.*;
+
+import at.dms.kjc.slir.*;
 
 public class MagicDram extends IODevice {
     // the list of instructions

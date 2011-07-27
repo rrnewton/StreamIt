@@ -1,7 +1,7 @@
 package at.dms.kjc;
 
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slicegraph.*;
+import at.dms.kjc.slir.*;
 import at.dms.kjc.iterator.*;
 import at.dms.util.*;
 import at.dms.compiler.JavaStyleComment;
@@ -180,8 +180,8 @@ public class AutoCloner {
             // don't clone these since they're immutable or shouldn't be copied
             result = o;
         } 
-        else if (o instanceof at.dms.kjc.slicegraph.Slice) {
-            result = cloneSlice((at.dms.kjc.slicegraph.Slice)o);
+        else if (o instanceof at.dms.kjc.slir.Slice) {
+            result = cloneSlice((at.dms.kjc.slir.Slice)o);
         }
         // other kjc classes, do deep cloning
         else if (CloneGenerator.inTargetClasses(typeName)) {
@@ -280,7 +280,7 @@ public class AutoCloner {
      * @param slice
      * @return
      */
-    static private Object cloneSlice(at.dms.kjc.slicegraph.Slice slice) {
+    static private Object cloneSlice(at.dms.kjc.slir.Slice slice) {
         Object newSlice = slice.deepClone();
         ((Slice)newSlice).finishClone();
         return newSlice;

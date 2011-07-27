@@ -5,15 +5,15 @@ import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.common.SimulatedAnnealing;
-import at.dms.kjc.slicegraph.DataFlowOrder;
-import at.dms.kjc.slicegraph.InterSliceEdge;
-import at.dms.kjc.slicegraph.FilterSliceNode;
-import at.dms.kjc.slicegraph.InputSliceNode;
-import at.dms.kjc.slicegraph.OutputSliceNode;
-import at.dms.kjc.slicegraph.SIRSlicer;
-import at.dms.kjc.slicegraph.SchedulingPhase;
-import at.dms.kjc.slicegraph.Slice;
-import at.dms.kjc.slicegraph.SliceNode;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.SliceNode;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -1001,7 +1001,7 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
         //create the filter list
         filterList = new LinkedList<SliceNode>();
         Iterator<SliceNode> sliceNodes = 
-            at.dms.kjc.slicegraph.Util.sliceNodeTraversal(slicer.getSliceGraph());
+            at.dms.kjc.slir.Util.sliceNodeTraversal(slicer.getSliceGraph());
         while (sliceNodes.hasNext()) {
             SliceNode node = sliceNodes.next();
             //add filters to the list of things to assign to tiles,

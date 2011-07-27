@@ -31,7 +31,7 @@ import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRSplitType;
 import at.dms.kjc.sir.SIRSplitter;
 import at.dms.kjc.sir.SIRTwoStageFilter;
-import at.dms.kjc.slicegraph.FilterContent;
+import at.dms.kjc.slir.FilterContent;
 import at.dms.util.GetSteadyMethods;
 import at.dms.util.Utils;
 
