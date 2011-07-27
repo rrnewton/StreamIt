@@ -197,7 +197,7 @@ public class BufferDRAMAssignment {
      * now we are being overly conservative, there could exist other dependencies to 
      * prevent the race.
      */
-    private boolean gdnStoreSamePortDifferentTile(Slice[] slices) {
+    private boolean gdnStoreSamePortDifferentTile(Filter[] slices) {
         //this hashset stores a mapping from drams to a tile that
         //has already issued a store on the gdn to the dram
         HashMap<StreamingDram, RawTile> dramToTile = new HashMap<StreamingDram, RawTile>();
@@ -242,7 +242,7 @@ public class BufferDRAMAssignment {
      * 
      * @param files The slices that read or write files.
      */
-    private  void fileStuff(Slice[] files) {
+    private  void fileStuff(Filter[] files) {
         // go through the drams and reset the file readers and writers 
         //associated with them...
         for (int i = 0; i < rawChip.getDevices().length; i++) {

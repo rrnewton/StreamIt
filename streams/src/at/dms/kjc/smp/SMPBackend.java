@@ -110,14 +110,14 @@ public class SMPBackend {
 
         // calculate computation to communication ratio
         if(KjcOptions.sharedbufs) {
-            LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
-            HashSet<Slice> compProcessed = new HashSet<Slice>();
-            HashSet<Slice> commProcessed = new HashSet<Slice>();
+            LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+            HashSet<Filter> compProcessed = new HashSet<Filter>();
+            HashSet<Filter> commProcessed = new HashSet<Filter>();
             
             long comp = 0;
             long comm = 0;
             
-            for(Slice slice : slices) {
+            for(Filter slice : slices) {
                 if(compProcessed.contains(slice))
                     continue;
                 
@@ -222,7 +222,7 @@ public class SMPBackend {
             */
             
             // Simple communication estimation
-            for(Slice slice : slices) {
+            for(Filter slice : slices) {
                 if(commProcessed.contains(slice))
                     continue;
                 

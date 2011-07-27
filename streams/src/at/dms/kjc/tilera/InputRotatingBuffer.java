@@ -62,7 +62,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * @param schedule The spacetime schedule of the slices 
      */
     public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
-        for (Slice slice : schedule.getScheduleList()) {
+        for (Filter slice : schedule.getScheduleList()) {
             assert slice.getNumFilters() == 1;
             if (!slice.getHead().noInputs()) {
                 assert slice.getHead().totalWeights(SchedulingPhase.STEADY) > 0;
@@ -223,7 +223,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
        addressBufs = new SourceAddressRotation[addressBufsSize];
        
        int i = 0;
-       for (Slice src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+       for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
            Tile tile = TileraBackend.backEndBits.getLayout().getComputeNode(src.getFirstFilter());
            if (tile == parent && hasLocalSrcFilter())
                continue;
@@ -286,7 +286,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //mults of all the sources
         int maxRotationLength = 0;
         
-        for (Slice src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+        for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
             int diff = schedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
             if (diff > maxRotationLength) {

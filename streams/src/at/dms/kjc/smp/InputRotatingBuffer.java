@@ -59,12 +59,12 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * @param schedule The spacetime schedule of the slices 
      */
     public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
-        for (Slice slice : schedule.getScheduleList()) {
+        for (Filter slice : schedule.getScheduleList()) {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
 
                 FissionGroup group = FissionGroupStore.getFissionGroup(slice);
-                for(Slice fizzedSlice : group.fizzedSlices)
+                for(Filter fizzedSlice : group.fizzedSlices)
                     createInputBuffer(fizzedSlice, schedule);
             }
             else {
@@ -73,7 +73,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         }
     }
 
-    public static void createInputBuffer(Slice slice, BasicSpaceTimeSchedule schedule) {
+    public static void createInputBuffer(Filter slice, BasicSpaceTimeSchedule schedule) {
         assert slice.getNumFilters() == 1 : slice.getNumFilters();
         
         if (!slice.getHead().noInputs()) {
@@ -113,9 +113,9 @@ public class InputRotatingBuffer extends RotatingBuffer {
             //System.out.println(filterNode + " is fizzed");
             if(!sharedBufferNames.containsKey(filterNode)) {
                 //System.out.println("  first InputRotatingBuffer, setting base name of: " + this.getIdent());
-                Slice[] fizzedSlices = FissionGroupStore.getFizzedSlices(filterNode.getParent());
+                Filter[] fizzedSlices = FissionGroupStore.getFizzedSlices(filterNode.getParent());
 
-                for(Slice slice : fizzedSlices)
+                for(Filter slice : fizzedSlices)
                     sharedBufferNames.put(slice.getFirstFilter(), this.getIdent());
             }
         }
@@ -149,7 +149,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //mults of all the sources
         int maxRotationLength = 0;
         
-        for (Slice src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+        for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
             int diff = schedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
             if (diff > maxRotationLength) {
@@ -232,10 +232,10 @@ public class InputRotatingBuffer extends RotatingBuffer {
        List<SourceAddressRotation> addressBufsList = new LinkedList<SourceAddressRotation>();
 
        int i = 0;
-       for (Slice src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+       for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
            if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(src)) {
                FissionGroup group = FissionGroupStore.getFissionGroup(src);
-               for(Slice fizzedSlice : group.fizzedSlices) {
+               for(Filter fizzedSlice : group.fizzedSlices) {
                    Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
                    SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, theEdge);
                    addressBufsList.add(rot);

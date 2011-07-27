@@ -73,7 +73,7 @@ public class Rawify {
      * @param layout
      */
     public static void run(SpaceTimeSchedule schedule, RawChip rawChip, Layout<RawTile> layout) {
-        Slice traces[];
+        Filter traces[];
 
         spaceTimeSchedule = schedule;
         
@@ -131,12 +131,12 @@ public class Rawify {
      * @param whichPhase True if the init stage.
      * @param rawChip The raw chip
      */
-    private static void iterateInorder(Slice traces[], SchedulingPhase whichPhase,
+    private static void iterateInorder(Filter traces[], SchedulingPhase whichPhase,
                                 RawProcElements rawChip) {
-        Slice slice;
+        Filter slice;
 
         for (int i = 0; i < traces.length; i++) {
-            slice = (Slice) traces[i];
+            slice = (Filter) traces[i];
             //create code for joining input to the trace
             processInputSliceNode((InputSliceNode)slice.getHead(),
                     whichPhase, rawChip);
@@ -160,24 +160,24 @@ public class Rawify {
      * @param whichPhase True if the init stage.
      * @param rawChip The raw chip
      */
-    private static void iterateJoinFiltersSplit(Slice traces[], SchedulingPhase whichPhase,
+    private static void iterateJoinFiltersSplit(Filter traces[], SchedulingPhase whichPhase,
                                 RawProcElements rawChip) {
-        Slice slice;
+        Filter slice;
 
         for (int i = 0; i < traces.length; i++) {
-            slice = (Slice) traces[i];
+            slice = (Filter) traces[i];
             //create code for joining input to the trace
             processInputSliceNode((InputSliceNode)slice.getHead(),
                     whichPhase, rawChip);
         }
         for (int i = 0; i < traces.length; i++) {
-            slice = (Slice) traces[i];
+            slice = (Filter) traces[i];
             //create the compute code and the communication code for the
             //filters of the trace
             processFilterSlices(slice, whichPhase, rawChip);
         }
         for (int i = 0; i < traces.length; i++) {
-            slice = (Slice) traces[i];
+            slice = (Filter) traces[i];
             //create communication code for splitting the output
             processOutputSliceNode((OutputSliceNode)slice.getTail(),
                     whichPhase, rawChip);
@@ -194,19 +194,19 @@ public class Rawify {
      * @param rawChip The raw chip
      * @param traces The schedule to execute.
      */
-    private static void iterateNoSWPipe(LinkedList<Slice> schedule, SchedulingPhase whichPhase,
+    private static void iterateNoSWPipe(LinkedList<Filter> schedule, SchedulingPhase whichPhase,
                                 RawChip rawChip) {
         
         HashSet<OutputSliceNode> hasBeenSplit = new HashSet<OutputSliceNode>();
         HashSet<InputSliceNode> hasBeenJoined = new HashSet<InputSliceNode>();
-        LinkedList<Slice> scheduled = new LinkedList<Slice>();
-        LinkedList<Slice> needToSchedule = (LinkedList<Slice>)schedule.clone();  
+        LinkedList<Filter> scheduled = new LinkedList<Filter>();
+        LinkedList<Filter> needToSchedule = (LinkedList<Filter>)schedule.clone();  
         
         while (needToSchedule.size() != 0) {
             {
                 //join everyone that can be joined
                 for (int n = 0; n < needToSchedule.size(); n++) {
-                    Slice notSched = needToSchedule.get(n);
+                    Filter notSched = needToSchedule.get(n);
                     if (notSched.getHead().noInputs()) {
                         hasBeenJoined.add(notSched.getHead());
                         continue;
@@ -238,7 +238,7 @@ public class Rawify {
                 //create the compute code and the communication code for the
                 //filters of the trace
                 while (needToSchedule.size() != 0) {
-                    Slice slice = needToSchedule.get(0);
+                    Filter slice = needToSchedule.get(0);
                     if (hasBeenJoined.contains(slice.getHead())) {
                         scheduled.add(slice);
                         processFilterSlices(slice, whichPhase, rawChip);
@@ -312,7 +312,7 @@ public class Rawify {
      * @param whichPhase      INIT / PRIMEPUMP / STEADY
      * @param rawChip
      */
-    public static void processFilterSlices(Slice slice, SchedulingPhase whichPhase,
+    public static void processFilterSlices(Filter slice, SchedulingPhase whichPhase,
             RawProcElements rawChip) {
         //don't do anything for io because it is handled at other levels
         if (spaceTimeSchedule.getSlicer().isIO(slice))
@@ -816,7 +816,7 @@ public class Rawify {
         
         //now we need to create the switch code to route the synch word from 
         //source to dest!!
-        Slice srcSlice = buffer.getSource().getParent();
+        Filter srcSlice = buffer.getSource().getParent();
         //get the raw chip that is write the data (sending it over the gdn)...
         RawTile srcTile = layout.getComputeNode(srcSlice.getTail().getPrevFilter());
                 
@@ -1936,7 +1936,7 @@ public class Rawify {
      * @param tile
      * @param rawChip
      */
-    private static void createCommunicationCode(FilterSliceNode node, Slice parent,
+    private static void createCommunicationCode(FilterSliceNode node, Filter parent,
                                              FilterInfo filterInfo, SchedulingPhase whichPhase,
                                              boolean linear, RawTile tile, RawProcElements rawChip) {
 

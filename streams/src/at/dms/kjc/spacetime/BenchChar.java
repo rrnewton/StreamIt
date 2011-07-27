@@ -9,7 +9,7 @@ import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 /**
@@ -83,7 +83,7 @@ public class BenchChar {
         return 0;        
     }
     
-    private static void findNodes(Slice[] slices) {
+    private static void findNodes(Filter[] slices) {
         joins = 0;
         splits = 0;
         peekingFilters = 0;
@@ -107,16 +107,16 @@ public class BenchChar {
         }
     }
     
-    private static void calcPaths(Slice[] slices) {
+    private static void calcPaths(Filter[] slices) {
         //find all the top slices, or sources
-        LinkedList<Slice> topSlices = new LinkedList<Slice>();
+        LinkedList<Filter> topSlices = new LinkedList<Filter>();
         for (int i = 0; i < slices.length; i++) {
             if (slices[i].getHead().noInputs())
                 topSlices.add(slices[i]);
         }
         
         int longestPath = 0;
-        Slice longestSource = null;
+        Filter longestSource = null;
         //find the source that has the longs path to a sink
         for (int i = 0; i < topSlices.size(); i++) {
             int longestPathSliceToSink = longestPathToSink(topSlices.get(i));
@@ -132,7 +132,7 @@ public class BenchChar {
         BenchChar.shortestPath = shortestPathToSink(longestSource);
     }
     
-    private static int longestPathToSink(Slice slice) {
+    private static int longestPathToSink(Filter slice) {
         if (slice.getTail().noOutputs())
             return 0;
         Iterator<InterSliceEdge> edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
@@ -146,7 +146,7 @@ public class BenchChar {
         return maxPath + 1;
     }
     
-    private static int shortestPathToSink(Slice slice) {
+    private static int shortestPathToSink(Filter slice) {
         if (slice.getTail().noOutputs())
             return 0;
         Iterator<InterSliceEdge> edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();

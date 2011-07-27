@@ -16,7 +16,7 @@ import at.dms.kjc.slir.FilterSliceNode;
 import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 /**
@@ -104,7 +104,7 @@ public class UniBackEndFactory extends BackEndFactory<
      * @param computeNodes    the available compute nodes.
      */
     @Override
-    public void processFilterSlices(Slice slice, 
+    public void processFilterSlices(Filter slice, 
             SchedulingPhase whichPhase, UniProcessors computeNodes) {
         throw new AssertionError("processFilterSlices called, back end should be calling processFilterSlice(singular)");
         

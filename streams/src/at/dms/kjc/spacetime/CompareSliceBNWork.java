@@ -6,7 +6,7 @@ package at.dms.kjc.spacetime;
 import java.util.Comparator;
 
 import at.dms.kjc.slir.SIRSlicer;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 
 /**
  * A Comparator for the work estimation of slices that compares slices
@@ -16,7 +16,7 @@ import at.dms.kjc.slir.Slice;
  * @author mgordon
  *
  */
-public class CompareSliceBNWork implements Comparator<Slice> {
+public class CompareSliceBNWork implements Comparator<Filter> {
     /** The partition we used */
     private SIRSlicer slicer;
     
@@ -34,14 +34,14 @@ public class CompareSliceBNWork implements Comparator<Slice> {
      * 
      * @return The comparison 
      */
-    public int compare(Slice o1, Slice o2) {
+    public int compare(Filter o1, Filter o2) {
 //        assert o1 instanceof Slice && o2 instanceof Slice;
         
-        if (slicer.getSliceBNWork((Slice) o1) < slicer
-                .getSliceBNWork((Slice) o2))
+        if (slicer.getSliceBNWork((Filter) o1) < slicer
+                .getSliceBNWork((Filter) o2))
             return -1;
-        else if (slicer.getSliceBNWork((Slice) o1) == slicer
-                .getSliceBNWork((Slice) o2))
+        else if (slicer.getSliceBNWork((Filter) o1) == slicer
+                .getSliceBNWork((Filter) o2))
             return 0;
         else
             return 1;

@@ -28,7 +28,7 @@ public class TMD extends Scheduler {
 
     private double DUP_THRESHOLD;
     public LevelizeSliceGraph lsg;
-    private HashMap<Slice, Integer> fizzAmount;
+    private HashMap<Filter, Integer> fizzAmount;
     public static final int FISS_COMP_COMM_THRESHOLD = 10;
     /** if true, then we have slices with fanout greater than 2 and we do not 
      * hava a layout where communicating slices are neighbors, boo
@@ -37,7 +37,7 @@ public class TMD extends Scheduler {
     
     public TMD() {
         super();
-        fizzAmount = new HashMap<Slice, Integer>();
+        fizzAmount = new HashMap<Filter, Integer>();
         DUP_THRESHOLD = ((double)KjcOptions.dupthresh) / 100.0;
     }
     
@@ -73,7 +73,7 @@ public class TMD extends Scheduler {
             "Must set the graph schedule (multiplicities) before running layout";
         
         lsg = new LevelizeSliceGraph(graphSchedule.getSlicer().getTopSlices());
-        Slice[][] levels = lsg.getLevels();
+        Filter[][] levels = lsg.getLevels();
         
         
         //if the fan out of any non-predefined filter is > 2 then we have to use the fallback
@@ -106,7 +106,7 @@ public class TMD extends Scheduler {
      * In this optimized layout algorithm communicating filters that are not placed on the
      * same tile are placed on neighboring tiles.
      */
-    private void neighborsLayout(Slice[][] levels) {
+    private void neighborsLayout(Filter[][] levels) {
         //we know fanout <= 2 and each level has number_of_tiles slices
         
         //assert that the first level only has a file reader and that we always have a
@@ -115,12 +115,12 @@ public class TMD extends Scheduler {
         
         //place each slice in a set that will be mapped to the same tile
         System.out.println("Partitioning into same tile sets...");
-        Set<Set<Slice>> sameTile = createSameTileSets(levels);
+        Set<Set<Filter>> sameTile = createSameTileSets(levels);
         assert sameTile.size() <= TileraBackend.chip.abstractSize() : 
             sameTile.size() + " " + TileraBackend.chip.abstractSize();
         Tile nextToAssign = TileraBackend.chip.getComputeNode(0, 0);
-        Set<Slice> current = sameTile.iterator().next();
-        Set<Set<Slice>> done = new HashSet<Set<Slice>>();
+        Set<Filter> current = sameTile.iterator().next();
+        Set<Set<Filter>> done = new HashSet<Set<Filter>>();
         System.out.println("Beginning Neighbors Layout...");
         
         while (true) {
@@ -132,12 +132,12 @@ public class TMD extends Scheduler {
             //now find the next slice set to assign to the snake
             //first find a slice that has a nonlocal output, so we can make the set it is in
             //neighbors with the slice we just assigned...
-            Slice nonLocalOutput = null;
-            for (Slice slice : current) {
+            Filter nonLocalOutput = null;
+            for (Filter slice : current) {
                 if (slice.getTail().getDestSet(SchedulingPhase.STEADY).size() > 1) 
                     nonLocalOutput = slice;
                 else if (slice.getTail().getDestSet(SchedulingPhase.STEADY).size() == 1) {
-                    Slice destSlice = slice.getTail().getDestSlices(SchedulingPhase.STEADY).iterator().next();
+                    Filter destSlice = slice.getTail().getDestSlices(SchedulingPhase.STEADY).iterator().next();
                     if (current != getSetWithSlice(sameTile, destSlice) && 
                             getSetWithSlice(sameTile, destSlice) != null) {
                         nonLocalOutput = slice;
@@ -154,8 +154,8 @@ public class TMD extends Scheduler {
             //fis
             if (nonLocalOutput != null) {
                 //one of the slices does communicate with a slice not of its own set
-                for (Slice slice : nonLocalOutput.getTail().getDestSlices(SchedulingPhase.STEADY)) {
-                    Set<Slice> set = getSetWithSlice(sameTile, slice);
+                for (Filter slice : nonLocalOutput.getTail().getDestSlices(SchedulingPhase.STEADY)) {
+                    Set<Filter> set = getSetWithSlice(sameTile, slice);
                     if (set != current && 
                             !done.contains(set)) {
                         current = getSetWithSlice(sameTile, slice);
@@ -165,7 +165,7 @@ public class TMD extends Scheduler {
             }
             //if we didn't find a communicating set to make a neighbor, then just pick any old set of slices 
             if (current == null) {
-                for (Set<Slice> next : sameTile) {
+                for (Set<Filter> next : sameTile) {
                     if (!done.contains(next))
                         current = next;
                 }
@@ -179,8 +179,8 @@ public class TMD extends Scheduler {
         
     }
     
-    private void assignSlicesToTile(Set<Slice> slices, Tile tile) {
-        for (Slice slice : slices) {
+    private void assignSlicesToTile(Set<Filter> slices, Tile tile) {
+        for (Filter slice : slices) {
             //System.out.println("Assign " + slice.getFirstFilter() + " to tile " + tile.getTileNumber());
             setComputeNode(slice.getFirstFilter(), tile);
         }
@@ -189,13 +189,13 @@ public class TMD extends Scheduler {
     /**
      * 
      */
-    private Set<Set<Slice>> createSameTileSets(Slice[][] levels) {
-        HashSet<Set<Slice>> sameTile = new HashSet<Set<Slice>>();
+    private Set<Set<Filter>> createSameTileSets(Filter[][] levels) {
+        HashSet<Set<Filter>> sameTile = new HashSet<Set<Filter>>();
         for (int l = 0; l < levels.length; l++) {
             //System.out.println("Level " + l + " has size " + levels[l].length);
-            LinkedList<Slice> alreadyAssigned = new LinkedList<Slice>();
+            LinkedList<Filter> alreadyAssigned = new LinkedList<Filter>();
             for (int s = 0; s < levels[l].length; s++) {
-                Slice slice = levels[l][s];
+                Filter slice = levels[l][s];
                 //assign predefined to offchip memory and don't add them to any set
                 if (slice.getFirstFilter().isPredefined()) {
                     setComputeNode(slice.getFirstFilter(), TileraBackend.chip.getOffChipMemory());
@@ -203,7 +203,7 @@ public class TMD extends Scheduler {
                     //find the input with the largest amount of data coming in
                     //and put this slice in the set that the max input is in
                     int bestInputs = -1;
-                    Set<Slice> theBest = null;;
+                    Set<Filter> theBest = null;;
                     
                     for (Edge edge : slice.getHead().getSourceSet(SchedulingPhase.STEADY)) {
                         if (slice.getHead().getWeight(edge, SchedulingPhase.STEADY) >= bestInputs) {
@@ -214,7 +214,7 @@ public class TMD extends Scheduler {
                                     continue;
                             }
                             //the set we want to see if this slice should be added to
-                            Set<Slice> testSet = getSetWithSlice(sameTile, edge.getSrc().getParent());
+                            Set<Filter> testSet = getSetWithSlice(sameTile, edge.getSrc().getParent());
                             
                             //if the test set is null, then we have not put the upstream slice on the chip 
                             if (testSet == null) {
@@ -224,7 +224,7 @@ public class TMD extends Scheduler {
                             //check if the best contains a slice from this level already, if so, we cannot
                             //assign another slice so continue
                             boolean canUse = true;
-                            for (Slice seen : alreadyAssigned) {
+                            for (Filter seen : alreadyAssigned) {
                                 if (testSet.contains(seen))
                                     canUse = false;
                             }
@@ -245,7 +245,7 @@ public class TMD extends Scheduler {
                     if (theBest == null) {
                         //System.out.println("no best: " + slice.getFirstFilter());
                         //create a new set and add it to the set of sets
-                        HashSet<Slice> newSet = new HashSet<Slice>();
+                        HashSet<Filter> newSet = new HashSet<Filter>();
                         newSet.add(slice);
                         sameTile.add(newSet);
                     } else {
@@ -262,9 +262,9 @@ public class TMD extends Scheduler {
      * Give a set of set of slices and slice return the set of slices that contains
      * slice.
      */
-    private Set<Slice> getSetWithSlice(Set<Set<Slice>> sameTile, Slice slice) {
-        Set<Slice> set = null;
-        for (Set<Slice> current : sameTile) {
+    private Set<Filter> getSetWithSlice(Set<Set<Filter>> sameTile, Filter slice) {
+        Set<Filter> set = null;
+        for (Set<Filter> current : sameTile) {
             if (current.contains(slice)) {
                 assert set == null;
                 set = current;
@@ -279,7 +279,7 @@ public class TMD extends Scheduler {
      */
     private void fallBackLayout() {
         System.out.println("Using fall back layout algorithm because a slice has fanout > 2.  Forced to use global barrier.");
-        Slice[][] levels = lsg.getLevels();
+        Filter[][] levels = lsg.getLevels();
         
         System.out.println("Levels: " + levels.length);
         
@@ -294,7 +294,7 @@ public class TMD extends Scheduler {
                setComputeNode(levels[l][0].getFirstFilter(), TileraBackend.chip.getOffChipMemory());
             } else {
                 for (int f = 0; f < levels[l].length; f++) {
-                    Slice slice = levels[l][f];
+                    Filter slice = levels[l][f];
                     Tile theTile = tileToAssign(slice, TileraBackend.chip, allocatedTiles);
                     setComputeNode(slice.getFirstFilter(), theTile);
                     allocatedTiles.add(theTile);
@@ -303,7 +303,7 @@ public class TMD extends Scheduler {
         }
     }
  
-    private Tile tileToAssign(Slice slice, TileraChip chip, Set<Tile> allocatedTiles) {
+    private Tile tileToAssign(Filter slice, TileraChip chip, Set<Tile> allocatedTiles) {
         Tile theBest = null;
         int bestInputs = -1;
            
@@ -351,10 +351,10 @@ public class TMD extends Scheduler {
         int factor = multiplicityFactor(tiles);
         System.out.println("Using fission steady multiplicty factor: " + factor);
         
-        LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
         
         //go through and multiply the steady multiplicity of each filter by factor
-        for (Slice slice : slices) {
+        for (Filter slice : slices) {
             FilterContent filter = slice.getFirstFilter().getFilter();
             filter.multSteadyMult(factor);
          }
@@ -367,7 +367,7 @@ public class TMD extends Scheduler {
         int maxFission = 0;
         int i = 0;
         //go throught and perform the fission
-        for (Slice slice : slices) {
+        for (Filter slice : slices) {
             if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
                 if (Fissioner.doit(slice, graphSchedule.getSlicer(), fizzAmount.get(slice)) != null) {
                     System.out.println("Fissed " + slice.getFirstFilter() + " by " + fizzAmount.get(slice));
@@ -393,7 +393,7 @@ public class TMD extends Scheduler {
     /**
      * Return the level that this slice occupies.
      */
-    public int getLevel(Slice slice) {
+    public int getLevel(Filter slice) {
         return lsg.getLevel(slice);
     }
     
@@ -409,7 +409,7 @@ public class TMD extends Scheduler {
      * 
      */
     public void calculateFizzAmounts(int totalTiles) {
-        Slice[][] origLevels = new LevelizeSliceGraph(graphSchedule.getSlicer().getTopSlices()).getLevels();
+        Filter[][] origLevels = new LevelizeSliceGraph(graphSchedule.getSlicer().getTopSlices()).getLevels();
         long peekingWork = 0;
         long totalWork = 0;
         //assume that level 0 has a file reader and the last level has a file writer
@@ -543,9 +543,9 @@ public class TMD extends Scheduler {
      */
     private int multiplicityFactor(int tiles) {
         int maxFactor = 1;
-        LinkedList<Slice> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
         
-        for (Slice slice : slices) {
+        for (Filter slice : slices) {
          
             if (slice.getFirstFilter().isPredefined())
                 continue;

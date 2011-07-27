@@ -9,7 +9,7 @@ import java.util.*;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 
 /**
  * This class will create a 3D representation of the Space-Time 
@@ -29,7 +29,7 @@ public class POVRAYScheduleRep {
     /** a unique ID used to label the color assigned to each trace */
     private static int colorID = 0;
     /** Map the trace to the name of the color created for it */
-    private HashMap<Slice, String> colorName;
+    private HashMap<Filter, String> colorName;
     
     private ScheduleModel scheduleModel;
     private SpaceTimeSchedule spaceTime;
@@ -44,7 +44,7 @@ public class POVRAYScheduleRep {
         this.spaceTime = spaceTime;
         this.layout = layout;
         
-        colorName = new HashMap<Slice, String>();
+        colorName = new HashMap<Filter, String>();
         
         //get the work estimation model for the schedule 
         scheduleModel = new ScheduleModel(spaceTime, layout, 
@@ -100,7 +100,7 @@ public class POVRAYScheduleRep {
      * @param layout
      * @throws Exception
      */
-    private void createSliceShape(Slice slice, Layout<RawTile> layout) 
+    private void createSliceShape(Filter slice, Layout<RawTile> layout) 
             throws Exception  {
         //don't do anything for file reader and writer traces
         if (spaceTime.getSlicer().isIO(slice))

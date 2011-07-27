@@ -30,7 +30,7 @@ public class SliceDotGraph {
      * @param fileName The file to dump the dot graph
      * @param DRAM True if DRAM port assignment is complete
      */
-    public static void dumpGraph(SpaceTimeSchedule spaceTime, Slice[] schedule, String fileName,
+    public static void dumpGraph(SpaceTimeSchedule spaceTime, Filter[] schedule, String fileName,
             Layout layout, boolean DRAM) {
         dumpGraph(spaceTime, schedule, fileName, layout, DRAM, true);
     }
@@ -43,11 +43,11 @@ public class SliceDotGraph {
      * @param DRAM True if DRAM port assignment is complete
      * @param label if true generate labels for filters and slices with stats
      */
-    public static void dumpGraph(SpaceTimeSchedule spaceTime, Slice[] schedule, String fileName,
+    public static void dumpGraph(SpaceTimeSchedule spaceTime, Filter[] schedule, String fileName,
                                  Layout layout, boolean DRAM, boolean label) {
         
         
-        List<Slice> steadyTrav = Arrays.asList(schedule);
+        List<Filter> steadyTrav = Arrays.asList(schedule);
         SIRSlicer slicer = spaceTime.getSIRSlicer();
         RawProcElements rawChip = spaceTime.getRawChip();
         
@@ -57,7 +57,7 @@ public class SliceDotGraph {
             FileWriter fw = new FileWriter(fileName);
             fw.write("digraph SliceDotGraph {\n");
             fw.write("size = \"8, 10.5\";\n");
-            LinkedList<Slice> tracesList = new LinkedList<Slice>(steadyTrav);
+            LinkedList<Filter> tracesList = new LinkedList<Filter>(steadyTrav);
          
             // HashSet traceSet = new HashSet();
             // Util.addAll(traceSet, steadyTrav);
@@ -65,9 +65,9 @@ public class SliceDotGraph {
             // for (int i = 0; i < io.length; i++)
             // traceSet.add(io[i]);
 
-            Iterator<Slice> traces = tracesList.iterator();
+            Iterator<Filter> traces = tracesList.iterator();
             while (traces.hasNext()) {
-                Slice slice = traces.next();
+                Filter slice = traces.next();
                 //System.out.println(trace);
                 SliceNode node = slice.getHead();
                 

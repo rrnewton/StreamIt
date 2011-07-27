@@ -46,7 +46,7 @@ public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
         int outputs = 0;
         
         //get all the file writers
-        Vector<Slice> fileWriters = new Vector<Slice>();
+        Vector<Filter> fileWriters = new Vector<Filter>();
         for (int i = 0; i < getSlicer().io.length; i++) 
             if (getSlicer().io[i].getHead().isFileOutput())
                 fileWriters.add(getSlicer().io[i]);

@@ -29,7 +29,7 @@ public class CellNoSWPipeLayout extends NoSWPipeLayout<CellPU,CellChip> {
     public void initialPlacement() {
         int spuTile = 0;
         assert chip.getNthComputeNode(0) instanceof PPU;
-        for (Slice slice : scheduleOrder) {
+        for (Filter slice : scheduleOrder) {
             assert slice.getNumFilters() == 1 : "NoSWPipeLayout only works for Time! " + slice;
             if (slice.getHead().getNextFilter().getFilter() instanceof OutputContent ||
                     slice.getHead().getNextFilter().getFilter() instanceof InputContent ) {

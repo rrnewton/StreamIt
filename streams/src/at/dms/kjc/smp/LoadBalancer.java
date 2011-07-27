@@ -95,7 +95,7 @@ public class LoadBalancer {
         return loadBalancedGroups.contains(group);
     }
 
-    public static boolean isLoadBalanced(Slice slice) {
+    public static boolean isLoadBalanced(Filter slice) {
         FissionGroup group = FissionGroupStore.getFissionGroup(slice);
 
         if(group == null)
@@ -104,7 +104,7 @@ public class LoadBalancer {
         return isLoadBalanced(group);
     }
 
-    public static String getStartIterRef(FissionGroup group, Slice fizzedSlice) {
+    public static String getStartIterRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
         Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
@@ -112,7 +112,7 @@ public class LoadBalancer {
         return startItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
     }
 
-    public static String getNumItersRef(FissionGroup group, Slice fizzedSlice) {
+    public static String getNumItersRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
         Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
@@ -120,7 +120,7 @@ public class LoadBalancer {
         return numItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
     }
 
-    public static String getFilterCycleCountRef(FissionGroup group, Slice fizzedSlice) {
+    public static String getFilterCycleCountRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
         Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
@@ -453,8 +453,8 @@ public class LoadBalancer {
         }
     }
 
-    private static Slice getFizzedSliceOnCore(FissionGroup group, Core core) {
-        for(Slice slice : group.fizzedSlices) {
+    private static Filter getFizzedSliceOnCore(FissionGroup group, Core core) {
+        for(Filter slice : group.fizzedSlices) {
             if(SMPBackend.scheduler.getComputeNode(slice.getFirstFilter()).equals(core)) {
                 return slice;
             }

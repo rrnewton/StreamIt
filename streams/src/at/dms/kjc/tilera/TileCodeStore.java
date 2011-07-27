@@ -416,10 +416,10 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
         addStatementToBufferInit("__cycle_counts__ = (uint64_t*)malloc(ITERATIONS * sizeof(uint64_t))");
     }
     
-    public void createExcludedProcessGroup(Slice[] level) {
+    public void createExcludedProcessGroup(Filter[] level) {
         //create the list of tiles that are used by this group
         HashSet<Integer> tilesUsed = new HashSet<Integer>();
-        for (Slice slice : level) {
+        for (Filter slice : level) {
             int absTile = 
                 TileraBackend.chip.getTranslatedTileNumber(
                         TileraBackend.backEndBits.getLayout().getComputeNode(slice.getFirstFilter()).getTileNumber());

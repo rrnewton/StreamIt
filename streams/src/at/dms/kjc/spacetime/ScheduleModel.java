@@ -14,7 +14,7 @@ import at.dms.kjc.slir.FilterSliceNode;
 import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 /**
@@ -33,7 +33,7 @@ public class ScheduleModel {
      */
     public static final int DRAM_ISSUE_COST = 5;
     private Layout<RawTile> layout;
-    private LinkedList<Slice> scheduleOrder;
+    private LinkedList<Filter> scheduleOrder;
     private RawChip rawChip;
     private SpaceTimeSchedule spaceTime;
     /** array of total work estimation for each tile including blocking*/
@@ -48,7 +48,7 @@ public class ScheduleModel {
     private long bottleNeckCost;
     
     public ScheduleModel(SpaceTimeSchedule spaceTime, Layout layout, 
-            LinkedList<Slice> scheduleOrder) {
+            LinkedList<Filter> scheduleOrder) {
         this.layout = layout;
         this.spaceTime = spaceTime;
         this.rawChip = spaceTime.getRawChip();
@@ -152,10 +152,10 @@ public class ScheduleModel {
     public void createModel(boolean debug) {
         //debug = true;
         tileCosts = new long[rawChip.getTotalTiles()];
-        Iterator<Slice> slices = scheduleOrder.iterator();
+        Iterator<Filter> slices = scheduleOrder.iterator();
         
         while (slices.hasNext()) {
-            Slice slice = slices.next();
+            Filter slice = slices.next();
              
             //don't do anything for predefined filters...
             if (slice.getHead().getNextFilter().isPredefined()) 
@@ -324,10 +324,10 @@ public class ScheduleModel {
    public void createModelNoSWPipe() {
        long tileCosts[] = new long[rawChip.getTotalTiles()];
        
-       Iterator<Slice> slices = scheduleOrder.iterator();
+       Iterator<Filter> slices = scheduleOrder.iterator();
        //HashMap<FilterSliceNode, Double> endTime = new HashMap<FilterSliceNode, Double>();
        while (slices.hasNext()) {
-           Slice slice = slices.next();
+           Filter slice = slices.next();
            RawTile tile = layout.getComputeNode(slice.getHead().getNextFilter());
            long traceWork = spaceTime.getSIRSlicer().getSliceBNWork(slice); 
            long myStart = 0;

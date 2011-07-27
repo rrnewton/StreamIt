@@ -89,7 +89,7 @@ public class SpaceTimeBackend {
         // Perform all standard optimization passes on SIR graph 
         // and convert into a Slice graph.
         CommonPasses commonPasses = new CommonPasses();
-        Slice[] sliceGraph = commonPasses.run(str, interfaces, 
+        Filter[] sliceGraph = commonPasses.run(str, interfaces, 
                 interfaceTables, structs, helpers, global, numCores);
         prefixAssociations = commonPasses.getAssociatedGlobals();
         
@@ -98,7 +98,7 @@ public class SpaceTimeBackend {
         // convert all multiple pops sequences of pops.
         // convert all pops that do not return values to writes to a volatile.
         ConvertLonelyPops convertLonelyPops = new ConvertLonelyPops();
-        for (Slice slice : sliceGraph) {
+        for (Filter slice : sliceGraph) {
             for (FilterSliceNode filterNode : slice.getFilterNodes()) {
                 for (JMethodDeclaration method : filterNode.getFilter().getMethods()) {
                     RemoveMultiPops.doit(method);

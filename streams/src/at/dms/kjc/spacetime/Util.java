@@ -213,7 +213,7 @@ public class Util {
      * @param tile
      * @return True if <pre>trace</pre> has a filter that is mapped to <pre>tile</pre>.
      */
-    public static boolean doesSliceUseTile(Slice slice, 
+    public static boolean doesSliceUseTile(Filter slice, 
             ComputeNode tile, Layout layout) {
         SliceNode node = slice.getHead().getNext();
         //cycle thru the nodes and see if we can find a match 
@@ -384,7 +384,7 @@ public class Util {
      * @return An array of all the TraceNode in the <pre>traces</pre> array 
      * dictated by the order that the traces appear in <pre>traces</pre>. 
      */
-    public static SliceNode[] sliceNodeArray(Slice[] traces) {
+    public static SliceNode[] sliceNodeArray(Filter[] traces) {
         LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
 
         for (int i = 0; i < traces.length; i++) {
@@ -419,18 +419,18 @@ public class Util {
     public static LinkedList<FilterSliceNode> sortedFilterSlicesTime(SIRSlicer slicer) {
         //now sort the filters by work
         LinkedList<FilterSliceNode> sortedList = new LinkedList<FilterSliceNode>();
-        LinkedList<Slice> scheduleOrder;
+        LinkedList<Filter> scheduleOrder;
  
   
 
-        Slice[] tempArray = (Slice[]) slicer.getSliceGraph().clone();
+        Filter[] tempArray = (Filter[]) slicer.getSliceGraph().clone();
         Arrays.sort(tempArray, new CompareSliceBNWork(slicer));
-        scheduleOrder = new LinkedList<Slice>(Arrays.asList(tempArray));
+        scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
         //reverse the list, we want the list in descending order!
         Collections.reverse(scheduleOrder);
   
         for (int i = 0; i < scheduleOrder.size(); i++) {
-            Slice slice = scheduleOrder.get(i);
+            Filter slice = scheduleOrder.get(i);
             //don't add io traces!
             /*if (partitioner.isIO(trace)) {
                 continue;

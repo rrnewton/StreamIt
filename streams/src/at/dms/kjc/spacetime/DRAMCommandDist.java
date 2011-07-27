@@ -8,7 +8,7 @@ import java.util.Iterator;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 
 /**
  * Determine the number of read and write commands that each 
@@ -19,7 +19,7 @@ import at.dms.kjc.slir.Slice;
  */
 public class DRAMCommandDist {
     /** The schedule we are executing */
-    private Slice[] schedule;
+    private Filter[] schedule;
     /** The raw chip we are executing on */
     private RawProcElements rawChip;
     /** the number of reads for <pre>schedule</pre> to each dram while
@@ -46,7 +46,7 @@ public class DRAMCommandDist {
      * @param schedule The schedule. 
      * @param rawChip The raw chip.
      */
-    public DRAMCommandDist(Slice[] schedule, RawProcElements rawChip) {
+    public DRAMCommandDist(Filter[] schedule, RawProcElements rawChip) {
         this.schedule = schedule;
         this.rawChip = rawChip;
         intraReads = new int[rawChip.getNumDev()];
@@ -107,7 +107,7 @@ public class DRAMCommandDist {
     
     public void calcDRAMDist() {
         for (int i = 0; i < schedule.length; i++) {
-            Slice slice = schedule[i];
+            Filter slice = schedule[i];
             if (!OffChipBuffer.unnecessary(slice.getHead())) {
                 //if we have a inputtracebuffer that does something, count its 
                 //reads and writers

@@ -7,7 +7,7 @@ import java.util.Vector;
 
 import at.dms.kjc.slir.Edge;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.util.Utils;
 
 /** This class generates the init schedule, the execution order as 
@@ -16,20 +16,20 @@ import at.dms.util.Utils;
 
 public class InitSchedule 
 {
-    public static LinkedList<Slice> getInitSchedule(Slice[] topTraces) 
+    public static LinkedList<Filter> getInitSchedule(Filter[] topTraces) 
     {
-        LinkedList<Slice> schedule = new LinkedList<Slice>();
-        HashSet<Slice> visited = new HashSet<Slice>();
-        LinkedList<Slice> queue = new LinkedList<Slice>();
+        LinkedList<Filter> schedule = new LinkedList<Filter>();
+        HashSet<Filter> visited = new HashSet<Filter>();
+        LinkedList<Filter> queue = new LinkedList<Filter>();
         for (int i = 0; i < topTraces.length; i++) {
             queue.add(topTraces[i]);
             while (!queue.isEmpty()) {      
-                Slice slice = queue.removeFirst();
+                Filter slice = queue.removeFirst();
                 if (!visited.contains(slice)) {
                     visited.add(slice);
                     Iterator dests = slice.getTail().getDestSet(SchedulingPhase.INIT).iterator();
                     while (dests.hasNext()) {
-                        Slice current = ((Edge)dests.next()).getDest().getParent();
+                        Filter current = ((Edge)dests.next()).getDest().getParent();
                         if (!visited.contains(current)) {
                             //only add if all sources has been visited
                             Iterator sources = current.getHead().getSourceSet(SchedulingPhase.INIT).iterator();

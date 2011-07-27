@@ -7,7 +7,7 @@ import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.FilterSliceNode;
 import at.dms.kjc.slir.SIRSlicer;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 
 /**
  * This class represents the space/time schedule for the application, 

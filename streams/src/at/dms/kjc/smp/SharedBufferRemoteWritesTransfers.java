@@ -823,8 +823,8 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         assert (parent instanceof OutputRotatingBuffer);
 
         if (((OutputRotatingBuffer)parent).hasDirectWrite()) {
-            Slice srcSlice = parent.filterNode.getParent();
-            Slice destSlice = ((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent();
+            Filter srcSlice = parent.filterNode.getParent();
+            Filter destSlice = ((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent();
 
             if(FissionGroupStore.isFizzed(srcSlice))
                 srcSlice = FissionGroupStore.getUnfizzedSlice(srcSlice);

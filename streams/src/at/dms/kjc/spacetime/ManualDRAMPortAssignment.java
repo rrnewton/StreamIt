@@ -14,7 +14,7 @@ import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 import at.dms.kjc.slir.Util;
 
@@ -32,7 +32,7 @@ public class ManualDRAMPortAssignment {
     /** The raw chip */
     private static RawProcElements chip; 
     /**the traces that are file readers and writers */
-    private static Slice[] files;
+    private static Filter[] files;
     private static BufferedReader inputBuffer;
     
     /**
@@ -193,7 +193,7 @@ public class ManualDRAMPortAssignment {
      * @param files The traces that are file readers and writers
      * @param chip The raw chip we are targeting
      */
-    private static void fileStuff(Slice[] files, RawProcElements chip) {
+    private static void fileStuff(Filter[] files, RawProcElements chip) {
         // first go thru the file, reader and writers and assign their
         // input->file and file->output buffers
         for (int i = 0; i < files.length; i++) {

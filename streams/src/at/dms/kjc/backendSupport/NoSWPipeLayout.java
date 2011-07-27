@@ -16,7 +16,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     
     protected SIRSlicer slicer;
     protected Ts chip;
-    protected LinkedList<Slice> scheduleOrder;
+    protected LinkedList<Filter> scheduleOrder;
     protected LinkedList<SliceNode> assignedFilters;
     protected Random rand;
     
@@ -70,11 +70,11 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * Random initial assignment.
      */
     public void initialPlacement() {
-        Iterator<Slice> slices = scheduleOrder.iterator();
+        Iterator<Filter> slices = scheduleOrder.iterator();
         int tile = 0;
         while (slices.hasNext()) {
             
-          Slice slice = slices.next();
+          Filter slice = slices.next();
           //System.out.println(trace.getHead().getNextFilter());
           //if (spaceTime.partitioner.isIO(trace))
           //    continue;
@@ -99,10 +99,10 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     public double placementCost(boolean debug) {
         double tileCosts[] = new double[chip.size()];
         
-        Iterator<Slice> slices = scheduleOrder.iterator();
+        Iterator<Filter> slices = scheduleOrder.iterator();
         HashMap<FilterSliceNode, Double> endTime = new HashMap<FilterSliceNode, Double>();
         while (slices.hasNext()) {
-            Slice slice = slices.next();
+            Filter slice = slices.next();
             //System.err.println(slice.toString());
             T tile = (T)assignment.get(slice.getHead().getNextFilter());
             double traceWork = slicer.getSliceBNWork(slice); 

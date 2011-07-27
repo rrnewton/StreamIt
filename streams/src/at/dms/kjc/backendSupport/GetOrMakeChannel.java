@@ -112,7 +112,7 @@ public class GetOrMakeChannel  {
         if (src instanceof InputSliceNode) {
             assert dst instanceof FilterSliceNode;
             // input -> filter
-            Slice s = dst.getParent();
+            Filter s = dst.getParent();
             // implicit assumption here: 
             // ! sliceNeedsPeekBuffer(s) -> ! sliceNeedsJoinerWorkFunction(s)
             // so either connect to joiner code using an unbufferred channel
@@ -152,7 +152,7 @@ public class GetOrMakeChannel  {
         } else if (dst instanceof OutputSliceNode) {
             assert src instanceof FilterSliceNode;
             // filter --> output
-            Slice s = dst.getParent();
+            Filter s = dst.getParent();
             // assumes slice does not need a work function to drive splitter:
             // splitter code can be connected directly to filter via an unbufferred channel
             // or bypass non-existent splitter code delegating to interslice channel.

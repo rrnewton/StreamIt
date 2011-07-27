@@ -33,21 +33,21 @@ public class GeneratePrimePumpScheduleSMD {
     /**
      * Create the preloop schedule and place it in the SpaceTimeSchedule.
      */
-    public void schedule(Slice[] sliceGraph) {
-        LinkedList<LinkedList<Slice>> preLoopSchedule = new LinkedList<LinkedList<Slice>>();
+    public void schedule(Filter[] sliceGraph) {
+        LinkedList<LinkedList<Filter>> preLoopSchedule = new LinkedList<LinkedList<Filter>>();
     
-        LinkedList<Slice> dataFlowTraversal = DataFlowOrder.getTraversal(sliceGraph);
+        LinkedList<Filter> dataFlowTraversal = DataFlowOrder.getTraversal(sliceGraph);
               
         //keep adding slices and edges to the schedule until all traces can fire 
         while (!canEverythingFire(dataFlowTraversal)) {
             CommonUtils.println_debugging("Pre-loop Scheduling Step...");
             //the traces that are firing in the current step...
-            LinkedList<Slice> currentStep = new LinkedList<Slice>();
+            LinkedList<Filter> currentStep = new LinkedList<Filter>();
             HashSet fired = new HashSet();
             
             /* XXX testing */   int maxsiz = dataFlowTraversal.size();
             /* XXX testing */   int usesiz = 0;
-            for (Slice slice : dataFlowTraversal) {
+            for (Filter slice : dataFlowTraversal) {
                 /* XXX testing */ assert usesiz < maxsiz;
                 /* XXX testing */ usesiz++;
                 //if the trace can fire, then fire it in this priming step
@@ -79,7 +79,7 @@ public class GeneratePrimePumpScheduleSMD {
      */
     private void recordFired(Set set) {
         for (Object obj: set) {
-            assert obj instanceof InterSliceEdge || obj instanceof Slice;
+            assert obj instanceof InterSliceEdge || obj instanceof Filter;
             if (exeCounts.containsKey(obj)) {
                 exeCounts.put(obj, exeCounts.get(obj) + 1);
             }
@@ -97,7 +97,7 @@ public class GeneratePrimePumpScheduleSMD {
      * @return The execution count (iteration number)
      */
     private int getExeCount(Object obj) {
-        assert obj instanceof InterSliceEdge || obj instanceof Slice;
+        assert obj instanceof InterSliceEdge || obj instanceof Filter;
         if (exeCounts.containsKey(obj))
             return exeCounts.get(obj).intValue();
         else
@@ -111,11 +111,11 @@ public class GeneratePrimePumpScheduleSMD {
      * @return True if the trace can fire.
      */
     private boolean canFire(Object obj) {
-        assert obj instanceof InterSliceEdge || obj instanceof Slice;
+        assert obj instanceof InterSliceEdge || obj instanceof Filter;
         int myExeCount = getExeCount(obj);
         
-        if (obj instanceof Slice) {
-            Slice slice = (Slice)obj;
+        if (obj instanceof Filter) {
+            Filter slice = (Filter)obj;
 
             //check each of the depends to make sure that they have fired at least
             //one more time than me.
@@ -141,8 +141,8 @@ public class GeneratePrimePumpScheduleSMD {
      * @return True if all the slices and edges in the stream graph can fire, 
      * end of pre-loop schedule.
      */
-    private boolean canEverythingFire(LinkedList<Slice> dataFlowTraversal) {
-        for (Slice slice : dataFlowTraversal) {
+    private boolean canEverythingFire(LinkedList<Filter> dataFlowTraversal) {
+        for (Filter slice : dataFlowTraversal) {
             for (InterSliceEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
                 if (!(canFire(edge))) {
                     System.out.println(slice + " ||| " + edge);
@@ -165,7 +165,7 @@ public class GeneratePrimePumpScheduleSMD {
      * @param slice the slice to check
      * @return should this be counted as a trace that needs to fire.
      */
-    private boolean shouldFireSlice(Slice slice) { 
+    private boolean shouldFireSlice(Filter slice) { 
         return !(slice.getHead().getNextFilter().isPredefined());
     }
 }

@@ -68,7 +68,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
     private void pack() {
         //now sort the filters by work
         LinkedList<SliceNode> sortedList = new LinkedList<SliceNode>();
-        LinkedList<Slice> scheduleOrder;
+        LinkedList<Filter> scheduleOrder;
         
         //get the schedule order of the graph!
         if (SpaceTimeBackend.NO_SWPIPELINE) {
@@ -77,16 +77,16 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
             scheduleOrder = DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
         } else {
             //if we are software pipelining then sort the traces by work
-            Slice[] tempArray = (Slice[]) spaceTime.getSlicer().getSliceGraph().clone();
+            Filter[] tempArray = (Filter[]) spaceTime.getSlicer().getSliceGraph().clone();
             Arrays.sort(tempArray, new CompareSliceBNWork(slicer));
-            scheduleOrder = new LinkedList<Slice>(Arrays.asList(tempArray));
+            scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
             //reverse the list, we want the list in descending order!
             Collections.reverse(scheduleOrder);
         }
 
         
         for (int i = 0; i < scheduleOrder.size(); i++) {
-            Slice slice = scheduleOrder.get(i);
+            Filter slice = scheduleOrder.get(i);
             assert slice.getNumFilters() == 1 : "The greedy partitioner only works for Time!";
             sortedList.add(slice.getHead().getNextFilter());
         }

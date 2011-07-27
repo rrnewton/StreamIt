@@ -16,7 +16,7 @@ import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SimpleSlice;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 
 /**
@@ -68,7 +68,7 @@ public class TileraBackEndScaffold extends BackEndScaffold {
         ComputeNodesI computeNodes = resources.getComputeNodes();
         this.resources = resources;
         
-        Slice slices[];
+        Filter slices[];
 
         beforeScheduling(schedule,resources);
         
@@ -98,12 +98,12 @@ public class TileraBackEndScaffold extends BackEndScaffold {
      * @param whichPhase True if the init stage.
      * @param computeNodes The collection of compute nodes.
      */
-    protected void iterateInorder(Slice slices[], SchedulingPhase whichPhase,
+    protected void iterateInorder(Filter slices[], SchedulingPhase whichPhase,
                                        TileraChip computeNodes) {
-        Slice slice;
+        Filter slice;
 
         for (int i = 0; i < slices.length; i++) {
-            slice = (Slice) slices[i];
+            slice = (Filter) slices[i];
             //create code for joining input to the trace
             resources.processInputSliceNode((InputSliceNode)slice.getHead(),
                     whichPhase, computeNodes);

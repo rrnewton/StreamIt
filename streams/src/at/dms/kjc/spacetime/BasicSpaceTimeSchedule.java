@@ -7,7 +7,7 @@ package at.dms.kjc.spacetime;
 
 import java.util.*;
 
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.common.CommonUtils;
 
@@ -20,32 +20,32 @@ import at.dms.kjc.common.CommonUtils;
  */
 public class BasicSpaceTimeSchedule {
     //the initialization schedule
-    private Slice[] initSchedule;
+    private Filter[] initSchedule;
     //the preloop schedule!
-    private Slice[][] primePumpSchedule; 
+    private Filter[][] primePumpSchedule; 
     //a list of the execution order of slices    
-    private Slice[] schedule;
+    private Filter[] schedule;
     //the multiplicities of the slices in the primepump
     //Slice->Integer
-    private HashMap<Slice, Integer> primePumpMult;
+    private HashMap<Filter, Integer> primePumpMult;
  
     /**
      * Constructor
      */
     public BasicSpaceTimeSchedule() {
-        primePumpMult = new HashMap<Slice, Integer>();
+        primePumpMult = new HashMap<Filter, Integer>();
     }
     /**
      * @param is The initSchedule to set.
      */
-    final public void setInitSchedule(LinkedList<Slice> is) {
-        this.initSchedule = (Slice[])is.toArray(new Slice[0]);
+    final public void setInitSchedule(LinkedList<Filter> is) {
+        this.initSchedule = (Filter[])is.toArray(new Filter[0]);
     }
 
     /**
      * @return Returns the initSchedule.
      */
-    final public Slice[] getInitSchedule() {
+    final public Filter[] getInitSchedule() {
         return initSchedule;
     }
 
@@ -56,8 +56,8 @@ public class BasicSpaceTimeSchedule {
      * @return a linked list representation of the
      * steady state schedule;
      */
-    final public LinkedList<Slice> getScheduleList() {
-        LinkedList<Slice> list = new LinkedList<Slice>();
+    final public LinkedList<Filter> getScheduleList() {
+        LinkedList<Filter> list = new LinkedList<Filter>();
         for (int i = 0; i < schedule.length; i++)
             list.add(schedule[i]);
         
@@ -67,51 +67,51 @@ public class BasicSpaceTimeSchedule {
     /**
      * @return Returns the steady state schedule.
      */
-    final public Slice[] getSchedule() {
+    final public Filter[] getSchedule() {
         return schedule;
     }
 
     /**
      * @param schedule The steady-state schedule to set.
      */
-    final public void setSchedule(LinkedList<Slice> schedule) {
-        this.schedule = schedule.toArray(new Slice[0]);
+    final public void setSchedule(LinkedList<Filter> schedule) {
+        this.schedule = schedule.toArray(new Filter[0]);
     }
     
     
     /**
      * @return Returns the primePumpSchedule.
      */
-    final public Slice[][] getPrimePumpSchedule() {
+    final public Filter[][] getPrimePumpSchedule() {
         return primePumpSchedule;
     }
 
     /** 
      * @return A flat (one-dimensional) array of the primepump schedule.
      */
-    final public Slice[] getPrimePumpScheduleFlat() {
-        LinkedList<Slice> pp = new LinkedList<Slice>();
+    final public Filter[] getPrimePumpScheduleFlat() {
+        LinkedList<Filter> pp = new LinkedList<Filter>();
         
         for (int i = 0; i < primePumpSchedule.length; i++) 
             for (int j = 0; j < primePumpSchedule[i].length; j++) 
                 pp.add(primePumpSchedule[i][j]);
         
         
-        return pp.toArray(new Slice[0]);
+        return pp.toArray(new Filter[0]);
     }
     
     /**
      * @param preLoopSchedule The primePumpSchedule to set.
      */
-    final public void setPrimePumpSchedule(LinkedList<LinkedList<Slice>> preLoopSchedule) {
+    final public void setPrimePumpSchedule(LinkedList<LinkedList<Filter>> preLoopSchedule) {
         //      convert into an array for easier access...
         //CommonUtils.println_debugging("Setting primepump schedule:");   
-        primePumpSchedule = new Slice[preLoopSchedule.size()][];
+        primePumpSchedule = new Filter[preLoopSchedule.size()][];
         for (int i = 0; i < preLoopSchedule.size(); i++ ) {
             LinkedList schStep = preLoopSchedule.get(i);
-            primePumpSchedule[i] = new Slice[schStep.size()];
+            primePumpSchedule[i] = new Filter[schStep.size()];
             for (int j = 0; j < schStep.size(); j++) {
-                Slice current = (Slice)schStep.get(j);
+                Filter current = (Filter)schStep.get(j);
                 //CommonUtils.println_debugging(current.toString());
                 primePumpSchedule[i][j] = current;
                 //generate the prime pump multiplicity map
@@ -128,7 +128,7 @@ public class BasicSpaceTimeSchedule {
      * @param slice
      * @return Return the number of times this slice fires in the prime pump schedule.
      */
-    final public int getPrimePumpMult(Slice slice) {
+    final public int getPrimePumpMult(Filter slice) {
         if (!primePumpMult.containsKey(slice))
             return 0;
         return primePumpMult.get(slice).intValue();

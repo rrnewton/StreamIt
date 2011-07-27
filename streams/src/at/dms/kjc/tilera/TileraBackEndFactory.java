@@ -11,7 +11,7 @@ import at.dms.kjc.slir.FilterSliceNode;
 import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 /**
@@ -116,7 +116,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#processFilterSlices(at.dms.kjc.slicegraph.Slice, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processFilterSlices(Slice slice, SchedulingPhase whichPhase,
+    public void processFilterSlices(Filter slice, SchedulingPhase whichPhase,
             TileraChip chip) {
         assert false : "The Tilera backend does not support slices with multiple filters (processFilterSlices()).";
     }

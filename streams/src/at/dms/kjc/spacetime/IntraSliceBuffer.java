@@ -129,7 +129,7 @@ public class IntraSliceBuffer extends OffChipBuffer {
      * @param t a slice.
      * @return The intrasliceBuffer between the last filter and the outputslicenode
      */
-    public static IntraSliceBuffer getDstIntraBuf(Slice t) {
+    public static IntraSliceBuffer getDstIntraBuf(Filter t) {
         return getBuffer(t.getTail().getPrevFilter(), t.getTail());
     }
 
@@ -138,7 +138,7 @@ public class IntraSliceBuffer extends OffChipBuffer {
      * @return The intraslicebuffer between the inputslicenode 
      * and the first filterslicenode
      */
-    public static IntraSliceBuffer getSrcIntraBuf(Slice t) {
+    public static IntraSliceBuffer getSrcIntraBuf(Filter t) {
         return getBuffer(t.getHead(), t.getHead().getNextFilter());
     }
 

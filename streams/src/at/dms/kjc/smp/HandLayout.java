@@ -20,7 +20,7 @@ public class HandLayout implements Layout {
     
     protected Slicer slicer;
     protected SMPMachine chip;
-    protected LinkedList<Slice> scheduleOrder;
+    protected LinkedList<Filter> scheduleOrder;
     protected HashMap<SliceNode, Core> assignment;    
         
     public HandLayout(SpaceTimeScheduleAndSlicer spaceTime, SMPMachine chip) {
@@ -40,7 +40,7 @@ public class HandLayout implements Layout {
      * for <pre>slice</pre>
      */
     private void assignFromReader(BufferedReader inputBuffer,
-                                  Slice slice) {
+                                  Filter slice) {
         // Assign a filter, joiner to a tile
         // perform some error checking.
         while (true) {
@@ -73,14 +73,14 @@ public class HandLayout implements Layout {
     }
     
     public void runLayout() {
-        Iterator<Slice> slices = scheduleOrder.iterator();
+        Iterator<Filter> slices = scheduleOrder.iterator();
                 
         System.out.println("Enter desired tile for each filter: ");
         BufferedReader inputBuffer = 
                 new BufferedReader(new InputStreamReader(System.in));
         
         while (slices.hasNext()) {
-          Slice slice = slices.next();
+          Filter slice = slices.next();
 
           assert slice.getNumFilters() == 1 : "HandLayout only works for Slices with one filter! "  + 
                slice;

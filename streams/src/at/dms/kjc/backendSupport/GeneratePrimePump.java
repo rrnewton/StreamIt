@@ -3,7 +3,7 @@ package at.dms.kjc.backendSupport;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.KjcOptions;
 import java.util.*;
 
@@ -19,42 +19,42 @@ import java.util.*;
 public class GeneratePrimePump {
     private SpaceTimeScheduleAndSlicer spaceTimeSchedule;
     //the execution count for each trace during the calculation of the schedule
-    private HashMap<Slice, Integer> exeCounts;
+    private HashMap<Filter, Integer> exeCounts;
     
     
    
     public GeneratePrimePump(SpaceTimeScheduleAndSlicer sts) {
         spaceTimeSchedule = sts;
-        exeCounts = new HashMap<Slice, Integer>();
+        exeCounts = new HashMap<Filter, Integer>();
     }
     
     /**
      * Set the primepump schedule to be empty.
      */
     public void setEmptySchedule() {
-        spaceTimeSchedule.setPrimePumpSchedule(new LinkedList<LinkedList<Slice>>());
+        spaceTimeSchedule.setPrimePumpSchedule(new LinkedList<LinkedList<Filter>>());
     }
     
     /**
      * Create the preloop schedule and place it in the SpaceTimeSchedule.
      */
-    public void schedule(Slice[] sliceGraph) {
-        LinkedList<LinkedList<Slice>> preLoopSchedule = new LinkedList<LinkedList<Slice>>();
+    public void schedule(Filter[] sliceGraph) {
+        LinkedList<LinkedList<Filter>> preLoopSchedule = new LinkedList<LinkedList<Filter>>();
         if (! (KjcOptions.spacetime || (KjcOptions.tilera > -1 || KjcOptions.smp > -1)) || KjcOptions.noswpipe) {
             spaceTimeSchedule.setPrimePumpSchedule(preLoopSchedule);
             return;
         }
         
-        LinkedList<Slice> dataFlowTraversal = DataFlowOrder.getTraversal(sliceGraph);
+        LinkedList<Filter> dataFlowTraversal = DataFlowOrder.getTraversal(sliceGraph);
               
         //keep adding traces to the schedule until all traces can fire 
         while (!canEverythingFire(dataFlowTraversal)) {
             CommonUtils.println_debugging("Pre-loop Scheduling Step...");
             //the traces that are firing in the current step...
-            LinkedList<Slice> currentStep = new LinkedList<Slice>();
+            LinkedList<Filter> currentStep = new LinkedList<Filter>();
            
-            LinkedList<Slice> canFireNow = new LinkedList<Slice>();
-            for (Slice slice : dataFlowTraversal) {
+            LinkedList<Filter> canFireNow = new LinkedList<Filter>();
+            for (Filter slice : dataFlowTraversal) {
                 if (canFire(slice)) {
                     canFireNow.add(slice);
                 }
@@ -62,7 +62,7 @@ public class GeneratePrimePump {
             
             /* XXX testing */   int maxsiz = dataFlowTraversal.size();
             /* XXX testing */   int usesiz = 0;
-            for (Slice slice : canFireNow) {
+            for (Filter slice : canFireNow) {
                 /* XXX testing */ assert usesiz < maxsiz;
                 /* XXX testing */ usesiz++;
                 //if the trace can fire, then fire it in this init step
@@ -81,10 +81,10 @@ public class GeneratePrimePump {
      * preloop schedule.
      * @param trace
      */
-    private void recordFired(LinkedList<Slice> fired) {
-        Iterator<Slice> it = fired.iterator();
+    private void recordFired(LinkedList<Filter> fired) {
+        Iterator<Filter> it = fired.iterator();
         while (it.hasNext()) {
-            Slice slice = it.next();
+            Filter slice = it.next();
             if (exeCounts.containsKey(slice)) {
                 exeCounts.put(slice, exeCounts.get(slice) + 1);
             }
@@ -100,7 +100,7 @@ public class GeneratePrimePump {
      * @param slice
      * @return The execution count (iteration number)
      */
-    private int getExeCount(Slice slice) {
+    private int getExeCount(Filter slice) {
         if (exeCounts.containsKey(slice))
             return exeCounts.get(slice).intValue();
         else
@@ -113,8 +113,8 @@ public class GeneratePrimePump {
      * @param slice
      * @return True if the trace can fire.
      */
-    private boolean canFire(Slice slice) {       
-        Slice[] depends = slice.getDependencies(SchedulingPhase.STEADY);
+    private boolean canFire(Filter slice) {       
+        Filter[] depends = slice.getDependencies(SchedulingPhase.STEADY);
         int myExeCount = getExeCount(slice);
         
         //check each of the depends to make sure that they have fired at least
@@ -131,8 +131,8 @@ public class GeneratePrimePump {
     /**
      * @return True if all the traces in the stream graph can fire, end of pre-loop schedule.
      */
-    private boolean canEverythingFire(LinkedList<Slice> dataFlowTraversal) {
-        for (Slice slice: dataFlowTraversal) {
+    private boolean canEverythingFire(LinkedList<Filter> dataFlowTraversal) {
+        for (Filter slice: dataFlowTraversal) {
             if (!canFire(slice))
                 return false;
         }

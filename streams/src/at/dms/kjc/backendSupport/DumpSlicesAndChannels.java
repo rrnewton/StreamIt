@@ -15,7 +15,7 @@ public class DumpSlicesAndChannels {
         buf.append("size = \"8, 10.5\";\n");
 
         for (int i = 0; i < slicer.getSliceGraph().length; i++) {
-            Slice slice = slicer.getSliceGraph()[i];
+            Filter slice = slicer.getSliceGraph()[i];
             assert slice != null;
             buf.append(slice.hashCode() + " [ " + 
                     sliceName(slice, slicer, backendbits) + 
@@ -23,7 +23,7 @@ public class DumpSlicesAndChannels {
             Edge[] outgoing = slice.getTail().getDestList(SchedulingPhase.STEADY);
             for (Edge e : outgoing) {
                 assert e != null && e.getDest() != null;
-                Slice next = e.getDest().getParent();
+                Filter next = e.getDest().getParent();
                 buf.append(slice.hashCode() + " -> " + next.hashCode()
                             + " [label=\""
                             + channelName(e,backendbits)
@@ -67,7 +67,7 @@ public class DumpSlicesAndChannels {
     
     /**return a string with all of the names of the filterslicenodes
      * and blue if linear. */
-    private static  String sliceName(Slice slice, SIRSlicer slicer, BackEndFactory backendbits) {
+    private static  String sliceName(Filter slice, SIRSlicer slicer, BackEndFactory backendbits) {
         SliceNode node = slice.getHead();
 
         StringBuffer out = new StringBuffer();

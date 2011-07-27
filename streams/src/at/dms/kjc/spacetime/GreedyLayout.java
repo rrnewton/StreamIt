@@ -9,7 +9,7 @@ import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 
@@ -108,7 +108,7 @@ public class GreedyLayout implements Layout<RawTile> {
     private void pack() {
         //now sort the filters by work
         LinkedList<FilterSliceNode> sortedList = new LinkedList<FilterSliceNode>();
-        LinkedList<Slice> scheduleOrder;
+        LinkedList<Filter> scheduleOrder;
         
         //get the schedule order of the graph!
         //System.out.println(SpaceTimeBackend.NO_SWPIPELINE);
@@ -118,17 +118,17 @@ public class GreedyLayout implements Layout<RawTile> {
             scheduleOrder = DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
         } else {
             //if we are software pipelining then sort the traces by work
-            Slice[] tempArray = (Slice[]) spaceTime.getSlicer().getSliceGraph().clone();
+            Filter[] tempArray = (Filter[]) spaceTime.getSlicer().getSliceGraph().clone();
             Arrays.sort(tempArray, new CompareSliceBNWork(spaceTime.getSIRSlicer()));
            // System.out.println(tempArray.length);
-            scheduleOrder = new LinkedList<Slice>(Arrays.asList(tempArray));
+            scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
             //reverse the list, we want the list in descending order!
             Collections.reverse(scheduleOrder);
         }
 
         
         for (int i = 0; i < scheduleOrder.size(); i++) {
-            Slice slice = scheduleOrder.get(i);
+            Filter slice = scheduleOrder.get(i);
             
             //don't add io traces!
             /*if (spaceTime.partitioner.isIO(trace)) {

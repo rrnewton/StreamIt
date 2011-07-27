@@ -56,7 +56,7 @@ public abstract class BackEndFactory<
      * @param whichPhase      INIT / PRIMEPUMP / STEADY
      * @param computeNodes    the available compute nodes.
      */
-    public abstract void processFilterSlices(Slice slice, 
+    public abstract void processFilterSlices(Filter slice, 
             SchedulingPhase whichPhase, ComputeNodesType computeNodes);
 
     /**
@@ -160,7 +160,7 @@ public abstract class BackEndFactory<
     /**
      * Does slice need a buffer between its final filter and its splitter?
      */
-    public boolean sliceNeedsPokeBuffer(Slice s) {
+    public boolean sliceNeedsPokeBuffer(Filter s) {
         return false;
     }
 
@@ -174,7 +174,7 @@ public abstract class BackEndFactory<
      * @param s a Slice
      * @return  whether first filter needs a peek buffer.
      */
-    public boolean sliceNeedsPeekBuffer(Slice s) {
+    public boolean sliceNeedsPeekBuffer(Filter s) {
         // todo:  push this down to UniBackEndFactory.
         if (! sliceHasUpstreamChannel(s)) {
             // first filter on a slice with no input
@@ -200,14 +200,14 @@ public abstract class BackEndFactory<
     /** @return true if slice has an upstream channel that it needs to receive data from, false otherwise.
      * May want to set false if upstream channel is to off-chip device and code for a filter controls that
      * device, but this implementation seems a good default. */
-    public boolean sliceHasUpstreamChannel(Slice s) {
+    public boolean sliceHasUpstreamChannel(Filter s) {
         return s.getHead().getWidth(SchedulingPhase.STEADY) > 0;
     }
 
     /** @return true if slice has a downstream channel that it needs to send data to, false otherwise 
      * May want to set false if downstream channel is to off-chip device and code for a filter controls that
      * device, but this implementation seems a good default. */
-    public boolean sliceHasDownstreamChannel(Slice s) {
+    public boolean sliceHasDownstreamChannel(Filter s) {
         return s.getTail().getWidth(SchedulingPhase.STEADY) > 0;
     }
 
@@ -216,20 +216,20 @@ public abstract class BackEndFactory<
      * @param s Slice
      * @return 
      */
-    public boolean sliceNeedsJoinerCode(Slice s) {
+    public boolean sliceNeedsJoinerCode(Filter s) {
         return s.getHead().getWidth(SchedulingPhase.STEADY) > 1;
     }
 
     /**
      * Slice needs work function for a joiner.
-     * We distinguish this from {@link #sliceNeedsJoinerCode(Slice)} since
+     * We distinguish this from {@link #sliceNeedsJoinerCode(Filter)} since
      * there may need to be code generated for a joiner, but the work function may be
      * rolled into the code for a filter.
      * 
      * @param s Slice
      * @return
      */
-    public boolean sliceNeedsJoinerWorkFunction(Slice s) {
+    public boolean sliceNeedsJoinerWorkFunction(Filter s) {
         // if needs peek buffer then needs joiner work function to transfer into peek buffer.
         return sliceNeedsPeekBuffer(s);
     }
@@ -239,7 +239,7 @@ public abstract class BackEndFactory<
      * @param s
      * @return
      */
-    public boolean sliceNeedsSplitterCode(Slice s) {
+    public boolean sliceNeedsSplitterCode(Filter s) {
         return s.getTail().getWidth(SchedulingPhase.STEADY) > 1;
     }
 
@@ -250,7 +250,7 @@ public abstract class BackEndFactory<
      * @param s
      * @return
      */
-    public boolean sliceNeedsSplitterWorkFunction(Slice s) {
+    public boolean sliceNeedsSplitterWorkFunction(Filter s) {
         return false;
     }
 }

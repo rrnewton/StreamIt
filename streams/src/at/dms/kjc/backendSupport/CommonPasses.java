@@ -54,7 +54,7 @@ import at.dms.kjc.slir.InstallInitDistributions;
 import at.dms.kjc.slir.OneFilterSlicer;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.SimpleSlicer;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.Slicer;
 import at.dms.kjc.slir.UnflatFilter;
 import at.dms.kjc.spacetime.AddBuffering;
@@ -103,9 +103,9 @@ public class CommonPasses {
      * @param global            SIRGlobal from  {@link at.dms.kjc.Kopi2SIR}
      * @param numCores          Number of {@link at.dms.kjc.backendSupport.ComputeNode}'s to use in partitioning. 
      *
-     * @return a slice graph: the optimized program in {@link at.dms.kjc.slir.Slice Slice} representation.
+     * @return a slice graph: the optimized program in {@link at.dms.kjc.slir.Filter Slice} representation.
      */
-    public Slice[] run(SIRStream str,
+    public Filter[] run(SIRStream str,
             JInterfaceDeclaration[] interfaces,
             SIRInterfaceTable[] interfaceTables,
             SIRStructure[]structs,
@@ -400,7 +400,7 @@ public class CommonPasses {
                 CommonUtils.println_debugging(topNodes[i].toString());
         }    
 
-        Slice[] sliceGraph = null; 
+        Filter[] sliceGraph = null; 
         
         setSlicer(null);
         if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {

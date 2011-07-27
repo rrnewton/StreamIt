@@ -43,7 +43,7 @@ public class ObjectDeepCloner
      * Deep copy a slice.
      * 
      */ 
-    static public Object deepCopy(Slice oldObj) {
+    static public Object deepCopy(Filter oldObj) {
         if (!KjcOptions.clone_with_serialization) {
             return AutoCloner.deepCopy(oldObj);
         } else {

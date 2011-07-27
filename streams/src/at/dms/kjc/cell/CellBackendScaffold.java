@@ -14,7 +14,7 @@ import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 import at.dms.util.Utils;
@@ -25,7 +25,7 @@ public class CellBackendScaffold extends BackEndScaffold {
     public void beforeScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         ComputeNodesI computeNodes = resources.getComputeNodes();        
-        Slice slices[] = schedule.getInitSchedule();
+        Filter slices[] = schedule.getInitSchedule();
         
         iterateInorder(slices, SchedulingPhase.PREINIT, computeNodes);
         

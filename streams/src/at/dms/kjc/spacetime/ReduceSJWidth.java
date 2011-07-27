@@ -21,15 +21,15 @@ import java.util.Vector;
  **/
 public class ReduceSJWidth
 {
-    private static List<Slice> steady;
-    private static List<Slice> init;
+    private static List<Filter> steady;
+    private static List<Filter> init;
     private static int DRAMs;
 
-    public static void run(List<Slice> initList, List<Slice> steadyList, 
-                           RawProcElements chip, Slice[] files) 
+    public static void run(List<Filter> initList, List<Filter> steadyList, 
+                           RawProcElements chip, Filter[] files) 
     {
         //keep the old steady traversal around so we can iterate over it...
-        Slice[] oldSteady = steadyList.toArray(new Slice[0]);
+        Filter[] oldSteady = steadyList.toArray(new Filter[0]);
         steady = steadyList;
         init = initList;
         DRAMs = chip.getNumDev();
@@ -42,14 +42,14 @@ public class ReduceSJWidth
     }
     
 
-    private static void reduceIncomingEdges(Slice slice) 
+    private static void reduceIncomingEdges(Filter slice) 
     {
         //check if there is anything to do
         if (slice.getHead().getSourceSet(SchedulingPhase.STEADY).size() <= DRAMs)
             return;
 
         //create the new trace to add with an identity
-        Slice newTrace = newIdentityTrace(slice.getHead().getType());
+        Filter newTrace = newIdentityTrace(slice.getHead().getType());
         InputSliceNode input = slice.getHead();
 
         //set the connections
@@ -89,7 +89,7 @@ public class ReduceSJWidth
         reduceIncomingEdges(newTrace);
     }
     
-    private static void addTraceBefore(Slice addMe, Slice before) 
+    private static void addTraceBefore(Filter addMe, Filter before) 
     {
         //add to init, this will not add it if before is not in the 
         //traversal
@@ -117,12 +117,12 @@ public class ReduceSJWidth
 
     //return a new trace with an identity filter and input/output
     //the state of the trace nodes are not set
-    private static Slice newIdentityTrace(CType type) 
+    private static Filter newIdentityTrace(CType type) 
     {
         FilterContent filterC = new FilterContent(new SIRIdentity(type));
         FilterSliceNode node = new FilterSliceNode(filterC);
     
-        Slice slice = new Slice(node);
+        Filter slice = new Filter(node);
         //finish creating the trace? Jasp?
         slice.finish();
     

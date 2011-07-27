@@ -48,7 +48,7 @@ import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
@@ -57,7 +57,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     
     private static final int numspus = KjcOptions.cell;
     
-    private HashMap<Slice,Integer> sliceIdMap = new HashMap<Slice,Integer>();
+    private HashMap<Filter,Integer> sliceIdMap = new HashMap<Filter,Integer>();
     
     private ArrayList<JMethodDeclaration> initfuncs = 
         new ArrayList<JMethodDeclaration>();
@@ -1807,7 +1807,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
     
     @Deprecated
-    private Integer getIdForSlice(Slice slice) {
+    private Integer getIdForSlice(Filter slice) {
         Integer newId = sliceIdMap.get(slice);
         if (newId == null) {
             newId = id;

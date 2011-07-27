@@ -17,7 +17,7 @@ import at.dms.kjc.slir.*;
 public class NumberGathering 
 {
     /** the file writers of the application */
-    public Slice[] fileWriters;
+    public Filter[] fileWriters;
     /** holds the number of items each fw writes in steady state */ 
     public int[] steady;
     /** holds the number of items each fw writes in init */ 
@@ -34,7 +34,7 @@ public class NumberGathering
      * 
      * @return The class with the stats.
      */
-    public static NumberGathering doit(RawProcElements chip, Slice[] files) 
+    public static NumberGathering doit(RawProcElements chip, Filter[] files) 
     {
         return (new NumberGathering(chip, files));
     }
@@ -45,15 +45,15 @@ public class NumberGathering
      * @param chip
      * @param files
      */
-    private NumberGathering(RawProcElements chip, Slice[] files)
+    private NumberGathering(RawProcElements chip, Filter[] files)
     {
         //get all the file writers
-        Vector<Slice> fw = new Vector<Slice>();
+        Vector<Filter> fw = new Vector<Filter>();
         for (int i = 0; i < files.length; i++) 
             if (files[i].getHead().isFileOutput())
                 fw.add(files[i]);
 
-        fileWriters = fw.toArray(new Slice[0]);
+        fileWriters = fw.toArray(new Filter[0]);
         assert fileWriters.length > 0 : "Error in number gathering: no file writer";
         steady = new int[fileWriters.length];
         skip = new int[fileWriters.length];

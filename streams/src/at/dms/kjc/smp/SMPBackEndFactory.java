@@ -13,7 +13,7 @@ import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.LevelizeSliceGraph;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 import java.util.HashMap;
@@ -49,7 +49,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
             levelLeftToProcessInit = new HashMap<Integer, Integer>();
             levelLeftToProcessPP = new HashMap<Integer, Integer>();
 
-        	Slice[][] levels = lsg.getLevels();
+        	Filter[][] levels = lsg.getLevels();
             for (int i = 0; i < levels.length; i++) {
                 levelLeftToProcessInit.put(i, levels[i].length);
                 levelLeftToProcessPP.put(i, levels[i].length);
@@ -141,7 +141,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
         } 
         else {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter.getParent())) {
-                for(Slice slice : FissionGroupStore.getFizzedSlices(filter.getParent())) {
+                for(Filter slice : FissionGroupStore.getFizzedSlices(filter.getParent())) {
                     (new ProcessFilterSliceNode(slice.getFirstFilter(), whichPhase, this)).processFilterSliceNode();
                 }
             }
@@ -182,7 +182,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
      * @see at.dms.kjc.backendSupport.BackEndFactory#processFilterSlices(at.dms.kjc.slicegraph.Slice, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processFilterSlices(Slice slice, SchedulingPhase whichPhase,
+    public void processFilterSlices(Filter slice, SchedulingPhase whichPhase,
             SMPMachine chip) {
         assert false : "The SMP backend does not support slices with multiple filters (processFilterSlices()).";
     }

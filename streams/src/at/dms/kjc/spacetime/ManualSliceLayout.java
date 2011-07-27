@@ -11,7 +11,7 @@ import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.slir.FilterSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 
@@ -39,7 +39,7 @@ public class ManualSliceLayout implements Layout<RawTile> {
     public void runLayout() {
         assignment = new HashMap<SliceNode,RawTile>();
         //call layout on traces!
-        Slice[] traces = spaceTime.getSlicer().getSliceGraph();
+        Filter[] traces = spaceTime.getSlicer().getSliceGraph();
         
         for (int i = 0; i < traces.length; i++) {
             if (!spaceTime.getSlicer().isIO(traces[i]))
@@ -48,7 +48,7 @@ public class ManualSliceLayout implements Layout<RawTile> {
         
         //now set the tiles of the i/o
         for (int i = 0; i < spaceTime.getSlicer().io.length; i++) {
-            Slice slice = spaceTime.getSlicer().io[i];
+            Filter slice = spaceTime.getSlicer().io[i];
             if (slice.getHead().getNextFilter().isFileOutput()) {
                 //file writer
                 assert slice.getHead().oneInput();
@@ -75,7 +75,7 @@ public class ManualSliceLayout implements Layout<RawTile> {
      * @param rawChip The Raw Chip 
      * @param slice The Slice we would want to layout out on <pre>rawChip</pre>
      */
-    private void layout(RawChip rawChip, Slice slice) {
+    private void layout(RawChip rawChip, Filter slice) {
         BufferedReader inputBuffer = 
             new BufferedReader(new InputStreamReader(
                     System.in));

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.SIRSlicer;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.KjcOptions;
 
 /**
@@ -26,7 +26,7 @@ import at.dms.kjc.KjcOptions;
 public class BasicGenerateSteadyStateSchedule {
     private BasicSpaceTimeSchedule spaceTime;
     private SIRSlicer slicer;
-    private LinkedList<Slice> schedule;
+    private LinkedList<Filter> schedule;
     
     /**
      * 
@@ -38,7 +38,7 @@ public class BasicGenerateSteadyStateSchedule {
       
         spaceTime = sts;
         this.slicer = slicer;
-        schedule = new LinkedList<Slice>();
+        schedule = new LinkedList<Filter>();
     }
     
     
@@ -61,9 +61,9 @@ public class BasicGenerateSteadyStateSchedule {
      */
     private void scheduleWork() {
         // sort traces into decreasing order by bottleneck work.
-        Slice[] tempArray = (Slice[]) slicer.getSliceGraph().clone();
+        Filter[] tempArray = (Filter[]) slicer.getSliceGraph().clone();
         Arrays.sort(tempArray, new CompareSliceBNWork(slicer));
-        LinkedList<Slice> sortedTraces = new LinkedList<Slice>(Arrays.asList(tempArray));
+        LinkedList<Filter> sortedTraces = new LinkedList<Filter>(Arrays.asList(tempArray));
         Collections.reverse(sortedTraces);
 
 //        CommonUtils.println_debugging("Sorted Traces: ");
@@ -74,17 +74,17 @@ public class BasicGenerateSteadyStateSchedule {
         
         while (!sortedTraces.isEmpty()) {
             //remove the first trace, the trace with the most work
-            Slice slice = sortedTraces.removeFirst();
+            Filter slice = sortedTraces.removeFirst();
             schedule.add(slice);
         }
     }
     
    
     private void printSchedule() {
-        Iterator<Slice> sch = schedule.iterator();
+        Iterator<Filter> sch = schedule.iterator();
         CommonUtils.println_debugging("Schedule: ");
         while (sch.hasNext()) {
-            Slice slice = sch.next();
+            Filter slice = sch.next();
             CommonUtils.println_debugging(" ** " + slice);
         }
 

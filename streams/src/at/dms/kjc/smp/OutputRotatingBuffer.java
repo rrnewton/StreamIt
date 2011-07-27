@@ -20,7 +20,7 @@ import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 
@@ -49,12 +49,12 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * @param slices The steady-state schedule of slices
      */
     public static void createOutputBuffers(BasicSpaceTimeSchedule schedule) {
-        for (Slice slice : schedule.getScheduleList()) {
+        for (Filter slice : schedule.getScheduleList()) {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
 
                 FissionGroup group = FissionGroupStore.getFissionGroup(slice);
-                for(Slice fizzedSlice : group.fizzedSlices)
+                for(Filter fizzedSlice : group.fizzedSlices)
                     createOutputBuffer(fizzedSlice, schedule);
             }
             else {
@@ -63,7 +63,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         }
     }
 
-    public static void createOutputBuffer(Slice slice, BasicSpaceTimeSchedule schedule) {
+    public static void createOutputBuffer(Filter slice, BasicSpaceTimeSchedule schedule) {
         assert slice.getNumFilters() == 1;
         
         //don't do anything for file readers or writers,
@@ -298,7 +298,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         //first find the max rotation length given the prime pump 
         //mults of all the sources
         int maxRotLength = 0;
-        for (Slice dest : filterNode.getParent().getTail().getDestSlices(SchedulingPhase.STEADY)) {
+        for (Filter dest : filterNode.getParent().getTail().getDestSlices(SchedulingPhase.STEADY)) {
             int diff = srcMult - schedule.getPrimePumpMult(dest);
             assert diff >= 0;
             if (diff > maxRotLength)

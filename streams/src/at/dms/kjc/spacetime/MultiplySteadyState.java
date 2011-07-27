@@ -8,7 +8,7 @@ import java.util.HashSet;
 import at.dms.kjc.*;
 
 public class MultiplySteadyState {
-    public static void doit(Slice[] traces) {
+    public static void doit(Filter[] traces) {
         
         assert KjcOptions.steadymult > 0 : "Illegal steadymult argument";
        /*

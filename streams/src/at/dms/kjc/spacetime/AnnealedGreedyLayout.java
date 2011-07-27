@@ -11,7 +11,7 @@ import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 import at.dms.kjc.*;
 
@@ -97,10 +97,10 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
     public void swapAssignment() {
         //find two slices to swap, remember this only work for time
         //slices are single filter
-        Slice slice1, slice2;
+        Filter slice1, slice2;
         FilterSliceNode filter1 = null, filter2 = null;
         int bin1, bin2;
-        Slice[] slices = slicer.getSliceGraph();
+        Filter[] slices = slicer.getSliceGraph();
         
         recalculateBinWeights();
         
@@ -317,7 +317,7 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
      */
     
     private int reorgCrossRoutes() {
-        Slice[] slices = slicer.getSliceGraph();
+        Filter[] slices = slicer.getSliceGraph();
         int crossed = 0;
         
         router = new SmarterRouter(tileCosts, chip);
@@ -330,7 +330,7 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
         HashSet<RawComputeNode> routersUsed = new HashSet<RawComputeNode>();
         
         for (int i = 0; i < slices.length; i++) {
-            Slice slice = slices[i];
+            Filter slice = slices[i];
             Iterator edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
             while (edges.hasNext()) {
                 InterSliceEdge edge = (InterSliceEdge)edges.next();

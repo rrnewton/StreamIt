@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 public class SimpleCellLayout implements Layout<CellPU> {
@@ -24,9 +24,9 @@ public class SimpleCellLayout implements Layout<CellPU> {
     }
 
     public void runLayout() {
-        Slice[] schedule = spaceTime.getSchedule();
+        Filter[] schedule = spaceTime.getSchedule();
         for (int i=0; i<schedule.length; i++) {
-            Slice s = schedule[i];
+            Filter s = schedule[i];
             //if (s.getTail().isFileInput() s.getHead().isInputSlice())
         }
     }

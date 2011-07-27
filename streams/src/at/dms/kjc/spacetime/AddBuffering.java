@@ -31,7 +31,7 @@ import at.dms.kjc.*;
  */
 public class AddBuffering {
     private Slicer spaceTime;
-    private HashSet<Slice> editedSlices;
+    private HashSet<Filter> editedSlices;
     private boolean limitTiles;
     private int totalTiles;
     
@@ -50,7 +50,7 @@ public class AddBuffering {
         this.spaceTime = st;
         this.limitTiles = limit;
         this.totalTiles = tt;
-        editedSlices = new HashSet<Slice>();
+        editedSlices = new HashSet<Filter>();
     }
     
     private void doitInternal() {
@@ -66,7 +66,7 @@ public class AddBuffering {
      */
     private void checkOutputNodes() {
         for (int t = 0; t < spaceTime.getSliceGraph().length; t++) {
-            Slice slice = spaceTime.getSliceGraph()[t];
+            Filter slice = spaceTime.getSliceGraph()[t];
             //check all the outgoing edges to see if they are balanced in the init
             //and fix them if we have to
             fixOutputNode(slice.getTail());
@@ -95,7 +95,7 @@ public class AddBuffering {
             //we have to buffer to items by adding an upstream id filter
             int itemsToBuffer = filter.initItemsPushed() % output.totalWeights(SchedulingPhase.INIT);
             int itemsIDShouldPass = filter.initItemsPushed() - itemsToBuffer;
-            Slice slice = output.getParent();
+            Filter slice = output.getParent();
             System.out.println(" * Adding buffering after " + slice.getTail().getPrevious() + 
                     " to equalize output, pass: " + itemsIDShouldPass + " buffer: " + itemsToBuffer);
             //System.out.println("   " + filter.initItemsPushed() + " % " + 
@@ -121,7 +121,7 @@ public class AddBuffering {
             //System.out.println("Iteration " + i++);
             change = false;
             for (int t = 0; t < spaceTime.getSliceGraph().length; t++) {
-                Slice slice = spaceTime.getSliceGraph()[t];
+                Filter slice = spaceTime.getSliceGraph()[t];
                 //check all the outgoing edges to see if they are balanced in the init
                 //and fix them if we have to
                 boolean currentChange 
@@ -200,7 +200,7 @@ public class AddBuffering {
                         mults.get(edge).doubleValue() + " to " + minMult);
                 
                 changes = true;
-                Slice slice = edge.getSrc().getParent();
+                Filter slice = edge.getSrc().getParent();
                 //System.out.println(" * Adding output buffering to " + slice);
                 //make sure that we have not already added buffering to this 
                 //slice, if we try to fix it will mess up the already fixed input
@@ -235,12 +235,12 @@ public class AddBuffering {
      * @param incoming
      * @param itemsToPassInit
      */
-    private void addNewBufferingSlice(Slice upSlice, InterSliceEdge edge, int itemsToPassInit) {
+    private void addNewBufferingSlice(Filter upSlice, InterSliceEdge edge, int itemsToPassInit) {
         System.out.println("Adding new buffering slice at edge: " + edge);
         CType type = edge.getType(); 
         
         //the downstream slice
-        Slice downSlice = edge.getDest().getParent();
+        Filter downSlice = edge.getDest().getParent();
         
         //the new input of the new slice
         InputSliceNode newInput = new InputSliceNode(new int[]{1});
@@ -261,7 +261,7 @@ public class AddBuffering {
         newOutput.setPrevious(filter);
         
         //the new slice
-        Slice bufferingSlice = new Slice(newInput);
+        Filter bufferingSlice = new Filter(newInput);
         bufferingSlice.finish();
         
         //create the new edge that will exist between the new slice and the
@@ -310,7 +310,7 @@ public class AddBuffering {
      * in the init stage.
      * @return True if we can add the required buffering to the inside of the slice.
      */
-    private boolean legalToAddBufferingInSlice(Slice slice, int initItemsSent) {
+    private boolean legalToAddBufferingInSlice(Filter slice, int initItemsSent) {
         if (KjcOptions.greedysched || KjcOptions.noswpipe)
             return false;
         if (limitTiles && slice.getNumFilters() >= totalTiles)
@@ -349,7 +349,7 @@ public class AddBuffering {
      * @return The number of items that the ID must pass to the output
      * slice node.
      */
-    private int itemsToPass(Slice slice, InterSliceEdge edge, double inputMult) {
+    private int itemsToPass(Filter slice, InterSliceEdge edge, double inputMult) {
         assert slice == edge.getSrc().getParent();
         OutputSliceNode output = edge.getSrc();
         InputSliceNode input = edge.getDest();
@@ -382,7 +382,7 @@ public class AddBuffering {
      * @param slice The slice to add to.
      * @param initMult The init multiplicity of the new id filter.
      */
-    private void addIDToSlice(Slice slice, int initMult) {
+    private void addIDToSlice(Filter slice, int initMult) {
         FilterSliceNode oldLast = slice.getTail().getPrevFilter();
 
 // removed check: can always convert to SimpleSlices

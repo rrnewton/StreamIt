@@ -26,7 +26,7 @@ import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.slir.FilterSliceNode;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.MutableStateExtractor;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.Slicer;
 import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.slir.fission.Fissioner;
@@ -38,7 +38,7 @@ public class StatelessFissioner {
     private int myID;
 
     /** the slice we are fissing */
-    private Slice slice;
+    private Filter slice;
     /** the amount we are fizzing slice by */
     private int fizzAmount;
     /** the filter of the slice we are fissing */
@@ -58,9 +58,9 @@ public class StatelessFissioner {
     private int sliceCopyDown;
 
     /** the fission products of the slice */
-    private Slice[] sliceClones;
+    private Filter[] sliceClones;
 
-    public static FissionGroup doit(Slice slice, Slicer slicer, int fissAmount) {
+    public static FissionGroup doit(Filter slice, Slicer slicer, int fissAmount) {
         if(!KjcOptions.sharedbufs) {
             return Fissioner.doit(slice, slicer, fissAmount);
         }
@@ -77,7 +77,7 @@ public class StatelessFissioner {
      * Return true if <slice> can be fissed, meaning it is stateless.  The method 
      * does not check that the schedule allows for fission.
      */
-    public static boolean canFizz(Slice slice, boolean debug) {
+    public static boolean canFizz(Filter slice, boolean debug) {
 
         // Get information on Slice rates
         FilterInfo.reset();
@@ -116,7 +116,7 @@ public class StatelessFissioner {
         return true;
     }
 
-    private StatelessFissioner(Slice slice, int fizzAmount) {
+    private StatelessFissioner(Filter slice, int fizzAmount) {
         this.slice = slice;
         this.fizzAmount = fizzAmount;
         this.filter = slice.getFirstFilter();
@@ -159,9 +159,9 @@ public class StatelessFissioner {
 
     private void createFissedSlices() {        
         // Fill array with clones of Slice
-        sliceClones = new Slice[fizzAmount];
+        sliceClones = new Filter[fizzAmount];
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x] = (Slice)ObjectDeepCloner.deepCopy(slice);
+            sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
         
         // Give each Slice clone a unique name
         String origName = slice.getFirstFilter().getFilter().getName();

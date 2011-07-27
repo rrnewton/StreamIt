@@ -12,7 +12,7 @@ import at.dms.kjc.slir.InputSliceNode;
 import at.dms.kjc.slir.InterSliceEdge;
 import at.dms.kjc.slir.OutputSliceNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Slice;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
 /**
@@ -77,7 +77,7 @@ public class RawBackEndFactory extends BackEndFactory<RawChip, RawTile, RawCompu
      * @param computeNodes    the available compute nodes.
      */
     @Override
-    public void processFilterSlices(Slice slice, 
+    public void processFilterSlices(Filter slice, 
             SchedulingPhase whichPhase, RawChip rawChip) {
         Rawify.processFilterSlices(slice, whichPhase, rawChip);
     }
