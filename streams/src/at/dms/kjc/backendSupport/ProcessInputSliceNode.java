@@ -6,7 +6,7 @@ import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.common.*;
 /**
- * Create kopi code for an {@link at.dms.kjc.slir.InputSliceNode}.
+ * Create kopi code for an {@link at.dms.kjc.slir.InputNode}.
  * @author dimock
  */
 public class ProcessInputSliceNode {
@@ -15,7 +15,7 @@ public class ProcessInputSliceNode {
     // uses WeakHashMap to be self-cleaning, but now have to insert some value.
     protected static Map<SliceNode,Boolean>  basicCodeWritten = new WeakHashMap<SliceNode,Boolean>();
     
-    protected InputSliceNode inputNode;
+    protected InputNode inputNode;
     protected SchedulingPhase whichPhase;
     protected BackEndFactory backEndBits;
     protected CodeStoreHelper joiner_code;
@@ -28,7 +28,7 @@ public class ProcessInputSliceNode {
      * @param whichPhase   a scheduling phase {@link SchedulingPhase}
      * @param backEndBits  a BackEndFactory to access layout, etc.
      */
-    public ProcessInputSliceNode(InputSliceNode inputNode,
+    public ProcessInputSliceNode(InputNode inputNode,
             SchedulingPhase whichPhase, BackEndFactory backEndBits) {
         this.inputNode = inputNode;
         this.whichPhase = whichPhase;
@@ -159,7 +159,7 @@ public class ProcessInputSliceNode {
          * Do not create a joiner if all weights are 0: this code
          * fails rather than creating nonsensical kopi code.
          * Note that this <b>always</b> creates code, if you want to reuse
-         * any existing code call {@link #getJoinerCode(InputSliceNode, BackEndFactory) getJoinerCode} instead.
+         * any existing code call {@link #getJoinerCode(InputNode, BackEndFactory) getJoinerCode} instead.
          * <pre>
     joiner as a state machine, driven off arrays:
     
@@ -227,7 +227,7 @@ public class ProcessInputSliceNode {
          * @param backEndBits to get info from appropriate BackEndFactory
          * @param helper CodeStoreHelper to get the fields and method implementing the joiner
          */
-        private static  void makeJoinerCode(InputSliceNode joiner,
+        private static  void makeJoinerCode(InputNode joiner,
                 BackEndFactory backEndBits, CodeStoreHelper helper) {
             String joiner_name = "_joiner_" + ProcessFilterSliceNode.getUid();
             String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
@@ -360,7 +360,7 @@ public class ProcessInputSliceNode {
          * @param joiner_code  place to put code
          */
         
-        public static  void makeJoinerWork(InputSliceNode joiner,
+        public static  void makeJoinerWork(InputNode joiner,
                 BackEndFactory backEndBits, CodeStoreHelper joiner_code) {
             JMethodDeclaration joinerWork;
 
@@ -441,7 +441,7 @@ public class ProcessInputSliceNode {
          * @param backEndBits
          * @return
          */
-        public static  CodeStoreHelper getJoinerCode(InputSliceNode joiner, BackEndFactory backEndBits) {
+        public static  CodeStoreHelper getJoinerCode(InputNode joiner, BackEndFactory backEndBits) {
             CodeStoreHelper joiner_code = CodeStoreHelper.findHelperForSliceNode(joiner);
             if (joiner_code == null) {
                 joiner_code = backEndBits.getCodeStoreHelper(joiner);

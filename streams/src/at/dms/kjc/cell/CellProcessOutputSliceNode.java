@@ -16,7 +16,7 @@ import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.backendSupport.ProcessOutputSliceNode;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 
 public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
@@ -24,7 +24,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
     private CellComputeCodeStore ppuCS;
     private CellComputeCodeStore initCodeStore; 
     
-    public CellProcessOutputSliceNode(OutputSliceNode outputNode, 
+    public CellProcessOutputSliceNode(OutputNode outputNode, 
             SchedulingPhase whichPhase, CellBackendFactory backEndBits) {
         super(outputNode, whichPhase, backEndBits);
         ppuCS = backEndBits.getPPU().getComputeCode();
@@ -119,7 +119,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
         }
     }
     
-    private CellPU getLocationFromScheduleLayout(OutputSliceNode sliceNode) {
+    private CellPU getLocationFromScheduleLayout(OutputNode sliceNode) {
         int cpu = -1;
         int filterId;
         if (sliceNode.isRRSplitter(SchedulingPhase.STEADY))
@@ -142,7 +142,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
         }
     }
     
-    public static  CodeStoreHelper getSplitterCode(OutputSliceNode splitter, BackEndFactory backEndBits) {
+    public static  CodeStoreHelper getSplitterCode(OutputNode splitter, BackEndFactory backEndBits) {
         CodeStoreHelper splitter_code = CodeStoreHelper.findHelperForSliceNode(splitter);
         if (splitter_code == null) {
             splitter_code = backEndBits.getCodeStoreHelper(splitter);
@@ -152,7 +152,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
         return splitter_code;
     }
     
-    private static void makeSplitterCode(OutputSliceNode splitter, 
+    private static void makeSplitterCode(OutputNode splitter, 
             BackEndFactory backEndBits, CodeStoreHelper helper) {
         String splitter_name = "_splitter_" + ProcessFilterSliceNode.getUid();
         String splitter_method_name =  splitter_name + splitter.getPrevFilter().getFilter().getName();

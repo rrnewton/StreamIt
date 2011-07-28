@@ -9,15 +9,15 @@ import java.util.*;
  * @author mgordon
  *
  */
-public class IntraSliceEdge extends Edge implements at.dms.kjc.DeepCloneable {
+public class IntraFilterEdge extends Edge implements at.dms.kjc.DeepCloneable {
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */
-    private IntraSliceEdge() {
+    private IntraFilterEdge() {
         super();
     }
     
-    public IntraSliceEdge(SliceNode src, SliceNode dst) {
+    public IntraFilterEdge(SliceNode src, SliceNode dst) {
         super(src, dst);
         //assert src.getParent() == dst.getParent(); //can't assume that parent pointer is set up
         //could use a lot more checking here, but at this point, not really crucial
@@ -27,14 +27,14 @@ public class IntraSliceEdge extends Edge implements at.dms.kjc.DeepCloneable {
 
     /** Returns a deep clone of this object. */
     public Object deepClone() {
-        at.dms.kjc.slir.IntraSliceEdge other = new at.dms.kjc.slir.IntraSliceEdge();
+        at.dms.kjc.slir.IntraFilterEdge other = new at.dms.kjc.slir.IntraFilterEdge();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);
         return other;
     }
 
     /** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.IntraSliceEdge other) {
+    protected void deepCloneInto(at.dms.kjc.slir.IntraFilterEdge other) {
         super.deepCloneInto(other);
     }
 

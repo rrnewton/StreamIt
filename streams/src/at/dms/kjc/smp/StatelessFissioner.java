@@ -23,8 +23,8 @@ import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.backendSupport.FilterInfo;
 
 
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.MutableStateExtractor;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.Slicer;
@@ -42,7 +42,7 @@ public class StatelessFissioner {
     /** the amount we are fizzing slice by */
     private int fizzAmount;
     /** the filter of the slice we are fissing */
-    private FilterSliceNode filter;
+    private WorkNode filter;
     /** the filter info of the filter of the slice we are fissing */
     private FilterInfo fInfo;
 
@@ -82,7 +82,7 @@ public class StatelessFissioner {
         // Get information on Slice rates
         FilterInfo.reset();
 
-        FilterSliceNode filter = slice.getFirstFilter();
+        WorkNode filter = slice.getFirstFilter();
         
         // Check to see if Slice has file reader/writer.  Don't fizz file
         // reader/writer
@@ -214,11 +214,11 @@ public class StatelessFissioner {
 
         for(int x = 1 ; x < fizzAmount ; x++) {
             sliceClones[x].getHead().setInitWeights(new int[0]);
-            sliceClones[x].getHead().setInitSources(new InterSliceEdge[0]);
+            sliceClones[x].getHead().setInitSources(new InterFilterEdge[0]);
         }
         for(int x = 1 ; x < fizzAmount ; x++) {
             sliceClones[x].getTail().setInitWeights(new int[0]);
-            sliceClones[x].getTail().setInitDests(new InterSliceEdge[0][0]);
+            sliceClones[x].getTail().setInitDests(new InterFilterEdge[0][0]);
         }
     }
 }

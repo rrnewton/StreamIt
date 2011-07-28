@@ -3,13 +3,13 @@ package at.dms.kjc.slir;
 
 /**
  * SliceNode's are a doubly-linked list with a parent pointer to a Slice.
- * They can be specialized into {@link InputSliceNode}, {@link FilterSliceNode}, or {@link OutputSliceNode}. 
+ * They can be specialized into {@link InputNode}, {@link WorkNode}, or {@link OutputNode}. 
  */
 public class SliceNode implements at.dms.kjc.DeepCloneable      {
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "toNext", "toPrev" };
 
-    private IntraSliceEdge toNext = null;  // internal to slice: remains null for OutputSliceNode
-    private IntraSliceEdge toPrev = null;  // internal to slice: remains null for InputSliceNode
+    private IntraFilterEdge toNext = null;  // internal to slice: remains null for OutputSliceNode
+    private IntraFilterEdge toPrev = null;  // internal to slice: remains null for InputSliceNode
 
     private Filter parent;
 
@@ -21,20 +21,20 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
         return (toPrev == null)? null : toPrev.getSrc();
     }
 
-    public IntraSliceEdge getEdgeToNext() {
+    public IntraFilterEdge getEdgeToNext() {
         return toNext;
     }
     
-    public IntraSliceEdge getEdgeToPrev() {
+    public IntraFilterEdge getEdgeToPrev() {
         return toPrev;
     }
 
-    private void setNextEdge(IntraSliceEdge edge) {
+    private void setNextEdge(IntraFilterEdge edge) {
         toNext = edge;
     }
     
 
-    private void setPrevEdge(IntraSliceEdge edge) {
+    private void setPrevEdge(IntraFilterEdge edge) {
         toPrev = edge;
     }
     
@@ -45,8 +45,8 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
      * @param prev The new previous node
      */
     public void setPrevious(SliceNode prev) {
-        assert ! (this instanceof InputSliceNode); 
-        toPrev = new IntraSliceEdge(prev,this);
+        assert ! (this instanceof InputNode); 
+        toPrev = new IntraFilterEdge(prev,this);
         prev.setNextEdge(toPrev);
     }
 
@@ -57,8 +57,8 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
      * @param next The new next node
      */
     public void setNext(SliceNode next) {
-        assert ! (this instanceof OutputSliceNode);
-        toNext = new IntraSliceEdge(this, next);
+        assert ! (this instanceof OutputNode);
+        toNext = new IntraFilterEdge(this, next);
         next.setPrevEdge(toNext);
     }
 
@@ -67,27 +67,27 @@ public class SliceNode implements at.dms.kjc.DeepCloneable      {
 //    }
     
     public boolean isInputSlice() {
-        return this instanceof InputSliceNode;
+        return this instanceof InputNode;
     }
 
     public boolean isFilterSlice() {
-        return this instanceof FilterSliceNode;
+        return this instanceof WorkNode;
     }
 
     public boolean isOutputSlice() {
-        return this instanceof OutputSliceNode;
+        return this instanceof OutputNode;
     }
 
-    public InputSliceNode getAsInput() {
-        return (InputSliceNode)this;
+    public InputNode getAsInput() {
+        return (InputNode)this;
     }
     
-    public OutputSliceNode getAsOutput() {
-        return (OutputSliceNode)this;
+    public OutputNode getAsOutput() {
+        return (OutputNode)this;
     }
     
-    public FilterSliceNode getAsFilter() {
-        return (FilterSliceNode) this;
+    public WorkNode getAsFilter() {
+        return (WorkNode) this;
     }
     
     /**

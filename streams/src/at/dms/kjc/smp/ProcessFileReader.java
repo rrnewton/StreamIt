@@ -12,15 +12,15 @@ import java.util.Set;
 
 public class ProcessFileReader {
     
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     protected SchedulingPhase phase;
     protected SMPBackEndFactory factory;
     protected CoreCodeStore codeStore;
     protected FileInputContent fileInput;
     protected Core allocatingCore;
-    protected OutputSliceNode fileOutput;
+    protected OutputNode fileOutput;
 
-    protected static HashMap<FilterSliceNode, Core> allocatingCores;
+    protected static HashMap<WorkNode, Core> allocatingCores;
 
     protected static HashMap<FileReaderCodeKey, FileReaderCode> fileReaderCodeStore;
     protected static HashMap<FileReaderCodeKey, JMethodDeclaration> PPMethodStore;
@@ -28,7 +28,7 @@ public class ProcessFileReader {
     protected static HashSet<String> fileNames;
     
     static {
-        allocatingCores = new HashMap<FilterSliceNode, Core>();
+        allocatingCores = new HashMap<WorkNode, Core>();
 
         fileReaderCodeStore = new HashMap<FileReaderCodeKey, FileReaderCode>();
         PPMethodStore = new HashMap<FileReaderCodeKey, JMethodDeclaration>();
@@ -36,7 +36,7 @@ public class ProcessFileReader {
         fileNames = new HashSet<String>();
     }
     
-    public ProcessFileReader (FilterSliceNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
+    public ProcessFileReader (WorkNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
         this.filterNode = filter;
         this.fileInput = (FileInputContent)filter.getFilter();
         this.phase = phase;
@@ -53,7 +53,7 @@ public class ProcessFileReader {
         }
 
         System.out.print("Generating FileReader code: ");
-        for (InterSliceEdge edge : fileOutput.getDestSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : fileOutput.getDestSet(SchedulingPhase.STEADY)) {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(edge.getDest().getParent())) {
                 for(Filter fizzedSlice : FissionGroupStore.getFizzedSlices(edge.getDest().getParent())) {
                     System.out.print(".");
@@ -68,7 +68,7 @@ public class ProcessFileReader {
         System.out.println();
     }
 
-    private void generateCode(FilterSliceNode dsFilter) {
+    private void generateCode(WorkNode dsFilter) {
         InputRotatingBuffer destBuf = InputRotatingBuffer.getInputBuffer(dsFilter);
         FileReaderCodeKey frcKey = new FileReaderCodeKey(filterNode, dsFilter);
 
@@ -108,7 +108,7 @@ public class ProcessFileReader {
                         initMethod.getName(), new JExpression[0]), null));
     }
 
-    private void generatePPCode(FilterSliceNode node, FileReaderCode fileReaderCode, CoreCodeStore codeStore, 
+    private void generatePPCode(WorkNode node, FileReaderCode fileReaderCode, CoreCodeStore codeStore, 
             InputRotatingBuffer destBuf) {
 
         FileReaderCodeKey frcKey = new FileReaderCodeKey(filterNode, node);
@@ -221,10 +221,10 @@ public class ProcessFileReader {
     }
     
     private class FileReaderCodeKey {
-        public FilterSliceNode filter;
-        public FilterSliceNode dsFilter;
+        public WorkNode filter;
+        public WorkNode dsFilter;
 
-        public FileReaderCodeKey(FilterSliceNode filter, FilterSliceNode dsFilter) {
+        public FileReaderCodeKey(WorkNode filter, WorkNode dsFilter) {
             this.filter = filter;
             this.dsFilter = dsFilter;
         }

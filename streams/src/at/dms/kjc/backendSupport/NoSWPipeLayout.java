@@ -62,7 +62,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * The assignment should contain only {@link at.dms.kjc.slicegraphFilterSliceNode FilterSliceNode}s when this is called.
      */
     public void swapAssignment() {
-        FilterSliceNode filter1 = (FilterSliceNode)assignedFilters.get(rand.nextInt(assignedFilters.size()));
+        WorkNode filter1 = (WorkNode)assignedFilters.get(rand.nextInt(assignedFilters.size()));
         assignment.put(filter1, chip.getNthComputeNode(rand.nextInt(chip.size())));
     }
     
@@ -100,7 +100,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
         double tileCosts[] = new double[chip.size()];
         
         Iterator<Filter> slices = scheduleOrder.iterator();
-        HashMap<FilterSliceNode, Double> endTime = new HashMap<FilterSliceNode, Double>();
+        HashMap<WorkNode, Double> endTime = new HashMap<WorkNode, Double>();
         while (slices.hasNext()) {
             Filter slice = slices.next();
             //System.err.println(slice.toString());
@@ -111,13 +111,13 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
             
             //find the max end times of all the traces that this trace depends on
             double maxDepStartTime = 0;
-            InputSliceNode input = slice.getHead();
-            Iterator<InterSliceEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
+            InputNode input = slice.getHead();
+            Iterator<InterFilterEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
             while (inEdges.hasNext()) {
-                InterSliceEdge edge = inEdges.next();
+                InterFilterEdge edge = inEdges.next();
                 if (slicer.isIO(edge.getSrc().getParent()))
                     continue;
-                FilterSliceNode upStream = edge.getSrc().getPrevFilter();
+                WorkNode upStream = edge.getSrc().getPrevFilter();
                 
                 ComputeNode upTile = (T)assignment.get(upStream);
                 assert endTime.containsKey(upStream); // TODO: assertion fails on fedback loop.
@@ -177,12 +177,12 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
             T cnode = snode_cnode.getValue();
             SliceNode snode = snode_cnode.getKey();
             
-            if (snode instanceof FilterSliceNode) {
+            if (snode instanceof WorkNode) {
                 setComputeNode(snode,cnode);
-                if (snode.getPrevious() instanceof InputSliceNode) {
+                if (snode.getPrevious() instanceof InputNode) {
                     setComputeNode(snode.getPrevious(),cnode);
                 }
-                if (snode.getNext() instanceof OutputSliceNode) {
+                if (snode.getNext() instanceof OutputNode) {
                     setComputeNode(snode.getNext(),cnode);
                 }
             }

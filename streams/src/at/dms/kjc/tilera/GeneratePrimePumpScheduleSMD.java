@@ -57,7 +57,7 @@ public class GeneratePrimePumpScheduleSMD {
                     CommonUtils.println_debugging("  Adding " + slice);
                 }
                 //check the outgoing edges of the slice to see if any of them can "fire"
-                for (InterSliceEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
+                for (InterFilterEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
                     if (canFire(edge)) {
                         fired.add(edge);
                         CommonUtils.println_debugging("  Adding " + edge);
@@ -79,7 +79,7 @@ public class GeneratePrimePumpScheduleSMD {
      */
     private void recordFired(Set set) {
         for (Object obj: set) {
-            assert obj instanceof InterSliceEdge || obj instanceof Filter;
+            assert obj instanceof InterFilterEdge || obj instanceof Filter;
             if (exeCounts.containsKey(obj)) {
                 exeCounts.put(obj, exeCounts.get(obj) + 1);
             }
@@ -97,7 +97,7 @@ public class GeneratePrimePumpScheduleSMD {
      * @return The execution count (iteration number)
      */
     private int getExeCount(Object obj) {
-        assert obj instanceof InterSliceEdge || obj instanceof Filter;
+        assert obj instanceof InterFilterEdge || obj instanceof Filter;
         if (exeCounts.containsKey(obj))
             return exeCounts.get(obj).intValue();
         else
@@ -111,7 +111,7 @@ public class GeneratePrimePumpScheduleSMD {
      * @return True if the trace can fire.
      */
     private boolean canFire(Object obj) {
-        assert obj instanceof InterSliceEdge || obj instanceof Filter;
+        assert obj instanceof InterFilterEdge || obj instanceof Filter;
         int myExeCount = getExeCount(obj);
         
         if (obj instanceof Filter) {
@@ -119,7 +119,7 @@ public class GeneratePrimePumpScheduleSMD {
 
             //check each of the depends to make sure that they have fired at least
             //one more time than me.
-            for (InterSliceEdge edge : slice.getHead().getSources(SchedulingPhase.STEADY)) {
+            for (InterFilterEdge edge : slice.getHead().getSources(SchedulingPhase.STEADY)) {
                 
                 int dependsExeCount = getExeCount(edge);
                 assert !(myExeCount > dependsExeCount);
@@ -128,7 +128,7 @@ public class GeneratePrimePumpScheduleSMD {
             }
             return true;
         } else {
-            InterSliceEdge edge = (InterSliceEdge)obj;
+            InterFilterEdge edge = (InterFilterEdge)obj;
             //check the edge to see if we can transfer data, meaning the upstream
             //slice has executed more than the edge has
             int upstreamExeCount = getExeCount(edge.getSrc().getParent());
@@ -143,7 +143,7 @@ public class GeneratePrimePumpScheduleSMD {
      */
     private boolean canEverythingFire(LinkedList<Filter> dataFlowTraversal) {
         for (Filter slice : dataFlowTraversal) {
-            for (InterSliceEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
+            for (InterFilterEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
                 if (!(canFire(edge))) {
                     System.out.println(slice + " ||| " + edge);
                     return false;

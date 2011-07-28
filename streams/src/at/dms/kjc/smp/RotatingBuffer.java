@@ -33,7 +33,7 @@ public abstract class RotatingBuffer extends Channel {
     /** the core this buffer is mapped to */
     protected Core parent;
 	/** the filter this buffer is associated with */   
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     /** the filter info object for the filter that contains this buffer */
     protected FilterInfo filterInfo;
     
@@ -53,16 +53,16 @@ public abstract class RotatingBuffer extends Channel {
     public static String rotTypeDefPrefix = "__rotating_buffer_";
 	
     /** maps each FilterSliceNode to Input/OutputRotatingBuffers */
-    protected static HashMap<FilterSliceNode, InputRotatingBuffer> inputBuffers;
-    protected static HashMap<FilterSliceNode, OutputRotatingBuffer> outputBuffers;
+    protected static HashMap<WorkNode, InputRotatingBuffer> inputBuffers;
+    protected static HashMap<WorkNode, OutputRotatingBuffer> outputBuffers;
 
     static {
         types = new HashSet<String>();
-        inputBuffers = new HashMap<FilterSliceNode, InputRotatingBuffer>();
-        outputBuffers = new HashMap<FilterSliceNode, OutputRotatingBuffer>();
+        inputBuffers = new HashMap<WorkNode, InputRotatingBuffer>();
+        outputBuffers = new HashMap<WorkNode, OutputRotatingBuffer>();
     }
     
-    protected RotatingBuffer(Edge edge, FilterSliceNode fsn, Core parent) {
+    protected RotatingBuffer(Edge edge, WorkNode fsn, Core parent) {
         super(edge);
         
         this.parent = parent;
@@ -127,19 +127,19 @@ public abstract class RotatingBuffer extends Channel {
         for (Core ownerCore : SMPBackend.chip.getCores()) {
             CoreCodeStore cs = ownerCore.getComputeCode();
             
-            for (FilterSliceNode filter : cs.getFilters())
+            for (WorkNode filter : cs.getFilters())
                 communicateAddressesForFilter(filter, ownerCore);
         }
         
         //now handle the file writers
-        for (FilterSliceNode fileWriter : ProcessFileWriter.getFileWriterFilters())
+        for (WorkNode fileWriter : ProcessFileWriter.getFileWriterFilters())
             communicateAddressesForFilter(fileWriter, ProcessFileWriter.getAllocatingCore(fileWriter));
         
         //now handle the file readers
         
     }
         
-    private static void communicateAddressesForFilter(FilterSliceNode filter, Core ownerCore) { 
+    private static void communicateAddressesForFilter(WorkNode filter, Core ownerCore) { 
         InputRotatingBuffer buf = InputRotatingBuffer.getInputBuffer(filter);
         
         //if this filter does not have an input buffer, then continue
@@ -280,11 +280,11 @@ public abstract class RotatingBuffer extends Channel {
         }
     }
     
-    public static void setOutputBuffer(FilterSliceNode node, OutputRotatingBuffer buf) {
+    public static void setOutputBuffer(WorkNode node, OutputRotatingBuffer buf) {
         outputBuffers.put(node, buf);
     }
     
-    public static void setInputBuffer(FilterSliceNode node, InputRotatingBuffer buf) {
+    public static void setInputBuffer(WorkNode node, InputRotatingBuffer buf) {
         inputBuffers.put(node, buf);
     }
     
@@ -298,7 +298,7 @@ public abstract class RotatingBuffer extends Channel {
      * @param fsn The filter node in question.
      * @return The input buffer of the filter node.
      */
-    public static InputRotatingBuffer getInputBuffer(FilterSliceNode fsn) {
+    public static InputRotatingBuffer getInputBuffer(WorkNode fsn) {
         if(!inputBuffers.containsKey(fsn) && KjcOptions.sharedbufs &&
            FissionGroupStore.isFizzed(fsn.getParent()) && 
            FissionGroupStore.isUnfizzedSlice(fsn.getParent())) {
@@ -309,7 +309,7 @@ public abstract class RotatingBuffer extends Channel {
         }
     }
   
-    public static RotatingBuffer getOutputBuffer(FilterSliceNode fsn) {
+    public static RotatingBuffer getOutputBuffer(WorkNode fsn) {
         if(!outputBuffers.containsKey(fsn) && KjcOptions.sharedbufs &&
            FissionGroupStore.isFizzed(fsn.getParent()) &&
            FissionGroupStore.isUnfizzedSlice(fsn.getParent())) {
@@ -354,7 +354,7 @@ public abstract class RotatingBuffer extends Channel {
      * 
      * @return Return the filter this buffer is associated with.
      */
-    public FilterSliceNode getFilterNode() {
+    public WorkNode getFilterNode() {
         return filterNode;
     }
     

@@ -75,10 +75,10 @@ public class IDFilterContent extends FilterContent {
      * Create and return a slice with a single ID filter.
      */
     public static Filter createIDSlice() {
-        InputSliceNode input = new InputSliceNode();
-        OutputSliceNode output = new OutputSliceNode();
+        InputNode input = new InputNode();
+        OutputNode output = new OutputNode();
         IDFilterContent id = new IDFilterContent();
-        FilterSliceNode filter = new FilterSliceNode(id);
+        WorkNode filter = new WorkNode(id);
         
         input.setNext(filter);
         filter.setPrevious(input);

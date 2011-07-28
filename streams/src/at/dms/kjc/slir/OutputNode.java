@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * @author mgordon
  */
-public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneable {
+public class OutputNode extends SliceNode implements at.dms.kjc.DeepCloneable {
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = 
         { "weights", "dests", "initWeights", "initDests" };
     
@@ -36,11 +36,11 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * A round-robin splitter of size n would be an Edge[n][1]
      * A duplicate splitter of size n would be an Edge[1][n]
      */
-    private InterSliceEdge[][] dests;
+    private InterFilterEdge[][] dests;
     /** the weights for init if this node requires a different init splitting pattern */
     private int[] initWeights;
     /** the dest array for init if this node requires a differnt init splitting pattern */
-    private InterSliceEdge[][] initDests; 
+    private InterFilterEdge[][] initDests; 
         /** unique identifier for this node */
     private String ident;
     /** used to generate unique id */
@@ -48,7 +48,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
     /** used to initialize the weights array */
     private static int[] EMPTY_WEIGHTS = new int[0];
     /** used to initialize the weights array */
-    private static InterSliceEdge[][] EMPTY_DESTS = new InterSliceEdge[0][0];
+    private static InterFilterEdge[][] EMPTY_DESTS = new InterFilterEdge[0][0];
 
     
     /**
@@ -59,7 +59,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * @param dests The array of dests.
      */
 
-    public OutputSliceNode(int[] weights, InterSliceEdge[][] dests) {
+    public OutputNode(int[] weights, InterFilterEdge[][] dests) {
         // this.parent = parent;
         assert weights.length == dests.length : "weights must equal sources";
         ident = "output" + unique;
@@ -78,8 +78,8 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * @param weights The list of weights
      * @param dests The list of dests.
      */
-    public OutputSliceNode(LinkedList<Integer> weights, 
-            LinkedList<LinkedList<InterSliceEdge>> dests) {
+    public OutputNode(LinkedList<Integer> weights, 
+            LinkedList<LinkedList<InterFilterEdge>> dests) {
         assert weights.size() == dests.size();
         ident = "output" + unique++;
         //convert the weights list
@@ -93,7 +93,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * 
      * @param weights The array of weights
      */
-    public OutputSliceNode(int[] weights) {
+    public OutputNode(int[] weights) {
         ident = "output" + unique;
         unique++;
         if (weights.length == 1)
@@ -108,7 +108,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * Weights and dests to be st later.
      *
      */
-    public OutputSliceNode() {
+    public OutputNode() {
         ident = "output" + unique;
         unique++;
         weights = EMPTY_WEIGHTS;
@@ -136,9 +136,9 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * @param dests List of Lists of Edge for splitting pattern.
      */
     public void set(LinkedList<Integer> weights, 
-            LinkedList<LinkedList<InterSliceEdge>> dests, SchedulingPhase phase) {
+            LinkedList<LinkedList<InterFilterEdge>> dests, SchedulingPhase phase) {
         int[] newWeights;
-        InterSliceEdge[][] newDests;
+        InterFilterEdge[][] newDests;
 
         if (weights.size() == 1) 
             newWeights = new int[]{1};
@@ -150,9 +150,9 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
 
         //convert the dests list
         int i = 0;
-        newDests = new InterSliceEdge[dests.size()][];
-        for(LinkedList<InterSliceEdge> dest : dests)
-            newDests[i++] = dest.toArray(new InterSliceEdge[0]);
+        newDests = new InterFilterEdge[dests.size()][];
+        for(LinkedList<InterFilterEdge> dest : dests)
+            newDests[i++] = dest.toArray(new InterFilterEdge[0]);
 
         if (SchedulingPhase.INIT == phase) {
             setInitWeights(newWeights);
@@ -170,7 +170,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * @param weights Array of integer weights
      * @param dests Array of Edge arrays for splitting pattern.
      */
-    public void set(int[] weights, InterSliceEdge[][] dests, SchedulingPhase phase) {
+    public void set(int[] weights, InterFilterEdge[][] dests, SchedulingPhase phase) {
         if (SchedulingPhase.INIT == phase) {
             setInitWeights(weights);
             setInitDests(dests);
@@ -197,18 +197,18 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
     
     /** @return whether previous filter was FileInput */
     public boolean isFileInput() {
-        return ((FilterSliceNode) getPrevious()).isFileInput();
+        return ((WorkNode) getPrevious()).isFileInput();
     }
 
     /** @return dests */
-    public InterSliceEdge[][] getDests(SchedulingPhase phase) {
+    public InterFilterEdge[][] getDests(SchedulingPhase phase) {
         if (phase == SchedulingPhase.INIT && initDests != null)
             return initDests;
         return dests;
     }
 
     /** Set dests */
-    public void setDests(InterSliceEdge[][] dests) {
+    public void setDests(InterFilterEdge[][] dests) {
         this.dests = dests;
     }
 
@@ -217,14 +217,14 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * if the pattern is the same as the steady pattern. 
      * @return dests 
      */
-    public InterSliceEdge[][] getInitDests() {
+    public InterFilterEdge[][] getInitDests() {
         return initDests;
     }
 
     /** 
      * Set the initialization pattern for splitting.
      */
-    public void setInitDests(InterSliceEdge[][] newDests) {
+    public void setInitDests(InterFilterEdge[][] newDests) {
         this.initDests = newDests;
     }
 
@@ -245,7 +245,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * Combine the weights of adjacent outputs that have equal 
      * destinations.
      * This operation exists as a cleanup operation for synch removal.
-     * Code generation for Edges may rely on {@link InputSliceNode#canonicalize()}
+     * Code generation for Edges may rely on {@link InputNode#canonicalize()}
      * being run on all input nodes whose edges are combined by canonicalize.
      */
     public void canonicalize(SchedulingPhase phase) {
@@ -253,7 +253,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
             return;
 
         int[] weights = new int[getWeights(phase).length];
-        InterSliceEdge[][] edges = new InterSliceEdge[getWeights(phase).length][];
+        InterFilterEdge[][] edges = new InterFilterEdge[getWeights(phase).length][];
         int curPort = 0;
 
         //add the first port to the new edges and weights
@@ -271,7 +271,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
             }
         }
 
-        InterSliceEdge[][] newEdges = new InterSliceEdge[curPort + 1][];
+        InterFilterEdge[][] newEdges = new InterFilterEdge[curPort + 1][];
         int[] newWeights = new int[curPort + 1];
 
         System.arraycopy(edges, 0, newEdges, 0, curPort + 1);
@@ -331,8 +331,8 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
     /**
      * Return true if the weight duplicates to edge during the scheduling phase.
      */
-    public boolean weightDuplicatesTo(int weight, InterSliceEdge edge, SchedulingPhase phase) {
-        InterSliceEdge[][] dests = getDests(phase);
+    public boolean weightDuplicatesTo(int weight, InterFilterEdge edge, SchedulingPhase phase) {
+        InterFilterEdge[][] dests = getDests(phase);
         
         for (int d = 0; d < dests[weight].length; d++) {
             if (dests[weight][d] == edge)
@@ -348,9 +348,9 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * 
      * @return The list.
      */
-    public LinkedList<InterSliceEdge> getDestSequence(SchedulingPhase phase) {
+    public LinkedList<InterFilterEdge> getDestSequence(SchedulingPhase phase) {
         
-        LinkedList<InterSliceEdge> list = new LinkedList<InterSliceEdge>();
+        LinkedList<InterFilterEdge> list = new LinkedList<InterFilterEdge>();
         for (int i = 0; i < getDests(phase).length; i++) {
             for (int j = 0; j < getDests(phase)[i].length; j++) 
                 if (!list.contains(getDests(phase)[i][j]))
@@ -362,7 +362,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
     /**
      * return the number of items sent by this output slice node on all instances of a particular edge.
      */
-    public int getWeight(InterSliceEdge in, SchedulingPhase phase) {
+    public int getWeight(InterFilterEdge in, SchedulingPhase phase) {
         int sum = 0;
 
         for (int i = 0; i < getDests(phase).length; i++) {
@@ -389,7 +389,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
     public Set<Filter> getDestSlices(SchedulingPhase phase) {
         HashSet<Filter> dests = new HashSet<Filter>();
         
-        for (InterSliceEdge edge : getDestSet(phase)) {
+        for (InterFilterEdge edge : getDestSet(phase)) {
             dests.add(edge.getDest().getParent());
         }
         
@@ -403,14 +403,14 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * @return A list of the dests in round-robin order flattening
      * the duplicates.  
      */ 
-    public InterSliceEdge[] getDestList(SchedulingPhase phase) {
+    public InterFilterEdge[] getDestList(SchedulingPhase phase) {
         
-        LinkedList<InterSliceEdge> edges = new LinkedList<InterSliceEdge>();
+        LinkedList<InterFilterEdge> edges = new LinkedList<InterFilterEdge>();
         for (int i = 0; i < getDests(phase).length; i++) {
             for (int j = 0; j < getDests(phase)[i].length; j++)
                 edges.add(getDests(phase)[i][j]);
         }
-        return edges.toArray(new InterSliceEdge[edges.size()]);
+        return edges.toArray(new InterFilterEdge[edges.size()]);
     }
     
     /**
@@ -418,8 +418,8 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * 
      * @return The set of the outgoing edges of this OutputSliceNode.
      */
-    public Set<InterSliceEdge> getDestSet(SchedulingPhase phase) {
-        HashSet<InterSliceEdge> set = new HashSet<InterSliceEdge>();
+    public Set<InterFilterEdge> getDestSet(SchedulingPhase phase) {
+        HashSet<InterFilterEdge> set = new HashSet<InterFilterEdge>();
         for (int i = 0; i < getDests(phase).length; i++) {
             for (int j = 0; j < getDests(phase)[i].length; j++)
                 set.add(getDests(phase)[i][j]);
@@ -456,7 +456,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
         return false;
     }
 
-    public InterSliceEdge getSingleEdge(SchedulingPhase phase) {
+    public InterFilterEdge getSingleEdge(SchedulingPhase phase) {
         assert oneOutput(phase) : "Calling getSingleEdge() on OutputSlice with less/more than one output";
         //System.out.println(getParent() + " " + phase);
         return getDests(phase)[0][0];
@@ -486,20 +486,20 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * return an iterator that iterates over the inputslicenodes in descending
      * order of the number of items sent to the inputslicenode
      */
-    public List<InterSliceEdge> getSortedOutputs(SchedulingPhase phase) {
-        LinkedList<InterSliceEdge>sortedOutputs = new LinkedList<InterSliceEdge>();  
+    public List<InterFilterEdge> getSortedOutputs(SchedulingPhase phase) {
+        LinkedList<InterFilterEdge>sortedOutputs = new LinkedList<InterFilterEdge>();  
         // if there are no dest just return an empty iterator
         if (weights.length == 0) {
             return sortedOutputs;
         }
         // just do a simple linear insert over the dests
         // only has to be done once
-        Vector<InterSliceEdge> sorted = new Vector<InterSliceEdge>();
-        Iterator<InterSliceEdge> destsIt = getDestSet(phase).iterator();
+        Vector<InterFilterEdge> sorted = new Vector<InterFilterEdge>();
+        Iterator<InterFilterEdge> destsIt = getDestSet(phase).iterator();
         // add one element
         sorted.add(destsIt.next());
         while (destsIt.hasNext()) {
-            InterSliceEdge current = destsIt.next();
+            InterFilterEdge current = destsIt.next();
             // add to end if it is less then everything
             if (getWeight(current, phase) <= getWeight(sorted.get(sorted
                     .size() - 1), phase))
@@ -517,19 +517,19 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
         }
         assert sorted.size() == getDestSet(phase).size() : "error "
             + sorted.size() + "!= " + getDestSet(phase).size();
-        sortedOutputs = (LinkedList<InterSliceEdge>)sorted.subList(0, sorted.size());
+        sortedOutputs = (LinkedList<InterFilterEdge>)sorted.subList(0, sorted.size());
 
         return sortedOutputs;
     }
 
-    public FilterSliceNode getPrevFilter() {
-        return (FilterSliceNode) getPrevious();
+    public WorkNode getPrevFilter() {
+        return (WorkNode) getPrevious();
     }
 
     /**
      * Return the number of items that are sent along the <edge> in <phase>.
      */
-    public int itemsSentOn(InterSliceEdge edge, SchedulingPhase phase) {
+    public int itemsSentOn(InterFilterEdge edge, SchedulingPhase phase) {
         int totalItems = FilterInfo.getFilterInfo(getPrevFilter()).totalItemsSent(phase);
         
         double items = totalItems * ratio(edge, phase);
@@ -538,7 +538,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
         return (int)(items);
     }
     
-    public double ratio(InterSliceEdge edge, SchedulingPhase phase) {
+    public double ratio(InterFilterEdge edge, SchedulingPhase phase) {
         if (totalWeights(phase) == 0)
             return 0.0;
         return ((double) getWeight(edge, phase) / (double) totalWeights(phase));
@@ -568,17 +568,17 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
     public boolean hasFileOutput() {
         Iterator dests = getDestSet(SchedulingPhase.STEADY).iterator();
         while (dests.hasNext()) {
-            if (((InterSliceEdge) dests.next()).getDest().isFileOutput())
+            if (((InterFilterEdge) dests.next()).getDest().isFileOutput())
                 return true;
         }
         return false;
     }
 
-    public Set<InputSliceNode> fileOutputs() {
-        HashSet<InputSliceNode> fileOutputs = new HashSet<InputSliceNode>();
+    public Set<InputNode> fileOutputs() {
+        HashSet<InputNode> fileOutputs = new HashSet<InputNode>();
         Iterator dests = getDestSet(SchedulingPhase.STEADY).iterator();
         while (dests.hasNext()) {
-            InterSliceEdge edge = (InterSliceEdge) dests.next();
+            InterFilterEdge edge = (InterFilterEdge) dests.next();
             if (edge.getDest().isFileOutput())
                 fileOutputs.add(edge.getDest());
         }
@@ -633,7 +633,7 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
      * @param edge The edge in question
      * @return The total weights before edge
      */
-    public int weightBefore(InterSliceEdge edge, SchedulingPhase phase) {
+    public int weightBefore(InterFilterEdge edge, SchedulingPhase phase) {
         assert singleAppearance();
         int total = 0;
         
@@ -668,14 +668,14 @@ public class OutputSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
 
     /** Returns a deep clone of this object. */
     public Object deepClone() {
-        at.dms.kjc.slir.OutputSliceNode other = new at.dms.kjc.slir.OutputSliceNode();
+        at.dms.kjc.slir.OutputNode other = new at.dms.kjc.slir.OutputNode();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);
         return other;
     }
 
     /** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.OutputSliceNode other) {
+    protected void deepCloneInto(at.dms.kjc.slir.OutputNode other) {
         super.deepCloneInto(other);
         other.weights = this.weights;
         other.dests = this.dests;

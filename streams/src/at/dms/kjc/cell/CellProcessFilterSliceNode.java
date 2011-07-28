@@ -12,10 +12,10 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.slir.FileOutputContent;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SliceNode;
 
@@ -24,7 +24,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
     private CellComputeCodeStore ppuCS;
     private CellComputeCodeStore initCodeStore;
     
-    public CellProcessFilterSliceNode(FilterSliceNode filterNode, 
+    public CellProcessFilterSliceNode(WorkNode filterNode, 
             SchedulingPhase whichPhase, CellBackendFactory backEndBits) {
         super(filterNode, whichPhase, backEndBits);
         ppuCS = backEndBits.getPPU().getComputeCode();
@@ -81,8 +81,8 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
     
     @Override
     protected void additionalPreInitProcessing() {
-        InputSliceNode inputNode = filterNode.getParent().getHead();
-        OutputSliceNode outputNode = filterNode.getParent().getTail();
+        InputNode inputNode = filterNode.getParent().getHead();
+        OutputNode outputNode = filterNode.getParent().getTail();
         // Add filter to mapping
         int filterId = CellBackend.numfilters;
         CellBackend.filters.add(filterNode);
@@ -117,7 +117,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
             // make artificial channel between filterslicenode and outputslicenode
             int channelId = CellBackend.numchannels;
             // dummy edge
-            InterSliceEdge a = new InterSliceEdge(outputNode);
+            InterFilterEdge a = new InterFilterEdge(outputNode);
             CellBackend.channels.add(a);
             CellBackend.channelIdMap.put(a, channelId);
             CellBackend.artificialRRSplitterChannels.put(outputNode, channelId);
@@ -130,7 +130,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
         }
 
         // Populate Channel-ID mapping, and increase number of channels.
-        for (InterSliceEdge e : outputNode.getDestSequence(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge e : outputNode.getDestSequence(SchedulingPhase.STEADY)) {
             if(!CellBackend.channelIdMap.containsKey(e)) {
                 int channelId = CellBackend.numchannels;
                 CellBackend.channels.add(e);
@@ -292,7 +292,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
      *
      */
     private void setupFileReaderChannel() {
-        OutputSliceNode outputNode = filterNode.getParent().getTail();
+        OutputNode outputNode = filterNode.getParent().getTail();
         // List of channel IDs for all output channels of the file reader
         LinkedList<Integer> outputIds = new LinkedList<Integer>();
         
@@ -300,7 +300,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
         int firstChannelId = CellBackend.numchannels;
         
         // Populate Channel-ID mapping, and increase number of channels.
-        for (InterSliceEdge e : outputNode.getDestSequence(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge e : outputNode.getDestSequence(SchedulingPhase.STEADY)) {
             int channelId;
             // get next available channel ID
             channelId = CellBackend.numchannels;
@@ -330,8 +330,8 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
     
     private void addToScheduleLayout() {
         int filterId = CellBackend.filterIdMap.get(filterNode);
-        InputSliceNode inputNode = filterNode.getPrevious().getAsInput();
-        OutputSliceNode outputNode = filterNode.getNext().getAsOutput();
+        InputNode inputNode = filterNode.getPrevious().getAsInput();
+        OutputNode outputNode = filterNode.getNext().getAsOutput();
         LinkedList<Integer> inputIds = CellBackend.inputChannelMap.get(inputNode);
         LinkedList<Integer> currentGroup = CellBackend.getLastScheduleGroup();
         if (inputNode.isJoiner(SchedulingPhase.STEADY)) {

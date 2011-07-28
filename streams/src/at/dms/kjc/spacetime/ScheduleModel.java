@@ -10,9 +10,9 @@ import java.util.HashSet;
 
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -39,9 +39,9 @@ public class ScheduleModel {
     /** array of total work estimation for each tile including blocking*/
     private long[] tileCosts;
     /** Map of filter to start time on the tile they are assigned */
-    private HashMap<FilterSliceNode, Long> startTime;
+    private HashMap<WorkNode, Long> startTime;
     /** Map if filter to end time on the tile they are assigned */
-    private HashMap<FilterSliceNode, Long> endTime;
+    private HashMap<WorkNode, Long> endTime;
     /** the tile with the most work */
     private int bottleNeckTile;
     /** the amount of work for the bottleneck tile */
@@ -53,8 +53,8 @@ public class ScheduleModel {
         this.spaceTime = spaceTime;
         this.rawChip = spaceTime.getRawChip();
         this.scheduleOrder = scheduleOrder;
-        startTime = new HashMap<FilterSliceNode, Long>();
-        endTime = new HashMap<FilterSliceNode, Long>(); 
+        startTime = new HashMap<WorkNode, Long>();
+        endTime = new HashMap<WorkNode, Long>(); 
     }
     
     /** 
@@ -79,7 +79,7 @@ public class ScheduleModel {
      * @return the time estimate for when this filter will begin executing
      * in the steady state on the tile to which is it assigned.
      */
-    public int getFilterStart(FilterSliceNode node) {
+    public int getFilterStart(WorkNode node) {
         //System.out.println(node);
         return startTime.get(node).intValue();
     }
@@ -92,7 +92,7 @@ public class ScheduleModel {
      * @return the time estimate for when this filter is finished executing
      * its entire steady state on the tile to which it is assigned.
      */
-    public int getFilterEnd(FilterSliceNode node) {
+    public int getFilterEnd(WorkNode node) {
         return endTime.get(node).intValue();
     }
     
@@ -171,7 +171,7 @@ public class ScheduleModel {
                 System.out.println("Finding correct times for last filter: ");
             
             //find the correct starting & ending time for the last filter of the trace
-            for (FilterSliceNode current : slice.getFilterNodes()) {
+            for (WorkNode current : slice.getFilterNodes()) {
                 
                 RawTile tile = layout.getComputeNode(current);
                 if (debug)
@@ -225,7 +225,7 @@ public class ScheduleModel {
             
             //the last filter is always the bottleneck of the filter, meaning
             //it finishes last and base everyone else on it
-            FilterSliceNode bottleNeck = slice.getTail().getPrevFilter();
+            WorkNode bottleNeck = slice.getTail().getPrevFilter();
                            
             RawTile bottleNeckTile = layout.getComputeNode(bottleNeck);
             
@@ -291,7 +291,7 @@ public class ScheduleModel {
             }
             */
             //some checks
-            for (FilterSliceNode fsn : slice.getFilterNodes()) {
+            for (WorkNode fsn : slice.getFilterNodes()) {
                 assert getFilterStart(fsn) <=
                     (getFilterEnd(fsn) - 
                     spaceTime.getSIRSlicer().getFilterWorkSteadyMult(fsn)) :
@@ -335,13 +335,13 @@ public class ScheduleModel {
            
            //find the max end times of all the traces that this trace depends on
            long maxDepStartTime = 0;
-           InputSliceNode input = slice.getHead();
-           Iterator<InterSliceEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
+           InputNode input = slice.getHead();
+           Iterator<InterFilterEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
            while (inEdges.hasNext()) {
-               InterSliceEdge edge = inEdges.next();
+               InterFilterEdge edge = inEdges.next();
                if (spaceTime.getSlicer().isIO(edge.getSrc().getParent()))
                    continue;
-               FilterSliceNode upStream = edge.getSrc().getPrevFilter();
+               WorkNode upStream = edge.getSrc().getPrevFilter();
                
                ComputeNode upTile = layout.getComputeNode(upStream);
                assert endTime.containsKey(upStream);

@@ -29,7 +29,7 @@ public class ProcessFilterSliceNode {
     
     protected CodeStoreHelper filterCode;
     protected CoreCodeStore codeStore;
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     protected SchedulingPhase whichPhase;
     protected SMPBackEndFactory backEndBits;
     protected Core location;
@@ -39,7 +39,7 @@ public class ProcessFilterSliceNode {
     * @param whichPhase   a scheduling phase {@link SchedulingPhase}
     * @param backEndBits  a BackEndFactory to access layout, etc.
     * */
-   public ProcessFilterSliceNode(FilterSliceNode filterNode, 
+   public ProcessFilterSliceNode(WorkNode filterNode, 
             SchedulingPhase whichPhase, SMPBackEndFactory backEndBits) {
         this.filterNode = filterNode;
         this.whichPhase = whichPhase;
@@ -230,7 +230,7 @@ public class ProcessFilterSliceNode {
      * @param outputChannel  The output channel -- specifies routines to call to replace push.
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
-    private static CodeStoreHelper makeFilterCode(FilterSliceNode filter, 
+    private static CodeStoreHelper makeFilterCode(WorkNode filter, 
             Channel inputChannel, Channel outputChannel,
             SMPBackEndFactory backEndBits) {
         
@@ -309,7 +309,7 @@ public class ProcessFilterSliceNode {
      * @param backEndBits
      * @return
      */
-    public static  CodeStoreHelper getFilterCode(FilterSliceNode filter, 
+    public static  CodeStoreHelper getFilterCode(WorkNode filter, 
         Channel inputChannel, Channel outputChannel, SMPBackEndFactory backEndBits) {
         CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {

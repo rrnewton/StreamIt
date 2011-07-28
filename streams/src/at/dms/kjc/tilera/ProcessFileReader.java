@@ -11,24 +11,24 @@ import java.util.HashSet;
 
 public class ProcessFileReader {
     
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     protected SchedulingPhase phase;
     protected TileraBackEndFactory factory;
     protected TileCodeStore codeStore;
     protected FileInputContent fileInput;
-    protected static HashMap<FilterSliceNode, Tile> allocatingTiles;
+    protected static HashMap<WorkNode, Tile> allocatingTiles;
     protected Tile allocatingTile;
-    protected OutputSliceNode fileOutput;  
-    protected static HashMap<FilterSliceNode, JMethodDeclaration> PPMethods;
+    protected OutputNode fileOutput;  
+    protected static HashMap<WorkNode, JMethodDeclaration> PPMethods;
     protected static HashSet<String> fileNames;
     
     static {
-        allocatingTiles = new HashMap<FilterSliceNode, Tile>();
-        PPMethods = new HashMap<FilterSliceNode, JMethodDeclaration>();
+        allocatingTiles = new HashMap<WorkNode, Tile>();
+        PPMethods = new HashMap<WorkNode, JMethodDeclaration>();
         fileNames = new HashSet<String>();
     }
     
-    public ProcessFileReader (FilterSliceNode filter, SchedulingPhase phase, TileraBackEndFactory factory) {
+    public ProcessFileReader (WorkNode filter, SchedulingPhase phase, TileraBackEndFactory factory) {
         this.filterNode = filter;
         this.fileInput = (FileInputContent)filter.getFilter();
         this.phase = phase;
@@ -43,12 +43,12 @@ public class ProcessFileReader {
             fileNames.add(fileInput.getFileName());
             allocateAndCommunicateAddrs();
         }
-        for (InterSliceEdge edge : fileOutput.getDestSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : fileOutput.getDestSet(SchedulingPhase.STEADY)) {
             generateCode(edge.getDest().getNextFilter());
         }
     }
 
-    private void generateCode(FilterSliceNode dsFilter) {
+    private void generateCode(WorkNode dsFilter) {
         //TODO: fix so that file reader code is not created twice!
         FileReaderCode fileReaderCode;
         InputRotatingBuffer destBuf = InputRotatingBuffer.getInputBuffer(dsFilter);
@@ -86,7 +86,7 @@ public class ProcessFileReader {
                         initMethod.getName(), new JExpression[0]), null));
     }
 
-    private void generatePPCode(FilterSliceNode node, FileReaderCode fileReaderCode, TileCodeStore codeStore, 
+    private void generatePPCode(WorkNode node, FileReaderCode fileReaderCode, TileCodeStore codeStore, 
             InputRotatingBuffer destBuf) {
         if (!PPMethods.containsKey(node)) {
             JBlock statements = new JBlock(fileReaderCode.commandsSteady);

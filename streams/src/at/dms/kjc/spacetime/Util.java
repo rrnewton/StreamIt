@@ -329,16 +329,16 @@ public class Util {
     }
 
     // the size of the buffer between in, out for the steady state
-    public static int steadyBufferSize(InterSliceEdge edge) {
+    public static int steadyBufferSize(InterFilterEdge edge) {
         return edge.steadyItems() * getTypeSize(edge.getType());
     }
 
     // the size of the buffer between in / out for the init stage
-    public static int initBufferSize(InterSliceEdge edge) {
+    public static int initBufferSize(InterFilterEdge edge) {
         return edge.initItems() * getTypeSize(edge.getType());
     }
     
-    public static int magicBufferSize(InterSliceEdge edge) {
+    public static int magicBufferSize(InterFilterEdge edge) {
         // i don't remember why I have the + down there,
         // but i am not going to change
         return Math.max(steadyBufferSize(edge), initBufferSize(edge));
@@ -416,9 +416,9 @@ public class Util {
      * @return a sorted list of filter trace nodes for time only that does not 
      * include io traces.
      */
-    public static LinkedList<FilterSliceNode> sortedFilterSlicesTime(SIRSlicer slicer) {
+    public static LinkedList<WorkNode> sortedFilterSlicesTime(SIRSlicer slicer) {
         //now sort the filters by work
-        LinkedList<FilterSliceNode> sortedList = new LinkedList<FilterSliceNode>();
+        LinkedList<WorkNode> sortedList = new LinkedList<WorkNode>();
         LinkedList<Filter> scheduleOrder;
  
   
@@ -492,7 +492,7 @@ public class Util {
      * @param node The InputSliceNode to check
      * @return true if reads file device as its single source
      */
-    public static boolean onlyFileInput(InputSliceNode node) {
+    public static boolean onlyFileInput(InputNode node) {
         // get this buffer or this first upstream non-redundant buffer
         OffChipBuffer buffer = 
             IntraSliceBuffer.getBuffer(node, node.getNextFilter()).getNonRedundant();
@@ -501,8 +501,8 @@ public class Util {
             return false;
         
         //if not a file reader, then we might have to align the dest
-        if (buffer.getDest() instanceof OutputSliceNode
-                && ((OutputSliceNode) buffer.getDest()).isFileInput())
+        if (buffer.getDest() instanceof OutputNode
+                && ((OutputNode) buffer.getDest()).isFileInput())
             return true;
         
         return false;
@@ -514,7 +514,7 @@ public class Util {
      * that output is directly writing to a file reader with no non-redundant
      * buffers in between.
      */
-    public static boolean onlyWritingToAFile(OutputSliceNode outNode) {
+    public static boolean onlyWritingToAFile(OutputNode outNode) {
         if (outNode.oneOutput()
                 && OffChipBuffer.unnecessary(outNode)
                 && outNode.getSingleEdge(SchedulingPhase.STEADY).getDest().isFileOutput()

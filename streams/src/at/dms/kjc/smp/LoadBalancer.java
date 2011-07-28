@@ -49,17 +49,17 @@ public class LoadBalancer {
     }
 
     private static boolean canLoadBalance(FissionGroup group) {
-        FilterSliceNode filter = group.unfizzedSlice.getFirstFilter();
+        WorkNode filter = group.unfizzedSlice.getFirstFilter();
         FilterInfo filterInfo = group.unfizzedFilterInfo;
-        OutputSliceNode output = group.unfizzedSlice.getTail();
+        OutputNode output = group.unfizzedSlice.getTail();
 
         if(filterInfo.push % output.totalWeights(SchedulingPhase.STEADY) != 0)
             return false;
 
         int numOutputRots = filterInfo.push / output.totalWeights(SchedulingPhase.STEADY);
 
-        for(InterSliceEdge edge : output.getDestSet(SchedulingPhase.STEADY)) {
-            InputSliceNode input = edge.getDest();
+        for(InterFilterEdge edge : output.getDestSet(SchedulingPhase.STEADY)) {
+            InputNode input = edge.getDest();
 
             int outputWeight = output.getWeight(edge, SchedulingPhase.STEADY);
             int inputWeight = input.getWeight(edge, SchedulingPhase.STEADY);

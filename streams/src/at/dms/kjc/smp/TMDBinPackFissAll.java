@@ -67,9 +67,9 @@ public class TMDBinPackFissAll extends Scheduler {
         HashSet<Filter> unfizzedSlices = new HashSet<Filter>();
         
         // Get work estimates for all slices
-        HashMap<FilterSliceNode, Long> workEsts = new HashMap<FilterSliceNode, Long>();
+        HashMap<WorkNode, Long> workEsts = new HashMap<WorkNode, Long>();
         for(Filter slice : slices) {
-        	long workEst = SliceWorkEstimate.getWork(slice);
+        	long workEst = FilterWorkEstimate.getWork(slice);
         	workEsts.put(slice.getFirstFilter(), workEst);
         }
         
@@ -248,10 +248,10 @@ public class TMDBinPackFissAll extends Scheduler {
     	
     	// Look for fizzable filters
     	for(Filter slice : slices) {
-    		FilterSliceNode fsn = slice.getFirstFilter();
+    		WorkNode fsn = slice.getFirstFilter();
     		FilterContent fc = fsn.getFilter();
     		
-    		long workEst = SliceWorkEstimate.getWork(slice);
+    		long workEst = FilterWorkEstimate.getWork(slice);
     		int commRate = (fc.getPushInt() + fc.getPopInt() * fc.getMult(SchedulingPhase.STEADY));
     		
     		// Predefined filters can't be fizzed, automatically skip

@@ -57,12 +57,12 @@ public class StreamingDram extends IODevice
 
     //check to see that all the outputs for an output trace go to different
     //drams
-    public static boolean differentDRAMs(OutputSliceNode out) 
+    public static boolean differentDRAMs(OutputNode out) 
     {
         HashSet<StreamingDram> drams = new HashSet<StreamingDram>();
         Iterator edges = out.getDestSet(SchedulingPhase.STEADY).iterator();
         while(edges.hasNext()) {
-            InterSliceEdge edge = (InterSliceEdge)edges.next();
+            InterFilterEdge edge = (InterFilterEdge)edges.next();
             //System.out.println(out + "->" + in);
             if (drams.contains(InterSliceBuffer.getBuffer(edge).getDRAM()))
                 return false;
@@ -73,13 +73,13 @@ public class StreamingDram extends IODevice
     
     //check to see that all the inputs for an input trace come from different
     //drams
-    public static boolean differentDRAMs(InputSliceNode in) 
+    public static boolean differentDRAMs(InputNode in) 
     {
         HashSet<StreamingDram> drams = new HashSet<StreamingDram>();
         //get the source set, so there are no duplicate edges.
         Iterator edges = in.getSourceSet(SchedulingPhase.STEADY).iterator();
         while(edges.hasNext()) {
-            InterSliceEdge edge = (InterSliceEdge)edges.next();
+            InterFilterEdge edge = (InterFilterEdge)edges.next();
             if (drams.contains(InterSliceBuffer.getBuffer(edge).getDRAM()))
                 return false;
             drams.add(InterSliceBuffer.getBuffer(edge).getDRAM());

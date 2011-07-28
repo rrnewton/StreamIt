@@ -6,10 +6,10 @@ import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.common.SimulatedAnnealing;
 import at.dms.kjc.slir.DataFlowOrder;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
@@ -334,7 +334,7 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
 	
 
         //if we get here we are a filterSliceNode 
-        FilterSliceNode filter = node.getAsFilter();
+        WorkNode filter = node.getAsFilter();
         
         if (node.getPrevious().isInputSlice()) {
             //Choose a random tile for the initial placement
@@ -427,11 +427,11 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
      * @param tile The tile it is currently mapped to.
      * @return false if there are other file readers mapped to this tile.
      */
-    private boolean legalFileReaderTile(FilterSliceNode filter,
+    private boolean legalFileReaderTile(WorkNode filter,
             ComputeNode tile) {
 	Iterator frs = fileReaders.iterator();
         while (frs.hasNext()) {
-            FilterSliceNode current = (FilterSliceNode)frs.next();
+            WorkNode current = (WorkNode)frs.next();
             if (current == filter) 
                 continue;
             ComputeNode occupied = (ComputeNode)assignment.get(current);
@@ -462,11 +462,11 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
      * @return false if another FilterSliceNode that writes to a file is 
      * mapped to tile.
      */
-    private boolean legalFileWriterTile(FilterSliceNode filter, 
+    private boolean legalFileWriterTile(WorkNode filter, 
             ComputeNode tile) {
 	Iterator fws = fileWriters.iterator();
 	while (fws.hasNext()) {
-	    FilterSliceNode current = (FilterSliceNode)fws.next();
+	    WorkNode current = (WorkNode)fws.next();
 	    if (current == filter)
 		continue;
 	    ComputeNode occupied = (ComputeNode)assignment.get(current);
@@ -539,7 +539,7 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
         Iterator<SliceNode> filters = filterList.iterator();
         
         while (filters.hasNext()) {
-            FilterSliceNode filter = (FilterSliceNode)filters.next();
+            WorkNode filter = (WorkNode)filters.next();
             //last filter of a slice, no need to check it          
             if (filter.getNext().isOutputSlice())
                 continue;
@@ -567,7 +567,7 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
      * @return A metric of the latency of the Edge edge.
      */
     private HashMap<RawComputeNode, Integer> distanceLatency
-         (HashSet<RawComputeNode> bigWorkers, InterSliceEdge edge) {
+         (HashSet<RawComputeNode> bigWorkers, InterFilterEdge edge) {
         
         //get the port that source is writing to
         RawTile srcTile = (RawTile)assignment.get(edge.getSrc().getPrevFilter());
@@ -618,7 +618,7 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
             Filter slice = slices[i];
             Iterator edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
             while (edges.hasNext()) {
-                InterSliceEdge edge = (InterSliceEdge)edges.next();
+                InterFilterEdge edge = (InterFilterEdge)edges.next();
                // System.out.println(" Checking if " + edge + " crosses.");
                 InterSliceBuffer buf = InterSliceBuffer.getBuffer(edge);
                 
@@ -626,8 +626,8 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
                 if (buf.redundant())
                     continue;
                 
-                OutputSliceNode output = edge.getSrc();
-                InputSliceNode input = edge.getDest();
+                OutputNode output = edge.getSrc();
+                InputNode input = edge.getDest();
                 StreamingDram bufDRAM = buf.getDRAM();
                
                 
@@ -697,7 +697,7 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
             Filter slice = slices[i];
             Iterator edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
             while (edges.hasNext()) {
-                InterSliceEdge edge = (InterSliceEdge)edges.next();
+                InterFilterEdge edge = (InterFilterEdge)edges.next();
                // System.out.println(" Checking if " + edge + " crosses.");
                 InterSliceBuffer buf = InterSliceBuffer.getBuffer(edge);
                 
@@ -705,8 +705,8 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
                 if (buf.redundant())
                     continue;
                 
-                OutputSliceNode output = edge.getSrc();
-                InputSliceNode input = edge.getDest();
+                OutputNode output = edge.getSrc();
+                InputNode input = edge.getDest();
                 StreamingDram bufDRAM = buf.getDRAM();
                
                 
@@ -1103,21 +1103,21 @@ public class AnnealedLayout extends SimulatedAnnealing implements Layout<RawTile
      * 
      * @return See method description.
      */
-    public boolean otherSplitFiltersMapped(FilterSliceNode node, ComputeNode tile) {
+    public boolean otherSplitFiltersMapped(WorkNode node, ComputeNode tile) {
         
         assert node.getPrevious().isInputSlice();
-        InputSliceNode input = node.getPrevious().getAsInput();
+        InputNode input = node.getPrevious().getAsInput();
         //no other filters to check
         if (input.noInputs())
             return false;
         
-        Iterator<InterSliceEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
+        Iterator<InterFilterEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
         while (inEdges.hasNext()) {
-            InterSliceEdge inEdge = inEdges.next();
-            OutputSliceNode output = inEdge.getSrc();
-            Iterator<InterSliceEdge> upstreamOutEdges = output.getDestSet(SchedulingPhase.STEADY).iterator();
+            InterFilterEdge inEdge = inEdges.next();
+            OutputNode output = inEdge.getSrc();
+            Iterator<InterFilterEdge> upstreamOutEdges = output.getDestSet(SchedulingPhase.STEADY).iterator();
             while (upstreamOutEdges.hasNext()) {
-                InterSliceEdge upstreamOutEdge = upstreamOutEdges.next();
+                InterFilterEdge upstreamOutEdge = upstreamOutEdges.next();
                 if (assignment.containsKey(upstreamOutEdge.getDest().getNextFilter()) &&
                         assignment.get(upstreamOutEdge.getDest().getNextFilter()) == tile)    
                     return true;

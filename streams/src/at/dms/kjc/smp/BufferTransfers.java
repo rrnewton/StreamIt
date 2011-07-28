@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.*;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 
 public abstract class BufferTransfers {

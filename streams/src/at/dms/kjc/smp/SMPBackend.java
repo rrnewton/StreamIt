@@ -96,12 +96,12 @@ public class SMPBackend {
         System.out.println("========================================");
         for(int x = 0 ; x < KjcOptions.smp ; x++) {
             Core core = chip.getNthComputeNode(x);
-            Set<FilterSliceNode> filters = core.getComputeCode().getFilters();
+            Set<WorkNode> filters = core.getComputeCode().getFilters();
             long totalWork = 0;
 
             System.out.println("Core " + core.getCoreID() + ": ");
-            for(FilterSliceNode filter : filters) {
-                long work = SliceWorkEstimate.getWork(filter.getParent());
+            for(WorkNode filter : filters) {
+                long work = FilterWorkEstimate.getWork(filter.getParent());
                 System.out.format("%16d | " + filter + "\n", work);
                 totalWork += work;
             }
@@ -121,7 +121,7 @@ public class SMPBackend {
                 if(compProcessed.contains(slice))
                     continue;
                 
-                comp += SliceWorkEstimate.getWork(slice);
+                comp += FilterWorkEstimate.getWork(slice);
                 compProcessed.add(slice);
             }
 

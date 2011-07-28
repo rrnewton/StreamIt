@@ -27,7 +27,7 @@ import java.util.List;
 public class TMD extends Scheduler {
 
     private double DUP_THRESHOLD;
-    private LevelizeSliceGraph lsg;
+    private LevelizeSSG lsg;
     private HashMap<Filter, Integer> fizzAmount;
     public static final int FISS_COMP_COMM_THRESHOLD = 10;
     /** if true, then we have slices with fanout greater than 2 and we do not 
@@ -72,7 +72,7 @@ public class TMD extends Scheduler {
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
         
-        lsg = new LevelizeSliceGraph(graphSchedule.getSlicer().getTopSlices());
+        lsg = new LevelizeSSG(graphSchedule.getSlicer().getTopSlices());
         Filter[][] levels = lsg.getLevels();
         
         
@@ -420,26 +420,26 @@ public class TMD extends Scheduler {
      * 
      */
     public void calculateFizzAmounts(int totalTiles) {
-        Filter[][] origLevels = new LevelizeSliceGraph(graphSchedule.getSlicer().getTopSlices()).getLevels();
+        Filter[][] origLevels = new LevelizeSSG(graphSchedule.getSlicer().getTopSlices()).getLevels();
         long peekingWork = 0;
         long totalWork = 0;
         //assume that level 0 has a file reader and the last level has a file writer
         for (int l = 0; l < origLevels.length; l++) {
             //for the level, calculate the total work and create a hashmap of fsn to work
-            HashMap <FilterSliceNode, Long> workEsts = new HashMap<FilterSliceNode, Long>();
-            LinkedList<FilterSliceNode> sortedWork = new LinkedList<FilterSliceNode>();
+            HashMap <WorkNode, Long> workEsts = new HashMap<WorkNode, Long>();
+            LinkedList<WorkNode> sortedWork = new LinkedList<WorkNode>();
             //this is the total amount of work
             long levelTotal = 0;
             //the total amount of stateless work
             long slTotal = 0;
             int cannotFizz = 0;            
             for (int s = 0; s < origLevels[l].length; s++) {
-               FilterSliceNode fsn = origLevels[l][s].getFirstFilter();
+               WorkNode fsn = origLevels[l][s].getFirstFilter();
                FilterContent fc = fsn.getFilter();
                if (fsn.isPredefined())
                    workEsts.put(fsn, (long)0);
                //the work estimation is the estimate for the work function  
-               long workEst = SliceWorkEstimate.getWork(origLevels[l][s]);
+               long workEst = FilterWorkEstimate.getWork(origLevels[l][s]);
                totalWork += workEst;
                if (fc.getPeekInt() > fc.getPopInt())
                    peekingWork += workEst;
@@ -482,7 +482,7 @@ public class TMD extends Scheduler {
             long perfectPar = slTotal / availTiles; 
                 
             for (int f = 0; f < sortedWork.size(); f++) {
-                FilterSliceNode fsn = sortedWork.get(f);
+                WorkNode fsn = sortedWork.get(f);
                 FilterContent fc = fsn.getFilter();
                 //don't parallelize file readers/writers
                 if (fsn.isPredefined())

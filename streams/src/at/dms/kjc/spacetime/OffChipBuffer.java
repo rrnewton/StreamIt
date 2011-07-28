@@ -7,9 +7,9 @@ import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.Edge;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SliceNode;
 
@@ -50,24 +50,24 @@ public abstract class OffChipBuffer extends Channel {
     public abstract OffChipBuffer getNonRedundant();
 
     // return true if the inputtracenode does anything necessary
-    public static boolean unnecessary(InputSliceNode input) {
+    public static boolean unnecessary(InputNode input) {
         if (input.noInputs())
             return true;
         if (input.oneInput()
             && (InterSliceBuffer.getBuffer(input.getSingleEdge(SchedulingPhase.STEADY)).getDRAM() == IntraSliceBuffer
-                .getBuffer(input, (FilterSliceNode) input.getNext())
+                .getBuffer(input, (WorkNode) input.getNext())
                 .getDRAM()))
             return true;
         return false;
     }
 
     // return true if OutputSliceNode does nothing useful
-    public static boolean unnecessary(OutputSliceNode output) {
+    public static boolean unnecessary(OutputNode output) {
         if (output.noOutputs())
             return true;
         if (output.oneOutput()
             && (IntraSliceBuffer.getBuffer(
-                                           (FilterSliceNode) output.getPrevious(), output)
+                                           (WorkNode) output.getPrevious(), output)
                 .getDRAM() == InterSliceBuffer.getBuffer(
                                                          output.getSingleEdge(SchedulingPhase.STEADY)).getDRAM()))
             return true;
@@ -251,8 +251,8 @@ public abstract class OffChipBuffer extends Channel {
         //output trace node!!
         if (length > 1 && buffer.redundant()) {
             //System.out.println("Setting upstream rotation length " + length);
-            IntraSliceBuffer upstream = IntraSliceBuffer.getBuffer((FilterSliceNode)buffer.getSource().getPrevious(), 
-                    (OutputSliceNode)buffer.getSource());
+            IntraSliceBuffer upstream = IntraSliceBuffer.getBuffer((WorkNode)buffer.getSource().getPrevious(), 
+                    (OutputNode)buffer.getSource());
             upstream.rotationLength = length;
         }
     }

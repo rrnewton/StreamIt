@@ -6,7 +6,7 @@ import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.slir.*;
 
 /**
- * Create kopi code for an {@link at.dms.kjc.slir.OutputSliceNode}.
+ * Create kopi code for an {@link at.dms.kjc.slir.OutputNode}.
  * @author dimock
  *
  */
@@ -15,7 +15,7 @@ public class ProcessOutputSliceNode {
     // uses WeakHashMap to be self-cleaning, but now have to insert some value.
     protected static Map<SliceNode,Boolean>  basicCodeWritten = new WeakHashMap<SliceNode,Boolean>();
 
-    protected OutputSliceNode outputNode;
+    protected OutputNode outputNode;
     protected SchedulingPhase whichPhase;
     protected BackEndFactory backEndBits;
     protected CodeStoreHelper splitter_code;
@@ -28,7 +28,7 @@ public class ProcessOutputSliceNode {
      * @param whichPhase   a scheduling phase {@link SchedulingPhase}
      * @param backEndBits  a BackEndFactory to access layout, etc.
      */
-    public ProcessOutputSliceNode(OutputSliceNode outputNode, 
+    public ProcessOutputSliceNode(OutputNode outputNode, 
             SchedulingPhase whichPhase, BackEndFactory backEndBits) {
         this.outputNode = outputNode;
         this.whichPhase = whichPhase;
@@ -198,7 +198,7 @@ public class ProcessOutputSliceNode {
          * @param splitter
          * @return
          */
-        private static void makeSplitterCode(OutputSliceNode splitter, 
+        private static void makeSplitterCode(OutputNode splitter, 
                 BackEndFactory backEndBits, CodeStoreHelper helper) {
             String splitter_name = "_splitter_" + ProcessFilterSliceNode.getUid();
             String splitter_method_name =  splitter_name + splitter.getPrevFilter().getFilter().getName();
@@ -337,7 +337,7 @@ public class ProcessOutputSliceNode {
          * @param backEndBits
          * @return
          */
-        public static  CodeStoreHelper getSplitterCode(OutputSliceNode splitter, BackEndFactory backEndBits) {
+        public static  CodeStoreHelper getSplitterCode(OutputNode splitter, BackEndFactory backEndBits) {
             CodeStoreHelper splitter_code = CodeStoreHelper.findHelperForSliceNode(splitter);
             if (splitter_code == null) {
                 splitter_code = backEndBits.getCodeStoreHelper(splitter);

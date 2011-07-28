@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class LevelizeSliceGraph {
+public class LevelizeSSG {
     private Filter[] topSlices;
     private HashMap<Filter, Integer> levelMap;
     private Filter[][] levels;
     
-    public LevelizeSliceGraph(Filter[] topSlices) {
+    public LevelizeSSG(Filter[] topSlices) {
         this.topSlices = topSlices;
         levelMap = new HashMap<Filter, Integer>();
         calcLevels();

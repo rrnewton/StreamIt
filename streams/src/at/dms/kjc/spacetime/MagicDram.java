@@ -166,7 +166,7 @@ public class MagicDram extends IODevice {
         }
     }
 
-    public void addBuffer(OutputSliceNode out, InputSliceNode in) {
+    public void addBuffer(OutputNode out, InputNode in) {
         // add the index
         indices.add(new String(getBufferIdent(out, in)));
 
@@ -174,16 +174,16 @@ public class MagicDram extends IODevice {
             buffers.add(new Buffer(in, out));
     }
 
-    public static String getBufferIdent(OutputSliceNode out, InputSliceNode in) {
+    public static String getBufferIdent(OutputNode out, InputNode in) {
         return out.getIdent() + "_" + in.getIdent();
     }
 
     static class Buffer {
-        public InputSliceNode in;
+        public InputNode in;
 
-        public OutputSliceNode out;
+        public OutputNode out;
 
-        public Buffer(InputSliceNode i, OutputSliceNode o) {
+        public Buffer(InputNode i, OutputNode o) {
             in = i;
             out = o;
         }

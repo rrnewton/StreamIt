@@ -73,7 +73,7 @@ public class DumpSlicesAndChannels {
         StringBuffer out = new StringBuffer();
 
         //do something fancy for linear slices!!!
-        if (((FilterSliceNode)node.getNext()).getFilter().getArray() != null)
+        if (((WorkNode)node.getNext()).getFilter().getArray() != null)
             out.append("color=cornflowerblue, style=filled, ");
         
         out.append("label=\"" + node.getAsInput().debugString(true));//toString());
@@ -97,7 +97,7 @@ public class DumpSlicesAndChannels {
                 out.append("\\nMult: init " + f.getInitMult() + ", steady " + f.getSteadyMult());
                 out.append("\\n *** ");
 
-                if (node.getNext() instanceof FilterSliceNode || backendbits.sliceHasDownstreamChannel(node.getParent())) {
+                if (node.getNext() instanceof WorkNode || backendbits.sliceHasDownstreamChannel(node.getParent())) {
                     out.append("  via " + channelName(node.getEdgeToNext(), backendbits) + "\\n");
                 }
             }

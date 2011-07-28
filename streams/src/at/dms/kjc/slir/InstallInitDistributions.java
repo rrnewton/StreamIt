@@ -27,7 +27,7 @@ public class InstallInitDistributions {
             } else {
                 //nothing done by input
                 slice.getHead().setInitWeights(new int[0]);
-                slice.getHead().setInitSources(new InterSliceEdge[0]);
+                slice.getHead().setInitSources(new InterFilterEdge[0]);
             }
             
             //do output slice
@@ -36,7 +36,7 @@ public class InstallInitDistributions {
                 slice.getTail().setInitWeights(slice.getTail().getWeights(SchedulingPhase.STEADY).clone());
             } else {
                 //nothing done by output
-                slice.getTail().setInitDests(new InterSliceEdge[0][0]);
+                slice.getTail().setInitDests(new InterFilterEdge[0][0]);
                 slice.getTail().setInitWeights(new int[0]);
             }
         }

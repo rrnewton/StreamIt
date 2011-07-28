@@ -34,7 +34,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
     protected JVariableDefinition writeHeadDefn;
     
     /** the output slice node */
-    protected OutputSliceNode output;
+    protected OutputNode output;
     
     /** true if this buffer's dest is a file writer */
     protected boolean directFileWrite = false;
@@ -220,7 +220,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
 
         //if this is an input buffer shared as an output buffer, then the output
         //filter is the local src filter of this input buffer
-        FilterSliceNode filter = parent.filterNode;
+        WorkNode filter = parent.filterNode;
 
         FilterInfo fi = FilterInfo.getFilterInfo(filter);
 
@@ -239,13 +239,13 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         int rotations = fi.totalItemsSent(phase) / output.totalWeights(phase);
         
         //first create an map from destinations to ints to index into the state arrays
-        HashMap<InterSliceEdge, Integer> destIndex = new HashMap<InterSliceEdge, Integer>();
+        HashMap<InterFilterEdge, Integer> destIndex = new HashMap<InterFilterEdge, Integer>();
         int index = 0;
         int numDests = output.getDestSet(phase).size();
         int[][] destIndices = new int[numDests][];
         int[] nextWriteIndex = new int[numDests];
         
-        for (InterSliceEdge edge : output.getDestSet(phase)) {
+        for (InterFilterEdge edge : output.getDestSet(phase)) {
             destIndex.put(edge, index);
             destIndices[index] = getDestIndices(edge, rotations, phase);
             nextWriteIndex[index] = 0;
@@ -256,7 +256,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
 
         String srcBuffer;
         if(((OutputRotatingBuffer)parent).hasDirectWrite()) {
-            FilterSliceNode directWriteFilter = ((OutputRotatingBuffer)parent).getDirectWriteFilter();
+            WorkNode directWriteFilter = ((OutputRotatingBuffer)parent).getDirectWriteFilter();
             srcBuffer = ((OutputRotatingBuffer)parent).getAddressBuffer(directWriteFilter.getParent().getHead()).currentWriteBufName;
         }
         else {
@@ -266,12 +266,12 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         int items = 0;
         for (int rot = 0; rot < rotations; rot++) {
             for (int weightIndex = 0; weightIndex < output.getWeights(phase).length; weightIndex++) {
-                InterSliceEdge[] dests = output.getDests(phase)[weightIndex];
+                InterFilterEdge[] dests = output.getDests(phase)[weightIndex];
                 for (int curWeight = 0; curWeight < output.getWeights(phase)[weightIndex]; curWeight++) {
                     int srcElement= rot * output.totalWeights(phase) + 
                         output.weightBefore(weightIndex, phase) + curWeight + writeOffset;
 
-                    for (InterSliceEdge dest : dests) {
+                    for (InterFilterEdge dest : dests) {
                         int destElement = destIndices[destIndex.get(dest)][nextWriteIndex[destIndex.get(dest)]];
                         nextWriteIndex[destIndex.get(dest)]++;
 
@@ -303,11 +303,11 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         statements.addAll(reorderStatements.toCompressedJStmts());   
     }
     
-    private int[] getDestIndices(InterSliceEdge edge, int outputRots, SchedulingPhase phase) {
+    private int[] getDestIndices(InterFilterEdge edge, int outputRots, SchedulingPhase phase) {
     	assert (parent instanceof OutputRotatingBuffer);
     	
         int[] indices = new int[outputRots * output.getWeight(edge, phase)];
-        InputSliceNode input = edge.getDest();
+        InputNode input = edge.getDest();
         FilterInfo dsFilter = FilterInfo.getFilterInfo(input.getNextFilter());
         //System.out.println("Dest copyDown: "+dsFilter.copyDown);
         assert indices.length %  input.getWeight(edge, phase) == 0;
@@ -339,10 +339,10 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             //if we are directly writing then we have to get the index into the remote
             //buffer of start of this source
         	
-        	Set<InterSliceEdge> edges = parent.filterNode.getParent().getTail().getDestSet(phase);
-        	InterSliceEdge edge = null;
+        	Set<InterFilterEdge> edges = parent.filterNode.getParent().getTail().getDestSet(phase);
+        	InterFilterEdge edge = null;
         	
-        	for(InterSliceEdge e : edges) {
+        	for(InterFilterEdge e : edges) {
         		if(e.getDest().getNextFilter().equals(((OutputRotatingBuffer)parent).getDirectWriteFilter())) {
         			edge = e;
         			break;

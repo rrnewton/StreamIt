@@ -72,17 +72,17 @@ public class Util {
      * @return an InterSliceEdge or Edge from src to dst
      */
     public static Edge srcDstToEdge(SliceNode src, SliceNode dst, SchedulingPhase phase) {
-        if (src instanceof OutputSliceNode && dst instanceof InputSliceNode) {
-            InterSliceEdge[][] edgesedges = ((OutputSliceNode)src).getDests(phase);
-            for (InterSliceEdge[] edges : edgesedges) {
-                for (InterSliceEdge edge : edges) {
+        if (src instanceof OutputNode && dst instanceof InputNode) {
+            InterFilterEdge[][] edgesedges = ((OutputNode)src).getDests(phase);
+            for (InterFilterEdge[] edges : edgesedges) {
+                for (InterFilterEdge edge : edges) {
                     assert edge.src == src;
                     if (edge.dest == dst) {
                         return edge;
                     }
                 }
             }
-            return new InterSliceEdge((OutputSliceNode)src,(InputSliceNode)dst);
+            return new InterFilterEdge((OutputNode)src,(InputNode)dst);
         } else {
             Edge e = src.getEdgeToNext();
             if (e == null || e.getDest() != dst) {

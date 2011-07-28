@@ -5,10 +5,10 @@ import at.dms.kjc.slir.*;
 
 public class MagicDramLoad extends MagicDramInstruction 
 {
-    private OutputSliceNode source;
-    private InputSliceNode dest;
+    private OutputNode source;
+    private InputNode dest;
     
-    public MagicDramLoad(InputSliceNode dest, OutputSliceNode source) 
+    public MagicDramLoad(InputNode dest, OutputNode source) 
     {
         this.dest = dest;
         this.source = source;
@@ -18,7 +18,7 @@ public class MagicDramLoad extends MagicDramInstruction
     {
         StringBuffer sb = new StringBuffer();
         if (source.isFileInput()) {
-            FileInputContent in = (FileInputContent)((FilterSliceNode)source.getPrevious()).getFilter();
+            FileInputContent in = (FileInputContent)((WorkNode)source.getPrevious()).getFilter();
             sb.append("\tif (");
             if (in.isFP())
                 sb.append("fscanf(" + Util.getFileHandle(in) + ", \"%e\\n\", &temp)");

@@ -20,7 +20,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /** if this input buffer is shared as an upstream output buffer for a filter on
      * the same tile, then this references the upstream filter.
      */
-    protected FilterSliceNode localSrcFilter;    
+    protected WorkNode localSrcFilter;    
     /** name of variable containing tail of array offset */
     protected String tailName;
     /** definition for tail */
@@ -85,7 +85,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * 
      * @param filterNode The filternode for which to create a new input buffer.
      */
-    private InputRotatingBuffer(FilterSliceNode filterNode, Tile parent) {
+    private InputRotatingBuffer(WorkNode filterNode, Tile parent) {
         super(filterNode.getEdgeToPrev(), filterNode, parent);
         bufType = filterNode.getFilter().getInputType();
         types.add(bufType);
@@ -121,7 +121,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         
     }
     
-    public FilterSliceNode getLocalSrcFilter() {
+    public WorkNode getLocalSrcFilter() {
         return localSrcFilter;
     }
     
@@ -135,12 +135,12 @@ public class InputRotatingBuffer extends RotatingBuffer {
     protected void setLocalSrcFilter() {
        
         //if we find a candidate this will be it
-        FilterSliceNode lsf = null;
+        WorkNode lsf = null;
         //this is the edge between the 2 local filters
-        InterSliceEdge theEdge = null;
+        InterFilterEdge theEdge = null;
         
-        for (InterSliceEdge edge : filterNode.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
-            FilterSliceNode upstream = edge.getSrc().getPrevFilter();
+        for (InterFilterEdge edge : filterNode.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
+            WorkNode upstream = edge.getSrc().getPrevFilter();
             if (TileraBackend.backEndBits.getLayout().getComputeNode(upstream) == parent) {
                 //System.out.println(upstream);
                 assert lsf == null : "Two upstream srcs mapped to same tile ?";
@@ -154,7 +154,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         
         //now we have to do some checks on the re-organization between them.
         //make sure the output node only has one output (or none in init)
-        OutputSliceNode output = lsf.getParent().getTail();
+        OutputNode output = lsf.getParent().getTail();
         if (!(output.peekingFissionPattern(SchedulingPhase.STEADY) && 
                 output.peekingFissionPattern(SchedulingPhase.INIT))) {
             //System.out.println(filterNode + " has no good local source 1.");
@@ -164,7 +164,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //now make sure the downstream consumer has a simple single appearance joiner and that
         //the lsf is the first in that joiner so nothing has to be redistributed...
         //or it is single appearance and all the upstream outputs fit in the slot in the joiner
-        InputSliceNode input = filterNode.getParent().getHead();
+        InputNode input = filterNode.getParent().getHead();
         if (!input.singleAppearance())
             return;
 
@@ -264,9 +264,9 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //fill the addressbuffers array
         addressBuffers = new HashMap<InputRotatingBuffer, SourceAddressRotation>();
         
-        OutputSliceNode outputNode = localSrcFilter.getParent().getTail();
+        OutputNode outputNode = localSrcFilter.getParent().getTail();
         
-        for (InterSliceEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
             if (edge.getDest() == this.filterNode.getParent().getHead())
                 continue;
             

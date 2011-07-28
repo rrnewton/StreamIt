@@ -39,7 +39,7 @@ public class FileReaderRemoteReads extends FileReaderCode {
         if (dstInfo.totalItemsReceived(phase) > 0) {
 
             //rotations of the output for the file reader
-            InterSliceEdge edge = input.getSingleEdge(phase);
+            InterFilterEdge edge = input.getSingleEdge(phase);
             assert edge == input.getEdgeFrom(phase, fileOutput.getPrevFilter());
 
             int dstTotalItemsReceived;

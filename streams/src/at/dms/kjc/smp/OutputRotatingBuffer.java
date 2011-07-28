@@ -15,10 +15,10 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.fission.FissionGroup;
@@ -39,7 +39,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /** whether transmitter can write directly into a receiver's buffer */
     protected boolean directWrite;
     /** filter whose receiver this transmitter will directly write to */
-    protected FilterSliceNode directWriteFilter;
+    protected WorkNode directWriteFilter;
     
     /**
      * Create all the output buffers necessary for this slice graph.  Iterate over
@@ -89,7 +89,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * 
      * @param filterNode The filternode for which to create a new output buffer.
      */
-    protected OutputRotatingBuffer(FilterSliceNode filterNode, Core parent) {
+    protected OutputRotatingBuffer(WorkNode filterNode, Core parent) {
         super(filterNode.getEdgeToNext(), filterNode, parent);
         
         bufType = filterNode.getFilter().getOutputType();
@@ -117,11 +117,11 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		// Get receivers that receive all outputs of this transmitter in steady-state
 		// In other words, receivers that appear in every weight of this filter's OutputSliceNode
 		
-		InterSliceEdge steadyDests[][] = filterNode.getParent().getTail().getDests(SchedulingPhase.STEADY);
-		Set<InterSliceEdge> steadyDestSet = filterNode.getParent().getTail().getDestSet(SchedulingPhase.STEADY);
-		Set<InterSliceEdge> candidateDestsSteady = new HashSet<InterSliceEdge>();
+		InterFilterEdge steadyDests[][] = filterNode.getParent().getTail().getDests(SchedulingPhase.STEADY);
+		Set<InterFilterEdge> steadyDestSet = filterNode.getParent().getTail().getDestSet(SchedulingPhase.STEADY);
+		Set<InterFilterEdge> candidateDestsSteady = new HashSet<InterFilterEdge>();
 		
-		for(InterSliceEdge edge : steadyDestSet) {
+		for(InterFilterEdge edge : steadyDestSet) {
 			boolean recvAllOutputs = true;
 			
 			for(int x = 0 ; x < steadyDests.length ; x++) {
@@ -153,11 +153,11 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		// Get receivers that receive everything or do not receive anything from
 		// this transmitter in initialization
 		
-		InterSliceEdge initDests[][] = filterNode.getParent().getTail().getDests(SchedulingPhase.INIT);
-		Set<InterSliceEdge> initDestsSet = filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT);
-		Set<InterSliceEdge> candidateDestsInit = new HashSet<InterSliceEdge>();
+		InterFilterEdge initDests[][] = filterNode.getParent().getTail().getDests(SchedulingPhase.INIT);
+		Set<InterFilterEdge> initDestsSet = filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT);
+		Set<InterFilterEdge> candidateDestsInit = new HashSet<InterFilterEdge>();
 		
-		for(InterSliceEdge edge : initDestsSet) {
+		for(InterFilterEdge edge : initDestsSet) {
 			boolean recvAllOutputs = true;
 			
 			for(int x = 0 ; x < initDests.length ; x++) {
@@ -181,7 +181,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 			}
 		}
 		
-		for(InterSliceEdge edge : initDestsSet) {
+		for(InterFilterEdge edge : initDestsSet) {
 			boolean recvNoOutputs = true;
 			
 			for(int x = 0 ; x < initDests.length ; x++) {
@@ -211,10 +211,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		}
 		
 		// Intersect candidate receivers from steady-state and initialization
-		Set<InterSliceEdge> candidateDests = new HashSet<InterSliceEdge>();
+		Set<InterFilterEdge> candidateDests = new HashSet<InterFilterEdge>();
 		
 		if(!initDestsSet.isEmpty()) {
-			for(InterSliceEdge edge : candidateDestsSteady)
+			for(InterFilterEdge edge : candidateDestsSteady)
 				if(candidateDestsInit.contains(edge))
 					candidateDests.add(edge);
 		}
@@ -228,9 +228,9 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		}
 		
 		// Take only candidate receivers that are single appearance
-		Set<InterSliceEdge> saCandidateDests = new HashSet<InterSliceEdge>();
+		Set<InterFilterEdge> saCandidateDests = new HashSet<InterFilterEdge>();
 		
-		for(InterSliceEdge edge : candidateDests)
+		for(InterFilterEdge edge : candidateDests)
 			if(edge.getDest().singleAppearance())
 				saCandidateDests.add(edge);
 			
@@ -240,9 +240,9 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		}
 		
 		// Check that schedules for OutputSliceNode and InputSliceNode are executed only once
-		Set<InterSliceEdge> finalCandidateDests = new HashSet<InterSliceEdge>();
+		Set<InterFilterEdge> finalCandidateDests = new HashSet<InterFilterEdge>();
 		
-		for(InterSliceEdge edge : saCandidateDests) {
+		for(InterFilterEdge edge : saCandidateDests) {
 			FilterInfo consumer = FilterInfo.getFilterInfo(edge.getDest().getNextFilter());
 			FilterInfo producer = FilterInfo.getFilterInfo(edge.getSrc().getPrevFilter());
 		
@@ -277,7 +277,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     	return directWrite;
     }
     
-    public FilterSliceNode getDirectWriteFilter() {
+    public WorkNode getDirectWriteFilter() {
     	return directWriteFilter;
     }
     
@@ -343,10 +343,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     
     public void createAddressBuffers() {
     	//fill the addressBuffers array
-    	OutputSliceNode outputNode = filterNode.getParent().getTail();
+    	OutputNode outputNode = filterNode.getParent().getTail();
     	
         addressBuffers = new HashMap<InputRotatingBuffer, SourceAddressRotation>();
-        for (InterSliceEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
             InputRotatingBuffer input = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
             addressBuffers.put(input, input.getAddressRotation(filterNode));
         }
@@ -359,7 +359,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * @return the dma address rotation used to store the address of the 
      * rotation associated with this input slice node
      */
-    public SourceAddressRotation getAddressBuffer(InputSliceNode input) {
+    public SourceAddressRotation getAddressBuffer(InputNode input) {
         assert addressBuffers.containsKey(InputRotatingBuffer.getInputBuffer(input.getNextFilter())) ;
         return addressBuffers.get(InputRotatingBuffer.getInputBuffer(input.getNextFilter()));
     }

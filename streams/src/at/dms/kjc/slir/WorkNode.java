@@ -7,34 +7,34 @@ import java.util.*;
 /** 
  * A {@link SliceNode} that references a {@link FilterContent}.
  **/
-public class FilterSliceNode extends SliceNode implements at.dms.kjc.DeepCloneable
+public class WorkNode extends SliceNode implements at.dms.kjc.DeepCloneable
 {
     private FilterContent filter;
    
     private boolean predefined;
     private boolean laidout;
 
-    private static HashMap<FilterContent, FilterSliceNode> contentToNode;
+    private static HashMap<FilterContent, WorkNode> contentToNode;
     
     static {
-        contentToNode = new HashMap<FilterContent, FilterSliceNode>();
+        contentToNode = new HashMap<FilterContent, WorkNode>();
     }
     
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */
-    private FilterSliceNode() {
+    private WorkNode() {
         super();
     }
 
-    public FilterSliceNode(FilterContent filter) {
+    public WorkNode(FilterContent filter) {
         predefined = (filter instanceof PredefinedContent);
         this.filter = filter;
         laidout = false;
         contentToNode.put(filter, this);
     }
     
-    public static FilterSliceNode getFilterNode(FilterContent f) {
+    public static WorkNode getFilterNode(FilterContent f) {
         return contentToNode.get(f);
     }
     
@@ -77,14 +77,14 @@ public class FilterSliceNode extends SliceNode implements at.dms.kjc.DeepCloneab
 
     /** Returns a deep clone of this object. */
     public Object deepClone() {
-        at.dms.kjc.slir.FilterSliceNode other = new at.dms.kjc.slir.FilterSliceNode();
+        at.dms.kjc.slir.WorkNode other = new at.dms.kjc.slir.WorkNode();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);
         return other;
     }
 
     /** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.FilterSliceNode other) {
+    protected void deepCloneInto(at.dms.kjc.slir.WorkNode other) {
         super.deepCloneInto(other);
         other.filter = (at.dms.kjc.slir.FilterContent)at.dms.kjc.AutoCloner.cloneToplevel(this.filter);
         other.predefined = this.predefined;

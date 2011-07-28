@@ -8,7 +8,7 @@ import java.util.*;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.slir.DataFlowOrder;
-import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
@@ -25,7 +25,7 @@ public class GreedyLayout implements Layout<RawTile> {
     private SpaceTimeSchedule spaceTime;
     private RawChip chip;
     private int numBins;
-    private LinkedList<FilterSliceNode>[] bins;
+    private LinkedList<WorkNode>[] bins;
     private long[] binWeight;
     private long maxBinWeight;
     private int[] searchOrder; 
@@ -47,7 +47,7 @@ public class GreedyLayout implements Layout<RawTile> {
         bins = new LinkedList[numBins];
         binWeight = new long[numBins];
         for (int i = 0; i < numBins; i++) {
-            bins[i] = new LinkedList<FilterSliceNode>();
+            bins[i] = new LinkedList<WorkNode>();
             binWeight[i] = 0;
         }
         //define a search order for each step of the packing
@@ -107,7 +107,7 @@ public class GreedyLayout implements Layout<RawTile> {
      */
     private void pack() {
         //now sort the filters by work
-        LinkedList<FilterSliceNode> sortedList = new LinkedList<FilterSliceNode>();
+        LinkedList<WorkNode> sortedList = new LinkedList<WorkNode>();
         LinkedList<Filter> scheduleOrder;
         
         //get the schedule order of the graph!
@@ -139,11 +139,11 @@ public class GreedyLayout implements Layout<RawTile> {
             sortedList.add(slice.getHead().getNextFilter());
         }
         
-        Iterator<FilterSliceNode> sorted = sortedList.iterator();
+        Iterator<WorkNode> sorted = sortedList.iterator();
         
         //perform the packing
         while (sorted.hasNext()) {
-            FilterSliceNode node = sorted.next();
+            WorkNode node = sorted.next();
             int bin = findMinBin();
             
             bins[bin].add(node);

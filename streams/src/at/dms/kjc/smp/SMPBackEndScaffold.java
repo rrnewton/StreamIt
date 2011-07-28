@@ -11,9 +11,9 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.ComputeNodesI;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SimpleSlice;
 import at.dms.kjc.slir.Filter;
@@ -52,7 +52,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
      * @param input InputSliceNode to consider for to a joiner.
      * @return
      */
-    protected boolean doNotCreateJoiner(InputSliceNode input) {
+    protected boolean doNotCreateJoiner(InputNode input) {
         return false;
     }
     
@@ -107,13 +107,13 @@ public class SMPBackEndScaffold extends BackEndScaffold {
         for (int i = 0; i < slices.length; i++) {
             slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputSliceNode)slice.getHead(),
+            resources.processInputSliceNode((InputNode)slice.getHead(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
             resources.processFilterSliceNode(slice.getFilterNodes().get(0), whichPhase, computeNodes);
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputSliceNode)slice.getTail(),
+            resources.processOutputSliceNode((OutputNode)slice.getTail(),
                     whichPhase, computeNodes);
         }
     }  

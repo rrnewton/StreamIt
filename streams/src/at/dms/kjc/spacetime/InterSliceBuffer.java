@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 import at.dms.kjc.*;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 
 /**
  * This class represents a buffer between two traces. The rotating register abstraction 
@@ -21,7 +21,7 @@ import at.dms.kjc.slir.OutputSliceNode;
  */
 public class InterSliceBuffer extends OffChipBuffer {
     // the edge
-    protected InterSliceEdge edge;
+    protected InterFilterEdge edge;
    
     /** 
      * A map of StreamingDrams to the number of InterTraceBuffers
@@ -30,13 +30,13 @@ public class InterSliceBuffer extends OffChipBuffer {
     protected static HashMap<StreamingDram, Integer> dramsToBuffers;
     
     
-    protected InterSliceBuffer(InterSliceEdge edge) {
+    protected InterSliceBuffer(InterFilterEdge edge) {
         super(edge.getSrc(), edge.getDest());
         this.edge = edge;
         calculateSize();
     }
 
-    public static InterSliceBuffer getBuffer(InterSliceEdge edge) {
+    public static InterSliceBuffer getBuffer(InterFilterEdge edge) {
         if (!bufferStore.containsKey(edge)) {
             System.out.println("Creating Inter Buffer from " + edge.getSrc() + " to " + edge.getDest());
             bufferStore.put(edge, new InterSliceBuffer(edge));
@@ -50,14 +50,14 @@ public class InterSliceBuffer extends OffChipBuffer {
      * of the source trace performs its function.
      */
     public boolean redundant() {
-        return unnecessary((OutputSliceNode) theEdge.getSrc());
+        return unnecessary((OutputNode) theEdge.getSrc());
     }
 
     public OffChipBuffer getNonRedundant() {
         if (redundant()) {
             return IntraSliceBuffer.getBuffer(
-                                              (FilterSliceNode) theEdge.getSrc().getPrevious(),
-                                              (OutputSliceNode) theEdge.getSrc()).getNonRedundant();
+                                              (WorkNode) theEdge.getSrc().getPrevious(),
+                                              (OutputNode) theEdge.getSrc()).getNonRedundant();
         }
         return this;
     }
@@ -69,7 +69,7 @@ public class InterSliceBuffer extends OffChipBuffer {
         sizeSteady = (Address.ZERO.add(maxItems)).add32Byte(0);
     }
 
-    public InterSliceEdge getEdge() {
+    public InterFilterEdge getEdge() {
         return edge;
     }
 

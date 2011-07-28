@@ -5,9 +5,9 @@ import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.*;
 import at.dms.kjc.sir.lowering.partition.*; 
 import at.dms.kjc.slir.DataFlowOrder;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SliceNode;
@@ -99,14 +99,14 @@ public class CompCommRatio {
             SliceNode sliceNode = sliceNodeIt.next();
 
             if (sliceNode.isFilterSlice()) {
-                FilterSliceNode filter = (FilterSliceNode) sliceNode;
+                WorkNode filter = (WorkNode) sliceNode;
                 // comm += (filter.getFilter().getSteadyMult() *
                 // filter.getFilter().getPushInt());
                 comp += (filter.getFilter().getSteadyMult() * slicer
                          .getFilterWork(filter));
             } else if (sliceNode.isOutputSlice()) {
-                OutputSliceNode output = (OutputSliceNode) sliceNode;
-                FilterSliceNode filter = (FilterSliceNode) output.getPrevious();
+                OutputNode output = (OutputNode) sliceNode;
+                WorkNode filter = (WorkNode) output.getPrevious();
                 // FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
                 // calculate the number of items sent
 
@@ -126,8 +126,8 @@ public class CompCommRatio {
 
                 comm += (iterations * itemsSent);
             } else {
-                InputSliceNode input = (InputSliceNode) sliceNode;
-                FilterSliceNode filter = (FilterSliceNode) input.getNext();
+                InputNode input = (InputNode) sliceNode;
+                WorkNode filter = (WorkNode) input.getNext();
 
                 // calculate the number of items received
                 int itemsSent = filter.getFilter().getSteadyMult()

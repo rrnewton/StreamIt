@@ -23,7 +23,7 @@ import at.dms.kjc.KjcOptions;
 
 public class FilterCodeGeneration extends CodeStoreHelper {
  
-    private FilterSliceNode filterNode;
+    private WorkNode filterNode;
     private FilterInfo filterInfo;
     private static String exeIndex1Name = "__EXEINDEX__1__";
     private JVariableDefinition exeIndex1;
@@ -50,7 +50,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
      * @param node          A filter slice node to wrap code for.
      * @param backEndBits   The back end factory as a source of data and back end specific functions.
      */
-    public FilterCodeGeneration(FilterSliceNode node, TileraBackEndFactory backEndBits) {
+    public FilterCodeGeneration(WorkNode node, TileraBackEndFactory backEndBits) {
         super(node,node.getAsFilter().getFilter(),backEndBits);
         filterNode = node;
         filterInfo = FilterInfo.getFilterInfo(filterNode);
@@ -74,8 +74,8 @@ public class FilterCodeGeneration extends CodeStoreHelper {
     @Override
     public JMethodDeclaration getInitStageMethod() {
         JBlock statements = new JBlock();
-        assert sliceNode instanceof FilterSliceNode;
-        FilterContent filter = ((FilterSliceNode) sliceNode).getFilter();
+        assert sliceNode instanceof WorkNode;
+        FilterContent filter = ((WorkNode) sliceNode).getFilter();
 
         // channel code before work block
         //slice has input, so we 
@@ -90,7 +90,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
             }
         }
         // add the calls for the work function in the initialization stage
-        if (FilterInfo.getFilterInfo((FilterSliceNode) sliceNode).isTwoStage()) {
+        if (FilterInfo.getFilterInfo((WorkNode) sliceNode).isTwoStage()) {
 
             JMethodCallExpression initWorkCall = new JMethodCallExpression(
                     null, new JThisExpression(null), filter.getInitWork()
@@ -110,7 +110,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         //determine if in the init there is a file writer slice downstream 
         //of the slice that contains this filter
         boolean dsFileWriter = false;
-        for (InterSliceEdge edge : filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT)) {
+        for (InterFilterEdge edge : filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT)) {
             if (edge.getDest().getParent().getFirstFilter().isFileOutput()) {
                 dsFileWriter = true;
                 break;
@@ -118,7 +118,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         }
         if (KjcOptions.numbers < 1 && dsFileWriter && filterInfo.totalItemsSent(SchedulingPhase.INIT) > 0) {
             assert filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT).size() == 1;
-            FilterSliceNode fileW = 
+            WorkNode fileW = 
                 filterNode.getParent().getTail().getDestList(SchedulingPhase.INIT)[0].getDest().getParent().getFirstFilter();
             
             InputRotatingBuffer buf = InputRotatingBuffer.getInputBuffer(fileW);
@@ -255,7 +255,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         
         // iterate work function as needed
         statements.addStatement(getWorkFunctionBlock(FilterInfo
-                .getFilterInfo((FilterSliceNode) sliceNode).steadyMult));
+                .getFilterInfo((WorkNode) sliceNode).steadyMult));
         
         // channel code after work block
         if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {

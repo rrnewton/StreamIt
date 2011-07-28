@@ -210,14 +210,14 @@ public class CellBackend {
     /**
      * InputSliceNode -> List of input channel IDs
      */
-    public static final HashMap<InputSliceNode,LinkedList<Integer>> inputChannelMap = 
-        new HashMap<InputSliceNode,LinkedList<Integer>>();
+    public static final HashMap<InputNode,LinkedList<Integer>> inputChannelMap = 
+        new HashMap<InputNode,LinkedList<Integer>>();
     
     /**
      * OutputSliceNode -> List of output channel IDs
      */
-    public static final HashMap<OutputSliceNode,LinkedList<Integer>> outputChannelMap =
-        new HashMap<OutputSliceNode,LinkedList<Integer>>();
+    public static final HashMap<OutputNode,LinkedList<Integer>> outputChannelMap =
+        new HashMap<OutputNode,LinkedList<Integer>>();
     
     public static final HashMap<Integer,SliceNode> SPUassignment = 
         new HashMap<Integer,SliceNode>();
@@ -231,11 +231,11 @@ public class CellBackend {
     public static final LinkedList<LinkedList<Integer>> scheduleLayout =
         new LinkedList<LinkedList<Integer>>();
     
-    public static final HashMap<InterSliceEdge,Integer> channelIdMap = 
-        new HashMap<InterSliceEdge,Integer>();
+    public static final HashMap<InterFilterEdge,Integer> channelIdMap = 
+        new HashMap<InterFilterEdge,Integer>();
     
-    public static final ArrayList<InterSliceEdge> channels = 
-        new ArrayList<InterSliceEdge>();
+    public static final ArrayList<InterFilterEdge> channels = 
+        new ArrayList<InterFilterEdge>();
     
     /**
      * List of all the filters in the graph (including RR splitters and joiners 
@@ -247,22 +247,22 @@ public class CellBackend {
     public static final HashMap<SliceNode,Integer> filterIdMap = 
         new HashMap<SliceNode,Integer>();
     
-    public static final HashMap<OutputSliceNode,Integer> duplicateSplitters = 
-        new HashMap<OutputSliceNode,Integer>();
+    public static final HashMap<OutputNode,Integer> duplicateSplitters = 
+        new HashMap<OutputNode,Integer>();
     
     /**
      * InputSliceNode -> ID of the artificial channel connecting it to the 
      * FilterSliceNode
      */
-    public static final HashMap<InputSliceNode,Integer> artificialJoinerChannels =
-        new HashMap<InputSliceNode,Integer>();
+    public static final HashMap<InputNode,Integer> artificialJoinerChannels =
+        new HashMap<InputNode,Integer>();
     
     /**
      * OutputSliceNode -> ID of the artificial channel connecting the FilterSliceNode
      * to it
      */
-    public static final HashMap<OutputSliceNode,Integer> artificialRRSplitterChannels = 
-        new HashMap<OutputSliceNode,Integer>();
+    public static final HashMap<OutputNode,Integer> artificialRRSplitterChannels = 
+        new HashMap<OutputNode,Integer>();
 
     /**
      * Set of IDs of channels that already have input data ready
@@ -282,15 +282,15 @@ public class CellBackend {
         for (int i : completedIds) {
             SliceNode sliceNode = filters.get(i);
             if (sliceNode.isInputSlice()) {
-                InputSliceNode inputNode = sliceNode.getAsInput();
+                InputNode inputNode = sliceNode.getAsInput();
                 if (inputNode.isJoiner(SchedulingPhase.STEADY)) {
                     // mark artificial channel to filterslicenode as ready
                     int artificialId = artificialJoinerChannels.get(inputNode);
                     readyInputs.add(artificialId);
                 }
             } else if (sliceNode.isFilterSlice()) {
-                FilterSliceNode filterNode = sliceNode.getAsFilter();
-                OutputSliceNode outputNode = filterNode.getNext().getAsOutput();
+                WorkNode filterNode = sliceNode.getAsFilter();
+                OutputNode outputNode = filterNode.getNext().getAsOutput();
                 if (outputNode.isRRSplitter(SchedulingPhase.STEADY)) {
                     // mark artificial channel to outputslicenode as ready 
                     int artificialId = artificialRRSplitterChannels.get(outputNode);
@@ -301,7 +301,7 @@ public class CellBackend {
                     readyInputs.addAll(outputIds);
                 }
             } else {
-                OutputSliceNode outputNode = sliceNode.getAsOutput();
+                OutputNode outputNode = sliceNode.getAsOutput();
                 if (outputNode.isRRSplitter(SchedulingPhase.STEADY)) {
                     // Mark all outputs as ready
                     LinkedList<Integer> outputIds = outputChannelMap.get(outputNode);
@@ -311,8 +311,8 @@ public class CellBackend {
         }
     }
     
-    public static InterSliceEdge getEdgeBetween(OutputSliceNode src, InputSliceNode dest) {
-        for (InterSliceEdge e : src.getDestSequence(SchedulingPhase.STEADY)) {
+    public static InterFilterEdge getEdgeBetween(OutputNode src, InputNode dest) {
+        for (InterFilterEdge e : src.getDestSequence(SchedulingPhase.STEADY)) {
             if (e.getDest() == dest)
                 return e;
         }

@@ -7,10 +7,10 @@ import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.slir.Edge;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -64,7 +64,7 @@ public class RawBackEndFactory extends BackEndFactory<RawChip, RawTile, RawCompu
      * 
      */
     @Override
-    public void processInputSliceNode(InputSliceNode input,
+    public void processInputSliceNode(InputNode input,
             SchedulingPhase whichPhase, RawChip rawChip) {
         Rawify.processInputSliceNode(input,whichPhase,rawChip);
     }
@@ -90,7 +90,7 @@ public class RawBackEndFactory extends BackEndFactory<RawChip, RawTile, RawCompu
      * @param computeNodes    the available compute nodes.
      */
     @Override
-    public void processFilterSliceNode(FilterSliceNode filter,
+    public void processFilterSliceNode(WorkNode filter,
             SchedulingPhase whichPhase, RawChip rawChip) {
         throw new AssertionError("Expect this method to be unused");
     }
@@ -104,7 +104,7 @@ public class RawBackEndFactory extends BackEndFactory<RawChip, RawTile, RawCompu
      * @param computeNodes    the available compute nodes.
      */
     @Override
-    public void processOutputSliceNode(OutputSliceNode output,
+    public void processOutputSliceNode(OutputNode output,
             SchedulingPhase whichPhase, RawChip rawChip) {
         Rawify.processOutputSliceNode(output, whichPhase, rawChip);
     }
@@ -152,27 +152,27 @@ public class RawBackEndFactory extends BackEndFactory<RawChip, RawTile, RawCompu
 
     @Override
     public Channel getChannel(Edge e) {
-        if (e instanceof InterSliceEdge) {
-            return InterSliceBuffer.getBuffer((InterSliceEdge)e);
+        if (e instanceof InterFilterEdge) {
+            return InterSliceBuffer.getBuffer((InterFilterEdge)e);
         } else {
             // insist on types
-            if (e.getSrc() instanceof FilterSliceNode) {
-                return IntraSliceBuffer.getBuffer((FilterSliceNode)(e.getSrc()), (OutputSliceNode)(e.getDest()));
+            if (e.getSrc() instanceof WorkNode) {
+                return IntraSliceBuffer.getBuffer((WorkNode)(e.getSrc()), (OutputNode)(e.getDest()));
             } else {
-                return IntraSliceBuffer.getBuffer((InputSliceNode)(e.getSrc()), (FilterSliceNode)(e.getDest()));
+                return IntraSliceBuffer.getBuffer((InputNode)(e.getSrc()), (WorkNode)(e.getDest()));
             }
         }
     }
 
     @Override
     public Channel getChannel(SliceNode src, SliceNode dst) {
-        if (src instanceof OutputSliceNode && dst instanceof InputSliceNode) {
-            return InterSliceBuffer.getBuffer(new InterSliceEdge((OutputSliceNode)src, (InputSliceNode)dst));
+        if (src instanceof OutputNode && dst instanceof InputNode) {
+            return InterSliceBuffer.getBuffer(new InterFilterEdge((OutputNode)src, (InputNode)dst));
         } else {
-            if (src instanceof FilterSliceNode) {
-                return IntraSliceBuffer.getBuffer((FilterSliceNode)(src), (OutputSliceNode)(dst));
+            if (src instanceof WorkNode) {
+                return IntraSliceBuffer.getBuffer((WorkNode)(src), (OutputNode)(dst));
             } else {
-                return IntraSliceBuffer.getBuffer((InputSliceNode)(src), (FilterSliceNode)(dst));
+                return IntraSliceBuffer.getBuffer((InputNode)(src), (WorkNode)(dst));
             }
         }
     }

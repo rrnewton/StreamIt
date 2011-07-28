@@ -96,8 +96,8 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         //perform the packing
         while (sorted.hasNext()) {
             SliceNode snode = sorted.next();
-            if (snode instanceof FilterSliceNode) {
-                FilterSliceNode fnode = (FilterSliceNode) snode;
+            if (snode instanceof WorkNode) {
+                WorkNode fnode = (WorkNode) snode;
                 int bin = findMinBin();
 
                 bins[bin].add(fnode);
@@ -112,10 +112,10 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
                         + slicer.getFilterWorkSteadyMult(
                                 fnode) + " on bin " + bin + ", bin work = "
                         + binWeight[bin]);
-                if (snode.getPrevious() instanceof InputSliceNode) {
+                if (snode.getPrevious() instanceof InputNode) {
                     assignment.put(snode.getPrevious(),nodes[bin]);
                 }
-                if (snode.getNext() instanceof OutputSliceNode) {
+                if (snode.getNext() instanceof OutputNode) {
                     assignment.put(snode.getNext(),nodes[bin]);
                 }
             

@@ -50,7 +50,7 @@ public class ReduceSJWidth
 
         //create the new trace to add with an identity
         Filter newTrace = newIdentityTrace(slice.getHead().getType());
-        InputSliceNode input = slice.getHead();
+        InputNode input = slice.getHead();
 
         //set the connections
         //choose first DRAMs incoming filters
@@ -110,7 +110,7 @@ public class ReduceSJWidth
     }
     
 
-    private static void reduceOutgoingEdges(OutputSliceNode output)
+    private static void reduceOutgoingEdges(OutputNode output)
     {
     
     }
@@ -120,7 +120,7 @@ public class ReduceSJWidth
     private static Filter newIdentityTrace(CType type) 
     {
         FilterContent filterC = new FilterContent(new SIRIdentity(type));
-        FilterSliceNode node = new FilterSliceNode(filterC);
+        WorkNode node = new WorkNode(filterC);
     
         Filter slice = new Filter(node);
         //finish creating the trace? Jasp?

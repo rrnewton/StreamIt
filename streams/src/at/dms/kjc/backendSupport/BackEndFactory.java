@@ -46,7 +46,7 @@ public abstract class BackEndFactory<
      * @param computeNodes    the available compute nodes.
      * 
      */
-    public abstract void processInputSliceNode(InputSliceNode input,
+    public abstract void processInputSliceNode(InputNode input,
             SchedulingPhase whichPhase, ComputeNodesType computeNodes);
     
     /**
@@ -67,7 +67,7 @@ public abstract class BackEndFactory<
      * @param computeNodes    the available compute nodes.
      */
 
-    public abstract void processFilterSliceNode(FilterSliceNode filter,
+    public abstract void processFilterSliceNode(WorkNode filter,
             SchedulingPhase whichPhase, ComputeNodesType computeNodes);
    
     /**
@@ -77,7 +77,7 @@ public abstract class BackEndFactory<
      * @param whichPhase      INIT / PRIMEPUMP / STEADY
      * @param computeNodes    the available compute nodes.
      */
-    public abstract void processOutputSliceNode(OutputSliceNode output,
+    public abstract void processOutputSliceNode(OutputNode output,
             SchedulingPhase whichPhase, ComputeNodesType computeNodes);
 
      /**
@@ -180,7 +180,7 @@ public abstract class BackEndFactory<
             // first filter on a slice with no input
             return false;
         }
-        FilterSliceNode filter = s.getFilterNodes().get(0);
+        WorkNode filter = s.getFilterNodes().get(0);
         FilterInfo info = FilterInfo.getFilterInfo(filter);
         if (info.noBuffer()) {
             // a filter with a 0 peek rate does not need

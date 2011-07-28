@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.*;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 
 public abstract class BufferTransfers {
@@ -20,7 +20,7 @@ public abstract class BufferTransfers {
     /** the dma commands block */
     protected List<JStatement> commandsInit;
     /** the output slice node */
-    protected OutputSliceNode output;
+    protected OutputNode output;
     /** any declarations that are needed */
     protected List<JStatement> decls;
     
@@ -80,8 +80,8 @@ public abstract class BufferTransfers {
     protected void checkSimple(SchedulingPhase phase) {
         assert output.singleAppearance();
         for (int w = 0; w < output.getWeights(phase).length; w++) {
-            for (InterSliceEdge edge : output.getDests(phase)[w]) {
-                InputSliceNode input = edge.getDest();
+            for (InterFilterEdge edge : output.getDests(phase)[w]) {
+                InputNode input = edge.getDest();
                 //assert that we don't have a single edge appear more than once for the input slice node
                 assert input.singleAppearance();
                 

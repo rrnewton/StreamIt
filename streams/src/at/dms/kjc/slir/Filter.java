@@ -14,12 +14,12 @@ import java.util.ArrayList;
 public class Filter implements at.dms.kjc.DeepCloneable {
         
     //The head of the slice.
-    protected InputSliceNode head;
+    protected InputNode head;
     //the Tail of the slice.
-    protected OutputSliceNode tail;
+    protected OutputNode tail;
     //The length of the slice.
     protected int len;
-    protected FilterSliceNode[] filterNodes;
+    protected WorkNode[] filterNodes;
     
     /*
      * public Slice (Slice[] edges, Slice[] depends, InputSliceNode head) { if
@@ -37,7 +37,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * @{link {@link #finish() finish} } will tack on an OutputSliceNode if missing.
      * @param head  the InputSliceNode
      */
-    public Filter(InputSliceNode head) {
+    public Filter(InputNode head) {
         this.head = head;
         head.setParent(this);
         len = -1;
@@ -49,9 +49,9 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * @param node
      */
     public Filter(SliceNode node) {
-        if (!(node instanceof FilterSliceNode))
+        if (!(node instanceof WorkNode))
             Utils.fail("FilterSliceNode expected: " + node);
-        head = new InputSliceNode();
+        head = new InputNode();
         head.setParent(this);
         head.setNext(node);
         node.setPrevious(head);
@@ -101,7 +101,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         int size = 0;
         SliceNode node = head.getNext();
         SliceNode end = node;
-        while (node != null && node instanceof FilterSliceNode) {
+        while (node != null && node instanceof WorkNode) {
             node.setParent(this);
             size++;
             end = node;
@@ -110,16 +110,16 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         if (node != null)
             end = node;
         len = size;
-        if (end instanceof OutputSliceNode)
-            tail = (OutputSliceNode) end;
+        if (end instanceof OutputNode)
+            tail = (OutputNode) end;
         else {
-            tail = new OutputSliceNode();
+            tail = new OutputNode();
             end.setNext(tail);
             tail.setPrevious(end);
         }
         tail.setParent(this);
         //set the filterNodes array
-        filterNodes = new FilterSliceNode[size];
+        filterNodes = new WorkNode[size];
         int i = 0;
         node = getHead().getNext();
         //remember that setting a node's next will also set the next node's previous edge
@@ -160,7 +160,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * 
      * @param out The new output slice node.
      */
-    public void setTail(OutputSliceNode out) {
+    public void setTail(OutputNode out) {
         tail = out;
         out.setParent(this);
     }
@@ -172,7 +172,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * 
      * @param node The new input slice node.
      */
-    public void setHead(InputSliceNode node) {
+    public void setHead(InputNode node) {
         head = node;
         node.setParent(this);
     }
@@ -182,7 +182,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      *   
      * @return The first FilterSliceNode of this Slice.
      */
-    public FilterSliceNode getFirstFilter() {
+    public WorkNode getFirstFilter() {
         return head.getNextFilter();
     }
     
@@ -190,7 +190,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * get the InputSliceNode of the Slice containing this node.
      * @return
      */
-    public InputSliceNode getHead() {
+    public InputNode getHead() {
         return head;
     }
 
@@ -199,7 +199,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * @return
      */
     // finish() must have been called
-    public OutputSliceNode getTail() {
+    public OutputNode getTail() {
         return tail;
     }
 
@@ -221,7 +221,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     public int getNumFilters() {
         SliceNode node = getHead().getNext();
         int ret = 0;
-        while (node instanceof FilterSliceNode) {
+        while (node instanceof WorkNode) {
             node = node.getNext();
             ret++;
         }
@@ -233,7 +233,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     /** 
      * @return list the filter slice nodes, in data flow order, unmodifiable.
      */
-    public java.util.List<FilterSliceNode> getFilterNodes() {
+    public java.util.List<WorkNode> getFilterNodes() {
         return java.util.Collections.unmodifiableList(java.util.Arrays.asList(filterNodes));
     }
 
@@ -249,10 +249,10 @@ public class Filter implements at.dms.kjc.DeepCloneable {
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.slir.Filter other) {
-        other.head = (at.dms.kjc.slir.InputSliceNode)at.dms.kjc.AutoCloner.cloneToplevel(this.head);
-        other.tail = (at.dms.kjc.slir.OutputSliceNode)at.dms.kjc.AutoCloner.cloneToplevel(this.tail);
+        other.head = (at.dms.kjc.slir.InputNode)at.dms.kjc.AutoCloner.cloneToplevel(this.head);
+        other.tail = (at.dms.kjc.slir.OutputNode)at.dms.kjc.AutoCloner.cloneToplevel(this.tail);
         other.len = this.len;
-        other.filterNodes = (at.dms.kjc.slir.FilterSliceNode[])at.dms.kjc.AutoCloner.cloneToplevel(this.filterNodes);
+        other.filterNodes = (at.dms.kjc.slir.WorkNode[])at.dms.kjc.AutoCloner.cloneToplevel(this.filterNodes);
         //System.out.println(other.filterNodes[0].hashCode() + " " + filterNodes[0].hashCode());
     }
 

@@ -5,7 +5,7 @@ import java.util.*;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.Filter;
 

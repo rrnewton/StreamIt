@@ -99,7 +99,7 @@ public class SpaceTimeBackend {
         // convert all pops that do not return values to writes to a volatile.
         ConvertLonelyPops convertLonelyPops = new ConvertLonelyPops();
         for (Filter slice : sliceGraph) {
-            for (FilterSliceNode filterNode : slice.getFilterNodes()) {
+            for (WorkNode filterNode : slice.getFilterNodes()) {
                 for (JMethodDeclaration method : filterNode.getFilter().getMethods()) {
                     RemoveMultiPops.doit(method);
                     convertLonelyPops.convert(method, filterNode.getFilter().getInputType());

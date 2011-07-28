@@ -3,8 +3,8 @@ package at.dms.kjc.spacetime;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.*;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 
 /**
@@ -103,7 +103,7 @@ public abstract class RawExecutionCode
         gdnInput = false;
         if (filterInfo.sliceNode.getPrevious().isInputSlice()) {
             if (!IntraSliceBuffer.getBuffer(
-                    (InputSliceNode)filterInfo.sliceNode.getPrevious(),
+                    (InputNode)filterInfo.sliceNode.getPrevious(),
                     filterInfo.sliceNode).isStaticNet())
                 gdnInput = true;
         }
@@ -111,7 +111,7 @@ public abstract class RawExecutionCode
         gdnOutput = false;
         if (filterInfo.sliceNode.getNext().isOutputSlice()) {
             if (!IntraSliceBuffer.getBuffer(filterInfo.sliceNode,
-                    (OutputSliceNode)filterInfo.sliceNode.getNext()).isStaticNet())
+                    (OutputNode)filterInfo.sliceNode.getNext()).isStaticNet())
                 gdnOutput = true;
         }
     }
@@ -179,7 +179,7 @@ public abstract class RawExecutionCode
         
         //get the buffer
         IntraSliceBuffer buf = IntraSliceBuffer.getBuffer(filterInfo.sliceNode,
-                (OutputSliceNode)filterInfo.sliceNode.getNext());
+                (OutputNode)filterInfo.sliceNode.getNext());
         
         //now see if this tile is not the owner of the dram
         //and a previous filter of the slice is not allocated on the
@@ -217,7 +217,7 @@ public abstract class RawExecutionCode
         assert filterInfo.sliceNode.getNext().isOutputSlice();
         //get the buffer
         IntraSliceBuffer buf = IntraSliceBuffer.getBuffer(filterInfo.sliceNode,
-                (OutputSliceNode)filterInfo.sliceNode.getNext());
+                (OutputNode)filterInfo.sliceNode.getNext());
         assert !buf.isStaticNet();
         //get the type size
         int size = Util.getTypeSize(filterInfo.filter.getOutputType());
@@ -370,7 +370,7 @@ public abstract class RawExecutionCode
                 Util.getTypeSize(filterInfo.filter.getInputType());
             //first make sure that we are not receiving code from a file
             //reader, because we do not align file readers
-            InputSliceNode input = (InputSliceNode)filterInfo.sliceNode.getPrevious();            
+            InputNode input = (InputNode)filterInfo.sliceNode.getPrevious();            
             //if not a file reader, then we might have to align the dest
             if (!Util.onlyFileInput(input) && wordsReceived > 0 &&
                     wordsReceived % RawChip.cacheLineWords != 0) {
@@ -388,7 +388,7 @@ public abstract class RawExecutionCode
             int wordsSent = Util.getTypeSize(filterInfo.filter.getOutputType()) *
                 filterInfo.totalItemsSent(whichPhase);
             
-            OutputSliceNode output = (OutputSliceNode)filterInfo.sliceNode.getNext();
+            OutputNode output = (OutputNode)filterInfo.sliceNode.getNext();
             
             //first make sure that we are not writing eventually to a file writer
             //file writers don't need to be aligned

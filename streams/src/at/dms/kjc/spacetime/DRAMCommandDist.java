@@ -6,7 +6,7 @@ package at.dms.kjc.spacetime;
 import java.util.Iterator;
 
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 
@@ -113,7 +113,7 @@ public class DRAMCommandDist {
                 //reads and writers
                 //the reads of the incoming arcs of the joiner
                 for (int s = 0; s < slice.getHead().getSources(SchedulingPhase.STEADY).length; s++) {
-                    InterSliceEdge edge = slice.getHead().getSources(SchedulingPhase.STEADY)[s];
+                    InterFilterEdge edge = slice.getHead().getSources(SchedulingPhase.STEADY)[s];
                     OffChipBuffer buf = InterSliceBuffer.getBuffer(edge);
                     interReads[buf.getDRAM().port]++;
                 }
@@ -126,7 +126,7 @@ public class DRAMCommandDist {
                 interReads[IntraSliceBuffer.getDstIntraBuf(slice).getDRAM().port]++;
                 Iterator dsts = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
                 while (dsts.hasNext()) {
-                    InterSliceEdge edge = (InterSliceEdge)dsts.next();
+                    InterFilterEdge edge = (InterFilterEdge)dsts.next();
                     OffChipBuffer buf = InterSliceBuffer.getBuffer(edge);
                     interWrites[buf.getDRAM().port]++;
                 }

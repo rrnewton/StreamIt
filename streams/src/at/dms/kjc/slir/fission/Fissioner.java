@@ -30,7 +30,7 @@ public class Fissioner {
     /** the amount we are fizzing slice by */
     private int fizzAmount;
     /** the filter of the slice we are fissing */
-    private FilterSliceNode filter;
+    private WorkNode filter;
     /** the filter info of the filter of the slice we are fissing */
     private FilterInfo fInfo;
     /** the identity slice inserted downstream fo the fizzed slices */
@@ -85,7 +85,7 @@ public class Fissioner {
         // Get information on Slice rates
         FilterInfo.reset();
 
-        FilterSliceNode filter = slice.getFirstFilter();
+        WorkNode filter = slice.getFirstFilter();
         
         // Check to see if Slice has file reader/writer.  Don't fizz file
         // reader/writer
@@ -152,25 +152,25 @@ public class Fissioner {
         
         inputsInit = new Filter[s.getHead().getSourceSet(SchedulingPhase.INIT).size()];
         i = 0;
-        for (InterSliceEdge edge : s.getHead().getSourceSet(SchedulingPhase.INIT)) {
+        for (InterFilterEdge edge : s.getHead().getSourceSet(SchedulingPhase.INIT)) {
             inputsInit[i++] = edge.getSrc().getParent();
         }
 
         inputsSteady = new Filter[s.getHead().getSourceSet(SchedulingPhase.STEADY).size()];
         i = 0;
-        for (InterSliceEdge edge : s.getHead().getSourceSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : s.getHead().getSourceSet(SchedulingPhase.STEADY)) {
             inputsSteady[i++] = edge.getSrc().getParent();
         }
         
         outputsInit = new Filter[s.getTail().getDestSet(SchedulingPhase.INIT).size()];
         i = 0; 
-        for (InterSliceEdge edge : s.getTail().getDestSet(SchedulingPhase.INIT)) {
+        for (InterFilterEdge edge : s.getTail().getDestSet(SchedulingPhase.INIT)) {
             outputsInit[i++] = edge.getDest().getParent();
         }
         
         outputsSteady = new Filter[s.getTail().getDestSet(SchedulingPhase.STEADY).size()];
         i = 0; 
-        for (InterSliceEdge edge : s.getTail().getDestSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : s.getTail().getDestSet(SchedulingPhase.STEADY)) {
             outputsSteady[i++] = edge.getDest().getParent();
         }
     }
@@ -212,9 +212,9 @@ public class Fissioner {
         Filter[] outputs = (phase == SchedulingPhase.INIT ? outputsInit : outputsSteady);
         
         for (int i = 0; i < outputs.length; i++) {
-            InterSliceEdge oldEdge = getEdge(slice, outputs[i]);
-            InterSliceEdge newEdge = getEdge(idOutput, outputs[i]);
-            InterSliceEdge[] srcs = outputs[i].getHead().getSources(phase);
+            InterFilterEdge oldEdge = getEdge(slice, outputs[i]);
+            InterFilterEdge newEdge = getEdge(idOutput, outputs[i]);
+            InterFilterEdge[] srcs = outputs[i].getHead().getSources(phase);
             srcs = replaceEdge(srcs, oldEdge, newEdge);
             int[] weights = outputs[i].getHead().getWeights(phase);
             
@@ -238,7 +238,7 @@ public class Fissioner {
     private void installSplitJoinIDOutput() {
         //set the join of id output to a round robin of the clones with weight
         //equal to their push rate
-        InterSliceEdge[] incoming = new InterSliceEdge[fizzAmount];
+        InterFilterEdge[] incoming = new InterFilterEdge[fizzAmount];
         int[] inWeights = new int[fizzAmount];
         for (int i = 0; i < fizzAmount; i++) {
             inWeights[i] = newPush;
@@ -251,12 +251,12 @@ public class Fissioner {
         
         //set the split of idOutput to the original filter's split pattern
         //with the src of the edges replaced with idOutput
-        InterSliceEdge[][] newDests = slice.getTail().getDests(SchedulingPhase.STEADY);
+        InterFilterEdge[][] newDests = slice.getTail().getDests(SchedulingPhase.STEADY);
         int newWeights[] = slice.getTail().getWeights(SchedulingPhase.STEADY).clone();
         
         for (int i = 0; i < outputsSteady.length; i++) {
-            InterSliceEdge oldEdge = getEdge(slice, outputsSteady[i]);
-            InterSliceEdge newEdge = getEdge(idOutput, outputsSteady[i]);
+            InterFilterEdge oldEdge = getEdge(slice, outputsSteady[i]);
+            InterFilterEdge newEdge = getEdge(idOutput, outputsSteady[i]);
             
             newDests = replaceEdge(newDests, oldEdge, newEdge);
         }
@@ -269,12 +269,12 @@ public class Fissioner {
 
         //if the original had a separate init pattern, we have to perform the search/replace 
         //of edges on it also
-        InterSliceEdge[][] newDestsInit = slice.getTail().getDests(SchedulingPhase.INIT);
+        InterFilterEdge[][] newDestsInit = slice.getTail().getDests(SchedulingPhase.INIT);
         int newWeightsInit[] = slice.getTail().getWeights(SchedulingPhase.INIT).clone();
 
         for (int i = 0; i < outputsInit.length; i++) {
-            InterSliceEdge oldEdge = getEdge(slice, outputsInit[i]);
-            InterSliceEdge newEdge = getEdge(idOutput, outputsInit[i]);
+            InterFilterEdge oldEdge = getEdge(slice, outputsInit[i]);
+            InterFilterEdge newEdge = getEdge(idOutput, outputsInit[i]);
 
             newDestsInit = replaceEdge(newDestsInit, oldEdge, newEdge);
         }
@@ -299,36 +299,36 @@ public class Fissioner {
             extra = 0;
         }
         
-        InterSliceEdge[][] dests = new InterSliceEdge[2 * fizzAmount + extra][];
+        InterFilterEdge[][] dests = new InterFilterEdge[2 * fizzAmount + extra][];
         int weights[] = new int[2 * fizzAmount + extra];
         //the first weight clone's pop - copydown - dup, so just what is for this filter minus 
         //what is already in the buffer (copydown)
         weights[0] = newPop - sliceCopyDown - dup;
         //the first dest is just the first filter
-        dests[0] = new InterSliceEdge[]{getEdge(idInput, sliceClones[0])};
+        dests[0] = new InterFilterEdge[]{getEdge(idInput, sliceClones[0])};
         //the second weight is just the duplication factor
         weights[1] = dup;
         //second dests are the first and second filter
-        dests[1] = new InterSliceEdge[]{getEdge(idInput, sliceClones[0]), getEdge(idInput, sliceClones[1])};
+        dests[1] = new InterFilterEdge[]{getEdge(idInput, sliceClones[0]), getEdge(idInput, sliceClones[1])};
         
         //generate the middle dests and weights
         for (int i = 2; i < 2 * fizzAmount; i += 2) {
             weights[i] = newPop - dup - dup;
-            dests[i] =  new InterSliceEdge[]{getEdge(idInput, sliceClones[i/2])};
+            dests[i] =  new InterFilterEdge[]{getEdge(idInput, sliceClones[i/2])};
             //now take care of the duplication to neighboring slices
             weights[i + 1] = dup;
             // the second dest of the duplication has to wrap around on the last index
             int secondDest = (i/2) + 1;
             if (secondDest >= fizzAmount) 
                 secondDest = 0  ;
-            dests[i + 1] = new InterSliceEdge[]{getEdge(idInput, sliceClones[i/2]), 
+            dests[i + 1] = new InterFilterEdge[]{getEdge(idInput, sliceClones[i/2]), 
                     getEdge(idInput, sliceClones[secondDest])};
         }
 
         if (extra == 1) {
             //now take care of the last weight and dest
             weights[2 * fizzAmount] = sliceCopyDown - dup;
-            dests[2 * fizzAmount] = new InterSliceEdge[]{getEdge(idInput, sliceClones[0])};
+            dests[2 * fizzAmount] = new InterFilterEdge[]{getEdge(idInput, sliceClones[0])};
         }
 
         //install the weights and edges for the steady state
@@ -341,12 +341,12 @@ public class Fissioner {
      * in the edges.
      */
     private void moveJoinToInputID() {
-        InterSliceEdge[] joining = slice.getHead().getSources(SchedulingPhase.STEADY);
-        InterSliceEdge[] newJoin = new InterSliceEdge[joining.length];
+        InterFilterEdge[] joining = slice.getHead().getSources(SchedulingPhase.STEADY);
+        InterFilterEdge[] newJoin = new InterFilterEdge[joining.length];
         
         for (int i = 0; i < joining.length; i++) {
             assert joining[i].getDest() == slice.getHead();
-            InterSliceEdge newEdge = getEdge(joining[i].getSrc().getParent(), idInput);
+            InterFilterEdge newEdge = getEdge(joining[i].getSrc().getParent(), idInput);
             newJoin[i] = newEdge;
         }
         
@@ -357,12 +357,12 @@ public class Fissioner {
 
 
         //if we have an init pattern, we have to replace the edges
-        InterSliceEdge[] joinInit = slice.getHead().getSources(SchedulingPhase.INIT);
-        InterSliceEdge[] newJoinInit = new InterSliceEdge[joinInit.length];
+        InterFilterEdge[] joinInit = slice.getHead().getSources(SchedulingPhase.INIT);
+        InterFilterEdge[] newJoinInit = new InterFilterEdge[joinInit.length];
 
         for (int i = 0; i < joinInit.length; i++) {
             assert joinInit[i].getDest() == slice.getHead();
-            InterSliceEdge newEdge = getEdge(joinInit[i].getSrc().getParent(), idInput);
+            InterFilterEdge newEdge = getEdge(joinInit[i].getSrc().getParent(), idInput);
             newJoinInit[i] = newEdge;
         }
 
@@ -382,9 +382,9 @@ public class Fissioner {
         
         for (int i = 0; i < inputs.length; i++) {
 
-            InterSliceEdge edge = getEdge(inputs[i], idInput);
-            InterSliceEdge oldEdge = getEdge(inputs[i], slice);
-            InterSliceEdge[][] newEdges = replaceEdge(inputs[i].getTail().getDests(phase), oldEdge, edge);
+            InterFilterEdge edge = getEdge(inputs[i], idInput);
+            InterFilterEdge oldEdge = getEdge(inputs[i], slice);
+            InterFilterEdge[][] newEdges = replaceEdge(inputs[i].getTail().getDests(phase), oldEdge, edge);
             int[] weights = inputs[i].getTail().getWeights(phase).clone();
             
             if (SchedulingPhase.INIT == phase) {
@@ -531,15 +531,15 @@ public class Fissioner {
  
         
         //set the incoming schedule of the 0th clone to receive from the input ID
-        InterSliceEdge idTo0 = getEdge(idInput, sliceClones[0]);
+        InterFilterEdge idTo0 = getEdge(idInput, sliceClones[0]);
         sliceClones[0].getHead().setInitWeights(new int[]{1});
-        sliceClones[0].getHead().setInitSources(new InterSliceEdge[]{idTo0});
+        sliceClones[0].getHead().setInitSources(new InterFilterEdge[]{idTo0});
         
         //set the outgoing schedule of the 0th clone to send to the output ID
-        InterSliceEdge toId = getEdge(sliceClones[0], idOutput);
+        InterFilterEdge toId = getEdge(sliceClones[0], idOutput);
         sliceClones[0].getTail().setInitWeights(new int[]{1});
-        InterSliceEdge[] outgoing = {toId};
-        sliceClones[0].getTail().setInitDests(new InterSliceEdge[][]{outgoing});
+        InterFilterEdge[] outgoing = {toId};
+        sliceClones[0].getTail().setInitDests(new InterFilterEdge[][]{outgoing});
         
         //set the rest of the slice clones' init dists to null
         for(int x = 1 ; x < fizzAmount ; x++) {
@@ -552,10 +552,10 @@ public class Fissioner {
         }
     }
     
-    private InterSliceEdge getEdge(Filter s1, Filter s2) {
-        InterSliceEdge edge = InterSliceEdge.getEdge(s1.getTail(), s2.getHead());
+    private InterFilterEdge getEdge(Filter s1, Filter s2) {
+        InterFilterEdge edge = InterFilterEdge.getEdge(s1.getTail(), s2.getHead());
         if (edge == null)
-            edge = new InterSliceEdge(s1.getTail(), s2.getHead());
+            edge = new InterFilterEdge(s1.getTail(), s2.getHead());
         
         return edge;
     }
@@ -621,31 +621,31 @@ public class Fissioner {
 
         assert idI.copyDown == 0 : idI.copyDown;
         assert idO.copyDown == 0;
-        IDSliceRemoval.doit(idInput);
-        IDSliceRemoval.doit(idOutput);
+        IDFilterRemoval.doit(idInput);
+        IDFilterRemoval.doit(idOutput);
     }
     
-    private InterSliceEdge[][] replaceEdge(InterSliceEdge[][] oldEdges, 
-            InterSliceEdge oldEdge, InterSliceEdge newEdge) {
+    private InterFilterEdge[][] replaceEdge(InterFilterEdge[][] oldEdges, 
+            InterFilterEdge oldEdge, InterFilterEdge newEdge) {
         if (oldEdges == null)
             return null;
         
-        InterSliceEdge[][] newEdges = new InterSliceEdge[oldEdges.length][];
+        InterFilterEdge[][] newEdges = new InterFilterEdge[oldEdges.length][];
         
         for (int i = 0; i < newEdges.length; i++) {
-            InterSliceEdge[] ret = replaceEdge(oldEdges[i], oldEdge, newEdge);
+            InterFilterEdge[] ret = replaceEdge(oldEdges[i], oldEdge, newEdge);
             newEdges[i] = ret;
         }
         
         return newEdges;
     }
     
-    private InterSliceEdge[] replaceEdge(InterSliceEdge[] oldEdges, 
-            InterSliceEdge oldEdge, InterSliceEdge newEdge) {
+    private InterFilterEdge[] replaceEdge(InterFilterEdge[] oldEdges, 
+            InterFilterEdge oldEdge, InterFilterEdge newEdge) {
         if (oldEdges == null)
             return null;
         
-        InterSliceEdge[] newEdges = new InterSliceEdge[oldEdges.length];
+        InterFilterEdge[] newEdges = new InterFilterEdge[oldEdges.length];
         
         for (int i = 0; i < newEdges.length; i++) {
             if (oldEdges[i] == oldEdge) 
@@ -664,21 +664,21 @@ public class Fissioner {
         //set the init mult of the id
         int items = 0;
         for (int i = 0; i < inputsInit.length; i++) {
-            InterSliceEdge edge = InterSliceEdge.getEdge(inputsInit[i].getTail(), slice.getHead());
+            InterFilterEdge edge = InterFilterEdge.getEdge(inputsInit[i].getTail(), slice.getHead());
             items += inputsInit[i].getTail().itemsSentOn(edge, SchedulingPhase.INIT);
         }
         idInput.getFirstFilter().getFilter().setInitMult(items);
         //set up the init weight and init dest, remember we only send to the left most clone in the init
         if (items > 0) {
             idInput.getTail().setInitWeights(new int[]{1});
-            idInput.getTail().setInitDests(new InterSliceEdge[][]{{getEdge(idInput, sliceClones[0])}});
+            idInput.getTail().setInitDests(new InterFilterEdge[][]{{getEdge(idInput, sliceClones[0])}});
         }
         
         //set the steady mult of the filter
         //check to make sure that we pop all we receive in the steady
         int totalItemsReceived = 0;
         for (int i = 0; i < inputsSteady.length; i++) {
-            InterSliceEdge edge = InterSliceEdge.getEdge(inputsSteady[i].getTail(), slice.getHead());
+            InterFilterEdge edge = InterFilterEdge.getEdge(inputsSteady[i].getTail(), slice.getHead());
             totalItemsReceived += inputsSteady[i].getTail().itemsSentOn(edge, SchedulingPhase.STEADY);
         }
         assert fInfo.steadyMult * fInfo.pop == totalItemsReceived;
@@ -686,9 +686,9 @@ public class Fissioner {
         
         //set the join schedule for each of the clones to just receive from the ID
         for (int i = 0; i < sliceClones.length; i++) {
-            InterSliceEdge edge = getEdge(idInput, sliceClones[i]);
+            InterFilterEdge edge = getEdge(idInput, sliceClones[i]);
             sliceClones[i].getHead().setWeights(new int[]{1});
-            sliceClones[i].getHead().setSources(new InterSliceEdge[]{edge});
+            sliceClones[i].getHead().setSources(new InterFilterEdge[]{edge});
         }
     }
 
@@ -701,7 +701,7 @@ public class Fissioner {
         //set the joining dist of the output id to just receive from the left most clone in init
         if (initItems > 0) {
             idOutput.getHead().setInitWeights(new int[]{1});
-            idOutput.getHead().setInitSources(new InterSliceEdge[]{getEdge(sliceClones[0], idOutput)});
+            idOutput.getHead().setInitSources(new InterFilterEdge[]{getEdge(sliceClones[0], idOutput)});
         }
                
         //set the steadymult of the id
@@ -719,9 +719,9 @@ public class Fissioner {
         
         //set the split schedule of each of the clones to just send to the id output
         for (int i = 0; i < sliceClones.length; i++) {
-            InterSliceEdge[] edge =  {getEdge(sliceClones[i], idOutput)};
+            InterFilterEdge[] edge =  {getEdge(sliceClones[i], idOutput)};
             sliceClones[i].getTail().setWeights(new int[]{1});
-            sliceClones[i].getTail().setDests(new InterSliceEdge[][]{edge});
+            sliceClones[i].getTail().setDests(new InterFilterEdge[][]{edge});
         }
     }
     

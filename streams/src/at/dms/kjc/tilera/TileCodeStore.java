@@ -20,12 +20,12 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
     /** Any text that should appear outside a function declaration in the c code */
     private StringBuffer globalTxt = new StringBuffer();
     /** set of filterslicenodes that are mapped to this tile */
-    protected HashSet<FilterSliceNode> filters;
+    protected HashSet<WorkNode> filters;
     
     public TileCodeStore(Tile nodeType) {
         super(nodeType);
         setMyMainName("__main__");
-        filters = new HashSet<FilterSliceNode>();
+        filters = new HashSet<WorkNode>();
         createBufferInitMethod();
     }
     
@@ -45,7 +45,7 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
      * 
      * @param filter The filter we are mapping to this tile.
      */
-    public void addFilter(FilterSliceNode filter) {
+    public void addFilter(WorkNode filter) {
         filters.add(filter);
         this.setHasCode();
     }
@@ -55,7 +55,7 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
      * 
      * @return all of the filters that are mapped to this tile.
      */
-    public Set<FilterSliceNode> getFilters() {
+    public Set<WorkNode> getFilters() {
         return filters;
     }
     
@@ -350,7 +350,7 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
         //find one of its sources, and add code to the source's tile to print the outputs
         //at the end of each steady state
         for (InputRotatingBuffer buf : fwb) {
-            FilterSliceNode fileW = buf.filterNode;
+            WorkNode fileW = buf.filterNode;
             //find the tile of the first input to the file writer
             Tile tile = 
                 TileraBackend.backEndBits.getLayout().
@@ -368,12 +368,12 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
         //We print the address buffer after it has been rotated, so that it points to the section
         //of the filewriter buffer that is about to be written to, but was written to 2 steady-states
         //ago
-        FilterSliceNode fileW = buf.filterNode;
+        WorkNode fileW = buf.filterNode;
         assert fileW.isFileOutput();
         //because of this scene we need a rotation length of 2
         assert buf.getRotationLength() == 2;
         //make sure that each of the inputs wrote to the file writer in the primepump stage
-        for (InterSliceEdge edge : fileW.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : fileW.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
             assert TileraBackend.scheduler.getGraphSchedule().getPrimePumpMult(edge.getSrc().getParent()) == 1;
         }
         int outputs = fileW.getFilter().getSteadyMult();

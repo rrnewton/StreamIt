@@ -10,19 +10,19 @@ import at.dms.kjc.slir.*;
 
 public class ProcessFileWriter {
     private static int totalOutputs = 0;
-    protected FilterSliceNode filterNode;
+    protected WorkNode filterNode;
     protected SchedulingPhase phase;
     protected SMPBackEndFactory factory;
     protected CoreCodeStore codeStore;
     protected FileOutputContent fileOutput;
-    protected static HashMap<FilterSliceNode, Core> allocatingCores;
+    protected static HashMap<WorkNode, Core> allocatingCores;
     protected Core allocatingCore; 
 
     static {
-        allocatingCores = new HashMap<FilterSliceNode, Core>();
+        allocatingCores = new HashMap<WorkNode, Core>();
     }
     
-    public ProcessFileWriter (FilterSliceNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
+    public ProcessFileWriter (WorkNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
         this.filterNode = filter;
         this.fileOutput = (FileOutputContent)filter.getFilter();
         this.phase = phase;
@@ -33,7 +33,7 @@ public class ProcessFileWriter {
         return totalOutputs;
     }
     
-    public static Set<FilterSliceNode> getFileWriterFilters() {
+    public static Set<WorkNode> getFileWriterFilters() {
         return allocatingCores.keySet();
     }
     
@@ -41,7 +41,7 @@ public class ProcessFileWriter {
      * Return the core that this file writer's buffer should be allocated on.
      * @param fo  The file writer
      */
-    public static Core getAllocatingCore(FilterSliceNode fo) {
+    public static Core getAllocatingCore(WorkNode fo) {
         assert fo.isFileOutput();
         
         if (!allocatingCores.containsKey(fo)) {
@@ -80,7 +80,7 @@ public class ProcessFileWriter {
      * the file reader is allocated to off-chip memory.  We just cycle through the cores
      * if there is more than one file reader, one reader per core.
      */
-    private static Core nextAllocatingCore(FilterSliceNode fo) {
+    private static Core nextAllocatingCore(WorkNode fo) {
         List<Core> reverseOrder = SMPBackend.chip.getCores(); 
         //Collections.reverse(reverseOrder);
         

@@ -21,7 +21,7 @@ public class MultiplySteadyState {
         while (sliceNodes.hasNext()) {
             SliceNode sliceNode = sliceNodes.next();
             if (sliceNode.isFilterSlice()) {
-                ((FilterSliceNode) sliceNode).getFilter().multSteadyMult(KjcOptions.steadymult);
+                ((WorkNode) sliceNode).getFilter().multSteadyMult(KjcOptions.steadymult);
             }
         }
 

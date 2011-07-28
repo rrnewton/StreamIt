@@ -12,9 +12,9 @@ import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.backendSupport.ProcessInputSliceNode;
 import at.dms.kjc.backendSupport.ProcessOutputSliceNode;
 import at.dms.kjc.slir.Edge;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -90,7 +90,7 @@ public class UniBackEndFactory extends BackEndFactory<
      * 
      */
     @Override
-    public void processInputSliceNode(InputSliceNode input,
+    public void processInputSliceNode(InputNode input,
             SchedulingPhase whichPhase, UniProcessors computeNodes) {
         new ProcessInputSliceNode(input,whichPhase,this).processInputSliceNode();
 
@@ -118,7 +118,7 @@ public class UniBackEndFactory extends BackEndFactory<
      * @param computeNodes    the available compute nodes.
      */
 
-    public void processFilterSliceNode(FilterSliceNode filter,
+    public void processFilterSliceNode(WorkNode filter,
             SchedulingPhase whichPhase, UniProcessors computeNodes) {
         new ProcessFilterSliceNode(filter,whichPhase,this).processFilterSliceNode();
     }
@@ -131,7 +131,7 @@ public class UniBackEndFactory extends BackEndFactory<
      * @param computeNodes    the available compute nodes.
      */
     @Override
-    public void processOutputSliceNode(OutputSliceNode output,
+    public void processOutputSliceNode(OutputNode output,
             SchedulingPhase whichPhase, UniProcessors computeNodes) {
         new ProcessOutputSliceNode(output,whichPhase,this).processOutputSliceNode();
 
@@ -155,15 +155,15 @@ public class UniBackEndFactory extends BackEndFactory<
 
     @Override
     public CodeStoreHelper getCodeStoreHelper(SliceNode node) {
-        if (node instanceof FilterSliceNode) {
+        if (node instanceof WorkNode) {
             // simply do appropriate wrapping of calls...
-            return new CodeStoreHelperSimple((FilterSliceNode)node,this);
-        } else if (node instanceof InputSliceNode) {
+            return new CodeStoreHelperSimple((WorkNode)node,this);
+        } else if (node instanceof InputNode) {
             // CodeStoreHelper that does not expect a work function.
             // Can we combine with above?
-            return new CodeStoreHelperJoiner((InputSliceNode)node, this);
+            return new CodeStoreHelperJoiner((InputNode)node, this);
         } else {
-            return new CodeStoreHelperSplitter((OutputSliceNode)node,this);
+            return new CodeStoreHelperSplitter((OutputNode)node,this);
         }
         
     }

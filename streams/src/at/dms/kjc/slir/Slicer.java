@@ -173,13 +173,13 @@ public abstract class Slicer {
     // because it is for execution order and this is not determined yet.
     protected Filter[] getNext(Filter slice, SchedulingPhase phase) {
         SliceNode node = slice.getHead();
-        if (node instanceof InputSliceNode)
+        if (node instanceof InputNode)
             node = node.getNext();
-        while (node != null && node instanceof FilterSliceNode) {
+        while (node != null && node instanceof WorkNode) {
             node = node.getNext();
         }
-        if (node instanceof OutputSliceNode) {
-            Edge[][] dests = ((OutputSliceNode) node).getDests(phase);
+        if (node instanceof OutputNode) {
+            Edge[][] dests = ((OutputNode) node).getDests(phase);
             ArrayList<Object> output = new ArrayList<Object>();
             for (int i = 0; i < dests.length; i++) {
                 Edge[] inner = dests[i];
@@ -221,7 +221,7 @@ public abstract class Slicer {
         StringBuffer out = new StringBuffer();
 
         //do something fancy for linear slices!!!
-        if (((FilterSliceNode)node.getNext()).getFilter().getArray() != null)
+        if (((WorkNode)node.getNext()).getFilter().getArray() != null)
             out.append("color=cornflowerblue, style=filled, ");
         
         out.append("label=\"" + slice.hashCode() + "\\n");
@@ -293,29 +293,29 @@ public abstract class Slicer {
 //            } else {
                 int numFilters = s.getNumFilters();
                 assert numFilters != 0 : s;
-                List<FilterSliceNode> fs = s.getFilterNodes();
-                OutputSliceNode prevTail = null;
+                List<WorkNode> fs = s.getFilterNodes();
+                OutputNode prevTail = null;
                 for (int i = 0; i < numFilters; i++) {
-                    InputSliceNode head;
-                    OutputSliceNode tail;
-                    FilterSliceNode f = fs.get(i);
+                    InputNode head;
+                    OutputNode tail;
+                    WorkNode f = fs.get(i);
                     // first simpleSlice has a head, otherwise create a new one.
                     if (i == 0) {
                         head = s.getHead();
                     } else {
                        /* TODO weight should probably not be 1 */
-                       head = new InputSliceNode(new int[]{1});
+                       head = new InputNode(new int[]{1});
                        // Connect tail from last iteration with head from this iteration.
                        // prevTail will not be null here...
-                       InterSliceEdge prevTailToHead = new InterSliceEdge(prevTail,head);
-                       head.setSources(new InterSliceEdge[]{prevTailToHead});
-                       prevTail.setDests(new InterSliceEdge[][]{{prevTailToHead}});
+                       InterFilterEdge prevTailToHead = new InterFilterEdge(prevTail,head);
+                       head.setSources(new InterFilterEdge[]{prevTailToHead});
+                       prevTail.setDests(new InterFilterEdge[][]{{prevTailToHead}});
                     }
                    if (i == numFilters - 1) {
                        tail = s.getTail();
                    } else {
                        /* TODO weight should probably not be 1 */
-                       tail = new OutputSliceNode(new int[]{1});
+                       tail = new OutputNode(new int[]{1});
                    }
                    prevTail = tail;
                    SimpleSlice ss = new SimpleSlice(head, f, tail);
@@ -356,7 +356,7 @@ public abstract class Slicer {
      */
     public void createPredefinedContent() {
         for (Filter s : getSliceGraph()) {
-            for (FilterSliceNode n : s.getFilterNodes()) {
+            for (WorkNode n : s.getFilterNodes()) {
                 if (n.getFilter() instanceof PredefinedContent) {
                     ((PredefinedContent)n.getFilter()).createContent();
                 }
@@ -371,7 +371,7 @@ public abstract class Slicer {
      * @param node The node to add.
      * @param slice The slice to add the node to.
      */
-    public void addFilterToSlice(FilterSliceNode node, 
+    public void addFilterToSlice(WorkNode node, 
             Filter slice) {
     }
     

@@ -34,7 +34,7 @@ public class SourceAddressRotation extends RotatingBuffer {
     private static HashMap<InputRotatingBuffer, Integer> bufCount =
     	new HashMap<InputRotatingBuffer, Integer>();
     
-    public SourceAddressRotation(Core core, InputRotatingBuffer buf, FilterSliceNode dest, Edge edge) {
+    public SourceAddressRotation(Core core, InputRotatingBuffer buf, WorkNode dest, Edge edge) {
         super(edge, dest, core);
         this.parent = core;
         this.inputBuffer = buf;

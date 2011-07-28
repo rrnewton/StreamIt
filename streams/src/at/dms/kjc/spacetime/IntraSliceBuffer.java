@@ -14,13 +14,13 @@ public class IntraSliceBuffer extends OffChipBuffer {
     /** true if this buffer uses static net */
     protected boolean staticNet;
     
-    public static IntraSliceBuffer getBuffer(FilterSliceNode src,
-                                             OutputSliceNode dst) {
+    public static IntraSliceBuffer getBuffer(WorkNode src,
+                                             OutputNode dst) {
         return getBufferSrcDst(src,dst);
     }
 
-    public static IntraSliceBuffer getBuffer(InputSliceNode src,
-                                             FilterSliceNode dst) {
+    public static IntraSliceBuffer getBuffer(InputNode src,
+                                             WorkNode dst) {
         return getBufferSrcDst(src,dst);
     }
     
@@ -54,8 +54,8 @@ public class IntraSliceBuffer extends OffChipBuffer {
         //perform some sanity checks
         if (!staticNet) {
             if (isInterSlice()) {
-                OutputSliceNode output = (OutputSliceNode)this.getDest();
-                InputSliceNode input = (InputSliceNode)this.getSource();
+                OutputNode output = (OutputNode)this.getDest();
+                InputNode input = (InputNode)this.getSource();
                 assert (output.oneOutput() || output.noOutputs()) &&
                     (input.noInputs() || input.oneInput()) : 
                         this.toString() + " cannot use the gdn unless it is a singleton.";
@@ -68,29 +68,29 @@ public class IntraSliceBuffer extends OffChipBuffer {
         // if there are no outputs for the output slice
         // then redundant
         if (theEdge.getSrc().isFilterSlice() && theEdge.getDest().isOutputSlice()) {
-            if (((OutputSliceNode) theEdge.getDest()).noOutputs())
+            if (((OutputNode) theEdge.getDest()).noOutputs())
                 return true;
         } else
             // if the inputslice is not necessray
-            return unnecessary((InputSliceNode) theEdge.getSrc());
+            return unnecessary((InputNode) theEdge.getSrc());
         return false;
     }
 
     public OffChipBuffer getNonRedundant() {
         if (theEdge.getSrc().isInputSlice() && theEdge.getDest().isFilterSlice()) {
             // if no inputs return null
-            if (((InputSliceNode) theEdge.getSrc()).noInputs())
+            if (((InputNode) theEdge.getSrc()).noInputs())
                 return null;
             // if redundant get the previous buffer and call getNonRedundant
             if (redundant())
                 return InterSliceBuffer.getBuffer(
-                                                  ((InputSliceNode) theEdge.getSrc()).getSingleEdge(SchedulingPhase.STEADY))
+                                                  ((InputNode) theEdge.getSrc()).getSingleEdge(SchedulingPhase.STEADY))
                     .getNonRedundant();
             // otherwise return this...
             return this;
         } else { // (theEdge.getSrc().isFilterSlice() && theEdge.getDest().isOutputSlice())
             // if no outputs return null
-            if (((OutputSliceNode) theEdge.getDest()).noOutputs())
+            if (((OutputNode) theEdge.getDest()).noOutputs())
                 return null;
             // the only way it could be redundant (unnecesary) is for there to
             // be no outputs
@@ -103,7 +103,7 @@ public class IntraSliceBuffer extends OffChipBuffer {
         if (theEdge.getSrc().isFilterSlice()) {
             // the init size is the max of the multiplicities for init and pp
             // times the push rate
-            FilterInfo fi = FilterInfo.getFilterInfo((FilterSliceNode) theEdge.getSrc());
+            FilterInfo fi = FilterInfo.getFilterInfo((WorkNode) theEdge.getSrc());
             int maxItems = fi.initMult;
             maxItems *= fi.push;
             // account for the initpush
@@ -114,7 +114,7 @@ public class IntraSliceBuffer extends OffChipBuffer {
             sizeSteady = (Address.ZERO.add(maxItems)).add32Byte(0);
         } else if (theEdge.getDest().isFilterSlice()) {
             // this is not a perfect estimation but who cares
-            FilterInfo fi = FilterInfo.getFilterInfo((FilterSliceNode) theEdge.getDest());
+            FilterInfo fi = FilterInfo.getFilterInfo((WorkNode) theEdge.getDest());
             int maxItems = fi.initMult;
             maxItems *= fi.pop;
             // now account for initpop, initpeek, peek

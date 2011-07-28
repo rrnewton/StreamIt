@@ -81,8 +81,8 @@ public class AddBuffering {
      * 
      * @param output The output slice node
      */
-    private void fixOutputNode(OutputSliceNode output) {
-        FilterSliceNode filterNode = output.getPrevFilter();
+    private void fixOutputNode(OutputNode output) {
+        WorkNode filterNode = output.getPrevFilter();
         FilterContent filter = filterNode.getFilter();
         
         //do nothing if nothing is pushed...
@@ -143,10 +143,10 @@ public class AddBuffering {
      * @return true if buffering was added to the correct this input
      * slice node.
      */
-    private boolean fixInputNodeBuffering(InputSliceNode input) {
+    private boolean fixInputNodeBuffering(InputNode input) {
         
-        Iterator<InterSliceEdge> edges = input.getSourceSet(SchedulingPhase.INIT).iterator();
-        HashMap<InterSliceEdge, Double> mults = new HashMap<InterSliceEdge, Double>();
+        Iterator<InterFilterEdge> edges = input.getSourceSet(SchedulingPhase.INIT).iterator();
+        HashMap<InterFilterEdge, Double> mults = new HashMap<InterFilterEdge, Double>();
         double minMult = Double.MAX_VALUE;
 
         //System.out.println("***** " + input + " " + input.getNext());
@@ -157,7 +157,7 @@ public class AddBuffering {
         //find the edge that has the smallest multiplicity in the
         //initialization stage
         while(edges.hasNext()) {
-            InterSliceEdge edge = edges.next();
+            InterFilterEdge edge = edges.next();
             
             double mult = 
                 (initItemsPushed(edge) / ((double)input.getWeight(edge, SchedulingPhase.INIT)));
@@ -191,7 +191,7 @@ public class AddBuffering {
         
         edges = input.getSourceSet(SchedulingPhase.INIT).iterator();
         while (edges.hasNext()) {
-            InterSliceEdge edge = edges.next();
+            InterFilterEdge edge = edges.next();
             
             double myMult = mults.get(edge).doubleValue();
             //if the mult is not equal to the target mult, we must buffer
@@ -235,7 +235,7 @@ public class AddBuffering {
      * @param incoming
      * @param itemsToPassInit
      */
-    private void addNewBufferingSlice(Filter upSlice, InterSliceEdge edge, int itemsToPassInit) {
+    private void addNewBufferingSlice(Filter upSlice, InterFilterEdge edge, int itemsToPassInit) {
         System.out.println("Adding new buffering slice at edge: " + edge);
         CType type = edge.getType(); 
         
@@ -243,17 +243,17 @@ public class AddBuffering {
         Filter downSlice = edge.getDest().getParent();
         
         //the new input of the new slice
-        InputSliceNode newInput = new InputSliceNode(new int[]{1});
+        InputNode newInput = new InputNode(new int[]{1});
         //create the identity filter for the new slice
         SIRFilter identity = new SIRIdentity(type);
         RenameAll.renameAllFilters(identity);
         
         //create the identity filter node...
-        FilterSliceNode filter = 
-            new FilterSliceNode(new FilterContent(identity));
+        WorkNode filter = 
+            new WorkNode(new FilterContent(identity));
        
         //create the new output slice node
-        OutputSliceNode newOutput = new OutputSliceNode(new int[]{1});
+        OutputNode newOutput = new OutputNode(new int[]{1});
         //set the intra-slice connections
         newInput.setNext(filter);
         filter.setPrevious(newInput);
@@ -266,7 +266,7 @@ public class AddBuffering {
         
         //create the new edge that will exist between the new slice and the
         //downstream slice
-        InterSliceEdge newEdge = new InterSliceEdge(newOutput, edge.getDest());
+        InterFilterEdge newEdge = new InterFilterEdge(newOutput, edge.getDest());
         
         //now install the edge at the input of the downstream slice instead 
         //of the old edge
@@ -276,8 +276,8 @@ public class AddBuffering {
         edge.setDest(newInput);
                 
         //set the sources and dests of the new input and new output
-        newInput.setSources(new InterSliceEdge[]{edge});
-        newOutput.setDests(new InterSliceEdge[][]{{newEdge}});
+        newInput.setSources(new InterFilterEdge[]{edge});
+        newOutput.setDests(new InterFilterEdge[][]{{newEdge}});
         
         System.out.println("   with new input: " + newInput);
         System.out.println("   with new output: " + newOutput);
@@ -316,11 +316,11 @@ public class AddBuffering {
         if (limitTiles && slice.getNumFilters() >= totalTiles)
             return false;
         
-        OutputSliceNode output = slice.getTail();
+        OutputNode output = slice.getTail();
         
-        Iterator<InterSliceEdge> edges = output.getDestSet(SchedulingPhase.INIT).iterator(); 
+        Iterator<InterFilterEdge> edges = output.getDestSet(SchedulingPhase.INIT).iterator(); 
         while (edges.hasNext()) {
-            InterSliceEdge edge = edges.next();
+            InterFilterEdge edge = edges.next();
             FilterInfo downstream = FilterInfo.getFilterInfo(edge.getDest().getNextFilter());
             
             int itemsRecOnEdge = (int) (((double)initItemsSent) *
@@ -349,10 +349,10 @@ public class AddBuffering {
      * @return The number of items that the ID must pass to the output
      * slice node.
      */
-    private int itemsToPass(Filter slice, InterSliceEdge edge, double inputMult) {
+    private int itemsToPass(Filter slice, InterFilterEdge edge, double inputMult) {
         assert slice == edge.getSrc().getParent();
-        OutputSliceNode output = edge.getSrc();
-        InputSliceNode input = edge.getDest();
+        OutputNode output = edge.getSrc();
+        InputNode input = edge.getDest();
         
         //the number of items that should now flow over this edge 
         //in the init stage
@@ -383,7 +383,7 @@ public class AddBuffering {
      * @param initMult The init multiplicity of the new id filter.
      */
     private void addIDToSlice(Filter slice, int initMult) {
-        FilterSliceNode oldLast = slice.getTail().getPrevFilter();
+        WorkNode oldLast = slice.getTail().getPrevFilter();
 
 // removed check: can always convert to SimpleSlices
 // and check would fail for UniProcessor every time...
@@ -398,8 +398,8 @@ public class AddBuffering {
         RenameAll.renameAllFilters(identity);
         
         //create the identity filter node...
-        FilterSliceNode filter = 
-            new FilterSliceNode(new FilterContent(identity));
+        WorkNode filter = 
+            new WorkNode(new FilterContent(identity));
         
         //set the multiplicities
         filter.getFilter().setInitMult(initMult);
@@ -424,7 +424,7 @@ public class AddBuffering {
      * @return The number of items pushed onto this edge in the initialization
      * stage.
      */
-    private double initItemsPushed(InterSliceEdge edge) {
+    private double initItemsPushed(InterFilterEdge edge) {
         return ((double)edge.getSrc().getPrevFilter().getFilter().initItemsPushed()) *
         edge.getSrc().ratio(edge, SchedulingPhase.INIT);
     }

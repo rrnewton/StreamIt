@@ -27,7 +27,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /** all the address buffers that are on the cores that feed this input buffer */
     protected SourceAddressRotation[] addressBufs;
     /** a map from source FilterSliceNode to address buf */
-    protected HashMap<FilterSliceNode, SourceAddressRotation> addrBufMap;
+    protected HashMap<WorkNode, SourceAddressRotation> addrBufMap;
     
     /** true if what feeds this inputbuffer is a file reader */
     protected boolean upstreamFileReader;
@@ -40,13 +40,13 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
     /** InputRotatingBuffers for fizzed filters will use shared constituent buffers.
      * This HashMap will store the names of the shared constituent buffers */
-    protected static HashMap<FilterSliceNode, String> sharedBufferNames;
+    protected static HashMap<WorkNode, String> sharedBufferNames;
 
     /** stores InputRotatingBuffers for file writers */
     protected static HashSet<InputRotatingBuffer> fileWriterBuffers;
 
     static {
-        sharedBufferNames = new HashMap<FilterSliceNode, String>();
+        sharedBufferNames = new HashMap<WorkNode, String>();
         fileWriterBuffers = new HashSet<InputRotatingBuffer>();
     }
     
@@ -95,7 +95,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * 
      * @param filterNode The filternode for which to create a new input buffer.
      */
-    private InputRotatingBuffer(FilterSliceNode filterNode, Core parent) {
+    private InputRotatingBuffer(WorkNode filterNode, Core parent) {
         super(filterNode.getEdgeToPrev(), filterNode, parent);
         
         bufType = filterNode.getFilter().getInputType();
@@ -128,7 +128,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
             filterNode.getParent().getHead().getWidth(SchedulingPhase.STEADY) <= 1;
         }
 
-        addrBufMap = new HashMap<FilterSliceNode, SourceAddressRotation>();
+        addrBufMap = new HashMap<WorkNode, SourceAddressRotation>();
     }
 
     /**
@@ -268,7 +268,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * @param filterSliceNode The FilterSliceNode
      * @return the address buffer for this input buffer on the core
      */
-    public SourceAddressRotation getAddressRotation(FilterSliceNode filterSliceNode) {
+    public SourceAddressRotation getAddressRotation(WorkNode filterSliceNode) {
         return addrBufMap.get(filterSliceNode);
     }
     

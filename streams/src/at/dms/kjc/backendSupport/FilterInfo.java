@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.HashMap;
 
 import at.dms.kjc.slir.FilterContent;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
 
 /**
@@ -47,12 +47,12 @@ public class FilterInfo {
     
     private boolean linear;
     /** The FilterNode with this info. */
-    public FilterSliceNode sliceNode;
+    public WorkNode sliceNode;
     /** The FilterContent with this info. */
     public FilterContent filter;
 
     /** HashMap of all the filter infos FilterSliceNode -> FilterInfo */
-    private static HashMap<FilterSliceNode, FilterInfo> filterInfos;
+    private static HashMap<WorkNode, FilterInfo> filterInfos;
 
     // true if everything is set and we can use this class
     // because once a filter info is created you cannot
@@ -60,7 +60,7 @@ public class FilterInfo {
     private static boolean canuse;
 
     static {
-        filterInfos = new HashMap<FilterSliceNode, FilterInfo>();
+        filterInfos = new HashMap<WorkNode, FilterInfo>();
         canuse = false;
     }
 
@@ -77,11 +77,11 @@ public class FilterInfo {
      * Force the filter info to be recalculated.
      */
     public static void reset() {
-        filterInfos = new HashMap<FilterSliceNode, FilterInfo>();
+        filterInfos = new HashMap<WorkNode, FilterInfo>();
     }
     
     /** Return a stored FilterInfo or calculate a new one as needed. */
-    public static FilterInfo getFilterInfo(FilterSliceNode sliceNode) {
+    public static FilterInfo getFilterInfo(WorkNode sliceNode) {
         assert canuse;
         if (!filterInfos.containsKey(sliceNode)) {
             FilterInfo info = new FilterInfo(sliceNode);
@@ -91,7 +91,7 @@ public class FilterInfo {
             return filterInfos.get(sliceNode);
     }
 
-    private FilterInfo(FilterSliceNode sliceNode) {
+    private FilterInfo(WorkNode sliceNode) {
         filter = sliceNode.getFilter();
         this.sliceNode = sliceNode;
         this.steadyMult = filter.getSteadyMult();
@@ -157,7 +157,7 @@ public class FilterInfo {
         // may cause an infinite loop because it creates filter infos
         int initItemsRec = 0;
         if (sliceNode.getPrevious().isFilterSlice()) {
-            FilterContent filterC = ((FilterSliceNode) sliceNode.getPrevious())
+            FilterContent filterC = ((WorkNode) sliceNode.getPrevious())
                 .getFilter();
             initItemsRec = filterC.getPushInt() * filterC.getInitMult();
             if (filterC.isTwoStage()) {
@@ -165,12 +165,12 @@ public class FilterInfo {
                 initItemsRec += filterC.getPreworkPush();
             }
         } else { // previous is an input slice
-            InputSliceNode in = (InputSliceNode) sliceNode.getPrevious();
+            InputNode in = (InputNode) sliceNode.getPrevious();
 
             // add all the upstream filters items that reach this filter
             for (int i = 0; i < in.getWeights(SchedulingPhase.INIT).length; i++) {
-                InterSliceEdge incoming = in.getSources(SchedulingPhase.INIT)[i];
-                FilterContent filterC = ((FilterSliceNode) incoming.getSrc()
+                InterFilterEdge incoming = in.getSources(SchedulingPhase.INIT)[i];
+                FilterContent filterC = ((WorkNode) incoming.getSrc()
                                          .getPrevious()).getFilter();
                 // calculate the init items sent by the upstream filter
                 int upstreamInitItems = 0;
@@ -280,27 +280,27 @@ public class FilterInfo {
         if (sliceNode.getPrevious().isFilterSlice()) {
             upStreamItems = 
                 FilterInfo.getFilterInfo(
-                        (FilterSliceNode) sliceNode.getPrevious()).initItemsSent();
+                        (WorkNode) sliceNode.getPrevious()).initItemsSent();
             if (debug)
                 System.out.println(" Upstream filter sends: " + upStreamItems);
         } else { // previous is an input slice
-            InputSliceNode in = (InputSliceNode) sliceNode.getPrevious();
+            InputNode in = (InputNode) sliceNode.getPrevious();
             if (debug)
                 System.out.println(" Upstream input node:");
             // add all the upstream filters items that reach this filter
-            Iterator<InterSliceEdge> edges = in.getSourceSet(SchedulingPhase.INIT).iterator();
+            Iterator<InterFilterEdge> edges = in.getSourceSet(SchedulingPhase.INIT).iterator();
             while (edges.hasNext()) {
-                InterSliceEdge incoming = edges.next();
+                InterFilterEdge incoming = edges.next();
                 upStreamItems += 
                     (int) 
-                    ((double)FilterInfo.getFilterInfo((FilterSliceNode)incoming.getSrc().getPrevious())
+                    ((double)FilterInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                             .initItemsSent() * incoming.getSrc().ratio(incoming, SchedulingPhase.INIT));
                 if (debug) {
                     System.out.println("   " + incoming + ": sends " + 
-                            FilterInfo.getFilterInfo((FilterSliceNode)incoming.getSrc().getPrevious())
+                            FilterInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                             .initItemsSent() + ", at ratio " + incoming.getSrc().ratio(incoming, SchedulingPhase.INIT) + " = " +
                             (int) 
-                            ((double)FilterInfo.getFilterInfo((FilterSliceNode)incoming.getSrc().getPrevious())
+                            ((double)FilterInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                                     .initItemsSent() * incoming.getSrc().ratio(incoming, SchedulingPhase.INIT)));
                 }
                             //((double) incoming.getSrc()

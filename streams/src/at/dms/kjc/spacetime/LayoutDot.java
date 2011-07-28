@@ -7,7 +7,7 @@ import java.util.HashMap;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.SliceNode;
 import at.dms.kjc.slir.Util;
 
@@ -76,7 +76,7 @@ public class LayoutDot
                              ", " + tile.getY() + ")\\n");
                     fw.write("Init:\\n");
                     for (SliceNode fs : tile.getSliceNodes(true, false)) {
-                        FilterInfo fi = FilterInfo.getFilterInfo((FilterSliceNode)fs);
+                        FilterInfo fi = FilterInfo.getFilterInfo((WorkNode)fs);
             
                         fw.write(fi.filter.toString() + "(" + 
                                  fi.initMult + ")\\n");
@@ -84,7 +84,7 @@ public class LayoutDot
             
                     fw.write("Prime Pump:\\n");
                     for (SliceNode fs : tile.getSliceNodes(false, true)) {
-                        FilterInfo fi = FilterInfo.getFilterInfo((FilterSliceNode)fs);
+                        FilterInfo fi = FilterInfo.getFilterInfo((WorkNode)fs);
             
                         fw.write(fi.filter.toString() + "(" + 
                                  spaceTime.getPrimePumpTotalMult(fi) + ")\\n");
@@ -92,7 +92,7 @@ public class LayoutDot
             
                     fw.write("Steady:\\n");
                     for (SliceNode fs : tile.getSliceNodes(false, false)) {
-                        FilterInfo fi = FilterInfo.getFilterInfo((FilterSliceNode)fs);
+                        FilterInfo fi = FilterInfo.getFilterInfo((WorkNode)fs);
             
                         fw.write(fi.filter.toString() + "(" + 
                                  fi.steadyMult + ")\\n");

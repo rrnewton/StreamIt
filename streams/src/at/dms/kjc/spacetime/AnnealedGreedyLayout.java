@@ -5,10 +5,10 @@ package at.dms.kjc.spacetime;
 
 import java.util.*;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
@@ -53,8 +53,8 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
     }
     
     public void setComputeNode(SliceNode node, RawTile tile) {
-        assert node instanceof FilterSliceNode;
-        FilterSliceNode fnode = (FilterSliceNode)node;
+        assert node instanceof WorkNode;
+        WorkNode fnode = (WorkNode)node;
         if (!fnode.isPredefined()) { 
             tileCosts[getComputeNode(fnode).getTileNumber()] -= 
                 slicer.getFilterWorkSteadyMult(fnode);
@@ -81,9 +81,9 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
             tileCosts[i] = 0;
         }
         
-        Iterator<FilterSliceNode> filters = assignment.keySet().iterator();
+        Iterator<WorkNode> filters = assignment.keySet().iterator();
         while (filters.hasNext()) {
-            FilterSliceNode filter = filters.next();
+            WorkNode filter = filters.next();
             int bin = ((RawTile)assignment.get(filter)).getTileNumber();
             tileCosts[bin] += slicer.getFilterWorkSteadyMult(filter);
         }
@@ -98,7 +98,7 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
         //find two slices to swap, remember this only work for time
         //slices are single filter
         Filter slice1, slice2;
-        FilterSliceNode filter1 = null, filter2 = null;
+        WorkNode filter1 = null, filter2 = null;
         int bin1, bin2;
         Filter[] slices = slicer.getSliceGraph();
         
@@ -247,17 +247,17 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
         for (int t = 0; t < chip.getTotalTiles(); t++) {
             for (int i = 0; i < duplicate.getFilterOnTile(t).size(); i++) {
                 SIRFilter filter = duplicate.getFilterOnTile(t).get(i);
-                FilterSliceNode node = 
-                    FilterSliceNode.getFilterNode(spaceTime.getSIRSlicer().getContent(filter));
+                WorkNode node = 
+                    WorkNode.getFilterNode(spaceTime.getSIRSlicer().getContent(filter));
                 assignment.put(node, chip.getTile(t));
                 tileCosts[t] += slicer.getFilterWorkSteadyMult(node); 
             }
         }
         
-        Iterator<FilterSliceNode> nodes = 
+        Iterator<WorkNode> nodes = 
             Util.sortedFilterSlicesTime(spaceTime.getSIRSlicer()).iterator();
         while (nodes.hasNext()) {
-            FilterSliceNode node = nodes.next();
+            WorkNode node = nodes.next();
             //already assigned above
             if (assignment.containsKey(node))
                 continue;
@@ -333,7 +333,7 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
             Filter slice = slices[i];
             Iterator edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
             while (edges.hasNext()) {
-                InterSliceEdge edge = (InterSliceEdge)edges.next();
+                InterFilterEdge edge = (InterFilterEdge)edges.next();
                // //System.out.println(" Checking if " + edge + " crosses.");
                 InterSliceBuffer buf = InterSliceBuffer.getBuffer(edge);
                 
@@ -341,8 +341,8 @@ public class AnnealedGreedyLayout extends SimulatedAnnealing implements Layout<R
                 if (buf.redundant())
                     continue;
                 
-                OutputSliceNode output = edge.getSrc();
-                InputSliceNode input = edge.getDest();
+                OutputNode output = edge.getSrc();
+                InputNode input = edge.getDest();
                 StreamingDram bufDRAM = buf.getDRAM();
                
                 

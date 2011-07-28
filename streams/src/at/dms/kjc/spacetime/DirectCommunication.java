@@ -22,8 +22,8 @@ import java.util.Hashtable;
 import java.math.BigInteger;
 
 import at.dms.kjc.slir.FilterContent;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.util.SIRPrinter;
 
@@ -57,7 +57,7 @@ public class DirectCommunication extends RawExecutionCode
         boolean dynamicInput = false;
         if (fi.sliceNode.getPrevious().isInputSlice()) {
             if (!IntraSliceBuffer.getBuffer(
-                    (InputSliceNode)fi.sliceNode.getPrevious(),
+                    (InputNode)fi.sliceNode.getPrevious(),
                     fi.sliceNode).isStaticNet())
                 dynamicInput = true;
         }
@@ -127,7 +127,7 @@ public class DirectCommunication extends RawExecutionCode
     public DirectCommunication(RawTile tile, FilterInfo filterInfo, Layout layout) 
     {
         super(tile, filterInfo, layout);
-        FilterSliceNode node=filterInfo.sliceNode;
+        WorkNode node=filterInfo.sliceNode;
         System.out.println(tile +  " Generating code for " + filterInfo.filter + " using Direct Comm.");
     }
 

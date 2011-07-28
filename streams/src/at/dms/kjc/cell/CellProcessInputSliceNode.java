@@ -39,9 +39,9 @@ import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.backendSupport.ProcessInputSliceNode;
 import at.dms.kjc.common.ALocalVariable;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SliceNode;
 
@@ -50,7 +50,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
     private CellComputeCodeStore ppuCS;
     private CellComputeCodeStore initCodeStore;
     
-    public CellProcessInputSliceNode(InputSliceNode inputNode, 
+    public CellProcessInputSliceNode(InputNode inputNode, 
             SchedulingPhase whichPhase, CellBackendFactory backEndBits) {
         super(inputNode, whichPhase, backEndBits);
         this.backEndBits = backEndBits;
@@ -84,9 +84,9 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
         // Ids of channels that are inputs to this filter
         LinkedList<Integer> inputIds = new LinkedList<Integer>();
         // Populate Channel-ID mapping, and increase number of channels.
-        for (InterSliceEdge e : inputNode.getSourceList(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge e : inputNode.getSourceList(SchedulingPhase.STEADY)) {
             // Always use output->input direction for edges
-            InterSliceEdge f = CellBackend.getEdgeBetween(e.getSrc(),inputNode);
+            InterFilterEdge f = CellBackend.getEdgeBetween(e.getSrc(),inputNode);
             if(!CellBackend.channelIdMap.containsKey(f)) {
                 int channelId = CellBackend.numchannels;
                 CellBackend.channels.add(f);
@@ -106,7 +106,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
             ppuCS.attachInputChannelArray(filterId, inputIds, whichPhase);
             //make artificial channel between inputslicenode and filterslicenode
             int channelId = CellBackend.numchannels;
-            InterSliceEdge a = new InterSliceEdge(inputNode);
+            InterFilterEdge a = new InterFilterEdge(inputNode);
             CellBackend.channels.add(a);
             CellBackend.channelIdMap.put(a, channelId);
             CellBackend.artificialJoinerChannels.put(inputNode, channelId);
@@ -197,7 +197,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
         }
     }
     
-    private CellPU getLocationFromScheduleLayout(InputSliceNode sliceNode) {
+    private CellPU getLocationFromScheduleLayout(InputNode sliceNode) {
         int cpu = -1;
         int filterId;
         if (sliceNode.isJoiner(SchedulingPhase.STEADY))
@@ -222,7 +222,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
         }
     }
     
-    public static CodeStoreHelper getJoinerCode(InputSliceNode joiner, BackEndFactory backEndBits) {
+    public static CodeStoreHelper getJoinerCode(InputNode joiner, BackEndFactory backEndBits) {
         //System.out.println("getjoinercode " + joiner);
         CodeStoreHelper joiner_code = CodeStoreHelper.findHelperForSliceNode(joiner);
         if (joiner_code == null) {
@@ -238,7 +238,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
         return joiner_code;
     }
     
-    private static  void makeJoinerCode(InputSliceNode joiner,
+    private static  void makeJoinerCode(InputNode joiner,
             BackEndFactory backEndBits, CodeStoreHelper helper) {
         String joiner_name = "_joiner_" + ProcessFilterSliceNode.getUid();
         String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
@@ -282,7 +282,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
      * @param joiner_code  place to put code
      */
     
-    public static  void makeJoinerWork(InputSliceNode joiner,
+    public static  void makeJoinerWork(InputNode joiner,
             BackEndFactory backEndBits, CodeStoreHelper joiner_code) {
         JMethodDeclaration joinerWork;
 

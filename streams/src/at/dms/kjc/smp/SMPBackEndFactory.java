@@ -8,10 +8,10 @@ import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.slir.Edge;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.LevelizeSliceGraph;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.LevelizeSSG;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -30,7 +30,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
     /** scheduler used by backend */
     private static Scheduler scheduler;
     /** splits the slicegraph into levels */
-    private static LevelizeSliceGraph lsg; 
+    private static LevelizeSSG lsg; 
     /** the number of filters that we have yet to process from a level the init stage */
     private static HashMap<Integer, Integer> levelLeftToProcessInit;
     /** the number of filters that we have yet to process from a level the init stage */
@@ -43,7 +43,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
 
         if (scheduler.isTMD()) {
         	//levelize the slicegraph
-        	lsg = new LevelizeSliceGraph(scheduler.getGraphSchedule().getSlicer().getTopSlices());
+        	lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSlicer().getTopSlices());
 
             //fill the left to process maps with the number of filters in a level
             levelLeftToProcessInit = new HashMap<Integer, Integer>();
@@ -93,9 +93,9 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
     @Override
     public CodeStoreHelper getCodeStoreHelper(SliceNode node) {
         // TODO Auto-generated method stub
-        if (node instanceof FilterSliceNode) {
+        if (node instanceof WorkNode) {
             // simply do appropriate wrapping of calls...
-            return new FilterCodeGeneration((FilterSliceNode)node,this);
+            return new FilterCodeGeneration((WorkNode)node,this);
         } else {
             return null;
         }
@@ -129,7 +129,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
      * @see at.dms.kjc.backendSupport.BackEndFactory#processFilterSliceNode(at.dms.kjc.slicegraph.FilterSliceNode, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processFilterSliceNode(FilterSliceNode filter,
+    public void processFilterSliceNode(WorkNode filter,
             SchedulingPhase whichPhase, SMPMachine chip) {
 
         if (filter.isPredefined()) {
@@ -191,7 +191,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
      * @see at.dms.kjc.backendSupport.BackEndFactory#processInputSliceNode(at.dms.kjc.slicegraph.InputSliceNode, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processInputSliceNode(InputSliceNode input,
+    public void processInputSliceNode(InputNode input,
             SchedulingPhase whichPhase, SMPMachine chip) {
         // TODO Auto-generated method stub
     }
@@ -200,7 +200,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
      * @see at.dms.kjc.backendSupport.BackEndFactory#processOutputSliceNode(at.dms.kjc.slicegraph.OutputSliceNode, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processOutputSliceNode(OutputSliceNode output,
+    public void processOutputSliceNode(OutputNode output,
             SchedulingPhase whichPhase, SMPMachine chip) {
         // TODO Auto-generated method stub
     }

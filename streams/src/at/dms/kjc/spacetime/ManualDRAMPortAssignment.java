@@ -9,10 +9,10 @@ import java.util.Iterator;
 
 import at.dms.kjc.slir.FileInputContent;
 import at.dms.kjc.slir.FileOutputContent;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -54,11 +54,11 @@ public class ManualDRAMPortAssignment {
             // assign the buffer between inputtracenode and the filter
             // to a dram
             if (sliceNode.isInputSlice())
-                manualIntraSliceAssignment((InputSliceNode) sliceNode, chip);
+                manualIntraSliceAssignment((InputNode) sliceNode, chip);
             // assign the buffer between the output trace node and the filter
             if (sliceNode.isOutputSlice()) {
-                manualIntraSliceAssignment((OutputSliceNode) sliceNode, chip);
-                manualInterSliceAssignment((OutputSliceNode)sliceNode, chip);
+                manualIntraSliceAssignment((OutputNode) sliceNode, chip);
+                manualInterSliceAssignment((OutputNode)sliceNode, chip);
             }
             
             sliceNode = sliceNode.getNext();
@@ -71,13 +71,13 @@ public class ManualDRAMPortAssignment {
     }
 
     
-    private static void manualInterSliceAssignment(OutputSliceNode output, RawProcElements chip) {
+    private static void manualInterSliceAssignment(OutputNode output, RawProcElements chip) {
         // get the assignment for each input trace node
         Iterator edges = output.getDestSet(SchedulingPhase.STEADY).iterator();
         
         // commit the assignment
         while (edges.hasNext()) {
-            InterSliceEdge edge = (InterSliceEdge) edges.next();
+            InterFilterEdge edge = (InterFilterEdge) edges.next();
             String query = output + " -> " + edge.getDest();
             
             int port = getPortNumberFromUser("Assignment for: " + query, chip);
@@ -86,8 +86,8 @@ public class ManualDRAMPortAssignment {
         }  
     }
     
-    private static void manualIntraSliceAssignment(OutputSliceNode output, RawProcElements chip) {
-        FilterSliceNode filter = output.getPrevFilter();
+    private static void manualIntraSliceAssignment(OutputNode output, RawProcElements chip) {
+        WorkNode filter = output.getPrevFilter();
         
         //if the output trace node does nothing assign to zero
         if (output.noOutputs()) {
@@ -106,8 +106,8 @@ public class ManualDRAMPortAssignment {
         IntraSliceBuffer.getBuffer(filter, output).setStaticNet(staticNet);
     }
     
-    private static void manualIntraSliceAssignment(InputSliceNode input, RawProcElements chip) {
-        FilterSliceNode filter = input.getNextFilter();
+    private static void manualIntraSliceAssignment(InputNode input, RawProcElements chip) {
+        WorkNode filter = input.getNextFilter();
         
         if (input.noInputs()) { //if we don't do anything assign to zero
             IntraSliceBuffer.getBuffer(input, filter).setDRAM((StreamingDram)chip.getDevices()[0]);
@@ -199,7 +199,7 @@ public class ManualDRAMPortAssignment {
         for (int i = 0; i < files.length; i++) {
             // these traces should have only one filter, make sure
             assert files[i].getHead().getNext().getNext() == files[i].getTail() : "File Slice incorrectly generated";
-            FilterSliceNode filter = (FilterSliceNode) files[i].getHead()
+            WorkNode filter = (WorkNode) files[i].getHead()
                 .getNext();
 
             if (files[i].getHead().isFileOutput()) {

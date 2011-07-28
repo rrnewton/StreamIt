@@ -7,7 +7,7 @@ import java.util.*;
 
 import at.dms.kjc.backendSupport.FilterInfo;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.slir.InterSliceEdge;
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -135,10 +135,10 @@ public class BenchChar {
     private static int longestPathToSink(Filter slice) {
         if (slice.getTail().noOutputs())
             return 0;
-        Iterator<InterSliceEdge> edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
+        Iterator<InterFilterEdge> edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
         int maxPath = 0;
         while (edges.hasNext()) {
-            InterSliceEdge edge = edges.next();
+            InterFilterEdge edge = edges.next();
             int pathLenToSink = longestPathToSink(edge.getDest().getParent());
             if (pathLenToSink > maxPath)
                 maxPath = pathLenToSink;
@@ -149,10 +149,10 @@ public class BenchChar {
     private static int shortestPathToSink(Filter slice) {
         if (slice.getTail().noOutputs())
             return 0;
-        Iterator<InterSliceEdge> edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
+        Iterator<InterFilterEdge> edges = slice.getTail().getDestSet(SchedulingPhase.STEADY).iterator();
         int minPath = Integer.MAX_VALUE;
         while (edges.hasNext()) {
-            InterSliceEdge edge = edges.next();
+            InterFilterEdge edge = edges.next();
             int pathLenToSink = shortestPathToSink(edge.getDest().getParent());
             if (pathLenToSink < minPath)
                 minPath = pathLenToSink;

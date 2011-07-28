@@ -61,7 +61,7 @@ public class BackEndScaffold  {
      * @param input InputSliceNode to consider for to a joiner.
      * @return
      */
-    protected boolean doNotCreateJoiner(InputSliceNode input) {
+    protected boolean doNotCreateJoiner(InputNode input) {
         return false;
     }
     
@@ -124,13 +124,13 @@ public class BackEndScaffold  {
         for (int i = 0; i < slices.length; i++) {
             slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputSliceNode)slice.getHead(),
+            resources.processInputSliceNode((InputNode)slice.getHead(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
             resources.processFilterSliceNode(slice.getFilterNodes().get(0), whichPhase, computeNodes);
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputSliceNode)slice.getTail(),
+            resources.processOutputSliceNode((OutputNode)slice.getTail(),
                     whichPhase, computeNodes);
             
         }
@@ -153,7 +153,7 @@ public class BackEndScaffold  {
         for (int i = 0; i < slices.length; i++) {
             slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputSliceNode)slice.getHead(),
+            resources.processInputSliceNode((InputNode)slice.getHead(),
                     whichPhase, computeNodes);
         }
         for (int i = 0; i < slices.length; i++) {
@@ -169,7 +169,7 @@ public class BackEndScaffold  {
         for (int i = 0; i < slices.length; i++) {
             slice = (Filter) slices[i];
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputSliceNode)slice.getTail(),
+            resources.processOutputSliceNode((OutputNode)slice.getTail(),
                     whichPhase, computeNodes);
         }
     }
@@ -177,8 +177,8 @@ public class BackEndScaffold  {
     /** Special scheduling for --spacetime --noswpipe */
     private void iterateNoSWPipe(List<Filter> scheduleList, SchedulingPhase whichPhase,
             ComputeNodesI computeNodes) {
-        HashSet<OutputSliceNode> hasBeenSplit = new HashSet<OutputSliceNode>();
-        HashSet<InputSliceNode> hasBeenJoined = new HashSet<InputSliceNode>();
+        HashSet<OutputNode> hasBeenSplit = new HashSet<OutputNode>();
+        HashSet<InputNode> hasBeenJoined = new HashSet<InputNode>();
         LinkedList<Filter> scheduled = new LinkedList<Filter>();
         LinkedList<Filter> needToSchedule = new LinkedList<Filter>();
         needToSchedule.addAll(scheduleList);
@@ -209,7 +209,7 @@ public class BackEndScaffold  {
                 // feeding the joiner have all been created.
                 // XXX WTF: Precludes feedback loops.
                 boolean canJoin = true;
-                for (InterSliceEdge inEdge : notSched.getHead().getSourceSet(whichPhase)) {
+                for (InterFilterEdge inEdge : notSched.getHead().getSourceSet(whichPhase)) {
                     if (!hasBeenSplit.contains(inEdge.getSrc())) {
                         canJoin = false;
                         break;
@@ -249,7 +249,7 @@ public class BackEndScaffold  {
         if (hasBeenSplit.size() != scheduled.size()) {
             for (int t = 0; t < scheduled.size(); t++) {
                 if (!hasBeenSplit.contains(scheduled.get(t).getTail())) {
-                    OutputSliceNode output = 
+                    OutputNode output = 
                         scheduled.get(t).getTail();
                     //System.out.println("Scheduling split of " + output.getPrevFilter()); 
                     resources.processOutputSliceNode(output,
@@ -264,7 +264,7 @@ public class BackEndScaffold  {
         if (hasBeenJoined.size() != scheduled.size()) {
             for (int t = 0; t < scheduled.size(); t++) {
                 if (!hasBeenJoined.contains(scheduled.get(t).getHead())) {
-                    InputSliceNode input  = 
+                    InputNode input  = 
                         scheduled.get(t).getHead();
                     //System.out.println("Scheduling join of " + input.getNextFilter()); 
                     resources.processInputSliceNode(input,

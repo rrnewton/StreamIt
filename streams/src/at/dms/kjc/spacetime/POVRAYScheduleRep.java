@@ -8,7 +8,7 @@ import java.util.*;
 
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.Filter;
 
 /**
@@ -108,7 +108,7 @@ public class POVRAYScheduleRep {
         
         fw.write("//-------------------------------------------\n");
         fw.write("// Objects for " + slice + "\n");
-        for (FilterSliceNode filter : slice.getFilterNodes()) {
+        for (WorkNode filter : slice.getFilterNodes()) {
             RawTile tile = layout.getComputeNode(filter);
             int lowerLeftX = getLowerLeftX(tile);
             int lowerLeftY = getLowerLeftY(tile); 

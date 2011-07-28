@@ -16,7 +16,7 @@ public class CellNoSWPipeLayout extends NoSWPipeLayout<CellPU,CellChip> {
     
     @Override
     public void swapAssignment() {
-        FilterSliceNode filter1 = (FilterSliceNode)assignedFilters.get(rand.nextInt(assignedFilters.size()));
+        WorkNode filter1 = (WorkNode)assignedFilters.get(rand.nextInt(assignedFilters.size()));
         if (filter1.getFilter() instanceof OutputContent || filter1.getFilter() instanceof InputContent) {
             // I/O filters stay where initially assigned: on PPU.
             return;

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -88,7 +88,7 @@ public class ManualSliceLayout implements Layout<RawTile> {
         
         System.out.println("Enter layout for trace: " + slice);
         
-        while (node instanceof FilterSliceNode) {
+        while (node instanceof WorkNode) {
             while (true) {
                 System.out.print("Enter tile number for " + node + ": ");
 

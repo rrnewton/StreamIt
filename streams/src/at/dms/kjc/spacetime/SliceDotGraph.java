@@ -84,35 +84,35 @@ public class SliceDotGraph {
                                  + node.getNext().hashCode() + ";\n");
                     if (node.isInputSlice()) {
                         bufferArc(IntraSliceBuffer.getBuffer(
-                                                             (InputSliceNode) node, (FilterSliceNode) node
+                                                             (InputNode) node, (WorkNode) node
                                                              .getNext()), fw, DRAM, label);
                         
                         if (label) {
                             fw.write("  " + node.hashCode());
                             fw.write("[ label=\"");
-                            if (((InputSliceNode) node).oneInput()
-                                    || ((InputSliceNode) node).noInputs())
+                            if (((InputNode) node).oneInput()
+                                    || ((InputNode) node).noInputs())
                                 fw.write(node.toString());
                             else {
-                                fw.write(((InputSliceNode) node).debugString(true));
+                                fw.write(((InputNode) node).debugString(true));
                             }
                         }
                     }
 
                     if (node.isOutputSlice()) {
                         bufferArc(IntraSliceBuffer.getBuffer(
-                                                             (FilterSliceNode) node.getPrevious(),
-                                                             (OutputSliceNode) node), fw, DRAM, label);
+                                                             (WorkNode) node.getPrevious(),
+                                                             (OutputNode) node), fw, DRAM, label);
                       
                         if (label) {
                             fw.write("  " + node.hashCode());
                             fw.write("[ label=\"");
-                            if (((OutputSliceNode) node).oneOutput()
-                                    || ((OutputSliceNode) node).noOutputs())
+                            if (((OutputNode) node).oneOutput()
+                                    || ((OutputNode) node).noOutputs())
                                 fw.write(node.toString());
                             else
                                 fw
-                                .write(((OutputSliceNode) node)
+                                .write(((OutputNode) node)
                                         .debugString(true));
                         }
                     }
@@ -120,12 +120,12 @@ public class SliceDotGraph {
                     if (label && node.isFilterSlice()) {
                         //System.out.println("  * info for " + node);
                         fw.write("  " + node.hashCode() + "[ label=\""
-                                 + ((FilterSliceNode) node).toString(layout));
+                                 + ((WorkNode) node).toString(layout));
                         FilterInfo filter = FilterInfo
-                            .getFilterInfo((FilterSliceNode) node);
+                            .getFilterInfo((WorkNode) node);
                         fw.write("\\nWork: "
                                  + slicer
-                                 .getFilterWorkSteadyMult((FilterSliceNode) node));
+                                 .getFilterWorkSteadyMult((WorkNode) node));
                         fw.write("\\nMult:(" + filter.initMult + ", "
                                  + spaceTime.getPrimePumpTotalMult(filter) + ", " + filter.steadyMult
                                  + ")");

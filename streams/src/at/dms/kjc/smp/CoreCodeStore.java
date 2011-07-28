@@ -21,12 +21,12 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
     /** Any text that should appear outside a function declaration in the c code */
     private StringBuffer globalTxt = new StringBuffer();
     /** set of FilterSliceNodes that are mapped to this core */
-    protected HashSet<FilterSliceNode> filters;
+    protected HashSet<WorkNode> filters;
     
     public CoreCodeStore(Core nodeType) {
         super(nodeType);
         setMyMainName("__main__");
-        filters = new HashSet<FilterSliceNode>();
+        filters = new HashSet<WorkNode>();
         createBufferInitMethod();
 
         mainMethod.addParameter(new JFormalParameter(CVoidPtrType.VoidPtr, "arg"));
@@ -41,7 +41,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
     public CoreCodeStore(Core parent, ALocalVariable iterationBound) {
        super(parent, iterationBound);
        setMyMainName("__main__");
-       filters = new HashSet<FilterSliceNode>();
+       filters = new HashSet<WorkNode>();
        createBufferInitMethod();
        
        mainMethod.addParameter(new JFormalParameter(CVoidPtrType.VoidPtr, "arg"));
@@ -63,7 +63,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
      * 
      * @param filter The filter we are mapping to this core.
      */
-    public void addFilter(FilterSliceNode filter) {
+    public void addFilter(WorkNode filter) {
         filters.add(filter);
         this.setHasCode();
     }
@@ -73,7 +73,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
      * 
      * @return all of the filters that are mapped to this core.
      */
-    public Set<FilterSliceNode> getFilters() {
+    public Set<WorkNode> getFilters() {
         return filters;
     }
     
@@ -271,10 +271,10 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
         //find one of its sources, and add code to the source's core to print the outputs
         //at the end of each steady state
         for (InputRotatingBuffer buf : fwb) {
-            FilterSliceNode fileW = buf.filterNode;
+            WorkNode fileW = buf.filterNode;
             
             //find the core of the first input to the file writer
-            FilterSliceNode firstInputFilter = 
+            WorkNode firstInputFilter = 
             	fileW.getParent().getHead().getSources(SchedulingPhase.STEADY)[0].getSrc().getParent().getFirstFilter();
 
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(firstInputFilter.getParent()))
@@ -297,16 +297,16 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
     /**
      * Add code to print the output written to the file writer mapped to this core.
      */
-    private void addPrintOutputCode(InputRotatingBuffer buf, FilterSliceNode filter) {
+    private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode filter) {
         //We print the address buffer after it has been rotated, so that it points to the section
         //of the filewriter buffer that is about to be written to, but was written to 2 steady-states
         //ago
-        FilterSliceNode fileW = buf.filterNode;
+        WorkNode fileW = buf.filterNode;
         assert fileW.isFileOutput();
         //because of this scene we need a rotation length of 2
         assert buf.getRotationLength() == 2;
         //make sure that each of the inputs wrote to the file writer in the primepump stage
-        for (InterSliceEdge edge : fileW.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : fileW.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
             assert SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult(edge.getSrc().getParent()) == 1;
         }
         int outputs = fileW.getFilter().getSteadyMult();

@@ -43,10 +43,10 @@ import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.slir.FileInputContent;
 import at.dms.kjc.slir.FileOutputContent;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
@@ -289,7 +289,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         
         
         for (int i = 0; i < CellBackend.channels.size(); i++) {
-            InterSliceEdge e = CellBackend.channels.get(i);
+            InterFilterEdge e = CellBackend.channels.get(i);
             if (e.getSrc().getPrevFilter().isFileInput()) {
                 int pushRate = e.getSrc().getPrevFilter().getFilter().getPushInt();
                 int steadyMult = e.getSrc().getPrevFilter().getFilter().getSteadyMult();
@@ -1134,7 +1134,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
                                     new JFieldAccessExpression("filters"),
                                     new JIntLiteral(filterId))}))));
             
-            InterSliceEdge e = CellBackend.channels.get(inputIds.get(i));
+            InterFilterEdge e = CellBackend.channels.get(inputIds.get(i));
 
             int poprate = sliceNode.getParent().getFilterNodes().get(0).getFilter().getPopInt();
             int peekrate = sliceNode.getParent().getFilterNodes().get(0).getFilter().getPeekInt();
@@ -1324,7 +1324,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * Adds the appropriate fopen(...) call for the file reader
      * @param filterNode
      */
-    public void initFileReader(FilterSliceNode filterNode) {
+    public void initFileReader(WorkNode filterNode) {
         
         FileInputContent fic = (FileInputContent) filterNode.getFilter();
         
@@ -1368,7 +1368,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
                 })));
     }
  
-    public void addFileReader(FilterSliceNode filterNode) {
+    public void addFileReader(WorkNode filterNode) {
         if (filterNode.getParent().getTail().isDuplicateSplitter(SchedulingPhase.INIT)) {
             addInitStatement(makeReadBlock(filterNode, 0, true));
         } else {
@@ -1379,7 +1379,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         }
     }
     
-    private JBlock makeReadBlock(FilterSliceNode filterNode, int i, boolean isDuplicate) {
+    private JBlock makeReadBlock(WorkNode filterNode, int i, boolean isDuplicate) {
         int channelId = 
             CellBackend.channelIdMap.get(filterNode.getParent().getTail().getDestList(SchedulingPhase.INIT)[i]);
 
@@ -1480,7 +1480,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         return readBlock;
     }
     
-    public void initFileWriter(FilterSliceNode filterNode) {
+    public void initFileWriter(WorkNode filterNode) {
     
         FileOutputContent foc = (FileOutputContent) filterNode.getFilter();
         
@@ -1526,7 +1526,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
                 })));
     }
     
-    public void addFileWriter(FilterSliceNode filterNode) {
+    public void addFileWriter(WorkNode filterNode) {
         
         //initFileWriter(filterNode);
         for (int i=0; i<filterNode.getParent().getHead().getWidth(SchedulingPhase.STEADY); i++) {
@@ -1544,7 +1544,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
                 new JFieldAccessExpression(FILE_WRITER)})));
     }
     
-    private JBlock makeWriteBlock(FilterSliceNode filterNode, int channelId, int i) {
+    private JBlock makeWriteBlock(WorkNode filterNode, int channelId, int i) {
 
         FileOutputContent foc = (FileOutputContent) filterNode.getFilter();
 
@@ -1893,7 +1893,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     
 
     @Deprecated
-    public void startNewFilter(InputSliceNode inputNode) {
+    public void startNewFilter(InputNode inputNode) {
         Integer id = getIdForSlice(inputNode.getParent());
         String fd = idToFd(id);
         
@@ -2018,7 +2018,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
     
     @Deprecated
-    public void addNewGroupAndFilterUnload(OutputSliceNode outputNode) {
+    public void addNewGroupAndFilterUnload(OutputNode outputNode) {
         Integer id = getIdForSlice(outputNode.getParent());
         String group = GROUP;
         
@@ -2038,7 +2038,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
     
     @Deprecated
-    public void addInputBufferAllocAttach(InputSliceNode inputNode) {
+    public void addInputBufferAllocAttach(InputNode inputNode) {
         Integer id = getIdForSlice(inputNode.getParent());
         String group = GROUP;
         
@@ -2068,7 +2068,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
     
     @Deprecated
-    public void addOutputBufferAllocAttach(OutputSliceNode outputNode) {
+    public void addOutputBufferAllocAttach(OutputNode outputNode) {
         Integer id = getIdForSlice(outputNode.getParent());
         String group = GROUP;
         
@@ -2146,7 +2146,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
     
     @Deprecated
-    public void addFilterLoad(InputSliceNode inputNode) {
+    public void addFilterLoad(InputNode inputNode) {
         Integer id = getIdForSlice(inputNode.getParent());
         String fd = idToFd(id);
         String group = GROUP + id;
@@ -2179,7 +2179,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
 
     @Deprecated
-    public void addInitFunctionAddresses(FilterSliceNode filterNode) {
+    public void addInitFunctionAddresses(WorkNode filterNode) {
         int filterId = CellBackend.filterIdMap.get(filterNode);
         addInitStatement(new JExpressionStatement(new JAssignmentExpression(
                 new JArrayAccessExpression(new JFieldAccessExpression(INIT_FUNC),new JIntLiteral(filterId)),
@@ -2249,10 +2249,10 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
     
     @Deprecated
-    public void initChannelArrays(FilterSliceNode filterNode,
+    public void initChannelArrays(WorkNode filterNode,
             LinkedList<Integer> inputnums, LinkedList<Integer> outputnums) {
-        InputSliceNode input = filterNode.getParent().getHead();
-        OutputSliceNode output = filterNode.getParent().getTail();
+        InputNode input = filterNode.getParent().getHead();
+        OutputNode output = filterNode.getParent().getTail();
         //initInputChannelArray(input, inputnums);
         //initOutputChannelArray(output, outputnums);
     }
@@ -2346,8 +2346,8 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
 //    }
     
     @Deprecated
-    public void initOutputBufferFields(InputSliceNode inputNode) {
-        OutputSliceNode outputNode = inputNode.getParent().getTail();
+    public void initOutputBufferFields(InputNode inputNode) {
+        OutputNode outputNode = inputNode.getParent().getTail();
         String filtername = inputNode.getNextFilter().getFilter().getName();
         int outputs;
         if (outputNode.isDuplicateSplitter(SchedulingPhase.STEADY))
@@ -2374,7 +2374,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
 //    }
     
     @Deprecated
-    public void dynSetupFilter(FilterSliceNode filterNode, int filternum,
+    public void dynSetupFilter(WorkNode filterNode, int filternum,
             int inputs, int outputs,
             ArrayList<Integer> inputnums, ArrayList<Integer> outputnums) {
         JBlock block = new JBlock();

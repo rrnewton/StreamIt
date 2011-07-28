@@ -50,7 +50,7 @@ import at.dms.kjc.sir.lowering.Unroller;
 import at.dms.kjc.sir.lowering.partition.WorkConstants;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate.WorkVisitor;
 
-public class SliceWorkEstimate extends SLIREmptyVisitor implements
+public class FilterWorkEstimate extends SLIREmptyVisitor implements
         WorkConstants {
     private Set<JMethodDeclaration> methodsBeingProcessed;
     
@@ -61,13 +61,13 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
     
     private Filter slice;
     
-    private SliceWorkEstimate(Filter slice) {
+    private FilterWorkEstimate(Filter slice) {
         this.work = 0;
         this.slice = slice;
         methodsBeingProcessed = new HashSet<JMethodDeclaration>();
     }
     
-    private SliceWorkEstimate(Filter slice, Set<JMethodDeclaration> methodsBeingProcessed) {
+    private FilterWorkEstimate(Filter slice, Set<JMethodDeclaration> methodsBeingProcessed) {
         this.work = 0;
         this.slice = slice;
         this.methodsBeingProcessed = methodsBeingProcessed;
@@ -99,7 +99,7 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
      * Returns estimate of work in <pre>node</pre> of <pre>filter</pre>, use on first call only.
      */
     private static long getWork(Filter slice, JPhylum node) {
-        SliceWorkEstimate visitor = new SliceWorkEstimate(slice);
+        FilterWorkEstimate visitor = new FilterWorkEstimate(slice);
         node.accept(visitor);
         return visitor.work;
     }
@@ -108,7 +108,7 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
      * Returns estimate of work in <pre>node</pre> of <pre>filter</pre>, use on internal calls.
      */
     private static long getWork(Filter slice, JPhylum node, Set<JMethodDeclaration> methodsBeingProcessed ) {
-        SliceWorkEstimate visitor = new SliceWorkEstimate(slice, methodsBeingProcessed);
+        FilterWorkEstimate visitor = new FilterWorkEstimate(slice, methodsBeingProcessed);
         node.accept(visitor);
         return visitor.work;
     }
@@ -229,10 +229,10 @@ public class SliceWorkEstimate extends SLIREmptyVisitor implements
 
         // get the work in the then and else clauses and average
         // them...
-        long thenWork = SliceWorkEstimate.getWork(slice, thenClause, methodsBeingProcessed);
+        long thenWork = FilterWorkEstimate.getWork(slice, thenClause, methodsBeingProcessed);
         long elseWork;
         if (elseClause != null) {
-            elseWork = SliceWorkEstimate.getWork(slice, elseClause, methodsBeingProcessed);
+            elseWork = FilterWorkEstimate.getWork(slice, elseClause, methodsBeingProcessed);
         } else {
             elseWork = 0;
         }

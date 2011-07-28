@@ -60,7 +60,7 @@ public class NumberGathering
         totalSteadyItems = 0;
         //assign all the arrays 
         for (int i = 0; i < fileWriters.length; i++) {
-            FilterSliceNode node = (FilterSliceNode)fileWriters[i].getHead().getNext();
+            WorkNode node = (WorkNode)fileWriters[i].getHead().getNext();
             FilterInfo fi = FilterInfo.getFilterInfo(node);
             assert node.getFilter().getInputType().isNumeric() :
                 "non-numeric type for input to filewriter";
@@ -81,7 +81,7 @@ public class NumberGathering
     public int getID(FileOutputContent foc) 
     {
         for (int i = 0; i < fileWriters.length; i++) {
-            if (foc == ((FilterSliceNode)fileWriters[i].getHead().getNext()).getFilter())
+            if (foc == ((WorkNode)fileWriters[i].getHead().getNext()).getFilter())
                 return i;
         }
         assert false : "FileOutputContent not found";

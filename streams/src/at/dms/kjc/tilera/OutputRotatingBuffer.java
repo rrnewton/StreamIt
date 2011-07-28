@@ -28,17 +28,17 @@ import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.FilterInfo;
-import at.dms.kjc.slir.FilterSliceNode;
-import at.dms.kjc.slir.InputSliceNode;
-import at.dms.kjc.slir.InterSliceEdge;
-import at.dms.kjc.slir.OutputSliceNode;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
     /** the output slice node for this output buffer */
-    protected OutputSliceNode outputNode;    
+    protected OutputNode outputNode;    
     /** the tile we are mapped to */
     protected Tile tile;
     
@@ -67,7 +67,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
                 //look to see if one of the downstream slices is mapped to the same tile as this slice
                 //and this slice uses the downstream's input buffer as an outputbuffer, if so, we don't
                 //need an output buffer
-                for (InterSliceEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
+                for (InterFilterEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
                     InputRotatingBuffer inBuf = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
                     if (inBuf != null && inBuf.getLocalSrcFilter() == slice.getFirstFilter()) {
                         assert RotatingBuffer.getOutputBuffer(slice.getFirstFilter()) != null;
@@ -94,7 +94,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * 
      * @param filterNode The filternode for which to create a new output buffer.
      */
-    protected OutputRotatingBuffer(FilterSliceNode filterNode, Tile parent) {
+    protected OutputRotatingBuffer(WorkNode filterNode, Tile parent) {
         super(filterNode.getEdgeToNext(), filterNode, parent);
         outputNode = filterNode.getParent().getTail();
         bufType = filterNode.getFilter().getOutputType();
@@ -121,7 +121,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     public void createAddressBuffers() {
       //fill the addressbuffers array
         addressBuffers = new HashMap<InputRotatingBuffer, SourceAddressRotation>();
-        for (InterSliceEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
             InputRotatingBuffer input = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
             addressBuffers.put(input, input.getAddressRotation(tile));               
         }

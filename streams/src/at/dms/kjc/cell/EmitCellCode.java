@@ -79,14 +79,14 @@ public class EmitCellCode extends EmitCode {
         p.println("include $(SPULIB_TOP)/make.inc");
     }
     
-    private void handleFilterSlice(CodegenPrintWriter p, FilterSliceNode s, boolean init) {
+    private void handleFilterSlice(CodegenPrintWriter p, WorkNode s, boolean init) {
         String str = "";
         if (init) str = "init_"; 
         p.println("#define FILTER_NAME " + str + s.getFilter().getName());
         p.println("#include \"beginfilter.h\"");
     }
     
-    private void handleInputSlice(CodegenPrintWriter p, InputSliceNode s, boolean init) {
+    private void handleInputSlice(CodegenPrintWriter p, InputNode s, boolean init) {
         String str = "";
         if (init) str = "init_"; 
         p.println("#define FILTER_NAME " + str + "joiner_" + s.getNext().getAsFilter().getFilter().getName());
@@ -105,7 +105,7 @@ public class EmitCellCode extends EmitCode {
             p.println("#include \"rrjoiner.h\"");
     }
     
-    private void handleOutputSlice(CodegenPrintWriter p, OutputSliceNode s, boolean init) {
+    private void handleOutputSlice(CodegenPrintWriter p, OutputNode s, boolean init) {
         String str = "";
         if (init) str = "init_";
         p.println("#define FILTER_NAME " + str + "splitter_" + s.getPrevious().getAsFilter().getFilter().getName());

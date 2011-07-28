@@ -37,8 +37,8 @@ public class BufferDMATransfers extends BufferTransfers {
 
     private void generateStatements(SchedulingPhase phase) {
         for (int w = 0; w < output.getWeights(phase).length; w++) {
-            for (InterSliceEdge edge : output.getDests(phase)[w]) {
-                InputSliceNode input = edge.getDest();
+            for (InterFilterEdge edge : output.getDests(phase)[w]) {
+                InputNode input = edge.getDest();
                 FilterInfo srcInfo = FilterInfo.getFilterInfo(output.getPrevFilter());
                 FilterInfo dstInfo = FilterInfo.getFilterInfo(input.getNextFilter());
                                 

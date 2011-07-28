@@ -20,7 +20,7 @@ public class OneFilterSlicer extends Slicer {
         HashSet<UnflatFilter> topUnflat = new HashSet<UnflatFilter>();
 
         // map unflatEdges -> Edge?
-        HashMap<UnflatEdge, InterSliceEdge> edges = new HashMap<UnflatEdge, InterSliceEdge>();
+        HashMap<UnflatEdge, InterFilterEdge> edges = new HashMap<UnflatEdge, InterFilterEdge>();
         // add the top filters to the queue
         for (int i = 0; i < topFilters.length; i++) {
             topUnflat.add(topFilters[i]);
@@ -44,35 +44,35 @@ public class OneFilterSlicer extends Slicer {
 
                 // create the input slice node
                 if (unflatFilter.in != null && unflatFilter.in.length > 0) {
-                    InterSliceEdge[] inEdges = new InterSliceEdge[unflatFilter.in.length];
-                    node = new InputSliceNode(unflatFilter.inWeights, inEdges);
+                    InterFilterEdge[] inEdges = new InterFilterEdge[unflatFilter.in.length];
+                    node = new InputNode(unflatFilter.inWeights, inEdges);
                     for (int i = 0; i < unflatFilter.in.length; i++) {
                         UnflatEdge unflatEdge = unflatFilter.in[i];
                         // get the edge
-                        InterSliceEdge edge = edges.get(unflatEdge);
+                        InterFilterEdge edge = edges.get(unflatEdge);
                         // we haven't see the edge before
                         if (edge == null) { // set dest?, wouldn't this always
                             // be the dest
-                            edge = new InterSliceEdge((InputSliceNode) node);
+                            edge = new InterFilterEdge((InputNode) node);
                             edges.put(unflatEdge, edge);
                         } else {
                             // we've seen this edge before, set the dest to this
                             // node
                             if (edge.getDest() != node)
-                                edge.setDest((InputSliceNode) node);
+                                edge.setDest((InputNode) node);
                         }
                         inEdges[i] = edge;
                     }
-                    slice = new Filter((InputSliceNode) node);
+                    slice = new Filter((InputNode) node);
 
 
-                    FilterSliceNode filterNode = new FilterSliceNode(filterContent);
+                    WorkNode filterNode = new WorkNode(filterContent);
                     node.setNext(filterNode);
                     filterNode.setPrevious(node);
                     node = filterNode;
 
                 } else { // null incoming arcs
-                    node = new FilterSliceNode(filterContent);
+                    node = new WorkNode(filterContent);
                     slice = new Filter(node);
                 }
 
@@ -91,14 +91,14 @@ public class OneFilterSlicer extends Slicer {
 
                     // we are finished the current slice, create the outputslicenode
                     if (unflatFilter.out != null && unflatFilter.out.length > 0) {
-                        InterSliceEdge[][] outEdges = new InterSliceEdge[unflatFilter.out.length][];
-                        OutputSliceNode outNode = new OutputSliceNode(
+                        InterFilterEdge[][] outEdges = new InterFilterEdge[unflatFilter.out.length][];
+                        OutputNode outNode = new OutputNode(
                                 unflatFilter.outWeights, outEdges);
                         node.setNext(outNode);
                         outNode.setPrevious(node);
                         for (int i = 0; i < unflatFilter.out.length; i++) {
                             UnflatEdge[] inner = unflatFilter.out[i];
-                            InterSliceEdge[] innerEdges = new InterSliceEdge[inner.length];
+                            InterFilterEdge[] innerEdges = new InterFilterEdge[inner.length];
                             outEdges[i] = innerEdges;
                             for (int j = 0; j < inner.length; j++) {
                                 UnflatEdge unflatEdge = inner[j];
@@ -106,9 +106,9 @@ public class OneFilterSlicer extends Slicer {
                                 // if we didn't visit one of the dests, add it
                                 if (!visited.contains(dest))
                                     queue.add(dest);
-                                InterSliceEdge edge = edges.get(unflatEdge);
+                                InterFilterEdge edge = edges.get(unflatEdge);
                                 if (edge == null) {
-                                    edge = new InterSliceEdge(outNode);
+                                    edge = new InterFilterEdge(outNode);
                                     edges.put(unflatEdge, edge);
                                 } else {
                                     if (edge.getSrc() != outNode)
@@ -134,14 +134,14 @@ public class OneFilterSlicer extends Slicer {
         int len = sliceGraph.length;
         int newLen = len;
         for (int i = 0; i < len; i++)
-            if (((FilterSliceNode) sliceGraph[i].getHead().getNext())
+            if (((WorkNode) sliceGraph[i].getHead().getNext())
                     .isPredefined())
                 newLen--;
         io = new Filter[len - newLen];
         int idx = 0;
         for (int i = 0; i < len; i++) {
             Filter slice = sliceGraph[i];
-            if (((FilterSliceNode) slice.getHead().getNext()).isPredefined()) {
+            if (((WorkNode) slice.getHead().getNext()).isPredefined()) {
                 io[idx++] = slice;
                 System.out.println(slice + " is i/o slice.");
             }

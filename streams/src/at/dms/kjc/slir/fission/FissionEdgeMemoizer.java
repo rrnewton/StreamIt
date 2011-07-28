@@ -5,41 +5,41 @@ import at.dms.kjc.*;
 import at.dms.kjc.slir.*;
 
 public class FissionEdgeMemoizer {
-    private static HashMap<EdgeDescriptor, InterSliceEdge> edges =
-        new HashMap<EdgeDescriptor, InterSliceEdge>();
+    private static HashMap<EdgeDescriptor, InterFilterEdge> edges =
+        new HashMap<EdgeDescriptor, InterFilterEdge>();
 
     public static void reset() {
         edges.clear();
     }
 
-    public static void addEdge(InterSliceEdge edge) {
+    public static void addEdge(InterFilterEdge edge) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(edge);
 
         edges.put(edgeDscr, edge);
     }
 
-    public static InterSliceEdge getEdge(OutputSliceNode src, InputSliceNode dest) {
+    public static InterFilterEdge getEdge(OutputNode src, InputNode dest) {
         EdgeDescriptor edgeDscr = new EdgeDescriptor(src, dest);      
 
-        InterSliceEdge edge = edges.get(edgeDscr);
+        InterFilterEdge edge = edges.get(edgeDscr);
 
         if(edge == null) {
-            edge = new InterSliceEdge(src, dest);
+            edge = new InterFilterEdge(src, dest);
             edges.put(edgeDscr, edge);
         }
 
         return edge;
     }
 
-    public static InterSliceEdge getEdge(Filter src, Filter dest) {
+    public static InterFilterEdge getEdge(Filter src, Filter dest) {
         return getEdge(src.getTail(), dest.getHead());
     }
 
     private static class EdgeDescriptor {
-        public OutputSliceNode src;
-        public InputSliceNode dest;
+        public OutputNode src;
+        public InputNode dest;
 
-        public EdgeDescriptor(OutputSliceNode src, InputSliceNode dest) {
+        public EdgeDescriptor(OutputNode src, InputNode dest) {
             this.src = src;
             this.dest = dest;
         }
@@ -48,7 +48,7 @@ public class FissionEdgeMemoizer {
             this(src.getTail(), dest.getHead());
         }
 
-        public EdgeDescriptor(InterSliceEdge edge) {
+        public EdgeDescriptor(InterFilterEdge edge) {
             this(edge.getSrc(), edge.getDest());
         }
         

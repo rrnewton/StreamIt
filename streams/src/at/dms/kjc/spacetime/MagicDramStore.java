@@ -5,10 +5,10 @@ import at.dms.kjc.slir.*;
 
 public class MagicDramStore extends MagicDramInstruction 
 {
-    private OutputSliceNode source;
-    private InputSliceNode[] dests;
+    private OutputNode source;
+    private InputNode[] dests;
 
-    public MagicDramStore(OutputSliceNode source, InputSliceNode[] dests) 
+    public MagicDramStore(OutputNode source, InputNode[] dests) 
     {
         this.source = source;
         this.dests = dests;
@@ -23,7 +23,7 @@ public class MagicDramStore extends MagicDramInstruction
         for (int i = 0; i < dests.length; i++) {
             if (dests[i].isFileOutput()) {
                 FileOutputContent out = 
-                    (FileOutputContent)((FilterSliceNode)dests[i].getNext()).getFilter();
+                    (FileOutputContent)((WorkNode)dests[i].getNext()).getFilter();
                 if (out.isFP()) {
                     sb.append("\tfprintf(" + Util.getFileHandle(out) + 
                               ", \"%f\\n\", double(temp));\n");

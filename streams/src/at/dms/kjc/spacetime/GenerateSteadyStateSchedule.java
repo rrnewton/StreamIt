@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.DataFlowOrder;
-import at.dms.kjc.slir.FilterSliceNode;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
 
@@ -136,7 +136,7 @@ public class GenerateSteadyStateSchedule {
         // and set the available time for each tile
         SliceNode node = slice.getHead().getNext();
 
-        while (node instanceof FilterSliceNode) {
+        while (node instanceof WorkNode) {
             
             RawTile tile = layout.getComputeNode(node.getAsFilter());
 
