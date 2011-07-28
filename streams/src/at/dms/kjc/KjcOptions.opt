@@ -495,11 +495,6 @@ longname		"wbs"
 	default 	"false"
 	help 		"Uses the work based simulator for laying out the communication instructions."
 
-longname		"spacetime"
-	type		boolean
-	default		"false"
-	help		"Uses the spacetime partitioner."
-
 longname		"cell"
 	type		int
 	default		"-1"
@@ -542,12 +537,6 @@ longname		"struct"
 	default		"false"
 	help		"Handle Structures. Experimental feature."
 
-/* remove: (real dram functional?) */
-/* longname		"magicdram" */
-/* 	type 		boolean */
-/* 	default		"false" */
-/* 	help		"For the SpaceTime RAW backend, use magic dram devices" */
-
 /* Not a strc switch but produced by strc */
 longname		"backend"
 	type		String
@@ -559,13 +548,7 @@ longname		"steadymult"
 	type 		int
 	default		"1"
 	requireArgument
-	help		"For the SpaceTime RAW backend, multiply the steady-state multiplicities by i"
-
-/* removed */
-/* longname		"forceplacement" */
-/* 	type 		boolean */
-/* 	default		"false" */
-/* 	help		"For the SpaceTime RAW backend, use try to minimize communication in layout" */
+	help		"Multiply the steady-state multiplicities by i"
 
 longname 		"rstream"
 	shortcut	"R"
@@ -639,12 +622,6 @@ longname 		"backendvalues"
 	help		"For debugging, specify class with package:value for static variable"
 	
 
-longname 		"slicethresh"
-	type 		int
-	default		"101"
-	requireArgument
-	help 		"For the spacetime backend, set the slice threshold to be <int> percent."
-
 longname 		"asciifileio"
 	type 		boolean
 	default		"false"
@@ -659,13 +636,7 @@ longname		"ssoutputs"
 longname		"noswpipe"
 	type		boolean
 	default		"false"
-	help		"For spacetime, do not software pipeline the steady state."
-
-longname 		"st_cyc_per_wd"
-	type 		int
-	default		"1"	
-	requireArgument
-	help		"For spacetime, define the bandwidth in cycles per word for the streaming memories attached to the raw chip."
+	help		"Do not software pipeline the steady state."
 
 longname 		"hwic"
 	type 		boolean 
@@ -676,27 +647,17 @@ longname 		"dup"
 	type 		int
 	default		"-1"
 	requireArgument
-	help 		"For the SpaceTime Backend, duplicate all stateless filters n times."
-
-longname 		"noswitchcomp"
-	type 		boolean
-	default		"false"
-	help		"For the SpaceTime Backend, turn off switch instruction compression."
-	
-longname 		"autoparams"
-	type		boolean
-	default		"false"
-	help		"For the SpaceTime Backend, automatically calculate parameters."
+	help 		"Duplicate all stateless filters n times."
 
 longname 		"greedysched"
 	type 		boolean
 	default		"false"
-	help		"For the SpaceTime Backend, use a greedy bin packing algorithm to calculate the schedule."
+	help		"Use a greedy bin packing algorithm to calculate the schedule."
 
 longname		"workestunroll"
 	type 		boolean
 	default		"false"
-	help		"For the SpaceTime Backend, perform unrolling on filters for work estimation."
+	help		"Perform unrolling on filters for work estimation."
 
 /* Note "icachesize" makes the existing -i switch ambiguous so prefix w "raw"*/
 longname		"rawdcachesize"

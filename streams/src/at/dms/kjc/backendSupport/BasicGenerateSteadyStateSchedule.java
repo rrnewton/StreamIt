@@ -43,7 +43,7 @@ public class BasicGenerateSteadyStateSchedule {
     
     
     public void schedule() {
-        if (! KjcOptions.spacetime || KjcOptions.noswpipe) {
+        if (KjcOptions.noswpipe) {
             spaceTime.setSchedule(DataFlowOrder.getTraversal
                     (slicer.getSliceGraph()));
         }

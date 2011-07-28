@@ -88,9 +88,7 @@ public class StreaMITMain {
         } else if (KjcOptions.rstream) {
             backendClass = "at.dms.kjc.rstream.StrToRStream";
         } else if (KjcOptions.raw != -1) {
-            if (KjcOptions.spacetime) {
-                backendClass = "at.dms.kjc.spacetime.SpaceTimeBackend";
-            } else if (KjcOptions.space) {
+             if (KjcOptions.space) {
                 backendClass = "at.dms.kjc.raw.RawBackend";
             } else {
                 backendClass = "at.dms.kjc.spacedynamic.SpaceDynamicBackend";

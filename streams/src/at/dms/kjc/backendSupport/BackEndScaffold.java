@@ -92,18 +92,9 @@ public class BackEndScaffold  {
 
         betweenScheduling(schedule, resources);
         
-        if (KjcOptions.noswpipe && KjcOptions.spacetime) {
-            iterateNoSWPipe(schedule.getScheduleList(), SchedulingPhase.STEADY, computeNodes);
-        } else if (KjcOptions.spacetime) {
-            //iterate over the joiners then the filters then 
-            //the splitter, this will create a data-redistribution 
-            //stage between the iterations that will improve performance 
-            //(can only work for spacetime since requires priming the pump
-            // for the joiners to have work available).
-            iterateJoinFiltersSplit(slices, SchedulingPhase.STEADY, computeNodes);
-        } else {
-            iterateInorder(slices, SchedulingPhase.STEADY, computeNodes);
-        }
+       
+        iterateInorder(slices, SchedulingPhase.STEADY, computeNodes);
+        
         afterScheduling(schedule, resources);
     }
  

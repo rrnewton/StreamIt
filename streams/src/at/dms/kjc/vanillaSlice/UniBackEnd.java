@@ -48,11 +48,9 @@ public class UniBackEnd {
 
         // assign SliceNodes to processors
         Layout<UniProcessor> layout;
-        if (KjcOptions.spacetime && !KjcOptions.noswpipe) {
-            layout = new BasicGreedyLayout<UniProcessor>(schedule, processors.toArray());
-        } else {
-            layout = new NoSWPipeLayout<UniProcessor,UniProcessors>(schedule, processors);
-        }
+       
+        layout = new NoSWPipeLayout<UniProcessor,UniProcessors>(schedule, processors);
+        
         layout.runLayout();
  
         // create other info needed to convert Slice graphs to Kopi code + Channels

@@ -31,8 +31,7 @@ public class SimpleSlicer extends SIRSlicer {
                              LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
         super(topFilters, exeCounts, lfa, work, maxPartitions);
         workEstimation = new HashMap<FilterContent, Long>();
-        TRASHOLD = (double)KjcOptions.slicethresh / (double)100.0;
-        System.out.println("Slice Work Threshold: " + TRASHOLD + "(" + KjcOptions.slicethresh + ")");
+        TRASHOLD = 1;
     }
 
     public Filter[] partition() {
