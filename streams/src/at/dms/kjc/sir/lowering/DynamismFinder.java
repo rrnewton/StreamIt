@@ -3,6 +3,9 @@
  */
 package at.dms.kjc.sir.lowering;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFeedbackLoopIter;
 import at.dms.kjc.iterator.SIRFilterIter;
@@ -25,11 +28,14 @@ public class DynamismFinder implements StreamVisitor {
 
 	private boolean isDynamic = false;
 	
+	Set<SIRStream> dynamicFilters = null;
+	
 	public DynamismFinder() {
 		// Do nothing
 	}
 	
 	public boolean find(SIRStream str) {
+		dynamicFilters = new HashSet<SIRStream>();
 		isDynamic = false;
 		IterFactory.createFactory().createIter(str).accept(this);
 		return isDynamic;
@@ -44,9 +50,11 @@ public class DynamismFinder implements StreamVisitor {
 		// TODO Auto-generated method stub
 		if (isDynamicPop(self)) {
 			isDynamic = true;
+			dynamicFilters.add(self);
 		}
-		if (isDynamicPush(self)) {
-			isDynamic = true;			
+		if (isDynamicPush(self)) {			
+			isDynamic = true;		
+			dynamicFilters.add(self);
 		}		
 	}
 
