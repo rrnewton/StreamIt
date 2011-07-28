@@ -64,14 +64,7 @@ import at.dms.kjc.slir.SimpleSlicer;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.Slicer;
 import at.dms.kjc.slir.UnflatFilter;
-import at.dms.kjc.spacetime.AddBuffering;
-import at.dms.kjc.spacetime.BasicGenerateSteadyStateSchedule;
-import at.dms.kjc.spacetime.CalculateParams;
-import at.dms.kjc.spacetime.CompCommRatio;
-import at.dms.kjc.spacetime.DuplicateBottleneck;
-import at.dms.kjc.spacetime.GranularityAdjust;
-import at.dms.kjc.spacetime.GreedyBinPacking;
-import at.dms.kjc.spacetime.StreamlinedDuplicate;
+
 
 /**
  * Common passes, useful in new back ends.
@@ -273,7 +266,6 @@ public class CommonPasses {
 		if (KjcOptions.fusion)
 			str = FuseAll.fuse(str, false);
 
-		StreamlinedDuplicate duplicate = null;
 		WorkEstimate work = WorkEstimate.getWorkEstimate(str);
 		work.printGraph(str, "work_estimate.dot");
 
@@ -362,16 +354,6 @@ public class CommonPasses {
 
 		// Print stream graph after fissing and fusing.
 		StreamItDot.printGraph(str, "canonical-graph.dot");
-
-		// Use the partition_greedier flag to enable the Granularity Adjustment
-		// phase, it will try to partition more as long as the critical path
-		// is not affected (see asplos 06).
-		if (KjcOptions.partition_greedier) {
-			StreamItDot.printGraph(str, "before-granularity-adjust.dot");
-			str = GranularityAdjust.doit(str, numCores);
-			StreamItDot.printGraph(str, "after-granularity-adjust.dot");
-
-		}
 
 		// this must run before vertical fission
 		str = Flattener.doLinearAnalysis(str);
@@ -462,11 +444,6 @@ public class CommonPasses {
 		double CCRatio = CompCommRatio.ratio(str, getWorkEstimate(),
 				executionCounts[1]);
 		System.out.println("Comp/Comm Ratio of SIR graph: " + CCRatio);
-
-		if (numCores > 1) {
-			// average max slice size.
-			new CalculateParams(str, CCRatio, executionCounts[1]).doit();
-		}
 
 		// Convert to SliceGraph representation.
 
@@ -561,12 +538,9 @@ public class CommonPasses {
 		schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer
 				.getSliceGraph()));
 		// set prime pump schedule (if --spacetime and not --noswpipe)
-		if (KjcOptions.spacetime) {
-			new at.dms.kjc.spacetime.GeneratePrimePumpSchedule(schedule)
-					.schedule(slicer.getSliceGraph());
-		} else {
-			new GeneratePrimePump(schedule).schedule(slicer.getSliceGraph());
-		}
+		
+		new GeneratePrimePump(schedule).schedule(slicer.getSliceGraph());
+		
 		// set steady schedule in standard order unless --spacetime in which
 		// case in
 		// decreasing order of estimated work

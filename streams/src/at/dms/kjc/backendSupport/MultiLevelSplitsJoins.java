@@ -10,7 +10,6 @@ import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.*;
 import at.dms.kjc.slir.*;
-import at.dms.kjc.spacetime.RawProcElements;
 
 /**
  * This pass will break up splits or joins (OutputSliceNodes and InputSliceNodes)

@@ -6,8 +6,6 @@ package at.dms.kjc.backendSupport;
 import java.util.*;
 
 import at.dms.kjc.slir.*;
-import at.dms.kjc.spacetime.CompareSliceBNWork;
-import at.dms.kjc.spacetime.SpaceTimeBackend;
 
 
 /**
@@ -70,19 +68,14 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         LinkedList<SliceNode> sortedList = new LinkedList<SliceNode>();
         LinkedList<Filter> scheduleOrder;
         
-        //get the schedule order of the graph!
-        if (SpaceTimeBackend.NO_SWPIPELINE) {
-            //if we are not software pipelining then use then respect
-            //dataflow dependencies
-            scheduleOrder = DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
-        } else {
-            //if we are software pipelining then sort the traces by work
-            Filter[] tempArray = (Filter[]) spaceTime.getSlicer().getSliceGraph().clone();
-            Arrays.sort(tempArray, new CompareSliceBNWork(slicer));
-            scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
-            //reverse the list, we want the list in descending order!
-            Collections.reverse(scheduleOrder);
-        }
+    
+        //if we are software pipelining then sort the traces by work
+        Filter[] tempArray = (Filter[]) spaceTime.getSlicer().getSliceGraph().clone();
+        Arrays.sort(tempArray, new CompareFilterWork(slicer));
+        scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
+        //reverse the list, we want the list in descending order!
+        Collections.reverse(scheduleOrder);
+        
 
         
         for (int i = 0; i < scheduleOrder.size(); i++) {

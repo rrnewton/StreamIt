@@ -9,7 +9,6 @@ import at.dms.kjc.slir.Edge;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SliceNode;
 import at.dms.kjc.slir.Util;
-import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
 //import at.dms.kjc.spacetime.InterSliceBuffer;
 import at.dms.kjc.*;
 import at.dms.util.Utils;
