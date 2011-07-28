@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Segmenter implements StreamVisitor {
-	
+
 	/* The SIR graph partitioned into static sections */
 	SegmentedGraph segmentedGraph = null;
 
@@ -36,17 +36,39 @@ public class Segmenter implements StreamVisitor {
 	/* an identifier to distinguish pipeline names */
 	private int pipelineId = 0;
 
+	private boolean debug = true;
+
 	public Segmenter() {
 		super();
+	}
+
+	public SegmentedGraph partition(SIRStream str) {
 		segmentedGraph = new SegmentedGraph(
 				new ArrayList<SIRStream>(),
 				new HashMap<SIRStream, List<SIRStream>>());
 		children = new LinkedList<Object>();
 
-	}
-
-	public SegmentedGraph partition(SIRStream str) {
 		IterFactory.createFactory().createIter(str).accept(this);
+
+		if (debug) {
+			List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();		
+			int j = 0;
+			for (SIRStream ssg : subgraphs) {
+				log("Segmenter.partition " + "printing ssg " + j
+						+ "name=" + ssg.getName());
+				at.dms.util.SIRPrinter printer = new at.dms.util.SIRPrinter("ssg_"
+						+ j + ".txt");
+				IterFactory.createFactory().createIter(ssg).accept(printer);
+				j++;
+				if (ssg instanceof SIRPipeline) {
+					log("Segmenter.partition " + "ssg is a pipeline");
+					log("Segmenter.partition "
+							+ "((SIRPipeline)ssg).getChildren().size()= "
+							+ ((SIRPipeline) ssg).getChildren().size());
+				}
+			}
+
+		}
 		return segmentedGraph;
 	}
 
