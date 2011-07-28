@@ -6,7 +6,6 @@ import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.spacetime.LinearFission;
 
 /**
  * Partition the stream graph into slices where each slice is a pipeline of filters with
@@ -91,7 +90,7 @@ public class SimpleSlicer extends SIRSlicer {
                     slice = new Filter((InputNode) node);
 
                     if (filterContent.isLinear()) { // Jasper's linear stuff??
-                        System.out
+                      /*  System.out
                             .println("******** Found linear fitler, array is of length "
                                      + filterContent.getArray().length
                                      + " pop is "
@@ -130,7 +129,7 @@ public class SimpleSlicer extends SIRSlicer {
                             filterNode.setPrevious(node);
                             node = filterNode;
                         }
-                    } else {
+                    */} else {
                         WorkNode filterNode = new WorkNode(
                                                                          filterContent);
                         node.setNext(filterNode);
@@ -173,7 +172,7 @@ public class SimpleSlicer extends SIRSlicer {
                     // if we get here we are contecting another linear filters
                     // to a
                     // previous linear filter
-                    if (dsContent.isLinear()) {
+                    if (dsContent.isLinear()) { /*
                         assert false : "Trying to add a 2 different linear filters to a slice (Not supported Yet)";
                         // the code for this case is broken
                         // the number of times to fiss the linear filter
@@ -205,7 +204,7 @@ public class SimpleSlicer extends SIRSlicer {
                             filterNode.setPrevious(node);
                             node = filterNode;
                             unflatFilter = downstream;
-                        }
+                        } */
                     } else if (!(downstream.filter instanceof SIRPredefinedFilter)) {
                         WorkNode filterNode = new WorkNode(
                                                                          dsContent);

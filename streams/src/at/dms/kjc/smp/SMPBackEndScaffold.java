@@ -17,7 +17,7 @@ import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.SimpleSlice;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 /**
  * @author mgordon

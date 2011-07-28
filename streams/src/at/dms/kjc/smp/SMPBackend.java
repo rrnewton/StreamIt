@@ -5,7 +5,6 @@ import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.slir.*;
-import at.dms.kjc.spacetime.*;
 import java.util.*;
 
 public class SMPBackend {

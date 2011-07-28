@@ -7,7 +7,6 @@ import at.dms.kjc.sir.lowering.fusion.*;
 import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.FissionGroup;
-import at.dms.kjc.spacetime.*;
 import at.dms.kjc.*;
 import java.util.LinkedList;
 import at.dms.kjc.backendSupport.*;

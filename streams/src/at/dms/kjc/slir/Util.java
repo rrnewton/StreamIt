@@ -1,5 +1,6 @@
 package at.dms.kjc.slir;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +14,48 @@ import java.util.ListIterator;
 **/
 public class Util {
 
+	
+	  /**
+     * Return true if the sets contructed from list and array are equal.
+     * @param <T> Type of list elements and array elements.
+     * 
+     * @param list The list
+     * @param array The array
+     * @return true if the sets contructed from list and array are equal.
+     */
+    public static <T> boolean setCompare(LinkedList<T> list, T[] array) {
+        if (array.length == list.size()) {
+            HashSet<T> listSet = new HashSet<T>();
+            HashSet<T> arraySet = new HashSet<T>();
+            for (int i = 0; i < array.length; i++) {
+                listSet.add(list.get(i));
+                arraySet.add(array[i]);
+            }
+            return listSet.equals(arraySet);
+        }
+        return false;
+    }
+
+    /**
+     * Return true if the sets contructed from two arrays are equal.
+     * @param <T> Type of list elements and array elements.
+     * 
+     * @param array1 First array
+     * @param array2 Second array
+     * @return true if the sets contructed from two arrays are equal.
+     */
+    public static <T> boolean setCompare(T[] array1, T[] array2) {
+        if (array1.length == array2.length) {
+            HashSet<T> array1Set = new HashSet<T>();
+            HashSet<T> array2Set = new HashSet<T>();
+            for(int i = 0 ; i < array1.length ; i++) {
+                array1Set.add(array1[i]);
+                array2Set.add(array2[i]);
+            }
+            return array1Set.equals(array2Set);
+        }
+        return false;
+    }
     /**
      * Get a traversal (linked list iterator) that includes all the slice nodes of the
      * given slice traversal.  Inserting or removing in the returned iterator will not

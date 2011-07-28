@@ -16,7 +16,7 @@ import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SliceNode;
-import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.util.Utils;
 
 public class CellBackendScaffold extends BackEndScaffold {

@@ -19,7 +19,6 @@ import at.dms.kjc.sir.lowering.*;
 import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.sir.lowering.fusion.*;
 import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.spacetime.DuplicateBottleneck;
 import at.dms.kjc.lir.*;
 import java.util.*;
 import java.io.*;
@@ -107,16 +106,7 @@ public class SpaceDynamicBackend {
             Utils.fail("Teleport messaging is not yet supported in the Raw backend.");
         }
 
-        //if we pass dup as 1 to the backend, fuse stateless subcomponents of the graph
-        //and then perform cousin-based data-parallelization
-        if (KjcOptions.dup == 1) {
-            DuplicateBottleneck dup = new DuplicateBottleneck();
-            dup.percentStateless(str);
-            str = FusePipelines.fusePipelinesOfStatelessStreams(str);
-            StreamItDot.printGraph(str, "after-fuse-stateless.dot");
-            dup.smarterDuplicate(str, rawChip.getTotalSimulatedTiles());
-            StreamItDot.printGraph(str, "after-data-par.dot");
-        } 
+        
         
         //first of all, flatten the graph to make it easier to deal with...
         GraphFlattener graphFlattener = new GraphFlattener(str);

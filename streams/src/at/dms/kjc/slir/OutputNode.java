@@ -1,7 +1,6 @@
 package at.dms.kjc.slir;
 
 import at.dms.kjc.*;
-import at.dms.kjc.spacetime.Util;
 import at.dms.kjc.backendSupport.*;
 import java.util.Arrays;
 import java.util.Set;

@@ -3,7 +3,6 @@ package at.dms.kjc.smp;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.*;
 import at.dms.util.Utils;
-import at.dms.kjc.spacetime.*;
 import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.*;
 

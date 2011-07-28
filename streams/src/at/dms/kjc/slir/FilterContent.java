@@ -8,7 +8,7 @@ import at.dms.kjc.*;
 import java.util.*;
 import at.dms.kjc.sir.linear.*;
 import at.dms.kjc.sir.lowering.RenameAll;
-import at.dms.kjc.spacetime.SafeFileReaderWriterPositions;
+import at.dms.kjc.backendSupport.SafeFileReaderWriterPositions;
 import at.dms.kjc.tilera.CFixedPointType;
 
 /**

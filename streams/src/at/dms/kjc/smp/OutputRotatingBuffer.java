@@ -22,7 +22,7 @@ import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.fission.FissionGroup;
-import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
 

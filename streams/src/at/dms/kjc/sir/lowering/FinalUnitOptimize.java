@@ -4,7 +4,6 @@ package at.dms.kjc.sir.lowering;
 
 import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
-import at.dms.kjc.spacetime.SpaceTimeBackend;
 
 import java.util.Hashtable;
 

@@ -9,7 +9,6 @@ import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.slir.*;
 
 import java.util.LinkedList;
-import at.dms.kjc.spacetime.*;
 import at.dms.kjc.*;
 import java.util.Set;
 import java.util.HashSet;

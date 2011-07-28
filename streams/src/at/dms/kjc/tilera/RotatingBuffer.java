@@ -13,7 +13,6 @@ import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.*;
 
 import java.util.LinkedList;
-import at.dms.kjc.spacetime.*;
 import at.dms.kjc.*;
 import at.dms.kjc.common.CommonUtils;
 import java.util.Set;

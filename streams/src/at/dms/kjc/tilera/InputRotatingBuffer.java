@@ -2,7 +2,6 @@ package at.dms.kjc.tilera;
 
 import at.dms.kjc.slir.*;
 import at.dms.util.Utils;
-import at.dms.kjc.spacetime.*;
 import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.*;

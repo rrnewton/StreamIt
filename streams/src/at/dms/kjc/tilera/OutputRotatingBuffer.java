@@ -34,7 +34,7 @@ import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.spacetime.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
     /** the output slice node for this output buffer */

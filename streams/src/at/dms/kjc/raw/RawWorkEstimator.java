@@ -12,7 +12,6 @@ import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.sir.lowering.fusion.*;
 import at.dms.kjc.sir.lowering.fission.*;
 import at.dms.kjc.spacedynamic.SpaceDynamicBackend;
-import at.dms.kjc.spacetime.SpaceTimeBackend;
 import at.dms.kjc.lir.*;
 import java.util.*;
 import at.dms.util.Utils;
@@ -103,10 +102,6 @@ public class RawWorkEstimator extends EmptyStreamVisitor
 
         if (KjcOptions.removeglobals) {
             RemoveGlobals.doit(top);
-        }
-
-        if (KjcOptions.spacetime) {
-            structures = SpaceTimeBackend.getStructures();
         }
         else if (KjcOptions.space) {
             structures = RawBackend.structures;

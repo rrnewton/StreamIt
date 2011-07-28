@@ -4,7 +4,7 @@ import at.dms.kjc.*;
 import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.slir.*;
-import at.dms.kjc.spacetime.BasicGenerateSteadyStateSchedule;
+import at.dms.kjc.backendSupport.BasicGenerateSteadyStateSchedule;
 
 public class TileraBackend {
     public static final boolean FAKE_IO = true;

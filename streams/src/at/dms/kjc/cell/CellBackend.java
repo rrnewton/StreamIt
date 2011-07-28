@@ -22,8 +22,6 @@ import at.dms.kjc.sir.SIRInterfaceTable;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
 import at.dms.kjc.slir.*;
-import at.dms.kjc.spacetime.SliceDotGraph;
-import at.dms.kjc.spacetime.SpaceTimeSchedule;
 import at.dms.kjc.vanillaSlice.EmitStandaloneCode;
 
 public class CellBackend {
