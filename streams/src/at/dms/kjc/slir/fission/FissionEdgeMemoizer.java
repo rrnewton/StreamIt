@@ -32,7 +32,7 @@ public class FissionEdgeMemoizer {
     }
 
     public static InterFilterEdge getEdge(Filter src, Filter dest) {
-        return getEdge(src.getTail(), dest.getHead());
+        return getEdge(src.getOutputNode(), dest.getInputNode());
     }
 
     private static class EdgeDescriptor {
@@ -45,7 +45,7 @@ public class FissionEdgeMemoizer {
         }
         
         public EdgeDescriptor(Filter src, Filter dest) {
-            this(src.getTail(), dest.getHead());
+            this(src.getOutputNode(), dest.getInputNode());
         }
 
         public EdgeDescriptor(InterFilterEdge edge) {

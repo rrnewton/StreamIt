@@ -354,8 +354,8 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
             //find the tile of the first input to the file writer
             Tile tile = 
                 TileraBackend.backEndBits.getLayout().
-                getComputeNode(fileW.getParent().getHead().getSources(SchedulingPhase.STEADY)[0].
-                        getSrc().getParent().getFirstFilter());
+                getComputeNode(fileW.getParent().getInputNode().getSources(SchedulingPhase.STEADY)[0].
+                        getSrc().getParent().getWorkNode());
             
             tile.getComputeCode().addPrintOutputCode(buf);
         }
@@ -373,7 +373,7 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
         //because of this scene we need a rotation length of 2
         assert buf.getRotationLength() == 2;
         //make sure that each of the inputs wrote to the file writer in the primepump stage
-        for (InterFilterEdge edge : fileW.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : fileW.getParent().getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
             assert TileraBackend.scheduler.getGraphSchedule().getPrimePumpMult(edge.getSrc().getParent()) == 1;
         }
         int outputs = fileW.getFilter().getSteadyMult();
@@ -422,7 +422,7 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
         for (Filter slice : level) {
             int absTile = 
                 TileraBackend.chip.getTranslatedTileNumber(
-                        TileraBackend.backEndBits.getLayout().getComputeNode(slice.getFirstFilter()).getTileNumber());
+                        TileraBackend.backEndBits.getLayout().getComputeNode(slice.getWorkNode()).getTileNumber());
             tilesUsed.add(absTile);
         }
         //create the list of tiles not utilized during this level

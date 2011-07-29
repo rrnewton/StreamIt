@@ -51,15 +51,14 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      */
     public static void createOutputBuffers(BasicSpaceTimeSchedule schedule) {
         for (Filter slice : schedule.getScheduleList()) {
-            assert slice.getNumFilters() == 1;
-            //don't do anything for file readers or writers,
+        	//don't do anything for file readers or writers,
             //for file readers the output buffer is allocated in processfilereader
-            if (slice.getHead().getNextFilter().isPredefined())
+            if (slice.getInputNode().getNextFilter().isPredefined())
                 continue;
             
-            if (!slice.getTail().noOutputs()) {
-                assert slice.getTail().totalWeights(SchedulingPhase.STEADY) > 0;
-                Tile parent = TileraBackend.backEndBits.getLayout().getComputeNode(slice.getFirstFilter());
+            if (!slice.getOutputNode().noOutputs()) {
+                assert slice.getOutputNode().totalWeights(SchedulingPhase.STEADY) > 0;
+                Tile parent = TileraBackend.backEndBits.getLayout().getComputeNode(slice.getWorkNode());
                 //only create an output buffer if no downstream filter is mapped to this tile
                 //if a downstream filter is mapped to this tile, then this slice will use the inputbuffer
                 //for its output
@@ -67,10 +66,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
                 //look to see if one of the downstream slices is mapped to the same tile as this slice
                 //and this slice uses the downstream's input buffer as an outputbuffer, if so, we don't
                 //need an output buffer
-                for (InterFilterEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
+                for (InterFilterEdge edge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
                     InputRotatingBuffer inBuf = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
-                    if (inBuf != null && inBuf.getLocalSrcFilter() == slice.getFirstFilter()) {
-                        assert RotatingBuffer.getOutputBuffer(slice.getFirstFilter()) != null;
+                    if (inBuf != null && inBuf.getLocalSrcFilter() == slice.getWorkNode()) {
+                        assert RotatingBuffer.getOutputBuffer(slice.getWorkNode()) != null;
                         createBuffer = false;
                         break;
                     }
@@ -80,7 +79,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
                     // create the new buffer, the constructor will put the buffer in the 
                     //hashmap
                     
-                    OutputRotatingBuffer buf = new OutputRotatingBuffer(slice.getFirstFilter(), parent);
+                    OutputRotatingBuffer buf = new OutputRotatingBuffer(slice.getWorkNode(), parent);
                     buf.setRotationLength(schedule);
                     buf.setBufferSize();
                     buf.createInitCode(false);
@@ -96,7 +95,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      */
     protected OutputRotatingBuffer(WorkNode filterNode, Tile parent) {
         super(filterNode.getEdgeToNext(), filterNode, parent);
-        outputNode = filterNode.getParent().getTail();
+        outputNode = filterNode.getParent().getOutputNode();
         bufType = filterNode.getFilter().getOutputType();
         setOutputBuffer(filterNode, this);
        
@@ -131,7 +130,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         //calculate the rotation length
         int srcMult = schedule.getPrimePumpMult(filterNode.getParent());
         int maxRotLength = 0;
-        for (Filter dest : filterNode.getParent().getTail().getDestSlices(SchedulingPhase.STEADY)) {
+        for (Filter dest : filterNode.getParent().getOutputNode().getDestSlices(SchedulingPhase.STEADY)) {
             int diff = srcMult - schedule.getPrimePumpMult(dest);
             assert diff >= 0;
             if (diff > maxRotLength)

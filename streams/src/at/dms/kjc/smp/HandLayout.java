@@ -47,7 +47,7 @@ public class HandLayout implements Layout {
             int tileNumber;
             String str = null;
 
-            System.out.print(slice.getFirstFilter().toString() + ": ");
+            System.out.print(slice.getWorkNode().toString() + ": ");
             try {
                 str = inputBuffer.readLine();
                 tileNumber = Integer.valueOf(str).intValue();
@@ -65,9 +65,9 @@ public class HandLayout implements Layout {
                 continue;
             }
             // other wise the assignment is valid, assign and break!!
-            System.out.println("Assigning " + slice.getFirstFilter().toString() + " to tile "
+            System.out.println("Assigning " + slice.getWorkNode().toString() + " to tile "
                                + tileNumber);
-            setComputeNode(slice.getFirstFilter(), tile);
+            setComputeNode(slice.getWorkNode(), tile);
             break;
         }
     }
@@ -82,8 +82,7 @@ public class HandLayout implements Layout {
         while (slices.hasNext()) {
           Filter slice = slices.next();
 
-          assert slice.getNumFilters() == 1 : "HandLayout only works for Slices with one filter! "  + 
-               slice;
+          
 
           assignFromReader(inputBuffer, slice);
         }

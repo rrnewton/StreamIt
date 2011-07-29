@@ -33,7 +33,7 @@ public abstract class FileReaderCode {
         commandsSteady = new LinkedList<JStatement>();
         commandsInit = new LinkedList<JStatement>();
         decls = new LinkedList<JStatement>();
-        input = parent.filterNode.getParent().getHead();
+        input = parent.filterNode.getParent().getInputNode();
         fileOutput = input.getSingleEdge(SchedulingPhase.STEADY).getSrc();   
         if (input.oneInput(SchedulingPhase.INIT)) {
             assert input.getSources(SchedulingPhase.INIT)[0] == input.getSources(SchedulingPhase.STEADY)[0];

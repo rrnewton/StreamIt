@@ -15,7 +15,6 @@ import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.SimpleSlice;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
@@ -107,13 +106,13 @@ public class SMPBackEndScaffold extends BackEndScaffold {
         for (int i = 0; i < slices.length; i++) {
             slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputNode)slice.getHead(),
+            resources.processInputSliceNode((InputNode)slice.getInputNode(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
-            resources.processFilterSliceNode(slice.getFilterNodes().get(0), whichPhase, computeNodes);
+            resources.processFilterSliceNode(slice.getWorkNode(), whichPhase, computeNodes);
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputNode)slice.getTail(),
+            resources.processOutputSliceNode((OutputNode)slice.getOutputNode(),
                     whichPhase, computeNodes);
         }
     }  

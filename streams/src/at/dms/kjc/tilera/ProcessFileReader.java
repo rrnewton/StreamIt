@@ -34,7 +34,7 @@ public class ProcessFileReader {
         this.phase = phase;
         this.factory = factory;
         this.allocatingTile = nextAllocatingTile();
-        this.fileOutput = filter.getParent().getTail();
+        this.fileOutput = filter.getParent().getOutputNode();
         codeStore = allocatingTile.getComputeCode();
     }
      

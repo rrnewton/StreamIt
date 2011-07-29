@@ -275,10 +275,10 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
             
             //find the core of the first input to the file writer
             WorkNode firstInputFilter = 
-            	fileW.getParent().getHead().getSources(SchedulingPhase.STEADY)[0].getSrc().getParent().getFirstFilter();
+            	fileW.getParent().getInputNode().getSources(SchedulingPhase.STEADY)[0].getSrc().getParent().getWorkNode();
 
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(firstInputFilter.getParent()))
-                firstInputFilter = FissionGroupStore.getFizzedSlices(firstInputFilter.getParent())[0].getFirstFilter();
+                firstInputFilter = FissionGroupStore.getFizzedSlices(firstInputFilter.getParent())[0].getWorkNode();
             
             Core core = 
                 SMPBackend.scheduler.getComputeNode(firstInputFilter);
@@ -306,7 +306,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
         //because of this scene we need a rotation length of 2
         assert buf.getRotationLength() == 2;
         //make sure that each of the inputs wrote to the file writer in the primepump stage
-        for (InterFilterEdge edge : fileW.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : fileW.getParent().getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
             assert SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult(edge.getSrc().getParent()) == 1;
         }
         int outputs = fileW.getFilter().getSteadyMult();

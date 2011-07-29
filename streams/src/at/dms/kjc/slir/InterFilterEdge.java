@@ -202,7 +202,7 @@ public class InterFilterEdge extends Edge implements at.dms.kjc.DeepCloneable, C
         }
         
         public EdgeDescriptor(Filter src, Filter dest) {
-            this(src.getTail(), dest.getHead());
+            this(src.getOutputNode(), dest.getInputNode());
         }
 
         public EdgeDescriptor(InterFilterEdge edge) {

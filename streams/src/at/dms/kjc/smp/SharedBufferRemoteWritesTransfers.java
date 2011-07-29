@@ -73,7 +73,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         	
         	writeDecls.add(new JVariableDeclarationStatement(writeHeadDefn));
 
-            output = parent.filterNode.getParent().getTail();
+            output = parent.filterNode.getParent().getOutputNode();
                 
             if (output.oneOutput(SchedulingPhase.STEADY) && 
                     (output.oneOutput(SchedulingPhase.INIT) || output.noOutputs(SchedulingPhase.INIT)) &&
@@ -119,8 +119,8 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                             String valueName, int value) {
         if(debug) {
             System.out.println(methodName + ", phase: " + phase + ", edge: " + 
-                               edge.getSrc().getParent().getFirstFilter() + "->" +
-                               edge.getDest().getParent().getFirstFilter() +
+                               edge.getSrc().getParent().getWorkNode() + "->" +
+                               edge.getDest().getParent().getWorkNode() +
                                ", " + valueName + ": " + value);
         }
     }
@@ -303,9 +303,9 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
            LoadBalancer.isLoadBalanced(parent.filterNode.getParent())) {
 
             FissionGroup group = FissionGroupStore.getFissionGroup(parent.filterNode.getParent());
-            WorkNode filter = group.unfizzedSlice.getFirstFilter();
+            WorkNode filter = group.unfizzedSlice.getWorkNode();
             FilterInfo fi = group.unfizzedFilterInfo;
-            OutputNode output = filter.getParent().getTail();
+            OutputNode output = filter.getParent().getOutputNode();
 
             // Declare variables used for transfers
             JVariableDefinition srcBaseOffsetVar =
@@ -374,7 +374,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                     destCopyDown = inputGroup.unfizzedFilterInfo.copyDown;
                 }
                 else {
-                    FilterInfo destInfo = FilterInfo.getFilterInfo(input.getParent().getFirstFilter());
+                    FilterInfo destInfo = FilterInfo.getFilterInfo(input.getParent().getWorkNode());
                     destCopyDown = destInfo.copyDown;
                 }
 
@@ -467,7 +467,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                         ((OutputRotatingBuffer)parent).getDirectWriteFilter();
                     srcBuffer = 
                         ((OutputRotatingBuffer)parent).getAddressBuffer(
-                            directWriteFilter.getParent().getHead()).currentWriteBufName;
+                            directWriteFilter.getParent().getInputNode()).currentWriteBufName;
                 }
                 else {
                     srcBuffer = ((OutputRotatingBuffer)parent).currentWriteBufName;
@@ -708,7 +708,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
             String srcBuffer;
             if(((OutputRotatingBuffer)parent).hasDirectWrite()) {
                 WorkNode directWriteFilter = ((OutputRotatingBuffer)parent).getDirectWriteFilter();
-                srcBuffer = ((OutputRotatingBuffer)parent).getAddressBuffer(directWriteFilter.getParent().getHead()).currentWriteBufName;
+                srcBuffer = ((OutputRotatingBuffer)parent).getAddressBuffer(directWriteFilter.getParent().getInputNode()).currentWriteBufName;
             }
             else {
                 srcBuffer = ((OutputRotatingBuffer)parent).currentWriteBufName;
@@ -833,7 +833,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                 destSlice = FissionGroupStore.getUnfizzedSlice(destSlice);
 
             //find edge from source to dest slice
-        	Set<InterFilterEdge> edges = srcSlice.getTail().getDestSet(phase);
+        	Set<InterFilterEdge> edges = srcSlice.getOutputNode().getDestSet(phase);
         	InterFilterEdge edge = null;
         	
         	for(InterFilterEdge e : edges) {
@@ -982,7 +982,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
             //set the buffer reference to the input buffer of the remote buffer that we are writing to
             if (((OutputRotatingBuffer)parent).hasDirectWrite()) {
                 bufRef = new JFieldAccessExpression(new JThisExpression(),
-                        ((OutputRotatingBuffer)parent).getAddressBuffer(((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent().getHead()).currentWriteBufName);
+                        ((OutputRotatingBuffer)parent).getAddressBuffer(((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent().getInputNode()).currentWriteBufName);
             }
             else {
                 bufRef = parent.writeBufRef();

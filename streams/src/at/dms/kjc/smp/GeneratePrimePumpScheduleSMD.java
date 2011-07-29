@@ -57,7 +57,7 @@ public class GeneratePrimePumpScheduleSMD {
                     CommonUtils.println_debugging("  Adding " + slice);
                 }
                 //check the outgoing edges of the slice to see if any of them can "fire"
-                for (InterFilterEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
+                for (InterFilterEdge edge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
                     if (canFire(edge)) {
                         fired.add(edge);
                         CommonUtils.println_debugging("  Adding " + edge);
@@ -119,7 +119,7 @@ public class GeneratePrimePumpScheduleSMD {
 
             //check each of the depends to make sure that they have fired at least
             //one more time than me.
-            for (InterFilterEdge edge : slice.getHead().getSources(SchedulingPhase.STEADY)) {
+            for (InterFilterEdge edge : slice.getInputNode().getSources(SchedulingPhase.STEADY)) {
                 
                 int dependsExeCount = getExeCount(edge);
                 assert !(myExeCount > dependsExeCount);
@@ -143,7 +143,7 @@ public class GeneratePrimePumpScheduleSMD {
      */
     private boolean canEverythingFire(LinkedList<Filter> dataFlowTraversal) {
         for (Filter slice : dataFlowTraversal) {
-            for (InterFilterEdge edge : slice.getTail().getDestSet(SchedulingPhase.STEADY)) {
+            for (InterFilterEdge edge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
                 if (!(canFire(edge))) {
                     System.out.println(slice + " ||| " + edge);
                     return false;
@@ -166,6 +166,6 @@ public class GeneratePrimePumpScheduleSMD {
      * @return should this be counted as a trace that needs to fire.
      */
     private boolean shouldFireSlice(Filter slice) { 
-        return !(slice.getHead().getNextFilter().isPredefined());
+        return !(slice.getInputNode().getNextFilter().isPredefined());
     }
 }

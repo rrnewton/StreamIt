@@ -32,14 +32,14 @@ public class PipelineFissioner {
     }
 
     private static WorkNode getFirstFilter(Filter slice) {
-        return slice.getFirstFilter();
+        return slice.getWorkNode();
     }
 
     private static WorkNode getLastFilter(Filter slice) {
-        assert (slice.getTail().getPrevious() instanceof WorkNode) :
+        assert (slice.getOutputNode().getPrevious() instanceof WorkNode) :
         "Can't get last FilterSliceNode from Slice";
 
-        return (WorkNode)slice.getTail().getPrevious();
+        return (WorkNode)slice.getOutputNode().getPrevious();
     }
 
     private static int[] toArraySingleInt(LinkedList<Integer> list) {
@@ -100,8 +100,8 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Filter sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
-        Filter dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // If sources are fizzed
         if(isFizzed(sources[0])) {
@@ -152,8 +152,8 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Filter sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
-        Filter dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // Check to see if Slice is a source/sink.  Don't fizz source/sink.
         if(sources.length == 0 || dests.length == 0) {
@@ -163,19 +163,13 @@ public class PipelineFissioner {
 
         // Check to see if Slice has file reader/writer.  Don't fizz file
         // reader/writer
-        if(slice.getTail().isFileInput() || slice.getHead().isFileOutput()) {
+        if(slice.getOutputNode().isFileInput() || slice.getInputNode().isFileOutput()) {
             if(debug) System.out.println("Can't fizz: Slice contains file reader/writer");
             return false;
         }
 
-        // Make sure that Slice has only one FilterSliceNode
-        if(!(slice.getNumFilters() == 1)) {
-            if(debug) System.out.println("Can't fizz: Slice has more than one FilterSliceNode");
-            return false;
-        }
-
         // Check to make sure that Slice is stateless
-        if(MutableStateExtractor.hasMutableState(slice.getFirstFilter().getFilter())) {
+        if(MutableStateExtractor.hasMutableState(slice.getWorkNode().getFilter())) {
             if(debug) System.out.println("Can't fizz: Slice is not stateless!!");
             return false;
         }
@@ -191,7 +185,7 @@ public class PipelineFissioner {
         
         // Make sure that sources only push to this Slice
         for(int x = 0 ; x < sources.length ; x++) {
-            if(sources[x].getTail().getDestSlices(SchedulingPhase.STEADY).size() > 1) {
+            if(sources[x].getOutputNode().getDestSlices(SchedulingPhase.STEADY).size() > 1) {
                 if(debug) System.out.println("Can't fizz: Sources for Slice send to other Slices");
                 return false;
             }
@@ -199,7 +193,7 @@ public class PipelineFissioner {
 
         // Make sure that dests only pop from this Slice
         for(int x = 0 ; x < dests.length ; x++) {
-            if(dests[x].getHead().getSourceSlices(SchedulingPhase.STEADY).size() > 1) {
+            if(dests[x].getInputNode().getSourceSlices(SchedulingPhase.STEADY).size() > 1) {
                 if(debug) System.out.println("Can't fizz: Dests for Slice receives from other Slices");
                 return false;
             }
@@ -335,8 +329,8 @@ public class PipelineFissioner {
 
         // Get Slice sources and destinations, ordered by how they were
         // originally fizzed
-        Filter sources[] = slice.getHead().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
-        Filter dests[] = slice.getTail().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         if(sources.length > 1)
             sources = sliceToFizzedCopies.get(sources[0]).toArray(new Filter[0]);
@@ -354,19 +348,19 @@ public class PipelineFissioner {
         // can be reused later in fission
         Set<InterFilterEdge> origEdges;
         
-        origEdges = slice.getHead().getSourceSet(SchedulingPhase.INIT);
+        origEdges = slice.getInputNode().getSourceSet(SchedulingPhase.INIT);
         for(InterFilterEdge edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
-        origEdges = slice.getHead().getSourceSet(SchedulingPhase.STEADY);
+        origEdges = slice.getInputNode().getSourceSet(SchedulingPhase.STEADY);
         for(InterFilterEdge edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
-        origEdges = slice.getTail().getDestSet(SchedulingPhase.INIT);
+        origEdges = slice.getOutputNode().getDestSet(SchedulingPhase.INIT);
         for(InterFilterEdge edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
-        origEdges = slice.getTail().getDestSet(SchedulingPhase.STEADY);
+        origEdges = slice.getOutputNode().getDestSet(SchedulingPhase.STEADY);
         for(InterFilterEdge edge : origEdges)
             FissionEdgeMemoizer.addEdge(edge);
 
@@ -376,9 +370,9 @@ public class PipelineFissioner {
             sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
 
         // Give each Slice clone a unique name
-        String origName = sliceClones[0].getFirstFilter().getFilter().getName();
+        String origName = sliceClones[0].getWorkNode().getFilter().getName();
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getFirstFilter().getFilter().setName(origName + "_fizz" + x);
+            sliceClones[x].getWorkNode().getFilter().setName(origName + "_fizz" + x);
 
         /**********************************************************************
          *                   Setup initialization schedule                    *
@@ -401,15 +395,15 @@ public class PipelineFissioner {
 
         if(sliceInitMult > 0) {
             JBlock firstWorkBody =
-                sliceClones[0].getFirstFilter().getFilter().getWork().getBody();
+                sliceClones[0].getWorkNode().getFilter().getWork().getBody();
 	    
             JBlock newPreworkBody = new JBlock();
 	    
-            if(sliceClones[0].getFirstFilter().getFilter().getPrework() != null &&
-               sliceClones[0].getFirstFilter().getFilter().getPrework().length > 0 &&
-               sliceClones[0].getFirstFilter().getFilter().getPrework()[0] != null &&
-               sliceClones[0].getFirstFilter().getFilter().getPrework()[0].getBody() != null) {
-                newPreworkBody.addStatement(sliceClones[0].getFirstFilter().getFilter().getPrework()[0].getBody());
+            if(sliceClones[0].getWorkNode().getFilter().getPrework() != null &&
+               sliceClones[0].getWorkNode().getFilter().getPrework().length > 0 &&
+               sliceClones[0].getWorkNode().getFilter().getPrework()[0] != null &&
+               sliceClones[0].getWorkNode().getFilter().getPrework()[0].getBody() != null) {
+                newPreworkBody.addStatement(sliceClones[0].getWorkNode().getFilter().getPrework()[0].getBody());
             }
 
             JVariableDefinition initMultLoopVar =
@@ -438,9 +432,9 @@ public class PipelineFissioner {
                                   (JBlock)ObjectDeepCloner.deepCopy(firstWorkBody));
             newPreworkBody.addStatement(initMultLoop);
 	    
-            if(sliceClones[0].getFirstFilter().getFilter().getPrework() == null ||
-               sliceClones[0].getFirstFilter().getFilter().getPrework().length == 0 ||
-               sliceClones[0].getFirstFilter().getFilter().getPrework()[0] == null) {
+            if(sliceClones[0].getWorkNode().getFilter().getPrework() == null ||
+               sliceClones[0].getWorkNode().getFilter().getPrework().length == 0 ||
+               sliceClones[0].getWorkNode().getFilter().getPrework()[0] == null) {
                 JMethodDeclaration newPreworkMethod =
                     new JMethodDeclaration(null,
                                            at.dms.kjc.Constants.ACC_PUBLIC,
@@ -452,14 +446,14 @@ public class PipelineFissioner {
                                            null,
                                            null);
 
-                sliceClones[0].getFirstFilter().getFilter().setPrework(newPreworkMethod);
+                sliceClones[0].getWorkNode().getFilter().setPrework(newPreworkMethod);
 
                 slicePrePeek = 0;
                 slicePrePush = 0;
                 slicePrePop = 0;
             }
             else {
-                sliceClones[0].getFirstFilter().getFilter().getPrework()[0].setBody(newPreworkBody);
+                sliceClones[0].getWorkNode().getFilter().getPrework()[0].setBody(newPreworkBody);
             }
 	    
             // For the first Slice clone, adjust prework rates to reflect that 
@@ -470,22 +464,22 @@ public class PipelineFissioner {
             slicePrePop = slicePrePop + sliceInitMult * slicePop;
             slicePrePush = slicePrePush + sliceInitMult * slicePush;
 	    
-            sliceClones[0].getFirstFilter().getFilter().getPrework()[0].setPeek(slicePrePeek);
-            sliceClones[0].getFirstFilter().getFilter().getPrework()[0].setPop(slicePrePop);
-            sliceClones[0].getFirstFilter().getFilter().getPrework()[0].setPush(slicePrePush);
+            sliceClones[0].getWorkNode().getFilter().getPrework()[0].setPeek(slicePrePeek);
+            sliceClones[0].getWorkNode().getFilter().getPrework()[0].setPop(slicePrePop);
+            sliceClones[0].getWorkNode().getFilter().getPrework()[0].setPush(slicePrePush);
 	    
             // Since the initialization work has been moved into prework, set
             // the initialization multiplicity of the first Slice clone to 0
 	    
-            sliceClones[0].getFirstFilter().getFilter().setInitMult(1);
+            sliceClones[0].getWorkNode().getFilter().setInitMult(1);
         }
 
         // Disable all other Slice clones in initialization.  This involves
         // disabling prework and seting initialization multiplicty to 0
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getFirstFilter().getFilter().setPrework(null);
-            sliceClones[x].getFirstFilter().getFilter().setInitMult(0);
+            sliceClones[x].getWorkNode().getFilter().setPrework(null);
+            sliceClones[x].getWorkNode().getFilter().setInitMult(0);
         }
 
         sliceInitMult = 0;
@@ -508,20 +502,20 @@ public class PipelineFissioner {
         edgeSetSet.add(edgeSet);
         weights.add(new Integer(1));
 	
-        sources[0].getTail().setInitWeights(toArraySingleInt(weights));
-        sources[0].getTail().setInitDests(toArrayDouble(edgeSetSet));
+        sources[0].getOutputNode().setInitWeights(toArraySingleInt(weights));
+        sources[0].getOutputNode().setInitDests(toArrayDouble(edgeSetSet));
 
-        sliceClones[0].getHead().setInitWeights(toArraySingleInt(weights));
-        sliceClones[0].getHead().setInitSources(toArraySingle(edgeSet));
+        sliceClones[0].getInputNode().setInitWeights(toArraySingleInt(weights));
+        sliceClones[0].getInputNode().setInitSources(toArraySingle(edgeSet));
 
         for(int x = 1 ; x < sources.length ; x++) {
-            sources[x].getTail().setInitWeights(null);
-            sources[x].getTail().setInitDests(null);                                             
+            sources[x].getOutputNode().setInitWeights(null);
+            sources[x].getOutputNode().setInitDests(null);                                             
         }
 	
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getHead().setInitWeights(null);
-            sliceClones[x].getHead().setInitSources(null);
+            sliceClones[x].getInputNode().setInitWeights(null);
+            sliceClones[x].getInputNode().setInitSources(null);
         }
 
         // Since only the first Slice clone executes, it will be the only Slice
@@ -542,20 +536,20 @@ public class PipelineFissioner {
         edgeSetSet.add(edgeSet);
         weights.add(new Integer(1));
 	
-        sliceClones[0].getTail().setInitWeights(toArraySingleInt(weights));
-        sliceClones[0].getTail().setInitDests(toArrayDouble(edgeSetSet));
+        sliceClones[0].getOutputNode().setInitWeights(toArraySingleInt(weights));
+        sliceClones[0].getOutputNode().setInitDests(toArrayDouble(edgeSetSet));
 
-        dests[0].getHead().setInitWeights(toArraySingleInt(weights));
-        dests[0].getHead().setInitSources(toArraySingle(edgeSet));
+        dests[0].getInputNode().setInitWeights(toArraySingleInt(weights));
+        dests[0].getInputNode().setInitSources(toArraySingle(edgeSet));
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getTail().setInitWeights(null);
-            sliceClones[x].getTail().setDests(null);
+            sliceClones[x].getOutputNode().setInitWeights(null);
+            sliceClones[x].getOutputNode().setDests(null);
         }
 	
         for(int x = 1 ; x < dests.length ; x++) {
-            dests[x].getHead().setInitWeights(null);
-            dests[x].getHead().setInitSources(null);
+            dests[x].getInputNode().setInitWeights(null);
+            dests[x].getInputNode().setInitSources(null);
         }
 
         // Set prepop for the last Slice clone.  Initially in steady-state, last
@@ -563,17 +557,17 @@ public class PipelineFissioner {
         // remove these unneeded elements.
 
         if(Math.max(0, (slicePeek - slicePop) - sliceCopyDown) > 0) {
-            if(!sliceClones[fizzAmount - 1].getFirstFilter().getFilter().isTwoStage()) {
+            if(!sliceClones[fizzAmount - 1].getWorkNode().getFilter().isTwoStage()) {
                 JMethodDeclaration prework = 
                     new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
                                            CStdType.Void, "emptyPrework",
                                            JFormalParameter.EMPTY, CClassType.EMPTY,
                                            new JBlock(), null, null);
                 
-                sliceClones[fizzAmount - 1].getFirstFilter().getFilter().setPrework(prework);
+                sliceClones[fizzAmount - 1].getWorkNode().getFilter().setPrework(prework);
             }
             
-            sliceClones[fizzAmount - 1].getFirstFilter().getFilter().getPrework()[0]
+            sliceClones[fizzAmount - 1].getWorkNode().getFilter().getPrework()[0]
                 .setPop(Math.max(0, (slicePeek - slicePop) - sliceCopyDown));
         }
 
@@ -588,7 +582,7 @@ public class PipelineFissioner {
         sliceSteadyMult /= fizzAmount;
 
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getFirstFilter().getFilter().setSteadyMult(sliceSteadyMult);
+            sliceClones[x].getWorkNode().getFilter().setSteadyMult(sliceSteadyMult);
 
         // Construct splitter-joiner schedule between source Slices and Slice 
         // clones
@@ -645,8 +639,8 @@ public class PipelineFissioner {
                 }
             }
 
-            sources[0].getTail().setWeights(toArraySingleInt(weights));
-            sources[0].getTail().setDests(toArrayDouble(edgeSetSet));
+            sources[0].getOutputNode().setWeights(toArraySingleInt(weights));
+            sources[0].getOutputNode().setDests(toArrayDouble(edgeSetSet));
 
             // Generate steady-state joiner schedules for Slices clones
             for(int x = 0 ; x < fizzAmount ; x++) {
@@ -656,8 +650,8 @@ public class PipelineFissioner {
                 edgeSet.add(getEdge(sources[0], sliceClones[x]));
                 weights.add(new Integer(1));
 
-                sliceClones[x].getHead().setWeights(toArraySingleInt(weights));
-                sliceClones[x].getHead().setSources(toArraySingle(edgeSet));
+                sliceClones[x].getInputNode().setWeights(toArraySingleInt(weights));
+                sliceClones[x].getInputNode().setSources(toArraySingle(edgeSet));
             }
         }
         else if(sources.length == fizzAmount) {
@@ -764,8 +758,8 @@ public class PipelineFissioner {
                     weights.add(new Integer(numSingle2));
                 }
 		
-                sources[x].getTail().setWeights(toArraySingleInt(weights));
-                sources[x].getTail().setDests(toArrayDouble(edgeSetSet));
+                sources[x].getOutputNode().setWeights(toArraySingleInt(weights));
+                sources[x].getOutputNode().setDests(toArrayDouble(edgeSetSet));
             }
     
             // Generate steady-state joiner schedules for Slice clones
@@ -784,8 +778,8 @@ public class PipelineFissioner {
                 weights.add(new Integer(sliceCopyDown));
             }
 
-            sliceClones[0].getHead().setWeights(toArraySingleInt(weights));
-            sliceClones[0].getHead().setSources(toArraySingle(edgeSet));
+            sliceClones[0].getInputNode().setWeights(toArraySingleInt(weights));
+            sliceClones[0].getInputNode().setSources(toArraySingle(edgeSet));
 
             for(int x = 1 ; x < fizzAmount ; x++) {
                 edgeSet = new LinkedList<InterFilterEdge>();
@@ -801,8 +795,8 @@ public class PipelineFissioner {
                     weights.add(new Integer((sliceSteadyMult * slicePop) + (slicePeek - slicePop) - sliceCopyDown));
                 }
 
-                sliceClones[x].getHead().setWeights(toArraySingleInt(weights));
-                sliceClones[x].getHead().setSources(toArraySingle(edgeSet));
+                sliceClones[x].getInputNode().setWeights(toArraySingleInt(weights));
+                sliceClones[x].getInputNode().setSources(toArraySingle(edgeSet));
             }
         }
         else {
@@ -836,8 +830,8 @@ public class PipelineFissioner {
                 edgeSetSet.add(edgeSet);
                 weights.add(new Integer(1));
 		
-                sliceClones[x].getTail().setWeights(toArraySingleInt(weights));
-                sliceClones[x].getTail().setDests(toArrayDouble(edgeSetSet));
+                sliceClones[x].getOutputNode().setWeights(toArraySingleInt(weights));
+                sliceClones[x].getOutputNode().setDests(toArrayDouble(edgeSetSet));
             }
 
             // Generate steady-state joiner schedule for destination Slice
@@ -849,8 +843,8 @@ public class PipelineFissioner {
                 weights.add(new Integer(sliceSteadyMult * slicePush));
             }
 
-            dests[0].getHead().setWeights(toArraySingleInt(weights));
-            dests[0].getHead().setSources(toArraySingle(edgeSet));
+            dests[0].getInputNode().setWeights(toArraySingleInt(weights));
+            dests[0].getInputNode().setSources(toArraySingle(edgeSet));
         }
         else if(dests.length == fizzAmount) {
             /*
@@ -939,8 +933,8 @@ public class PipelineFissioner {
                     weights.add(new Integer(numSingle2));
                 }
 		
-                sliceClones[x].getTail().setWeights(toArraySingleInt(weights));
-                sliceClones[x].getTail().setDests(toArrayDouble(edgeSetSet));
+                sliceClones[x].getOutputNode().setWeights(toArraySingleInt(weights));
+                sliceClones[x].getOutputNode().setDests(toArrayDouble(edgeSetSet));
             }
 
             // Generate steady-state joiner schedule for destination Slice
@@ -955,8 +949,8 @@ public class PipelineFissioner {
                 weights.add(new Integer(destCopyDown));
             }
 
-            sliceClones[0].getHead().setWeights(toArraySingleInt(weights));
-            sliceClones[0].getHead().setSources(toArraySingle(edgeSet));
+            sliceClones[0].getInputNode().setWeights(toArraySingleInt(weights));
+            sliceClones[0].getInputNode().setSources(toArraySingle(edgeSet));
 
             for(int x = 1 ; x < fizzAmount ; x++) {
                 edgeSet = new LinkedList<InterFilterEdge>();
@@ -970,8 +964,8 @@ public class PipelineFissioner {
                 edgeSet.add(getEdge(sliceClones[x], dests[x]));
                 weights.add(new Integer((destPopMult * destPop) + (destPeek - destPop) - destCopyDown));
 
-                sliceClones[x].getHead().setWeights(toArraySingleInt(weights));
-                sliceClones[x].getHead().setSources(toArraySingle(edgeSet));
+                sliceClones[x].getInputNode().setWeights(toArraySingleInt(weights));
+                sliceClones[x].getInputNode().setSources(toArraySingle(edgeSet));
             }
         }
         else {
@@ -1017,7 +1011,7 @@ public class PipelineFissioner {
 
         for(int x = 0 ; x < fizzAmount ; x++)
             origWorkBodies[x] =
-                sliceClones[x].getFirstFilter().getFilter().getWork().getBody();
+                sliceClones[x].getWorkNode().getFilter().getWork().getBody();
 
         // Roll the steady-state multiplicity into a loop around the work
         // body of each Slice.
@@ -1055,7 +1049,7 @@ public class PipelineFissioner {
             newWorkBody.addStatement(steadyMultLoop);
 
             // Set new work body
-            sliceClones[x].getFirstFilter().getFilter().getWork().setBody(newWorkBody);
+            sliceClones[x].getWorkNode().getFilter().getWork().setBody(newWorkBody);
         }
 
         // Now that steady-state multiplicity has been rolled around the work
@@ -1067,10 +1061,10 @@ public class PipelineFissioner {
         slicePush = slicePush * sliceSteadyMult;
 
         for(int x = 0 ; x < fizzAmount ; x++) {
-            sliceClones[x].getFirstFilter().getFilter().setSteadyMult(1);
-            sliceClones[x].getFirstFilter().getFilter().getWork().setPeek(slicePeek);
-            sliceClones[x].getFirstFilter().getFilter().getWork().setPop(slicePop);
-            sliceClones[x].getFirstFilter().getFilter().getWork().setPush(slicePush);
+            sliceClones[x].getWorkNode().getFilter().setSteadyMult(1);
+            sliceClones[x].getWorkNode().getFilter().getWork().setPeek(slicePeek);
+            sliceClones[x].getWorkNode().getFilter().getWork().setPop(slicePop);
+            sliceClones[x].getWorkNode().getFilter().getWork().setPush(slicePush);
         }
         
         /**********************************************************************
@@ -1090,14 +1084,14 @@ public class PipelineFissioner {
             // Add pop statement to end of each work body
             for(int x = 0 ; x < fizzAmount ; x++) {
                 CType inputType = 
-                    sliceClones[x].getFirstFilter().getFilter().getInputType();
+                    sliceClones[x].getWorkNode().getFilter().getInputType();
                 
                 SIRPopExpression popExpr =
                     new SIRPopExpression(inputType, slicePeek - slicePop);
                 JExpressionStatement popStmnt =
                     new JExpressionStatement(popExpr);
                 
-                sliceClones[x].getFirstFilter().getFilter().getWork().getBody()
+                sliceClones[x].getWorkNode().getFilter().getWork().getBody()
                     .addStatement(popStmnt);
             }
 
@@ -1105,7 +1099,7 @@ public class PipelineFissioner {
             slicePop += (slicePeek - slicePop);
 
             for(int x = 0 ; x < fizzAmount ; x++)
-                sliceClones[x].getFirstFilter().getFilter().getWork().setPop(slicePop);
+                sliceClones[x].getWorkNode().getFilter().getWork().setPop(slicePop);
         }
 
         // This is a hack to maintain the meaning of the peek rate.  Normally,
@@ -1119,10 +1113,10 @@ public class PipelineFissioner {
 
         if(sliceCopyDown > 0) {
             int newPeek = 
-                sliceClones[0].getFirstFilter().getFilter().getWork().getPeekInt() +
+                sliceClones[0].getWorkNode().getFilter().getWork().getPeekInt() +
                 sliceCopyDown;
 
-            sliceClones[0].getFirstFilter().getFilter().getWork().setPeek(newPeek);
+            sliceClones[0].getWorkNode().getFilter().getWork().setPeek(newPeek);
         }
 
         /**********************************************************************

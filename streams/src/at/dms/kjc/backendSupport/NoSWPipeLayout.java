@@ -78,11 +78,10 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
           //System.out.println(trace.getHead().getNextFilter());
           //if (spaceTime.partitioner.isIO(trace))
           //    continue;
-          assert slice.getNumFilters() == 1 : "NoSWPipeLayout only works for Time! "  + 
-               slice;
+       
           //System.out.println("init assiging " + trace.getHead().getNextFilter() + " to " + tile);
-          assignment.put(slice.getHead().getNextFilter(), chip.getNthComputeNode(tile++));
-          assignedFilters.add(slice.getHead().getNextFilter());
+          assignment.put(slice.getInputNode().getNextFilter(), chip.getNthComputeNode(tile++));
+          assignedFilters.add(slice.getInputNode().getNextFilter());
           tile = tile % chip.size();
           
         }
@@ -104,14 +103,14 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
         while (slices.hasNext()) {
             Filter slice = slices.next();
             //System.err.println(slice.toString());
-            T tile = (T)assignment.get(slice.getHead().getNextFilter());
+            T tile = (T)assignment.get(slice.getInputNode().getNextFilter());
             double traceWork = slicer.getSliceBNWork(slice); 
             double startTime = 0;
             //now find the start time
             
             //find the max end times of all the traces that this trace depends on
             double maxDepStartTime = 0;
-            InputNode input = slice.getHead();
+            InputNode input = slice.getInputNode();
             Iterator<InterFilterEdge> inEdges = input.getSourceSet(SchedulingPhase.STEADY).iterator();
             while (inEdges.hasNext()) {
                 InterFilterEdge edge = inEdges.next();
@@ -129,7 +128,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
             
             //add the start time to the trace work (one filter)!
             tileCosts[tile.getUniqueId()] = startTime + traceWork;
-            endTime.put(slice.getHead().getNextFilter(), tileCosts[tile.getUniqueId()]);
+            endTime.put(slice.getInputNode().getNextFilter(), tileCosts[tile.getUniqueId()]);
         }
         
         

@@ -42,7 +42,7 @@ public class ProcessFileReader {
         this.phase = phase;
         this.factory = factory;
         this.allocatingCore = nextAllocatingCore();
-        this.fileOutput = filter.getParent().getTail();
+        this.fileOutput = filter.getParent().getOutputNode();
         codeStore = allocatingCore.getComputeCode();
     }
      
@@ -57,7 +57,7 @@ public class ProcessFileReader {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(edge.getDest().getParent())) {
                 for(Filter fizzedSlice : FissionGroupStore.getFizzedSlices(edge.getDest().getParent())) {
                     System.out.print(".");
-                    generateCode(fizzedSlice.getFirstFilter());
+                    generateCode(fizzedSlice.getWorkNode());
                 }
             }
             else {

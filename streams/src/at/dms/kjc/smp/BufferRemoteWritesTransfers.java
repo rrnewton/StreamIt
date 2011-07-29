@@ -72,7 +72,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         	
         	writeDecls.add(new JVariableDeclarationStatement(writeHeadDefn));
 
-            output = parent.filterNode.getParent().getTail();
+            output = parent.filterNode.getParent().getOutputNode();
                 
             if (output.oneOutput(SchedulingPhase.STEADY) && 
                     (output.oneOutput(SchedulingPhase.INIT) || output.noOutputs(SchedulingPhase.INIT)) &&
@@ -257,7 +257,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         String srcBuffer;
         if(((OutputRotatingBuffer)parent).hasDirectWrite()) {
             WorkNode directWriteFilter = ((OutputRotatingBuffer)parent).getDirectWriteFilter();
-            srcBuffer = ((OutputRotatingBuffer)parent).getAddressBuffer(directWriteFilter.getParent().getHead()).currentWriteBufName;
+            srcBuffer = ((OutputRotatingBuffer)parent).getAddressBuffer(directWriteFilter.getParent().getInputNode()).currentWriteBufName;
         }
         else {
             srcBuffer = ((OutputRotatingBuffer)parent).currentWriteBufName;
@@ -339,7 +339,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             //if we are directly writing then we have to get the index into the remote
             //buffer of start of this source
         	
-        	Set<InterFilterEdge> edges = parent.filterNode.getParent().getTail().getDestSet(phase);
+        	Set<InterFilterEdge> edges = parent.filterNode.getParent().getOutputNode().getDestSet(phase);
         	InterFilterEdge edge = null;
         	
         	for(InterFilterEdge e : edges) {
@@ -400,7 +400,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             //set the buffer reference to the input buffer of the remote buffer that we are writing to
             if (((OutputRotatingBuffer)parent).hasDirectWrite()) {
                 bufRef = new JFieldAccessExpression(new JThisExpression(),
-                        ((OutputRotatingBuffer)parent).getAddressBuffer(((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent().getHead()).currentWriteBufName);
+                        ((OutputRotatingBuffer)parent).getAddressBuffer(((OutputRotatingBuffer)parent).getDirectWriteFilter().getParent().getInputNode()).currentWriteBufName);
             }
             else {
                 bufRef = parent.writeBufRef();

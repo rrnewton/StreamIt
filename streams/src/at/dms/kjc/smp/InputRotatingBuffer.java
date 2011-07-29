@@ -73,14 +73,13 @@ public class InputRotatingBuffer extends RotatingBuffer {
     }
 
     public static void createInputBuffer(Filter slice, BasicSpaceTimeSchedule schedule) {
-        assert slice.getNumFilters() == 1 : slice.getNumFilters();
-        
-        if (!slice.getHead().noInputs()) {
-            assert slice.getHead().totalWeights(SchedulingPhase.STEADY) > 0;
-            Core parent = SMPBackend.scheduler.getComputeNode(slice.getFirstFilter());
+             
+        if (!slice.getInputNode().noInputs()) {
+            assert slice.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
+            Core parent = SMPBackend.scheduler.getComputeNode(slice.getWorkNode());
             
             //create the new buffer, the constructor will put the buffer in the hashmap
-            InputRotatingBuffer buf = new InputRotatingBuffer(slice.getFirstFilter(), parent);
+            InputRotatingBuffer buf = new InputRotatingBuffer(slice.getWorkNode(), parent);
             
             buf.setRotationLength(schedule);
             buf.setBufferSize();
@@ -115,16 +114,16 @@ public class InputRotatingBuffer extends RotatingBuffer {
                 Filter[] fizzedSlices = FissionGroupStore.getFizzedSlices(filterNode.getParent());
 
                 for(Filter slice : fizzedSlices)
-                    sharedBufferNames.put(slice.getFirstFilter(), this.getIdent());
+                    sharedBufferNames.put(slice.getWorkNode(), this.getIdent());
             }
         }
 
         //if we have a file reader source for this filter, right now
         //we only support a single input for a filter that is feed by a file
-        upstreamFileReader = filterNode.getParent().getHead().hasFileInput();
+        upstreamFileReader = filterNode.getParent().getInputNode().hasFileInput();
         if (upstreamFileReader) {
-            assert filterNode.getParent().getHead().getWidth(SchedulingPhase.INIT) <= 1 &&
-            filterNode.getParent().getHead().getWidth(SchedulingPhase.STEADY) <= 1;
+            assert filterNode.getParent().getInputNode().getWidth(SchedulingPhase.INIT) <= 1 &&
+            filterNode.getParent().getInputNode().getWidth(SchedulingPhase.STEADY) <= 1;
         }
 
         addrBufMap = new HashMap<WorkNode, SourceAddressRotation>();
@@ -148,7 +147,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //mults of all the sources
         int maxRotationLength = 0;
         
-        for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+        for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
             int diff = schedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
             if (diff > maxRotationLength) {
@@ -231,21 +230,21 @@ public class InputRotatingBuffer extends RotatingBuffer {
        List<SourceAddressRotation> addressBufsList = new LinkedList<SourceAddressRotation>();
 
        int i = 0;
-       for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+       for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
            if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(src)) {
                FissionGroup group = FissionGroupStore.getFissionGroup(src);
                for(Filter fizzedSlice : group.fizzedSlices) {
-                   Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
+                   Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
                    SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, theEdge);
                    addressBufsList.add(rot);
-                   addrBufMap.put(fizzedSlice.getFirstFilter(), rot);
+                   addrBufMap.put(fizzedSlice.getWorkNode(), rot);
                }
            }
            else {
-               Core core = SMPBackend.scheduler.getComputeNode(src.getFirstFilter());
+               Core core = SMPBackend.scheduler.getComputeNode(src.getWorkNode());
                SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, theEdge);
                addressBufsList.add(rot);
-               addrBufMap.put(src.getFirstFilter(), rot);
+               addrBufMap.put(src.getWorkNode(), rot);
            }
        }
 

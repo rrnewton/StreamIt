@@ -122,16 +122,16 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         //determine if in the init there is a file writer slice downstream 
         //of the slice that contains this filter
         boolean dsFileWriter = false;
-        for (InterFilterEdge edge : filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT)) {
-            if (edge.getDest().getParent().getFirstFilter().isFileOutput()) {
+        for (InterFilterEdge edge : filterNode.getParent().getOutputNode().getDestSet(SchedulingPhase.INIT)) {
+            if (edge.getDest().getParent().getWorkNode().isFileOutput()) {
                 dsFileWriter = true;
                 break;
             }
         }
         if (dsFileWriter && filterInfo.totalItemsSent(SchedulingPhase.INIT) > 0) {
-            assert filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT).size() == 1;
+            assert filterNode.getParent().getOutputNode().getDestSet(SchedulingPhase.INIT).size() == 1;
             WorkNode fileW = 
-                filterNode.getParent().getTail().getDestList(SchedulingPhase.INIT)[0].getDest().getParent().getFirstFilter();
+                filterNode.getParent().getOutputNode().getDestList(SchedulingPhase.INIT)[0].getDest().getParent().getWorkNode();
             
             InputRotatingBuffer buf = InputRotatingBuffer.getInputBuffer(fileW);
             int outputs = filterInfo.totalItemsSent(SchedulingPhase.INIT);

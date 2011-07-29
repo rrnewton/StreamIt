@@ -301,7 +301,7 @@ public abstract class RotatingBuffer extends Channel {
         if(!inputBuffers.containsKey(fsn) && KjcOptions.sharedbufs &&
            FissionGroupStore.isFizzed(fsn.getParent()) && 
            FissionGroupStore.isUnfizzedSlice(fsn.getParent())) {
-            return inputBuffers.get(FissionGroupStore.getFizzedSlices(fsn.getParent())[0].getFirstFilter());
+            return inputBuffers.get(FissionGroupStore.getFizzedSlices(fsn.getParent())[0].getWorkNode());
         }
         else {
             return inputBuffers.get(fsn);
@@ -313,7 +313,7 @@ public abstract class RotatingBuffer extends Channel {
            FissionGroupStore.isFizzed(fsn.getParent()) &&
            FissionGroupStore.isUnfizzedSlice(fsn.getParent())) {
             assert FissionGroupStore.isUnfizzedSlice(fsn.getParent());
-            return outputBuffers.get(FissionGroupStore.getFizzedSlices(fsn.getParent())[0].getFirstFilter());
+            return outputBuffers.get(FissionGroupStore.getFizzedSlices(fsn.getParent())[0].getWorkNode());
         }
         else {
             return outputBuffers.get(fsn);

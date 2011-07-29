@@ -49,9 +49,9 @@ public class LoadBalancer {
     }
 
     private static boolean canLoadBalance(FissionGroup group) {
-        WorkNode filter = group.unfizzedSlice.getFirstFilter();
+        WorkNode filter = group.unfizzedSlice.getWorkNode();
         FilterInfo filterInfo = group.unfizzedFilterInfo;
-        OutputNode output = group.unfizzedSlice.getTail();
+        OutputNode output = group.unfizzedSlice.getOutputNode();
 
         if(filterInfo.push % output.totalWeights(SchedulingPhase.STEADY) != 0)
             return false;
@@ -76,11 +76,11 @@ public class LoadBalancer {
 
         for(FissionGroup group : groups) {
             if(canLoadBalance(group)) {
-                System.out.println(group.unfizzedSlice.getFirstFilter() + " can be load balanced");
+                System.out.println(group.unfizzedSlice.getWorkNode() + " can be load balanced");
                 loadBalancedGroups.add(group);
             }
             else {
-                System.out.println(group.unfizzedSlice.getFirstFilter() + " can't be load balanced");
+                System.out.println(group.unfizzedSlice.getWorkNode() + " can't be load balanced");
             }
         }
 
@@ -106,7 +106,7 @@ public class LoadBalancer {
 
     public static String getStartIterRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
-        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
+        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
 
         return startItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
@@ -114,7 +114,7 @@ public class LoadBalancer {
 
     public static String getNumItersRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
-        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
+        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
 
         return numItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
@@ -122,7 +122,7 @@ public class LoadBalancer {
 
     public static String getFilterCycleCountRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
-        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getFirstFilter());
+        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
 
         return filterCycleCountsArrayPrefix + "_" + id + "[" + coreIndex + "]";
@@ -455,7 +455,7 @@ public class LoadBalancer {
 
     private static Filter getFizzedSliceOnCore(FissionGroup group, Core core) {
         for(Filter slice : group.fizzedSlices) {
-            if(SMPBackend.scheduler.getComputeNode(slice.getFirstFilter()).equals(core)) {
+            if(SMPBackend.scheduler.getComputeNode(slice.getWorkNode()).equals(core)) {
                 return slice;
             }
         }
@@ -475,7 +475,7 @@ public class LoadBalancer {
             int itersPerFizzedSlice = group.unfizzedFilterInfo.steadyMult / group.fizzedSlices.length;
             int curStartIter = 0;
 
-            p.println("// Load balancing for " + group.unfizzedSlice.getFirstFilter());
+            p.println("// Load balancing for " + group.unfizzedSlice.getWorkNode());
 
             // Construct array for starting iterations
             p.print("int " + startItersArrayPrefix + "_" + id + "[" + KjcOptions.smp + "] = {");

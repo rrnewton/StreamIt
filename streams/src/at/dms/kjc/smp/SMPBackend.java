@@ -225,7 +225,7 @@ public class SMPBackend {
                 if(commProcessed.contains(slice))
                     continue;
                 
-                FilterInfo info = FilterInfo.getFilterInfo(slice.getFirstFilter());
+                FilterInfo info = FilterInfo.getFilterInfo(slice.getWorkNode());
                 int totalItemsReceived = info.totalItemsReceived(SchedulingPhase.STEADY);
 
                 if(totalItemsReceived == 0)

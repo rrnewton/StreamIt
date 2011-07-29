@@ -17,8 +17,8 @@ public class DistributionUnroller {
    
     public static void test(Filter[] slices) {
         for (Filter slice : slices) {
-            InputNode input = slice.getHead();
-            OutputNode output = slice.getTail();
+            InputNode input = slice.getInputNode();
+            OutputNode output = slice.getOutputNode();
             
             System.out.println(slice);
             String inBefore = "nothing";
@@ -54,8 +54,8 @@ public class DistributionUnroller {
      * of <slice>.   
      */
     public static void roll(Filter slice) {
-        InputNode input = slice.getHead();
-        OutputNode output = slice.getTail();
+        InputNode input = slice.getInputNode();
+        OutputNode output = slice.getOutputNode();
         
         input.canonicalize(SchedulingPhase.STEADY);
         output.canonicalize(SchedulingPhase.STEADY);
@@ -82,8 +82,8 @@ public class DistributionUnroller {
      * of <slice>.   
      */
     public static void unroll(Filter slice) {
-        InputNode input = slice.getHead();
-        OutputNode output = slice.getTail();
+        InputNode input = slice.getInputNode();
+        OutputNode output = slice.getOutputNode();
         unroll(input);
         unroll(output);
     }

@@ -30,16 +30,15 @@ public class CellNoSWPipeLayout extends NoSWPipeLayout<CellPU,CellChip> {
         int spuTile = 0;
         assert chip.getNthComputeNode(0) instanceof PPU;
         for (Filter slice : scheduleOrder) {
-            assert slice.getNumFilters() == 1 : "NoSWPipeLayout only works for Time! " + slice;
-            if (slice.getHead().getNextFilter().getFilter() instanceof OutputContent ||
-                    slice.getHead().getNextFilter().getFilter() instanceof InputContent ) {
-                assignment.put(slice.getHead().getNextFilter(), chip.getNthComputeNode(0));
+        	if (slice.getInputNode().getNextFilter().getFilter() instanceof OutputContent ||
+                    slice.getInputNode().getNextFilter().getFilter() instanceof InputContent ) {
+                assignment.put(slice.getInputNode().getNextFilter(), chip.getNthComputeNode(0));
             } else {
-                assignment.put(slice.getHead().getNextFilter(), chip.getNthComputeNode(spuTile+1));
+                assignment.put(slice.getInputNode().getNextFilter(), chip.getNthComputeNode(spuTile+1));
                 spuTile += 1;
                 spuTile = spuTile % (chip.size() - 1);
             }
-            assignedFilters.add(slice.getHead().getNextFilter());
+            assignedFilters.add(slice.getInputNode().getNextFilter());
         }
     }
 }

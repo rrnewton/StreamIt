@@ -64,19 +64,18 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     }
 
     public static void createOutputBuffer(Filter slice, BasicSpaceTimeSchedule schedule) {
-        assert slice.getNumFilters() == 1;
-        
+                
         //don't do anything for file readers or writers,
         //for file readers the output buffer is allocated in ProcessFileReader
-        if (slice.getHead().getNextFilter().isPredefined())
+        if (slice.getInputNode().getNextFilter().isPredefined())
             return;
         
-        if (!slice.getTail().noOutputs()) {
-            assert slice.getTail().totalWeights(SchedulingPhase.STEADY) > 0;
-            Core parent = SMPBackend.scheduler.getComputeNode(slice.getFirstFilter());
+        if (!slice.getOutputNode().noOutputs()) {
+            assert slice.getOutputNode().totalWeights(SchedulingPhase.STEADY) > 0;
+            Core parent = SMPBackend.scheduler.getComputeNode(slice.getWorkNode());
             
             // create the new buffer, the constructor will put the buffer in the hashmap
-            OutputRotatingBuffer buf = new OutputRotatingBuffer(slice.getFirstFilter(), parent);
+            OutputRotatingBuffer buf = new OutputRotatingBuffer(slice.getWorkNode(), parent);
             
             buf.setRotationLength(schedule);
             buf.setBufferSize();
@@ -117,8 +116,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		// Get receivers that receive all outputs of this transmitter in steady-state
 		// In other words, receivers that appear in every weight of this filter's OutputSliceNode
 		
-		InterFilterEdge steadyDests[][] = filterNode.getParent().getTail().getDests(SchedulingPhase.STEADY);
-		Set<InterFilterEdge> steadyDestSet = filterNode.getParent().getTail().getDestSet(SchedulingPhase.STEADY);
+		InterFilterEdge steadyDests[][] = filterNode.getParent().getOutputNode().getDests(SchedulingPhase.STEADY);
+		Set<InterFilterEdge> steadyDestSet = filterNode.getParent().getOutputNode().getDestSet(SchedulingPhase.STEADY);
 		Set<InterFilterEdge> candidateDestsSteady = new HashSet<InterFilterEdge>();
 		
 		for(InterFilterEdge edge : steadyDestSet) {
@@ -153,8 +152,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		// Get receivers that receive everything or do not receive anything from
 		// this transmitter in initialization
 		
-		InterFilterEdge initDests[][] = filterNode.getParent().getTail().getDests(SchedulingPhase.INIT);
-		Set<InterFilterEdge> initDestsSet = filterNode.getParent().getTail().getDestSet(SchedulingPhase.INIT);
+		InterFilterEdge initDests[][] = filterNode.getParent().getOutputNode().getDests(SchedulingPhase.INIT);
+		Set<InterFilterEdge> initDestsSet = filterNode.getParent().getOutputNode().getDestSet(SchedulingPhase.INIT);
 		Set<InterFilterEdge> candidateDestsInit = new HashSet<InterFilterEdge>();
 		
 		for(InterFilterEdge edge : initDestsSet) {
@@ -298,7 +297,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         //first find the max rotation length given the prime pump 
         //mults of all the sources
         int maxRotLength = 0;
-        for (Filter dest : filterNode.getParent().getTail().getDestSlices(SchedulingPhase.STEADY)) {
+        for (Filter dest : filterNode.getParent().getOutputNode().getDestSlices(SchedulingPhase.STEADY)) {
             int diff = srcMult - schedule.getPrimePumpMult(dest);
             assert diff >= 0;
             if (diff > maxRotLength)
@@ -343,7 +342,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     
     public void createAddressBuffers() {
     	//fill the addressBuffers array
-    	OutputNode outputNode = filterNode.getParent().getTail();
+    	OutputNode outputNode = filterNode.getParent().getOutputNode();
     	
         addressBuffers = new HashMap<InputRotatingBuffer, SourceAddressRotation>();
         for (InterFilterEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {

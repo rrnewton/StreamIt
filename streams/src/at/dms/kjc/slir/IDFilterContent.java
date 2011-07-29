@@ -87,7 +87,7 @@ public class IDFilterContent extends FilterContent {
         
         Filter slice = new Filter(input);
         
-        slice.setTail(output);
+        slice.setOutputNode(output);
         
         slice.finish();
         

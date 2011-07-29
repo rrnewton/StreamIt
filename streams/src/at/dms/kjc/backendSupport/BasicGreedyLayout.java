@@ -80,8 +80,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         
         for (int i = 0; i < scheduleOrder.size(); i++) {
             Filter slice = scheduleOrder.get(i);
-            assert slice.getNumFilters() == 1 : "The greedy partitioner only works for Time!";
-            sortedList.add(slice.getHead().getNextFilter());
+            sortedList.add(slice.getInputNode().getNextFilter());
         }
         
         Iterator<SliceNode> sorted = sortedList.iterator();

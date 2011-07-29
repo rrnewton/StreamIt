@@ -134,14 +134,14 @@ public class OneFilterSlicer extends Slicer {
         int len = sliceGraph.length;
         int newLen = len;
         for (int i = 0; i < len; i++)
-            if (((WorkNode) sliceGraph[i].getHead().getNext())
+            if (((WorkNode) sliceGraph[i].getInputNode().getNext())
                     .isPredefined())
                 newLen--;
         io = new Filter[len - newLen];
         int idx = 0;
         for (int i = 0; i < len; i++) {
             Filter slice = sliceGraph[i];
-            if (((WorkNode) slice.getHead().getNext()).isPredefined()) {
+            if (((WorkNode) slice.getInputNode().getNext()).isPredefined()) {
                 io[idx++] = slice;
                 System.out.println(slice + " is i/o slice.");
             }

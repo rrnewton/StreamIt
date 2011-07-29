@@ -157,14 +157,14 @@ public class GeneratePrimePumpSchedule {
         if (!spaceTimeSchedule.getSlicer().isIO(slice)) {
             return true;
         }
-        if (slice.getHead().getNextFilter().isFileOutput()) {
-            if (slice.getHead().oneInput())
+        if (slice.getInputNode().getNextFilter().isFileOutput()) {
+            if (slice.getInputNode().oneInput())
                 return false;
             else 
                 return true;
         }
         else {
-            if (slice.getTail().oneOutput())
+            if (slice.getOutputNode().oneOutput())
                 return false;
             else
                 return true;

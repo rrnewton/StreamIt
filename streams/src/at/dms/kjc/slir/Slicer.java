@@ -172,7 +172,7 @@ public abstract class Slicer {
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
     protected Filter[] getNext(Filter slice, SchedulingPhase phase) {
-        SliceNode node = slice.getHead();
+        SliceNode node = slice.getInputNode();
         if (node instanceof InputNode)
             node = node.getNext();
         while (node != null && node instanceof WorkNode) {
@@ -216,7 +216,7 @@ public abstract class Slicer {
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
     protected  String sliceName(Filter slice, Layout layout, boolean fullInfo) {
-        SliceNode node = slice.getHead();
+        SliceNode node = slice.getInputNode();
 
         StringBuffer out = new StringBuffer();
 
@@ -242,7 +242,7 @@ public abstract class Slicer {
                         f.getPeekInt() + ", " + f.getPopInt() + ", " + f.getPushInt() + ")");
                 out.append("\\nMult: init " + f.getInitMult() + ", steady " + f.getSteadyMult());
                 if (layout != null) 
-                    out.append("\\nTile: " + layout.getComputeNode(slice.getFirstFilter()).getUniqueId());
+                    out.append("\\nTile: " + layout.getComputeNode(slice.getWorkNode()).getUniqueId());
                 out.append("\\n *** ");
             }
             else {
@@ -258,108 +258,14 @@ public abstract class Slicer {
         }
         return out.toString();
     }
-    
-   
-    
-    /**
-     * Make sure that all the {@link Filter}s are {@link SimpleSlice}s.
-     */
-    
-    public void ensureSimpleSlices() {
-        Filter[] sliceGraph = getSliceGraph();
-        // update sliceGraph, topSlices, io, sliceBNWork, bottleNeckFilter
-        // Assume that topSlices, io, sliceBNWork.keys(), bottleNeckFilter.keys() 
-        // are all proper subsets of sliceGraph.
-        List<SimpleSlice> newSliceGraph = new LinkedList<SimpleSlice>();
-        Map<Filter,SimpleSlice> newtopSlices = new HashMap<Filter,SimpleSlice>();
-        for (Filter s : topSlices) {newtopSlices.put(s, null);}
-        Map<Filter,SimpleSlice> newIo = new HashMap<Filter,SimpleSlice>();
-        for (Filter s : io) {newIo.put(s,null);}
-        
-        // for each slice s, derived initial simple slice ss1, following simple slices ss2 ... ssn
-        // add to ss1 ... ssn to newSliceGraph,
-        // replace newtopSlices: s |-> null with s -> ss1
-        // replace newIo: s |-> null with s -> ss1
-        for (Filter s : sliceGraph) {
-//            if (s.getNumFilters() == 1) {
-//                SimpleSlice ss = new SimpleSlice(s.getHead(), s.getFilterNodes().get(0), s.getTail());
-//                newSliceGraph.add(ss);
-//                if (newtopSlices.containsKey(s)) {
-//                    newtopSlices.put(s,ss);
-//                }
-//                if (newIo.containsKey(s)) {
-//                    newIo.put(s,ss);
-//                }
-//            } else {
-                int numFilters = s.getNumFilters();
-                assert numFilters != 0 : s;
-                List<WorkNode> fs = s.getFilterNodes();
-                OutputNode prevTail = null;
-                for (int i = 0; i < numFilters; i++) {
-                    InputNode head;
-                    OutputNode tail;
-                    WorkNode f = fs.get(i);
-                    // first simpleSlice has a head, otherwise create a new one.
-                    if (i == 0) {
-                        head = s.getHead();
-                    } else {
-                       /* TODO weight should probably not be 1 */
-                       head = new InputNode(new int[]{1});
-                       // Connect tail from last iteration with head from this iteration.
-                       // prevTail will not be null here...
-                       InterFilterEdge prevTailToHead = new InterFilterEdge(prevTail,head);
-                       head.setSources(new InterFilterEdge[]{prevTailToHead});
-                       prevTail.setDests(new InterFilterEdge[][]{{prevTailToHead}});
-                    }
-                   if (i == numFilters - 1) {
-                       tail = s.getTail();
-                   } else {
-                       /* TODO weight should probably not be 1 */
-                       tail = new OutputNode(new int[]{1});
-                   }
-                   prevTail = tail;
-                   SimpleSlice ss = new SimpleSlice(head, f, tail);
 
-                   // now put these slices in crect data structures.
-                   newSliceGraph.add(ss);
-                   if (i == 0) {
-                       if (newtopSlices.containsKey(s)) {
-                           newtopSlices.put(s,ss);
-                       }
-                       if (newIo.containsKey(s)) {
-                           // check criterion used elsewhere for inclusion in io[]
-                           // it is the case that a slice in io[] only contains a single filter.
-                           assert f.isPredefined();
-                           newIo.put(s,ss);
-                       }
-                   }
-                }
-                
-            }
-            
-//        }
-        // update arrays of slices with new info.
-        Filter[] oldTopSlices = topSlices.toArray(new Filter[topSlices.size()]);
-        topSlices = new LinkedList<Filter>();
-        for (int i = 0; i < oldTopSlices.length; i++) {
-            topSlices.add(newtopSlices.get(oldTopSlices[i]));
-            assert topSlices.get(i) != null;
-        }
-        for (int i = 0; i < io.length; i++) {
-            io[i] = newIo.get(io[i]);
-            assert io[i] != null;
-        }
-    }
-    
     /**
      * Force creation of kopi methods and fields for predefined filters.
      */
     public void createPredefinedContent() {
         for (Filter s : getSliceGraph()) {
-            for (WorkNode n : s.getFilterNodes()) {
-                if (n.getFilter() instanceof PredefinedContent) {
-                    ((PredefinedContent)n.getFilter()).createContent();
-                }
+        	if (s.getWorkNode().getFilter() instanceof PredefinedContent) {
+        		((PredefinedContent)s.getWorkNode().getFilter()).createContent();
             }
         }
 

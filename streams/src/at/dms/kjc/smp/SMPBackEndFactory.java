@@ -142,7 +142,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
         else {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter.getParent())) {
                 for(Filter slice : FissionGroupStore.getFizzedSlices(filter.getParent())) {
-                    (new ProcessFilterSliceNode(slice.getFirstFilter(), whichPhase, this)).processFilterSliceNode();
+                    (new ProcessFilterSliceNode(slice.getWorkNode(), whichPhase, this)).processFilterSliceNode();
                 }
             }
             else {

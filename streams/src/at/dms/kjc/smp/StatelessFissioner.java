@@ -65,7 +65,7 @@ public class StatelessFissioner {
             return Fissioner.doit(slice, slicer, fissAmount);
         }
         else {
-            System.out.println("Performing fission on: " + slice.getFirstFilter() + ", fizzAmount: " + fissAmount);
+            System.out.println("Performing fission on: " + slice.getWorkNode() + ", fizzAmount: " + fissAmount);
             StatelessFissioner fissioner = new StatelessFissioner(slice, fissAmount);
             if(canFizz(slice, false))
                 return fissioner.fizz();
@@ -82,7 +82,7 @@ public class StatelessFissioner {
         // Get information on Slice rates
         FilterInfo.reset();
 
-        WorkNode filter = slice.getFirstFilter();
+        WorkNode filter = slice.getWorkNode();
         
         // Check to see if Slice has file reader/writer.  Don't fizz file
         // reader/writer
@@ -91,14 +91,8 @@ public class StatelessFissioner {
             return false;
         }
 
-        // Make sure that Slice has only one FilterSliceNode
-        if(!(slice.getNumFilters() == 1)) {
-            if(debug) System.out.println("Can't fizz: Slice has more than one FilterSliceNode: " + slice);
-            return false;
-        }
-
         // Check to make sure that Slice is stateless
-        if(MutableStateExtractor.hasMutableState(slice.getFirstFilter().getFilter())) {
+        if(MutableStateExtractor.hasMutableState(slice.getWorkNode().getFilter())) {
             if(debug) System.out.println("Can't fizz: Slice is not stateless: " + slice);
             return false;
         }
@@ -119,7 +113,7 @@ public class StatelessFissioner {
     private StatelessFissioner(Filter slice, int fizzAmount) {
         this.slice = slice;
         this.fizzAmount = fizzAmount;
-        this.filter = slice.getFirstFilter();
+        this.filter = slice.getWorkNode();
         this.fInfo = FilterInfo.getFilterInfo(filter);
 
         slicePeek = fInfo.peek;
@@ -164,12 +158,12 @@ public class StatelessFissioner {
             sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
         
         // Give each Slice clone a unique name
-        String origName = slice.getFirstFilter().getFilter().getName();
+        String origName = slice.getWorkNode().getFilter().getName();
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getFirstFilter().getFilter().setName(origName + "_fizz" + fizzAmount + "_clone" + x);
+            sliceClones[x].getWorkNode().getFilter().setName(origName + "_fizz" + fizzAmount + "_clone" + x);
 
         // Modify name of original Slice
-        slice.getFirstFilter().getFilter().setName(origName + "_fizz" + fizzAmount);
+        slice.getWorkNode().getFilter().setName(origName + "_fizz" + fizzAmount);
         
         // Calculate new steady-state multiplicity based upon fizzAmount.  
         // Because work is equally shared among all Slice clones, steady-state 
@@ -177,7 +171,7 @@ public class StatelessFissioner {
         int newSteadyMult = sliceSteadyMult / fizzAmount;
 
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getFirstFilter().getFilter().setSteadyMult(newSteadyMult);
+            sliceClones[x].getWorkNode().getFilter().setSteadyMult(newSteadyMult);
     }
 
     private void setupInitPhase() {
@@ -195,8 +189,8 @@ public class StatelessFissioner {
         // disabling prework and seting initialization multiplicty to 0
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getFirstFilter().getFilter().setPrework(null);
-            sliceClones[x].getFirstFilter().getFilter().setInitMult(0);
+            sliceClones[x].getWorkNode().getFilter().setPrework(null);
+            sliceClones[x].getWorkNode().getFilter().setInitMult(0);
         }
 
         // Since only the first Slice clone executes, it will be the only Slice
@@ -213,12 +207,12 @@ public class StatelessFissioner {
         // clones' init dests to null
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getHead().setInitWeights(new int[0]);
-            sliceClones[x].getHead().setInitSources(new InterFilterEdge[0]);
+            sliceClones[x].getInputNode().setInitWeights(new int[0]);
+            sliceClones[x].getInputNode().setInitSources(new InterFilterEdge[0]);
         }
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getTail().setInitWeights(new int[0]);
-            sliceClones[x].getTail().setInitDests(new InterFilterEdge[0][0]);
+            sliceClones[x].getOutputNode().setInitWeights(new int[0]);
+            sliceClones[x].getOutputNode().setInitDests(new InterFilterEdge[0][0]);
         }
     }
 }

@@ -65,9 +65,9 @@ public class MultiLevelSplitsJoins {
            
             //see if the width of the joiner is too wide and 
             //keep breaking it up until it is, adding new levels...
-            while (slice.getHead().getWidth(SchedulingPhase.STEADY) > maxWidth) {
-                System.out.println("Breaking up " + slice.getHead() + 
-                        " width is " + slice.getHead().getWidth(SchedulingPhase.STEADY));
+            while (slice.getInputNode().getWidth(SchedulingPhase.STEADY) > maxWidth) {
+                System.out.println("Breaking up " + slice.getInputNode() + 
+                        " width is " + slice.getInputNode().getWidth(SchedulingPhase.STEADY));
                 breakUpJoin(slice, slices);
             }
             
@@ -75,9 +75,9 @@ public class MultiLevelSplitsJoins {
             slices.add(slice);
             
             //see if the width of the splitter is too wide
-            while (slice.getTail().getWidth(SchedulingPhase.STEADY) > maxWidth) {
-                System.out.println("Breaking up " + slice.getTail() + 
-                        " width is " + slice.getTail().getWidth(SchedulingPhase.STEADY));
+            while (slice.getOutputNode().getWidth(SchedulingPhase.STEADY) > maxWidth) {
+                System.out.println("Breaking up " + slice.getOutputNode() + 
+                        " width is " + slice.getOutputNode().getWidth(SchedulingPhase.STEADY));
                 breakUpSplit(slice, slices);
             }
             
@@ -102,7 +102,7 @@ public class MultiLevelSplitsJoins {
      */
     private void breakUpJoin(Filter slice, LinkedList<Filter> slices) {
         //the old input trace node, it will get replaced!
-        InputNode input = slice.getHead();
+        InputNode input = slice.getInputNode();
         //nothing to do, so return...
         if (input.getWidth(SchedulingPhase.STEADY) <= maxWidth)
             return;
@@ -188,16 +188,16 @@ public class MultiLevelSplitsJoins {
         LinkedList<InterFilterEdge> origSliceInputEdges = new LinkedList<InterFilterEdge>();
         for (int i = 0; i < origSliceInputSources.size(); i++) {
             Filter source = newSlices[origSliceInputSources.get(i).intValue()];
-            origSliceInputEdges.add(source.getTail().getSingleEdge(SchedulingPhase.STEADY));
+            origSliceInputEdges.add(source.getOutputNode().getSingleEdge(SchedulingPhase.STEADY));
         }
         //set the pattern of the new input trace
         newInput.set(origSliceInputWeights, origSliceInputEdges, SchedulingPhase.STEADY);
         newInput.canonicalize(SchedulingPhase.STEADY);
         //now install the new input trace node in the old trace
-        newInput.setNext(slice.getHead().getNext());
-        slice.getHead().getNext().setPrevious(newInput);
+        newInput.setNext(slice.getInputNode().getNext());
+        slice.getInputNode().getNext().setPrevious(newInput);
         newInput.setParent(slice);
-        slice.setHead(newInput);
+        slice.setInputNode(newInput);
         
         //set the multiplicities of the new identities of the new traces
         setMultiplicitiesJoin(newSlices);
@@ -259,7 +259,7 @@ public class MultiLevelSplitsJoins {
      */
     private void setMultiplicitiesJoin(Filter[] traces) {
         for (int i = 0; i < traces.length; i++) {
-            InterFilterEdge downEdge = traces[i].getTail().getSingleEdge(SchedulingPhase.STEADY);
+            InterFilterEdge downEdge = traces[i].getOutputNode().getSingleEdge(SchedulingPhase.STEADY);
             
             //the downstream filter
             FilterContent next = downEdge.getDest().getNextFilter().getFilter();
@@ -273,13 +273,13 @@ public class MultiLevelSplitsJoins {
                     
             //System.out.println("Setting steady items " + steadyItems + " " + 
             //        traces[i].getHead().getNextFilter().getFilter());
-            traces[i].getHead().getNextFilter().getFilter().setSteadyMult(steadyItems);
+            traces[i].getInputNode().getNextFilter().getFilter().setSteadyMult(steadyItems);
             
             int initItems = 0;
             int steadyItemsOther = 0;
             //set the init items baed on the number each of the upstream 
             //filters push on to each incoming edge
-            InputNode input = traces[i].getHead();
+            InputNode input = traces[i].getInputNode();
             for (int s = 0; s < input.getSources(SchedulingPhase.STEADY).length; s++) {
                 InterFilterEdge upEdge = input.getSources(SchedulingPhase.STEADY)[s];
                FilterContent prev = upEdge.getSrc().getPrevFilter().getFilter();
@@ -288,7 +288,7 @@ public class MultiLevelSplitsJoins {
                steadyItemsOther += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
                        ((double)(prev.getPushInt() * prev.getSteadyMult())));
             }
-            traces[i].getHead().getNextFilter().getFilter().setInitMult(initItems);
+            traces[i].getInputNode().getNextFilter().getFilter().setInitMult(initItems);
             
             //this has to be greater than the requirement for the downstream filter
             //on this edge
@@ -309,7 +309,7 @@ public class MultiLevelSplitsJoins {
      * @param slices
      */
     private void breakUpSplit(Filter slice, LinkedList<Filter> slices) {
-        OutputNode output = slice.getTail();
+        OutputNode output = slice.getOutputNode();
        
         //do nothing if we have less than maxwidth connections
         if (output.getWidth(SchedulingPhase.STEADY) <= maxWidth)
@@ -430,7 +430,7 @@ public class MultiLevelSplitsJoins {
                 //into the single incoming edge of the new trace
                 //so that it connects to the original trace
                 port.add(newSlices[origSliceNewDests.get(i).get(j).intValue()].
-                        getHead().getSingleEdge(SchedulingPhase.STEADY));
+                        getInputNode().getSingleEdge(SchedulingPhase.STEADY));
             }
             //add the port the pattern of output of the original trace
             origSliceNewEdges.add(port);
@@ -441,7 +441,7 @@ public class MultiLevelSplitsJoins {
         newOutput.setPrevious(output.getPrevious());
         newOutput.getPrevious().setNext(newOutput);
         newOutput.setParent(slice);
-        slice.setTail(newOutput);
+        slice.setOutputNode(newOutput);
 
         
         //set the multiplicities of the identity filter of the new trace
@@ -457,7 +457,7 @@ public class MultiLevelSplitsJoins {
     private void setMultiplicitiesSplit(Filter[] slices) {
         
         for (int i = 0; i < slices.length; i++) {
-            InterFilterEdge edge = slices[i].getHead().getSingleEdge(SchedulingPhase.STEADY);
+            InterFilterEdge edge = slices[i].getInputNode().getSingleEdge(SchedulingPhase.STEADY);
      
             //the last filter of the prev (original) trace 
             FilterContent prev = 
@@ -469,7 +469,7 @@ public class MultiLevelSplitsJoins {
             //trace in the init stage
             int initItems = 
                 (int) (((double) prev.initItemsPushed()) * edge.getSrc().ratio(edge, SchedulingPhase.STEADY));
-            slices[i].getHead().getNextFilter().getFilter().setInitMult(initItems);
+            slices[i].getInputNode().getNextFilter().getFilter().setInitMult(initItems);
             
             //calc the number of steady items
             int steadyItems = (int) ((((double)prev.getSteadyMult()) * ((double)prev.getPushInt())) * 
@@ -477,7 +477,7 @@ public class MultiLevelSplitsJoins {
             
             //System.out.println("Setting Steady Items: " + steadyItems + " " + 
             //        traces[i].getHead().getNextFilter().getFilter());
-            slices[i].getHead().getNextFilter().getFilter().setSteadyMult(steadyItems);
+            slices[i].getInputNode().getNextFilter().getFilter().setSteadyMult(steadyItems);
         }
         
     }

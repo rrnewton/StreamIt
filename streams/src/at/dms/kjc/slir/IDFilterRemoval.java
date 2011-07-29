@@ -18,7 +18,7 @@ public class IDFilterRemoval {
     private int[] usOutputIndices;
     
     public static void doit(Filter slice) {
-        assert slice.getFirstFilter().getFilter() instanceof IDFilterContent : 
+        assert slice.getWorkNode().getFilter() instanceof IDFilterContent : 
             "Trying to remove a non ID slice";
         
         IDFilterRemoval remover = new IDFilterRemoval(slice);
@@ -27,8 +27,8 @@ public class IDFilterRemoval {
     
     private IDFilterRemoval(Filter s) {
         idSlice = s;
-        idInput = idSlice.getHead();
-        idOutput = idSlice.getTail();
+        idInput = idSlice.getInputNode();
+        idOutput = idSlice.getOutputNode();
         
         removeID(SchedulingPhase.INIT);
         removeID(SchedulingPhase.STEADY);

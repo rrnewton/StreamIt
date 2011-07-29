@@ -260,7 +260,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             //the weights of any inputs that are not mapped to this tile that appear before
             //the local source
             
-            InputNode input = parent.filterNode.getParent().getHead();
+            InputNode input = parent.filterNode.getParent().getInputNode();
             WorkNode localSrc = ((InputRotatingBuffer)parent).getLocalSrcFilter();
             //the local source and dest might not communicate in the init stage, if not
             //the offset should just be zero

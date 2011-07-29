@@ -129,7 +129,7 @@ public class EmitCellCode extends EmitCode {
         p.println("#include <math.h>");
         p.println();
         String type;
-        if (s.getParent().getHead().getNextFilter().getFilter().getOutputType().isFloatingPoint())
+        if (s.getParent().getInputNode().getNextFilter().getFilter().getOutputType().isFloatingPoint())
             type = "float";
         else type = "int";
         p.println("#define ITEM_TYPE " + type);

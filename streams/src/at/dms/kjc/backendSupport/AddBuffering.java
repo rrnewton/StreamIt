@@ -67,7 +67,7 @@ public class AddBuffering {
             Filter slice = spaceTime.getSliceGraph()[t];
             //check all the outgoing edges to see if they are balanced in the init
             //and fix them if we have to
-            fixOutputNode(slice.getTail());
+            fixOutputNode(slice.getOutputNode());
         }
         //don't forget to reset the filter infos after each iteration
         FilterInfo.reset();
@@ -94,7 +94,7 @@ public class AddBuffering {
             int itemsToBuffer = filter.initItemsPushed() % output.totalWeights(SchedulingPhase.INIT);
             int itemsIDShouldPass = filter.initItemsPushed() - itemsToBuffer;
             Filter slice = output.getParent();
-            System.out.println(" * Adding buffering after " + slice.getTail().getPrevious() + 
+            System.out.println(" * Adding buffering after " + slice.getOutputNode().getPrevious() + 
                     " to equalize output, pass: " + itemsIDShouldPass + " buffer: " + itemsToBuffer);
             //System.out.println("   " + filter.initItemsPushed() + " % " + 
             //        output.totalWeights() + " != 0");
@@ -123,7 +123,7 @@ public class AddBuffering {
                 //check all the outgoing edges to see if they are balanced in the init
                 //and fix them if we have to
                 boolean currentChange 
-                    = fixInputNodeBuffering(slice.getHead());
+                    = fixInputNodeBuffering(slice.getInputNode());
                 if (currentChange)
                     change = true;
             }
@@ -268,7 +268,7 @@ public class AddBuffering {
         
         //now install the edge at the input of the downstream slice instead 
         //of the old edge
-        downSlice.getHead().replaceEdge(edge, newEdge, SchedulingPhase.INIT);
+        downSlice.getInputNode().replaceEdge(edge, newEdge, SchedulingPhase.INIT);
         
         //reset the dest of the existing edge to be the new buffering slice
         edge.setDest(newInput);
@@ -282,7 +282,7 @@ public class AddBuffering {
         
         //set the mults of the new identity
         filter.getFilter().setInitMult(itemsToPassInit);
-        FilterContent prev = upSlice.getTail().getPrevFilter().getFilter();
+        FilterContent prev = upSlice.getOutputNode().getPrevFilter().getFilter();
         
         //calc the number of steady items
         int steadyItems = (int) 
@@ -311,10 +311,10 @@ public class AddBuffering {
     private boolean legalToAddBufferingInSlice(Filter slice, int initItemsSent) {
         if (KjcOptions.greedysched || KjcOptions.noswpipe)
             return false;
-        if (limitTiles && slice.getNumFilters() >= totalTiles)
+        if (limitTiles && 1 >= totalTiles)
             return false;
         
-        OutputNode output = slice.getTail();
+        OutputNode output = slice.getOutputNode();
         
         Iterator<InterFilterEdge> edges = output.getDestSet(SchedulingPhase.INIT).iterator(); 
         while (edges.hasNext()) {
@@ -381,16 +381,11 @@ public class AddBuffering {
      * @param initMult The init multiplicity of the new id filter.
      */
     private void addIDToSlice(Filter slice, int initMult) {
-        WorkNode oldLast = slice.getTail().getPrevFilter();
+        WorkNode oldLast = slice.getOutputNode().getPrevFilter();
 
 // removed check: can always convert to SimpleSlices
 // and check would fail for UniProcessor every time...
-        if (limitTiles) {
-        assert slice.getNumFilters() < 
-            totalTiles : 
-               "Cannot add buffering to slice because it has (filters == tiles).";
-        }
-        
+       
         //create the identity
         SIRFilter identity = new SIRIdentity(oldLast.getFilter().getOutputType());
         RenameAll.renameAllFilters(identity);
@@ -407,8 +402,8 @@ public class AddBuffering {
         //connect and re-finish slice
         oldLast.setNext(filter);
         filter.setPrevious(oldLast);
-        filter.setNext(slice.getTail());
-        slice.getTail().setPrevious(filter);
+        filter.setNext(slice.getOutputNode());
+        slice.getOutputNode().setPrevious(filter);
         slice.finish();
         
         spaceTime.addFilterToSlice(filter, slice);

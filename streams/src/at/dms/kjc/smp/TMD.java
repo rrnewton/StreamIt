@@ -82,10 +82,10 @@ public class TMD extends Scheduler {
         fallBackLayout = false;
         for (int l = 0; l < levels.length; l++) {
             for (int f = 0; f < levels[l].length; f++) {
-                if (levels[l][f].getFirstFilter().isPredefined())
+                if (levels[l][f].getWorkNode().isPredefined())
                     continue;
-                if (levels[l][f].getTail().getDestSet(SchedulingPhase.STEADY).size() > maxFanout) {
-                    maxFanout = levels[l][f].getTail().getDestSet(SchedulingPhase.STEADY).size();
+                if (levels[l][f].getOutputNode().getDestSet(SchedulingPhase.STEADY).size() > maxFanout) {
+                    maxFanout = levels[l][f].getOutputNode().getDestSet(SchedulingPhase.STEADY).size();
                     if (maxFanout > 2) {
                         fallBackLayout = true;
                         System.out.println(levels[l][f] + " has fanout > 2!");
@@ -136,10 +136,10 @@ public class TMD extends Scheduler {
             //neighbors with the slice we just assigned...
             Filter nonLocalOutput = null;
             for (Filter slice : current) {
-                if (slice.getTail().getDestSet(SchedulingPhase.STEADY).size() > 1) 
+                if (slice.getOutputNode().getDestSet(SchedulingPhase.STEADY).size() > 1) 
                     nonLocalOutput = slice;
-                else if (slice.getTail().getDestSet(SchedulingPhase.STEADY).size() == 1) {
-                    Filter destSlice = slice.getTail().getDestSlices(SchedulingPhase.STEADY).iterator().next();
+                else if (slice.getOutputNode().getDestSet(SchedulingPhase.STEADY).size() == 1) {
+                    Filter destSlice = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).iterator().next();
                     if (current != getSetWithSlice(sameTile, destSlice) && 
                             getSetWithSlice(sameTile, destSlice) != null) {
                         nonLocalOutput = slice;
@@ -156,7 +156,7 @@ public class TMD extends Scheduler {
             //fis
             if (nonLocalOutput != null) {
                 //one of the slices does communicate with a slice not of its own set
-                for (Filter slice : nonLocalOutput.getTail().getDestSlices(SchedulingPhase.STEADY)) {
+                for (Filter slice : nonLocalOutput.getOutputNode().getDestSlices(SchedulingPhase.STEADY)) {
                     Set<Filter> set = getSetWithSlice(sameTile, slice);
                     if (set != current && 
                             !done.contains(set)) {
@@ -184,7 +184,7 @@ public class TMD extends Scheduler {
     private void assignSlicesToTile(Set<Filter> slices, Core core) {
         for (Filter slice : slices) {
             //System.out.println("Assign " + slice.getFirstFilter() + " to tile " + tile.getTileNumber());
-            setComputeNode(slice.getFirstFilter(), core);
+            setComputeNode(slice.getWorkNode(), core);
         }
     }
     
@@ -199,20 +199,20 @@ public class TMD extends Scheduler {
             for (int s = 0; s < levels[l].length; s++) {
                 Filter slice = levels[l][s];
                 //assign predefined to offchip memory and don't add them to any set
-                if (slice.getFirstFilter().isPredefined()) {
-                    setComputeNode(slice.getFirstFilter(), SMPBackend.chip.getOffChipMemory());
+                if (slice.getWorkNode().isPredefined()) {
+                    setComputeNode(slice.getWorkNode(), SMPBackend.chip.getOffChipMemory());
                 } else {
                     //find the input with the largest amount of data coming in
                     //and put this slice in the set that the max input is in
                     int bestInputs = -1;
                     Set<Filter> theBest = null;;
                     
-                    for (Edge edge : slice.getHead().getSourceSet(SchedulingPhase.STEADY)) {
-                        if (slice.getHead().getWeight(edge, SchedulingPhase.STEADY) >= bestInputs) {
-                            if (slice.getHead().getWeight(edge, SchedulingPhase.STEADY) == bestInputs) {
+                    for (Edge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+                        if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) >= bestInputs) {
+                            if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) == bestInputs) {
                                 //want to be careful about when they are equal because you want to place the 
                                 //downstream best that is at the beginning of the round-robin when distributing
-                                if (slice.getHead().getSources(SchedulingPhase.STEADY)[0] != edge)
+                                if (slice.getInputNode().getSources(SchedulingPhase.STEADY)[0] != edge)
                                     continue;
                             }
                             //the set we want to see if this slice should be added to
@@ -236,7 +236,7 @@ public class TMD extends Scheduler {
                             //otherwise, we have not added a slice from this level to this set, so 
                             //we can use it
                             theBest = testSet;
-                            bestInputs = slice.getHead().getWeight(edge, SchedulingPhase.STEADY);
+                            bestInputs = slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY);
                             
                  
                         }
@@ -291,15 +291,15 @@ public class TMD extends Scheduler {
                 "Too many filters in level for TMD layout!";
             HashSet<Core> allocatedTiles = new HashSet<Core>(); 
 
-            if (levels[l].length == 1 && levels[l][0].getFirstFilter().isPredefined()) {
+            if (levels[l].length == 1 && levels[l][0].getWorkNode().isPredefined()) {
                 //we only support full levels for right now other than predefined filters 
                 //that are not fizzed
-            	setComputeNode(levels[l][0].getFirstFilter(), SMPBackend.chip.getOffChipMemory());
+            	setComputeNode(levels[l][0].getWorkNode(), SMPBackend.chip.getOffChipMemory());
             } else {
                 for (int f = 0; f < levels[l].length; f++) {
                     Filter slice = levels[l][f];
                     Core theTile = tileToAssign(slice, SMPBackend.chip, allocatedTiles);
-                    setComputeNode(slice.getFirstFilter(), theTile);
+                    setComputeNode(slice.getWorkNode(), theTile);
                     allocatedTiles.add(theTile);
                 }
             }
@@ -311,16 +311,16 @@ public class TMD extends Scheduler {
         int bestInputs = -1;
 
         //add the tiles to the list that are allocated to upstream inputs
-        for (Edge edge : slice.getHead().getSourceSet(SchedulingPhase.STEADY)) {
+        for (Edge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
             Core upstreamTile = getComputeNode(edge.getSrc().getPrevious());
             if (upstreamTile == SMPBackend.chip.getOffChipMemory())
                 continue;
             if (allocatedTiles.contains(upstreamTile))
                 continue;
             
-            if (slice.getHead().getWeight(edge, SchedulingPhase.STEADY) > bestInputs) {
+            if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) > bestInputs) {
                 theBest = upstreamTile;
-                bestInputs = slice.getHead().getWeight(edge, SchedulingPhase.STEADY);
+                bestInputs = slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY);
             }
         }
         
@@ -350,7 +350,7 @@ public class TMD extends Scheduler {
 		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
 	
 		    for (Filter slice : slices) {
-		    	FilterContent filter = slice.getFirstFilter().getFilter();
+		    	FilterContent filter = slice.getWorkNode().getFilter();
 		    	filter.multSteadyMult(KjcOptions.steadymult);
 		    }
 		    
@@ -366,7 +366,7 @@ public class TMD extends Scheduler {
         
         //go through and multiply the steady multiplicity of each filter by factor
         for (Filter slice : slices) {
-            FilterContent filter = slice.getFirstFilter().getFilter();
+            FilterContent filter = slice.getWorkNode().getFilter();
             filter.multSteadyMult(factor * KjcOptions.steadymult);
          }
         //must reset the filter info's because we have changed the schedule
@@ -381,7 +381,7 @@ public class TMD extends Scheduler {
         for (Filter slice : slices) {
             if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
                 if (Fissioner.doit(slice, graphSchedule.getSlicer(), fizzAmount.get(slice)) != null) {
-                    System.out.println("Fissed " + slice.getFirstFilter() + " by " + fizzAmount.get(slice));
+                    System.out.println("Fissed " + slice.getWorkNode() + " by " + fizzAmount.get(slice));
                     if (fizzAmount.get(slice) > maxFission)
                         maxFission = fizzAmount.get(slice);
                 }
@@ -434,7 +434,7 @@ public class TMD extends Scheduler {
             long slTotal = 0;
             int cannotFizz = 0;            
             for (int s = 0; s < origLevels[l].length; s++) {
-               WorkNode fsn = origLevels[l][s].getFirstFilter();
+               WorkNode fsn = origLevels[l][s].getWorkNode();
                FilterContent fc = fsn.getFilter();
                if (fsn.isPredefined())
                    workEsts.put(fsn, (long)0);
@@ -558,10 +558,10 @@ public class TMD extends Scheduler {
         
         for (Filter slice : slices) {
          
-            if (slice.getFirstFilter().isPredefined())
+            if (slice.getWorkNode().isPredefined())
                 continue;
             
-            FilterInfo fi = FilterInfo.getFilterInfo(slice.getFirstFilter());
+            FilterInfo fi = FilterInfo.getFilterInfo(slice.getWorkNode());
             //nothing to do for filters with no input
             if (fi.pop == 0)
                 continue;

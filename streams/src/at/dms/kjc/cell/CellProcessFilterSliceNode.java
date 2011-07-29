@@ -81,8 +81,8 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
     
     @Override
     protected void additionalPreInitProcessing() {
-        InputNode inputNode = filterNode.getParent().getHead();
-        OutputNode outputNode = filterNode.getParent().getTail();
+        InputNode inputNode = filterNode.getParent().getInputNode();
+        OutputNode outputNode = filterNode.getParent().getOutputNode();
         // Add filter to mapping
         int filterId = CellBackend.numfilters;
         CellBackend.filters.add(filterNode);
@@ -292,7 +292,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
      *
      */
     private void setupFileReaderChannel() {
-        OutputNode outputNode = filterNode.getParent().getTail();
+        OutputNode outputNode = filterNode.getParent().getOutputNode();
         // List of channel IDs for all output channels of the file reader
         LinkedList<Integer> outputIds = new LinkedList<Integer>();
         

@@ -34,10 +34,10 @@ public abstract class BufferTransfers {
         //the output buffer we are implementing here is the upstream output buffer
         //on the same tile
         if (buf instanceof InputRotatingBuffer) {
-            output = ((InputRotatingBuffer)buf).getLocalSrcFilter().getParent().getTail();
+            output = ((InputRotatingBuffer)buf).getLocalSrcFilter().getParent().getOutputNode();
         }
         else
-            output = parent.filterNode.getParent().getTail();
+            output = parent.filterNode.getParent().getOutputNode();
     }
     
     /**

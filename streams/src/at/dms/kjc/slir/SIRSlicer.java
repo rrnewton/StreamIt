@@ -135,9 +135,8 @@ public abstract class SIRSlicer extends Slicer {
             assert sliceBNWork.containsKey(slices[i]) : slices[i];
             //this doesn't get filled till later
             //assert bottleNeckFilter.containsKey(slices[i]) : slices[i];
-            for (WorkNode fsn : slices[i].getFilterNodes()) {
-                assert workEstimation.containsKey(fsn.getFilter()) : fsn.getFilter();
-            }
+            assert workEstimation.containsKey(slices[i].getWorkNode().getFilter()) : slices[i].getWorkNode().getFilter();
+            	
         }
     }
     
@@ -196,8 +195,7 @@ public abstract class SIRSlicer extends Slicer {
         //add the new filters to the necessary structures...
         for (int i = 0; i < slices.length; i++) {
             if (!containsSlice(slices[i])) {
-                assert slices[i].getNumFilters() == 1;
-                WorkNode filter = slices[i].getFilterNodes().get(0);
+                WorkNode filter = slices[i].getWorkNode();
                 assert filter.toString().startsWith("Identity");
                                 
                 if (!workEstimation.containsKey(filter)) {
@@ -288,7 +286,7 @@ public abstract class SIRSlicer extends Slicer {
             //FilterSliceNode bottleNeck = 
             //    bottleNeckFilter.get(slice);
             
-            SliceNode prev = slice.getHead().getNextFilter();
+            SliceNode prev = slice.getInputNode().getNextFilter();
             long prevWork = getFilterWorkSteadyMult((WorkNode)prev);
             
             //set the first filter
@@ -327,7 +325,7 @@ public abstract class SIRSlicer extends Slicer {
             
             //go back from the tail
             
-            SliceNode next = slice.getTail().getPrevFilter();
+            SliceNode next = slice.getOutputNode().getPrevFilter();
             //if the work of the last filter is more than the occupancy calculated
             //by the forward traversal, set he occupancy to the filter's total work
             if (getFilterWorkSteadyMult((WorkNode)next) > 
@@ -354,7 +352,7 @@ public abstract class SIRSlicer extends Slicer {
                 current = current.getPrevious();
             }
             //check to see if everything is correct
-            current = slice.getHead().getNext();
+            current = slice.getInputNode().getNext();
             while (current.isFilterSlice()) {
                 assert  (getFilterOccupancy((WorkNode)current) >=
                     getFilterWorkSteadyMult((WorkNode)current)) : current;
@@ -382,7 +380,7 @@ public abstract class SIRSlicer extends Slicer {
             long maxWork;
             WorkNode maxFilter;
             //get the first filter
-            WorkNode node = slices[i].getHead().getNextFilter();
+            WorkNode node = slices[i].getInputNode().getNextFilter();
             filterStartupCost.put(node, new Integer(0));
             int prevStartupCost = 0;
             WorkNode prevNode = node;
@@ -457,7 +455,7 @@ public abstract class SIRSlicer extends Slicer {
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
     protected Filter[] getNext(Filter slice) {
-        SliceNode node = slice.getHead();
+        SliceNode node = slice.getInputNode();
         if (node instanceof InputNode)
             node = node.getNext();
         while (node != null && node instanceof WorkNode) {
@@ -512,7 +510,7 @@ public abstract class SIRSlicer extends Slicer {
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
     protected  String sliceName(Filter slice) {
-        SliceNode node = slice.getHead();
+        SliceNode node = slice.getInputNode();
 
         StringBuffer out = new StringBuffer();
 
@@ -575,115 +573,16 @@ public abstract class SIRSlicer extends Slicer {
         return filterStartupCost.get(node).intValue();
     }
     
-    /**
-     * Make sure that all the {@link Filter}s are {@link SimpleSlice}s.
-     */
-    
-    public void ensureSimpleSlices() {
-        // update sliceGraph, topSlices, io, sliceBNWork, bottleNeckFilter
-        // Assume that topSlices, io, sliceBNWork.keys(), bottleNeckFilter.keys() 
-        // are all proper subsets of sliceGraph.
-        List<SimpleSlice> newSliceGraph = new LinkedList<SimpleSlice>();
-        Map<Filter,SimpleSlice> newtopSlices = new HashMap<Filter,SimpleSlice>();
-        for (Filter s : topSlices) {newtopSlices.put(s, null);}
-        Map<Filter,SimpleSlice> newIo = new HashMap<Filter,SimpleSlice>();
-        for (Filter s : io) {newIo.put(s,null);}
-        
-        // for each slice s, derived initial simple slice ss1, following simple slices ss2 ... ssn
-        // add to ss1 ... ssn to newSliceGraph,
-        // replace newtopSlices: s |-> null with s -> ss1
-        // replace newIo: s |-> null with s -> ss1
-        Filter[] sliceGraph = getSliceGraph();
-        for (Filter s : sliceGraph) {
-//            if (s.getNumFilters() == 1) {
-//                SimpleSlice ss = new SimpleSlice(s.getHead(), s.getFilterNodes().get(0), s.getTail());
-//                newSliceGraph.add(ss);
-//                if (newtopSlices.containsKey(s)) {
-//                    newtopSlices.put(s,ss);
-//                }
-//                if (newIo.containsKey(s)) {
-//                    newIo.put(s,ss);
-//                }
-//            } else {
-                int numFilters = s.getNumFilters();
-                assert numFilters != 0 : s;
-                List<WorkNode> fs = s.getFilterNodes();
-                OutputNode prevTail = null;
-                for (int i = 0; i < numFilters; i++) {
-                    InputNode head;
-                    OutputNode tail;
-                    WorkNode f = fs.get(i);
-                    // first simpleSlice has a head, otherwise create a new one.
-                    if (i == 0) {
-                        head = s.getHead();
-                    } else {
-                       /* TODO weight should probably not be 1 */
-                       head = new InputNode(new int[]{1});
-                       // Connect tail from last iteration with head from this iteration.
-                       // prevTail will not be null here...
-                       InterFilterEdge prevTailToHead = new InterFilterEdge(prevTail,head);
-                       head.setSources(new InterFilterEdge[]{prevTailToHead});
-                       prevTail.setDests(new InterFilterEdge[][]{{prevTailToHead}});
-                    }
-                   if (i == numFilters - 1) {
-                       tail = s.getTail();
-                   } else {
-                       /* TODO weight should probably not be 1 */
-                       tail = new OutputNode(new int[]{1});
-                   }
-                   prevTail = tail;
-                   SimpleSlice ss = new SimpleSlice(head, f, tail);
-
-                   // now put these slices in crect data structures.
-                   newSliceGraph.add(ss);
-                   if (i == 0) {
-                       if (newtopSlices.containsKey(s)) {
-                           newtopSlices.put(s,ss);
-                       }
-                       if (newIo.containsKey(s)) {
-                           // check criterion used elsewhere for inclusion in io[]
-                           // it is the case that a slice in io[] only contains a single filter.
-                           assert f.isPredefined();
-                           newIo.put(s,ss);
-                       }
-                   }
-                }
-                
-            }
-            
-//        }
-        Filter[] oldTopSlices = topSlices.toArray(new Filter[topSlices.size()]);
-        topSlices = new LinkedList<Filter>();
-        for (int i = 0; i < oldTopSlices.length; i++) {
-            topSlices.add(newtopSlices.get(oldTopSlices[i]));
-            assert topSlices.get(i) != null;
-        }
-        for (int i = 0; i < io.length; i++) {
-            io[i] = newIo.get(io[i]);
-            assert io[i] != null;
-        }
-        // update bottleNeckFilter, sliceBNWork.
-        bottleNeckFilter = new HashMap<Filter, WorkNode>();
-        sliceBNWork = new HashMap<Filter, Long>();
-        for (Filter s : sliceGraph) {
-            SimpleSlice ss = (SimpleSlice)s;
-            long workEst = workEst(ss.getBody());
-            sliceBNWork.put(ss, workEst);
-            bottleNeckFilter.put(ss,ss.getBody());
-        }
-    }
     
     /**
      * Force creation of kopi methods and fields for predefined filters.
      */
     public void createPredefinedContent() {
-        for (Filter s : getSliceGraph()) {
-            for (WorkNode n : s.getFilterNodes()) {
-                if (n.getFilter() instanceof PredefinedContent) {
-                    ((PredefinedContent)n.getFilter()).createContent();
-                }
-            }
-        }
+    	for (Filter s : getSliceGraph()) {
+    		if (s.getWorkNode().getFilter() instanceof PredefinedContent) {
+    			((PredefinedContent)s.getWorkNode().getFilter()).createContent();
+    		}
+    	}
 
     }
 }

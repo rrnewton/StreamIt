@@ -62,13 +62,12 @@ public class InputRotatingBuffer extends RotatingBuffer {
      */
     public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
         for (Filter slice : schedule.getScheduleList()) {
-            assert slice.getNumFilters() == 1;
-            if (!slice.getHead().noInputs()) {
-                assert slice.getHead().totalWeights(SchedulingPhase.STEADY) > 0;
-                Tile parent = TileraBackend.backEndBits.getLayout().getComputeNode(slice.getFirstFilter());
+        	if (!slice.getInputNode().noInputs()) {
+                assert slice.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
+                Tile parent = TileraBackend.backEndBits.getLayout().getComputeNode(slice.getWorkNode());
                 //create the new buffer, the constructor will put the buffer in the 
                 //hashmap
-                InputRotatingBuffer buf = new InputRotatingBuffer(slice.getFirstFilter(), parent);
+                InputRotatingBuffer buf = new InputRotatingBuffer(slice.getWorkNode(), parent);
                                   
                 buf.setRotationLength(schedule);
                 buf.createInitCode(true);
@@ -105,11 +104,11 @@ public class InputRotatingBuffer extends RotatingBuffer {
         
         //if we have a file reader source for this filter, right now
         //we only support a single input for a filter that is feed by a file
-        upstreamFileReader = filterNode.getParent().getHead().hasFileInput();
+        upstreamFileReader = filterNode.getParent().getInputNode().hasFileInput();
         if (upstreamFileReader) {
             //System.out.println(filterNode);
-            assert filterNode.getParent().getHead().getWidth(SchedulingPhase.INIT) <= 1 &&
-            filterNode.getParent().getHead().getWidth(SchedulingPhase.STEADY) <= 1;
+            assert filterNode.getParent().getInputNode().getWidth(SchedulingPhase.INIT) <= 1 &&
+            filterNode.getParent().getInputNode().getWidth(SchedulingPhase.STEADY) <= 1;
         }
         addrBufMap = new HashMap<Tile, SourceAddressRotation>();
         localSrcFilter = null;
@@ -138,7 +137,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //this is the edge between the 2 local filters
         InterFilterEdge theEdge = null;
         
-        for (InterFilterEdge edge : filterNode.getParent().getHead().getSourceSet(SchedulingPhase.STEADY)) {
+        for (InterFilterEdge edge : filterNode.getParent().getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
             WorkNode upstream = edge.getSrc().getPrevFilter();
             if (TileraBackend.backEndBits.getLayout().getComputeNode(upstream) == parent) {
                 //System.out.println(upstream);
@@ -153,7 +152,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         
         //now we have to do some checks on the re-organization between them.
         //make sure the output node only has one output (or none in init)
-        OutputNode output = lsf.getParent().getTail();
+        OutputNode output = lsf.getParent().getOutputNode();
         if (!(output.peekingFissionPattern(SchedulingPhase.STEADY) && 
                 output.peekingFissionPattern(SchedulingPhase.INIT))) {
             //System.out.println(filterNode + " has no good local source 1.");
@@ -163,7 +162,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //now make sure the downstream consumer has a simple single appearance joiner and that
         //the lsf is the first in that joiner so nothing has to be redistributed...
         //or it is single appearance and all the upstream outputs fit in the slot in the joiner
-        InputNode input = filterNode.getParent().getHead();
+        InputNode input = filterNode.getParent().getInputNode();
         if (!input.singleAppearance())
             return;
 
@@ -213,7 +212,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * this input buffer has an address buffer for this input buffer.
      */
     protected void createAddressBufs() {
-       int addressBufsSize = filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY).size();
+       int addressBufsSize = filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY).size();
        //if we are using this input buffer as an output buffer, then we don't need the address buffer
        //for the output buffer that is used for the upstream filter that is mapped to this tile
        if (hasLocalSrcFilter())
@@ -222,8 +221,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
        addressBufs = new SourceAddressRotation[addressBufsSize];
        
        int i = 0;
-       for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
-           Tile tile = TileraBackend.backEndBits.getLayout().getComputeNode(src.getFirstFilter());
+       for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
+           Tile tile = TileraBackend.backEndBits.getLayout().getComputeNode(src.getWorkNode());
            if (tile == parent && hasLocalSrcFilter())
                continue;
            
@@ -263,10 +262,10 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //fill the addressbuffers array
         addressBuffers = new HashMap<InputRotatingBuffer, SourceAddressRotation>();
         
-        OutputNode outputNode = localSrcFilter.getParent().getTail();
+        OutputNode outputNode = localSrcFilter.getParent().getOutputNode();
         
         for (InterFilterEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
-            if (edge.getDest() == this.filterNode.getParent().getHead())
+            if (edge.getDest() == this.filterNode.getParent().getInputNode())
                 continue;
             
             InputRotatingBuffer input = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
@@ -285,7 +284,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //mults of all the sources
         int maxRotationLength = 0;
         
-        for (Filter src : filterNode.getParent().getHead().getSourceSlices(SchedulingPhase.STEADY)) {
+        for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
             int diff = schedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
             if (diff > maxRotationLength) {

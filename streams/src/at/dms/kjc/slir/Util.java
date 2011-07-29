@@ -71,7 +71,7 @@ public class Util {
     
         while (it.hasNext()) {
             Filter slice = (Filter) it.next();
-            SliceNode sliceNode = slice.getHead();
+            SliceNode sliceNode = slice.getInputNode();
             while (sliceNode != null) {
                 trav.add(sliceNode);
                 sliceNode = sliceNode.getNext();
@@ -93,7 +93,7 @@ public class Util {
         LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
     
         for (int i = 0; i < slices.length; i++) {
-            SliceNode sliceNode = slices[i].getHead();
+            SliceNode sliceNode = slices[i].getInputNode();
             while (sliceNode != null) {
                 trav.add(sliceNode);
                 sliceNode = sliceNode.getNext();
