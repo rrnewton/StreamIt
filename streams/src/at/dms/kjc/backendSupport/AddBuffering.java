@@ -81,7 +81,7 @@ public class AddBuffering {
      */
     private void fixOutputNode(OutputNode output) {
         WorkNode filterNode = output.getPrevFilter();
-        FilterContent filter = filterNode.getFilter();
+        WorkNodeContent filter = filterNode.getFilter();
         
         //do nothing if nothing is pushed...
         if (filter.initItemsPushed() == 0) 
@@ -248,7 +248,7 @@ public class AddBuffering {
         
         //create the identity filter node...
         WorkNode filter = 
-            new WorkNode(new FilterContent(identity));
+            new WorkNode(new WorkNodeContent(identity));
        
         //create the new output slice node
         OutputNode newOutput = new OutputNode(new int[]{1});
@@ -282,7 +282,7 @@ public class AddBuffering {
         
         //set the mults of the new identity
         filter.getFilter().setInitMult(itemsToPassInit);
-        FilterContent prev = upSlice.getOutputNode().getPrevFilter().getFilter();
+        WorkNodeContent prev = upSlice.getOutputNode().getPrevFilter().getFilter();
         
         //calc the number of steady items
         int steadyItems = (int) 
@@ -392,7 +392,7 @@ public class AddBuffering {
         
         //create the identity filter node...
         WorkNode filter = 
-            new WorkNode(new FilterContent(identity));
+            new WorkNode(new WorkNodeContent(identity));
         
         //set the multiplicities
         filter.getFilter().setInitMult(initMult);

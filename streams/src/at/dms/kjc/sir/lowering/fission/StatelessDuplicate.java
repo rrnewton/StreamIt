@@ -31,7 +31,7 @@ import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRSplitType;
 import at.dms.kjc.sir.SIRSplitter;
 import at.dms.kjc.sir.SIRTwoStageFilter;
-import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.util.GetSteadyMethods;
 import at.dms.util.Utils;
 
@@ -167,7 +167,7 @@ public class StatelessDuplicate {
         return sizeOfMutableState(filter) > 0;
     }
     
-    public static boolean hasMutableState(final FilterContent filter) {
+    public static boolean hasMutableState(final WorkNodeContent filter) {
         return sizeOfMutableState(filter) > 0;
     }
     
@@ -179,7 +179,7 @@ public class StatelessDuplicate {
         return doGetMutableState(methods);
     }
     
-    public static HashSet<String> getMutableState(final FilterContent filter) {
+    public static HashSet<String> getMutableState(final WorkNodeContent filter) {
         // visit all methods except <init>
         List<JMethodDeclaration> methods = GetSteadyMethods.getSteadyMethods(filter);
         
@@ -283,7 +283,7 @@ public class StatelessDuplicate {
         return mutableSizeInC;
     }
     
-    public static int sizeOfMutableState(final FilterContent filter) {
+    public static int sizeOfMutableState(final WorkNodeContent filter) {
         HashSet<String> mutatedFields = getMutableState(filter);
         // tally up the size of all the fields found
         int mutableSizeInC = 0;

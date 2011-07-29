@@ -87,7 +87,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
     public JMethodDeclaration getInitStageMethod() {
         JBlock statements = new JBlock();
         assert sliceNode instanceof WorkNode;
-        FilterContent filter = ((WorkNode) sliceNode).getFilter();
+        WorkNodeContent filter = ((WorkNode) sliceNode).getFilter();
 
         // channel code before work block
         //slice has input, so we 
@@ -179,7 +179,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
      * 
      * @return The code to fire the work function in the init stage.
      */
-    private JStatement generateInitWorkLoop(FilterContent filter)
+    private JStatement generateInitWorkLoop(WorkNodeContent filter)
     {
         JBlock block = new JBlock();
 

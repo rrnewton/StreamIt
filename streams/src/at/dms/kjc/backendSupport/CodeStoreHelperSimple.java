@@ -53,7 +53,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
     public JMethodDeclaration getInitStageMethod() {
         JBlock statements = new JBlock();
         assert sliceNode instanceof WorkNode;
-        FilterContent filter = ((WorkNode) sliceNode).getFilter();
+        WorkNodeContent filter = ((WorkNode) sliceNode).getFilter();
 
         // channel code before work block
         if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
@@ -122,7 +122,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
      * 
      * @return The code to fire the work function in the init stage.
      */
-    private JStatement generateInitWorkLoop(FilterContent filter)
+    private JStatement generateInitWorkLoop(WorkNodeContent filter)
     {
         FilterInfo filterInfo = FilterInfo.getFilterInfo((WorkNode)sliceNode);
         JBlock block = new JBlock();

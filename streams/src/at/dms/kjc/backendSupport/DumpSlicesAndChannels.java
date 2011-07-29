@@ -85,7 +85,7 @@ public class DumpSlicesAndChannels {
         node = node.getNext();
         while (node != null ) {
             if (node.isFilterSlice()) {
-                FilterContent f = node.getAsFilter().getFilter();
+                WorkNodeContent f = node.getAsFilter().getFilter();
                 out.append("\\n" + node.toString() + "{"
                         + slicer.getFilterWork(node.getAsFilter())
                         + "}");

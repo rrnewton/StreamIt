@@ -6,7 +6,7 @@ package at.dms.kjc.backendSupport;
 import java.util.Iterator;
 import java.util.HashMap;
 
-import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
@@ -49,7 +49,7 @@ public class FilterInfo {
     /** The FilterNode with this info. */
     public WorkNode sliceNode;
     /** The FilterContent with this info. */
-    public FilterContent filter;
+    public WorkNodeContent filter;
 
     /** HashMap of all the filter infos FilterSliceNode -> FilterInfo */
     private static HashMap<WorkNode, FilterInfo> filterInfos;
@@ -157,7 +157,7 @@ public class FilterInfo {
         // may cause an infinite loop because it creates filter infos
         int initItemsRec = 0;
         if (sliceNode.getPrevious().isFilterSlice()) {
-            FilterContent filterC = ((WorkNode) sliceNode.getPrevious())
+            WorkNodeContent filterC = ((WorkNode) sliceNode.getPrevious())
                 .getFilter();
             initItemsRec = filterC.getPushInt() * filterC.getInitMult();
             if (filterC.isTwoStage()) {
@@ -170,7 +170,7 @@ public class FilterInfo {
             // add all the upstream filters items that reach this filter
             for (int i = 0; i < in.getWeights(SchedulingPhase.INIT).length; i++) {
                 InterFilterEdge incoming = in.getSources(SchedulingPhase.INIT)[i];
-                FilterContent filterC = ((WorkNode) incoming.getSrc()
+                WorkNodeContent filterC = ((WorkNode) incoming.getSrc()
                                          .getPrevious()).getFilter();
                 // calculate the init items sent by the upstream filter
                 int upstreamInitItems = 0;

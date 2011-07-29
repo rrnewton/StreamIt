@@ -178,7 +178,7 @@ public class TMDBinPackFissAll extends Scheduler {
 		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
 
 		    for (Filter slice : slices) {
-		    	FilterContent filter = slice.getWorkNode().getFilter();
+		    	WorkNodeContent filter = slice.getWorkNode().getFilter();
 		    	filter.multSteadyMult(KjcOptions.steadymult);
 		    }
 
@@ -198,7 +198,7 @@ public class TMDBinPackFissAll extends Scheduler {
         LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
 
         for (Filter slice : slices) {
-            FilterContent filter = slice.getWorkNode().getFilter();
+            WorkNodeContent filter = slice.getWorkNode().getFilter();
             filter.multSteadyMult(factor * KjcOptions.steadymult);
          }
         
@@ -248,7 +248,7 @@ public class TMDBinPackFissAll extends Scheduler {
     	// Look for fizzable filters
     	for(Filter slice : slices) {
     		WorkNode fsn = slice.getWorkNode();
-    		FilterContent fc = fsn.getFilter();
+    		WorkNodeContent fc = fsn.getFilter();
     		
     		long workEst = FilterWorkEstimate.getWork(slice);
     		int commRate = (fc.getPushInt() + fc.getPopInt() * fc.getMult(SchedulingPhase.STEADY));

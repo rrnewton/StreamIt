@@ -229,7 +229,7 @@ public class MultiLevelSplitsJoins {
         
         //create the identity filter node...
         WorkNode filter = 
-            new WorkNode(new FilterContent(identity));
+            new WorkNode(new WorkNodeContent(identity));
         
         //create the outputSliceNode
         InterFilterEdge edge = new InterFilterEdge(dest);
@@ -262,7 +262,7 @@ public class MultiLevelSplitsJoins {
             InterFilterEdge downEdge = traces[i].getOutputNode().getSingleEdge(SchedulingPhase.STEADY);
             
             //the downstream filter
-            FilterContent next = downEdge.getDest().getNextFilter().getFilter();
+            WorkNodeContent next = downEdge.getDest().getNextFilter().getFilter();
             //System.out.println(next + " receives " + next.getSteadyMult() * next.getPopInt());
             
             //set the steady items based on the number of items the down stream 
@@ -282,7 +282,7 @@ public class MultiLevelSplitsJoins {
             InputNode input = traces[i].getInputNode();
             for (int s = 0; s < input.getSources(SchedulingPhase.STEADY).length; s++) {
                 InterFilterEdge upEdge = input.getSources(SchedulingPhase.STEADY)[s];
-               FilterContent prev = upEdge.getSrc().getPrevFilter().getFilter();
+               WorkNodeContent prev = upEdge.getSrc().getPrevFilter().getFilter();
                initItems += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
                        ((double)prev.initItemsPushed()));
                steadyItemsOther += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
@@ -460,7 +460,7 @@ public class MultiLevelSplitsJoins {
             InterFilterEdge edge = slices[i].getInputNode().getSingleEdge(SchedulingPhase.STEADY);
      
             //the last filter of the prev (original) trace 
-            FilterContent prev = 
+            WorkNodeContent prev = 
                edge.getSrc().getPrevFilter().getFilter();
             //System.out.println("Source Total Items Steady: " + 
             //        prev.getSteadyMult() * prev.getPushInt() + " " + prev);
@@ -517,7 +517,7 @@ public class MultiLevelSplitsJoins {
         //System.out.println("Creating " + identity + " for splitting.");
         
         WorkNode filter = 
-            new WorkNode(new FilterContent(identity));
+            new WorkNode(new WorkNodeContent(identity));
                 
         Filter slice = new Filter(input);
         

@@ -350,7 +350,7 @@ public class TMD extends Scheduler {
 		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
 	
 		    for (Filter slice : slices) {
-		    	FilterContent filter = slice.getWorkNode().getFilter();
+		    	WorkNodeContent filter = slice.getWorkNode().getFilter();
 		    	filter.multSteadyMult(KjcOptions.steadymult);
 		    }
 		    
@@ -366,7 +366,7 @@ public class TMD extends Scheduler {
         
         //go through and multiply the steady multiplicity of each filter by factor
         for (Filter slice : slices) {
-            FilterContent filter = slice.getWorkNode().getFilter();
+            WorkNodeContent filter = slice.getWorkNode().getFilter();
             filter.multSteadyMult(factor * KjcOptions.steadymult);
          }
         //must reset the filter info's because we have changed the schedule
@@ -435,7 +435,7 @@ public class TMD extends Scheduler {
             int cannotFizz = 0;            
             for (int s = 0; s < origLevels[l].length; s++) {
                WorkNode fsn = origLevels[l][s].getWorkNode();
-               FilterContent fc = fsn.getFilter();
+               WorkNodeContent fc = fsn.getFilter();
                if (fsn.isPredefined())
                    workEsts.put(fsn, (long)0);
                //the work estimation is the estimate for the work function  
@@ -483,7 +483,7 @@ public class TMD extends Scheduler {
                 
             for (int f = 0; f < sortedWork.size(); f++) {
                 WorkNode fsn = sortedWork.get(f);
-                FilterContent fc = fsn.getFilter();
+                WorkNodeContent fc = fsn.getFilter();
                 //don't parallelize file readers/writers
                 if (fsn.isPredefined())
                     continue;

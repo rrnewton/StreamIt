@@ -4,7 +4,7 @@ import java.util.*;
 import at.dms.kjc.*;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.SliceNode;
 import at.dms.util.Utils;
 
@@ -58,7 +58,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
     
     /** Constructor from a FilterContent, fills out fields, methods, initMethod, preWorkMethod, workMethod.
      * Note: clones inputs. */
-    public CodeStoreHelper(SliceNode node, FilterContent filter, BackEndFactory backEndBits) {
+    public CodeStoreHelper(SliceNode node, WorkNodeContent filter, BackEndFactory backEndBits) {
         this(node, backEndBits);
         setFields((JFieldDeclaration[])ObjectDeepCloner.deepCopy(filter.getFields()));
         setMethods((JMethodDeclaration[])ObjectDeepCloner.deepCopy(filter.getMethods()));
