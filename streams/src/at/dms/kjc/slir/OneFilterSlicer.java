@@ -35,7 +35,7 @@ public class OneFilterSlicer extends Slicer {
                 WorkNodeContent filterContent = getFilterContent(unflatFilter);
                 // remember the work estimation based on the filter content
 
-                SliceNode node;
+                InternalFilterNode node;
                 Filter slice;
                 int filtersInSlice = 1;
 

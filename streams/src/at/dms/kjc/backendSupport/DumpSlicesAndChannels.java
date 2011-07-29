@@ -68,7 +68,7 @@ public class DumpSlicesAndChannels {
     /**return a string with all of the names of the filterslicenodes
      * and blue if linear. */
     private static  String sliceName(Filter slice, SIRSlicer slicer, BackEndFactory backendbits) {
-        SliceNode node = slice.getInputNode();
+        InternalFilterNode node = slice.getInputNode();
 
         StringBuffer out = new StringBuffer();
 

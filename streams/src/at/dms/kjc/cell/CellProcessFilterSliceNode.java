@@ -17,7 +17,7 @@ import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
     
@@ -59,7 +59,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
         }
     }
     
-    private CellPU getLocationFromScheduleLayout(SliceNode sliceNode) {
+    private CellPU getLocationFromScheduleLayout(InternalFilterNode sliceNode) {
         int cpu = -1;
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         for (LinkedList<Integer> l : CellBackend.scheduleLayout) {

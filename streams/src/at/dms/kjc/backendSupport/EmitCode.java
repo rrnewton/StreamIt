@@ -154,7 +154,7 @@ public class EmitCode {
         Layout l = backendbits.getLayout();
         Collection<Channel> channels = backendbits.getChannels();
         for (Channel c : channels) {
-            SliceNode s = c.getSource();
+            InternalFilterNode s = c.getSource();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
             }
@@ -173,7 +173,7 @@ public class EmitCode {
         Layout l = backendbits.getLayout();
         Collection<Channel> channels = backendbits.getChannels();
         for (Channel c : channels) {
-            SliceNode s = c.getDest();
+            InternalFilterNode s = c.getDest();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
             }

@@ -76,7 +76,7 @@ public class InterFilterEdge extends Edge implements at.dms.kjc.DeepCloneable, C
     }
 
     @Override
-    public void setSrc(SliceNode src) {
+    public void setSrc(InternalFilterNode src) {
         assert src instanceof OutputNode;
         
         //make sure we did not create this edge before!
@@ -90,7 +90,7 @@ public class InterFilterEdge extends Edge implements at.dms.kjc.DeepCloneable, C
     }
 
     @Override
-    public void setDest(SliceNode dest) {
+    public void setDest(InternalFilterNode dest) {
         assert dest instanceof InputNode;
         //make sure we did not create this edge before!
         EdgeDescriptor edgeDscr = new EdgeDescriptor(getSrc(), (InputNode)dest);      

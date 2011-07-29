@@ -12,7 +12,7 @@ import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 /**
  * @author mgordon
@@ -49,7 +49,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#getChannel(at.dms.kjc.slicegraph.SliceNode, at.dms.kjc.slicegraph.SliceNode)
      */
     @Override
-    public Channel getChannel(SliceNode src, SliceNode dst) {
+    public Channel getChannel(InternalFilterNode src, InternalFilterNode dst) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -58,7 +58,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#getCodeStoreHelper(at.dms.kjc.slicegraph.SliceNode)
      */
     @Override
-    public CodeStoreHelper getCodeStoreHelper(SliceNode node) {
+    public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
         // TODO Auto-generated method stub
         if (node instanceof WorkNode) {
             // simply do appropriate wrapping of calls...

@@ -184,18 +184,6 @@ public class AutoCloner {
         else if (o instanceof at.dms.kjc.slir.Filter) {
             result = cloneFilter((at.dms.kjc.slir.Filter)o);
         }
-        else if (o instanceof at.dms.kjc.slir.InputNode) {
-            result = cloneInputNode((at.dms.kjc.slir.InputNode)o);
-        }
-        else if (o instanceof at.dms.kjc.slir.OutputNode) {
-            result = cloneOutputNode((at.dms.kjc.slir.OutputNode)o);
-        }
-        else if (o instanceof at.dms.kjc.slir.WorkNode) {
-            result = cloneWorkNode((at.dms.kjc.slir.WorkNode)o);
-        }
-        else if (o instanceof at.dms.kjc.slir.WorkNodeContent) {
-            result = cloneWorkNodeContent((at.dms.kjc.slir.WorkNodeContent)o);
-        }
         // other kjc classes, do deep cloning
         else if (CloneGenerator.inTargetClasses(typeName)) {
             // first pass:  output deep cloning for everything in at.dms
@@ -299,26 +287,6 @@ public class AutoCloner {
         return newSlice;
     }
 
-    static private Object cloneInputNode(at.dms.kjc.slir.InputNode inode) {
-        Object newInputNode = inode.deepClone();
-        return newInputNode;
-    }
-
-    static private Object cloneOutputNode(at.dms.kjc.slir.OutputNode onode) {
-        Object newOutputNode = onode.deepClone();
-        return newOutputNode;
-    }
-
-    static private Object cloneWorkNode(at.dms.kjc.slir.WorkNode wnode) {
-        Object newWorkNode = wnode.deepClone();
-        return newWorkNode;
-    }
-
-    static private Object cloneWorkNodeContent(at.dms.kjc.slir.WorkNodeContent content) {
-        Object newFilterContent = content.deepClone();
-        return newFilterContent;
-    }
-    
     /**
      * Helper function.  Should only be called as part of automatic
      * cloning process.

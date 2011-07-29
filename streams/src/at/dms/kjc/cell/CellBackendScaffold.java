@@ -15,7 +15,7 @@ import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.util.Utils;
 
@@ -59,7 +59,7 @@ public class CellBackendScaffold extends BackEndScaffold {
             int spuId = 0;
             JBlock body = new JBlock();
             for (int filterId : group) {
-                SliceNode sliceNode = CellBackend.filters.get(filterId);
+                InternalFilterNode sliceNode = CellBackend.filters.get(filterId);
                 body.addStatement(ppuCS.setupFilterDescriptionWorkFunc(sliceNode, SchedulingPhase.INIT));
                 body.addStatement(ppuCS.setupPSPNumIOputs(sliceNode, SchedulingPhase.INIT));
                 body.addStatement(ppuCS.setupPSPIOBytes(sliceNode, SchedulingPhase.INIT));
@@ -78,7 +78,7 @@ public class CellBackendScaffold extends BackEndScaffold {
             int spuId = 0;
             JBlock body = new JBlock();
             for (int filterId : group) {
-                SliceNode sliceNode = CellBackend.filters.get(filterId);
+                InternalFilterNode sliceNode = CellBackend.filters.get(filterId);
                 body.addStatement(ppuCS.setupFilterDescriptionWorkFunc(sliceNode, SchedulingPhase.STEADY));
                 body.addStatement(ppuCS.setupPSPNumIOputs(sliceNode, SchedulingPhase.STEADY));
                 body.addStatement(ppuCS.setupPSPIOBytes(sliceNode, SchedulingPhase.STEADY));
@@ -109,7 +109,7 @@ public class CellBackendScaffold extends BackEndScaffold {
         ppuCS.addSteadyLoopStatement(block);
     }
     
-    private static int getIters(SliceNode sliceNode, SchedulingPhase whichPhase) {
+    private static int getIters(InternalFilterNode sliceNode, SchedulingPhase whichPhase) {
         int iters = 1;
 
         if (sliceNode.isInputSlice()) {

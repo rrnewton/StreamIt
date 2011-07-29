@@ -17,7 +17,7 @@ import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 /**
  * Specialization of {@link at.dms.kjc.backendSupport.BackEndFactory} for uniprocessor backend.
@@ -145,7 +145,7 @@ public class UniBackEndFactory extends BackEndFactory<
     }
 
     @Override
-    public Channel getChannel(SliceNode src, SliceNode dst) {
+    public Channel getChannel(InternalFilterNode src, InternalFilterNode dst) {
         throw new AssertionError("Getting channel by src, dst not supported.");
     }
     
@@ -154,7 +154,7 @@ public class UniBackEndFactory extends BackEndFactory<
     public static final String iterationBound = "_iteration_bound";
 
     @Override
-    public CodeStoreHelper getCodeStoreHelper(SliceNode node) {
+    public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
         if (node instanceof WorkNode) {
             // simply do appropriate wrapping of calls...
             return new CodeStoreHelperSimple((WorkNode)node,this);

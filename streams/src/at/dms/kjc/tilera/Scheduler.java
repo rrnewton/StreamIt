@@ -18,11 +18,11 @@ import at.dms.kjc.KjcOptions;
 public abstract class Scheduler implements Layout<Tile> {
     
     protected SpaceTimeScheduleAndSlicer graphSchedule;
-    protected HashMap<SliceNode, Tile> layoutMap;
+    protected HashMap<InternalFilterNode, Tile> layoutMap;
     
     public Scheduler() {
         graphSchedule = null;
-        layoutMap = new HashMap<SliceNode, Tile>();
+        layoutMap = new HashMap<InternalFilterNode, Tile>();
     }
 
     public boolean isSMD() {

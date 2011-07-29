@@ -65,13 +65,13 @@ public class Util {
      * @param slices a list of Slice's.
      * @return An Iterator over SliceNode's.
      */
-    public static Iterator<SliceNode> sliceNodeTraversal(List<Filter> slices) {
-        LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
+    public static Iterator<InternalFilterNode> sliceNodeTraversal(List<Filter> slices) {
+        LinkedList<InternalFilterNode> trav = new LinkedList<InternalFilterNode>();
         ListIterator it = slices.listIterator();
     
         while (it.hasNext()) {
             Filter slice = (Filter) it.next();
-            SliceNode sliceNode = slice.getInputNode();
+            InternalFilterNode sliceNode = slice.getInputNode();
             while (sliceNode != null) {
                 trav.add(sliceNode);
                 sliceNode = sliceNode.getNext();
@@ -89,11 +89,11 @@ public class Util {
      * @param slices an array of Slice's.
      * @return An Iterator over SliceNodes.
      */
-    public static Iterator<SliceNode> sliceNodeTraversal(Filter[] slices) {
-        LinkedList<SliceNode> trav = new LinkedList<SliceNode>();
+    public static Iterator<InternalFilterNode> sliceNodeTraversal(Filter[] slices) {
+        LinkedList<InternalFilterNode> trav = new LinkedList<InternalFilterNode>();
     
         for (int i = 0; i < slices.length; i++) {
-            SliceNode sliceNode = slices[i].getInputNode();
+            InternalFilterNode sliceNode = slices[i].getInputNode();
             while (sliceNode != null) {
                 trav.add(sliceNode);
                 sliceNode = sliceNode.getNext();
@@ -114,7 +114,7 @@ public class Util {
      * @param dst  Destination SliceNode for Edge
      * @return an InterSliceEdge or Edge from src to dst
      */
-    public static Edge srcDstToEdge(SliceNode src, SliceNode dst, SchedulingPhase phase) {
+    public static Edge srcDstToEdge(InternalFilterNode src, InternalFilterNode dst, SchedulingPhase phase) {
         if (src instanceof OutputNode && dst instanceof InputNode) {
             InterFilterEdge[][] edgesedges = ((OutputNode)src).getDests(phase);
             for (InterFilterEdge[] edges : edgesedges) {

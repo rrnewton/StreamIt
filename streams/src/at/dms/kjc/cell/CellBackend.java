@@ -217,8 +217,8 @@ public class CellBackend {
     public static final HashMap<OutputNode,LinkedList<Integer>> outputChannelMap =
         new HashMap<OutputNode,LinkedList<Integer>>();
     
-    public static final HashMap<Integer,SliceNode> SPUassignment = 
-        new HashMap<Integer,SliceNode>();
+    public static final HashMap<Integer,InternalFilterNode> SPUassignment = 
+        new HashMap<Integer,InternalFilterNode>();
     
     /**
      * Encapsulates the schedule and layout of the program. The first dimension
@@ -239,11 +239,11 @@ public class CellBackend {
      * List of all the filters in the graph (including RR splitters and joiners 
      * as separate filters)
      */
-    public static final ArrayList<SliceNode> filters = 
-        new ArrayList<SliceNode>();
+    public static final ArrayList<InternalFilterNode> filters = 
+        new ArrayList<InternalFilterNode>();
     
-    public static final HashMap<SliceNode,Integer> filterIdMap = 
-        new HashMap<SliceNode,Integer>();
+    public static final HashMap<InternalFilterNode,Integer> filterIdMap = 
+        new HashMap<InternalFilterNode,Integer>();
     
     public static final HashMap<OutputNode,Integer> duplicateSplitters = 
         new HashMap<OutputNode,Integer>();
@@ -278,7 +278,7 @@ public class CellBackend {
     
     public static void addReadyInputsForCompleted(LinkedList<Integer> completedIds) {
         for (int i : completedIds) {
-            SliceNode sliceNode = filters.get(i);
+            InternalFilterNode sliceNode = filters.get(i);
             if (sliceNode.isInputSlice()) {
                 InputNode inputNode = sliceNode.getAsInput();
                 if (inputNode.isJoiner(SchedulingPhase.STEADY)) {

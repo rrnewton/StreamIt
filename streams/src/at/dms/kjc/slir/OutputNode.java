@@ -19,7 +19,7 @@ import java.util.List;
  * 
  * @author mgordon
  */
-public class OutputNode extends SliceNode implements at.dms.kjc.DeepCloneable {
+public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepCloneable {
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = 
         { "weights", "dests", "initWeights", "initDests" };
     

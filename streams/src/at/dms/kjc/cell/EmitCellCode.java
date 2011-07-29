@@ -123,7 +123,7 @@ public class EmitCellCode extends EmitCode {
             p.println("#include \"rrsplitter.h\"");
     }
     
-    public void generateSPUCHeader(CodegenPrintWriter p, SliceNode s, boolean init) {
+    public void generateSPUCHeader(CodegenPrintWriter p, InternalFilterNode s, boolean init) {
         p.println("#include \"filterdefs.h\"");
         p.println("#include \"structs.h\"");
         p.println("#include <math.h>");

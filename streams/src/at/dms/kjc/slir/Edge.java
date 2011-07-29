@@ -3,7 +3,7 @@ package at.dms.kjc.slir;
 import at.dms.kjc.CType;
 
 /**
- * An Edge connects two {@link SliceNode}s.
+ * An Edge connects two {@link InternalFilterNode}s.
  * Edges can be differentiated into {@link InterFilterEdge}s that connect the OutputSliceNode of a slice
  * and the InputSliceNode of a slice, and {@link IntraFilterEdge} that connect two SliceNodes in
  * the same slice.  
@@ -24,12 +24,12 @@ public class Edge implements at.dms.kjc.DeepCloneable {
     /**
      * Source of directed edge in Slice graph
      */
-    protected SliceNode src;
+    protected InternalFilterNode src;
 
     /**
      * Destination of directed edge in Slice graph
      */
-    protected SliceNode dest;
+    protected InternalFilterNode dest;
 
     /**
      * Caches type for {@link #getType()} calls
@@ -41,7 +41,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * @param src   Source assumed to be an OutputSliceNode or a FilterSliceNode.
      * @param dest  Dest assumed to be an InputSliceNode or a FilterSliceNode.
      */
-    public Edge(SliceNode src, SliceNode dest) {
+    public Edge(InternalFilterNode src, InternalFilterNode dest) {
         assert src != null;
         assert dest != null;
         this.src = src;
@@ -59,7 +59,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
     /**
      * @return source SliceNode
      */
-    public SliceNode getSrc() {
+    public InternalFilterNode getSrc() {
         return src;
     }
 
@@ -115,7 +115,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
     /**
      * @return dest SliceNode
      */
-    public SliceNode getDest() {
+    public InternalFilterNode getDest() {
         return dest;
     }
 
@@ -123,7 +123,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * Set the source SliceNode
      * @param src
      */
-    public void setSrc(SliceNode src) {
+    public void setSrc(InternalFilterNode src) {
         this.src = src;
     }
 
@@ -131,7 +131,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * Set the destination SliceNode
      * @param dest
      */
-    public void setDest(SliceNode dest) {
+    public void setDest(InternalFilterNode dest) {
         this.dest = dest;
     }
 
@@ -144,7 +144,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * @param node a FilterSliceNode or InputSliceNode
      * @return a FilterSliceNode
      */
-    private static WorkNode nextFilter(SliceNode node) {
+    private static WorkNode nextFilter(InternalFilterNode node) {
         if (node instanceof WorkNode) {
             return (WorkNode)node;
         } else {
@@ -159,7 +159,7 @@ public class Edge implements at.dms.kjc.DeepCloneable {
      * @return a FilterSliceNode
      */
    
-    private static WorkNode prevFilter(SliceNode node) {
+    private static WorkNode prevFilter(InternalFilterNode node) {
         if (node instanceof WorkNode) {
             return (WorkNode)node;
         } else {

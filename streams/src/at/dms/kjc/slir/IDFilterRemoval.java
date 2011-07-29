@@ -13,7 +13,7 @@ public class IDFilterRemoval {
     private OutputNode idOutput;
     private InputNode[] dsInputs;
     private int[] dsInputIndices;
-    private HashMap<SliceNode, Integer> indexToIndex;
+    private HashMap<InternalFilterNode, Integer> indexToIndex;
     private OutputNode[] usOutputs;
     private int[] usOutputIndices;
     
@@ -76,7 +76,7 @@ public class IDFilterRemoval {
     }
     
     private void unroll(SchedulingPhase phase) {
-        indexToIndex = new HashMap<SliceNode, Integer>();
+        indexToIndex = new HashMap<InternalFilterNode, Integer>();
         //unroll all the upstream output slice nodes
         LinkedList<OutputNode> outputs = new LinkedList<OutputNode>();
         for (InterFilterEdge edge : idInput.getSourceSet(phase)) {

@@ -9,7 +9,7 @@ import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.Util;
 import java.lang.*;
@@ -91,11 +91,11 @@ public class CompCommRatio {
     public static double ratio(SIRSlicer slicer) {
         int comp = 0, comm = 0;
         // get the slice node travesal
-        Iterator<SliceNode> sliceNodeIt = Util.sliceNodeTraversal(DataFlowOrder
+        Iterator<InternalFilterNode> sliceNodeIt = Util.sliceNodeTraversal(DataFlowOrder
                                                        .getTraversal(slicer.getTopSlices()));
 
         while (sliceNodeIt.hasNext()) {
-            SliceNode sliceNode = sliceNodeIt.next();
+            InternalFilterNode sliceNode = sliceNodeIt.next();
 
             if (sliceNode.isFilterSlice()) {
                 WorkNode filter = (WorkNode) sliceNode;

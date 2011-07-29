@@ -33,19 +33,19 @@ public class TMDBinPackFissAll extends Scheduler {
     }
     
     /** Get the Core for a Slice 
-     * @param node the {@link at.dms.kjc.slir.SliceNode} to look up. 
-     * @return the Core that should execute the {@link at.dms.kjc.slir.SliceNode}. 
+     * @param node the {@link at.dms.kjc.slir.InternalFilterNode} to look up. 
+     * @return the Core that should execute the {@link at.dms.kjc.slir.InternalFilterNode}. 
      */
-    public Core getComputeNode(SliceNode node) {
+    public Core getComputeNode(InternalFilterNode node) {
         assert layoutMap.keySet().contains(node);
         return layoutMap.get(node);
     }
     
     /** Set the Core for a Slice 
-     * @param node         the {@link at.dms.kjc.slir.SliceNode} to associate with ...
+     * @param node         the {@link at.dms.kjc.slir.InternalFilterNode} to associate with ...
      * @param core   The tile to assign the node
      */
-    public void setComputeNode(SliceNode node, Core core) {
+    public void setComputeNode(InternalFilterNode node, Core core) {
         assert node != null && core != null;
         //remember what filters each tile has mapped to it
         layoutMap.put(node, core);

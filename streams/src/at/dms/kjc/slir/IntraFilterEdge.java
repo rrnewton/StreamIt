@@ -17,7 +17,7 @@ public class IntraFilterEdge extends Edge implements at.dms.kjc.DeepCloneable {
         super();
     }
     
-    public IntraFilterEdge(SliceNode src, SliceNode dst) {
+    public IntraFilterEdge(InternalFilterNode src, InternalFilterNode dst) {
         super(src, dst);
         //assert src.getParent() == dst.getParent(); //can't assume that parent pointer is set up
         //could use a lot more checking here, but at this point, not really crucial

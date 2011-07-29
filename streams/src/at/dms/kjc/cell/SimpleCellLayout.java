@@ -5,11 +5,11 @@ import java.util.HashMap;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 public class SimpleCellLayout implements Layout<CellPU> {
 
-    private HashMap<SliceNode,CellPU> layout;
+    private HashMap<InternalFilterNode,CellPU> layout;
     SpaceTimeScheduleAndSlicer spaceTime;
     CellChip cellChip;
     
@@ -18,7 +18,7 @@ public class SimpleCellLayout implements Layout<CellPU> {
         this.cellChip = cellChip;
     }
     
-    public CellPU getComputeNode(SliceNode node) {
+    public CellPU getComputeNode(InternalFilterNode node) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -31,7 +31,7 @@ public class SimpleCellLayout implements Layout<CellPU> {
         }
     }
 
-    public void setComputeNode(SliceNode node, CellPU computeNode) {
+    public void setComputeNode(InternalFilterNode node, CellPU computeNode) {
         // TODO Auto-generated method stub
 
     }

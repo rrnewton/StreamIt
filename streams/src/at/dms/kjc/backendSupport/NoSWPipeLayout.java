@@ -17,32 +17,32 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     protected SIRSlicer slicer;
     protected Ts chip;
     protected LinkedList<Filter> scheduleOrder;
-    protected LinkedList<SliceNode> assignedFilters;
+    protected LinkedList<InternalFilterNode> assignedFilters;
     protected Random rand;
     
     /** from assignment when done with simulated annealing */
-    private HashMap<SliceNode, T> layout;
+    private HashMap<InternalFilterNode, T> layout;
     
     public NoSWPipeLayout(SpaceTimeScheduleAndSlicer spaceTime, Ts chip) {
         this.chip = chip;
         this.slicer = (SIRSlicer)spaceTime.getSlicer();
         scheduleOrder = 
             DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
-        assignedFilters = new LinkedList<SliceNode>();
+        assignedFilters = new LinkedList<InternalFilterNode>();
         rand = new Random(17);
     }
     
     /**
      * only valid after run();
      */
-    public T getComputeNode(SliceNode node) {
+    public T getComputeNode(InternalFilterNode node) {
         return layout.get(node);
     }
     
     /**
      * only valid after run()
      */
-    public void setComputeNode(SliceNode node, T tile) {
+    public void setComputeNode(InternalFilterNode node, T tile) {
         layout.put(node, tile);
     }
     
@@ -171,10 +171,10 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
 
         // set assignments for all SliceNodes in layout
         Set<Map.Entry> entries = assignment.entrySet();
-        layout = new HashMap<SliceNode, T>();
-        for (Map.Entry<SliceNode, T> snode_cnode : entries) {
+        layout = new HashMap<InternalFilterNode, T>();
+        for (Map.Entry<InternalFilterNode, T> snode_cnode : entries) {
             T cnode = snode_cnode.getValue();
-            SliceNode snode = snode_cnode.getKey();
+            InternalFilterNode snode = snode_cnode.getKey();
             
             if (snode instanceof WorkNode) {
                 setComputeNode(snode,cnode);

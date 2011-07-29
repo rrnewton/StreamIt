@@ -43,7 +43,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * Creates an InputSliceNode automatically and links it with the FilterSliceNode.
      * @param node
      */
-    public Filter(SliceNode node) {
+    public Filter(InternalFilterNode node) {
         if (!(node instanceof WorkNode))
             Utils.fail("FilterSliceNode expected: " + node);
         head = new InputNode();

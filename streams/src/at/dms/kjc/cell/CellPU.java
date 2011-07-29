@@ -5,22 +5,22 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import at.dms.kjc.backendSupport.ComputeNode;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 public abstract class CellPU extends ComputeNode<CellComputeCodeStore> {
 
-    private HashMap<SliceNode,CellComputeCodeStore> computeCodeStores;
-    private HashMap<SliceNode,CellComputeCodeStore> initComputeCodeStores;
+    private HashMap<InternalFilterNode,CellComputeCodeStore> computeCodeStores;
+    private HashMap<InternalFilterNode,CellComputeCodeStore> initComputeCodeStores;
     
     protected CellPU(int uniqueId) {
         super();
         setUniqueId(uniqueId);
         computeCode = new CellComputeCodeStore(this);
-        computeCodeStores = new HashMap<SliceNode,CellComputeCodeStore>();
-        initComputeCodeStores = new HashMap<SliceNode,CellComputeCodeStore>();
+        computeCodeStores = new HashMap<InternalFilterNode,CellComputeCodeStore>();
+        initComputeCodeStores = new HashMap<InternalFilterNode,CellComputeCodeStore>();
     }
     
-    public CellComputeCodeStore getComputeCodeStore(SliceNode s) {
+    public CellComputeCodeStore getComputeCodeStore(InternalFilterNode s) {
         CellComputeCodeStore cs = computeCodeStores.get(s);
         if (cs == null) {
             cs = new CellComputeCodeStore(this, s);
@@ -42,7 +42,7 @@ public abstract class CellPU extends ComputeNode<CellComputeCodeStore> {
     }
     
     
-    public CellComputeCodeStore getInitComputeCodeStore(SliceNode s) {
+    public CellComputeCodeStore getInitComputeCodeStore(InternalFilterNode s) {
         CellComputeCodeStore cs = initComputeCodeStores.get(s);
         if (cs == null) {
             cs = new CellComputeCodeStore(this, s);

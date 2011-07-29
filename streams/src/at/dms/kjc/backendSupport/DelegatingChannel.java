@@ -135,12 +135,12 @@ public class DelegatingChannel extends Channel {
     /* } RMR */
     
     @Override
-    public SliceNode getDest() {
+    public InternalFilterNode getDest() {
         return theEdge.getDest();
     }
 
     @Override
-    public SliceNode getSource() {
+    public InternalFilterNode getSource() {
         return theEdge.getSrc();
     }
 

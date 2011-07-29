@@ -43,7 +43,7 @@ import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 public class CellProcessInputSliceNode extends ProcessInputSliceNode {
 

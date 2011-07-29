@@ -106,7 +106,7 @@ public class ChannelAsArray extends Channel {
 
     /** Obsolete constructor, don't use. */
     @Deprecated
-    public ChannelAsArray(SliceNode src, SliceNode dst) {
+    public ChannelAsArray(InternalFilterNode src, InternalFilterNode dst) {
         super(src, dst);
         throw new AssertionError("Creating ChannelAsArray from src, dst not supported.");
     }

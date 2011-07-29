@@ -14,10 +14,10 @@ import at.dms.kjc.slir.*;
  *
  */
 public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
-    private HashMap<SliceNode, T> assignment;
+    private HashMap<InternalFilterNode, T> assignment;
     private SpaceTimeScheduleAndSlicer spaceTime;
     private int numBins;
-    private LinkedList<SliceNode>[] bins;
+    private LinkedList<InternalFilterNode>[] bins;
     private int[] binWeight;
     //private int[] searchOrder;
     private int totalWork;
@@ -38,25 +38,25 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         bins = new LinkedList[numBins];
         binWeight = new int[numBins];
         for (int i = 0; i < numBins; i++) {
-            bins[i] = new LinkedList<SliceNode>();
+            bins[i] = new LinkedList<InternalFilterNode>();
             binWeight[i] = 0;
         }
     }
     
-    public HashMap<SliceNode, T> getAssignment() {
+    public HashMap<InternalFilterNode, T> getAssignment() {
         return assignment;
     }
     
     
-    public T getComputeNode(SliceNode node) {
+    public T getComputeNode(InternalFilterNode node) {
         return assignment.get(node);
     }
    
-    public void setComputeNode(SliceNode node, T tile) {
+    public void setComputeNode(InternalFilterNode node, T tile) {
         assignment.put(node, tile);
     }
     public void runLayout() {
-        assignment = new HashMap<SliceNode, T>();
+        assignment = new HashMap<InternalFilterNode, T>();
         pack();
 
         System.out.println("IdealWork = " + totalWork / numBins);
@@ -65,7 +65,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
     
     private void pack() {
         //now sort the filters by work
-        LinkedList<SliceNode> sortedList = new LinkedList<SliceNode>();
+        LinkedList<InternalFilterNode> sortedList = new LinkedList<InternalFilterNode>();
         LinkedList<Filter> scheduleOrder;
         
     
@@ -83,11 +83,11 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
             sortedList.add(slice.getInputNode().getNextFilter());
         }
         
-        Iterator<SliceNode> sorted = sortedList.iterator();
+        Iterator<InternalFilterNode> sorted = sortedList.iterator();
         
         //perform the packing
         while (sorted.hasNext()) {
-            SliceNode snode = sorted.next();
+            InternalFilterNode snode = sorted.next();
             if (snode instanceof WorkNode) {
                 WorkNode fnode = (WorkNode) snode;
                 int bin = findMinBin();

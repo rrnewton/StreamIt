@@ -16,7 +16,7 @@ import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 public class CellBackendFactory 
     extends BackEndFactory<CellChip, CellPU, CellComputeCodeStore, Integer> {
@@ -70,13 +70,13 @@ public class CellBackendFactory
     }
 
     @Override
-    public Channel getChannel(SliceNode src, SliceNode dst) {
+    public Channel getChannel(InternalFilterNode src, InternalFilterNode dst) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public CodeStoreHelper getCodeStoreHelper(SliceNode node) {
+    public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
         if (node instanceof WorkNode) {
             // simply do appropriate wrapping of calls...
             return new CodeStoreHelperSimple((WorkNode)node,this);

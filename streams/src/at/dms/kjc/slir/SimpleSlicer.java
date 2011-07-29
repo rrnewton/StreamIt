@@ -60,7 +60,7 @@ public class SimpleSlicer extends SIRSlicer {
                 long workEstimate = getWorkEstimate(unflatFilter);
                 workEstimation.put(filterContent, new Long(workEstimate));
 
-                SliceNode node;
+                InternalFilterNode node;
                 Filter slice;
                 int filtersInSlice = 1;
 

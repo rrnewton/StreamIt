@@ -21,17 +21,17 @@ public class HandLayout implements Layout {
     protected Slicer slicer;
     protected TileraChip chip;
     protected LinkedList<Filter> scheduleOrder;
-    protected HashMap<SliceNode, Tile> assignment;    
+    protected HashMap<InternalFilterNode, Tile> assignment;    
         
     public HandLayout(SpaceTimeScheduleAndSlicer spaceTime, TileraChip chip) {
         this.chip = chip;
         this.slicer = spaceTime.getSlicer();
         scheduleOrder = 
             DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
-        assignment = new HashMap<SliceNode, Tile>();
+        assignment = new HashMap<InternalFilterNode, Tile>();
     }
 
-    public ComputeNode getComputeNode(SliceNode node) {
+    public ComputeNode getComputeNode(InternalFilterNode node) {
         return assignment.get(node);
     }
 
@@ -86,7 +86,7 @@ public class HandLayout implements Layout {
         }
     }
 
-    public void setComputeNode(SliceNode node, ComputeNode tile) {
+    public void setComputeNode(InternalFilterNode node, ComputeNode tile) {
         assignment.put(node, (Tile)tile);
     }
 

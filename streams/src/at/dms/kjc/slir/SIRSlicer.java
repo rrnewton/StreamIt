@@ -286,7 +286,7 @@ public abstract class SIRSlicer extends Slicer {
             //FilterSliceNode bottleNeck = 
             //    bottleNeckFilter.get(slice);
             
-            SliceNode prev = slice.getInputNode().getNextFilter();
+            InternalFilterNode prev = slice.getInputNode().getNextFilter();
             long prevWork = getFilterWorkSteadyMult((WorkNode)prev);
             
             //set the first filter
@@ -296,7 +296,7 @@ public abstract class SIRSlicer extends Slicer {
                     prev + " " + prevWork);
             
             //for forward from the bottleneck
-            SliceNode current = prev.getNext();
+            InternalFilterNode current = prev.getNext();
             
             while (current.isFilterSlice()) {
                 long occ = 
@@ -325,7 +325,7 @@ public abstract class SIRSlicer extends Slicer {
             
             //go back from the tail
             
-            SliceNode next = slice.getOutputNode().getPrevFilter();
+            InternalFilterNode next = slice.getOutputNode().getPrevFilter();
             //if the work of the last filter is more than the occupancy calculated
             //by the forward traversal, set he occupancy to the filter's total work
             if (getFilterWorkSteadyMult((WorkNode)next) > 
@@ -455,7 +455,7 @@ public abstract class SIRSlicer extends Slicer {
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
     protected Filter[] getNext(Filter slice) {
-        SliceNode node = slice.getInputNode();
+        InternalFilterNode node = slice.getInputNode();
         if (node instanceof InputNode)
             node = node.getNext();
         while (node != null && node instanceof WorkNode) {
@@ -510,7 +510,7 @@ public abstract class SIRSlicer extends Slicer {
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
     protected  String sliceName(Filter slice) {
-        SliceNode node = slice.getInputNode();
+        InternalFilterNode node = slice.getInputNode();
 
         StringBuffer out = new StringBuffer();
 

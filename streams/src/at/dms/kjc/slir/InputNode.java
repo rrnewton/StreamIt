@@ -15,7 +15,7 @@ import at.dms.kjc.backendSupport.FilterInfo;
  * 
  * Has an array of weights and corresponding {@link InterFilterEdge}s.
  */
-public class InputNode extends SliceNode implements at.dms.kjc.DeepCloneable {
+public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepCloneable {
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = 
         { "weights", "sources", "initWeights", "initSources" };
     

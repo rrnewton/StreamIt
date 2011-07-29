@@ -14,7 +14,7 @@ import at.dms.kjc.slir.LevelizeSSG;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 import java.util.HashMap;
 
@@ -81,7 +81,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
      * @see at.dms.kjc.backendSupport.BackEndFactory#getChannel(at.dms.kjc.slicegraph.SliceNode, at.dms.kjc.slicegraph.SliceNode)
      */
     @Override
-    public Channel getChannel(SliceNode src, SliceNode dst) {
+    public Channel getChannel(InternalFilterNode src, InternalFilterNode dst) {
         // TODO Auto-generated method stub
     	assert false;
         return null;
@@ -91,7 +91,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
      * @see at.dms.kjc.backendSupport.BackEndFactory#getCodeStoreHelper(at.dms.kjc.slicegraph.SliceNode)
      */
     @Override
-    public CodeStoreHelper getCodeStoreHelper(SliceNode node) {
+    public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
         // TODO Auto-generated method stub
         if (node instanceof WorkNode) {
             // simply do appropriate wrapping of calls...

@@ -49,7 +49,7 @@ import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SliceNode;
+import at.dms.kjc.slir.InternalFilterNode;
 
 public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     
@@ -65,7 +65,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     private int id = 0;
     
     // The slicenode whose code is stored here
-    private SliceNode slicenode;
+    private InternalFilterNode slicenode;
     
     /***************************************************************************
      *                              Constructors
@@ -75,7 +75,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         super(parent);
     }
     
-    public CellComputeCodeStore(CellPU parent, SliceNode s) {
+    public CellComputeCodeStore(CellPU parent, InternalFilterNode s) {
         super(parent);
         slicenode = s;
     }
@@ -442,7 +442,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * depending on which is being run. Thus, work_func will be set later.
      * @param sliceNode
      */
-    public void setupFilter(SliceNode sliceNode) {
+    public void setupFilter(InternalFilterNode sliceNode) {
         if (KjcOptions.celldyn) {
             setupDynamicFilter(sliceNode);
         } else {
@@ -450,7 +450,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         }
     }
     
-    private void setupStaticFilter(SliceNode sliceNode) {
+    private void setupStaticFilter(InternalFilterNode sliceNode) {
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         
         JBlock body = new JBlock();
@@ -468,7 +468,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
 
     }
     
-    private void setupDynamicFilter(SliceNode sliceNode) {
+    private void setupDynamicFilter(InternalFilterNode sliceNode) {
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         int inputs, outputs;
         inputs = getNumInputs(sliceNode);
@@ -562,7 +562,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * @param whichPhase
      * @return TODO
      */
-    public JBlock setupFilterDescriptionWorkFunc(SliceNode sliceNode, SchedulingPhase whichPhase) {
+    public JBlock setupFilterDescriptionWorkFunc(InternalFilterNode sliceNode, SchedulingPhase whichPhase) {
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         
         String workfuncname;
@@ -585,7 +585,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         return body;
     }
     
-    public JBlock setupPSPNumIOputs(SliceNode sliceNode, SchedulingPhase whichPhase) {
+    public JBlock setupPSPNumIOputs(InternalFilterNode sliceNode, SchedulingPhase whichPhase) {
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         
         int inputs, outputs;
@@ -644,7 +644,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * wf = &wf_[init_]splitter_[splittername]
      * @param sliceNode
      */
-    public void setupWorkFunctionAddress(SliceNode sliceNode) {
+    public void setupWorkFunctionAddress(InternalFilterNode sliceNode) {
         String sliceName = getFilterName(sliceNode);
         addInitStatement(new JExpressionStatement(new JAssignmentExpression(
                 new JArrayAccessExpression(
@@ -667,7 +667,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * which differ depending on INIT/STEADY stage
      * @param sliceNode
      */
-    public void setupPSP(SliceNode sliceNode) {
+    public void setupPSP(InternalFilterNode sliceNode) {
         // This is only done for static scheduling
         if (KjcOptions.celldyn) return;
         
@@ -755,7 +755,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * @param whichPhase
      * @return TODO
      */
-    public JBlock setupPSPIOBytes(SliceNode sliceNode, SchedulingPhase whichPhase) {
+    public JBlock setupPSPIOBytes(InternalFilterNode sliceNode, SchedulingPhase whichPhase) {
         int inputs, outputs;
         inputs = getNumInputs(sliceNode);
         outputs = getNumOutputs(sliceNode);
@@ -812,7 +812,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * @param spuId
      * @return TODO
      */
-    public JBlock setupPSPSpuId(SliceNode sliceNode, int spuId) {
+    public JBlock setupPSPSpuId(InternalFilterNode sliceNode, int spuId) {
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         JBlock body = new JBlock();
         body.addStatement(new JExpressionStatement(new JAssignmentExpression(
@@ -827,11 +827,11 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * @param sliceNode
      * @return TODO
      */
-    public JBlock callExtPSP(SliceNode sliceNode) {
+    public JBlock callExtPSP(InternalFilterNode sliceNode) {
         return callExtPSP(sliceNode, 1);
     }
     
-    public JBlock callExtPSP(SliceNode sliceNode, int iters) {
+    public JBlock callExtPSP(InternalFilterNode sliceNode, int iters) {
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         JBlock body = new JBlock();
         body.addStatement(new JExpressionStatement(new JMethodCallExpression("ext_ppu_spu_ppu_ex",
@@ -1094,7 +1094,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     
     private void attachInputChannelArrayDynamic(int filterId,
             LinkedList<Integer> inputIds, SchedulingPhase whichPhase) {
-        SliceNode sliceNode = CellBackend.filters.get(filterId);
+        InternalFilterNode sliceNode = CellBackend.filters.get(filterId);
         
         for (int i=0; i<inputIds.size(); i++) {
             // filters[id].inputs[i] = &channels[j];
@@ -1219,7 +1219,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         if (outputIds == null)
             return;
         
-        SliceNode sliceNode = CellBackend.filters.get(filterId);
+        InternalFilterNode sliceNode = CellBackend.filters.get(filterId);
         
         if (KjcOptions.celldyn) {
             for (int i=0; i<outputIds.size(); i++) {
@@ -1635,7 +1635,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      ***************************************************************************
      */
     
-    public SliceNode getSliceNode() {
+    public InternalFilterNode getSliceNode() {
         return slicenode;
     }
     
@@ -1754,7 +1754,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * @param sliceNode
      * @return
      */
-    private static int getNumInputs(SliceNode sliceNode) {
+    private static int getNumInputs(InternalFilterNode sliceNode) {
         int inputs;
         if (sliceNode.isInputSlice()) {
             inputs = sliceNode.getAsInput().getWidth(SchedulingPhase.STEADY);
@@ -1771,7 +1771,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * @param sliceNode
      * @return
      */
-    private static int getNumOutputs(SliceNode sliceNode) {
+    private static int getNumOutputs(InternalFilterNode sliceNode) {
         int outputs;
         if (sliceNode.isInputSlice()) {
             outputs = 1;
@@ -1796,7 +1796,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
      * @param sliceNode
      * @return
      */
-    private static String getFilterName(SliceNode sliceNode) {
+    private static String getFilterName(InternalFilterNode sliceNode) {
         String basename = 
             sliceNode.getParent().getWorkNode().getFilter().getName();
         if (sliceNode.isFilterSlice())

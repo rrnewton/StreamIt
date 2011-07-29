@@ -172,7 +172,7 @@ public abstract class Slicer {
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
     protected Filter[] getNext(Filter slice, SchedulingPhase phase) {
-        SliceNode node = slice.getInputNode();
+        InternalFilterNode node = slice.getInputNode();
         if (node instanceof InputNode)
             node = node.getNext();
         while (node != null && node instanceof WorkNode) {
@@ -216,7 +216,7 @@ public abstract class Slicer {
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
     protected  String sliceName(Filter slice, Layout layout, boolean fullInfo) {
-        SliceNode node = slice.getInputNode();
+        InternalFilterNode node = slice.getInputNode();
 
         StringBuffer out = new StringBuffer();
 

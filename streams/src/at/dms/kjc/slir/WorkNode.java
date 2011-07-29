@@ -5,9 +5,9 @@ import at.dms.kjc.backendSupport.Layout;
 
 import java.util.*;
 /** 
- * A {@link SliceNode} that references a {@link WorkNodeContent}.
+ * A {@link InternalFilterNode} that references a {@link WorkNodeContent}.
  **/
-public class WorkNode extends SliceNode implements at.dms.kjc.DeepCloneable
+public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepCloneable
 {
     private WorkNodeContent filter;
    

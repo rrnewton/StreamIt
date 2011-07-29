@@ -105,7 +105,7 @@ public abstract class BackEndFactory<
     protected Layout<ComputeNodeType> layout;
 
     /**
-     * Keep a copy of the {@link Layout}: the mapping from {@link at.dms.kjc.slir.SliceNode SliceNode} to 
+     * Keep a copy of the {@link Layout}: the mapping from {@link at.dms.kjc.slir.InternalFilterNode SliceNode} to 
      * {@link ComputeNode}.
      * @param layout
      */
@@ -146,7 +146,7 @@ public abstract class BackEndFactory<
      * @param dst
      * @return a channel: preexisting or newly created.
      */
-    public abstract Channel getChannel(SliceNode src, SliceNode dst);
+    public abstract Channel getChannel(InternalFilterNode src, InternalFilterNode dst);
 
     /**
      * Select a CodeStoreHelper subclass given a SliceNode.
@@ -155,7 +155,7 @@ public abstract class BackEndFactory<
      * @param node the SliceNode.
      * @return an instance of CodeStoreHelper
      */
-    public abstract CodeStoreHelper getCodeStoreHelper(SliceNode node);
+    public abstract CodeStoreHelper getCodeStoreHelper(InternalFilterNode node);
 
     /**
      * Does slice need a buffer between its final filter and its splitter?

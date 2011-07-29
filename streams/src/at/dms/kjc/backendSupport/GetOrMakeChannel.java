@@ -38,8 +38,8 @@ public class GetOrMakeChannel  {
         if (c != null) {
             return c;
         }
-        SliceNode src = e.getSrc();
-        SliceNode dst = e.getDest();
+        InternalFilterNode src = e.getSrc();
+        InternalFilterNode dst = e.getDest();
 
         if (src instanceof OutputNode && dst instanceof InputNode) {
             c = makeInterSliceChannel((InterFilterEdge)e);
@@ -104,8 +104,8 @@ public class GetOrMakeChannel  {
      * @return a channel that implements the edge or <b>null</b> if no data passes over the edge.
      */
     protected Channel makeIntraSliceChannel(Edge e) {
-        SliceNode src = e.getSrc();
-        SliceNode dst = e.getDest();
+        InternalFilterNode src = e.getSrc();
+        InternalFilterNode dst = e.getDest();
 
         Channel c;
                 
