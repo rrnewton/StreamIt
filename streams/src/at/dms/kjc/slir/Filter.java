@@ -61,7 +61,15 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * in it.
      */
     public void finishClone() {
-      finish();
+    	//set the head refs
+        head.setParent(this);
+        head.setNext(workNode);
+        
+        workNode.setParent(this);
+        
+        //set the tail's structures
+        tail.setParent(this);
+        tail.setPrevious(workNode);
     }
     
     /**
@@ -77,6 +85,10 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         head.setNext(workNode);
         
         workNode.setParent(this);
+        
+        if (tail == null) {
+        	tail = new OutputNode();
+        }
         
         //set the tail's structures
         tail.setParent(this);
