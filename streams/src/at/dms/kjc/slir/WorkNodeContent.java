@@ -23,7 +23,7 @@ import at.dms.kjc.tilera.CFixedPointType;
  * 
  * @author jasperln
  */
-public class FilterContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
+public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /** Static unique id used in new name if one FilterContent created from another. */
     protected static int unique_ID = 0; 
     /** The unique id given to this FilterContent for use in constructing names */
@@ -74,14 +74,14 @@ public class FilterContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */
-    protected FilterContent() {
+    protected WorkNodeContent() {
     }
 
     /**
      * Copy constructor for FilterContent
      * @param content The FilterContent to copy.
      */
-    public FilterContent(FilterContent content) {
+    public WorkNodeContent(WorkNodeContent content) {
         my_unique_ID = unique_ID++;
         name = content.name + my_unique_ID;
         prework = content.prework;
@@ -110,7 +110,7 @@ public class FilterContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
      * Constructor FilterContent from SIRPhasedFilter.
      * @param filter SIRPhasedFilter to construct from.
      */
-    public FilterContent(SIRPhasedFilter filter) {
+    public WorkNodeContent(SIRPhasedFilter filter) {
         my_unique_ID = unique_ID++;
         name = filter.getName();
         prework = filter.getInitPhases();
@@ -134,7 +134,7 @@ public class FilterContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
      * Constructor FilterContent from UnflatFilter.
      * @param unflat UnflatFilter to construct from.
      */
-    public FilterContent(UnflatFilter unflat) {
+    public WorkNodeContent(UnflatFilter unflat) {
         SIRFilter filter = unflat.filter;
         //assert filter != null : unflat.toString();
         if (filter == null) {
@@ -802,14 +802,14 @@ public class FilterContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
 
     /** Returns a deep clone of this object. */
     public Object deepClone() {
-        at.dms.kjc.slir.FilterContent other = new at.dms.kjc.slir.FilterContent();
+        at.dms.kjc.slir.WorkNodeContent other = new at.dms.kjc.slir.WorkNodeContent();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);
         return other;
     }
 
     /** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.FilterContent other) {
+    protected void deepCloneInto(at.dms.kjc.slir.WorkNodeContent other) {
         other.my_unique_ID = this.my_unique_ID;
         other.name = (java.lang.String)at.dms.kjc.AutoCloner.cloneToplevel(this.name);
         other.prework = (at.dms.kjc.JMethodDeclaration[])at.dms.kjc.AutoCloner.cloneToplevel(this.prework);

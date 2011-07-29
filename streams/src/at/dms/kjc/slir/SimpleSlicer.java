@@ -30,7 +30,7 @@ public class SimpleSlicer extends SIRSlicer {
     public SimpleSlicer(UnflatFilter[] topFilters, HashMap[] exeCounts,
                              LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
         super(topFilters, exeCounts, lfa, work, maxPartitions);
-        workEstimation = new HashMap<FilterContent, Long>();
+        workEstimation = new HashMap<WorkNodeContent, Long>();
         TRASHOLD = 1;
     }
 
@@ -55,7 +55,7 @@ public class SimpleSlicer extends SIRSlicer {
             if (!visited.contains(unflatFilter)) {
                 visited.add(unflatFilter);
                 // the filter content for the new filter
-                FilterContent filterContent = getFilterContent(unflatFilter);
+                WorkNodeContent filterContent = getFilterContent(unflatFilter);
                 // remember the work estimation based on the filter content
                 long workEstimate = getWorkEstimate(unflatFilter);
                 workEstimation.put(filterContent, new Long(workEstimate));
@@ -161,7 +161,7 @@ public class SimpleSlicer extends SIRSlicer {
                     // trying to put
                     // another filter in the slice
                     UnflatFilter downstream = unflatFilter.out[0][0].dest;
-                    FilterContent dsContent = getFilterContent(downstream);
+                    WorkNodeContent dsContent = getFilterContent(downstream);
 
                     // remember the work estimation based on the filter content
                     workEstimation.put(dsContent, new Long(

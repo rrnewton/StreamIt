@@ -3,7 +3,7 @@ package at.dms.kjc.slir;
 import at.dms.kjc.*;
 import at.dms.kjc.sir.SIRIdentity;
 
-public class IDFilterContent extends FilterContent {
+public class IDFilterContent extends WorkNodeContent {
 
     public IDFilterContent() {
         my_unique_ID = unique_ID++;

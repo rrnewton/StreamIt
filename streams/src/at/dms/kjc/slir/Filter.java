@@ -120,7 +120,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         node.setParent(this);
     }
 
-    public FilterContent getWorkNodeContent() {
+    public WorkNodeContent getWorkNodeContent() {
     	return workNode.getFilter();
     }
     

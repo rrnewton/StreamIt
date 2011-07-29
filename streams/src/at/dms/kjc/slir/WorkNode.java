@@ -5,19 +5,19 @@ import at.dms.kjc.backendSupport.Layout;
 
 import java.util.*;
 /** 
- * A {@link SliceNode} that references a {@link FilterContent}.
+ * A {@link SliceNode} that references a {@link WorkNodeContent}.
  **/
 public class WorkNode extends SliceNode implements at.dms.kjc.DeepCloneable
 {
-    private FilterContent filter;
+    private WorkNodeContent filter;
    
     private boolean predefined;
     private boolean laidout;
 
-    private static HashMap<FilterContent, WorkNode> contentToNode;
+    private static HashMap<WorkNodeContent, WorkNode> contentToNode;
     
     static {
-        contentToNode = new HashMap<FilterContent, WorkNode>();
+        contentToNode = new HashMap<WorkNodeContent, WorkNode>();
     }
     
     /**
@@ -27,14 +27,14 @@ public class WorkNode extends SliceNode implements at.dms.kjc.DeepCloneable
         super();
     }
 
-    public WorkNode(FilterContent filter) {
+    public WorkNode(WorkNodeContent filter) {
         predefined = (filter instanceof PredefinedContent);
         this.filter = filter;
         laidout = false;
         contentToNode.put(filter, this);
     }
     
-    public static WorkNode getFilterNode(FilterContent f) {
+    public static WorkNode getFilterNode(WorkNodeContent f) {
         return contentToNode.get(f);
     }
     
@@ -48,7 +48,7 @@ public class WorkNode extends SliceNode implements at.dms.kjc.DeepCloneable
         return laidout;
     }
 
-    public FilterContent getFilter() {
+    public WorkNodeContent getFilter() {
         return filter;
     }
 
@@ -86,7 +86,7 @@ public class WorkNode extends SliceNode implements at.dms.kjc.DeepCloneable
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.slir.WorkNode other) {
         super.deepCloneInto(other);
-        other.filter = (at.dms.kjc.slir.FilterContent)at.dms.kjc.AutoCloner.cloneToplevel(this.filter);
+        other.filter = (at.dms.kjc.slir.WorkNodeContent)at.dms.kjc.AutoCloner.cloneToplevel(this.filter);
         other.predefined = this.predefined;
         other.laidout = this.laidout;
     }

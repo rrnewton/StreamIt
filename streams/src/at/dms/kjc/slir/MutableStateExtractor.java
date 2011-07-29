@@ -16,7 +16,7 @@ import at.dms.kjc.JPostfixExpression;
 import at.dms.kjc.JPrefixExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.util.GetSteadyMethods;
 
@@ -32,11 +32,11 @@ public class MutableStateExtractor {
      * outside of the init function.
      */
 
-    public static boolean hasMutableState(final FilterContent filter) {
+    public static boolean hasMutableState(final WorkNodeContent filter) {
         return sizeOfMutableState(filter) > 0;
     }
 
-    public static HashSet<String> getMutableState(final FilterContent filter) {
+    public static HashSet<String> getMutableState(final WorkNodeContent filter) {
         // visit all methods except <init>
         List<JMethodDeclaration> methods = GetSteadyMethods.getSteadyMethods(filter);
         
@@ -108,7 +108,7 @@ public class MutableStateExtractor {
         return mutatedFields;
     }
 
-    public static int sizeOfMutableState(final FilterContent filter) {
+    public static int sizeOfMutableState(final WorkNodeContent filter) {
         HashSet<String> mutatedFields = getMutableState(filter);
         // tally up the size of all the fields found
         int mutableSizeInC = 0;

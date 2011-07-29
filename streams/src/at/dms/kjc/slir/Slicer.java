@@ -197,8 +197,8 @@ public abstract class Slicer {
         return new Filter[0];
     }
 
-    protected FilterContent getFilterContent(UnflatFilter f) {
-        FilterContent content;
+    protected WorkNodeContent getFilterContent(UnflatFilter f) {
+        WorkNodeContent content;
 
         if (f.filter instanceof SIRFileReader)
             content = new FileInputContent(f);
@@ -206,7 +206,7 @@ public abstract class Slicer {
             content = new FileOutputContent(f);
         else {
             assert f.filter != null;
-            content = new FilterContent(f);
+            content = new WorkNodeContent(f);
         }
         
         return content;
@@ -232,7 +232,7 @@ public abstract class Slicer {
         node = node.getNext();
         while (node != null ) {
             if (node.isFilterSlice()) {
-                FilterContent f = node.getAsFilter().getFilter();
+                WorkNodeContent f = node.getAsFilter().getFilter();
                 out.append("\\n" + node.toString() + "{"
                         + "}");
                 if (f.isTwoStage())

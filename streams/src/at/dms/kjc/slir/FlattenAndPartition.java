@@ -40,7 +40,7 @@ public class FlattenAndPartition extends SIRSlicer {
     public FlattenAndPartition(UnflatFilter[] topFilters, HashMap[] exeCounts,
             LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
         super(topFilters, exeCounts, lfa, work, maxPartitions);
-        workEstimation = new HashMap<FilterContent, Long>();
+        workEstimation = new HashMap<WorkNodeContent, Long>();
     }
 
     public Filter[] partition() {
@@ -226,7 +226,7 @@ class SIRToSliceNodes implements FlatVisitor {
         //System.out.println("Creating SliceNodes: " + node);
         OutputNode output = new OutputNode();
         InputNode input = new InputNode();
-        FilterContent content;
+        WorkNodeContent content;
         int mult = 1;
 
         if (node.isFilter()) {
@@ -237,7 +237,7 @@ class SIRToSliceNodes implements FlatVisitor {
                 content = new FileInputContent((SIRFileReader)node.contents);
             }
             else
-                content = new FilterContent(node.getFilter());
+                content = new WorkNodeContent(node.getFilter());
 
         } else if (node.isSplitter()) {
             CType type = CommonUtils.getOutputType(node);

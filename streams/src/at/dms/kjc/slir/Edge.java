@@ -77,8 +77,8 @@ public class Edge implements at.dms.kjc.DeepCloneable {
         }
         // inter-slice edge
         if (src instanceof OutputNode && dest instanceof InputNode) {
-            FilterContent srcContent;
-            FilterContent dstContent;
+            WorkNodeContent srcContent;
+            WorkNodeContent dstContent;
             CType srcType;
             CType dstType;
             srcContent = ((OutputNode)src).getPrevFilter().getFilter();

@@ -58,11 +58,11 @@ public abstract class SIRSlicer extends Slicer {
     protected HashMap<WorkNode, Long> filterOccupancy;
     
 //  filtercontent -> work estimation
-    protected HashMap<FilterContent, Long> workEstimation;
+    protected HashMap<WorkNodeContent, Long> workEstimation;
 
     protected int steadyMult;
     
-    protected HashMap <SIRFilter, FilterContent> sirToContent;
+    protected HashMap <SIRFilter, WorkNodeContent> sirToContent;
     
     /**
      * Create a Partitioner.
@@ -92,7 +92,7 @@ public abstract class SIRSlicer extends Slicer {
         bottleNeckFilter = new HashMap<Filter, WorkNode>();
         filterOccupancy = new HashMap<WorkNode, Long>();
         genIdWorks = new HashMap<SIRFilter, Integer>();
-        sirToContent = new HashMap<SIRFilter, FilterContent>();
+        sirToContent = new HashMap<SIRFilter, WorkNodeContent>();
     }
 
     /**
@@ -480,8 +480,8 @@ public abstract class SIRSlicer extends Slicer {
         return new Filter[0];
     }
 
-    protected FilterContent getFilterContent(UnflatFilter f) {
-        FilterContent content;
+    protected WorkNodeContent getFilterContent(UnflatFilter f) {
+        WorkNodeContent content;
 
         if (f.filter instanceof SIRFileReader)
             content = new FileInputContent(f);
@@ -489,19 +489,19 @@ public abstract class SIRSlicer extends Slicer {
             content = new FileOutputContent(f);
         else {
             if (f.filter == null) {
-                content = new FilterContent(f);
+                content = new WorkNodeContent(f);
                 genIdWorks.put(f.filter, MultiLevelSplitsJoins.IDENTITY_WORK *
                         f.steadyMult);
                 
             } else 
-                content = new FilterContent(f);
+                content = new WorkNodeContent(f);
         }
         
         sirToContent.put(f.filter, content);
         return content;
     }
 
-    public FilterContent getContent(SIRFilter f) {
+    public WorkNodeContent getContent(SIRFilter f) {
         return sirToContent.get(f);
     }
     
@@ -523,7 +523,7 @@ public abstract class SIRSlicer extends Slicer {
         node = node.getNext();
         while (node != null ) {
             if (node.isFilterSlice()) {
-                FilterContent f = node.getAsFilter().getFilter();
+                WorkNodeContent f = node.getAsFilter().getFilter();
                 out.append("\\n" + node.toString() + "{"
                         + getWorkEstimate(f)
                         + "}");
@@ -546,7 +546,7 @@ public abstract class SIRSlicer extends Slicer {
         return out.toString();
     }
     
-    protected long getWorkEstimate(FilterContent fc) {
+    protected long getWorkEstimate(WorkNodeContent fc) {
         assert workEstimation.containsKey(fc);
         return workEstimation.get(fc).longValue();
     }

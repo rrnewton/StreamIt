@@ -17,7 +17,7 @@ public class PeekPopPushInHelper extends SLIREmptyVisitor {
      * 
      * @return true if we find a peek, pop, or push in a helper function
      */
-    public static boolean check(FilterContent filter) {
+    public static boolean check(WorkNodeContent filter) {
         for (int i = 0; i < filter.getMethods().length; i++) {
             if (!filter.getMethods()[i].equals(filter.getWork())) {
                 found = false;

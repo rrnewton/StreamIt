@@ -32,7 +32,7 @@ public class OneFilterSlicer extends Slicer {
             if (!visited.contains(unflatFilter)) {
                 visited.add(unflatFilter);
                 // the filter content for the new filter
-                FilterContent filterContent = getFilterContent(unflatFilter);
+                WorkNodeContent filterContent = getFilterContent(unflatFilter);
                 // remember the work estimation based on the filter content
 
                 SliceNode node;
