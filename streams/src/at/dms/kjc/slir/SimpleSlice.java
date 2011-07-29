@@ -56,7 +56,6 @@ public class SimpleSlice extends Filter implements at.dms.kjc.DeepCloneable {
             head.setParent(this);
             body.setParent(this);
             tail.setParent(this);
-            len = 1;
             head.setNext(body);
             body.setPrevious(head);
             body.setNext(tail);
