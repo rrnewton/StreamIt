@@ -72,6 +72,10 @@ public class SIRSplitType implements Serializable, DeepCloneable {
         return name.equals("NULL_SJ");
     }
 
+    public boolean isDynamic() {
+        return false;
+    }
+    
     public String toString() {
         return name;
     }

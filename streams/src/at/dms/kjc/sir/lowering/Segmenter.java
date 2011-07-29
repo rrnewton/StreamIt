@@ -164,6 +164,9 @@ public class Segmenter implements StreamVisitor {
 	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
 		// TODO Auto-generated method stub
 		log(this.getClass().getCanonicalName() + " preVisitSplitJoin()");
+		if (self.getSplitter().getType().isDynamic()) {
+			// If it is not dynamic, we can add the splitter to the pipeline			
+		}
 	}
 
 	private String uniquePipelineName() {

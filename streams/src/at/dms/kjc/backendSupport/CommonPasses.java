@@ -3,10 +3,8 @@
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,12 +15,10 @@ import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.common.ConvertLocalsToFields;
-import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.sir.SIRInterfaceTable;
-import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPortal;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;

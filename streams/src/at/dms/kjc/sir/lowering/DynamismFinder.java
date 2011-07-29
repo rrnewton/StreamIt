@@ -82,7 +82,9 @@ public class DynamismFinder implements StreamVisitor {
 	@Override
 	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
 		// TODO Auto-generated method stub
-		
+		if (self.getSplitter().getType().isDynamic()) {
+			// If it is not dynamic, we can add the splitter to the pipeline			
+		}
 	}
 
 	/* (non-Javadoc)
