@@ -193,8 +193,8 @@ public class AutoCloner {
         else if (o instanceof at.dms.kjc.slir.WorkNode) {
             result = cloneWorkNode((at.dms.kjc.slir.WorkNode)o);
         }
-        else if (o instanceof at.dms.kjc.slir.FilterContent) {
-            result = cloneFilterContent((at.dms.kjc.slir.FilterContent)o);
+        else if (o instanceof at.dms.kjc.slir.WorkNodeContent) {
+            result = cloneWorkNodeContent((at.dms.kjc.slir.WorkNodeContent)o);
         }
         // other kjc classes, do deep cloning
         else if (CloneGenerator.inTargetClasses(typeName)) {
@@ -314,7 +314,7 @@ public class AutoCloner {
         return newWorkNode;
     }
 
-    static private Object cloneFilterContent(at.dms.kjc.slir.FilterContent content) {
+    static private Object cloneWorkNodeContent(at.dms.kjc.slir.WorkNodeContent content) {
         Object newFilterContent = content.deepClone();
         return newFilterContent;
     }
