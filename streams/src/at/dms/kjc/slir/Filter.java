@@ -80,6 +80,12 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * @return The number of FilterSliceNodes.
      */
     public void finish() {
+    	if (workNode == null) {
+    		workNode = head.getNextFilter();
+    	}
+    	
+    	assert workNode != null : "Trying to finish a Filter with no WorkNode installed.";
+    	
         //set the head refs
         head.setParent(this);
         head.setNext(workNode);
