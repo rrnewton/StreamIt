@@ -11,7 +11,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRTwoStageFilter;
-import at.dms.kjc.slir.FilterContent;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /**
  * Pulled out of lowering.fission.StatelessMethodDublicate for general use:
@@ -64,7 +64,7 @@ public class GetSteadyMethods {
         return retval;
     }
     
-    public static List<JMethodDeclaration> getSteadyMethods(FilterContent filter) {
+    public static List<JMethodDeclaration> getSteadyMethods(WorkNodeContent filter) {
         // I'm not sure how to find who is a message handler.  So,
         // count as "steady" any method that is reachable from work or
         // NOT reachable from init (idea being that init functions
