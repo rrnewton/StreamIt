@@ -199,7 +199,8 @@ public class CommonPasses {
 		// done after fusion, and should not affect fusable
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
-		if (new DynamismFinder().find(str)) {
+		DynamismFinder.Result result = new DynamismFinder().find(str);
+		if (result.isDynamic()) {
 			return doDynamicPass(str);
 		}
 		return doStaticPass(str);
@@ -209,7 +210,7 @@ public class CommonPasses {
 		System.out.println("CommonPasses::doDynamicPass()");
 		SegmentedGraph segmentedGraph = new Segmenter().partition(str);
 		for (SIRStream ssg : segmentedGraph.getStaticSubGraphs()) {
-			log("CommonPasses. "
+			log(this.getClass().getCanonicalName() 
 					+ "performing semantic analysis on ssg ");
 			SemanticChecker.doCheck(ssg);
 		}
@@ -219,8 +220,9 @@ public class CommonPasses {
 		// we want to convert to the StreamGraph
 		new SIRToSLIR().translate(segmentedGraph);
 
-		Filter[] sliceGraph = null;
-		return sliceGraph;
+		Filter[] filterGraph = null;
+
+		return filterGraph;
 	}
 
 	private Filter[] doStaticPass(SIRStream str) {
@@ -455,7 +457,7 @@ public class CommonPasses {
 
 		// TODO: This is where we want to convert to the StreamGraph - soule
 
-		Filter[] sliceGraph = null;
+		Filter[] filterGraph = null;
 		setSlicer(null);
 		if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {
 			if (!KjcOptions.nopartition) {
@@ -479,11 +481,11 @@ public class CommonPasses {
 						getWorkEstimate(), numCores));
 			}
 		}
-		sliceGraph = getSlicer().partition();
-		System.out.println("Traces: " + sliceGraph.length);
+		filterGraph = getSlicer().partition();
+		System.out.println("Traces: " + filterGraph.length);
 
-		// Need to make slice graph, partitioner accessible.
-		return sliceGraph;
+		// Need to make filter graph, partitioner accessible.
+		return filterGraph;
 	}
 
 	/**

@@ -20,8 +20,6 @@ import at.dms.kjc.sir.StreamVisitor;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JIntLiteral;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class Segmenter implements StreamVisitor {
 	SegmentedGraph segmentedGraph = null;
 
 	/* These are the child nodes of the pipeline currently being created */
-	private LinkedList<Object> children = null;
+	private LinkedList<Object> pipelines = null;
 
 	/* an identifier to distinguish pipeline names */
 	private int pipelineId = 0;
@@ -43,10 +41,8 @@ public class Segmenter implements StreamVisitor {
 	}
 
 	public SegmentedGraph partition(SIRStream str) {
-		segmentedGraph = new SegmentedGraph(
-				new ArrayList<SIRStream>(),
-				new HashMap<SIRStream, List<SIRStream>>());
-		children = new LinkedList<Object>();
+		segmentedGraph = new SegmentedGraph();
+		pipelines = new LinkedList<Object>();
 
 		IterFactory.createFactory().createIter(str).accept(this);
 
@@ -95,18 +91,18 @@ public class Segmenter implements StreamVisitor {
 		if (!isSink(self)) {
 			log(this.getClass().getCanonicalName() + " adding a sink after "
 					+ self.getName());
-			children.add(createSink(self, iter));
+			pipelines.add(createSink(self, iter));
 		}
 		if (!isSource(self)) {
 			log(this.getClass().getCanonicalName() + " adding a source before "
 					+ self.getName());
-			children.add(0, createSource((SIRFilter) children.get(0), iter));
+			pipelines.add(0, createSource((SIRFilter) pipelines.get(0), iter));
 		}
 		SIRPipeline pipeline = new SIRPipeline(null, uniquePipelineName());
 		pipeline.setInit(SIRStream.makeEmptyInit());
-		pipeline.setChildren(children);
+		pipeline.setChildren(pipelines);
 		segmentedGraph.addPipe(pipeline);
-		children = new LinkedList<Object>();
+		pipelines = new LinkedList<Object>();
 		log(this.getClass().getCanonicalName() + " pipeline.size()="
 				+ pipeline.size());
 	}
@@ -202,7 +198,7 @@ public class Segmenter implements StreamVisitor {
 				filter.setPop(new JIntLiteral(1));
 				filter.setPeek(new JIntLiteral(1));
 			}
-			children.add(filter);
+			pipelines.add(filter);
 			finishPipeline(filter, iter);
 			return;
 		}
@@ -210,14 +206,14 @@ public class Segmenter implements StreamVisitor {
 		// If its a dynamic pop, check to see if there is anything
 		// preceeding the filter that should be in its own pipeline
 		if (isDynamicPop(filter)) {
-			if (children.size() > 0) {
+			if (pipelines.size() > 0) {
 				finishPipeline(filter, iter);
 				return;
 			}
 			// TODO: this should be on a copy
 			filter.setPop(new JIntLiteral(1));
 			filter.setPeek(new JIntLiteral(1));
-			children.add(filter);
+			pipelines.add(filter);
 			if (isSink(filter)) {
 				finishPipeline(filter, iter);
 				return;

@@ -21,117 +21,188 @@ import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.StreamVisitor;
 
 /**
+ * A visitor to check if a stream graph contains any dynamic sections.
+ * 
  * @author soule
  *
  */
 public class DynamismFinder implements StreamVisitor {
 
-	private boolean isDynamic = false;
+	/** An internal class to hold the return value for a call to find
+	 * 
+	 * @author soule
+	 
+	 */
+	public class Result {		
+		/** flag set to true if there is a dynamic rate */
+		private boolean isDynamic = false;
+
+		/** The set of filters with dynamic rates */
+		private Set<SIRStream> dynamicFilters = null;
+
+		public Result() {
+			isDynamic = false;
+			dynamicFilters = new HashSet<SIRStream>();
+		}
+		
+		public boolean isDynamic() {
+			return isDynamic;
+		}
+
+		public void setDynamic(boolean isDynamic) {
+			this.isDynamic = isDynamic;
+		}
+
+		public Set<SIRStream> getDynamicFilters() {
+			return dynamicFilters;
+		}
+
+		public void setDynamicFilters(Set<SIRStream> dynamicFilters) {
+			this.dynamicFilters = dynamicFilters;
+		}
+
+		public void addDynamicFilter(SIRStream str) {
+			dynamicFilters.add(str);
+		}
 	
-	Set<SIRStream> dynamicFilters = null;
+	}
 	
+	/** An instance of the result class that corresponds to one
+	 * call to find.
+	 */
+	private Result result;
+	
+	/**
+	 * Constructs a new DynamismFinder.
+	 */
 	public DynamismFinder() {
 		// Do nothing
 	}
 	
-	public boolean find(SIRStream str) {
-		dynamicFilters = new HashSet<SIRStream>();
-		isDynamic = false;
-		IterFactory.createFactory().createIter(str).accept(this);
-		return isDynamic;
-	}
+	/**
+	 * Remove when stable.
+	 * @param str
+	 */
+	private void log(String str) {
+		boolean debug = true;
+		if (debug)
+			System.out.println(str);
+	}	
 
+	/**
+	 * Vists all filters in str to check for dynamic rates.
+	 * @param str the stream to check for dynamic rates.
+	 * @return true if str contains a dynamic rate.
+	 */
+	public Result find(SIRStream str) {
+		log(this.getClass().getCanonicalName() + " find()");
+		result = new Result();		
+		IterFactory.createFactory().createIter(str).accept(this);
+		return result;
+	}
 	
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#visitFilter(at.dms.kjc.sir.SIRFilter, at.dms.kjc.iterator.SIRFilterIter)
+	/**
+	 * Sets the flag to true if there is a dynamic filter.
+	 * @param self the filter to visit
+	 * @param iter the iterator visiting
+	 * @return void
 	 */
 	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
-		// TODO Auto-generated method stub
+		log(this.getClass().getCanonicalName() + " visitFilter()");
 		if (isDynamicPop(self)) {
-			isDynamic = true;
-			dynamicFilters.add(self);
+			result.setDynamic(true);
+			result.addDynamicFilter(self);
 		}
-		if (isDynamicPush(self)) {			
-			isDynamic = true;		
-			dynamicFilters.add(self);
+		if (isDynamicPush(self)) {	
+			result.setDynamic(true);
+			result.addDynamicFilter(self);
 		}		
 	}
 
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#visitPhasedFilter(at.dms.kjc.sir.SIRPhasedFilter, at.dms.kjc.iterator.SIRPhasedFilterIter)
+	/**
+	 * Throws an exception if called. Dynamic rates do not support SIRPhasedFilters.
+	 * @param self the filter to visit
+	 * @param iter the iterator visiting
+	 * @return void
 	 */
 	@Override
 	public void visitPhasedFilter(SIRPhasedFilter self, SIRPhasedFilterIter iter) {
-		// TODO Auto-generated method stub
-		
+        throw new java.lang.RuntimeException("Dynamic rates do not support SIRPhasedFilters.");
 	}
 
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#preVisitPipeline(at.dms.kjc.sir.SIRPipeline, at.dms.kjc.iterator.SIRPipelineIter)
+	/**
+	 * Visits a Pipeline
+	 * @param self the filter to visit
+	 * @param iter the iterator visiting
+	 * @return void
 	 */
 	@Override
 	public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
-		// TODO Auto-generated method stub
-		
+		/* Do nothing */		
 	}
 
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#preVisitSplitJoin(at.dms.kjc.sir.SIRSplitJoin, at.dms.kjc.iterator.SIRSplitJoinIter)
+	/**
+	 * Visits a SplitJoin
+	 * @param self the filter to visit
+	 * @param iter the iterator visiting
+	 * @return void
 	 */
 	@Override
 	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
-		// TODO Auto-generated method stub
+		// If it is not dynamic, we can add the splitter to the pipeline			
 		if (self.getSplitter().getType().isDynamic()) {
-			// If it is not dynamic, we can add the splitter to the pipeline			
+			result.setDynamic(true);
+			result.addDynamicFilter(self);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#preVisitFeedbackLoop(at.dms.kjc.sir.SIRFeedbackLoop, at.dms.kjc.iterator.SIRFeedbackLoopIter)
+	/**
+	 * Visits a Feedback loop
+	 * @param self the filter to visit
+	 * @param iter the iterator visiting
+	 * @return void
 	 */
 	@Override
 	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
 			SIRFeedbackLoopIter iter) {
-		// TODO Auto-generated method stub
-		
+		// TODO: Check if any of the children are dynamic. If they are, we should signal an error here.		
 	}
 
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#postVisitPipeline(at.dms.kjc.sir.SIRPipeline, at.dms.kjc.iterator.SIRPipelineIter)
+	/** 
+	 * Not used by DynamismFinder class. 
 	 */
 	@Override
-	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) { /* do nothing */ }
 
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#postVisitSplitJoin(at.dms.kjc.sir.SIRSplitJoin, at.dms.kjc.iterator.SIRSplitJoinIter)
+	/** 
+	 * Not used by DynamismFinder class. 
 	 */
 	@Override
-	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter)  { /* do nothing */ }
 
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.sir.StreamVisitor#postVisitFeedbackLoop(at.dms.kjc.sir.SIRFeedbackLoop, at.dms.kjc.iterator.SIRFeedbackLoopIter)
+	/** 
+	 * Not used by DynamismFinder class. 
 	 */
-	@Override
-	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
-			SIRFeedbackLoopIter iter) {
-		// TODO Auto-generated method stub
-		
-	}
+	@Override public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+			SIRFeedbackLoopIter iter)  { /* do nothing */ }
 
+	/** 
+	 * Check if filter has a dynamic pop rate.
+     * @param filter The filter to check.
+     * @return true if filter has a dynamic pop rate.
+	 */
 	private boolean isDynamicPop(SIRFilter filter) {
 		return filter.getPop().isDynamic();
 	}
 
+	/** 
+	 * Check if filter has a dynamic push rate.
+     * @param filter The filter to check.
+     * @return true if filter has a dynamic push rate.
+	 */
 	private boolean isDynamicPush(SIRFilter filter) {
 		return filter.getPush().isDynamic();
 	}
-
 	
 }
