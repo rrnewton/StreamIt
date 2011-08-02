@@ -218,8 +218,9 @@ public class CommonPasses {
 		// TODO: add the optimizations here -- soule
 		
 		// we want to convert to the StreamGraph
-		new SIRToSLIR().translate(segmentedGraph);
-
+		SIRToSLIR.Result result = new SIRToSLIR().translate(segmentedGraph, numCores);
+		setSlicer(result.getSlicer());
+		
 		Filter[] filterGraph = null;
 
 		return filterGraph;

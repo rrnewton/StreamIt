@@ -3,6 +3,7 @@
  */
 package at.dms.kjc.slir;
 
+import java.util.HashMap;
 import java.util.List;
 
 import at.dms.kjc.KjcOptions;
@@ -20,7 +21,11 @@ import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.StreamVisitor;
+import at.dms.kjc.sir.linear.LinearAnalyzer;
+import at.dms.kjc.sir.lowering.Flattener;
+import at.dms.kjc.sir.lowering.SIRScheduler;
 import at.dms.kjc.sir.lowering.SegmentedGraph;
+import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 
 
 /**
@@ -29,6 +34,24 @@ import at.dms.kjc.sir.lowering.SegmentedGraph;
  */
 public class SIRToSLIR implements StreamVisitor {
 
+	
+	public class Result {
+		private StreamGraph streamGraph;
+		private Slicer slicer;
+		public StreamGraph getStreamGraph() {
+			return streamGraph;
+		}
+		public void setStreamGraph(StreamGraph streamGraph) {
+			this.streamGraph = streamGraph;
+		}
+		public Slicer getSlicer() {
+			return slicer;
+		}
+		public void setSlicer(Slicer slicer) {
+			this.slicer = slicer;
+		}
+	}
+	
 	public SIRToSLIR() {
 		log(this.getClass().getCanonicalName() + " SIRToSLIR()");		
 	}
@@ -55,67 +78,67 @@ public class SIRToSLIR implements StreamVisitor {
 	 * Note: Take a look at the FlatGraph code to see how the hierarchy is handled
 	 * @return
 	 */
-	public StreamGraph translate(SegmentedGraph segmentedGraph) {
+	public Result translate(SegmentedGraph segmentedGraph, int numCores) {
 		log(this.getClass().getCanonicalName() + " translate()");		
 		// A StreamGraph is a list of StaticSubGraphs. 
 		// A StaticSubGraph has an input, output, and a List<Filter>;		
 		StreamGraph streamGraph = new StreamGraph();
 		List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();
+
+		LinearAnalyzer lfa = Flattener.lfa;
+		Slicer slicer = null;
+		
 		for (SIRStream str : subgraphs) {
 			streamGraph.addRoot(new StaticSubGraph());
-			IterFactory.createFactory().createIter(str).accept(this);
-		}		
-		
-		
-		
-		
-		
-//		
-//		// flatten the graph by running (super?) synch removal
-//		UnflatFilter[] topNodes = null;
-//		if (!KjcOptions.nopartition) {
-//			FlattenGraph.flattenGraph(str, lfa, executionCounts);
-//			topNodes = FlattenGraph.getTopLevelNodes();
-//			CommonUtils.println_debugging("Top Nodes:");
-//			for (int i = 0; i < topNodes.length; i++)
-//				CommonUtils.println_debugging(topNodes[i].toString());
-//		}
+			//IterFactory.createFactory().createIter(str).accept(this);
 
+			@SuppressWarnings("rawtypes")
+			HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);
 
+			// flatten the graph by running (super?) synch removal
+			UnflatFilter[] topNodes = null;
+			if (!KjcOptions.nopartition) {
+				FlattenGraph.flattenGraph(str, lfa, executionCounts);
+				topNodes = FlattenGraph.getTopLevelNodes();
+				CommonUtils.println_debugging("Top Nodes:");
+				for (int i = 0; i < topNodes.length; i++) {
+					CommonUtils.println_debugging(topNodes[i].toString());
+				}
+			}
 
-//		Filter[] filterGraph = null;
-//		setSlicer(null);
-//		if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {
-//			if (!KjcOptions.nopartition) {
-//				System.out.println("Using OneFilterSlicer slicer");
-//				setSlicer(new OneFilterSlicer(topNodes, executionCounts));
-//			} else {
-//				System.out.println("Using FlattenAndPartition slicer");
-//				setSlicer(new FlattenAndPartition(topNodes, executionCounts,
-//						lfa, getWorkEstimate(), numCores));
-//				((FlattenAndPartition) getSlicer()).flatten(str,
-//						executionCounts);
-//			}
-//		} else {
-//			if (KjcOptions.nopartition) {
-//				setSlicer(new FlattenAndPartition(topNodes, executionCounts,
-//						lfa, getWorkEstimate(), numCores));
-//				((FlattenAndPartition) getSlicer()).flatten(str,
-//						executionCounts);
-//			} else {
-//				setSlicer(new SimpleSlicer(topNodes, executionCounts, lfa,
-//						getWorkEstimate(), numCores));
-//			}
-//		}
-//		filterGraph = getSlicer().partition();
-//		System.out.println("Traces: " + filterGraph.length);
+			Filter[] filterGraph = null;
 
+			if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {
+				if (!KjcOptions.nopartition) {
+					System.out.println("Using OneFilterSlicer slicer");
+					slicer = new OneFilterSlicer(topNodes, executionCounts);
+				} else {
+					System.out.println("Using FlattenAndPartition slicer");
+					slicer = new FlattenAndPartition(topNodes, executionCounts,
+							lfa, WorkEstimate.getWorkEstimate(str), numCores);
+					((FlattenAndPartition) slicer).flatten(str, executionCounts);
+				}
+
+			} else {
+				if (KjcOptions.nopartition) {
+					slicer = new FlattenAndPartition(topNodes, executionCounts,
+							lfa, WorkEstimate.getWorkEstimate(str), numCores);
+					((FlattenAndPartition) slicer).flatten(str, executionCounts);
+				} else {
+					slicer = new SimpleSlicer(topNodes, executionCounts, lfa,
+							WorkEstimate.getWorkEstimate(str), numCores);
+				}
+			}
+			assert (slicer != null);
+			filterGraph = slicer.partition();
+			System.out.println("Traces: " + filterGraph.length);
+
+		} // for (SIRStream str : subgraphs) 
 		
-		
-		
-		
-		
-		return streamGraph;
+		Result result = new Result();
+		result.setStreamGraph(streamGraph);
+		result.setSlicer(slicer);
+		return result;
 	}
 	
 	@Override
