@@ -3,6 +3,8 @@
  */
 package at.dms.kjc.slir;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -89,7 +91,7 @@ public class SIRToSLIR implements StreamVisitor {
 		Slicer slicer = null;
 		
 		for (SIRStream str : subgraphs) {
-			streamGraph.addRoot(new StaticSubGraph());
+			
 			//IterFactory.createFactory().createIter(str).accept(this);
 
 			@SuppressWarnings("rawtypes")
@@ -133,6 +135,18 @@ public class SIRToSLIR implements StreamVisitor {
 			filterGraph = slicer.partition();
 			System.out.println("Traces: " + filterGraph.length);
 
+
+			// TODO: Set the inputPort, outputPort, etc.
+			// topSlices is pointers to the roots of the forest
+			// filterGraph(i.e. sliceGraph) is all the filters in the graph
+
+			InputPort inputPort = null;
+			OutputPort outputPort = null;
+			//StaticSubGraph ssg = new StaticSubGraph(inputPort, outputPort, new ArrayList<Filter>(Arrays.asList(topNodes)));
+			StaticSubGraph ssg = new StaticSubGraph();
+			streamGraph.addRoot(ssg);
+			
+			
 		} // for (SIRStream str : subgraphs) 
 		
 		Result result = new Result();

@@ -15,6 +15,8 @@ public class StaticSubGraph {
     private OutputPort outputPort;
 
     private List<Filter> roots;
+    
+    private Filter[] filterGraph;
 
 	public StaticSubGraph() {
 		roots = new ArrayList<Filter>();
@@ -56,5 +58,12 @@ public class StaticSubGraph {
 		roots.add(filter);
 	}
     
-    
+	public void setFilterGraph(Filter[] filterGraph) {
+		this.filterGraph = filterGraph;	
+	}
+
+	public Filter[] getFilterGraph() {
+		return filterGraph;	
+	}
+
 }
