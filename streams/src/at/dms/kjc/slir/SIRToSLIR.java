@@ -97,6 +97,13 @@ public class SIRToSLIR implements StreamVisitor {
 			@SuppressWarnings("rawtypes")
 			HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);
 
+			
+			// Don't use flattenGraph at all
+			
+			// Each SIROperator -> Filter, even joiners and splitters
+			// joiners and splitters will be identity (leave it for sync removal
+			// to get rid of the identities)
+			
 			// flatten the graph by running (super?) synch removal
 			UnflatFilter[] topNodes = null;
 			if (!KjcOptions.nopartition) {
@@ -110,6 +117,10 @@ public class SIRToSLIR implements StreamVisitor {
 
 			Filter[] filterGraph = null;
 
+			// Conversion pass, SIRFilter to Filter, looks like OneFilterSlicer
+			// but removing some cruft.
+			// There should not be a "slicer"
+						
 			if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {
 				if (!KjcOptions.nopartition) {
 					System.out.println("Using OneFilterSlicer slicer");
@@ -139,7 +150,24 @@ public class SIRToSLIR implements StreamVisitor {
 			// TODO: Set the inputPort, outputPort, etc.
 			// topSlices is pointers to the roots of the forest
 			// filterGraph(i.e. sliceGraph) is all the filters in the graph
-
+			// Want to get rid of unflat filters
+			// "TopNodes" should be filters...
+			// TODO: Get rid of things to do with Slicing....
+			// Remove FlattenAndPartition, SimpleSlicer, etc. once SIRToSLIR is working
+			// Might need to keep Unflat... see how it works. Prefer to not use it.
+			
+			// Filter -> WorkNodeContent 
+			// WorkNodeContent installed in WorkNode (Decide if we need both)
+			// Filter requires InputNode, OutputNode, WorkNode
+			// Examples : Splitter, SIRFilter, Joiner
+			
+			// SIRFitler -> (Input, Output (WorkNode (WorkNodeContent (SIRFilter))))
+			// Splitter -> (Input, (Output i.e. dup, rr) (WorkNode (WorkNodeContent (Identity))))
+			
+			// TODO: The FlattenAndPartition does pretty much what I want to do
+			// SIR to Slice node, is already in there.
+			
+			
 			InputPort inputPort = null;
 			OutputPort outputPort = null;
 			//StaticSubGraph ssg = new StaticSubGraph(inputPort, outputPort, new ArrayList<Filter>(Arrays.asList(topNodes)));
