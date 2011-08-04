@@ -113,6 +113,7 @@ public class SIRToSLIR implements StreamVisitor {
 			slicer = new FlattenAndPartition(topNodes, executionCounts,
 					lfa, WorkEstimate.getWorkEstimate(str), numCores);
 			((FlattenAndPartition) slicer).flatten(str, executionCounts);
+			//slicer = null;
 			// END SECTION OF TO REMOVE
 			
 			
@@ -146,9 +147,9 @@ public class SIRToSLIR implements StreamVisitor {
 //					slicer = new OneFilterSlicer(topNodes, executionCounts);
 //				} else {
 //					System.out.println("Using FlattenAndPartition slicer");
-					slicer = new FlattenAndPartition(topNodes, executionCounts,
-							lfa, WorkEstimate.getWorkEstimate(str), numCores);
-					((FlattenAndPartition) slicer).flatten(str, executionCounts);
+//					slicer = new FlattenAndPartition(topNodes, executionCounts,
+//							lfa, WorkEstimate.getWorkEstimate(str), numCores);
+//					((FlattenAndPartition) slicer).flatten(str, executionCounts);
 //				}
 //
 //			} else {
