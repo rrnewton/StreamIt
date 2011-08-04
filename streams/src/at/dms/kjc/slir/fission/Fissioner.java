@@ -59,7 +59,7 @@ public class Fissioner {
     private int newPush;
     private int myID;
     private boolean isSourceSlice;
-    private SIRSlicer slicer;
+    private StaticSubGraph slicer;
     
     static {
         uniqueID = 0;
@@ -68,7 +68,7 @@ public class Fissioner {
     /**
      * Attempt to fiss <slice> by <fissAmount>.  Return true if the fission was successful.
      */
-    public static FissionGroup doit(Filter slice, SIRSlicer slicer, int fissAmount) {
+    public static FissionGroup doit(Filter slice, StaticSubGraph slicer, int fissAmount) {
         System.out.println("Performing fission on: " + slice.getWorkNode() + ", fizzAmount: " + fissAmount);
         Fissioner fissioner = new Fissioner(slice, slicer, fissAmount);
         if(canFizz(slice, false)) 
@@ -113,7 +113,7 @@ public class Fissioner {
         return true;
     }
 
-    private Fissioner(Filter s, SIRSlicer slicer, int d) {
+    private Fissioner(Filter s, StaticSubGraph slicer, int d) {
         this.slicer = slicer;
         // reset the filter info's just in case things have change
         FilterInfo.reset();

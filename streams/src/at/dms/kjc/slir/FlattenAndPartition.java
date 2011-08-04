@@ -24,7 +24,7 @@ import at.dms.kjc.common.CommonUtils;
  * @author mgordon
  * 
  */
-public class FlattenAndPartition extends SIRSlicer {
+public class FlattenAndPartition extends StreamGraph {
     private SIRToSliceNodes sliceNodes;
 
     private HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>> edges;
@@ -39,7 +39,6 @@ public class FlattenAndPartition extends SIRSlicer {
 
     public FlattenAndPartition(HashMap[] exeCounts,
             LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
-        super(exeCounts, lfa, work, maxPartitions);
         workEstimation = new HashMap<WorkNodeContent, Long>();
     }
 

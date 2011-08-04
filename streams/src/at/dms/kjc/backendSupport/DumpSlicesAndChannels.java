@@ -9,7 +9,7 @@ import java.io.*;
 /** Dump a graph with info about slices and channels. */
 public class DumpSlicesAndChannels {
     // dump the the completed partition to a dot file
-    public static void dumpGraph(String filename, SIRSlicer slicer, BackEndFactory backendbits) {
+    public static void dumpGraph(String filename, StreamGraph slicer, BackEndFactory backendbits) {
         StringBuffer buf = new StringBuffer();
         buf.append("digraph Flattend {\n");
         buf.append("size = \"8, 10.5\";\n");
@@ -67,7 +67,7 @@ public class DumpSlicesAndChannels {
     
     /**return a string with all of the names of the filterslicenodes
      * and blue if linear. */
-    private static  String sliceName(Filter slice, SIRSlicer slicer, BackEndFactory backendbits) {
+    private static  String sliceName(Filter slice, StreamGraph slicer, BackEndFactory backendbits) {
         InternalFilterNode node = slice.getInputNode();
 
         StringBuffer out = new StringBuffer();

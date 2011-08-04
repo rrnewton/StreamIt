@@ -3,13 +3,9 @@
  */
 package at.dms.kjc.slir;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFeedbackLoopIter;
 import at.dms.kjc.iterator.SIRFilterIter;
@@ -17,13 +13,13 @@ import at.dms.kjc.iterator.SIRPhasedFilterIter;
 import at.dms.kjc.iterator.SIRPipelineIter;
 import at.dms.kjc.iterator.SIRSplitJoinIter;
 import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRPhasedFilter;
 import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.SIRFileWriter;
-import at.dms.kjc.sir.SIRFileReader;
 import at.dms.kjc.sir.StreamVisitor;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.Flattener;
@@ -81,7 +77,7 @@ public class SIRToSLIR implements StreamVisitor {
 			InputPort inputPort = new UnaryInputPort();
 			OutputPort outputPort = new UnaryOutputPort();
 				//StaticSubGraph ssg = new StaticSubGraph(inputPort, outputPort, new ArrayList<Filter>(Arrays.asList(topNodes)));
-			currentSSG = new StaticSubGraph();			
+			currentSSG = new StaticSubGraph(streamGraph);			
 			IterFactory.createFactory().createIter(str).accept(this);
 			currentSSG.setInputPort(inputPort);
 			currentSSG.setOutputPort(outputPort);
@@ -90,21 +86,15 @@ public class SIRToSLIR implements StreamVisitor {
 			
 			// TODO: REMOVE SOON!
 			@SuppressWarnings("rawtypes")
-			HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);
-
+			HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);			
+			streamGraph = new StreamGraph();
 			
-			streamGraph = new StreamGraph(executionCounts,
-					lfa, WorkEstimate.getWorkEstimate(str), numCores);
-			streamGraph.flatten(str, executionCounts);
 			// END SECTION OF TO REMOVE
 			
 			
-			streamGraph.addRoot(currentSSG);
+			//streamGraph.addRoot(currentSSG);
 			
 
-
-			
-			
 //			
 //			// Don't use flattenGraph at all
 //			

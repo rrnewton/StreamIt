@@ -27,7 +27,7 @@ import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.MutableStateExtractor;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.slir.fission.Fissioner;
 
@@ -60,7 +60,7 @@ public class StatelessFissioner {
     /** the fission products of the slice */
     private Filter[] sliceClones;
 
-    public static FissionGroup doit(Filter slice, SIRSlicer slicer, int fissAmount) {
+    public static FissionGroup doit(Filter slice, StreamGraph slicer, int fissAmount) {
         if(!KjcOptions.sharedbufs) {
             return Fissioner.doit(slice, slicer, fissAmount);
         }

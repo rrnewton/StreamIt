@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.KjcOptions;
 
 /**
@@ -25,7 +25,7 @@ import at.dms.kjc.KjcOptions;
  */
 public class BasicGenerateSteadyStateSchedule {
     private BasicSpaceTimeSchedule spaceTime;
-    private SIRSlicer slicer;
+    private StreamGraph slicer;
     private LinkedList<Filter> schedule;
     
     /**
@@ -34,7 +34,7 @@ public class BasicGenerateSteadyStateSchedule {
      * @param layout The layout of filterTraceNode->RawTile, this could
      * be null if we are --noanneal. 
      */
-    public BasicGenerateSteadyStateSchedule(BasicSpaceTimeSchedule sts, SIRSlicer slicer) {
+    public BasicGenerateSteadyStateSchedule(BasicSpaceTimeSchedule sts, StreamGraph slicer) {
       
         spaceTime = sts;
         this.slicer = slicer;

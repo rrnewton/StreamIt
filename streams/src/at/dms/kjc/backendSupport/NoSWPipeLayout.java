@@ -14,7 +14,7 @@ import at.dms.kjc.slir.*;
  */
 public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> extends SimulatedAnnealing implements Layout<T> {
     
-    protected SIRSlicer slicer;
+    protected StreamGraph slicer;
     protected Ts chip;
     protected LinkedList<Filter> scheduleOrder;
     protected LinkedList<InternalFilterNode> assignedFilters;
@@ -25,7 +25,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     
     public NoSWPipeLayout(SpaceTimeScheduleAndSlicer spaceTime, Ts chip) {
         this.chip = chip;
-        this.slicer = (SIRSlicer)spaceTime.getSlicer();
+        this.slicer = (StreamGraph)spaceTime.getSlicer();
         scheduleOrder = 
             DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
         assignedFilters = new LinkedList<InternalFilterNode>();

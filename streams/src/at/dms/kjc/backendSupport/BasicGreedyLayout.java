@@ -22,7 +22,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
     //private int[] searchOrder;
     private int totalWork;
     private T[] nodes;
-    private SIRSlicer slicer;
+    private StreamGraph slicer;
     
     /**
      * Constructor
@@ -30,7 +30,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
      * @param nodes
      */
     public BasicGreedyLayout(SpaceTimeScheduleAndSlicer spaceTime, T[] nodes) {
-        this.slicer = (SIRSlicer)spaceTime.getSlicer();
+        this.slicer = (StreamGraph)spaceTime.getSlicer();
         this.spaceTime = spaceTime;
         this.nodes = nodes;
         this.numBins = nodes.length;

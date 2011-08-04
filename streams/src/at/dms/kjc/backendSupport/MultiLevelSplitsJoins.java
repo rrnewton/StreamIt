@@ -27,7 +27,7 @@ public class MultiLevelSplitsJoins {
     /** The maximum width allowed for any split or join, it is set to the
      * number of devices*/
     private int maxWidth;
-    private SIRSlicer slicer;
+    private StreamGraph slicer;
     
     /**
      * Create an instance of the pass that will operate on the 
@@ -37,7 +37,7 @@ public class MultiLevelSplitsJoins {
      * @param slicer The partitioning.
      * @param maxWidth The Raw chip.
      */
-    public MultiLevelSplitsJoins(SIRSlicer slicer, int maxWidth) {
+    public MultiLevelSplitsJoins(StreamGraph slicer, int maxWidth) {
         this.slicer = slicer;
         //set max width to number of devices
         this.maxWidth = maxWidth;

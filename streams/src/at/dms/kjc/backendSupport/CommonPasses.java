@@ -52,10 +52,10 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.FlattenAndPartition;
 import at.dms.kjc.slir.InstallInitDistributions;
-import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.StreamGraph;
 
 
@@ -67,7 +67,7 @@ import at.dms.kjc.slir.StreamGraph;
  */
 public class CommonPasses {
 	/** field that may be useful later */
-	private SIRSlicer slicer;
+	private StreamGraph slicer;
 
 	/** field that may be useful later */
 	private WorkEstimate workEstimate;
@@ -440,27 +440,20 @@ public class CommonPasses {
 		double CCRatio = CompCommRatio.ratio(str, getWorkEstimate(),
 				executionCounts[1]);
 		System.out.println("Comp/Comm Ratio of SIR graph: " + CCRatio);
-
-		// Convert to SliceGraph representation.
-
-		// flatten the graph by running (super?) synch removal
+		
 
 		// TODO: This is where we want to convert to the StreamGraph - soule
-
-		Filter[] filterGraph = null;
-		setSlicer(null);
-
-		setSlicer(new FlattenAndPartition(executionCounts,
-				lfa, getWorkEstimate(), numCores));
-		((FlattenAndPartition) getSlicer()).flatten(str,
-				executionCounts);
-
-
-		filterGraph = getSlicer().partition();
-		System.out.println("Traces: " + filterGraph.length);
-
-		// Need to make filter graph, partitioner accessible.
-		return filterGraph;
+		
+		// Call SIRToSLIR to create sreamGraph
+		// Assume StreamGraph has only one ssg for now
+		
+		
+		StreamGraph streamGraph = 
+				new StreamGraph();			
+		
+		setSlicer(streamGraph);
+		
+		return streamGraph.getSSG(0).getTopSlices();
 	}
 
 	/**
@@ -517,7 +510,7 @@ public class CommonPasses {
 		// set steady schedule in standard order unless --spacetime in which
 		// case in
 		// decreasing order of estimated work
-		new BasicGenerateSteadyStateSchedule(schedule, (SIRSlicer) slicer)
+		new BasicGenerateSteadyStateSchedule(schedule, (StreamGraph) slicer)
 				.schedule();
 		return schedule;
 	}
@@ -531,7 +524,7 @@ public class CommonPasses {
 	 * @param slicer
 	 *            the slicer to set
 	 */
-	private void setSlicer(SIRSlicer slicer) {
+	private void setSlicer(StreamGraph slicer) {
 		this.slicer = slicer;
 	}
 
@@ -542,7 +535,7 @@ public class CommonPasses {
 	 * 
 	 * @return the slicer
 	 */
-	public SIRSlicer getSlicer() {
+	public StreamGraph getSlicer() {
 		return slicer;
 	}
 

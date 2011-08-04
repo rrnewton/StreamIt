@@ -7,7 +7,7 @@ import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
-import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.WorkNode;
@@ -88,7 +88,7 @@ public class CompCommRatio {
      * 
      * @return The computation to communication ratio.
      */
-    public static double ratio(SIRSlicer slicer) {
+    public static double ratio(StreamGraph slicer) {
         int comp = 0, comm = 0;
         // get the slice node travesal
         Iterator<InternalFilterNode> sliceNodeIt = Util.sliceNodeTraversal(DataFlowOrder

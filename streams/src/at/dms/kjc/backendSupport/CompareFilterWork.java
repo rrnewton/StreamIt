@@ -5,7 +5,7 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Comparator;
 
-import at.dms.kjc.slir.SIRSlicer;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.Filter;
 
 /**
@@ -18,14 +18,14 @@ import at.dms.kjc.slir.Filter;
  */
 public class CompareFilterWork implements Comparator<Filter> {
     /** The partition we used */
-    private SIRSlicer slicer;
+    private StreamGraph slicer;
     
     /**
      * Create a new object that uses the work estimates of partitioner.
      * 
      * @param slicer
      */
-    public CompareFilterWork(SIRSlicer slicer) {
+    public CompareFilterWork(StreamGraph slicer) {
         this.slicer = slicer;
     }
     

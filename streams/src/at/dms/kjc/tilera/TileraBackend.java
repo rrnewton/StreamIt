@@ -82,7 +82,7 @@ public class TileraBackend {
      * @return a Scheduler from which the schedules for the phases may be extracted. 
      */
     public static void scheduleSlices(SpaceTimeScheduleAndSlicer schedule) {
-        SIRSlicer slicer = schedule.getSlicer();
+        StreamGraph slicer = schedule.getSlicer();
         
         // set init schedule in standard order
         schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer.getSliceGraph()));

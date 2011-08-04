@@ -54,7 +54,7 @@ public class CellBackend {
         commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
         
         // partitioner contains information about the Slice graph used by dumpGraph
-        SIRSlicer slicer = (SIRSlicer)commonPasses.getSlicer();
+        StreamGraph slicer = (StreamGraph)commonPasses.getSlicer();
         
         new MultiLevelSplitsJoins(slicer, MAX_TAPES/2).doit();
         slicer.dumpGraph("traces-after-multi.dot");
