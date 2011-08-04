@@ -1,3 +1,8 @@
+/**
+ * A SegmentedGraph is a structure that contains each of the static subgraphs
+ * from a SIRStream with dynamic regions. Each segment has a source and sink.
+ * The SegmentedGraph also maintains connectivity and rate information.
+ */
 package at.dms.kjc.sir.lowering;
 
 import java.util.ArrayList;
@@ -18,33 +23,40 @@ public class SegmentedGraph {
 	 */
 	private Map<SIRStream, List<SIRStream>> connections = null;
 
+	/**
+	 *  Create a new SegmentedGraph.
+	 */
 	public SegmentedGraph() {
 		staticSubGraphs = new ArrayList<SIRStream>();
 		connections = new HashMap<SIRStream, List<SIRStream>>();
 	}
 
-	public SegmentedGraph(ArrayList<SIRStream> staticSubGraphs2,
-			Map<SIRStream, List<SIRStream>> connections2) {
-		// TODO Auto-generated constructor stub
-	}
-
+   /**
+    * Add a new static subsection to the graph. Each subsection 
+    * must be a pipeline with a source, some number of other filters, 
+    * and a sink.
+    * 
+    * @param pipeline subsection to add
+    * @return void
+    */
 	public void addPipe(SIRStream pipeline) {
 		staticSubGraphs.add(pipeline);
 	}
 
+	/**
+	 * Returns the connections between static subsections.
+	 * @return the connections between static subsections.
+	 */
 	public Map<SIRStream, List<SIRStream>> getConnections() {
 		return connections;
 	}
 
+	/**
+	 * Returns the list of static subsections
+	 * @return the list of static subsections
+	 */
 	public List<SIRStream> getStaticSubGraphs() {
 		return staticSubGraphs;
 	}
 
-	public void setConnections(Map<SIRStream, List<SIRStream>> connections) {
-		this.connections = connections;
-	}
-
-	public void setStaticSubGraphs(List<SIRStream> staticSubGraphs) {
-		this.staticSubGraphs = staticSubGraphs;
-	}
 }
