@@ -28,7 +28,7 @@ import at.dms.kjc.*;
  *
  */
 public class AddBuffering {
-    private Slicer spaceTime;
+    private SIRSlicer spaceTime;
     private HashSet<Filter> editedSlices;
     private boolean limitTiles;
     private int totalTiles;
@@ -39,12 +39,12 @@ public class AddBuffering {
      *  
      * @param spaceTime The space time schedule.
      */
-    public static void doit(Slicer spaceTime, boolean limitTiles, int totalTiles) {
+    public static void doit(SIRSlicer spaceTime, boolean limitTiles, int totalTiles) {
         System.out.println("Equalizing splits and joins by buffering...");
         new AddBuffering(spaceTime,limitTiles,totalTiles).doitInternal();
     }
     
-    private AddBuffering(Slicer st, boolean limit, int tt) {
+    private AddBuffering(SIRSlicer st, boolean limit, int tt) {
         this.spaceTime = st;
         this.limitTiles = limit;
         this.totalTiles = tt;

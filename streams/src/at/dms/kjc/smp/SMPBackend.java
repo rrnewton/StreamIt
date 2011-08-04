@@ -322,7 +322,7 @@ public class SMPBackend {
      * @return a Scheduler from which the schedules for the phases may be extracted. 
      */
     public static void scheduleSlices(SpaceTimeScheduleAndSlicer schedule) {
-        Slicer slicer = schedule.getSlicer();
+        SIRSlicer slicer = schedule.getSlicer();
         
         // set init schedule in standard order
         schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer.getSliceGraph()));

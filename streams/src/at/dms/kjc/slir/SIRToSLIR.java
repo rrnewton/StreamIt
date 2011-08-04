@@ -92,8 +92,8 @@ public class SIRToSLIR implements StreamVisitor {
 			@SuppressWarnings("rawtypes")
 			HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);
 
-			UnflatFilter[] topNodes = null;
-			streamGraph = new StreamGraph(topNodes, executionCounts,
+			
+			streamGraph = new StreamGraph(executionCounts,
 					lfa, WorkEstimate.getWorkEstimate(str), numCores);
 			streamGraph.flatten(str, executionCounts);
 			// END SECTION OF TO REMOVE

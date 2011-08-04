@@ -8,43 +8,44 @@ import java.util.List;
 import java.util.Map;
 
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.MultiLevelSplitsJoins;
-import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.sir.SIRFileReader;
 import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.common.CommonUtils;
 
 /**
- * An abstract class that a slice partitioner will subclass from: It holds the
- * partitioned stream graph.  It contains a lot of structures that key off of SIR objects
- * for work estimation, hence the name.
- * 
- * Partitioning maps filters to slices.  This is normally not useful since most 
- * back ends will assume one filter per slice, but is sometimes used in {@link at.dms.kjc.spacetime}.
- * Partitioning also converts a SIR graph to a slice graph.
  * 
  * @author mgordon
- * 
+ *
  */
-public abstract class SIRSlicer extends Slicer {
+public abstract class SIRSlicer {
+    
+ 
+    protected HashMap[] exeCounts;
+
+    protected LinkedList<Filter> topSlices;
+
+    public Filter[] io;
+
     // Slice->Long for bottleNeck work estimation
     protected HashMap<Filter, Long> sliceBNWork;
-
+   
     /** The startup cost of a filter when starting a slice */
     protected HashMap<WorkNode, Integer> filterStartupCost;
     
     // the largest number of partitions that we will allow.
     // exceeding this causes assertion error.
     protected int maxPartitions;
-
+    
     protected LinearAnalyzer lfa;
-
+    
     // sirfilter -> work estimation
     protected WorkEstimate work;
-
-    protected HashMap<SIRFilter, Integer> genIdWorks; 
+         
+    protected HashMap<SIRFilter, Integer> genIdWorks;
     
     /** This hashmap maps a Slice to the FilterSliceNode that
      * has the most work;
@@ -57,11 +58,11 @@ public abstract class SIRSlicer extends Slicer {
      */  
     protected HashMap<WorkNode, Long> filterOccupancy;
     
-//  filtercontent -> work estimation
+    //  filtercontent -> work estimation
     protected HashMap<WorkNodeContent, Long> workEstimation;
-
+   
     protected int steadyMult;
-    
+
     protected HashMap <SIRFilter, WorkNodeContent> sirToContent;
     
     /**
@@ -76,16 +77,32 @@ public abstract class SIRSlicer extends Slicer {
      * @param work a work estimate, see {@link at.dms.kjc.sir.lowering.partition}, updeted if filters are added to a slice.
      * @param maxPartitions if non-zero, a maximum number of partitions to create
      */
-    public SIRSlicer(UnflatFilter[] topFilters, HashMap[] exeCounts,
+    public SIRSlicer(HashMap[] exeCounts) {
+        
+        this.exeCounts = exeCounts;
+       
+           topSlices = new LinkedList<Filter>();
+    }
+
+    /**
+     * Create a Partitioner.
+     * 
+     * The number of partitions may be limited by <i>maxPartitions</i>, but
+     * some implementations ignore <i>maxPartitions</i>.
+     * 
+     * @param topFilters  from {@link FlattenGraph}
+     * @param exeCounts  a schedule
+     * @param lfa  a linearAnalyzer to convert filters to linear form if appropriate.
+     * @param work a work estimate, see {@link at.dms.kjc.sir.lowering.partition}, updeted if filters are added to a slice.
+     * @param maxPartitions if non-zero, a maximum number of partitions to create
+     */
+    public SIRSlicer(HashMap[] exeCounts,
                        LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
-        super(topFilters, exeCounts);
         this.maxPartitions = maxPartitions;
-        this.topFilters = topFilters;
         this.exeCounts = exeCounts;
         this.lfa = lfa;
         this.work = work;
-        if (topFilters != null)
-            topSlices = new LinkedList<Filter>();
+        topSlices = new LinkedList<Filter>();
         sliceBNWork = new HashMap<Filter, Long>();
         steadyMult = KjcOptions.steadymult;
         filterStartupCost = new HashMap<WorkNode, Integer>();
@@ -95,75 +112,6 @@ public abstract class SIRSlicer extends Slicer {
         sirToContent = new HashMap<SIRFilter, WorkNodeContent>();
     }
 
-    /**
-     * Partition the stream graph into slices (slices) and return the slices.
-     * @return The slices (slices) of the partitioned graph. 
-     */
-    public abstract Filter[] partition();
-
-    /**
-     * Check for I/O in slice
-     * @param slice
-     * @return Return true if this slice is an IO slice (file reader/writer).
-     */
-    public boolean isIO(Filter slice) {
-        for (int i = 0; i < io.length; i++) {
-            if (slice == io[i])
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     *  Get just top level slices in the slice graph.
-     * @return top level slices
-     */
-    public Filter[] getTopSlices() {
-        assert topSlices != null;
-        return topSlices.toArray(new Filter[topSlices.size()]);
-    }
-
-    /**
-     * Set the slice graph to slices.
-     * 
-     * @param slices The slice list to install as the new slice graph.
-     */
-    private void setSliceGraph(Filter[] slices) {
-        
-        //perform some checks on the slice graph...
-        for (int i = 0; i < slices.length; i++) {
-            assert sliceBNWork.containsKey(slices[i]) : slices[i];
-            //this doesn't get filled till later
-            //assert bottleNeckFilter.containsKey(slices[i]) : slices[i];
-            assert workEstimation.containsKey(slices[i].getWorkNode().getFilter()) : slices[i].getWorkNode().getFilter();
-            	
-        }
-    }
-    
-    /**
-     * Does the the slice graph contain slice (perform a simple linear
-     * search).
-     * 
-     * @param slice The slice to query.
-     * 
-     * @return True if the slice graph contains slice.
-     */
-    public boolean containsSlice(Filter slice) {
-        Filter[] sliceGraph = getSliceGraph();
-        for (int i = 0; i < sliceGraph.length; i++) 
-            if (sliceGraph[i] == slice)
-                return true;
-        return false;
-    }
-    
-   /*
-    * work estimate for filter needed in various places. 
-    */
-   private int workEst(WorkNode node) {
-       return MultiLevelSplitsJoins.IDENTITY_WORK *
-       node.getFilter().getSteadyMult();
-   }
-    
     /**
      * Update all the necessary state to add node to slice.
      * 
@@ -183,7 +131,254 @@ public abstract class SIRSlicer extends Slicer {
             bottleNeckFilter.put(slice, node);
         }
     }
+
+    /**
+     * Add the slice to the list of top slices, roots of the forest.
+     */
+    public void addTopSlice(Filter slice) {
+        topSlices.add(slice);
+    } 
     
+    public void calculateWorkStats() {
+        calcStartupCost();
+        calcOccupancy();
+    }
+    
+    /**
+     * Does the the slice graph contain slice (perform a simple linear
+     * search).
+     * 
+     * @param slice The slice to query.
+     * 
+     * @return True if the slice graph contains slice.
+     */
+    public boolean containsSlice(Filter slice) {
+        Filter[] sliceGraph = getSliceGraph();
+        for (int i = 0; i < sliceGraph.length; i++) 
+            if (sliceGraph[i] == slice)
+                return true;
+        return false;
+    }
+    
+/**
+     * Force creation of kopi methods and fields for predefined filters.
+     */
+    public void createPredefinedContent() {
+    	for (Filter s : getSliceGraph()) {
+    		if (s.getWorkNode().getFilter() instanceof PredefinedContent) {
+    			((PredefinedContent)s.getWorkNode().getFilter()).createContent();
+    		}
+    	}
+
+    }
+
+    // dump the the completed partition to a dot file
+    public void dumpGraph(String filename) {
+        Filter[] sliceGraph = getSliceGraph();
+        StringBuffer buf = new StringBuffer();
+        buf.append("digraph Flattend {\n");
+        buf.append("size = \"8, 10.5\";\n");
+
+        for (int i = 0; i < sliceGraph.length; i++) {
+            Filter slice = sliceGraph[i];
+            assert slice != null;
+            buf.append(slice.hashCode() + " [ " + 
+                    sliceName(slice) + 
+                    "\" ];\n");
+            Filter[] next = getNext(slice/* ,parent */);
+            for (int j = 0; j < next.length; j++) {
+                assert next[j] != null;
+                buf.append(slice.hashCode() + " -> " + next[j].hashCode()
+                           + ";\n");
+            }
+        }
+
+        buf.append("}\n");
+        // write the file
+        try {
+            FileWriter fw = new FileWriter(filename);
+            fw.write(buf.toString());
+            fw.close();
+        } catch (Exception e) {
+            System.err.println("Could not print extracted slices");
+        }
+    }
+    
+    public void dumpGraph(String filename, Layout layout) {
+        dumpGraph(filename, layout, true);
+    }
+    
+    // dump the the completed partition to a dot file
+    public void dumpGraph(String filename, Layout layout, boolean fullInfo) {
+        Filter[] sliceGraph = getSliceGraph();
+        StringBuffer buf = new StringBuffer();
+        buf.append("digraph Flattend {\n");
+        buf.append("size = \"8, 10.5\";\n");
+
+        for (int i = 0; i < sliceGraph.length; i++) {
+            Filter slice = sliceGraph[i];
+            assert slice != null;
+            buf.append(slice.hashCode() + " [ " + 
+                    sliceName(slice, layout, fullInfo) + 
+                    "\" ];\n");
+            Filter[] next = getNext(slice/* ,parent */, SchedulingPhase.STEADY);
+            for (int j = 0; j < next.length; j++) {
+                assert next[j] != null;
+                buf.append(slice.hashCode() + " -> " + next[j].hashCode()
+                           + ";\n");
+            }
+            next = getNext(slice, SchedulingPhase.INIT);
+            for (int j = 0; j < next.length; j++) {
+                assert next[j] != null;
+                buf.append(slice.hashCode() + " -> " + next[j].hashCode()
+                           + "[style=dashed,color=red];\n");
+            }
+        }
+
+        buf.append("}\n");
+        // write the file
+        try {
+            FileWriter fw = new FileWriter(filename);
+            fw.write(buf.toString());
+            fw.close();
+        } catch (Exception e) {
+            System.err.println("Could not print extracted slices");
+        }
+    }
+
+    public WorkNodeContent getContent(SIRFilter f) {
+        return sirToContent.get(f);
+    }
+
+    /**
+     * This hashmap store the filters work plus any blocking that is
+     * caused by the pipeline imbalance of the slice. 
+     */
+    public long getFilterOccupancy(WorkNode filter) {
+        assert filterOccupancy.containsKey(filter);
+        return filterOccupancy.get(filter).longValue();
+    }
+
+    /**
+     * @param node
+     * @return The startup cost for <pre>node</pre> 
+     */
+    public int getFilterStartupCost(WorkNode node) {
+        assert filterStartupCost.containsKey(node);
+       
+        return filterStartupCost.get(node).intValue();
+    }
+
+    /**
+     * @param node The Filter 
+     * @return The work estimation for the filter slice node for one steady-state
+     * mult of the filter.
+     */
+    public long getFilterWork(WorkNode node) {
+        return workEstimation.get(node.getFilter()).longValue();
+    }
+    
+    /**            
+     * @param node
+     * @return The work estimation for the filter for one steady-state 
+     * multiplied by the steady-state multiplier
+     */
+    public long getFilterWorkSteadyMult(WorkNode node)  {
+        return getFilterWork(node)  * steadyMult;
+    }
+    
+   /**
+ * @param slice
+ * @return Return the filter of slice that does the most work. 
+ */
+public WorkNode getSliceBNFilter(Filter slice) {
+    assert bottleNeckFilter.containsKey(slice);
+    return (WorkNode)bottleNeckFilter.get(slice);
+}
+    
+    /**
+     * @param slice
+     * @return The work estimation for the slice (the estimation for the filter that does the
+     * most work for one steady-state mult of the filter multipled by the steady state multiplier.
+     */
+    public long getSliceBNWork(Filter slice) {
+        assert sliceBNWork.containsKey(slice);
+        return sliceBNWork.get(slice).longValue() * steadyMult;
+    }
+    
+    /**
+     * Get all slices
+     * @return All the slices of the slice graph. 
+     */
+    public Filter[] getSliceGraph() {
+        //new slices may have been added so we need to reconstruct the graph each time
+        LinkedList<Filter> sliceGraph = 
+            DataFlowOrder.getTraversal(topSlices.toArray(new Filter[topSlices.size()]));
+        
+        return sliceGraph.toArray(new Filter[sliceGraph.size()]);
+    }
+    
+    /**
+     *  Get just top level slices in the slice graph.
+     * @return top level slices
+     */
+    public Filter[] getTopSlices() {
+        assert topSlices != null;
+        return topSlices.toArray(new Filter[topSlices.size()]);
+    }
+
+    
+    /**
+     * The cost of 1 firing of the filter, to be run after the steady multiplier
+     * has been accounted for in the steady multiplicity of each filter content.
+     * 
+     * @param node
+     * @return 
+     */
+    public long getWorkEstOneFiring(WorkNode node) {
+        return (getFilterWork(node) / (node.getFilter().getSteadyMult() / steadyMult));
+    }
+
+    /**
+     * Check for I/O in slice
+     * @param slice
+     * @return Return true if this slice is an IO slice (file reader/writer).
+     */
+    public boolean isIO(Filter slice) {
+        for (int i = 0; i < io.length; i++) {
+            if (slice == io[i])
+                return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Return true if the slice is a top (source) slice in the forrest
+     */
+    public boolean isTopSlice(Filter slice) {
+        for (Filter cur : topSlices) {
+            if (cur == slice)
+                return true;
+        }
+        return false;
+    }
+     
+    
+    /**
+     * Partition the stream graph into slices (slices) and return the slices.
+     * @return The slices (slices) of the partitioned graph. 
+     */
+    public abstract Filter[] partition();
+    
+    
+    /**
+     * remove this slice from the list of top slices, roots of the forest.
+     */
+    public void removeTopSlice(Filter slice) {
+        assert topSlices.contains(slice);
+        topSlices.remove(slice);
+    }
+
     /**
      * Set the slice graph to slices, where the only difference between the 
      * previous slice graph and the new slice graph is the addition of identity
@@ -222,60 +417,6 @@ public abstract class SIRSlicer extends Slicer {
         setSliceGraph(slices);
     }
     
-    /**
-     * @param node The Filter 
-     * @return The work estimation for the filter slice node for one steady-state
-     * mult of the filter.
-     */
-    public long getFilterWork(WorkNode node) {
-        return workEstimation.get(node.getFilter()).longValue();
-    }
-
-    
-    /**            
-     * @param node
-     * @return The work estimation for the filter for one steady-state 
-     * multiplied by the steady-state multiplier
-     */
-    public long getFilterWorkSteadyMult(WorkNode node)  {
-        return getFilterWork(node)  * steadyMult;
-    }
-
-    /**
-     * @param slice
-     * @return The work estimation for the slice (the estimation for the filter that does the
-     * most work for one steady-state mult of the filter multipled by the steady state multiplier.
-     */
-    public long getSliceBNWork(Filter slice) {
-        assert sliceBNWork.containsKey(slice);
-        return sliceBNWork.get(slice).longValue() * steadyMult;
-    }
-    
-    /**
-     * This hashmap store the filters work plus any blocking that is
-     * caused by the pipeline imbalance of the slice. 
-     */
-    public long getFilterOccupancy(WorkNode filter) {
-        assert filterOccupancy.containsKey(filter);
-        return filterOccupancy.get(filter).longValue();
-    }
-     
-    
-    /**
-     * @param slice
-     * @return Return the filter of slice that does the most work. 
-     */
-    public WorkNode getSliceBNFilter(Filter slice) {
-        assert bottleNeckFilter.containsKey(slice);
-        return (WorkNode)bottleNeckFilter.get(slice);
-    }
-    
-    
-    public void calculateWorkStats() {
-        calcStartupCost();
-        calcOccupancy();
-    }
-
     private void calcOccupancy() {
         Filter[] slices = getSliceGraph();
         for (int i = 0; i < slices.length; i++) {
@@ -360,7 +501,6 @@ public abstract class SIRSlicer extends Slicer {
             }
         }
     }
-    
     /**
      * For each filterslicenode of the slice graph, calculate the startup
      * cost.  This is essentially the time it takes to first start the filter,
@@ -420,38 +560,33 @@ public abstract class SIRSlicer extends Slicer {
             //on to the next slice
         }
     }
-    // dump the the completed partition to a dot file
-    public void dumpGraph(String filename) {
-        Filter[] sliceGraph = getSliceGraph();
-        StringBuffer buf = new StringBuffer();
-        buf.append("digraph Flattend {\n");
-        buf.append("size = \"8, 10.5\";\n");
-
-        for (int i = 0; i < sliceGraph.length; i++) {
-            Filter slice = sliceGraph[i];
-            assert slice != null;
-            buf.append(slice.hashCode() + " [ " + 
-                    sliceName(slice) + 
-                    "\" ];\n");
-            Filter[] next = getNext(slice/* ,parent */);
-            for (int j = 0; j < next.length; j++) {
-                assert next[j] != null;
-                buf.append(slice.hashCode() + " -> " + next[j].hashCode()
-                           + ";\n");
-            }
-        }
-
-        buf.append("}\n");
-        // write the file
-        try {
-            FileWriter fw = new FileWriter(filename);
-            fw.write(buf.toString());
-            fw.close();
-        } catch (Exception e) {
-            System.err.println("Could not print extracted slices");
+    
+    /**
+     * Set the slice graph to slices.
+     * 
+     * @param slices The slice list to install as the new slice graph.
+     */
+    private void setSliceGraph(Filter[] slices) {
+        
+        //perform some checks on the slice graph...
+        for (int i = 0; i < slices.length; i++) {
+            assert sliceBNWork.containsKey(slices[i]) : slices[i];
+            //this doesn't get filled till later
+            //assert bottleNeckFilter.containsKey(slices[i]) : slices[i];
+            assert workEstimation.containsKey(slices[i].getWorkNode().getFilter()) : slices[i].getWorkNode().getFilter();
+            	
         }
     }
-    
+
+
+    /*
+	    * work estimate for filter needed in various places. 
+	    */
+	   private int workEst(WorkNode node) {
+	       return MultiLevelSplitsJoins.IDENTITY_WORK *
+	       node.getFilter().getSteadyMult();
+	   }
+        
     // get the downstream slices we cannot use the edge[] of slice
     // because it is for execution order and this is not determined yet.
     protected Filter[] getNext(Filter slice) {
@@ -479,33 +614,40 @@ public abstract class SIRSlicer extends Slicer {
         }
         return new Filter[0];
     }
-
-    protected WorkNodeContent getFilterContent(UnflatFilter f) {
-        WorkNodeContent content;
-
-        if (f.filter instanceof SIRFileReader)
-            content = new FileInputContent(f);
-        else if (f.filter instanceof SIRFileWriter)
-            content = new FileOutputContent(f);
-        else {
-            if (f.filter == null) {
-                content = new WorkNodeContent(f);
-                genIdWorks.put(f.filter, MultiLevelSplitsJoins.IDENTITY_WORK *
-                        f.steadyMult);
-                
-            } else 
-                content = new WorkNodeContent(f);
-        }
-        
-        sirToContent.put(f.filter, content);
-        return content;
-    }
-
-    public WorkNodeContent getContent(SIRFilter f) {
-        return sirToContent.get(f);
-    }
     
-   
+    // get the downstream slices we cannot use the edge[] of slice
+    // because it is for execution order and this is not determined yet.
+    protected Filter[] getNext(Filter slice, SchedulingPhase phase) {
+        InternalFilterNode node = slice.getInputNode();
+        if (node instanceof InputNode)
+            node = node.getNext();
+        while (node != null && node instanceof WorkNode) {
+            node = node.getNext();
+        }
+        if (node instanceof OutputNode) {
+            Edge[][] dests = ((OutputNode) node).getDests(phase);
+            ArrayList<Object> output = new ArrayList<Object>();
+            for (int i = 0; i < dests.length; i++) {
+                Edge[] inner = dests[i];
+                for (int j = 0; j < inner.length; j++) {
+                    // Object next=parent.get(inner[j]);
+                    Object next = inner[j].getDest().getParent();
+                    if (!output.contains(next))
+                        output.add(next);
+                }
+            }
+            Filter[] out = new Filter[output.size()];
+            output.toArray(out);
+            return out;
+        }
+        return new Filter[0];
+    }
+
+
+    protected long getWorkEstimate(WorkNodeContent fc) {
+        assert workEstimation.containsKey(fc);
+        return workEstimation.get(fc).longValue();
+    }
     
     //return a string with all of the names of the filterslicenodes
     // and blue if linear
@@ -546,43 +688,53 @@ public abstract class SIRSlicer extends Slicer {
         return out.toString();
     }
     
-    protected long getWorkEstimate(WorkNodeContent fc) {
-        assert workEstimation.containsKey(fc);
-        return workEstimation.get(fc).longValue();
-    }
-
-
-    /**
-     * The cost of 1 firing of the filter, to be run after the steady multiplier
-     * has been accounted for in the steady multiplicity of each filter content.
-     * 
-     * @param node
-     * @return 
-     */
-    public long getWorkEstOneFiring(WorkNode node) {
-        return (getFilterWork(node) / (node.getFilter().getSteadyMult() / steadyMult));
-    }
     
-    /**
-     * @param node
-     * @return The startup cost for <pre>node</pre> 
-     */
-    public int getFilterStartupCost(WorkNode node) {
-        assert filterStartupCost.containsKey(node);
-       
-        return filterStartupCost.get(node).intValue();
-    }
-    
-    
-    /**
-     * Force creation of kopi methods and fields for predefined filters.
-     */
-    public void createPredefinedContent() {
-    	for (Filter s : getSliceGraph()) {
-    		if (s.getWorkNode().getFilter() instanceof PredefinedContent) {
-    			((PredefinedContent)s.getWorkNode().getFilter()).createContent();
-    		}
-    	}
+    //return a string with all of the names of the filterslicenodes
+    // and blue if linear
+    protected  String sliceName(Filter slice, Layout layout, boolean fullInfo) {
+        InternalFilterNode node = slice.getInputNode();
 
+        StringBuffer out = new StringBuffer();
+
+        //do something fancy for linear slices!!!
+        if (((WorkNode)node.getNext()).getFilter().getArray() != null)
+            out.append("color=cornflowerblue, style=filled, ");
+        
+        out.append("label=\"" + slice.hashCode() + "\\n");
+        if (fullInfo)
+            out.append(node.getAsInput().debugString(true, SchedulingPhase.INIT) + "\\n" +
+                        node.getAsInput().debugString(true, SchedulingPhase.STEADY));//toString());
+        
+        node = node.getNext();
+        while (node != null ) {
+            if (node.isFilterSlice()) {
+                WorkNodeContent f = node.getAsFilter().getFilter();
+                out.append("\\n" + node.toString() + "{"
+                        + "}");
+                if (f.isTwoStage())
+                    out.append("\\npre:(peek, pop, push): (" + 
+                            f.getPreworkPeek() + ", " + f.getPreworkPop() + "," + f.getPreworkPush());
+                out.append(")\\n(peek, pop, push: (" + 
+                        f.getPeekInt() + ", " + f.getPopInt() + ", " + f.getPushInt() + ")");
+                out.append("\\nMult: init " + f.getInitMult() + ", steady " + f.getSteadyMult());
+                if (layout != null) 
+                    out.append("\\nTile: " + layout.getComputeNode(slice.getWorkNode()).getUniqueId());
+                out.append("\\n *** ");
+            }
+            else {
+                if (fullInfo)
+                    out.append("\\n" + node.getAsOutput().debugString(true, SchedulingPhase.INIT) + "\\n" +
+                            node.getAsOutput().debugString(true, SchedulingPhase.STEADY));
+               
+            }
+            /*else {
+                //out.append("\\n" + node.toString());
+            }*/
+            node = node.getNext();
+        }
+        return out.toString();
     }
 }
+    
+
+

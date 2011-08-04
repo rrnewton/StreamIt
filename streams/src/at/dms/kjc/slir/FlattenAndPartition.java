@@ -37,9 +37,9 @@ public class FlattenAndPartition extends SIRSlicer {
     
     public HashSet<WorkNode> generatedIds;
 
-    public FlattenAndPartition(UnflatFilter[] topFilters, HashMap[] exeCounts,
+    public FlattenAndPartition(HashMap[] exeCounts,
             LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
-        super(topFilters, exeCounts, lfa, work, maxPartitions);
+        super(exeCounts, lfa, work, maxPartitions);
         workEstimation = new HashMap<WorkNodeContent, Long>();
     }
 

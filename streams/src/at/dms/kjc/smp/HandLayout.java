@@ -18,7 +18,7 @@ import at.dms.kjc.spacedynamic.SpdStaticStreamGraph;
 
 public class HandLayout implements Layout {
     
-    protected Slicer slicer;
+    protected SIRSlicer slicer;
     protected SMPMachine chip;
     protected LinkedList<Filter> scheduleOrder;
     protected HashMap<InternalFilterNode, Core> assignment;    

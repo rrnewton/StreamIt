@@ -26,9 +26,9 @@ import at.dms.kjc.slir.*;
  */
 public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
     /** Partitioner stored with schedule. */
-    private Slicer slicer;
+    private SIRSlicer slicer;
     
-    public SpaceTimeScheduleAndSlicer(Slicer slicer) {
+    public SpaceTimeScheduleAndSlicer(SIRSlicer slicer) {
         super();
         this.slicer = slicer;
     }
@@ -66,14 +66,14 @@ public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
     /** 
      * @param slicer
      */
-    public void setSlicer(Slicer slicer) {
+    public void setSlicer(SIRSlicer slicer) {
         this.slicer = slicer;
     }
 
     /**
      * @return the partitioner associated with this schedule.
      */
-    public Slicer getSlicer() {
+    public SIRSlicer getSlicer() {
         return slicer;
     }
 }

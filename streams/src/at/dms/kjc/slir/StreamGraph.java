@@ -33,9 +33,9 @@ public class StreamGraph extends SIRSlicer {
 //	}
 //	
 	
-    public StreamGraph(UnflatFilter[] topFilters, HashMap[] exeCounts,
+    public StreamGraph(HashMap[] exeCounts,
             LinearAnalyzer lfa, WorkEstimate work, int maxPartitions) {
-        super(topFilters, exeCounts, lfa, work, maxPartitions);
+        super(exeCounts, lfa, work, maxPartitions);
         workEstimation = new HashMap<WorkNodeContent, Long>();
     
         roots = new LinkedList<StaticSubGraph>();	

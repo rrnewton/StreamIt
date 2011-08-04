@@ -51,16 +51,12 @@ import at.dms.kjc.sir.lowering.partition.SJToPipe;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.FlattenAndPartition;
-import at.dms.kjc.slir.FlattenGraph;
 import at.dms.kjc.slir.InstallInitDistributions;
-import at.dms.kjc.slir.OneFilterSlicer;
 import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.SIRToSLIR;
-import at.dms.kjc.slir.SimpleSlicer;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.Slicer;
+import at.dms.kjc.slir.SIRSlicer;
 import at.dms.kjc.slir.StreamGraph;
-import at.dms.kjc.slir.UnflatFilter;
 
 
 /**
@@ -71,7 +67,7 @@ import at.dms.kjc.slir.UnflatFilter;
  */
 public class CommonPasses {
 	/** field that may be useful later */
-	private Slicer slicer;
+	private SIRSlicer slicer;
 
 	/** field that may be useful later */
 	private WorkEstimate workEstimate;
@@ -448,41 +444,18 @@ public class CommonPasses {
 		// Convert to SliceGraph representation.
 
 		// flatten the graph by running (super?) synch removal
-		UnflatFilter[] topNodes = null;
-		if (!KjcOptions.nopartition) {
-			FlattenGraph.flattenGraph(str, lfa, executionCounts);
-			topNodes = FlattenGraph.getTopLevelNodes();
-			CommonUtils.println_debugging("Top Nodes:");
-			for (int i = 0; i < topNodes.length; i++)
-				CommonUtils.println_debugging(topNodes[i].toString());
-		}
 
 		// TODO: This is where we want to convert to the StreamGraph - soule
 
 		Filter[] filterGraph = null;
 		setSlicer(null);
-		if (KjcOptions.tilera > 1 || KjcOptions.smp > 1) {
-			if (!KjcOptions.nopartition) {
-				System.out.println("Using OneFilterSlicer slicer");
-				setSlicer(new OneFilterSlicer(topNodes, executionCounts));
-			} else {
-				System.out.println("Using FlattenAndPartition slicer");
-				setSlicer(new FlattenAndPartition(topNodes, executionCounts,
-						lfa, getWorkEstimate(), numCores));
-				((FlattenAndPartition) getSlicer()).flatten(str,
-						executionCounts);
-			}
-		} else {
-			if (KjcOptions.nopartition) {
-				setSlicer(new FlattenAndPartition(topNodes, executionCounts,
-						lfa, getWorkEstimate(), numCores));
-				((FlattenAndPartition) getSlicer()).flatten(str,
-						executionCounts);
-			} else {
-				setSlicer(new SimpleSlicer(topNodes, executionCounts, lfa,
-						getWorkEstimate(), numCores));
-			}
-		}
+
+		setSlicer(new FlattenAndPartition(executionCounts,
+				lfa, getWorkEstimate(), numCores));
+		((FlattenAndPartition) getSlicer()).flatten(str,
+				executionCounts);
+
+
 		filterGraph = getSlicer().partition();
 		System.out.println("Traces: " + filterGraph.length);
 
@@ -558,7 +531,7 @@ public class CommonPasses {
 	 * @param slicer
 	 *            the slicer to set
 	 */
-	private void setSlicer(Slicer slicer) {
+	private void setSlicer(SIRSlicer slicer) {
 		this.slicer = slicer;
 	}
 
@@ -569,7 +542,7 @@ public class CommonPasses {
 	 * 
 	 * @return the slicer
 	 */
-	public Slicer getSlicer() {
+	public SIRSlicer getSlicer() {
 		return slicer;
 	}
 

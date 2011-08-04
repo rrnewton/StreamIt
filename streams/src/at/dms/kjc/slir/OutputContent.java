@@ -35,14 +35,6 @@ public abstract class OutputContent extends PredefinedContent implements at.dms.
     public OutputContent(SIRPredefinedFilter filter) {
         super(filter);
     }
-
-    /**
-     * Construct OutputContent from UnflatFilter.
-     * @param unflat The UnflatFilter used to contruct the OutputContent.
-     */
-    public OutputContent(UnflatFilter unflat) {
-        super(unflat);
-    }
     
     public abstract void createContent();
 
