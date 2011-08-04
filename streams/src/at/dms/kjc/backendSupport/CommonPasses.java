@@ -59,6 +59,7 @@ import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.SimpleSlicer;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.Slicer;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.UnflatFilter;
 
 
@@ -218,8 +219,8 @@ public class CommonPasses {
 		// TODO: add the optimizations here -- soule
 		
 		// we want to convert to the StreamGraph
-		SIRToSLIR.Result result = new SIRToSLIR().translate(segmentedGraph, numCores);
-		setSlicer(result.getSlicer());
+		StreamGraph streamGraph = new SIRToSLIR().translate(segmentedGraph, numCores);
+		setSlicer(streamGraph);
 		
 		Filter[] filterGraph = null;
 

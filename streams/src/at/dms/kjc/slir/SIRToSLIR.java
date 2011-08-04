@@ -39,24 +39,7 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 public class SIRToSLIR implements StreamVisitor {
 
 	private StaticSubGraph currentSSG = null;
-	
-	public class Result {
-		private StreamGraph streamGraph;
-		private Slicer slicer;
-		public StreamGraph getStreamGraph() {
-			return streamGraph;
-		}
-		public void setStreamGraph(StreamGraph streamGraph) {
-			this.streamGraph = streamGraph;
-		}
-		public Slicer getSlicer() {
-			return slicer;
-		}
-		public void setSlicer(Slicer slicer) {
-			this.slicer = slicer;
-		}
-	}
-	
+		
 	public SIRToSLIR() {
 		log(this.getClass().getCanonicalName() + " SIRToSLIR()");		
 	}
@@ -83,15 +66,15 @@ public class SIRToSLIR implements StreamVisitor {
 	 * Note: Take a look at the FlatGraph code to see how the hierarchy is handled
 	 * @return
 	 */
-	public Result translate(SegmentedGraph segmentedGraph, int numCores) {
+	public StreamGraph translate(SegmentedGraph segmentedGraph, int numCores) {
 		log(this.getClass().getCanonicalName() + " translate()");		
 		// A StreamGraph is a list of StaticSubGraphs. 
 		// A StaticSubGraph has an input, output, and a List<Filter>;		
-		StreamGraph streamGraph = new StreamGraph();
+		//StreamGraph streamGraph = new StreamGraph();
+		StreamGraph streamGraph = null;
 		List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();
 
 		LinearAnalyzer lfa = Flattener.lfa;
-		Slicer slicer = null;
 		
 		for (SIRStream str : subgraphs) {
 
@@ -102,7 +85,7 @@ public class SIRToSLIR implements StreamVisitor {
 			IterFactory.createFactory().createIter(str).accept(this);
 			currentSSG.setInputPort(inputPort);
 			currentSSG.setOutputPort(outputPort);
-			streamGraph.addRoot(currentSSG);
+			
 			
 			
 			// TODO: REMOVE SOON!
@@ -110,11 +93,16 @@ public class SIRToSLIR implements StreamVisitor {
 			HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);
 
 			UnflatFilter[] topNodes = null;
-			slicer = new FlattenAndPartition(topNodes, executionCounts,
+			streamGraph = new StreamGraph(topNodes, executionCounts,
 					lfa, WorkEstimate.getWorkEstimate(str), numCores);
-			((FlattenAndPartition) slicer).flatten(str, executionCounts);
-			//slicer = null;
+			streamGraph.flatten(str, executionCounts);
 			// END SECTION OF TO REMOVE
+			
+			
+			streamGraph.addRoot(currentSSG);
+			
+
+
 			
 			
 //			
@@ -199,11 +187,8 @@ public class SIRToSLIR implements StreamVisitor {
 			
 			
 		} // for (SIRStream str : subgraphs) 
-		
-		Result result = new Result();
-		result.setStreamGraph(streamGraph);
-		result.setSlicer(slicer);
-		return result;
+				
+		return streamGraph;
 	}
 	
 	@Override
