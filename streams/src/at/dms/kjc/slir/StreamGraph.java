@@ -59,6 +59,12 @@ public class StreamGraph {
     	return ssgs.get(i);
     }
 
+
+	public StaticSubGraph getSSG() {
+		assert ssgs.size() == 0 : "Calling getSSG() on a graph with dynamic rates, and thus multiple SSGs!";
+    	return ssgs.get(0);
+    }
+
  
     
     public int getSteadyMult() {
@@ -70,7 +76,11 @@ public class StreamGraph {
     public void setSteadyMult(int steadyMult) {
 		this.steadyMult = steadyMult;
 	}
- 
+
+    public int getNumSSGs() {
+    	return ssgs.size();
+    }
+    
 }
     
 

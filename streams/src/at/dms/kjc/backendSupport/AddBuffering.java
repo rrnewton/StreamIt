@@ -28,7 +28,7 @@ import at.dms.kjc.*;
  *
  */
 public class AddBuffering {
-    private StreamGraph spaceTime;
+    private StaticSubGraph ssg;
     private HashSet<Filter> editedSlices;
     private boolean limitTiles;
     private int totalTiles;
@@ -39,13 +39,13 @@ public class AddBuffering {
      *  
      * @param spaceTime The space time schedule.
      */
-    public static void doit(StreamGraph spaceTime, boolean limitTiles, int totalTiles) {
+    public static void doit(StaticSubGraph spaceTime, boolean limitTiles, int totalTiles) {
         System.out.println("Equalizing splits and joins by buffering...");
         new AddBuffering(spaceTime,limitTiles,totalTiles).doitInternal();
     }
     
-    private AddBuffering(StreamGraph st, boolean limit, int tt) {
-        this.spaceTime = st;
+    private AddBuffering(StaticSubGraph st, boolean limit, int tt) {
+        this.ssg = st;
         this.limitTiles = limit;
         this.totalTiles = tt;
         editedSlices = new HashSet<Filter>();
@@ -63,8 +63,8 @@ public class AddBuffering {
      * then create an id filter to buffer items to make it integral.
      */
     private void checkOutputNodes() {
-        for (int t = 0; t < spaceTime.getSliceGraph().length; t++) {
-            Filter slice = spaceTime.getSliceGraph()[t];
+        for (int t = 0; t < ssg.getSliceGraph().length; t++) {
+            Filter slice = ssg.getSliceGraph()[t];
             //check all the outgoing edges to see if they are balanced in the init
             //and fix them if we have to
             fixOutputNode(slice.getOutputNode());
@@ -118,8 +118,8 @@ public class AddBuffering {
         do {
             //System.out.println("Iteration " + i++);
             change = false;
-            for (int t = 0; t < spaceTime.getSliceGraph().length; t++) {
-                Filter slice = spaceTime.getSliceGraph()[t];
+            for (int t = 0; t < ssg.getSliceGraph().length; t++) {
+                Filter slice = ssg.getSliceGraph()[t];
                 //check all the outgoing edges to see if they are balanced in the init
                 //and fix them if we have to
                 boolean currentChange 
@@ -406,7 +406,7 @@ public class AddBuffering {
         slice.getOutputNode().setPrevious(filter);
         slice.finish();
         
-        spaceTime.addFilterToSlice(filter, slice);
+        ssg.addFilterToSlice(filter, slice);
     }
     
     /**

@@ -72,7 +72,7 @@ public class TMD extends Scheduler {
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
         
-        lsg = new LevelizeSSG(graphSchedule.getSlicer().getTopSlices());
+        lsg = new LevelizeSSG(graphSchedule.getSSG().getTopSlices());
         Filter[][] levels = lsg.getLevels();
         
         
@@ -347,7 +347,7 @@ public class TMD extends Scheduler {
     public void run(int tiles) {
         //if we are using the SIR data parallelism pass, then don't run TMD
         if (KjcOptions.dup == 1) {
-		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
 	
 		    for (Filter slice : slices) {
 		    	WorkNodeContent filter = slice.getWorkNode().getFilter();
@@ -362,7 +362,7 @@ public class TMD extends Scheduler {
         int factor = multiplicityFactor(tiles);
         System.out.println("Using fission steady multiplicty factor: " + factor);
         
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
         
         //go through and multiply the steady multiplicity of each filter by factor
         for (Filter slice : slices) {
@@ -372,7 +372,7 @@ public class TMD extends Scheduler {
         //must reset the filter info's because we have changed the schedule
         FilterInfo.reset();
         
-        SMPBackend.scheduler.graphSchedule.getSlicer().dumpGraph("before_fission.dot", 
+        SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("before_fission.dot", 
                 null, false);
         
         int maxFission = 0;
@@ -380,12 +380,12 @@ public class TMD extends Scheduler {
         //go through and perform the fission
         for (Filter slice : slices) {
             if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
-                if (Fissioner.doit(slice, graphSchedule.getSlicer(), fizzAmount.get(slice)) != null) {
+                if (Fissioner.doit(slice, graphSchedule.getSSG(), fizzAmount.get(slice)) != null) {
                     System.out.println("Fissed " + slice.getWorkNode() + " by " + fizzAmount.get(slice));
                     if (fizzAmount.get(slice) > maxFission)
                         maxFission = fizzAmount.get(slice);
                 }
-                SMPBackend.scheduler.graphSchedule.getSlicer().dumpGraph("fission_pass_" + i + ".dot", 
+                SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("fission_pass_" + i + ".dot", 
 									 null, false);
                 i++;
             }
@@ -420,7 +420,7 @@ public class TMD extends Scheduler {
      * 
      */
     public void calculateFizzAmounts(int totalTiles) {
-        Filter[][] origLevels = new LevelizeSSG(graphSchedule.getSlicer().getTopSlices()).getLevels();
+        Filter[][] origLevels = new LevelizeSSG(graphSchedule.getSSG().getTopSlices()).getLevels();
         long peekingWork = 0;
         long totalWork = 0;
         //assume that level 0 has a file reader and the last level has a file writer
@@ -554,7 +554,7 @@ public class TMD extends Scheduler {
      */
     private int multiplicityFactor(int tiles) {
         int maxFactor = 1;
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
         
         for (Filter slice : slices) {
          

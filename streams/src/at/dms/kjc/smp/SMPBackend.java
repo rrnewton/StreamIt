@@ -43,14 +43,15 @@ public class SMPBackend {
         // The usual optimizations and transformation to slice graph
         CommonPasses commonPasses = new CommonPasses();
         // perform standard optimizations, use the number of cores the user wants to target
-        commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, chip.size());
+        StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, chip.size());
+        StaticSubGraph ssg = streamGraph.getSSG();
         // perform some standard cleanup on the slice graph.
-        commonPasses.simplifySlices();
+        commonPasses.simplifySlices(ssg);
         // dump slice graph to dot file
-        commonPasses.getSlicer().dumpGraph("traces.dot", null);
+        commonPasses.getSSG().dumpGraph("traces.dot", null);
         
         // partition the slice graph based on the scheduling policy
-        SpaceTimeScheduleAndSlicer graphSchedule = new SpaceTimeScheduleAndSlicer(commonPasses.getSlicer());
+        SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(commonPasses.getSSG());
         scheduler.setGraphSchedule(graphSchedule);
         scheduler.run(chip.size());
         FilterInfo.reset();
@@ -62,8 +63,8 @@ public class SMPBackend {
         scheduler.runLayout();
 
         // dump final slice graph to dot file
-        graphSchedule.getSlicer().dumpGraph("after_slice_partition.dot", scheduler);
-        graphSchedule.getSlicer().dumpGraph("slice_graph.dot", scheduler, false);
+        graphSchedule.getSSG().dumpGraph("after_slice_partition.dot", scheduler);
+        graphSchedule.getSSG().dumpGraph("slice_graph.dot", scheduler, false);
 
         // if load balancing, find candidiate fission groups to load balance
         if(KjcOptions.loadbalance) {
@@ -109,7 +110,7 @@ public class SMPBackend {
 
         // calculate computation to communication ratio
         if(KjcOptions.sharedbufs) {
-            LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+            LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
             HashSet<Filter> compProcessed = new HashSet<Filter>();
             HashSet<Filter> commProcessed = new HashSet<Filter>();
             
@@ -321,8 +322,8 @@ public class SMPBackend {
      *
      * @return a Scheduler from which the schedules for the phases may be extracted. 
      */
-    public static void scheduleSlices(SpaceTimeScheduleAndSlicer schedule) {
-        StreamGraph slicer = schedule.getSlicer();
+    public static void scheduleSlices(SpaceTimeScheduleAndSSG schedule) {
+        StaticSubGraph slicer = schedule.getSSG();
         
         // set init schedule in standard order
         schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer.getSliceGraph()));

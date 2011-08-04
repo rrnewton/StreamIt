@@ -15,22 +15,22 @@ import at.dms.kjc.slir.*;
  */
 public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
     private HashMap<InternalFilterNode, T> assignment;
-    private SpaceTimeScheduleAndSlicer spaceTime;
+    private SpaceTimeScheduleAndSSG spaceTime;
     private int numBins;
     private LinkedList<InternalFilterNode>[] bins;
     private int[] binWeight;
     //private int[] searchOrder;
     private int totalWork;
     private T[] nodes;
-    private StreamGraph slicer;
+    private StaticSubGraph ssg;
     
     /**
      * Constructor
      * @param spaceTime
      * @param nodes
      */
-    public BasicGreedyLayout(SpaceTimeScheduleAndSlicer spaceTime, T[] nodes) {
-        this.slicer = (StreamGraph)spaceTime.getSlicer();
+    public BasicGreedyLayout(SpaceTimeScheduleAndSSG spaceTime, T[] nodes) {
+        this.ssg = (StaticSubGraph)spaceTime.getSSG();
         this.spaceTime = spaceTime;
         this.nodes = nodes;
         this.numBins = nodes.length;
@@ -70,8 +70,8 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         
     
         //if we are software pipelining then sort the traces by work
-        Filter[] tempArray = (Filter[]) spaceTime.getSlicer().getSliceGraph().clone();
-        Arrays.sort(tempArray, new CompareFilterWork(slicer));
+        Filter[] tempArray = (Filter[]) spaceTime.getSSG().getSliceGraph().clone();
+        Arrays.sort(tempArray, new CompareFilterWork(ssg));
         scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
         //reverse the list, we want the list in descending order!
         Collections.reverse(scheduleOrder);
@@ -94,14 +94,14 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
 
                 bins[bin].add(fnode);
                 assignment.put(fnode, nodes[bin]);
-                binWeight[bin] += slicer
+                binWeight[bin] += ssg
                         .getFilterWorkSteadyMult(fnode);
-                totalWork += slicer
+                totalWork += ssg
                         .getFilterWorkSteadyMult(fnode);
                 System.out.println(" Placing: "
                         + fnode
                         + " work = "
-                        + slicer.getFilterWorkSteadyMult(
+                        + ssg.getFilterWorkSteadyMult(
                                 fnode) + " on bin " + bin + ", bin work = "
                         + binWeight[bin]);
                 if (snode.getPrevious() instanceof InputNode) {

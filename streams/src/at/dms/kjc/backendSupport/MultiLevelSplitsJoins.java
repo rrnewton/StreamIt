@@ -27,18 +27,18 @@ public class MultiLevelSplitsJoins {
     /** The maximum width allowed for any split or join, it is set to the
      * number of devices*/
     private int maxWidth;
-    private StreamGraph slicer;
+    private StaticSubGraph ssg;
     
     /**
      * Create an instance of the pass that will operate on the 
      * partitioning calculated by partitioner for the number of memories
      * in RawChip.
      * 
-     * @param slicer The partitioning.
+     * @param ssg The partitioning.
      * @param maxWidth The Raw chip.
      */
-    public MultiLevelSplitsJoins(StreamGraph slicer, int maxWidth) {
-        this.slicer = slicer;
+    public MultiLevelSplitsJoins(StaticSubGraph ssg, int maxWidth) {
+        this.ssg = ssg;
         //set max width to number of devices
         this.maxWidth = maxWidth;
         System.out.println("Maxwidth: " + maxWidth);
@@ -56,12 +56,12 @@ public class MultiLevelSplitsJoins {
         //created by this pass, to be installed in the partitioner at the 
         //end of this driver
         LinkedList<Filter> slices = new LinkedList<Filter>();
-        int oldNumSlices = slicer.getSliceGraph().length;
+        int oldNumSlices = ssg.getSliceGraph().length;
         
         //cycle thru the trace graph and see if there are any 
         //splits or joins that need to be reduced...
-        for (int i = 0; i < slicer.getSliceGraph().length; i++) {
-            Filter slice = slicer.getSliceGraph()[i];
+        for (int i = 0; i < ssg.getSliceGraph().length; i++) {
+            Filter slice = ssg.getSliceGraph()[i];
            
             //see if the width of the joiner is too wide and 
             //keep breaking it up until it is, adding new levels...
@@ -84,9 +84,9 @@ public class MultiLevelSplitsJoins {
         }
         //set the trace graph to the new list of traces that we have
         //calculated in this pass
-        slicer.setSliceGraphNewIds(slices.toArray(new Filter[0]));
+        ssg.setSliceGraphNewIds(slices.toArray(new Filter[0]));
         System.out.println("Done Breaking Splits / Joins (was " + oldNumSlices + 
-                " traces, now " + slicer.getSliceGraph().length + " traces).");
+                " traces, now " + ssg.getSliceGraph().length + " traces).");
         
     }
     

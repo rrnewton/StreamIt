@@ -23,6 +23,7 @@ import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.backendSupport.FilterInfo;
 
 
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.MutableStateExtractor;
@@ -60,9 +61,9 @@ public class StatelessFissioner {
     /** the fission products of the slice */
     private Filter[] sliceClones;
 
-    public static FissionGroup doit(Filter slice, StreamGraph slicer, int fissAmount) {
+    public static FissionGroup doit(Filter slice, StaticSubGraph ssg, int fissAmount) {
         if(!KjcOptions.sharedbufs) {
-            return Fissioner.doit(slice, slicer, fissAmount);
+            return Fissioner.doit(slice, ssg, fissAmount);
         }
         else {
             System.out.println("Performing fission on: " + slice.getWorkNode() + ", fizzAmount: " + fissAmount);

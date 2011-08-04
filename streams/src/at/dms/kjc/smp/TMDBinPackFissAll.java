@@ -61,7 +61,7 @@ public class TMDBinPackFissAll extends Scheduler {
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
         
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
         HashSet<Filter> fizzedSlices = new HashSet<Filter>();
         HashSet<Filter> unfizzedSlices = new HashSet<Filter>();
         
@@ -175,7 +175,7 @@ public class TMDBinPackFissAll extends Scheduler {
         if (KjcOptions.dup == 1 || KjcOptions.optfile != null) {
         	System.out.println("***** Not using TMD scheduler since an SIR partitioner was used *****!");
         	//multiply steady multiplicity of each filter by KjcOptions.steadyMult
-		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
 
 		    for (Filter slice : slices) {
 		    	WorkNodeContent filter = slice.getWorkNode().getFilter();
@@ -195,7 +195,7 @@ public class TMDBinPackFissAll extends Scheduler {
         System.out.println("Using fission steady multiplicity factor: " + factor);
                 
         //go through and multiply the steady multiplicity of each filter by factor        
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
 
         for (Filter slice : slices) {
             WorkNodeContent filter = slice.getWorkNode().getFilter();
@@ -205,7 +205,7 @@ public class TMDBinPackFissAll extends Scheduler {
         //must reset the filter info's because we have changed the schedule
         FilterInfo.reset();
         
-        SMPBackend.scheduler.graphSchedule.getSlicer().dumpGraph("before_fission.dot", 
+        SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("before_fission.dot", 
                 null, false);
         
         int maxFission = 0;
@@ -214,7 +214,7 @@ public class TMDBinPackFissAll extends Scheduler {
         for (Filter slice : slices) {
             if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
                 FissionGroup fissionGroup = 
-                    StatelessFissioner.doit(slice, graphSchedule.getSlicer(), fizzAmount.get(slice));
+                    StatelessFissioner.doit(slice, graphSchedule.getSSG(), fizzAmount.get(slice));
 
                 if(fissionGroup != null) {
                     System.out.println("Fissing " + slice.getWorkNode() + " by " + fizzAmount.get(slice));
@@ -224,7 +224,7 @@ public class TMDBinPackFissAll extends Scheduler {
                     FissionGroupStore.addFissionGroup(fissionGroup);
                 }
 
-                SMPBackend.scheduler.graphSchedule.getSlicer().dumpGraph("fission_pass_" + i + ".dot", 
+                SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("fission_pass_" + i + ".dot", 
 									 null, false);
                 i++;
             }
@@ -243,7 +243,7 @@ public class TMDBinPackFissAll extends Scheduler {
      * filters that meet specific criteria are all fizzed by <totalTiles>
      */
     public void calculateFizzAmounts(int totalTiles) {
-    	LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+    	LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
     	
     	// Look for fizzable filters
     	for(Filter slice : slices) {
@@ -302,7 +302,7 @@ public class TMDBinPackFissAll extends Scheduler {
      */
     private int multiplicityFactor(int tiles) {
         int maxFactor = 1;
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSlicer().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
         
         //find minimum steady-state multiplicity factor necessary to meet
         //copyDown and duplication constraints of fission

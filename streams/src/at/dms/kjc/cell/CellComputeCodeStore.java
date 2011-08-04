@@ -38,7 +38,7 @@ import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
+import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSSG;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.slir.FileInputContent;
@@ -904,7 +904,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         )));
     }
     
-    public void addSPUInit(SpaceTimeScheduleAndSlicer schedule) {
+    public void addSPUInit(SpaceTimeScheduleAndSSG schedule) {
         // spuinit()
         JExpressionStatement spuinit = new JExpressionStatement(
                 new JMethodCallExpression(

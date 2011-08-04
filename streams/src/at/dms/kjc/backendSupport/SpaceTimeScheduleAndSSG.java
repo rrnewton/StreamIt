@@ -7,6 +7,7 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Vector;
 
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.*;
 
 /**
@@ -24,13 +25,13 @@ import at.dms.kjc.slir.*;
  * 
  * @author mgordon (refactored dimock)
  */
-public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
+public class SpaceTimeScheduleAndSSG extends BasicSpaceTimeSchedule {
     /** Partitioner stored with schedule. */
-    private StreamGraph slicer;
+    private StaticSubGraph ssg;
     
-    public SpaceTimeScheduleAndSlicer(StreamGraph slicer) {
+    public SpaceTimeScheduleAndSSG(StaticSubGraph ssg) {
         super();
-        this.slicer = slicer;
+        this.ssg = ssg;
     }
     
     
@@ -46,9 +47,9 @@ public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
         
         //get all the file writers
         Vector<Filter> fileWriters = new Vector<Filter>();
-        for (int i = 0; i < getSlicer().io.length; i++) 
-            if (getSlicer().io[i].getInputNode().isFileOutput())
-                fileWriters.add(getSlicer().io[i]);
+        for (int i = 0; i < getSSG().io.length; i++) 
+            if (getSSG().io[i].getInputNode().isFileOutput())
+                fileWriters.add(getSSG().io[i]);
         
         for (int i = 0; i < fileWriters.size(); i++) {
             WorkNode node = (WorkNode)fileWriters.get(i).getInputNode().getNext();
@@ -64,16 +65,16 @@ public class SpaceTimeScheduleAndSlicer extends BasicSpaceTimeSchedule {
 
     
     /** 
-     * @param slicer
+     * @param ssg
      */
-    public void setSlicer(StreamGraph slicer) {
-        this.slicer = slicer;
+    public void setSSG(StaticSubGraph ssg) {
+        this.ssg = ssg;
     }
 
     /**
      * @return the partitioner associated with this schedule.
      */
-    public StreamGraph getSlicer() {
-        return slicer;
+    public StaticSubGraph getSSG() {
+        return ssg;
     }
 }

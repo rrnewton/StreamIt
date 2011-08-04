@@ -34,14 +34,13 @@ public class UniBackEnd {
         // The usual optimizations and transformation to slice graph
         CommonPasses commonPasses = new CommonPasses();
         // perform standard optimizations.
-        commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
+        StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
+        StaticSubGraph ssg = streamGraph.getSSG();
         // perform some standard cleanup on the slice graph.
-        commonPasses.simplifySlices();
+        commonPasses.simplifySlices(ssg);
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
-        SpaceTimeScheduleAndSlicer schedule = commonPasses.scheduleSlices();
-        // partitioner contains information about the Slice graph used by dumpGraph
-        StreamGraph slicer = (StreamGraph)commonPasses.getSlicer();
-
+        SpaceTimeScheduleAndSSG schedule = commonPasses.scheduleSlices(ssg);
+      
 
         // create a collection of (very uninformative) processor descriptions.
         UniProcessors processors = new UniProcessors(numCores);
@@ -63,7 +62,7 @@ public class UniBackEnd {
         top_call.run(schedule, backEndBits);
 
         // Dump graphical representation
-        DumpSlicesAndChannels.dumpGraph("slicesAndChannels.dot", slicer, backEndBits);
+        DumpSlicesAndChannels.dumpGraph("slicesAndChannels.dot", ssg, backEndBits);
         
         /*
          * Emit code to structs.h

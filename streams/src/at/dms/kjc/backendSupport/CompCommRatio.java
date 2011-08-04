@@ -7,6 +7,7 @@ import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.InternalFilterNode;
@@ -84,15 +85,15 @@ public class CompCommRatio {
      * in the steady-state and the communication is the 
      * number of items sent between slices.
      * 
-     * @param slicer The partitioner we used to slice the graph.
+     * @param SSG The partitioner we used to slice the graph.
      * 
      * @return The computation to communication ratio.
      */
-    public static double ratio(StreamGraph slicer) {
+    public static double ratio(StaticSubGraph SSG) {
         int comp = 0, comm = 0;
         // get the slice node travesal
         Iterator<InternalFilterNode> sliceNodeIt = Util.sliceNodeTraversal(DataFlowOrder
-                                                       .getTraversal(slicer.getTopSlices()));
+                                                       .getTraversal(SSG.getTopSlices()));
 
         while (sliceNodeIt.hasNext()) {
             InternalFilterNode sliceNode = sliceNodeIt.next();
@@ -101,7 +102,7 @@ public class CompCommRatio {
                 WorkNode filter = (WorkNode) sliceNode;
                 // comm += (filter.getFilter().getSteadyMult() *
                 // filter.getFilter().getPushInt());
-                comp += (filter.getFilter().getSteadyMult() * slicer
+                comp += (filter.getFilter().getSteadyMult() * SSG
                          .getFilterWork(filter));
             } else if (sliceNode.isOutputSlice()) {
                 OutputNode output = (OutputNode) sliceNode;

@@ -14,7 +14,7 @@ import at.dms.kjc.slir.*;
  */
 public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> extends SimulatedAnnealing implements Layout<T> {
     
-    protected StreamGraph slicer;
+    protected StaticSubGraph slicer;
     protected Ts chip;
     protected LinkedList<Filter> scheduleOrder;
     protected LinkedList<InternalFilterNode> assignedFilters;
@@ -23,11 +23,11 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     /** from assignment when done with simulated annealing */
     private HashMap<InternalFilterNode, T> layout;
     
-    public NoSWPipeLayout(SpaceTimeScheduleAndSlicer spaceTime, Ts chip) {
+    public NoSWPipeLayout(SpaceTimeScheduleAndSSG spaceTime, Ts chip) {
         this.chip = chip;
-        this.slicer = (StreamGraph)spaceTime.getSlicer();
+        this.slicer = (StaticSubGraph)spaceTime.getSSG();
         scheduleOrder = 
-            DataFlowOrder.getTraversal(spaceTime.getSlicer().getSliceGraph());
+            DataFlowOrder.getTraversal(spaceTime.getSSG().getSliceGraph());
         assignedFilters = new LinkedList<InternalFilterNode>();
         rand = new Random(17);
     }

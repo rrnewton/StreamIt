@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.KjcOptions;
 
@@ -25,7 +26,7 @@ import at.dms.kjc.KjcOptions;
  */
 public class BasicGenerateSteadyStateSchedule {
     private BasicSpaceTimeSchedule spaceTime;
-    private StreamGraph slicer;
+    private StaticSubGraph ssg;
     private LinkedList<Filter> schedule;
     
     /**
@@ -34,10 +35,10 @@ public class BasicGenerateSteadyStateSchedule {
      * @param layout The layout of filterTraceNode->RawTile, this could
      * be null if we are --noanneal. 
      */
-    public BasicGenerateSteadyStateSchedule(BasicSpaceTimeSchedule sts, StreamGraph slicer) {
+    public BasicGenerateSteadyStateSchedule(BasicSpaceTimeSchedule sts, StaticSubGraph slicer) {
       
         spaceTime = sts;
-        this.slicer = slicer;
+        this.ssg = slicer;
         schedule = new LinkedList<Filter>();
     }
     
@@ -45,7 +46,7 @@ public class BasicGenerateSteadyStateSchedule {
     public void schedule() {
         if (KjcOptions.noswpipe) {
             spaceTime.setSchedule(DataFlowOrder.getTraversal
-                    (slicer.getSliceGraph()));
+                    (ssg.getSliceGraph()));
         }
         else {
             //for now just call schedule work, may want other schemes later
@@ -61,8 +62,8 @@ public class BasicGenerateSteadyStateSchedule {
      */
     private void scheduleWork() {
         // sort traces into decreasing order by bottleneck work.
-        Filter[] tempArray = (Filter[]) slicer.getSliceGraph().clone();
-        Arrays.sort(tempArray, new CompareFilterWork(slicer));
+        Filter[] tempArray = (Filter[]) ssg.getSliceGraph().clone();
+        Arrays.sort(tempArray, new CompareFilterWork(ssg));
         LinkedList<Filter> sortedTraces = new LinkedList<Filter>(Arrays.asList(tempArray));
         Collections.reverse(sortedTraces);
 

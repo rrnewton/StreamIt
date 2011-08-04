@@ -9,16 +9,16 @@ import java.io.*;
 /** Dump a graph with info about slices and channels. */
 public class DumpSlicesAndChannels {
     // dump the the completed partition to a dot file
-    public static void dumpGraph(String filename, StreamGraph slicer, BackEndFactory backendbits) {
+    public static void dumpGraph(String filename, StaticSubGraph ssg, BackEndFactory backendbits) {
         StringBuffer buf = new StringBuffer();
         buf.append("digraph Flattend {\n");
         buf.append("size = \"8, 10.5\";\n");
 
-        for (int i = 0; i < slicer.getSliceGraph().length; i++) {
-            Filter slice = slicer.getSliceGraph()[i];
+        for (int i = 0; i < ssg.getSliceGraph().length; i++) {
+            Filter slice = ssg.getSliceGraph()[i];
             assert slice != null;
             buf.append(slice.hashCode() + " [ " + 
-                    sliceName(slice, slicer, backendbits) + 
+                    sliceName(slice, ssg, backendbits) + 
                     "\" ];\n");
             Edge[] outgoing = slice.getOutputNode().getDestList(SchedulingPhase.STEADY);
             for (Edge e : outgoing) {
@@ -67,7 +67,7 @@ public class DumpSlicesAndChannels {
     
     /**return a string with all of the names of the filterslicenodes
      * and blue if linear. */
-    private static  String sliceName(Filter slice, StreamGraph slicer, BackEndFactory backendbits) {
+    private static  String sliceName(Filter slice, StaticSubGraph ssg, BackEndFactory backendbits) {
         InternalFilterNode node = slice.getInputNode();
 
         StringBuffer out = new StringBuffer();
@@ -87,7 +87,7 @@ public class DumpSlicesAndChannels {
             if (node.isFilterSlice()) {
                 WorkNodeContent f = node.getAsFilter().getFilter();
                 out.append("\\n" + node.toString() + "{"
-                        + slicer.getFilterWork(node.getAsFilter())
+                        + ssg.getFilterWork(node.getAsFilter())
                         + "}");
                 if (f.isTwoStage())
                     out.append("\\npre:(peek, pop, push): (" + 

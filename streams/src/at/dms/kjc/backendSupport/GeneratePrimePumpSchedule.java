@@ -4,7 +4,7 @@
 package at.dms.kjc.backendSupport;
 
 import java.util.*;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
+import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSSG;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.SchedulingPhase;
@@ -21,13 +21,13 @@ import at.dms.kjc.KjcOptions;
  *
  */
 public class GeneratePrimePumpSchedule {
-    private SpaceTimeScheduleAndSlicer spaceTimeSchedule;
+    private SpaceTimeScheduleAndSSG spaceTimeSchedule;
     //the execution count for each trace during the calculation of the schedule
     private HashMap<Filter, Integer> exeCounts;
     
     
    
-    public GeneratePrimePumpSchedule(SpaceTimeScheduleAndSlicer sts) {
+    public GeneratePrimePumpSchedule(SpaceTimeScheduleAndSSG sts) {
         spaceTimeSchedule = sts;
         exeCounts = new HashMap<Filter, Integer>();
     }
@@ -119,7 +119,7 @@ public class GeneratePrimePumpSchedule {
         //one more time than me.
         for (int i = 0; i < depends.length; i++) {
             //file input nodes can always fire
-            if (spaceTimeSchedule.getSlicer().isIO(depends[i]))
+            if (spaceTimeSchedule.getSSG().isIO(depends[i]))
                 continue;
             
             int dependsExeCount = getExeCount(depends[i]);
@@ -154,7 +154,7 @@ public class GeneratePrimePumpSchedule {
      * @return should this be counted as a trace that needs to fire.
      */
     private boolean shouldFire(Filter slice) {
-        if (!spaceTimeSchedule.getSlicer().isIO(slice)) {
+        if (!spaceTimeSchedule.getSSG().isIO(slice)) {
             return true;
         }
         if (slice.getInputNode().getNextFilter().isFileOutput()) {

@@ -52,6 +52,7 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.FlattenAndPartition;
 import at.dms.kjc.slir.InstallInitDistributions;
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.Filter;
@@ -67,7 +68,7 @@ import at.dms.kjc.slir.StreamGraph;
  */
 public class CommonPasses {
 	/** field that may be useful later */
-	private StreamGraph slicer;
+	private StreamGraph streamGraph;
 
 	/** field that may be useful later */
 	private WorkEstimate workEstimate;
@@ -126,7 +127,7 @@ public class CommonPasses {
 	 * @return a slice graph: the optimized program in
 	 *         {@link at.dms.kjc.slir.Filter Slice} representation.
 	 */
-	public Filter[] run(SIRStream str, JInterfaceDeclaration[] interfaces,
+	public StreamGraph run(SIRStream str, JInterfaceDeclaration[] interfaces,
 			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
 			SIRHelper[] helpers, SIRGlobal global, int numCores) {
 
@@ -203,7 +204,7 @@ public class CommonPasses {
 		return doStaticPass(str);
 	}
 
-	private Filter[] doDynamicPass(SIRStream str) {
+	private StreamGraph doDynamicPass(SIRStream str) {
 		System.out.println("CommonPasses::doDynamicPass()");
 		SegmentedGraph segmentedGraph = new Segmenter().partition(str);
 		for (SIRStream ssg : segmentedGraph.getStaticSubGraphs()) {
@@ -215,15 +216,14 @@ public class CommonPasses {
 		// TODO: add the optimizations here -- soule
 		
 		// we want to convert to the StreamGraph
-		StreamGraph streamGraph = new SIRToSLIR().translate(segmentedGraph, numCores);
-		setSlicer(streamGraph);
+		streamGraph = new SIRToSLIR().translate(segmentedGraph, numCores);
 		
 		Filter[] filterGraph = null;
 
-		return filterGraph;
+		return streamGraph;
 	}
 
-	private Filter[] doStaticPass(SIRStream str) {
+	private StreamGraph doStaticPass(SIRStream str) {
 
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
@@ -451,9 +451,7 @@ public class CommonPasses {
 		StreamGraph streamGraph = 
 				new StreamGraph();			
 		
-		setSlicer(streamGraph);
-		
-		return streamGraph.getSSG(0).getTopSlices();
+		return streamGraph;
 	}
 
 	/**
@@ -465,9 +463,9 @@ public class CommonPasses {
 	 * Spacetime does not use this code since it allows general slices and
 	 * generates its own code for file readers and file writers.
 	 */
-	public void simplifySlices() {
+	public void simplifySlices(StaticSubGraph ssg) {
 		// Create code for predefined content: file readers, file writers.
-		slicer.createPredefinedContent();
+		ssg.createPredefinedContent();
 		// guarantee that we are not going to hack properties of filters in the
 		// future
 		FilterInfo.canUse();
@@ -481,9 +479,9 @@ public class CommonPasses {
 		 * ((FlattenAndPartition)getSlicer()).generatedIds) {
 		 * IDSliceRemoval.doit(id.getParent()); } }
 		 */
-		InstallInitDistributions.doit(getSlicer().getSliceGraph());
+		InstallInitDistributions.doit(ssg.getSliceGraph());
 		// fix any rate skew introduced in conversion to Slice graph.
-		AddBuffering.doit(slicer, false, numCores);
+		AddBuffering.doit(ssg, false, numCores);
 		// decompose any pipelines of filters in the Slice graph.
 		// slicer.ensureSimpleSlices();
 	}
@@ -495,37 +493,24 @@ public class CommonPasses {
 	 * @return a Scheduler from which the schedules for the phases may be
 	 *         extracted.
 	 */
-	public SpaceTimeScheduleAndSlicer scheduleSlices() {
+	public SpaceTimeScheduleAndSSG scheduleSlices(StaticSubGraph ssg) {
 		// Set schedules for initialization, priming (if --spacetime), and
 		// steady state.
-		SpaceTimeScheduleAndSlicer schedule = new SpaceTimeScheduleAndSlicer(
-				slicer);
+		SpaceTimeScheduleAndSSG schedule = new SpaceTimeScheduleAndSSG(
+				ssg);
 		// set init schedule in standard order
-		schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer
+		schedule.setInitSchedule(DataFlowOrder.getTraversal(ssg
 				.getSliceGraph()));
 		// set prime pump schedule (if --spacetime and not --noswpipe)
 		
-		new GeneratePrimePump(schedule).schedule(slicer.getSliceGraph());
+		new GeneratePrimePump(schedule).schedule(ssg.getSliceGraph());
 		
 		// set steady schedule in standard order unless --spacetime in which
 		// case in
 		// decreasing order of estimated work
-		new BasicGenerateSteadyStateSchedule(schedule, (StreamGraph) slicer)
+		new BasicGenerateSteadyStateSchedule(schedule, ssg)
 				.schedule();
 		return schedule;
-	}
-
-	/**
-	 * Allows you to change the value returned by {@link #getSlicer()
-	 * getWorkEstimate} after the initial value has been set by
-	 * {@link #run(SIRStream, JInterfaceDeclaration[], SIRInterfaceTable[], SIRStructure[], SIRHelper[], SIRGlobal, int)
-	 * run}.
-	 * 
-	 * @param slicer
-	 *            the slicer to set
-	 */
-	private void setSlicer(StreamGraph slicer) {
-		this.slicer = slicer;
 	}
 
 	/**
@@ -535,8 +520,9 @@ public class CommonPasses {
 	 * 
 	 * @return the slicer
 	 */
-	public StreamGraph getSlicer() {
-		return slicer;
+	public StaticSubGraph getSSG() {
+		assert streamGraph.getNumSSGs() == 0;
+		return streamGraph.getSSG(0);
 	}
 
 	/**

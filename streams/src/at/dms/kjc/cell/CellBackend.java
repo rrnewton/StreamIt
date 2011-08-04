@@ -14,7 +14,7 @@ import at.dms.kjc.backendSupport.CommonPasses;
 import at.dms.kjc.backendSupport.DumpSlicesAndChannels;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.MultiLevelSplitsJoins;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSlicer;
+import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSSG;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
@@ -54,16 +54,16 @@ public class CellBackend {
         commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
         
         // partitioner contains information about the Slice graph used by dumpGraph
-        StreamGraph slicer = (StreamGraph)commonPasses.getSlicer();
+        StaticSubGraph ssg = commonPasses.getSSG();
         
-        new MultiLevelSplitsJoins(slicer, MAX_TAPES/2).doit();
-        slicer.dumpGraph("traces-after-multi.dot");
+        new MultiLevelSplitsJoins(ssg, MAX_TAPES/2).doit();
+        ssg.dumpGraph("traces-after-multi.dot");
         
         // perform some standard cleanup on the slice graph.
-        commonPasses.simplifySlices();
+        commonPasses.simplifySlices(ssg);
         
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
-        SpaceTimeScheduleAndSlicer schedule = commonPasses.scheduleSlices();
+        SpaceTimeScheduleAndSSG schedule = commonPasses.scheduleSlices(ssg);
 
         // create a collection of (very uninformative) processor descriptions.
         CellChip cellChip = new CellChip(numCores);
@@ -117,7 +117,7 @@ public class CellBackend {
         }
         
         // Dump graphical representation
-        DumpSlicesAndChannels.dumpGraph("slicesAndChannels.dot", slicer, backEndBits);
+        DumpSlicesAndChannels.dumpGraph("slicesAndChannels.dot", ssg, backEndBits);
         
         /*
          * Emit code to structs.h

@@ -5,6 +5,7 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Comparator;
 
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.Filter;
 
@@ -18,15 +19,15 @@ import at.dms.kjc.slir.Filter;
  */
 public class CompareFilterWork implements Comparator<Filter> {
     /** The partition we used */
-    private StreamGraph slicer;
+    private StaticSubGraph ssg;
     
     /**
      * Create a new object that uses the work estimates of partitioner.
      * 
      * @param slicer
      */
-    public CompareFilterWork(StreamGraph slicer) {
-        this.slicer = slicer;
+    public CompareFilterWork(StaticSubGraph slicer) {
+        this.ssg = slicer;
     }
     
     /**
@@ -37,10 +38,10 @@ public class CompareFilterWork implements Comparator<Filter> {
     public int compare(Filter o1, Filter o2) {
 //        assert o1 instanceof Slice && o2 instanceof Slice;
         
-        if (slicer.getSliceBNWork((Filter) o1) < slicer
+        if (ssg.getSliceBNWork((Filter) o1) < ssg
                 .getSliceBNWork((Filter) o2))
             return -1;
-        else if (slicer.getSliceBNWork((Filter) o1) == slicer
+        else if (ssg.getSliceBNWork((Filter) o1) == ssg
                 .getSliceBNWork((Filter) o2))
             return 0;
         else

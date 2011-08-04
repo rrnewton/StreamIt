@@ -43,7 +43,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
 
         if (scheduler.isTMD()) {
         	//levelize the slicegraph
-        	lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSlicer().getTopSlices());
+        	lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSSG().getTopSlices());
 
             //fill the left to process maps with the number of filters in a level
             levelLeftToProcessInit = new HashMap<Integer, Integer>();

@@ -33,13 +33,15 @@ public class TileraBackend {
         // The usual optimizations and transformation to slice graph
         CommonPasses commonPasses = new CommonPasses();
         // perform standard optimizations, use the number of tiles the user wants to target
-        commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, chip.abstractSize());
+        StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, chip.abstractSize());
         // perform some standard cleanup on the slice graph.
-        commonPasses.simplifySlices();
+        StaticSubGraph ssg = streamGraph.getSSG();
         
-        commonPasses.getSlicer().dumpGraph("traces.dot", null);
+        commonPasses.simplifySlices(ssg);
         
-        SpaceTimeScheduleAndSlicer graphSchedule = new SpaceTimeScheduleAndSlicer(commonPasses.getSlicer());
+        commonPasses.getSSG().dumpGraph("traces.dot", null);
+        
+        SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(ssg);
         scheduler.setGraphSchedule(graphSchedule);
         
         //partition the slice graph based on the scheduling policy
@@ -52,8 +54,8 @@ public class TileraBackend {
         backEndBits = new TileraBackEndFactory(chip);
         backEndBits.setLayout(scheduler);
                 
-        graphSchedule.getSlicer().dumpGraph("after_slice_partition.dot", scheduler);
-        graphSchedule.getSlicer().dumpGraph("slice_graph.dot", scheduler, false);
+        graphSchedule.getSSG().dumpGraph("after_slice_partition.dot", scheduler);
+        graphSchedule.getSSG().dumpGraph("slice_graph.dot", scheduler, false);
         
         //create all buffers and set the rotation lengths
         RotatingBuffer.createBuffers(graphSchedule);
@@ -81,8 +83,8 @@ public class TileraBackend {
      *
      * @return a Scheduler from which the schedules for the phases may be extracted. 
      */
-    public static void scheduleSlices(SpaceTimeScheduleAndSlicer schedule) {
-        StreamGraph slicer = schedule.getSlicer();
+    public static void scheduleSlices(SpaceTimeScheduleAndSSG schedule) {
+        StaticSubGraph slicer = schedule.getSSG();
         
         // set init schedule in standard order
         schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer.getSliceGraph()));

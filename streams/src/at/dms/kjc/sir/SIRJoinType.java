@@ -67,6 +67,7 @@ public class SIRJoinType implements Serializable, DeepCloneable {
     public boolean isNull() {
         return name.equals("NULL_SJ");
     }
+    
 
     public boolean isDynamic() {
         return false;
