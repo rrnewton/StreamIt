@@ -13,7 +13,6 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
-import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.common.ConvertLocalsToFields;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRGlobal;
@@ -25,7 +24,6 @@ import at.dms.kjc.sir.SIRStructure;
 import at.dms.kjc.sir.SemanticChecker;
 import at.dms.kjc.sir.lowering.SegmentedGraph;
 import at.dms.kjc.sir.lowering.Segmenter;
-import at.dms.kjc.sir.linear.LinearAnalyzer;
 import at.dms.kjc.sir.lowering.ArrayInitExpander;
 import at.dms.kjc.sir.lowering.ConstantProp;
 import at.dms.kjc.sir.lowering.ConstructSIRTree;
@@ -50,14 +48,10 @@ import at.dms.kjc.sir.lowering.partition.ManualPartition;
 import at.dms.kjc.sir.lowering.partition.SJToPipe;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.slir.DataFlowOrder;
-import at.dms.kjc.slir.FlattenAndPartition;
 import at.dms.kjc.slir.InstallInitDistributions;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.SIRToSLIR;
-import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.StreamGraph;
-import at.dms.kjc.slir.StreamGraph;
 
 
 /**
@@ -221,11 +215,10 @@ public class CommonPasses {
 		// we want to convert to the StreamGraph
 		streamGraph = new SIRToSLIR().translate(segmentedGraph, numCores);
 		
-		Filter[] filterGraph = null;
-
 		return streamGraph;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private StreamGraph doStaticPass(SegmentedGraph segmentedGraph) {
 
 		SIRStream str = segmentedGraph.getStaticSubGraph0();
@@ -359,7 +352,6 @@ public class CommonPasses {
 		// this must run before vertical fission
 		str = Flattener.doLinearAnalysis(str);
 		str = Flattener.doStateSpaceAnalysis(str);
-		LinearAnalyzer lfa = Flattener.lfa;
 
 		// vertical fission requested.
 		if (KjcOptions.fission > 1) {

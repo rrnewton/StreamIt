@@ -4,7 +4,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.MultiLevelSplitsJoins;
@@ -50,8 +49,6 @@ public class StaticSubGraph {
 	 * This hashmap maps a Slice to the FilterSliceNode that has the most work;
 	 */
 	protected HashMap<Filter, WorkNode> bottleNeckFilter;
-
-	protected HashMap[] exeCounts;
 
 	protected HashMap<SIRFilter, WorkNodeContent> sirToContent;
 
@@ -174,11 +171,12 @@ public class StaticSubGraph {
 		}
 	}
 
-	public void dumpGraph(String filename, Layout layout) {
+	public void dumpGraph(String filename, @SuppressWarnings("rawtypes") Layout layout) {
 		dumpGraph(filename, layout, true);
 	}
 
 	// dump the the completed partition to a dot file
+	@SuppressWarnings("rawtypes")
 	public void dumpGraph(String filename, Layout layout, boolean fullInfo) {
 		Filter[] sliceGraph = getFilterGraph();
 		StringBuffer buf = new StringBuffer();
@@ -522,6 +520,7 @@ public class StaticSubGraph {
 
 	// return a string with all of the names of the filterslicenodes
 	// and blue if linear
+	@SuppressWarnings("rawtypes")
 	protected String sliceName(Filter slice, Layout layout, boolean fullInfo) {
 		InternalFilterNode node = slice.getInputNode();
 
