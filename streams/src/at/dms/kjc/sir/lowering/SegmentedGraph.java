@@ -59,4 +59,9 @@ public class SegmentedGraph {
 		return staticSubGraphs;
 	}
 
+	public SIRStream getStaticSubGraph0() {
+		assert staticSubGraphs.size() == 1 : "SegmentedGraph.getStaticSubGraph0 staticSubGraph should have only one subsection in static case.";
+		return staticSubGraphs.get(0);
+	}
+
 }

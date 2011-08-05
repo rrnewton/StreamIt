@@ -27,7 +27,7 @@ public class HandLayout implements Layout {
         this.chip = chip;
         this.ssg = spaceTime.getSSG();
         scheduleOrder = 
-            DataFlowOrder.getTraversal(spaceTime.getSSG().getSliceGraph());
+            DataFlowOrder.getTraversal(spaceTime.getSSG().getFilterGraph());
         assignment = new HashMap<InternalFilterNode, Core>();
     }
 

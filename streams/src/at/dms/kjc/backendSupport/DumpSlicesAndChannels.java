@@ -14,8 +14,8 @@ public class DumpSlicesAndChannels {
         buf.append("digraph Flattend {\n");
         buf.append("size = \"8, 10.5\";\n");
 
-        for (int i = 0; i < ssg.getSliceGraph().length; i++) {
-            Filter slice = ssg.getSliceGraph()[i];
+        for (int i = 0; i < ssg.getFilterGraph().length; i++) {
+            Filter slice = ssg.getFilterGraph()[i];
             assert slice != null;
             buf.append(slice.hashCode() + " [ " + 
                     sliceName(slice, ssg, backendbits) + 

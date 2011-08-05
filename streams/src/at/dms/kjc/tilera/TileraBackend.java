@@ -87,7 +87,7 @@ public class TileraBackend {
         StaticSubGraph slicer = schedule.getSSG();
         
         // set init schedule in standard order
-        schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer.getSliceGraph()));
+        schedule.setInitSchedule(DataFlowOrder.getTraversal(slicer.getFilterGraph()));
         
         //set the prime pump to be empty
         new GeneratePrimePump(schedule).setEmptySchedule();
@@ -96,9 +96,9 @@ public class TileraBackend {
         //we are space multiplexing and we need to prime the pipe more so that everything can fire
         //when ready
         if (at.dms.kjc.tilera.TileraBackend.scheduler.isSMD())
-            new at.dms.kjc.tilera.GeneratePrimePumpScheduleSMD(schedule).schedule(slicer.getSliceGraph());
+            new at.dms.kjc.tilera.GeneratePrimePumpScheduleSMD(schedule).schedule(slicer.getFilterGraph());
         else 
-            new GeneratePrimePump(schedule).schedule(slicer.getSliceGraph());
+            new GeneratePrimePump(schedule).schedule(slicer.getFilterGraph());
 
         //Still need to generate the steady state schedule!
         schedule.setSchedule(DataFlowOrder.getTraversal(slicer.getTopSlices()));

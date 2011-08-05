@@ -40,6 +40,13 @@ public class Segmenter implements StreamVisitor {
 		super();
 	}
 
+	/** TODO: Remove this after partitioning is fixed */
+	public SegmentedGraph noPartition(SIRStream str) {
+		segmentedGraph = new SegmentedGraph();
+		segmentedGraph.addPipe(str);
+		return segmentedGraph;
+	}
+	
 	public SegmentedGraph partition(SIRStream str) {
 		segmentedGraph = new SegmentedGraph();
 		pipelines = new LinkedList<Object>();

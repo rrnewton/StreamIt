@@ -1,4 +1,5 @@
 package at.dms.kjc.slir;
+
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,14 +14,31 @@ import at.dms.kjc.sir.SIRFilter;
  * 
  * 
  * @author mgordon and soule
- *
+ * 
  */
 public class StaticSubGraph {
 
+	/**
+	 * Create a Partitioner.
+	 * 
+	 * The number of partitions may be limited by <i>maxPartitions</i>, but some
+	 * implementations ignore <i>maxPartitions</i>.
+	 * 
+	 * @param topFilters
+	 *            from {@link FlattenGraph}
+	 * @param exeCounts
+	 *            a schedule
+	 * @param lfa
+	 *            a linearAnalyzer to convert filters to linear form if
+	 *            appropriate.
+	 * @param work
+	 *            a work estimate, see {@link at.dms.kjc.sir.lowering.partition}
+	 *            , updeted if filters are added to a slice.
+	 * @param maxPartitions
+	 *            if non-zero, a maximum number of partitions to create
+	 */
 
 	public Filter[] io;
-
-	private Filter[] filterGraph;
 
 	private InputPort inputPort;
 
@@ -28,36 +46,31 @@ public class StaticSubGraph {
 
 	private StreamGraph parent;
 
-	private List<Filter> roots;
-
-	/** This hashmap maps a Slice to the FilterSliceNode that
-	 * has the most work;
-	 */ 
+	/**
+	 * This hashmap maps a Slice to the FilterSliceNode that has the most work;
+	 */
 	protected HashMap<Filter, WorkNode> bottleNeckFilter;
-
 
 	protected HashMap[] exeCounts;
 
-	protected HashMap <SIRFilter, WorkNodeContent> sirToContent;
+	protected HashMap<SIRFilter, WorkNodeContent> sirToContent;
 
 	// Slice->Long for bottleNeck work estimation
 	protected HashMap<Filter, Long> sliceBNWork;
 
 	protected LinkedList<Filter> topSlices;
 
-	//  filtercontent -> work estimation
+	// filtercontent -> work estimation
 	protected HashMap<WorkNodeContent, Long> workEstimation;
 
 	// TODO calculate protected WorkEstimate work;
 
 	// TODO calculate private HashMap[] exeCounts; // calculuate when done
 
-	public StaticSubGraph(InputPort inputPort, OutputPort outputPort,
-			List<Filter> roots) {
+	public StaticSubGraph(InputPort inputPort, OutputPort outputPort) {
 		super();
 		this.inputPort = inputPort;
 		this.outputPort = outputPort;
-		this.roots = roots;
 		topSlices = new LinkedList<Filter>();
 		sliceBNWork = new HashMap<Filter, Long>();
 		bottleNeckFilter = new HashMap<Filter, WorkNode>();
@@ -66,8 +79,6 @@ public class StaticSubGraph {
 
 	public StaticSubGraph(StreamGraph parent) {
 		this.parent = parent;
-		roots = new ArrayList<Filter>();
-		this.roots = roots;
 		topSlices = new LinkedList<Filter>();
 		sliceBNWork = new HashMap<Filter, Long>();
 		bottleNeckFilter = new HashMap<Filter, WorkNode>();
@@ -77,14 +88,15 @@ public class StaticSubGraph {
 	/**
 	 * Update all the necessary state to add node to slice.
 	 * 
-	 * @param node The node to add.
-	 * @param slice The slice to add the node to.
+	 * @param node
+	 *            The node to add.
+	 * @param slice
+	 *            The slice to add the node to.
 	 */
-	public void addFilterToSlice(WorkNode node, 
-			Filter slice) {
+	public void addFilterToSlice(WorkNode node, Filter slice) {
 		long workEst = workEst(node);
 
-		//add the node to the work estimation
+		// add the node to the work estimation
 		if (!workEstimation.containsKey(node.getFilter()))
 			workEstimation.put(node.getFilter(), workEst);
 
@@ -93,11 +105,7 @@ public class StaticSubGraph {
 			bottleNeckFilter.put(slice, node);
 		}
 	}
-
-	public void addRoot(Filter filter) {
-		roots.add(filter);
-	}
-
+	
 	/**
 	 * Add the slice to the list of top slices, roots of the forest.
 	 */
@@ -106,16 +114,16 @@ public class StaticSubGraph {
 	}
 
 	/**
-	 * Does the the slice graph contain slice (perform a simple linear
-	 * search).
+	 * Does the the slice graph contain slice (perform a simple linear search).
 	 * 
-	 * @param slice The slice to query.
+	 * @param slice
+	 *            The slice to query.
 	 * 
 	 * @return True if the slice graph contains slice.
 	 */
 	public boolean containsSlice(Filter slice) {
-		Filter[] sliceGraph = getSliceGraph();
-		for (int i = 0; i < sliceGraph.length; i++) 
+		Filter[] sliceGraph = getFilterGraph();
+		for (int i = 0; i < sliceGraph.length; i++)
 			if (sliceGraph[i] == slice)
 				return true;
 		return false;
@@ -125,18 +133,20 @@ public class StaticSubGraph {
 	 * Force creation of kopi methods and fields for predefined filters.
 	 */
 	public void createPredefinedContent() {
-		for (Filter s : getSliceGraph()) {
+		for (Filter s : getFilterGraph()) {
 			if (s.getWorkNode().getFilter() instanceof PredefinedContent) {
-				((PredefinedContent)s.getWorkNode().getFilter()).createContent();
+				((PredefinedContent) s.getWorkNode().getFilter())
+						.createContent();
 			}
 		}
 
 	}
 
-
-	// dump the the completed partition to a dot file
+	/**
+	 * Dump the the completed partition to a dot file
+	 */
 	public void dumpGraph(String filename) {
-		Filter[] sliceGraph = getSliceGraph();
+		Filter[] sliceGraph = getFilterGraph();
 		StringBuffer buf = new StringBuffer();
 		buf.append("digraph Flattend {\n");
 		buf.append("size = \"8, 10.5\";\n");
@@ -144,9 +154,7 @@ public class StaticSubGraph {
 		for (int i = 0; i < sliceGraph.length; i++) {
 			Filter slice = sliceGraph[i];
 			assert slice != null;
-			buf.append(slice.hashCode() + " [ " + 
-					sliceName(slice) + 
-					"\" ];\n");
+			buf.append(slice.hashCode() + " [ " + sliceName(slice) + "\" ];\n");
 			Filter[] next = getNext(slice/* ,parent */);
 			for (int j = 0; j < next.length; j++) {
 				assert next[j] != null;
@@ -172,7 +180,7 @@ public class StaticSubGraph {
 
 	// dump the the completed partition to a dot file
 	public void dumpGraph(String filename, Layout layout, boolean fullInfo) {
-		Filter[] sliceGraph = getSliceGraph();
+		Filter[] sliceGraph = getFilterGraph();
 		StringBuffer buf = new StringBuffer();
 		buf.append("digraph Flattend {\n");
 		buf.append("size = \"8, 10.5\";\n");
@@ -180,9 +188,8 @@ public class StaticSubGraph {
 		for (int i = 0; i < sliceGraph.length; i++) {
 			Filter slice = sliceGraph[i];
 			assert slice != null;
-			buf.append(slice.hashCode() + " [ " + 
-					sliceName(slice, layout, fullInfo) + 
-					"\" ];\n");
+			buf.append(slice.hashCode() + " [ "
+					+ sliceName(slice, layout, fullInfo) + "\" ];\n");
 			Filter[] next = getNext(slice/* ,parent */, SchedulingPhase.STEADY);
 			for (int j = 0; j < next.length; j++) {
 				assert next[j] != null;
@@ -212,45 +219,42 @@ public class StaticSubGraph {
 		return sirToContent.get(f);
 	}
 
-
-
-	public Filter[] getFilterGraph() {
-		return filterGraph;	
-	}
-
 	/**
-	 * @param node The Filter 
-	 * @return The work estimation for the filter slice node for one steady-state
-	 * mult of the filter.
+	 * @param node
+	 *            The Filter
+	 * @return The work estimation for the filter slice node for one
+	 *         steady-state mult of the filter.
 	 */
 	public long getFilterWork(WorkNode node) {
 		return workEstimation.get(node.getFilter()).longValue();
 	}
 
-	/**            
+	/**
 	 * @param node
-	 * @return The work estimation for the filter for one steady-state 
-	 * multiplied by the steady-state multiplier
+	 * @return The work estimation for the filter for one steady-state
+	 *         multiplied by the steady-state multiplier
 	 */
-	public long getFilterWorkSteadyMult(WorkNode node)  {
-		return getFilterWork(node)  * parent.getSteadyMult();
-	} 
+	public long getFilterWorkSteadyMult(WorkNode node) {
+		return getFilterWork(node) * parent.getSteadyMult();
+	}
 
+	/**
+	 * @return The InputPort for the StaticSubGraph
+	 */
 	public InputPort getInputPort() {
 		return inputPort;
 	}
 
+	/**
+	 * @return The OutputPort for the StaticSubGraph
+	 */
 	public OutputPort getOutputPort() {
 		return outputPort;
 	}
-
-	public List<Filter> getRoots() {
-		return roots;
-	}
-
+	
 	/**
 	 * @param slice
-	 * @return Return the filter of slice that does the most work. 
+	 * @return Return the filter of slice that does the most work.
 	 */
 	public WorkNode getSliceBNFilter(Filter slice) {
 		assert bottleNeckFilter.containsKey(slice);
@@ -259,8 +263,9 @@ public class StaticSubGraph {
 
 	/**
 	 * @param slice
-	 * @return The work estimation for the slice (the estimation for the filter that does the
-	 * most work for one steady-state mult of the filter multipled by the steady state multiplier.
+	 * @return The work estimation for the slice (the estimation for the filter
+	 *         that does the most work for one steady-state mult of the filter
+	 *         multipled by the steady state multiplier.
 	 */
 	public long getSliceBNWork(Filter slice) {
 		assert sliceBNWork.containsKey(slice);
@@ -269,18 +274,21 @@ public class StaticSubGraph {
 
 	/**
 	 * Get all slices
-	 * @return All the slices of the slice graph. 
+	 * 
+	 * @return All the slices of the slice graph.
 	 */
-	public Filter[] getSliceGraph() {
-		//new slices may have been added so we need to reconstruct the graph each time
-		LinkedList<Filter> sliceGraph = 
-				DataFlowOrder.getTraversal(topSlices.toArray(new Filter[topSlices.size()]));
+	public Filter[] getFilterGraph() {
+		// new slices may have been added so we need to reconstruct the graph
+		// each time
+		LinkedList<Filter> filterGraph = DataFlowOrder.getTraversal(topSlices
+				.toArray(new Filter[topSlices.size()]));
 
-		return sliceGraph.toArray(new Filter[sliceGraph.size()]);
+		return filterGraph.toArray(new Filter[filterGraph.size()]);
 	}
 
 	/**
-	 *  Get just top level slices in the slice graph.
+	 * Get just top level slices in the slice graph.
+	 * 
 	 * @return top level slices
 	 */
 	public Filter[] getTopSlices() {
@@ -293,14 +301,16 @@ public class StaticSubGraph {
 	 * has been accounted for in the steady multiplicity of each filter content.
 	 * 
 	 * @param node
-	 * @return 
+	 * @return
 	 */
 	public long getWorkEstOneFiring(WorkNode node) {
-		return (getFilterWork(node) / (node.getFilter().getSteadyMult() / parent.getSteadyMult()));
+		return (getFilterWork(node) / (node.getFilter().getSteadyMult() / parent
+				.getSteadyMult()));
 	}
 
 	/**
 	 * Check for I/O in slice
+	 * 
 	 * @param slice
 	 * @return Return true if this slice is an IO slice (file reader/writer).
 	 */
@@ -311,7 +321,6 @@ public class StaticSubGraph {
 		}
 		return false;
 	}
-
 
 	/**
 	 * Return true if the slice is a top (source) slice in the forrest
@@ -332,11 +341,6 @@ public class StaticSubGraph {
 		topSlices.remove(slice);
 	}
 
-
-	public void setFilterGraph(Filter[] filterGraph) {
-		this.filterGraph = filterGraph;	
-	}
-
 	public void setInputPort(InputPort inputPort) {
 		this.inputPort = inputPort;
 	}
@@ -345,39 +349,38 @@ public class StaticSubGraph {
 		this.outputPort = outputPort;
 	}
 
-
-
-	public void setRoots(List<Filter> roots) {
-		this.roots = roots;
-	}
-
 	/**
-	 * Set the slice graph to slices, where the only difference between the 
+	 * Set the slice graph to slices, where the only difference between the
 	 * previous slice graph and the new slice graph is the addition of identity
 	 * slices (meaning slices with only an identities filter).
-	 *  
-	 * @param slices The new slice graph.
+	 * 
+	 * @param slices
+	 *            The new slice graph.
 	 */
 	public void setSliceGraphNewIds(Filter[] slices) {
-		//add the new filters to the necessary structures...
+		// add the new filters to the necessary structures...
 		for (int i = 0; i < slices.length; i++) {
 			if (!containsSlice(slices[i])) {
 				WorkNode filter = slices[i].getWorkNode();
 				assert filter.toString().startsWith("Identity");
 
 				if (!workEstimation.containsKey(filter)) {
-					//for a work estimation of an identity filter
-					//multiple the estimated cost of on item by the number
-					//of items that passes through it (determined by the schedule mult).
-					workEstimation.put(filter.getFilter(), 
-							(long)(MultiLevelSplitsJoins.IDENTITY_WORK *
-									filter.getFilter().getSteadyMult()));
+					// for a work estimation of an identity filter
+					// multiple the estimated cost of on item by the number
+					// of items that passes through it (determined by the
+					// schedule mult).
+					workEstimation
+							.put(filter.getFilter(),
+									(long) (MultiLevelSplitsJoins.IDENTITY_WORK * filter
+											.getFilter().getSteadyMult()));
 				}
 
-				//remember that that the only filter, the id, is the bottleneck..
+				// remember that that the only filter, the id, is the
+				// bottleneck..
 				if (!sliceBNWork.containsKey(slices[i])) {
-					sliceBNWork.put(slices[i], 
-							workEstimation.get(filter.getFilter()));;
+					sliceBNWork.put(slices[i],
+							workEstimation.get(filter.getFilter()));
+					;
 				}
 				if (!bottleNeckFilter.containsKey(slices[i])) {
 					bottleNeckFilter.put(slices[i], filter);
@@ -385,35 +388,35 @@ public class StaticSubGraph {
 
 			}
 		}
-		//now set the new slice graph...
+		// now set the new slice graph...
 		setSliceGraph(slices);
 	}
-
 
 	/**
 	 * Set the slice graph to slices.
 	 * 
-	 * @param slices The slice list to install as the new slice graph.
+	 * @param slices
+	 *            The slice list to install as the new slice graph.
 	 */
 	private void setSliceGraph(Filter[] slices) {
 
-		//perform some checks on the slice graph...
+		// perform some checks on the slice graph...
 		for (int i = 0; i < slices.length; i++) {
 			assert sliceBNWork.containsKey(slices[i]) : slices[i];
-			//this doesn't get filled till later
-			//assert bottleNeckFilter.containsKey(slices[i]) : slices[i];
-			assert workEstimation.containsKey(slices[i].getWorkNode().getFilter()) : slices[i].getWorkNode().getFilter();
+			// this doesn't get filled till later
+			// assert bottleNeckFilter.containsKey(slices[i]) : slices[i];
+			assert workEstimation.containsKey(slices[i].getWorkNode()
+					.getFilter()) : slices[i].getWorkNode().getFilter();
 
 		}
 	}
 
-
 	/*
-	 * work estimate for filter needed in various places. 
+	 * work estimate for filter needed in various places.
 	 */
 	private int workEst(WorkNode node) {
-		return MultiLevelSplitsJoins.IDENTITY_WORK *
-				node.getFilter().getSteadyMult();
+		return MultiLevelSplitsJoins.IDENTITY_WORK
+				* node.getFilter().getSteadyMult();
 	}
 
 	// get the downstream slices we cannot use the edge[] of slice
@@ -426,7 +429,8 @@ public class StaticSubGraph {
 			node = node.getNext();
 		}
 		if (node instanceof OutputNode) {
-			Edge[][] dests = ((OutputNode) node).getDests(SchedulingPhase.STEADY);
+			Edge[][] dests = ((OutputNode) node)
+					.getDests(SchedulingPhase.STEADY);
 			ArrayList<Object> output = new ArrayList<Object>();
 			for (int i = 0; i < dests.length; i++) {
 				Edge[] inner = dests[i];
@@ -472,97 +476,103 @@ public class StaticSubGraph {
 		return new Filter[0];
 	}
 
-
 	protected long getWorkEstimate(WorkNodeContent fc) {
 		assert workEstimation.containsKey(fc);
 		return workEstimation.get(fc).longValue();
 	}
 
-	//return a string with all of the names of the filterslicenodes
+	// return a string with all of the names of the filterslicenodes
 	// and blue if linear
-	protected  String sliceName(Filter slice) {
+	protected String sliceName(Filter slice) {
 		InternalFilterNode node = slice.getInputNode();
 
 		StringBuffer out = new StringBuffer();
 
-		//do something fancy for linear slices!!!
-		if (((WorkNode)node.getNext()).getFilter().getArray() != null)
+		// do something fancy for linear slices!!!
+		if (((WorkNode) node.getNext()).getFilter().getArray() != null)
 			out.append("color=cornflowerblue, style=filled, ");
 
-		out.append("label=\"" + node.getAsInput().debugString(true));//toString());
+		out.append("label=\"" + node.getAsInput().debugString(true));// toString());
 
 		node = node.getNext();
-		while (node != null ) {
+		while (node != null) {
 			if (node.isFilterSlice()) {
 				WorkNodeContent f = node.getAsFilter().getFilter();
-				out.append("\\n" + node.toString() + "{"
-						+ getWorkEstimate(f)
+				out.append("\\n" + node.toString() + "{" + getWorkEstimate(f)
 						+ "}");
 				if (f.isTwoStage())
-					out.append("\\npre:(peek, pop, push): (" + 
-							f.getPreworkPeek() + ", " + f.getPreworkPop() + "," + f.getPreworkPush());
-				out.append(")\\n(peek, pop, push: (" + 
-						f.getPeekInt() + ", " + f.getPopInt() + ", " + f.getPushInt() + ")");
-				out.append("\\nMult: init " + f.getInitMult() + ", steady " + f.getSteadyMult());
+					out.append("\\npre:(peek, pop, push): ("
+							+ f.getPreworkPeek() + ", " + f.getPreworkPop()
+							+ "," + f.getPreworkPush());
+				out.append(")\\n(peek, pop, push: (" + f.getPeekInt() + ", "
+						+ f.getPopInt() + ", " + f.getPushInt() + ")");
+				out.append("\\nMult: init " + f.getInitMult() + ", steady "
+						+ f.getSteadyMult());
 				out.append("\\n *** ");
-			}
-			else {
+			} else {
 				out.append("\\n" + node.getAsOutput().debugString(true));
 			}
-			/*else {
-                //out.append("\\n" + node.toString());
-            }*/
+			/*
+			 * else { //out.append("\\n" + node.toString()); }
+			 */
 			node = node.getNext();
 		}
 		return out.toString();
 	}
 
-
-	//return a string with all of the names of the filterslicenodes
+	// return a string with all of the names of the filterslicenodes
 	// and blue if linear
-	protected  String sliceName(Filter slice, Layout layout, boolean fullInfo) {
+	protected String sliceName(Filter slice, Layout layout, boolean fullInfo) {
 		InternalFilterNode node = slice.getInputNode();
 
 		StringBuffer out = new StringBuffer();
 
-		//do something fancy for linear slices!!!
-		if (((WorkNode)node.getNext()).getFilter().getArray() != null)
+		// do something fancy for linear slices!!!
+		if (((WorkNode) node.getNext()).getFilter().getArray() != null)
 			out.append("color=cornflowerblue, style=filled, ");
 
 		out.append("label=\"" + slice.hashCode() + "\\n");
 		if (fullInfo)
-			out.append(node.getAsInput().debugString(true, SchedulingPhase.INIT) + "\\n" +
-					node.getAsInput().debugString(true, SchedulingPhase.STEADY));//toString());
+			out.append(node.getAsInput()
+					.debugString(true, SchedulingPhase.INIT)
+					+ "\\n"
+					+ node.getAsInput().debugString(true,
+							SchedulingPhase.STEADY));// toString());
 
 		node = node.getNext();
-		while (node != null ) {
+		while (node != null) {
 			if (node.isFilterSlice()) {
 				WorkNodeContent f = node.getAsFilter().getFilter();
-				out.append("\\n" + node.toString() + "{"
-						+ "}");
+				out.append("\\n" + node.toString() + "{" + "}");
 				if (f.isTwoStage())
-					out.append("\\npre:(peek, pop, push): (" + 
-							f.getPreworkPeek() + ", " + f.getPreworkPop() + "," + f.getPreworkPush());
-				out.append(")\\n(peek, pop, push: (" + 
-						f.getPeekInt() + ", " + f.getPopInt() + ", " + f.getPushInt() + ")");
-				out.append("\\nMult: init " + f.getInitMult() + ", steady " + f.getSteadyMult());
-				if (layout != null) 
-					out.append("\\nTile: " + layout.getComputeNode(slice.getWorkNode()).getUniqueId());
+					out.append("\\npre:(peek, pop, push): ("
+							+ f.getPreworkPeek() + ", " + f.getPreworkPop()
+							+ "," + f.getPreworkPush());
+				out.append(")\\n(peek, pop, push: (" + f.getPeekInt() + ", "
+						+ f.getPopInt() + ", " + f.getPushInt() + ")");
+				out.append("\\nMult: init " + f.getInitMult() + ", steady "
+						+ f.getSteadyMult());
+				if (layout != null)
+					out.append("\\nTile: "
+							+ layout.getComputeNode(slice.getWorkNode())
+									.getUniqueId());
 				out.append("\\n *** ");
-			}
-			else {
+			} else {
 				if (fullInfo)
-					out.append("\\n" + node.getAsOutput().debugString(true, SchedulingPhase.INIT) + "\\n" +
-							node.getAsOutput().debugString(true, SchedulingPhase.STEADY));
+					out.append("\\n"
+							+ node.getAsOutput().debugString(true,
+									SchedulingPhase.INIT)
+							+ "\\n"
+							+ node.getAsOutput().debugString(true,
+									SchedulingPhase.STEADY));
 
 			}
-			/*else {
-                //out.append("\\n" + node.toString());
-            }*/
+			/*
+			 * else { //out.append("\\n" + node.toString()); }
+			 */
 			node = node.getNext();
 		}
 		return out.toString();
 	}
-
 
 }

@@ -27,7 +27,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
         this.chip = chip;
         this.slicer = (StaticSubGraph)spaceTime.getSSG();
         scheduleOrder = 
-            DataFlowOrder.getTraversal(spaceTime.getSSG().getSliceGraph());
+            DataFlowOrder.getTraversal(spaceTime.getSSG().getFilterGraph());
         assignedFilters = new LinkedList<InternalFilterNode>();
         rand = new Random(17);
     }

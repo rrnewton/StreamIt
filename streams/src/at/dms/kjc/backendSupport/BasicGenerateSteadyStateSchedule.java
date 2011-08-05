@@ -46,7 +46,7 @@ public class BasicGenerateSteadyStateSchedule {
     public void schedule() {
         if (KjcOptions.noswpipe) {
             spaceTime.setSchedule(DataFlowOrder.getTraversal
-                    (ssg.getSliceGraph()));
+                    (ssg.getFilterGraph()));
         }
         else {
             //for now just call schedule work, may want other schemes later
@@ -62,7 +62,7 @@ public class BasicGenerateSteadyStateSchedule {
      */
     private void scheduleWork() {
         // sort traces into decreasing order by bottleneck work.
-        Filter[] tempArray = (Filter[]) ssg.getSliceGraph().clone();
+        Filter[] tempArray = (Filter[]) ssg.getFilterGraph().clone();
         Arrays.sort(tempArray, new CompareFilterWork(ssg));
         LinkedList<Filter> sortedTraces = new LinkedList<Filter>(Arrays.asList(tempArray));
         Collections.reverse(sortedTraces);

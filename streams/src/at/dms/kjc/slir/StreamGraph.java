@@ -30,26 +30,7 @@ public class StreamGraph {
 	// more like an ssg, but it should represent multiple ssgs.
 	List<StaticSubGraph> ssgs;
 
-	/**
-	 * Create a Partitioner.
-	 * 
-	 * The number of partitions may be limited by <i>maxPartitions</i>, but some
-	 * implementations ignore <i>maxPartitions</i>.
-	 * 
-	 * @param topFilters
-	 *            from {@link FlattenGraph}
-	 * @param exeCounts
-	 *            a schedule
-	 * @param lfa
-	 *            a linearAnalyzer to convert filters to linear form if
-	 *            appropriate.
-	 * @param work
-	 *            a work estimate, see {@link at.dms.kjc.sir.lowering.partition}
-	 *            , updeted if filters are added to a slice.
-	 * @param maxPartitions
-	 *            if non-zero, a maximum number of partitions to create
-	 */
-	// DELETE work abd exeCounts
+		
 	public StreamGraph() {
 		steadyMult = KjcOptions.steadymult;
 		ssgs = new ArrayList<StaticSubGraph>();
@@ -75,5 +56,8 @@ public class StreamGraph {
 	public int getNumSSGs() {
 		return ssgs.size();
 	}
-
+	
+	public void addSSG(StaticSubGraph ssg) {
+		 ssgs.add(ssg);
+	}
 }

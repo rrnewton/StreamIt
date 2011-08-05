@@ -56,12 +56,12 @@ public class MultiLevelSplitsJoins {
         //created by this pass, to be installed in the partitioner at the 
         //end of this driver
         LinkedList<Filter> slices = new LinkedList<Filter>();
-        int oldNumSlices = ssg.getSliceGraph().length;
+        int oldNumSlices = ssg.getFilterGraph().length;
         
         //cycle thru the trace graph and see if there are any 
         //splits or joins that need to be reduced...
-        for (int i = 0; i < ssg.getSliceGraph().length; i++) {
-            Filter slice = ssg.getSliceGraph()[i];
+        for (int i = 0; i < ssg.getFilterGraph().length; i++) {
+            Filter slice = ssg.getFilterGraph()[i];
            
             //see if the width of the joiner is too wide and 
             //keep breaking it up until it is, adding new levels...
@@ -86,7 +86,7 @@ public class MultiLevelSplitsJoins {
         //calculated in this pass
         ssg.setSliceGraphNewIds(slices.toArray(new Filter[0]));
         System.out.println("Done Breaking Splits / Joins (was " + oldNumSlices + 
-                " traces, now " + ssg.getSliceGraph().length + " traces).");
+                " traces, now " + ssg.getFilterGraph().length + " traces).");
         
     }
     

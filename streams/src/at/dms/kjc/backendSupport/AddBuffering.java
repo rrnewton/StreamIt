@@ -63,8 +63,8 @@ public class AddBuffering {
      * then create an id filter to buffer items to make it integral.
      */
     private void checkOutputNodes() {
-        for (int t = 0; t < ssg.getSliceGraph().length; t++) {
-            Filter slice = ssg.getSliceGraph()[t];
+        for (int t = 0; t < ssg.getFilterGraph().length; t++) {
+            Filter slice = ssg.getFilterGraph()[t];
             //check all the outgoing edges to see if they are balanced in the init
             //and fix them if we have to
             fixOutputNode(slice.getOutputNode());
@@ -118,8 +118,8 @@ public class AddBuffering {
         do {
             //System.out.println("Iteration " + i++);
             change = false;
-            for (int t = 0; t < ssg.getSliceGraph().length; t++) {
-                Filter slice = ssg.getSliceGraph()[t];
+            for (int t = 0; t < ssg.getFilterGraph().length; t++) {
+                Filter slice = ssg.getFilterGraph()[t];
                 //check all the outgoing edges to see if they are balanced in the init
                 //and fix them if we have to
                 boolean currentChange 

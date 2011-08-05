@@ -70,7 +70,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         
     
         //if we are software pipelining then sort the traces by work
-        Filter[] tempArray = (Filter[]) spaceTime.getSSG().getSliceGraph().clone();
+        Filter[] tempArray = (Filter[]) spaceTime.getSSG().getFilterGraph().clone();
         Arrays.sort(tempArray, new CompareFilterWork(ssg));
         scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
         //reverse the list, we want the list in descending order!

@@ -198,15 +198,18 @@ public class CommonPasses {
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
 		DynamismFinder.Result result = new DynamismFinder().find(str);
+		SegmentedGraph segmentedGraph = null;
 		if (result.isDynamic()) {
-			return doDynamicPass(str);
+			segmentedGraph = new Segmenter().partition(str);
+			return doDynamicPass(segmentedGraph);
 		}
-		return doStaticPass(str);
+		segmentedGraph = new Segmenter().noPartition(str);
+		return doStaticPass(segmentedGraph);
 	}
 
-	private StreamGraph doDynamicPass(SIRStream str) {
+	private StreamGraph doDynamicPass(SegmentedGraph segmentedGraph) {
 		System.out.println("CommonPasses::doDynamicPass()");
-		SegmentedGraph segmentedGraph = new Segmenter().partition(str);
+		
 		for (SIRStream ssg : segmentedGraph.getStaticSubGraphs()) {
 			log(this.getClass().getCanonicalName() 
 					+ "performing semantic analysis on ssg ");
@@ -223,8 +226,10 @@ public class CommonPasses {
 		return streamGraph;
 	}
 
-	private StreamGraph doStaticPass(SIRStream str) {
+	private StreamGraph doStaticPass(SegmentedGraph segmentedGraph) {
 
+		SIRStream str = segmentedGraph.getStaticSubGraph0();
+		
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
 		CheckStatefulFilters.doit(str);
@@ -447,10 +452,7 @@ public class CommonPasses {
 		// Call SIRToSLIR to create sreamGraph
 		// Assume StreamGraph has only one ssg for now
 		
-		
-		StreamGraph streamGraph = 
-				new StreamGraph();			
-		
+		streamGraph = new SIRToSLIR().translate(segmentedGraph, numCores);
 		return streamGraph;
 	}
 
@@ -479,7 +481,7 @@ public class CommonPasses {
 		 * ((FlattenAndPartition)getSlicer()).generatedIds) {
 		 * IDSliceRemoval.doit(id.getParent()); } }
 		 */
-		InstallInitDistributions.doit(ssg.getSliceGraph());
+		InstallInitDistributions.doit(ssg.getFilterGraph());
 		// fix any rate skew introduced in conversion to Slice graph.
 		AddBuffering.doit(ssg, false, numCores);
 		// decompose any pipelines of filters in the Slice graph.
@@ -500,10 +502,10 @@ public class CommonPasses {
 				ssg);
 		// set init schedule in standard order
 		schedule.setInitSchedule(DataFlowOrder.getTraversal(ssg
-				.getSliceGraph()));
+				.getFilterGraph()));
 		// set prime pump schedule (if --spacetime and not --noswpipe)
 		
-		new GeneratePrimePump(schedule).schedule(ssg.getSliceGraph());
+		new GeneratePrimePump(schedule).schedule(ssg.getFilterGraph());
 		
 		// set steady schedule in standard order unless --spacetime in which
 		// case in
@@ -521,7 +523,7 @@ public class CommonPasses {
 	 * @return the slicer
 	 */
 	public StaticSubGraph getSSG() {
-		assert streamGraph.getNumSSGs() == 0;
+		assert streamGraph.getNumSSGs() == 1;
 		return streamGraph.getSSG(0);
 	}
 
