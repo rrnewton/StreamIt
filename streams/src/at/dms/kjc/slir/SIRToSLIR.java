@@ -3,36 +3,9 @@
  */
 package at.dms.kjc.slir;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import at.dms.kjc.flatgraph.DataFlowTraversal;
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.GraphFlattener;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFeedbackLoopIter;
-import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRPhasedFilterIter;
-import at.dms.kjc.iterator.SIRPipelineIter;
-import at.dms.kjc.iterator.SIRSplitJoinIter;
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFileReader;
-import at.dms.kjc.sir.SIRFileWriter;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRPhasedFilter;
-import at.dms.kjc.sir.SIRPipeline;
-import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.StreamVisitor;
-import at.dms.kjc.sir.linear.LinearAnalyzer;
-import at.dms.kjc.sir.lowering.Flattener;
-import at.dms.kjc.sir.lowering.SIRScheduler;
 import at.dms.kjc.sir.lowering.SegmentedGraph;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 
 /**
  * @author soule
