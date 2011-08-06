@@ -3,7 +3,6 @@
  */
 package at.dms.kjc.slir;
 
-import java.util.List;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.SegmentedGraph;
 
@@ -39,13 +38,9 @@ public class SIRToSLIR {
 	 */
 	public StreamGraph translate(SegmentedGraph segmentedGraph, int numCores) {
 		log(this.getClass().getCanonicalName() + " translate()");
-		// A StreamGraph is a list of StaticSubGraphs.
-		// A StaticSubGraph has an input, output, and a List<Filter>;
-		// StreamGraph streamGraph = new StreamGraph();
-		StreamGraph streamGraph = new StreamGraph();
-		List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();
 
-		for (SIRStream str : subgraphs) {
+		StreamGraph streamGraph = new StreamGraph();
+		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			InputPort inputPort = new UnaryInputPort();
 			OutputPort outputPort = new UnaryOutputPort();
 			streamGraph.addSSG(new StaticSubGraph().init(streamGraph, str, inputPort, outputPort));		
