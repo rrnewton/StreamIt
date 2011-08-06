@@ -38,7 +38,7 @@ public class StaticSubGraph {
 	/**  */
 	private HashSet<WorkNode> generatedIds;
 
-	/**  */
+	/** The input port for this static subgraph  */
 	private InputPort inputPort;
 
 	/**  */
@@ -47,10 +47,10 @@ public class StaticSubGraph {
 	/**  */
 	private List<Filter> ioList = null;
 
-	/**  */
+	/** The output port of this static subgraph */
 	private OutputPort outputPort;
 
-	/**  */
+	/** The StreamGraph that contains this subgraph */
 	private StreamGraph parent;
 
 	/**  */
