@@ -97,6 +97,7 @@ public class StaticSubGraph {
 	 * @param str The SIR graph used to generate this subgraph
 	 * @param inputPort The input port 
 	 * @param outputPort The output port
+	 * @return this
 	 */
 	public StaticSubGraph init(StreamGraph parent, SIRStream str,
 			InputPort inputPort, OutputPort outputPort) {
