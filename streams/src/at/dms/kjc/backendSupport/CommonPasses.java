@@ -194,55 +194,38 @@ public class CommonPasses {
 		DynamismFinder.Result result = new DynamismFinder().find(str);
 		SegmentedGraph segmentedGraph = null;
 		if (result.isDynamic()) {
-			segmentedGraph = new Segmenter().partition(str);
-			return doDynamicPass(segmentedGraph);
+			segmentedGraph = new Segmenter().partition(str);			
 		}
 		segmentedGraph = new Segmenter().noPartition(str);
-		return doStaticPass(segmentedGraph);
+		return doStaticPasses(segmentedGraph);
 	}
 
-	private StreamGraph doDynamicPass(SegmentedGraph segmentedGraph) {
-		System.out.println("CommonPasses::doDynamicPass()");
-		
-		for (SIRStream ssg : segmentedGraph.getStaticSubGraphs()) {
-			log(this.getClass().getCanonicalName() 
-					+ "performing semantic analysis on ssg ");
-			SemanticChecker.doCheck(ssg);
+
+	/**
+	 * Loop over each SIR in the segmentedGraph and apply optimizations
+	 * @param segmentedGraph
+	 * @return The SLIR representation of each optimized SSG
+	 */
+	private StreamGraph doStaticPasses(SegmentedGraph segmentedGraph) {
+		SegmentedGraph optimizedGraph = new SegmentedGraph();		
+		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
+			SemanticChecker.doCheck(str);
+			str = doStaticPass(str);
+			optimizedGraph.addPipe(str);
 		}
-		
-		// TODO: add the optimizations here -- soule
-		
-		// we want to convert to the StreamGraph
-		streamGraph = new SIRToSLIR().translate(segmentedGraph, numCores);
-		
+		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
 		return streamGraph;
-	}
+
+	}	
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private StreamGraph doStaticPass(SegmentedGraph segmentedGraph) {
-
-		SIRStream str = segmentedGraph.getStaticSubGraph0();
-		
+	private SIRStream doStaticPass(SIRStream str) {
+			
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
 		CheckStatefulFilters.doit(str);
 
-		double CCRatioOrig = CompCommRatio.ratio(str,
-				WorkEstimate.getWorkEstimate(str),
-				SIRScheduler.getExecutionCounts(str)[1]);
-		System.out.println("Comp/Comm Ratio of original SIR graph: "
-				+ CCRatioOrig);
-
-		long[] workStats = null;
-		if (KjcOptions.tilera != -1)
-			workStats = at.dms.kjc.tilera.TMD.totalWork(str);
-		else if (KjcOptions.smp != -1)
-			workStats = at.dms.kjc.smp.TMD.totalWork(str);
-		else
-			assert false : "Current backend does not contain workStats informations";
-
-		System.out.println("SIR Peeking Work: " + workStats[0]
-				+ ",  SIR Total Work: " + workStats[1]);
+		
 		if (KjcOptions.fusion || KjcOptions.dup >= 1 || KjcOptions.noswpipe) {
 			// if we are about to fuse filters, we should perform
 			// any vectorization now, since vectorization can not work inside
@@ -263,14 +246,6 @@ public class CommonPasses {
 		WorkEstimate work = WorkEstimate.getWorkEstimate(str);
 		work.printGraph(str, "work_estimate.dot");
 
-		/*
-		 * WorkList workList = work.getSortedFilterWork(); for (int i = 0; i <
-		 * workList.size(); i++) { SIRFilter filter = workList.getFilter(i);
-		 * long filterWork = work.getWork(filter);
-		 * System.out.println("Sorted Work " + i + ": " + filter + " work " +
-		 * filterWork + ", is fissable: " +
-		 * StatelessDuplicate.isFissable(filter)); }
-		 */
 
 		if (KjcOptions.tilera != -1) {
 			// running the tilera backend
@@ -444,8 +419,8 @@ public class CommonPasses {
 		// Call SIRToSLIR to create sreamGraph
 		// Assume StreamGraph has only one ssg for now
 		
-		streamGraph = new SIRToSLIR().translate(segmentedGraph, numCores);
-		return streamGraph;
+		return str;
+
 	}
 
 	/**
