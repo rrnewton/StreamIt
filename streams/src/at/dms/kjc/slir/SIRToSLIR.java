@@ -13,8 +13,6 @@ import at.dms.kjc.sir.lowering.SegmentedGraph;
  */
 public class SIRToSLIR {
 
-	private StaticSubGraph currentSSG = null;
-
 	public SIRToSLIR() {
 		log(this.getClass().getCanonicalName() + " SIRToSLIR()");
 	}
@@ -48,12 +46,9 @@ public class SIRToSLIR {
 		List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();
 
 		for (SIRStream str : subgraphs) {
-
 			InputPort inputPort = new UnaryInputPort();
 			OutputPort outputPort = new UnaryOutputPort();
-			currentSSG = new StaticSubGraph(streamGraph, str, inputPort, outputPort);								
-			streamGraph.addSSG(currentSSG);
-		
+			streamGraph.addSSG(new StaticSubGraph().init(streamGraph, str, inputPort, outputPort));		
 		}
 
 		return streamGraph;

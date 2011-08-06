@@ -73,42 +73,50 @@ public class StaticSubGraph {
 
 	/** filter content -> work estimation */
 	protected HashMap<WorkNodeContent, Long> workEstimation;
-
+	
 	/**
 	 * Create a StaticSubGraph.
 	 * 
+	 */
+	public StaticSubGraph() {
+		sliceList        = new LinkedList<Filter>();
+		ioList           = new LinkedList<Filter>();
+		edges            = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
+		bottleNeckFilter = new HashMap<Filter, WorkNode>();
+		sliceBNWork      = new HashMap<Filter, Long>();
+		workEstimation   = new HashMap<WorkNodeContent, Long>();
+		topFilters       = new LinkedList<Filter>();
+		sirToContent     = new HashMap<SIRFilter, WorkNodeContent>();
+	}
+	
+	/**
+	 * This function MUST be called after the constructor. I don't want
+	 * to do this work in the constructor, in case something fails.
+     *
 	 * @param parent The StreamGraph that contains this subgraph
 	 * @param str The SIR graph used to generate this subgraph
 	 * @param inputPort The input port 
 	 * @param outputPort The output port
 	 */
-
-	public StaticSubGraph(StreamGraph parent, SIRStream str,
+	public StaticSubGraph init(StreamGraph parent, SIRStream str,
 			InputPort inputPort, OutputPort outputPort) {
-		this.parent = parent;
-		this.inputPort = inputPort;
-		this.outputPort = outputPort;
-		sliceList = new LinkedList<Filter>();
-		ioList = new LinkedList<Filter>();
-		work = WorkEstimate.getWorkEstimate(str);
-		edges = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
-		bottleNeckFilter = new HashMap<Filter, WorkNode>();
-		sliceBNWork = new HashMap<Filter, Long>();
-		workEstimation = new HashMap<WorkNodeContent, Long>();
-		topFilters = new LinkedList<Filter>();
-		sirToContent = new HashMap<SIRFilter, WorkNodeContent>();
-		topFilter = null;
 
+		this.parent      = parent;
+		this.inputPort   = inputPort;
+		this.outputPort  = outputPort;
+		
 		@SuppressWarnings("rawtypes")
 		HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);
 
+		work = WorkEstimate.getWorkEstimate(str);
+		
 		// use FlatGraph to eliminate intermediate levels of pipelines
 		// when looking at stream.
 		GraphFlattener fg = new GraphFlattener(str);
 		SIRToSliceNodes sliceNodes = new SIRToSliceNodes();
 		sliceNodes.createNodes(fg.top, executionCounts);
 
-		init(sliceNodes, fg.top, edges, bottleNeckFilter, sliceBNWork,
+		flatten(sliceNodes, fg.top, edges, bottleNeckFilter, sliceBNWork,
 				workEstimation, work, topFilter, sliceList, ioList, topFilters);
 
 		io = ioList.toArray(new Filter[ioList.size()]);
@@ -118,7 +126,7 @@ public class StaticSubGraph {
 		 }
 
 		this.setGeneratedIds(sliceNodes.generatedIds);
-
+		return this;
 	}
 
 	/**
@@ -427,7 +435,7 @@ public class StaticSubGraph {
 	 * @param ioList
 	 * @param topSlices
 	 */
-	private void init(SIRToSliceNodes sliceNodes, FlatNode top,
+	private void flatten(SIRToSliceNodes sliceNodes, FlatNode top,
 			Map<OutputNode, HashMap<InputNode, InterFilterEdge>> edges,
 			HashMap<Filter, WorkNode> bottleNeckFilter,
 			HashMap<Filter, Long> sliceBNWork,
