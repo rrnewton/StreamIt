@@ -359,7 +359,7 @@ public class TMD extends Scheduler {
             filter.multSteadyMult(factor);
          }
         //must reset the filter info's because we have changed the schedule
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
         
         TileraBackend.scheduler.graphSchedule.getSSG().dumpGraph("before_fission.dot", 
                 null);
@@ -385,7 +385,7 @@ public class TMD extends Scheduler {
         //because we have changed the multiplicities of the FilterContents
         //we have to reset the filter info's because they cache the date of the 
         //FilterContents
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
         
         
     }
@@ -550,7 +550,7 @@ public class TMD extends Scheduler {
             if (slice.getWorkNode().isPredefined())
                 continue;
             
-            FilterInfo fi = FilterInfo.getFilterInfo(slice.getWorkNode());
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
             //nothing to do for filters with no input
             if (fi.pop == 0)
                 continue;

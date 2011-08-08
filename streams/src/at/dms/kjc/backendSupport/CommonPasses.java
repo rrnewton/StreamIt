@@ -22,7 +22,7 @@ import at.dms.kjc.sir.SIRPortal;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
 import at.dms.kjc.sir.SemanticChecker;
-import at.dms.kjc.sir.lowering.SegmentedGraph;
+import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
 import at.dms.kjc.sir.lowering.Segmenter;
 import at.dms.kjc.sir.lowering.ArrayInitExpander;
 import at.dms.kjc.sir.lowering.ConstantProp;
@@ -63,9 +63,6 @@ import at.dms.kjc.slir.SIRToSLIR;
 public class CommonPasses {
 	/** field that may be useful later */
 	private StreamGraph streamGraph;
-
-	/** field that may be useful later */
-	private WorkEstimate workEstimate;
 
 	/** stores pre-modified str for statistics gathering */
 	private SIRStream origSTR;
@@ -192,7 +189,7 @@ public class CommonPasses {
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
 		DynamismFinder.Result result = new DynamismFinder().find(str);
-		SegmentedGraph segmentedGraph = null;
+		SegmentedSIRGraph segmentedGraph = null;
 		if (result.isDynamic()) {
 			segmentedGraph = new Segmenter().partition(str);			
 		}
@@ -206,8 +203,8 @@ public class CommonPasses {
 	 * @param segmentedGraph
 	 * @return The SLIR representation of each optimized SSG
 	 */
-	private StreamGraph doStaticPasses(SegmentedGraph segmentedGraph) {
-		SegmentedGraph optimizedGraph = new SegmentedGraph();		
+	private StreamGraph doStaticPasses(SegmentedSIRGraph segmentedGraph) {
+		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();		
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
 			str = doStaticPass(str);
@@ -395,8 +392,6 @@ public class CommonPasses {
 			VectorizeEnable.vectorizeEnable(str, null);
 		}
 
-		setWorkEstimate(WorkEstimate.getWorkEstimate(str));
-
 		StreamItDot.printGraph(str, "after-partition.dot");
 
 		// convert locals to fields if desired (can avoid stack overflow for
@@ -404,20 +399,6 @@ public class CommonPasses {
 		if (KjcOptions.localstoglobals) {
 			ConvertLocalsToFields.doit(str);
 		}
-
-		// get the execution counts from the scheduler
-		HashMap[] executionCounts = SIRScheduler.getExecutionCounts(str);
-
-		// Print out computation to communication ratio.
-		double CCRatio = CompCommRatio.ratio(str, getWorkEstimate(),
-				executionCounts[1]);
-		System.out.println("Comp/Comm Ratio of SIR graph: " + CCRatio);
-		
-
-		// TODO: This is where we want to convert to the StreamGraph - soule
-		
-		// Call SIRToSLIR to create sreamGraph
-		// Assume StreamGraph has only one ssg for now
 		
 		return str;
 
@@ -437,7 +418,7 @@ public class CommonPasses {
 		ssg.createPredefinedContent();
 		// guarantee that we are not going to hack properties of filters in the
 		// future
-		FilterInfo.canUse();
+		WorkNodeInfo.canUse();
 		// now we require that all input and output slice nodes have separate
 		// init distribution pattern
 		// for splitting and joining in the init stage (could be null or could
@@ -492,30 +473,6 @@ public class CommonPasses {
 	public StaticSubGraph getSSG() {
 		assert streamGraph.getNumSSGs() == 1;
 		return streamGraph.getSSG(0);
-	}
-
-	/**
-	 * Allows you to change the value returned by {@link #getWorkEstimate()
-	 * getWorkEstimate} after the initial value has been set by
-	 * {@link #run(SIRStream, JInterfaceDeclaration[], SIRInterfaceTable[], SIRStructure[], SIRHelper[], SIRGlobal, int)
-	 * run}.
-	 * 
-	 * @param workEstimate
-	 *            the workEstimate to set
-	 */
-	private void setWorkEstimate(WorkEstimate workEstimate) {
-		this.workEstimate = workEstimate;
-	}
-
-	/**
-	 * Get the WorkEstimate used in
-	 * {@link #run(SIRStream, JInterfaceDeclaration[], SIRInterfaceTable[], SIRStructure[], SIRHelper[], SIRGlobal, int)
-	 * run}.
-	 * 
-	 * @return the workEstimate
-	 */
-	public WorkEstimate getWorkEstimate() {
-		return workEstimate;
 	}
 
 	/**

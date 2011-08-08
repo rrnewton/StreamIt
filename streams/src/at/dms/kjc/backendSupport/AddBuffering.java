@@ -4,7 +4,7 @@
 package at.dms.kjc.backendSupport;
 
 import java.util.*;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRIdentity;
@@ -70,7 +70,7 @@ public class AddBuffering {
             fixOutputNode(slice.getOutputNode());
         }
         //don't forget to reset the filter infos after each iteration
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
     }
     
     /**
@@ -128,7 +128,7 @@ public class AddBuffering {
                     change = true;
             }
             //don't forget to reset the filter infos after each iteration
-            FilterInfo.reset();
+            WorkNodeInfo.reset();
             
         } while (change);
     }
@@ -319,7 +319,7 @@ public class AddBuffering {
         Iterator<InterFilterEdge> edges = output.getDestSet(SchedulingPhase.INIT).iterator(); 
         while (edges.hasNext()) {
             InterFilterEdge edge = edges.next();
-            FilterInfo downstream = FilterInfo.getFilterInfo(edge.getDest().getNextFilter());
+            WorkNodeInfo downstream = WorkNodeInfo.getFilterInfo(edge.getDest().getNextFilter());
             
             int itemsRecOnEdge = (int) (((double)initItemsSent) *
                     output.ratio(edge, SchedulingPhase.INIT));
@@ -406,7 +406,6 @@ public class AddBuffering {
         slice.getOutputNode().setPrevious(filter);
         slice.finish();
         
-        ssg.addFilterToSlice(filter, slice);
     }
     
     /**

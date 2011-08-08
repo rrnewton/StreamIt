@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Arrays;
 
 import at.dms.kjc.slir.fission.*;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 public class IDFilterRemoval {
     private Filter idSlice;
@@ -22,7 +22,7 @@ public class IDFilterRemoval {
             "Trying to remove a non ID slice";
         
         IDFilterRemoval remover = new IDFilterRemoval(slice);
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
     }
     
     private IDFilterRemoval(Filter s) {

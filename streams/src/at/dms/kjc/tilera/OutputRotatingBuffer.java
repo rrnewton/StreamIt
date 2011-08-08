@@ -27,7 +27,7 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
@@ -288,7 +288,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     }   
     
     protected void setBufferSize() {
-        FilterInfo fi = FilterInfo.getFilterInfo(filterNode);
+        WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(filterNode);
         
         bufSize = Math.max(fi.totalItemsSent(SchedulingPhase.INIT),
                 fi.totalItemsSent(SchedulingPhase.STEADY));
@@ -391,7 +391,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      */
     public List<JStatement> beginInitWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
-        if (FilterInfo.getFilterInfo(filterNode).totalItemsSent(SchedulingPhase.INIT) > 0)
+        if (WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(SchedulingPhase.INIT) > 0)
             list.add(transferCommands.zeroOutHead(SchedulingPhase.INIT));   
         return list;
     }

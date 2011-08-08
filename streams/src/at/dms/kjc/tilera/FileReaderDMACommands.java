@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.JStatement;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
@@ -27,8 +27,8 @@ public class FileReaderDMACommands extends FileReaderCode{
     }
 
     private void generateStatements() {
-        FilterInfo srcInfo = FilterInfo.getFilterInfo(fileOutput.getPrevFilter());
-        FilterInfo dstInfo = FilterInfo.getFilterInfo(input.getNextFilter());
+        WorkNodeInfo srcInfo = WorkNodeInfo.getFilterInfo(fileOutput.getPrevFilter());
+        WorkNodeInfo dstInfo = WorkNodeInfo.getFilterInfo(input.getNextFilter());
                 
         String requestVar = parent.writeRotStructName  + "_request";
         int itemBytes = Util.getTypeSize(parent.getType()) * 4;

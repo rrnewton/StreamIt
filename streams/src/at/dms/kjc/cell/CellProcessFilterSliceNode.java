@@ -9,7 +9,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.slir.FileOutputContent;
 import at.dms.kjc.slir.WorkNode;
@@ -238,28 +238,28 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
             // debug info only: expected splitter and joiner firings.
             System.err.print("(Filter" + filterNode.getFilter().getName());
             System.err.print(" "
-                    + FilterInfo.getFilterInfo(filterNode).getMult(
+                    + WorkNodeInfo.getFilterInfo(filterNode).getMult(
                             SchedulingPhase.INIT));
             System.err.print(" "
-                    + FilterInfo.getFilterInfo(filterNode).getMult(
+                    + WorkNodeInfo.getFilterInfo(filterNode).getMult(
                             SchedulingPhase.STEADY));
             System.err.println(")");
             System.err.print("(Joiner joiner_"
                     + filterNode.getFilter().getName());
             System.err.print(" "
-                    + FilterInfo.getFilterInfo(filterNode)
+                    + WorkNodeInfo.getFilterInfo(filterNode)
                             .totalItemsReceived(SchedulingPhase.INIT));
             System.err.print(" "
-                    + FilterInfo.getFilterInfo(filterNode)
+                    + WorkNodeInfo.getFilterInfo(filterNode)
                             .totalItemsReceived(SchedulingPhase.STEADY));
             System.err.println(")");
             System.err.print("(Splitter splitter_"
                     + filterNode.getFilter().getName());
             System.err.print(" "
-                    + FilterInfo.getFilterInfo(filterNode).totalItemsSent(
+                    + WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(
                             SchedulingPhase.INIT));
             System.err.print(" "
-                    + FilterInfo.getFilterInfo(filterNode).totalItemsSent(
+                    + WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(
                             SchedulingPhase.STEADY));
             System.err.println(")");
         }

@@ -1,15 +1,15 @@
 package at.dms.kjc.slir.fission;
 
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 public class FissionGroup {
     public Filter unfizzedSlice;
-    public FilterInfo unfizzedFilterInfo;
+    public WorkNodeInfo unfizzedFilterInfo;
 
     public Filter[] fizzedSlices;
 
-    public FissionGroup(Filter unfizzedSlice, FilterInfo unfizzedFilterInfo, Filter[] fizzedSlices) {
+    public FissionGroup(Filter unfizzedSlice, WorkNodeInfo unfizzedFilterInfo, Filter[] fizzedSlices) {
         this.unfizzedSlice = unfizzedSlice;
         this.unfizzedFilterInfo = unfizzedFilterInfo;
         this.fizzedSlices = fizzedSlices;
@@ -19,7 +19,7 @@ public class FissionGroup {
         return unfizzedSlice;
     }
 
-    public FilterInfo getUnfizzedFilterInfo() {
+    public WorkNodeInfo getUnfizzedFilterInfo() {
         return unfizzedFilterInfo;
     }
 

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.LinkedList;
 import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 /**
  * Each Slice is started by an InputSlice Node that is either a joiner connecting several other slices, 
@@ -460,7 +460,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
 
     public int itemsReceivedOn(InterFilterEdge edge, SchedulingPhase phase) {
-        double totalItems = FilterInfo.getFilterInfo(getNextFilter()).totalItemsReceived(phase);
+        double totalItems = WorkNodeInfo.getFilterInfo(getNextFilter()).totalItemsReceived(phase);
         
         double items = totalItems * ratio(edge, phase);
         assert items == Math.floor(items);

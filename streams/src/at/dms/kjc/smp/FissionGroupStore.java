@@ -1,6 +1,6 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.fission.FissionGroup;
 
@@ -70,7 +70,7 @@ public class FissionGroupStore {
         return null;
     }
 
-    public static FilterInfo getUnfizzedFilterInfo(Filter slice) {
+    public static WorkNodeInfo getUnfizzedFilterInfo(Filter slice) {
         return getFissionGroup(slice).unfizzedFilterInfo;
     }
 

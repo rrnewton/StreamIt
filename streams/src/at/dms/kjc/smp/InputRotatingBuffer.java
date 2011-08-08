@@ -165,7 +165,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
     protected void setBufferSize() {
         //System.out.println("Inside InputRotatingBuffer.setBufferSize()");
 
-        FilterInfo fi;
+        WorkNodeInfo fi;
         if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filterNode.getParent())) {
             //System.out.println("  " + filterNode + " is fizzed");
             fi = FissionGroupStore.getFissionGroup(filterNode.getParent()).unfizzedFilterInfo;

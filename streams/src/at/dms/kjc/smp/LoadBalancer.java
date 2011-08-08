@@ -50,7 +50,7 @@ public class LoadBalancer {
 
     private static boolean canLoadBalance(FissionGroup group) {
         WorkNode filter = group.unfizzedSlice.getWorkNode();
-        FilterInfo filterInfo = group.unfizzedFilterInfo;
+        WorkNodeInfo filterInfo = group.unfizzedFilterInfo;
         OutputNode output = group.unfizzedSlice.getOutputNode();
 
         if(filterInfo.push % output.totalWeights(SchedulingPhase.STEADY) != 0)

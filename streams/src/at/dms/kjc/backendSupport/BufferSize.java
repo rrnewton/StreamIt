@@ -23,14 +23,14 @@ public class BufferSize {
         if (theEdge.getSrc().isFilterSlice()) {  // filter->filter, filter->output
             // the init size is the max of the multiplicities for init and prime-pump
             // times the push rate
-            FilterInfo fi = FilterInfo.getFilterInfo((WorkNode) theEdge.getSrc());
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo((WorkNode) theEdge.getSrc());
             int maxItems = Math.max(initPush(fi), steadyPush(fi));
             // steady is just pop * mult
             return maxItems;
         } else if (theEdge.getDest().isFilterSlice()) { // joiner->filter
             // calculate the maximum number of elements that we may need 
             // upstream of a filter.
-            FilterInfo fi = FilterInfo.getFilterInfo((WorkNode) theEdge.getDest());
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo((WorkNode) theEdge.getDest());
             // on init: have calculation:
             int initSize = fi.initItemsReceived();
             // in steady state: max(peek, pop+remaining) if multiplicity == 1
@@ -50,7 +50,7 @@ public class BufferSize {
     
     /** number of items pushed during init / pre-work, account for primepump
      * because each stage of the primepump does the work of the steady-state*/
-    public static int initPush(FilterInfo fi) {
+    public static int initPush(WorkNodeInfo fi) {
         int items= fi.initMult * fi.push;
         // account for the initpush.
         // currently overestimates if there is a preWork and it pushes
@@ -62,7 +62,7 @@ public class BufferSize {
     }
     
     /** number of items pushed in a steady state (takes multiplicity into account). */
-    public static int steadyPush(FilterInfo fi) {
+    public static int steadyPush(WorkNodeInfo fi) {
         return fi.push*fi.steadyMult;
     }
     

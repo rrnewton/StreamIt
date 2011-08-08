@@ -89,7 +89,7 @@ public class DistributionUnroller {
     }
     
     public static void unroll(InputNode input) {
-        FilterInfo fi = FilterInfo.getFilterInfo(input.getNextFilter());
+        WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(input.getNextFilter());
        
         //unroll the init joining schedule
         InterFilterEdge[] initSrcs = 
@@ -115,7 +115,7 @@ public class DistributionUnroller {
     
     public static void unroll(OutputNode output) {
         //unroll the steady splitting schedule
-        FilterInfo fi = FilterInfo.getFilterInfo(output.getPrevFilter());
+        WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(output.getPrevFilter());
         
 
         InterFilterEdge[][] initDests = 

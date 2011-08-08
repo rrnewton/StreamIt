@@ -7,7 +7,7 @@ import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.*;
 
@@ -24,8 +24,8 @@ public class FileReaderRemoteReads extends FileReaderCode {
     }
 
     private void generateStatements(SchedulingPhase phase) {
-        FilterInfo srcInfo = FilterInfo.getFilterInfo(fileOutput.getPrevFilter());
-        FilterInfo dstInfo = FilterInfo.getFilterInfo(input.getNextFilter());
+        WorkNodeInfo srcInfo = WorkNodeInfo.getFilterInfo(fileOutput.getPrevFilter());
+        WorkNodeInfo dstInfo = WorkNodeInfo.getFilterInfo(input.getNextFilter());
 
         //System.out.println("FileReaderRemoteReads, dstFilter: " + input.getNextFilter() + ", phase: " + phase);
        

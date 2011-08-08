@@ -4,7 +4,7 @@
 package at.dms.kjc.slir;
 
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.SegmentedGraph;
+import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
 
 /**
  * @author soule
@@ -36,7 +36,7 @@ public class SIRToSLIR {
 	 * 
 	 * @return
 	 */
-	public StreamGraph translate(SegmentedGraph segmentedGraph, int numCores) {
+	public StreamGraph translate(SegmentedSIRGraph segmentedGraph, int numCores) {
 		log(this.getClass().getCanonicalName() + " translate()");
 
 		StreamGraph streamGraph = new StreamGraph();

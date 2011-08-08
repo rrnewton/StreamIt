@@ -65,12 +65,12 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
                     (output.getSingleEdge(SchedulingPhase.STEADY).getDest().singleAppearance() &&
                             //check steady for only one input downstream or only one rotation
                             (output.getSingleEdge(SchedulingPhase.STEADY).getDest().totalWeights(SchedulingPhase.STEADY) == 
-                                FilterInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.STEADY).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.STEADY) ||
+                                WorkNodeInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.STEADY).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.STEADY) ||
                                 output.getSingleEdge(SchedulingPhase.STEADY).getDest().oneInput(SchedulingPhase.INIT)) &&
                                 //check the init stage
                                 (output.noOutputs(SchedulingPhase.INIT) || (output.oneOutput(SchedulingPhase.INIT) &&
                                         output.getSingleEdge(SchedulingPhase.INIT).getDest().totalWeights(SchedulingPhase.INIT) == 
-                                            FilterInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.INIT).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.INIT) ||
+                                            WorkNodeInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.INIT).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.INIT) ||
                                             output.getSingleEdge(SchedulingPhase.INIT).getDest().oneInput(SchedulingPhase.INIT)))))
         {
             directWrite = true;
@@ -138,7 +138,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             filter = parent.filterNode;
 
 
-        FilterInfo fi = FilterInfo.getFilterInfo(filter);
+        WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(filter);
 
         List<JStatement> statements = null;
         
@@ -223,7 +223,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
     private int[] getDestIndices(InterFilterEdge edge, int outputRots, SchedulingPhase phase) {
         int[] indices = new int[outputRots * output.getWeight(edge, phase)];
         InputNode input = edge.getDest();
-        FilterInfo dsFilter = FilterInfo.getFilterInfo(input.getNextFilter());
+        WorkNodeInfo dsFilter = WorkNodeInfo.getFilterInfo(input.getNextFilter());
         //System.out.println("Dest copyDown: "+dsFilter.copyDown);
         assert indices.length %  input.getWeight(edge, phase) == 0;
         
@@ -254,7 +254,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
      */
     private int getWriteOffset(SchedulingPhase phase) {
         if (usesSharedBuffer()) {
-            FilterInfo localDest = FilterInfo.getFilterInfo(parent.filterNode);
+            WorkNodeInfo localDest = WorkNodeInfo.getFilterInfo(parent.filterNode);
             
             //no address array needed but we have to set the head to the copydown plus
             //the weights of any inputs that are not mapped to this tile that appear before
@@ -296,7 +296,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
                     literal = 0;
                 }
                 else {
-                    FilterInfo destInfo = FilterInfo.getFilterInfo(edge.getDest().getNextFilter());
+                    WorkNodeInfo destInfo = WorkNodeInfo.getFilterInfo(edge.getDest().getNextFilter());
                     literal = 
                         edge.getDest().weightBefore(edge, phase);
                     //if we are in the init, skip copy down as well

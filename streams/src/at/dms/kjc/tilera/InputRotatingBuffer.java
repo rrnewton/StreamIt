@@ -173,8 +173,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
             return;
         }
 
-        FilterInfo consumer = FilterInfo.getFilterInfo(input.getNextFilter());
-        FilterInfo producer = FilterInfo.getFilterInfo(output.getPrevFilter());
+        WorkNodeInfo consumer = WorkNodeInfo.getFilterInfo(input.getNextFilter());
+        WorkNodeInfo producer = WorkNodeInfo.getFilterInfo(output.getPrevFilter());
         
         //check that the 
         if ((input.getWidth(SchedulingPhase.INIT) > 1 && 
@@ -457,7 +457,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
             //if this filter has a local source filter, then we are using this buffer
             //for its output also, so we have to consider the amount of output in the 
             //buffer calculation
-            FilterInfo srcInfo = FilterInfo.getFilterInfo(localSrcFilter);
+            WorkNodeInfo srcInfo = WorkNodeInfo.getFilterInfo(localSrcFilter);
             int output = Math.max(srcInfo.totalItemsSent(SchedulingPhase.STEADY) + filterInfo.copyDown, 
                     srcInfo.totalItemsSent(SchedulingPhase.INIT) + filterInfo.copyDown);
             bufSize = Math.max(bufSize, output);
@@ -956,7 +956,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
     public List<JStatement> beginInitWrite() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         LinkedList<JStatement> list = new LinkedList<JStatement>();
-        if (FilterInfo.getFilterInfo(localSrcFilter).totalItemsSent(SchedulingPhase.INIT) > 0)
+        if (WorkNodeInfo.getFilterInfo(localSrcFilter).totalItemsSent(SchedulingPhase.INIT) > 0)
             list.add(transferCommands.zeroOutHead(SchedulingPhase.INIT));
         return list;
     }

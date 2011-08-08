@@ -96,7 +96,9 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * @return placement cost
      */
     public double placementCost(boolean debug) {
-        double tileCosts[] = new double[chip.size()];
+    	assert false : "placement() should not be called";
+    	
+    	double tileCosts[] = new double[chip.size()];
         
         Iterator<Filter> slices = scheduleOrder.iterator();
         HashMap<WorkNode, Double> endTime = new HashMap<WorkNode, Double>();
@@ -104,7 +106,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
             Filter slice = slices.next();
             //System.err.println(slice.toString());
             T tile = (T)assignment.get(slice.getInputNode().getNextFilter());
-            double traceWork = slicer.getSliceBNWork(slice); 
+            double traceWork = 0.0;//slicer.getSliceBNWork(slice); 
             double startTime = 0;
             //now find the start time
             

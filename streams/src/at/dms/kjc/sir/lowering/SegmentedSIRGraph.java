@@ -12,7 +12,7 @@ import java.util.Map;
 
 import at.dms.kjc.sir.SIRStream;
 
-public class SegmentedGraph {
+public class SegmentedSIRGraph {
 	
 	/** This is the list of all pipelines created */
 	private List<SIRStream> staticSubGraphs = null;
@@ -26,7 +26,7 @@ public class SegmentedGraph {
 	/**
 	 *  Create a new SegmentedGraph.
 	 */
-	public SegmentedGraph() {
+	public SegmentedSIRGraph() {
 		staticSubGraphs = new ArrayList<SIRStream>();
 		connections = new HashMap<SIRStream, List<SIRStream>>();
 	}

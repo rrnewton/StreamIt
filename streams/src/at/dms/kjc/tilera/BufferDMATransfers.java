@@ -39,8 +39,8 @@ public class BufferDMATransfers extends BufferTransfers {
         for (int w = 0; w < output.getWeights(phase).length; w++) {
             for (InterFilterEdge edge : output.getDests(phase)[w]) {
                 InputNode input = edge.getDest();
-                FilterInfo srcInfo = FilterInfo.getFilterInfo(output.getPrevFilter());
-                FilterInfo dstInfo = FilterInfo.getFilterInfo(input.getNextFilter());
+                WorkNodeInfo srcInfo = WorkNodeInfo.getFilterInfo(output.getPrevFilter());
+                WorkNodeInfo dstInfo = WorkNodeInfo.getFilterInfo(input.getNextFilter());
                                 
                 SourceAddressRotation addrBuf = parent.getAddressBuffer(input);
                 String requestVar = addrBuf.writeRotStructName  + "_request";

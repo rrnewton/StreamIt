@@ -20,7 +20,7 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.sir.SIRPopExpression;
 
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 
 import at.dms.kjc.slir.StaticSubGraph;
@@ -45,7 +45,7 @@ public class StatelessFissioner {
     /** the filter of the slice we are fissing */
     private WorkNode filter;
     /** the filter info of the filter of the slice we are fissing */
-    private FilterInfo fInfo;
+    private WorkNodeInfo fInfo;
 
     /** the stats from the original filter, these don't change! */
     private int slicePeek;
@@ -81,7 +81,7 @@ public class StatelessFissioner {
     public static boolean canFizz(Filter slice, boolean debug) {
 
         // Get information on Slice rates
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
 
         WorkNode filter = slice.getWorkNode();
         
@@ -115,7 +115,7 @@ public class StatelessFissioner {
         this.slice = slice;
         this.fizzAmount = fizzAmount;
         this.filter = slice.getWorkNode();
-        this.fInfo = FilterInfo.getFilterInfo(filter);
+        this.fInfo = WorkNodeInfo.getFilterInfo(filter);
 
         slicePeek = fInfo.peek;
         slicePop = fInfo.pop;

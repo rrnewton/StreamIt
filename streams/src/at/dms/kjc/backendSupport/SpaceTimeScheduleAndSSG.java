@@ -53,7 +53,7 @@ public class SpaceTimeScheduleAndSSG extends BasicSpaceTimeSchedule {
         
         for (int i = 0; i < fileWriters.size(); i++) {
             WorkNode node = (WorkNode)fileWriters.get(i).getInputNode().getNext();
-            FilterInfo fi = FilterInfo.getFilterInfo(node);
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(node);
             assert node.getFilter().getInputType().isNumeric() :
                 "non-numeric type for input to filewriter";
         

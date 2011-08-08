@@ -19,7 +19,7 @@ public class InstallInitDistributions {
      */  
     public static void doit(Filter[] slices) {
         for (Filter slice : slices) {
-            FilterInfo fi = FilterInfo.getFilterInfo(slice.getWorkNode());
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
             //do input slice node
             if (fi.totalItemsReceived(SchedulingPhase.INIT) > 0) {
                 slice.getInputNode().setInitWeights(slice.getInputNode().getWeights(SchedulingPhase.STEADY).clone());

@@ -14,7 +14,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
@@ -242,8 +242,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		Set<InterFilterEdge> finalCandidateDests = new HashSet<InterFilterEdge>();
 		
 		for(InterFilterEdge edge : saCandidateDests) {
-			FilterInfo consumer = FilterInfo.getFilterInfo(edge.getDest().getNextFilter());
-			FilterInfo producer = FilterInfo.getFilterInfo(edge.getSrc().getPrevFilter());
+			WorkNodeInfo consumer = WorkNodeInfo.getFilterInfo(edge.getDest().getNextFilter());
+			WorkNodeInfo producer = WorkNodeInfo.getFilterInfo(edge.getSrc().getPrevFilter());
 		
 	        if ((edge.getDest().getWidth(SchedulingPhase.INIT) > 1 && 
 	                edge.getDest().totalWeights(SchedulingPhase.INIT) != consumer.totalItemsPopped(SchedulingPhase.INIT)) ||
@@ -323,7 +323,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
             }
         }
         else {
-            FilterInfo fi = FilterInfo.getFilterInfo(filterNode);
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(filterNode);
         
             bufSize = Math.max(fi.totalItemsSent(SchedulingPhase.INIT),
                                fi.totalItemsSent(SchedulingPhase.STEADY));
@@ -557,7 +557,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      */
     public List<JStatement> beginInitWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
-        if (FilterInfo.getFilterInfo(filterNode).totalItemsSent(SchedulingPhase.INIT) > 0)
+        if (WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(SchedulingPhase.INIT) > 0)
             list.add(transferCommands.zeroOutHead(SchedulingPhase.INIT));   
         return list;
     }

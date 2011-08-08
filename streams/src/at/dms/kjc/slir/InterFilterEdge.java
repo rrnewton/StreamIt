@@ -2,7 +2,7 @@ package at.dms.kjc.slir;
 
 import java.util.HashMap;
 
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 /**
  *  An InterSliceEdge represents an edge in the partitioned stream graph between slices.
@@ -111,14 +111,14 @@ public class InterFilterEdge extends Edge implements at.dms.kjc.DeepCloneable, C
     public int initItems() {
         int itemsReceived, itemsSent;
 
-        FilterInfo next = FilterInfo.getFilterInfo((WorkNode) ((InputNode)dest)
+        WorkNodeInfo next = WorkNodeInfo.getFilterInfo((WorkNode) ((InputNode)dest)
                                                    .getNext());
         
         itemsSent = (int) ((double) next.initItemsReceived() * ((InputNode)dest).ratio(this, SchedulingPhase.INIT));
         //System.out.println(next.initItemsReceived()  + " * " + ((InputSliceNode)dest).ratio(this));
         
         // calculate the items the output slice sends
-        FilterInfo prev = FilterInfo.getFilterInfo((WorkNode) ((OutputNode)src)
+        WorkNodeInfo prev = WorkNodeInfo.getFilterInfo((WorkNode) ((OutputNode)src)
                                                    .getPrevious());
         itemsReceived = (int) ((double) prev.initItemsSent() * ((OutputNode)src).ratio(this, SchedulingPhase.INIT));
 
@@ -151,12 +151,12 @@ public class InterFilterEdge extends Edge implements at.dms.kjc.DeepCloneable, C
         int itemsReceived, itemsSent;
 
         // calculate the items the input slice receives
-        FilterInfo next = FilterInfo.getFilterInfo(((InputNode)dest).getNextFilter());
+        WorkNodeInfo next = WorkNodeInfo.getFilterInfo(((InputNode)dest).getNextFilter());
         itemsSent = (int) ((next.steadyMult * next.pop) * ((double) ((InputNode)dest)
                                                            .getWeight(this, SchedulingPhase.STEADY) / ((InputNode)dest).totalWeights(SchedulingPhase.STEADY)));
 
         // calculate the items the output slice sends
-        FilterInfo prev = FilterInfo.getFilterInfo((WorkNode) ((OutputNode)src)
+        WorkNodeInfo prev = WorkNodeInfo.getFilterInfo((WorkNode) ((OutputNode)src)
                                                    .getPrevious());
         itemsReceived = (int) ((prev.steadyMult * prev.push) * ((double) ((OutputNode)src)
                                                                 .getWeight(this, SchedulingPhase.STEADY) / ((OutputNode)src).totalWeights(SchedulingPhase.STEADY)));
@@ -175,7 +175,7 @@ public class InterFilterEdge extends Edge implements at.dms.kjc.DeepCloneable, C
     * @return ...
     */
     public int primePumpItems() {
-        return (int) ((double) FilterInfo.getFilterInfo(((OutputNode)src).getPrevFilter())
+        return (int) ((double) WorkNodeInfo.getFilterInfo(((OutputNode)src).getPrevFilter())
                       .totalItemsSent(SchedulingPhase.PRIMEPUMP) * ((OutputNode)src).ratio(this, SchedulingPhase.STEADY));
     }
     

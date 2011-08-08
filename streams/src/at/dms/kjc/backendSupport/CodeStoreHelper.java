@@ -176,7 +176,7 @@ public abstract  class CodeStoreHelper extends MinCodeUnit {
      * @return The method that implements one stage of the primepump exeuction of this
      * filter. 
      */
-    protected JMethodDeclaration getPrimePumpMethodForFilter(FilterInfo filterInfo) 
+    protected JMethodDeclaration getPrimePumpMethodForFilter(WorkNodeInfo filterInfo) 
     {
         if (primePumpMethod != null) {
             return primePumpMethod;

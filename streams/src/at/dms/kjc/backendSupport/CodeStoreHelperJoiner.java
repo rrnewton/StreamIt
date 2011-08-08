@@ -20,7 +20,7 @@ public class CodeStoreHelperJoiner extends CodeStoreHelper {
         // if we have a work method, iterate it enough
         // for downstream filter.
         JBlock statements = new JBlock();
-        FilterInfo filterInfo = FilterInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
 
         // channel code before work block
         for (InterFilterEdge e : sliceNode.getAsInput().getSourceList(SchedulingPhase.INIT)) {
@@ -61,7 +61,7 @@ public class CodeStoreHelperJoiner extends CodeStoreHelper {
             return primePumpMethod;
         }
         JBlock statements = new JBlock();
-        FilterInfo filterInfo = FilterInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
         
         // channel code before work block
         for (InterFilterEdge e : sliceNode.getAsInput().getSourceList(SchedulingPhase.STEADY)) {
@@ -104,7 +104,7 @@ public class CodeStoreHelperJoiner extends CodeStoreHelper {
             return null;
         }
         JBlock statements = new JBlock();
-        FilterInfo filterInfo = FilterInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
         
         // channel code before work block
         for (InterFilterEdge e : sliceNode.getAsInput().getSourceList(SchedulingPhase.STEADY)) {

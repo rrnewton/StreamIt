@@ -181,7 +181,7 @@ public abstract class BackEndFactory<
             return false;
         }
         WorkNode filter = s.getWorkNode();
-        FilterInfo info = FilterInfo.getFilterInfo(filter);
+        WorkNodeInfo info = WorkNodeInfo.getFilterInfo(filter);
         if (info.noBuffer()) {
             // a filter with a 0 peek rate does not need
             // a peek buffer (is this redundant with !sliceHasUpstreamChannel ?)

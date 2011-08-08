@@ -529,7 +529,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * Return the number of items that are sent along the <edge> in <phase>.
      */
     public int itemsSentOn(InterFilterEdge edge, SchedulingPhase phase) {
-        int totalItems = FilterInfo.getFilterInfo(getPrevFilter()).totalItemsSent(phase);
+        int totalItems = WorkNodeInfo.getFilterInfo(getPrevFilter()).totalItemsSent(phase);
         
         double items = totalItems * ratio(edge, phase);
         

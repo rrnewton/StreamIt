@@ -18,7 +18,7 @@ import at.dms.kjc.slir.SchedulingPhase;
  * FilterContent changes, then you have to reset() the FilterInfos.
  * 
  */
-public class FilterInfo {
+public class WorkNodeInfo {
     /** peeked amount in pre-work of two-stage filter */
     public int prePeek;
     /** popped amount in pre-work in two-stage filter */
@@ -52,7 +52,7 @@ public class FilterInfo {
     public WorkNodeContent filter;
 
     /** HashMap of all the filter infos FilterSliceNode -> FilterInfo */
-    private static HashMap<WorkNode, FilterInfo> filterInfos;
+    private static HashMap<WorkNode, WorkNodeInfo> filterInfos;
 
     // true if everything is set and we can use this class
     // because once a filter info is created you cannot
@@ -60,7 +60,7 @@ public class FilterInfo {
     private static boolean canuse;
 
     static {
-        filterInfos = new HashMap<WorkNode, FilterInfo>();
+        filterInfos = new HashMap<WorkNode, WorkNodeInfo>();
         canuse = false;
     }
 
@@ -77,21 +77,21 @@ public class FilterInfo {
      * Force the filter info to be recalculated.
      */
     public static void reset() {
-        filterInfos = new HashMap<WorkNode, FilterInfo>();
+        filterInfos = new HashMap<WorkNode, WorkNodeInfo>();
     }
     
     /** Return a stored FilterInfo or calculate a new one as needed. */
-    public static FilterInfo getFilterInfo(WorkNode sliceNode) {
+    public static WorkNodeInfo getFilterInfo(WorkNode sliceNode) {
         assert canuse;
         if (!filterInfos.containsKey(sliceNode)) {
-            FilterInfo info = new FilterInfo(sliceNode);
+            WorkNodeInfo info = new WorkNodeInfo(sliceNode);
             filterInfos.put(sliceNode, info);
             return info;
         } else
             return filterInfos.get(sliceNode);
     }
 
-    private FilterInfo(WorkNode sliceNode) {
+    private WorkNodeInfo(WorkNode sliceNode) {
         filter = sliceNode.getFilter();
         this.sliceNode = sliceNode;
         this.steadyMult = filter.getSteadyMult();
@@ -279,7 +279,7 @@ public class FilterInfo {
         
         if (sliceNode.getPrevious().isFilterSlice()) {
             upStreamItems = 
-                FilterInfo.getFilterInfo(
+                WorkNodeInfo.getFilterInfo(
                         (WorkNode) sliceNode.getPrevious()).initItemsSent();
             if (debug)
                 System.out.println(" Upstream filter sends: " + upStreamItems);
@@ -293,14 +293,14 @@ public class FilterInfo {
                 InterFilterEdge incoming = edges.next();
                 upStreamItems += 
                     (int) 
-                    ((double)FilterInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
+                    ((double)WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                             .initItemsSent() * incoming.getSrc().ratio(incoming, SchedulingPhase.INIT));
                 if (debug) {
                     System.out.println("   " + incoming + ": sends " + 
-                            FilterInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
+                            WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                             .initItemsSent() + ", at ratio " + incoming.getSrc().ratio(incoming, SchedulingPhase.INIT) + " = " +
                             (int) 
-                            ((double)FilterInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
+                            ((double)WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                                     .initItemsSent() * incoming.getSrc().ratio(incoming, SchedulingPhase.INIT)));
                 }
                             //((double) incoming.getSrc()

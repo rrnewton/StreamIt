@@ -3,7 +3,7 @@ package at.dms.kjc.tilera;
 import java.util.List;
 import at.dms.kjc.tilera.arrayassignment.*;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.*;
 
 
@@ -18,8 +18,8 @@ public class FileReaderRemoteReads extends FileReaderCode {
     }
 
     private void generateStatements(SchedulingPhase phase) {
-        FilterInfo srcInfo = FilterInfo.getFilterInfo(fileOutput.getPrevFilter());
-        FilterInfo dstInfo = FilterInfo.getFilterInfo(input.getNextFilter());
+        WorkNodeInfo srcInfo = WorkNodeInfo.getFilterInfo(fileOutput.getPrevFilter());
+        WorkNodeInfo dstInfo = WorkNodeInfo.getFilterInfo(input.getNextFilter());
        
         //we are assuming that the downstream filter has only the file reader as input
         

@@ -140,7 +140,7 @@ public class GetOrMakeChannel  {
                 }
             } else {
                 // make peek buffer as a channel
-                if (FilterInfo.getFilterInfo((WorkNode) dst).isSimple()) {
+                if (WorkNodeInfo.getFilterInfo((WorkNode) dst).isSimple()) {
                     // no items remain in channel between steady states.
                     c = ChannelAsArray.getChannel(e);
                 } else {

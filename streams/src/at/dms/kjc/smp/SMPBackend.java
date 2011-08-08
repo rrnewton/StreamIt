@@ -54,7 +54,7 @@ public class SMPBackend {
         SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(commonPasses.getSSG());
         scheduler.setGraphSchedule(graphSchedule);
         scheduler.run(chip.size());
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
         
         // generate schedules for initialization, primepump and steady-state
         scheduleSlices(graphSchedule);
@@ -226,7 +226,7 @@ public class SMPBackend {
                 if(commProcessed.contains(slice))
                     continue;
                 
-                FilterInfo info = FilterInfo.getFilterInfo(slice.getWorkNode());
+                WorkNodeInfo info = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
                 int totalItemsReceived = info.totalItemsReceived(SchedulingPhase.STEADY);
 
                 if(totalItemsReceived == 0)

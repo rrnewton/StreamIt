@@ -1,4 +1,8 @@
 package at.dms.kjc.sir.lowering;
+/**
+ * The Segmenter class is used to partition a graph of SIR Streams
+ * into static subsections.
+ */
 
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.iterator.IterFactory;
@@ -26,57 +30,58 @@ import java.util.List;
 public class Segmenter implements StreamVisitor {
 
 	/* The SIR graph partitioned into static sections */
-	SegmentedGraph segmentedGraph = null;
+	SegmentedSIRGraph segmentedGraph = null;
 
 	/* These are the child nodes of the pipeline currently being created */
 	private LinkedList<Object> pipelines = null;
 
-	/* an identifier to distinguish pipeline names */
+	/** An identifier to distinguish pipeline names */
 	private int pipelineId = 0;
 
-	private boolean debug = true;
-
+	/** a flag to turn on debugging */
+	boolean debug = true;
+	
 	public Segmenter() {
 		super();
 	}
 
 	/** TODO: Remove this after partitioning is fixed */
-	public SegmentedGraph noPartition(SIRStream str) {
-		segmentedGraph = new SegmentedGraph();
+	public SegmentedSIRGraph noPartition(SIRStream str) {
+		segmentedGraph = new SegmentedSIRGraph();
 		segmentedGraph.addPipe(str);
 		return segmentedGraph;
 	}
 	
-	public SegmentedGraph partition(SIRStream str) {
-		segmentedGraph = new SegmentedGraph();
+	public SegmentedSIRGraph partition(SIRStream str) {
+		log("Segmenter.partition called");
+		segmentedGraph = new SegmentedSIRGraph();
 		pipelines = new LinkedList<Object>();
 
 		IterFactory.createFactory().createIter(str).accept(this);
 
-		if (debug) {
-			List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();		
-			int j = 0;
-			for (SIRStream ssg : subgraphs) {
-				log("Segmenter.partition " + "printing ssg " + j
-						+ "name=" + ssg.getName());
-				at.dms.util.SIRPrinter printer = new at.dms.util.SIRPrinter("ssg_"
-						+ j + ".txt");
-				IterFactory.createFactory().createIter(ssg).accept(printer);
-				j++;
-				if (ssg instanceof SIRPipeline) {
-					log("Segmenter.partition " + "ssg is a pipeline");
-					log("Segmenter.partition "
-							+ "((SIRPipeline)ssg).getChildren().size()= "
-							+ ((SIRPipeline) ssg).getChildren().size());
-				}
+		// This section is for debugging
+		List<SIRStream> subgraphs = segmentedGraph.getStaticSubGraphs();		
+		int j = 0;
+		for (SIRStream ssg : subgraphs) {
+			log("Segmenter.partition " + "printing ssg " + j
+					+ "name=" + ssg.getName());
+			at.dms.util.SIRPrinter printer = new at.dms.util.SIRPrinter("ssg_"
+					+ j + ".txt");
+			IterFactory.createFactory().createIter(ssg).accept(printer);
+			j++;
+			if (ssg instanceof SIRPipeline) {
+				log("Segmenter.partition " + "ssg is a pipeline");
+				log("Segmenter.partition "
+						+ "((SIRPipeline)ssg).getChildren().size()= "
+						+ ((SIRPipeline) ssg).getChildren().size());
 			}
-
 		}
+
+
 		return segmentedGraph;
 	}
 
-	private void log(String str) {
-		boolean debug = false;
+	private void log(String str) {		
 		if (debug)
 			System.out.println(str);
 	}
@@ -130,47 +135,6 @@ public class Segmenter implements StreamVisitor {
 		return (self.getInputType() == CStdType.Void);
 	}
 
-	@Override
-	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
-			SIRFeedbackLoopIter iter) {
-		// TODO Auto-generated method stub
-		log(this.getClass().getCanonicalName() + " postVisitFeedbackLoop()");
-	}
-
-	@Override
-	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
-		// TODO Auto-generated method stub
-		log(this.getClass().getCanonicalName() + " postVisitPipeline()");
-	}
-
-	@Override
-	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
-		// TODO Auto-generated method stub
-		log(this.getClass().getCanonicalName() + " postVisitSplitJoin()");
-	}
-
-	@Override
-	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
-			SIRFeedbackLoopIter iter) {
-		// TODO Auto-generated method stub
-		log(this.getClass().getCanonicalName() + " preVisitFeedbackLoop()");
-	}
-
-	@Override
-	public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
-		// TODO Auto-generated method stub
-		log(this.getClass().getCanonicalName() + " preVisitPipeline()");
-		// pipeline = (SIRPipeline) self.deepClone();
-	}
-
-	@Override
-	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
-		// TODO Auto-generated method stub
-		log(this.getClass().getCanonicalName() + " preVisitSplitJoin()");
-		if (self.getSplitter().getType().isDynamic()) {
-			// If it is not dynamic, we can add the splitter to the pipeline			
-		}
-	}
 
 	private String uniquePipelineName() {
 		pipelineId++;
@@ -192,14 +156,12 @@ public class Segmenter implements StreamVisitor {
 				+ isDynamicPop(self));
 		log(this.getClass().getCanonicalName() + " iter.getPos="
 				+ iter.getPos());
-
-		// SIRFilter filter = self;
+		
 		SIRFilter filter = (SIRFilter) ObjectDeepCloner.deepCopy(self);
 
 		// If its a dynamic push, then add this filter, and create
 		// a new pipeline
 		if (isDynamicPush(filter)) {
-			// TODO: this should be on a copy
 			filter.setPush(new JIntLiteral(1));
 			if (isSource(filter)) {
 				filter.setPop(new JIntLiteral(1));
@@ -217,7 +179,6 @@ public class Segmenter implements StreamVisitor {
 				finishPipeline(filter, iter);
 				return;
 			}
-			// TODO: this should be on a copy
 			filter.setPop(new JIntLiteral(1));
 			filter.setPeek(new JIntLiteral(1));
 			pipelines.add(filter);
@@ -228,10 +189,38 @@ public class Segmenter implements StreamVisitor {
 		}
 	}
 
+	/******************************* Code below is not used for now ******************************/
+	
 	@Override
 	public void visitPhasedFilter(SIRPhasedFilter self, SIRPhasedFilterIter iter) {
-		// TODO Auto-generated method stub
-		log(this.getClass().getCanonicalName() + " visitPhasedFilter()");
+        throw new java.lang.RuntimeException("Dynamic rates do not support SIRPhasedFilters.");
 	}
 
+	@Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+			SIRFeedbackLoopIter iter) { /* Do nothing yet */ }
+
+	@Override
+	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) { /* Do nothing yet */ }
+
+	@Override
+	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) 
+	{ /* Do nothing yet */ }
+
+	@Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+			SIRFeedbackLoopIter iter) { /* Do nothing yet */ }
+
+	@Override
+	public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) 
+	{ /* Do nothing yet */ }
+
+	@Override
+	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
+		{ /* Do nothing yet */ }
+		// if (self.getSplitter().getType().isDynamic()) { }		
+	}
+
+	
+	
 }

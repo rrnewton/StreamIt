@@ -34,7 +34,7 @@ public abstract class RotatingBuffer extends Channel {
 	/** the filter this buffer is associated with */   
     protected WorkNode filterNode;
     /** the filter info object for the filter that contains this buffer */
-    protected FilterInfo filterInfo;
+    protected WorkNodeInfo filterInfo;
     
     /** the names of the individual buffers */
     protected String[] bufferNames;
@@ -66,7 +66,7 @@ public abstract class RotatingBuffer extends Channel {
         
         this.parent = parent;
         filterNode = fsn;
-        filterInfo = FilterInfo.getFilterInfo(fsn);
+        filterInfo = WorkNodeInfo.getFilterInfo(fsn);
     }
    
     /**

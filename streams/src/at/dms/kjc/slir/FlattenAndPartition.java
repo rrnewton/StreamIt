@@ -14,7 +14,7 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.flatgraph.*;
 import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.common.CommonUtils;
 
 /**

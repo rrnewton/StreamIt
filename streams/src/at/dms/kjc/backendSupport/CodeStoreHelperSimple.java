@@ -69,7 +69,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
             }
         }
         // add the calls for the work function in the initialization stage
-        if (FilterInfo.getFilterInfo((WorkNode) sliceNode).isTwoStage()) {
+        if (WorkNodeInfo.getFilterInfo((WorkNode) sliceNode).isTwoStage()) {
 
             JMethodCallExpression initWorkCall = new JMethodCallExpression(
                     null, new JThisExpression(null), filter.getInitWork()
@@ -124,7 +124,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
      */
     private JStatement generateInitWorkLoop(WorkNodeContent filter)
     {
-        FilterInfo filterInfo = FilterInfo.getFilterInfo((WorkNode)sliceNode);
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo((WorkNode)sliceNode);
         JBlock block = new JBlock();
 
         //clone the work function and inline it
@@ -151,7 +151,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
 
     @Override
     public JMethodDeclaration getPrimePumpMethod() {
-        return super.getPrimePumpMethodForFilter(FilterInfo.getFilterInfo((WorkNode)sliceNode));
+        return super.getPrimePumpMethodForFilter(WorkNodeInfo.getFilterInfo((WorkNode)sliceNode));
     }
 
     @Override
@@ -171,7 +171,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
             }
         }
         // iterate work function as needed
-        statements.addStatement(getWorkFunctionBlock(FilterInfo
+        statements.addStatement(getWorkFunctionBlock(WorkNodeInfo
                 .getFilterInfo((WorkNode) sliceNode).steadyMult));
         // channel code after work block
         if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {

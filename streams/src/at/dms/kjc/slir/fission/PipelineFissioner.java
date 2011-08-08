@@ -82,10 +82,10 @@ public class PipelineFissioner {
     
     public static boolean canFizz(Filter slice, int fizzAmount, boolean debug) {
         // Get information on Slice rates
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
 
         WorkNode filter = getFirstFilter(slice);
-        FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(filter);
         
         int slicePeek = filterInfo.peek;
         int slicePop = filterInfo.pop;
@@ -134,10 +134,10 @@ public class PipelineFissioner {
     public static boolean canFizz(Filter slice, boolean debug) {
 
         // Get information on Slice rates
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
 
         WorkNode filter = getFirstFilter(slice);
-        FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(filter);
         
         int slicePeek = filterInfo.peek;
         int slicePop = filterInfo.pop;
@@ -243,8 +243,8 @@ public class PipelineFissioner {
         }
         
         // Make sure that rates match between Slice and its sources/dests
-        FilterInfo sourceInfo = FilterInfo.getFilterInfo(getLastFilter(sources[0]));
-        FilterInfo destInfo = FilterInfo.getFilterInfo(getFirstFilter(dests[0]));
+        WorkNodeInfo sourceInfo = WorkNodeInfo.getFilterInfo(getLastFilter(sources[0]));
+        WorkNodeInfo destInfo = WorkNodeInfo.getFilterInfo(getFirstFilter(dests[0]));
 
         assert(sources.length * sourceInfo.steadyMult * sourceInfo.push ==
                sliceSteadyMult * slicePop) :
@@ -300,10 +300,10 @@ public class PipelineFissioner {
         LinkedList<Integer> weights;
 
         // Get information on Slice rates
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
 
         WorkNode filter = getFirstFilter(slice);
-        FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(filter);
 
         int slicePeek = filterInfo.peek;
         int slicePop = filterInfo.pop;
@@ -664,7 +664,7 @@ public class PipelineFissioner {
 
             // Get information on source Slices
             WorkNode sourceLastFilter = getLastFilter(sources[0]);
-            FilterInfo sourceLastFilterInfo = FilterInfo.getFilterInfo(sourceLastFilter);
+            WorkNodeInfo sourceLastFilterInfo = WorkNodeInfo.getFilterInfo(sourceLastFilter);
 
             int sourcePush = sourceLastFilterInfo.push;
             int sourcePushMult = sourceLastFilterInfo.steadyMult;
@@ -856,7 +856,7 @@ public class PipelineFissioner {
 
             // Get information on destination Slices
             WorkNode destFirstFilter = getFirstFilter(dests[0]);
-            FilterInfo destFirstFilterInfo = FilterInfo.getFilterInfo(destFirstFilter);
+            WorkNodeInfo destFirstFilterInfo = WorkNodeInfo.getFilterInfo(destFirstFilter);
 
             int destPop = destFirstFilterInfo.pop;
             int destPeek = destFirstFilterInfo.peek;

@@ -14,7 +14,7 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.backendSupport.*;
@@ -24,7 +24,7 @@ import at.dms.kjc.KjcOptions;
 public class FilterCodeGeneration extends CodeStoreHelper {
  
     private WorkNode filterNode;
-    private FilterInfo filterInfo;
+    private WorkNodeInfo filterInfo;
     private static String exeIndex1Name = "__EXEINDEX__1__";
     private JVariableDefinition exeIndex1;
     private boolean exeIndex1Used;
@@ -53,7 +53,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
     public FilterCodeGeneration(WorkNode node, TileraBackEndFactory backEndBits) {
         super(node,node.getAsFilter().getFilter(),backEndBits);
         filterNode = node;
-        filterInfo = FilterInfo.getFilterInfo(filterNode);
+        filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
         //assume that every filter is a two-stage and prework is called
         initMult = filterInfo.initMult;
         if (!filterInfo.isTwoStage()) {
@@ -90,7 +90,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
             }
         }
         // add the calls for the work function in the initialization stage
-        if (FilterInfo.getFilterInfo((WorkNode) sliceNode).isTwoStage()) {
+        if (WorkNodeInfo.getFilterInfo((WorkNode) sliceNode).isTwoStage()) {
 
             JMethodCallExpression initWorkCall = new JMethodCallExpression(
                     null, new JThisExpression(null), filter.getInitWork()
@@ -254,7 +254,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         }
         
         // iterate work function as needed
-        statements.addStatement(getWorkFunctionBlock(FilterInfo
+        statements.addStatement(getWorkFunctionBlock(WorkNodeInfo
                 .getFilterInfo((WorkNode) sliceNode).steadyMult));
         
         // channel code after work block

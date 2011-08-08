@@ -19,7 +19,7 @@ import at.dms.kjc.JRelationalExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.slir.*;
 
@@ -32,7 +32,7 @@ public class Fissioner {
     /** the filter of the slice we are fissing */
     private WorkNode filter;
     /** the filter info of the filter of the slice we are fissing */
-    private FilterInfo fInfo;
+    private WorkNodeInfo fInfo;
     /** the identity slice inserted downstream fo the fizzed slices */
     private Filter idOutput;
     /** the identity slice inserted upstream to the fizzed slices */
@@ -83,7 +83,7 @@ public class Fissioner {
     public static boolean canFizz(Filter slice, boolean debug) {
 
         // Get information on Slice rates
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
 
         WorkNode filter = slice.getWorkNode();
         
@@ -116,7 +116,7 @@ public class Fissioner {
     private Fissioner(Filter s, StaticSubGraph slicer, int d) {
         this.slicer = slicer;
         // reset the filter info's just in case things have change
-        FilterInfo.reset();
+        WorkNodeInfo.reset();
 
         //we need to know if this is a source slice, if so add the 
         //copies to the slicer's top slices, roots of the forrest
@@ -129,7 +129,7 @@ public class Fissioner {
         
         this.slice = s;
         this.fizzAmount = d;
-        this.fInfo = FilterInfo.getFilterInfo(s.getWorkNode());
+        this.fInfo = WorkNodeInfo.getFilterInfo(s.getWorkNode());
         this.filter = slice.getWorkNode();
         slicePeek = fInfo.peek;
         slicePop = fInfo.pop;
@@ -609,9 +609,9 @@ public class Fissioner {
      * After this we are done.
      */
     private void synchRemoveIDs() {
-        FilterInfo.reset();
-        FilterInfo idI = FilterInfo.getFilterInfo(idInput.getWorkNode());
-        FilterInfo idO = FilterInfo.getFilterInfo(idOutput.getWorkNode());
+        WorkNodeInfo.reset();
+        WorkNodeInfo idI = WorkNodeInfo.getFilterInfo(idInput.getWorkNode());
+        WorkNodeInfo idO = WorkNodeInfo.getFilterInfo(idOutput.getWorkNode());
 
         assert idI.copyDown == 0 : idI.copyDown;
         assert idO.copyDown == 0;

@@ -8,7 +8,7 @@ package at.dms.kjc.backendSupport;
 import java.util.*;
 
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.backendSupport.FilterInfo;
+import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.common.CommonUtils;
 
 /**
@@ -140,7 +140,7 @@ public class BasicSpaceTimeSchedule {
      * so this accounts for the number number of times that a slice if called in the
      * prime pump stage to fill the rotating buffers.
      */
-    final public int getPrimePumpTotalMult(FilterInfo f) {
+    final public int getPrimePumpTotalMult(WorkNodeInfo f) {
         return getPrimePumpMult(f.sliceNode.getParent()) * f.steadyMult;
     }
 

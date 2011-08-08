@@ -38,11 +38,11 @@ public class CompareFilterWork implements Comparator<Filter> {
     public int compare(Filter o1, Filter o2) {
 //        assert o1 instanceof Slice && o2 instanceof Slice;
         
-        if (ssg.getSliceBNWork((Filter) o1) < ssg
-                .getSliceBNWork((Filter) o2))
+        if (ssg.getWorkEstimate(o1.getWorkNodeContent()) < 
+        		ssg.getWorkEstimate(o2.getWorkNodeContent()))
             return -1;
-        else if (ssg.getSliceBNWork((Filter) o1) == ssg
-                .getSliceBNWork((Filter) o2))
+        else if (ssg.getWorkEstimate(o1.getWorkNodeContent()) == 
+                ssg.getWorkEstimate(o2.getWorkNodeContent()))
             return 0;
         else
             return 1;

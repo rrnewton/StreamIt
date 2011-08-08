@@ -83,12 +83,12 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                         (output.getSingleEdge(SchedulingPhase.STEADY).getDest().singleAppearance() &&
                                 //check steady for only one input downstream or only one rotation
                                 (output.getSingleEdge(SchedulingPhase.STEADY).getDest().totalWeights(SchedulingPhase.STEADY) == 
-                                    FilterInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.STEADY).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.STEADY) ||
+                                    WorkNodeInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.STEADY).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.STEADY) ||
                                     output.getSingleEdge(SchedulingPhase.STEADY).getDest().oneInput(SchedulingPhase.INIT)) &&
                                     //check the init stage
                                     (output.noOutputs(SchedulingPhase.INIT) || (output.oneOutput(SchedulingPhase.INIT) &&
                                             output.getSingleEdge(SchedulingPhase.INIT).getDest().totalWeights(SchedulingPhase.INIT) == 
-                                                FilterInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.INIT).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.INIT) ||
+                                                WorkNodeInfo.getFilterInfo(output.getSingleEdge(SchedulingPhase.INIT).getDest().getNextFilter()).totalItemsPopped(SchedulingPhase.INIT) ||
                                                 output.getSingleEdge(SchedulingPhase.INIT).getDest().oneInput(SchedulingPhase.INIT)))))
             {
                 if (output.getSingleEdge(SchedulingPhase.STEADY).getDest().getNextFilter().isFileOutput()) {
@@ -173,7 +173,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         
         ArrayAssignmentStatements aaStmts = new ArrayAssignmentStatements();
 
-        FilterInfo fi;
+        WorkNodeInfo fi;
         if(FissionGroupStore.isFizzed(parent.filterNode.getParent()))
             fi = FissionGroupStore.getUnfizzedFilterInfo(parent.filterNode.getParent());
         else
@@ -304,7 +304,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
 
             FissionGroup group = FissionGroupStore.getFissionGroup(parent.filterNode.getParent());
             WorkNode filter = group.unfizzedSlice.getWorkNode();
-            FilterInfo fi = group.unfizzedFilterInfo;
+            WorkNodeInfo fi = group.unfizzedFilterInfo;
             OutputNode output = filter.getParent().getOutputNode();
 
             // Declare variables used for transfers
@@ -374,7 +374,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                     destCopyDown = inputGroup.unfizzedFilterInfo.copyDown;
                 }
                 else {
-                    FilterInfo destInfo = FilterInfo.getFilterInfo(input.getParent().getWorkNode());
+                    WorkNodeInfo destInfo = WorkNodeInfo.getFilterInfo(input.getParent().getWorkNode());
                     destCopyDown = destInfo.copyDown;
                 }
 
@@ -676,7 +676,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         }
         else {
             WorkNode filter = parent.filterNode;
-            FilterInfo fi = FilterInfo.getFilterInfo(filter);
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(filter);
             
             //no further code necessary if nothing is being produced
             if (fi.totalItemsSent(phase) == 0)
@@ -767,7 +767,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         if(FissionGroupStore.isFizzed(input.getParent()))
             dsFilterCopyDown = FissionGroupStore.getUnfizzedFilterInfo(input.getParent()).copyDown;
         else
-            dsFilterCopyDown = FilterInfo.getFilterInfo(input.getNextFilter()).copyDown;
+            dsFilterCopyDown = WorkNodeInfo.getFilterInfo(input.getNextFilter()).copyDown;
         debugPrint("getDestIndices", phase, edge, "dsFilterCopyDown", dsFilterCopyDown);
 
         int fissionOffset = 0;
@@ -856,7 +856,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                     offset += group.unfizzedFilterInfo.copyDown;
                 }
                 else {
-                    offset += FilterInfo.getFilterInfo(((OutputRotatingBuffer)parent).getDirectWriteFilter()).copyDown;
+                    offset += WorkNodeInfo.getFilterInfo(((OutputRotatingBuffer)parent).getDirectWriteFilter()).copyDown;
                 }
         	}
 

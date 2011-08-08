@@ -64,7 +64,7 @@ public abstract class RotatingBuffer extends Channel {
     /** the tile this buffer is mapped to */
     protected Tile parent;
     /** the filter info object for the filter that contains this buffer */
-    protected FilterInfo filterInfo;
+    protected WorkNodeInfo filterInfo;
     /** the data transfer statements that are generated for this output buffer */
     protected BufferTransfers transferCommands;
     /** the address buffers that this buffer rotation uses as destinations for transfers */ 
@@ -84,7 +84,7 @@ public abstract class RotatingBuffer extends Channel {
         super(edge);
         this.parent = parent;
         filterNode = fsn;
-        filterInfo = FilterInfo.getFilterInfo(fsn);
+        filterInfo = WorkNodeInfo.getFilterInfo(fsn);
         writeRotStructName = this.getIdent() + "write_rot_struct";
         currentWriteRotName =this.getIdent() + "_write_current";
         currentWriteBufName =this.getIdent() + "_write_buf";
