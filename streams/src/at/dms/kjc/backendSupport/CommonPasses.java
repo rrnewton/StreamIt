@@ -3,7 +3,6 @@
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,6 @@ import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
 import at.dms.kjc.sir.SemanticChecker;
 import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
-import at.dms.kjc.sir.lowering.Segmenter;
 import at.dms.kjc.sir.lowering.ArrayInitExpander;
 import at.dms.kjc.sir.lowering.ConstantProp;
 import at.dms.kjc.sir.lowering.ConstructSIRTree;
@@ -34,7 +32,6 @@ import at.dms.kjc.sir.lowering.Flattener;
 import at.dms.kjc.sir.lowering.IntroduceMultiPops;
 import at.dms.kjc.sir.lowering.RenameAll;
 import at.dms.kjc.sir.lowering.RoundToFloor;
-import at.dms.kjc.sir.lowering.SIRScheduler;
 import at.dms.kjc.sir.lowering.SimplifyArguments;
 import at.dms.kjc.sir.lowering.SimplifyPopPeekPush;
 import at.dms.kjc.sir.lowering.StaticsProp;
@@ -52,7 +49,6 @@ import at.dms.kjc.slir.InstallInitDistributions;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.SIRToSLIR;
-
 
 /**
  * Common passes, useful in new back ends.
@@ -83,17 +79,6 @@ public class CommonPasses {
 	 */
 
 	private boolean vectorizedEarly = false;
-
-	/**
-	 * Abstracts away printlns. Should change to log4j or some other logger.
-	 * 
-	 * @param str
-	 */
-	private void log(String str) {
-		boolean debug = false;
-		if (debug)
-			System.out.println(str);
-	}
 
 	/**
 	 * Top level method for executing passes common to some current and all
@@ -163,7 +148,7 @@ public class CommonPasses {
 		ArrayInitExpander.doit(str);
 
 		// Currently do not support messages in these back ends.
-		// TODO: add support for mesages.
+		// TODO: add support for messages.
 		if (SIRPortal.findMessageStatements(str)) {
 			throw new AssertionError(
 					"Teleport messaging is not yet supported in the Raw backend.");
@@ -189,22 +174,23 @@ public class CommonPasses {
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
 		DynamismFinder.Result result = new DynamismFinder().find(str);
-		SegmentedSIRGraph segmentedGraph = null;
+		SegmentedSIRGraph segmentedGraph = new SegmentedSIRGraph();
 		if (result.isDynamic()) {
-			segmentedGraph = new Segmenter().partition(str);			
+			segmentedGraph.partition(str);
+		} else {
+			segmentedGraph.noPartition(str);
 		}
-		segmentedGraph = new Segmenter().noPartition(str);
 		return doStaticPasses(segmentedGraph);
 	}
 
-
 	/**
 	 * Loop over each SIR in the segmentedGraph and apply optimizations
+	 * 
 	 * @param segmentedGraph
 	 * @return The SLIR representation of each optimized SSG
 	 */
 	private StreamGraph doStaticPasses(SegmentedSIRGraph segmentedGraph) {
-		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();		
+		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
 			str = doStaticPass(str);
@@ -213,16 +199,14 @@ public class CommonPasses {
 		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
 		return streamGraph;
 
-	}	
+	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private SIRStream doStaticPass(SIRStream str) {
-			
+
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
 		CheckStatefulFilters.doit(str);
 
-		
 		if (KjcOptions.fusion || KjcOptions.dup >= 1 || KjcOptions.noswpipe) {
 			// if we are about to fuse filters, we should perform
 			// any vectorization now, since vectorization can not work inside
@@ -242,7 +226,6 @@ public class CommonPasses {
 
 		WorkEstimate work = WorkEstimate.getWorkEstimate(str);
 		work.printGraph(str, "work_estimate.dot");
-
 
 		if (KjcOptions.tilera != -1) {
 			// running the tilera backend
@@ -399,7 +382,7 @@ public class CommonPasses {
 		if (KjcOptions.localstoglobals) {
 			ConvertLocalsToFields.doit(str);
 		}
-		
+
 		return str;
 
 	}
@@ -446,20 +429,18 @@ public class CommonPasses {
 	public SpaceTimeScheduleAndSSG scheduleSlices(StaticSubGraph ssg) {
 		// Set schedules for initialization, priming (if --spacetime), and
 		// steady state.
-		SpaceTimeScheduleAndSSG schedule = new SpaceTimeScheduleAndSSG(
-				ssg);
+		SpaceTimeScheduleAndSSG schedule = new SpaceTimeScheduleAndSSG(ssg);
 		// set init schedule in standard order
 		schedule.setInitSchedule(DataFlowOrder.getTraversal(ssg
 				.getFilterGraph()));
 		// set prime pump schedule (if --spacetime and not --noswpipe)
-		
+
 		new GeneratePrimePump(schedule).schedule(ssg.getFilterGraph());
-		
+
 		// set steady schedule in standard order unless --spacetime in which
 		// case in
 		// decreasing order of estimated work
-		new BasicGenerateSteadyStateSchedule(schedule, ssg)
-				.schedule();
+		new BasicGenerateSteadyStateSchedule(schedule, ssg).schedule();
 		return schedule;
 	}
 
