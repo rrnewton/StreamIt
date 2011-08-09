@@ -1,7 +1,7 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.slir.fission.FissionGroup;
 
 import java.util.HashMap;

@@ -37,6 +37,9 @@ public class UniBackEnd {
         StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
 
         assert streamGraph.getSSGs().size() == 1 : "UniBackEnd does not yet support dynamic graphs";
+   
+        // perform some standard cleanup on the slice graph.
+        streamGraph.simplifyFilters(numCores);
         
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
         	runSSG(ssg, commonPasses, numCores, structs);
@@ -45,9 +48,7 @@ public class UniBackEnd {
     
     public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses, int numCores, SIRStructure[]structs ) {     
     	
-        // perform some standard cleanup on the slice graph.
-        ssg = commonPasses.simplifySlices(ssg);
-
+   
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
         SpaceTimeScheduleAndSSG schedule = commonPasses.scheduleSlices(ssg);
       

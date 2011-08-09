@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Arrays;
 
 import at.dms.kjc.slir.fission.*;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 public class IDFilterRemoval {
     private Filter idSlice;

@@ -65,6 +65,16 @@ public class StreamGraph {
 		 ssgs.add(ssg);
 	}
 	
+
+	/**
+	 * This method performs some standard cleanup on the slice graph. On return,
+	 * file readers and file writers are expanded to contain Kopi code to read
+	 * and write files. The slice graph will have any rate skew corrected and
+	 * will be converted to SimpleSlice's. The FilterInfo class will be usable.
+	 * 
+	 * Spacetime does not use this code since it allows general slices and
+	 * generates its own code for file readers and file writers.
+	 */
 	public void simplifyFilters(int numCores) {
 		for ( StaticSubGraph ssg : ssgs) {
 			simplifyStaticSubGraph(ssg, numCores);

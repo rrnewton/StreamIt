@@ -1,7 +1,7 @@
 package at.dms.kjc.slir.fission;
 
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 public class FissionGroup {
     public Filter unfizzedSlice;

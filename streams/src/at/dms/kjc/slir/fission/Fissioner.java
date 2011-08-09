@@ -19,7 +19,6 @@ import at.dms.kjc.JRelationalExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.slir.*;
 

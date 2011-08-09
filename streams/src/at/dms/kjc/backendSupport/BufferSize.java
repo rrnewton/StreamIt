@@ -3,6 +3,7 @@ package at.dms.kjc.backendSupport;
 import at.dms.kjc.slir.Edge;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
  * Centralize calculation of buffer sizes

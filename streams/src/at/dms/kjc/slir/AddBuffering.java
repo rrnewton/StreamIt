@@ -1,10 +1,9 @@
 /**
  * 
  */
-package at.dms.kjc.backendSupport;
+package at.dms.kjc.slir;
 
 import java.util.*;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRIdentity;

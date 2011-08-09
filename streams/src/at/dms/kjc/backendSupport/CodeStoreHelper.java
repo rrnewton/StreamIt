@@ -6,6 +6,7 @@ import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.util.Utils;
 
 /**

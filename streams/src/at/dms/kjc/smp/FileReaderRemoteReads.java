@@ -7,7 +7,6 @@ import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.*;
 

@@ -8,7 +8,7 @@ package at.dms.kjc.backendSupport;
 import java.util.*;
 
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
+import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.common.CommonUtils;
 
 /**

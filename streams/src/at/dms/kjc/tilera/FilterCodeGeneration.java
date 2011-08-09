@@ -14,7 +14,6 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.backendSupport.*;

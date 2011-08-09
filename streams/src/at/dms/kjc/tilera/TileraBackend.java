@@ -38,6 +38,8 @@ public class TileraBackend {
 		
         assert streamGraph.getSSGs().size() == 1 : "TileraBackend does not yet support dynamic graphs";
 		
+        streamGraph.simplifyFilters(chip.abstractSize());
+        
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
         	runSSG(ssg, commonPasses);
         }		
@@ -45,8 +47,6 @@ public class TileraBackend {
     
     public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses) {     
 		
-		ssg = commonPasses.simplifySlices(ssg);
-
 		ssg.dumpGraph("traces.dot", null);
 
 		SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(ssg);

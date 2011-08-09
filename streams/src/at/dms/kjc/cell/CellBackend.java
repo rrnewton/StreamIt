@@ -54,21 +54,27 @@ public class CellBackend {
         StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
         
         assert streamGraph.getSSGs().size() == 1 : "CellBackend does not yet support dynamic graphs";
+    
+        
+        streamGraph.simplifyFilters(numCores);
         
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
         	runSSG(ssg, commonPasses, numCores, structs);
         }		
-	  }
+	  
+    
+    
+    
+    }
     
     public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses, int numCores, SIRStructure[]structs ) {     
     	
-        
-        
-        new MultiLevelSplitsJoins(ssg, MAX_TAPES/2).doit();
+    	/* WARNING: Aug  9, 2011 We moved the call to simplifyFilters to happen before
+    	 * the call to MultiLevelSplitsJoins.doit. Prior to this date, it was the reverse.
+    	 */
+    	
+    	new MultiLevelSplitsJoins(ssg, MAX_TAPES/2).doit();
         ssg.dumpGraph("traces-after-multi.dot");
-        
-        // perform some standard cleanup on the slice graph.
-        ssg = commonPasses.simplifySlices(ssg);
         
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
         SpaceTimeScheduleAndSSG schedule = commonPasses.scheduleSlices(ssg);

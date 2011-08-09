@@ -2,7 +2,6 @@ package at.dms.kjc.slir;
 
 import java.util.HashMap;
 
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 /**
  *  An InterSliceEdge represents an edge in the partitioned stream graph between slices.

@@ -44,11 +44,13 @@ import at.dms.kjc.sir.lowering.fusion.Lifter;
 import at.dms.kjc.sir.lowering.partition.ManualPartition;
 import at.dms.kjc.sir.lowering.partition.SJToPipe;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.slir.AddBuffering;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.InstallInitDistributions;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.SIRToSLIR;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
  * Common passes, useful in new back ends.
@@ -174,7 +176,7 @@ public class CommonPasses {
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
 		DynamismFinder.Result result = new DynamismFinder().find(str);
-		return doStaticPasses(new SegmentedSIRGraph().init(str, result.isDynamic()));
+		return doStaticPassesSegmentedSIRGraph(new SegmentedSIRGraph().init(str, result.isDynamic()));
 	}
 
 	/**
@@ -183,11 +185,11 @@ public class CommonPasses {
 	 * @param segmentedGraph
 	 * @return The SLIR representation of each optimized SSG
 	 */
-	private StreamGraph doStaticPasses(SegmentedSIRGraph segmentedGraph) {
+	private StreamGraph doStaticPassesSegmentedSIRGraph(SegmentedSIRGraph segmentedGraph) {
 		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
-			str = doStaticPass(str);
+			str = doStaticPassSIRStream(str);
 			optimizedGraph.addPipe(str);
 		}
 		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
@@ -201,7 +203,7 @@ public class CommonPasses {
 	 * @param str the SIRStream on which to do the single pass
 	 * @return The modified SIRStream
 	 */
-	private SIRStream doStaticPass(SIRStream str) {
+	private SIRStream doStaticPassSIRStream(SIRStream str) {
 
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
@@ -385,39 +387,6 @@ public class CommonPasses {
 
 		return str;
 
-	}
-
-	/**
-	 * This method performs some standard cleanup on the slice graph. On return,
-	 * file readers and file writers are expanded to contain Kopi code to read
-	 * and write files. The slice graph will have any rate skew corrected and
-	 * will be converted to SimpleSlice's. The FilterInfo class will be usable.
-	 * 
-	 * Spacetime does not use this code since it allows general slices and
-	 * generates its own code for file readers and file writers.
-	 */
-	public StaticSubGraph simplifySlices(StaticSubGraph ssg) {
-		// Create code for predefined content: file readers, file writers.
-		ssg.createPredefinedContent();
-		// guarantee that we are not going to hack properties of filters in the
-		// future
-		WorkNodeInfo.canUse();
-		// now we require that all input and output slice nodes have separate
-		// init distribution pattern
-		// for splitting and joining in the init stage (could be null or could
-		// be equal to steady or could be
-		// different)
-		/*
-		 * if (KjcOptions.nopartition) { for (FilterSliceNode id :
-		 * ((FlattenAndPartition)getSlicer()).generatedIds) {
-		 * IDSliceRemoval.doit(id.getParent()); } }
-		 */
-		InstallInitDistributions.doit(ssg.getFilterGraph());
-		// fix any rate skew introduced in conversion to Slice graph.
-		AddBuffering.doit(ssg, false, numCores);
-		// decompose any pipelines of filters in the Slice graph.
-		// slicer.ensureSimpleSlices();
-		return ssg;
 	}
 
 	/**

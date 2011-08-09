@@ -5,6 +5,7 @@ import at.dms.kjc.backendSupport.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.slir.*;
+
 import java.util.*;
 
 public class SMPBackend {
@@ -47,16 +48,18 @@ public class SMPBackend {
         // perform standard optimizations, use the number of cores the user wants to target
         StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, chip.size());
 
+        streamGraph.simplifyFilters(chip.size());
+        
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
         	runSSG(ssg, commonPasses);
         }
+        
+        emitCode();
     
     }
         
-    public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses) {        	            
+    private static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses) {        	            
       
-        // perform some standard cleanup on the slice graph.
-        ssg = commonPasses.simplifySlices(ssg);
         // dump slice graph to dot file
         ssg.dumpGraph("traces.dot", null);
         
@@ -84,23 +87,40 @@ public class SMPBackend {
         
         // create all buffers and set the rotation lengths
         RotatingBuffer.createBuffers(graphSchedule);
-	        
+	                                
         // now convert to Kopi code plus communication commands
         backEndBits = new SMPBackEndFactory(chip, scheduler);
         backEndBits.getBackEndMain().run(graphSchedule, backEndBits);
 	
-	//generate code for file writer
-	CoreCodeStore.generatePrintOutputCode();
-      
-	if (KjcOptions.numbers > 0)
-            chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
-        
-        // emit c code for all cores
-        EmitSMPCode.doit(backEndBits);
-        
-        // dump structs.h file
-        structs_h.writeToFile();
+        // calculate computation to communication ratio
+        if(KjcOptions.sharedbufs && KjcOptions.numbers > 0) {
+        	calculateCompCommRatio(graphSchedule);
+        }
 
+        
+    }
+    
+    private static void emitCode() {
+
+    	//generate code for file writer
+    	CoreCodeStore.generatePrintOutputCode();
+
+    	if (KjcOptions.numbers > 0)
+    		chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
+
+    	// emit c code for all cores
+    	EmitSMPCode.doit(backEndBits);
+
+    	// dump structs.h file
+    	structs_h.writeToFile();
+
+    	printFinalWorkAssignments();
+
+    	System.exit(0);
+    }
+    
+    
+    private static void printFinalWorkAssignments() {
         // display final assignment of filters to cores
         System.out.println("Final filter assignments:");
         System.out.println("========================================");
@@ -117,51 +137,50 @@ public class SMPBackend {
             }
             System.out.format("%16d | Total\n", totalWork);
         }
-
-        // calculate computation to communication ratio
-        if(KjcOptions.sharedbufs) {
-            LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
-            HashSet<Filter> compProcessed = new HashSet<Filter>();
-            HashSet<Filter> commProcessed = new HashSet<Filter>();
-            
-            long comp = 0;
-            long comm = 0;
-            
-            for(Filter slice : slices) {
-                if(compProcessed.contains(slice))
-                    continue;
-                
-                comp += FilterWorkEstimate.getWork(slice);
-                compProcessed.add(slice);
-            }
+    	
+    }
+    
+    private static void calculateCompCommRatio(SpaceTimeScheduleAndSSG graphSchedule) {
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+        HashSet<Filter> compProcessed = new HashSet<Filter>();
+        HashSet<Filter> commProcessed = new HashSet<Filter>();
         
-            // Simple communication estimation
-            for(Filter slice : slices) {
-                if(commProcessed.contains(slice))
-                    continue;
-                
-                WorkNodeInfo info = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
-                int totalItemsReceived = info.totalItemsReceived(SchedulingPhase.STEADY);
-
-                if(totalItemsReceived == 0)
-                    continue;
-
-                comm += totalItemsReceived;
-
-                if(FissionGroupStore.isFizzed(slice)) {
-                    assert info.peek >= info.pop;
-                    comm += (info.peek - info.pop) * KjcOptions.smp;
-                }
-
-                commProcessed.add(slice);
-            }
-          
-            System.out.println("Final Computation: " + comp);
-            System.out.println("Final Communication: " + comm);
-            System.out.println("Final Comp/Comm Ratio: " + (float)comp/(float)comm);
+        long comp = 0;
+        long comm = 0;
+        
+        for(Filter slice : slices) {
+            if(compProcessed.contains(slice))
+                continue;
+            
+            comp += FilterWorkEstimate.getWork(slice);
+            compProcessed.add(slice);
         }
+    
+        // Simple communication estimation
+        for(Filter slice : slices) {
+            if(commProcessed.contains(slice))
+                continue;
+            
+            WorkNodeInfo info = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
+            int totalItemsReceived = info.totalItemsReceived(SchedulingPhase.STEADY);
 
-        System.exit(0);
+            if(totalItemsReceived == 0)
+                continue;
+
+            comm += totalItemsReceived;
+
+            if(FissionGroupStore.isFizzed(slice)) {
+                assert info.peek >= info.pop;
+                comm += (info.peek - info.pop) * KjcOptions.smp;
+            }
+
+            commProcessed.add(slice);
+        }
+      
+        System.out.println("Final Computation: " + comp);
+        System.out.println("Final Communication: " + comm);
+        System.out.println("Final Comp/Comm Ratio: " + (float)comp/(float)comm);
+    	
     }
     
     /**

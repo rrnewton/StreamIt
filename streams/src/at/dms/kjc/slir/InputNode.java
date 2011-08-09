@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.LinkedList;
 import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 /**
  * Each Slice is started by an InputSlice Node that is either a joiner connecting several other slices, 

@@ -7,7 +7,6 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Vector;
 
-import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.*;
 
 /**

@@ -1,8 +1,3 @@
-/**
- * A SegmentedGraph is a structure that contains each of the static subgraphs
- * from a SIRStream with dynamic regions. Each segment has a source and sink.
- * The SegmentedGraph also maintains connectivity and rate information.
- */
 package at.dms.kjc.sir.lowering;
 
 import java.util.ArrayList;
@@ -30,6 +25,14 @@ import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.StreamVisitor;
 
+/**
+ *  A SegmentedGraph is a structure that contains each of the static subgraphs
+ * from a SIRStream with dynamic regions. Each segment has a source and sink.
+ * The SegmentedGraph also maintains connectivity and rate information.
+ *
+ * @author soule
+ *
+ */
 public class SegmentedSIRGraph implements StreamVisitor {
 
 	/** This is the list of all pipelines created */

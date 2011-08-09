@@ -20,7 +20,6 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.sir.SIRPopExpression;
 
-import at.dms.kjc.backendSupport.WorkNodeInfo;
 
 
 import at.dms.kjc.slir.StaticSubGraph;
@@ -29,6 +28,7 @@ import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.MutableStateExtractor;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.StreamGraph;
+import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.slir.fission.Fissioner;
 

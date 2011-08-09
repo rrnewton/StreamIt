@@ -1,4 +1,4 @@
-package at.dms.kjc.backendSupport;
+package at.dms.kjc.slir;
 
 //import at.dms.kjc.sir.*;
 //import at.dms.util.Utils;
@@ -6,11 +6,6 @@ package at.dms.kjc.backendSupport;
 import java.util.Iterator;
 import java.util.HashMap;
 
-import at.dms.kjc.slir.WorkNodeContent;
-import at.dms.kjc.slir.WorkNode;
-import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
-import at.dms.kjc.slir.SchedulingPhase;
 
 /**
  * A class to hold all the various information for a filter.  Be careful, 
