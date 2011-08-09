@@ -174,13 +174,7 @@ public class CommonPasses {
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
 		DynamismFinder.Result result = new DynamismFinder().find(str);
-		SegmentedSIRGraph segmentedGraph = new SegmentedSIRGraph();
-		if (result.isDynamic()) {
-			segmentedGraph.partition(str);
-		} else {
-			segmentedGraph.noPartition(str);
-		}
-		return doStaticPasses(segmentedGraph);
+		return doStaticPasses(new SegmentedSIRGraph().init(str, result.isDynamic()));
 	}
 
 	/**

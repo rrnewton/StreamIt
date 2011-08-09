@@ -58,15 +58,12 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		connections = new HashMap<SIRStream, List<SIRStream>>();
 	}
 
-	/** TODO: Remove this after partitioning is fixed */
-	public void noPartition(SIRStream str) {
-		staticSubGraphs = new ArrayList<SIRStream>();
-		this.addPipe(str);
-	}
-	
-	public void partition(SIRStream str) {
-		log("Segmenter.partition called");
-		staticSubGraphs = new ArrayList<SIRStream>();
+	public SegmentedSIRGraph init(SIRStream str, boolean isDynamic) {		
+		if (!isDynamic) {
+			this.addPipe(str);
+			return this;
+		} 
+
 		pipelines = new LinkedList<Object>();
 
 		IterFactory.createFactory().createIter(str).accept(this);
@@ -87,6 +84,8 @@ public class SegmentedSIRGraph implements StreamVisitor {
 						+ ((SIRPipeline) ssg).getChildren().size());
 			}
 		}
+
+		return this;
 	}
 
 	/**
