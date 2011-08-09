@@ -51,10 +51,18 @@ public class CellBackend {
         // The usual optimizations and transformation to slice graph
         CommonPasses commonPasses = new CommonPasses();
         // perform standard optimizations.
-        commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
+        StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
         
-        // partitioner contains information about the Slice graph used by dumpGraph
-        StaticSubGraph ssg = commonPasses.getSSG();
+        assert streamGraph.getSSGs().size() == 1 : "CellBackend does not yet support dynamic graphs";
+        
+        for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
+        	runSSG(ssg, commonPasses, numCores, structs);
+        }		
+	  }
+    
+    public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses, int numCores, SIRStructure[]structs ) {     
+    	
+        
         
         new MultiLevelSplitsJoins(ssg, MAX_TAPES/2).doit();
         ssg.dumpGraph("traces-after-multi.dot");

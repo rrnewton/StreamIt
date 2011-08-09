@@ -69,21 +69,23 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		IterFactory.createFactory().createIter(str).accept(this);
 
 		// This section is for debugging
+		log("*********************************");
 		int j = 0;
 		for (SIRStream ssg : staticSubGraphs) {
-			log("Segmenter.partition " + "printing ssg " + j + "name="
+			log(this.getClass().getCanonicalName() + " init " + "printing ssg " + j + " name="
 					+ ssg.getName());
 			at.dms.util.SIRPrinter printer = new at.dms.util.SIRPrinter("ssg_"
 					+ j + ".txt");
 			IterFactory.createFactory().createIter(ssg).accept(printer);
 			j++;
 			if (ssg instanceof SIRPipeline) {
-				log("Segmenter.partition " + "ssg is a pipeline");
-				log("Segmenter.partition "
+				log(this.getClass().getCanonicalName() + " init " + "ssg is a pipeline");
+				log(this.getClass().getCanonicalName() + " init "
 						+ "((SIRPipeline)ssg).getChildren().size()= "
 						+ ((SIRPipeline) ssg).getChildren().size());
 			}
 		}
+		log("*********************************");
 
 		return this;
 	}

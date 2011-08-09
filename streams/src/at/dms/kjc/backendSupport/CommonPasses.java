@@ -390,7 +390,7 @@ public class CommonPasses {
 	 * Spacetime does not use this code since it allows general slices and
 	 * generates its own code for file readers and file writers.
 	 */
-	public void simplifySlices(StaticSubGraph ssg) {
+	public StaticSubGraph simplifySlices(StaticSubGraph ssg) {
 		// Create code for predefined content: file readers, file writers.
 		ssg.createPredefinedContent();
 		// guarantee that we are not going to hack properties of filters in the
@@ -411,6 +411,7 @@ public class CommonPasses {
 		AddBuffering.doit(ssg, false, numCores);
 		// decompose any pipelines of filters in the Slice graph.
 		// slicer.ensureSimpleSlices();
+		return ssg;
 	}
 
 	/**
@@ -445,7 +446,7 @@ public class CommonPasses {
 	 * 
 	 * @return the slicer
 	 */
-	public StaticSubGraph getSSG() {
+	public StaticSubGraph getSSG0() {
 		assert streamGraph.getNumSSGs() == 1;
 		return streamGraph.getSSG(0);
 	}

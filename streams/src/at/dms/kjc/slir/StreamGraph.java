@@ -36,11 +36,15 @@ public class StreamGraph {
 		ssgs = new ArrayList<StaticSubGraph>();
 	}
 
+	public List<StaticSubGraph> getSSGs() {
+		return ssgs;
+	}
+	
 	public StaticSubGraph getSSG(int i) {
 		return ssgs.get(i);
 	}
 
-	public StaticSubGraph getSSG() {
+	public StaticSubGraph getSSG0() {
 		assert ssgs.size() == 1 : "Calling getSSG() on a graph with dynamic rates, and thus multiple SSGs!";
 		return ssgs.get(0);
 	}

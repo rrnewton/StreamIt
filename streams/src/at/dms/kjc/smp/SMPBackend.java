@@ -16,6 +16,8 @@ public class SMPBackend {
     public static Structs_h structs_h;
     public static int[] coreOrder = {0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15};
 
+  
+    
     public static void run(SIRStream str,
                            JInterfaceDeclaration[] interfaces,
                            SIRInterfaceTable[] interfaceTables,
@@ -44,14 +46,22 @@ public class SMPBackend {
         CommonPasses commonPasses = new CommonPasses();
         // perform standard optimizations, use the number of cores the user wants to target
         StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, chip.size());
-        StaticSubGraph ssg = streamGraph.getSSG();
+
+        for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
+        	runSSG(ssg, commonPasses);
+        }
+    
+    }
+        
+    public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses) {        	            
+      
         // perform some standard cleanup on the slice graph.
-        commonPasses.simplifySlices(ssg);
+        ssg = commonPasses.simplifySlices(ssg);
         // dump slice graph to dot file
-        commonPasses.getSSG().dumpGraph("traces.dot", null);
+        ssg.dumpGraph("traces.dot", null);
         
         // partition the slice graph based on the scheduling policy
-        SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(commonPasses.getSSG());
+        SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(ssg);
         scheduler.setGraphSchedule(graphSchedule);
         scheduler.run(chip.size());
         WorkNodeInfo.reset();
@@ -124,103 +134,7 @@ public class SMPBackend {
                 comp += FilterWorkEstimate.getWork(slice);
                 compProcessed.add(slice);
             }
-
-            /*
-            for(Slice slice : slices) {
-                if(commProcessed.contains(slice))
-                    continue;
-                
-                FilterInfo info = FilterInfo.getFilterInfo(slice.getFirstFilter());
-                int totalItemsReceived = info.totalItemsReceived(SchedulingPhase.STEADY);
-
-                if(totalItemsReceived == 0)
-                    continue;
-
-                InputSliceNode input = slice.getHead();
-                Set<InterSliceEdge> sources = input.getSourceSet(SchedulingPhase.STEADY);
-                int numInputRots = totalItemsReceived / input.totalWeights(SchedulingPhase.STEADY);
-
-                if(!FissionGroupStore.isFizzed(slice)) {
-                    for(InterSliceEdge source : sources) {
-                        Slice srcSlice = source.getSrc().getParent();
-
-//                         if(srcSlice.getFirstFilter().isFileInput())
-//                             continue;
-
-                        if(FissionGroupStore.isFizzed(srcSlice)) {
-                            // Filter is not fizzed, source is fizzed
-                            // Filter must receive (N-1)/N of inputs from different cores
-                            comm += numInputRots * 
-                                input.getWeight(source, SchedulingPhase.STEADY) / 
-                                KjcOptions.smp * (KjcOptions.smp - 1);
-                        }
-                        else {
-                            // Filter is not fizzed, source is not fizzed
-                            // Check to see if on same core
-                            // If not, must communicate all elements
-                            if(!scheduler.getComputeNode(slice.getFirstFilter()).equals(
-                                   scheduler.getComputeNode(srcSlice.getFirstFilter()))) {
-                                comm += numInputRots * 
-                                    input.getWeight(source, SchedulingPhase.STEADY);
-                            }
-                        }
-                    }
-                }
-                else {
-                    for(InterSliceEdge source : sources) {
-                        Slice srcSlice = source.getSrc().getParent();
-
-//                         if(srcSlice.getFirstFilter().isFileInput())
-//                             continue;
-
-                        if(FissionGroupStore.isFizzed(srcSlice)) {
-                            // Filter is fizzed, source is also fizzed
-                            int totalItemsReceivedPerFizzed = totalItemsReceived /
-                                FissionGroupStore.getFissionGroup(slice).fizzedSlices.length;
-                            int numInputRotsPerFizzed = numInputRots /
-                                FissionGroupStore.getFissionGroup(slice).fizzedSlices.length;
-
-                            System.out.println("totalItemsReceivedPerFizzed: " + totalItemsReceivedPerFizzed);
-                            System.out.println("numInputRotsPerFizzed: " + numInputRotsPerFizzed);
-
-                            int inputWeightBeforeSrc = 
-                                input.weightBefore(source, SchedulingPhase.STEADY);
-                            int inputWeightSrc = input.getWeight(source, SchedulingPhase.STEADY);
-                            int inputTotalWeight = input.totalWeights(SchedulingPhase.STEADY);
-
-                            System.out.println("inputWeightBeforeSrc: " + inputWeightBeforeSrc);
-                            System.out.println("inputWeightSrc: " + inputWeightSrc);
-                            System.out.println("copyDown: " + info.copyDown);
-
-                            int numXmit = 0;
-
-                            for(int rot = 0 ; rot < numInputRotsPerFizzed ; rot++) {
-                                numXmit += Math.min(inputWeightSrc,
-                                                    Math.max(0,
-                                                             info.copyDown +
-                                                             rot * inputTotalWeight + 
-                                                             inputWeightBeforeSrc + inputWeightSrc -
-                                                             totalItemsReceivedPerFizzed));
-                            }
-
-                            System.out.println("numXmit: " + numXmit);
-
-                            comm += KjcOptions.smp * numXmit;
-                        }
-                        else {
-                            // Filter is fizzed, source is not fizzed
-                            // Source must send (N-1)/N of outputs to different cores
-                            comm += numInputRots *
-                                input.getWeight(source, SchedulingPhase.STEADY) /
-                                KjcOptions.smp * (KjcOptions.smp - 1);
-                        }
-                    }
-                }
-
-                commProcessed.add(slice);
-            }
-            */
-            
+        
             // Simple communication estimation
             for(Filter slice : slices) {
                 if(commProcessed.contains(slice))
@@ -241,32 +155,7 @@ public class SMPBackend {
 
                 commProcessed.add(slice);
             }
-
-            // Simple communication estimation 2
-            /*
-            for(Slice slice : slices) {
-                if(commProcessed.contains(slice))
-                    continue;
-                
-                FilterInfo info = FilterInfo.getFilterInfo(slice.getFirstFilter());
-                int totalItemsReceived = info.totalItemsReceived(SchedulingPhase.STEADY);
-                int totalItemsSent = info.totalItemsSent(SchedulingPhase.STEADY);
-
-                comm += totalItemsReceived;
-                comm += totalItemsSent;
-
-                if(totalItemsReceived == 0)
-                    continue;
-
-                if(FissionGroupStore.isFizzed(slice)) {
-                    assert info.peek >= info.pop;
-                    comm += (info.peek - info.pop) * KjcOptions.smp;
-                }
-
-                commProcessed.add(slice);
-            }
-            */
-
+          
             System.out.println("Final Computation: " + comp);
             System.out.println("Final Communication: " + comm);
             System.out.println("Final Comp/Comm Ratio: " + (float)comp/(float)comm);

@@ -29,13 +29,22 @@ public class UniBackEnd {
             SIRHelper[] helpers,
             SIRGlobal global) {
 
-        int numCores = KjcOptions.newSimple;
+    	int numCores = KjcOptions.newSimple;
         
         // The usual optimizations and transformation to slice graph
         CommonPasses commonPasses = new CommonPasses();
         // perform standard optimizations.
         StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, numCores);
-        StaticSubGraph ssg = streamGraph.getSSG();
+
+        assert streamGraph.getSSGs().size() == 1 : "UniBackEnd does not yet support dynamic graphs";
+        
+        for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
+        	runSSG(ssg, commonPasses, numCores, structs);
+        }		
+	  }
+    
+    public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses, int numCores, SIRStructure[]structs ) {     
+    	
         // perform some standard cleanup on the slice graph.
         commonPasses.simplifySlices(ssg);
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
