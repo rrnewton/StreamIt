@@ -195,6 +195,12 @@ public class CommonPasses {
 
 	}
 
+	/**
+	 * Equivalent to one call of CommonPass run before re-factoring
+	 * to have multiple static subgraphs.
+	 * @param str the SIRStream on which to do the single pass
+	 * @return The modified SIRStream
+	 */
 	private SIRStream doStaticPass(SIRStream str) {
 
 		// Checks that all filters with mutable states are labeled with

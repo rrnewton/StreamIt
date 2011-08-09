@@ -64,4 +64,43 @@ public class StreamGraph {
 	public void addSSG(StaticSubGraph ssg) {
 		 ssgs.add(ssg);
 	}
+	
+	public void simplifyFilters(int numCores) {
+		for ( StaticSubGraph ssg : ssgs) {
+			simplifyStaticSubGraph(ssg, numCores);
+		}		
+	}
+	
+	/**
+	 * This method performs some standard cleanup on the slice graph. On return,
+	 * file readers and file writers are expanded to contain Kopi code to read
+	 * and write files. The slice graph will have any rate skew corrected and
+	 * will be converted to SimpleSlice's. The FilterInfo class will be usable.
+	 * 
+	 * Spacetime does not use this code since it allows general slices and
+	 * generates its own code for file readers and file writers.
+	 */
+	public StaticSubGraph simplifyStaticSubGraph(StaticSubGraph ssg, int numCores) {
+		// Create code for predefined content: file readers, file writers.
+		ssg.createPredefinedContent();
+		// guarantee that we are not going to hack properties of filters in the
+		// future
+		WorkNodeInfo.canUse();
+		// now we require that all input and output slice nodes have separate
+		// init distribution pattern
+		// for splitting and joining in the init stage (could be null or could
+		// be equal to steady or could be
+		// different)
+		/*
+		 * if (KjcOptions.nopartition) { for (FilterSliceNode id :
+		 * ((FlattenAndPartition)getSlicer()).generatedIds) {
+		 * IDSliceRemoval.doit(id.getParent()); } }
+		 */
+		InstallInitDistributions.doit(ssg.getFilterGraph());
+		// fix any rate skew introduced in conversion to Slice graph.
+		AddBuffering.doit(ssg, false, numCores);
+		// decompose any pipelines of filters in the Slice graph.
+		// slicer.ensureSimpleSlices();
+		return ssg;
+	}
 }

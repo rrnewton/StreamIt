@@ -46,7 +46,8 @@ public class UniBackEnd {
     public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses, int numCores, SIRStructure[]structs ) {     
     	
         // perform some standard cleanup on the slice graph.
-        commonPasses.simplifySlices(ssg);
+        ssg = commonPasses.simplifySlices(ssg);
+
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
         SpaceTimeScheduleAndSSG schedule = commonPasses.scheduleSlices(ssg);
       

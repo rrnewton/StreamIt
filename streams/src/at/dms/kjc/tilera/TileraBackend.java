@@ -45,7 +45,7 @@ public class TileraBackend {
     
     public static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses) {     
 		
-		commonPasses.simplifySlices(ssg);
+		ssg = commonPasses.simplifySlices(ssg);
 
 		ssg.dumpGraph("traces.dot", null);
 
