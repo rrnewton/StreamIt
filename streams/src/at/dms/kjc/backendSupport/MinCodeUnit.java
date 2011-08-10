@@ -1,6 +1,7 @@
 package at.dms.kjc.backendSupport;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import at.dms.kjc.CType;
 import at.dms.kjc.JFieldDeclaration;
@@ -8,6 +9,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.lir.LIRStreamType;
 import at.dms.kjc.sir.AttributeStreamVisitor;
 import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRStream;
 
 /**
@@ -33,12 +35,12 @@ public class MinCodeUnit implements SIRCodeUnit {
         }
 
         @Override
-        public int getPopForSchedule(HashMap[] counts) {
+        public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
             throw new AssertionError("unusable method");
         }
 
         @Override
-        public int getPushForSchedule(HashMap[] counts) {
+        public int getPushForSchedule(Map<SIROperator, int[]>[]counts) {
             throw new AssertionError("unusable method");
         }
 

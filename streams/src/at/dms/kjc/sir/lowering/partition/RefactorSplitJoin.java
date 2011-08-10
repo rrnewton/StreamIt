@@ -9,6 +9,7 @@ import at.dms.kjc.sir.lowering.partition.*;
 import at.dms.kjc.sir.lowering.fusion.*;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 
 public class RefactorSplitJoin {
 
@@ -248,7 +249,7 @@ public class RefactorSplitJoin {
         assert partition.getNumChildren()==((SIRPipeline)sj.get(0)).size();
 
         // get execution counts for <pre>sj</pre>
-        HashMap[] sched = SIRScheduler.getExecutionCounts(sj);
+        Map<SIROperator, int[]>[] sched = SIRScheduler.getExecutionCounts(sj);
 
         // make result pipeline
         SIRPipeline result = new SIRPipeline(sj.getParent(), 

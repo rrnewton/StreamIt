@@ -1,6 +1,8 @@
 package at.dms.kjc.backendSupport;
 
 import java.util.Iterator;
+import java.util.Map;
+
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.*;
 import at.dms.kjc.sir.lowering.partition.*; 
@@ -30,10 +32,10 @@ public class CompCommRatio {
     private static double comp = 0;
     private static double comm = 0;
     private static WorkEstimate work;
-    private static HashMap<SIRStream, int[]> mults;
+    private static Map<SIROperator, int[]> mults;
     
     public static double ratio(SIRStream str, WorkEstimate work,
-            HashMap<SIRStream, int[]> executionCounts) {
+            Map<SIROperator, int[]> executionCounts) {
         
         comp = 0;
         comm = 0;

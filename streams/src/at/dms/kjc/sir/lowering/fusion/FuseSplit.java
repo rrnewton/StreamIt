@@ -1104,7 +1104,7 @@ public class FuseSplit {
         private void compute(SIRSplitJoin sj) {
 
             // fill in the execution count info for this
-            HashMap[] execCount = SIRScheduler.getExecutionCounts(sj);
+            Map<SIROperator, int[]>[] execCount = SIRScheduler.getExecutionCounts(sj);
             for (int i=0; i<sj.size(); i++) {
                 // get the steady-state count
                 int[] count = (int[])execCount[1].get(sj.get(i));

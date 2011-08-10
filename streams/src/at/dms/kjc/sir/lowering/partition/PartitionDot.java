@@ -19,7 +19,7 @@ public class PartitionDot extends StreamItDot {
     private boolean markStateful; // if true, then indicate which filters are stateful
     private boolean markIO; // if true, marks pop and push rates in filters
     private boolean markVectorizable; // if true, marks vectorizable filters.
-    private HashMap[] execCounts; // schedule for stream (only used if markIO is true)
+    private Map<SIROperator, int[]>[] execCounts; // schedule for stream (only used if markIO is true)
     private HashMap<SIROperator, Object> partitions;
     // color managemet:
     private HashMap<Long, String> colorMap = new HashMap(); // maps from a partition value to a color for that partition
@@ -324,13 +324,13 @@ public class PartitionDot extends StreamItDot {
      */
     public static void printScheduleGraph(SIRStream str,
                                           String filename,
-                                          HashMap[] execCounts) {
+                                          Map<SIROperator, int[]>[] maps) {
         // make a string representation for init/steady schedules
         HashMap<SIROperator, Object> stringMap = new HashMap<SIROperator, Object>();
-        HashSet allKeys = new HashSet();
-        allKeys.addAll(execCounts[0].keySet());
-        allKeys.addAll(execCounts[1].keySet());
-        for (Iterator it = allKeys.iterator(); it.hasNext(); ) {
+        HashSet<SIROperator> allKeys = new HashSet<SIROperator>();
+        allKeys.addAll(maps[0].keySet());
+        allKeys.addAll(maps[1].keySet());
+        for (Iterator<SIROperator> it = allKeys.iterator(); it.hasNext(); ) {
             SIROperator op = (SIROperator)it.next();
             String string;
             // retain rate labels for filters
@@ -340,8 +340,8 @@ public class PartitionDot extends StreamItDot {
                 string = "";
             }
             // add schedule labels
-            int[] initCount = (int[])execCounts[0].get(op);
-            int[] steadyCount = (int[])execCounts[1].get(op);
+            int[] initCount = (int[])maps[0].get(op);
+            int[] steadyCount = (int[])maps[1].get(op);
             if (initCount!=null) {
                 string += "\\ninit reps=" + initCount[0];
             }

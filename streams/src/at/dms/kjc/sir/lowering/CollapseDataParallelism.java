@@ -1,6 +1,7 @@
 package at.dms.kjc.sir.lowering;
 
 import java.util.*;
+
 import at.dms.util.*;
 import at.dms.kjc.*;
 import at.dms.kjc.iterator.*;
@@ -210,7 +211,7 @@ public class CollapseDataParallelism {
         int U = filter.getPushInt();
         SIRSplitter origSplit = sj.getSplitter();
         SIRJoiner origJoin = sj.getJoiner();
-        HashMap reps = SIRScheduler.getExecutionCounts(sj)[1];
+        Map<SIROperator, int[]> reps = SIRScheduler.getExecutionCounts(sj)[1];
 
         // make new first splitjoin
         SIRSplitJoin sj1 = new SIRSplitJoin(null, "CollapsedDataParallel_1");
@@ -259,7 +260,7 @@ public class CollapseDataParallelism {
      * However, if all the weights are the same, then collapses all
      * the values down to "k".
      */
-    private JExpression[] createWeights(SIRSplitJoin sj, HashMap reps, int k) {
+    private JExpression[] createWeights(SIRSplitJoin sj, Map<SIROperator, int[]> reps, int k) {
         JExpression[] weights = new JExpression[sj.size()];
         for (int i=0; i<sj.size(); i++) {
             weights[i] = new JIntLiteral(((int[])reps.get(sj.get(i)))[0] * k);

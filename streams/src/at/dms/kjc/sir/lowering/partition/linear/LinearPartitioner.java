@@ -72,7 +72,7 @@ public class LinearPartitioner {
     /**
      * Execution counts for <pre>str</pre> (given original factoring of containers).
      */
-    private HashMap[] counts;
+    private Map<SIROperator, int[]>[] counts;
     
     public LinearPartitioner(SIRStream str, LinearAnalyzer lfa) {
         this.str = str;
@@ -163,7 +163,7 @@ public class LinearPartitioner {
      * Returns the pre-computed execution counts for the stream that
      * we're partitioning.
      */
-    public HashMap[] getExecutionCounts() {
+    public Map<SIROperator, int[]>[] getExecutionCounts() {
         return counts;
     }
 

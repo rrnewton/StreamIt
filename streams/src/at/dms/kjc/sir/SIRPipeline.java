@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Map;
 import java.io.*;
 
 /**
@@ -69,12 +70,12 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
         return LIRStreamType.LIR_PIPELINE;
     }
 
-    public int getPushForSchedule(HashMap[] counts) {
+    public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
         // the pipeline pushes what the last element pushes
         return get(size()-1).getPushForSchedule(counts);
     }
 
-    public int getPopForSchedule(HashMap[] counts) {
+    public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
         // the pipeline pops what the first item pops
         return get(0).getPopForSchedule(counts);
     }

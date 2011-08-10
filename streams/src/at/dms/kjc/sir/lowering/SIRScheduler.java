@@ -1,11 +1,9 @@
 package at.dms.kjc.sir.lowering;
 
-import streamit.scheduler2.iriter.Iterator;
 import streamit.scheduler2.Scheduler;
 import streamit.scheduler2.Schedule;
 import streamit.library.StreamIt;
 
-import at.dms.util.IRPrinter;
 import at.dms.util.Utils;
 import at.dms.kjc.*;
 import at.dms.kjc.iterator.*;
@@ -13,11 +11,10 @@ import at.dms.kjc.sir.*;
 import at.dms.kjc.lir.*;
 import at.dms.kjc.sir.lowering.partition.PartitionDot;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * This builds a schedule for the stream and instantiates the schedule
@@ -33,13 +30,6 @@ public class SIRScheduler implements Constants {
      * The destination flatClass that we're working on.
      */
     private JClassDeclaration flatClass;
-
-    /**
-     * Whether or not we're working on the initial schedule.  This is
-     * true when we're building the initial work function, false when
-     * we're building the steady-state work function.
-     */
-    private boolean initMode;    
 
     /**
      * Maps schedules (phases) to work functions.  A given phase could
@@ -83,7 +73,7 @@ public class SIRScheduler implements Constants {
      *  result[0] = map for initializaiton schedule
      *  result[1] = map for steady-state schedule
      */ 
-    public static HashMap[] getExecutionCounts(SIRStream str) {
+    public static Map<SIROperator, int[]>[] getExecutionCounts(SIRStream str) {
         return getExecutionCounts(str, computeSchedule(str));
     }
     /**
@@ -92,7 +82,7 @@ public class SIRScheduler implements Constants {
      * executes once).  (In contrast, getExecutionCounts will likely
      * throw exception in presence of dynamic rates.)
      */ 
-    public static HashMap[] getApproxExecutionCounts(SIRStream str) {
+    public static Map<SIROperator, int[]>[] getApproxExecutionCounts(SIRStream str) {
         if (KjcOptions.dynamicRatesEverywhere) {
             // if treating everything as dynamic, then pretend
             // everything executes just once
@@ -104,10 +94,14 @@ public class SIRScheduler implements Constants {
     /**
      * Internal routine for getting execution counts given a scheduler.
      */
-    private static HashMap[] getExecutionCounts(SIRStream str, Scheduler scheduler) {
+    private static Map<SIROperator, int[]>[] getExecutionCounts(SIRStream str, Scheduler scheduler) {
         // make the result
-        HashMap[] result = { new HashMap(), new HashMap() } ;
-
+    	
+    	@SuppressWarnings("rawtypes")
+		HashMap[] myarray = { new HashMap<SIRStream, int[]>(), new HashMap<SIRStream, int[]>() } ;
+        @SuppressWarnings("unchecked")
+		HashMap<SIROperator, int[]>[] result = (HashMap<SIROperator, int[]>[])myarray;
+        
         // fill in the init schedule
         fillExecutionCounts(scheduler.getOptimizedInitSchedule(), result[0], 1);
         // fill in the steady-state schedule
@@ -126,8 +120,11 @@ public class SIRScheduler implements Constants {
      * Returns dummy execution counts that maps every SIROperator in
      * 'str' to execute once in steady state, none in initialization.
      */
-    private static HashMap[] unaryExecutionCounts(SIRStream str) {
-        final HashMap[] result = { new HashMap(), new HashMap() };
+    private static Map<SIROperator, int[]>[] unaryExecutionCounts(SIRStream str) {
+    	@SuppressWarnings("rawtypes")
+		HashMap[] myarray = { new HashMap<SIRStream, int[]>(), new HashMap<SIRStream, int[]>() } ;
+        @SuppressWarnings("unchecked")
+		final HashMap<SIROperator, int[]>[] result = (HashMap<SIROperator, int[]>[])myarray;        
         str.accept(new EmptyAttributeStreamVisitor() {
                 public Object visitFilter(SIRFilter self,
                                           JFieldDeclaration[] fields,
@@ -270,9 +267,6 @@ public class SIRScheduler implements Constants {
      * for <this.toplevel>.
      */
     private void scheduleSteady(Scheduler scheduler) {
-        // indicate we're working on steady schedule
-        this.initMode = false;
-
         // get steady schedule
         Schedule schedule = scheduler.getOptimizedSteadySchedule();
         // make the steady work
@@ -286,9 +280,6 @@ public class SIRScheduler implements Constants {
      * <this.toplevel>.
      */
     private void scheduleInit(Scheduler scheduler) {
-        // indicate we're working on init schedule
-        this.initMode = true;
-
         // get init schedule
         Schedule schedule = scheduler.getOptimizedInitSchedule();
 

@@ -4,6 +4,7 @@ import at.dms.kjc.lir.LIRStreamType;
 import at.dms.util.Utils;
 import at.dms.kjc.*;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A StreamIt phased filter.  Like SIRFilter, this has constant
@@ -152,7 +153,7 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         return "SIRPhasedFilter name=" + getName();
     }
 
-    public int getPushForSchedule(HashMap[] counts) {
+    public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
         // not implementing this right now because I'm unclear if
         // there is a distinct execution count for each phase.  can
         // fix without too much trouble later. --bft
@@ -160,7 +161,7 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         return -1;
     }
 
-    public int getPopForSchedule(HashMap[] counts) {
+    public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
         // not implementing this right now because I'm unclear if
         // there is a distinct execution count for each phase.  can
         // fix without too much trouble later. --bft

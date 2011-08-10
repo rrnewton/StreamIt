@@ -6,6 +6,7 @@ import at.dms.util.Utils;
 import at.dms.kjc.*;
 import at.dms.util.*;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This represents a basic StreamIt filter.  In this case, a filter
@@ -119,10 +120,10 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
         return getPhases()[0].getPop();
     }
 
-    public int getPushForSchedule(HashMap[] counts) {
-        assert counts[1].containsKey(this):
+    public int getPushForSchedule(Map<SIROperator, int[]>[] execCounts) {
+        assert execCounts[1].containsKey(this):
             "Execution count doesn't contain " + this;
-        int steadyCount = ((int[])counts[1].get(this))[0];
+        int steadyCount = ((int[])execCounts[1].get(this))[0];
         return steadyCount * getPushInt();
     }
 

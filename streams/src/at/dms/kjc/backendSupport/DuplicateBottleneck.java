@@ -4,11 +4,13 @@
 package at.dms.kjc.backendSupport;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import at.dms.kjc.sir.SIRFeedbackLoop;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPredefinedFilter;
 import at.dms.kjc.sir.SIRSplitJoin;
@@ -41,15 +43,15 @@ public class DuplicateBottleneck {
      * the schedule exeCounts.
      * 
      * @param str The toplevel container.
-     * @param exeCounts The schedule.
+     * @param map The schedule.
      * @return the number of items the file writers write to files in
      * the schedule exeCounts.
      */
-    public static int outputsPerSteady(SIRStream str, HashMap exeCounts) {
+    public static int outputsPerSteady(SIRStream str, Map<SIROperator, int[]> map) {
         if (str instanceof SIRFeedbackLoop) {
             SIRFeedbackLoop fl = (SIRFeedbackLoop) str;
-            return outputsPerSteady(fl.getBody(), exeCounts) + 
-            outputsPerSteady(fl.getLoop(), exeCounts);
+            return outputsPerSteady(fl.getBody(), map) + 
+            outputsPerSteady(fl.getLoop(), map);
         }
         if (str instanceof SIRPipeline) {
             SIRPipeline pl = (SIRPipeline) str;
@@ -57,7 +59,7 @@ public class DuplicateBottleneck {
             int outputs = 0;
             while (iter.hasNext()) {
                 SIRStream child = (SIRStream) iter.next();
-                outputs += outputsPerSteady(child, exeCounts);
+                outputs += outputsPerSteady(child, map);
             }
             return outputs;
         }
@@ -67,14 +69,14 @@ public class DuplicateBottleneck {
             int outputs = 0;
             while (iter.hasNext()) {
                 SIRStream child = iter.next();
-                outputs += outputsPerSteady(child, exeCounts);
+                outputs += outputsPerSteady(child, map);
             }
             return outputs;
         }
         //update the comm and comp numbers...
         if (str instanceof SIRFilter) {
             if (str instanceof SIRFileWriter)
-                return ((int[])exeCounts.get(str))[0];
+                return ((int[])map.get(str))[0];
             else
                 return 0;
         }

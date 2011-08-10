@@ -52,7 +52,7 @@ public class StrToRStream {
     public static final boolean HEADER_FOOTER_PEEK_RESTORE = false;
 
     /** The execution counts from the scheduler: [0] init, [1] steady **/
-    public static HashMap[] executionCounts;
+    public static Map<SIROperator, int[]>[] executionCounts;
     
     /** The structure defined in the application, see SIRStructure **/
     public static SIRStructure[] structures;

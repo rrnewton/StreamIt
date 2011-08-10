@@ -31,7 +31,7 @@ public class RawBackend {
     //the simulator to be run
     public static Simulator simulator;
     // get the execution counts from the scheduler
-    public static HashMap[] executionCounts;
+    public static Map<SIROperator, int[]>[] executionCounts;
     
     public static SIRStructure[] structures;
     
@@ -500,7 +500,7 @@ public class RawBackend {
     public static HashMap[] returnExecutionCounts(SIRStream str,
                                                   GraphFlattener graphFlattener) {
 
-	HashMap[] localExecutionCounts = SIRScheduler.getExecutionCounts(str);
+	Map<SIROperator, int[]>[] localExecutionCounts = SIRScheduler.getExecutionCounts(str);
 	// make fresh hashmaps for results
 	HashMap[] result = { initExecutionCounts = new HashMap<FlatNode, Integer>(), 
 			     steadyExecutionCounts = new HashMap<FlatNode, Integer>()} ;

@@ -4,6 +4,7 @@ import at.dms.kjc.lir.LIRStreamType;
 import at.dms.kjc.*;
 import at.dms.util.Utils;
 import java.util.*;
+
 import streamit.frontend.FEIRToSIR;
 
 /**
@@ -91,7 +92,7 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public int getPushForSchedule(HashMap[] counts)
+    public int getPushForSchedule(Map<SIROperator, int[]>[] counts)
     {
         throw new RuntimeException("Can't get push for schedule of recursive stub.");
         //return -1;
@@ -100,7 +101,7 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public int getPopForSchedule(HashMap[] counts)
+    public int getPopForSchedule(Map<SIROperator, int[]>[] counts)
     {
         throw new RuntimeException("Can't get pop for schedule of recursive stub.");
         //return -1;

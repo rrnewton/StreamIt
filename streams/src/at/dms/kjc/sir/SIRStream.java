@@ -250,12 +250,12 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      * graph can be refactored, and one can still call this to get the
      * push count of new constructs without re-invoking the scheduler.
      */
-    public abstract int getPushForSchedule(HashMap[] counts);
+    public abstract int getPushForSchedule(Map<SIROperator, int[]>[] maps);
 
     /**
      * Same as getPushForSchedule, but with pop instead of push.
      */
-    public abstract int getPopForSchedule(HashMap[] counts);
+    public abstract int getPopForSchedule(Map<SIROperator, int[]>[] maps);
 
     /**
      * Returns whether or not this class needs a call to an init

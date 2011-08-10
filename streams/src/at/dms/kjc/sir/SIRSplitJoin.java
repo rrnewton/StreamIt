@@ -6,6 +6,7 @@ import at.dms.kjc.lir.LIRStreamType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * This represents a SplitJoin construct.
@@ -116,7 +117,7 @@ public class SIRSplitJoin extends SIRContainer implements Cloneable {
         return CStdType.Void;
     }
 
-    public int getPushForSchedule(HashMap[] counts) {
+    public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
         // the splitjoin pushes everything that children push in a
         // steady-state
         int sum = 0;
@@ -126,7 +127,7 @@ public class SIRSplitJoin extends SIRContainer implements Cloneable {
         return sum;
     }
 
-    public int getPopForSchedule(HashMap[] counts) {
+    public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
         // the splitjoin pops everything that children pop in a
         // steady-state.  Unless it's a duplicate splitter, in which
         // case it pops only what one child pops.

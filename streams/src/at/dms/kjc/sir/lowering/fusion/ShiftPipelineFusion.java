@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Map;
 
 class ShiftPipelineFusion {
 
@@ -108,7 +109,7 @@ class ShiftPipelineFusion {
         // make the result
         List<FilterInfo> result = new LinkedList<FilterInfo>();
         // get execution counts for <pipe>
-        HashMap[] execCount = SIRScheduler.getExecutionCounts(pipe);
+        Map<SIROperator, int[]>[] execCount = SIRScheduler.getExecutionCounts(pipe);
 
         // for each filter...
         for (int i=0; i<pipe.size(); i++) {

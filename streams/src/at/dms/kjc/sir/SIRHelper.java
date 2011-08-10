@@ -2,7 +2,6 @@ package at.dms.kjc.sir;
 
 import at.dms.kjc.lir.LIRStreamType;
 import at.dms.kjc.*;
-import java.util.HashMap;
 import java.util.*;
 
 /**
@@ -32,12 +31,12 @@ public class SIRHelper extends SIRStream
     {
         at.dms.util.Utils.fail(ident + ": attempt to add an init function to a Helper");
     }
-    public int getPushForSchedule(HashMap[] counts)
+    public int getPushForSchedule(Map<SIROperator, int[]>[] counts)
     {
         at.dms.util.Utils.fail(ident + ": attempt to call getPushForSchedule for Helper");
         return -1;
     }
-    public int getPopForSchedule(HashMap[] counts)
+    public int getPopForSchedule(Map<SIROperator, int[]>[] counts)
     {
         at.dms.util.Utils.fail(ident + ": attempt to call getPopForSchedule for Helper");
         return -1;

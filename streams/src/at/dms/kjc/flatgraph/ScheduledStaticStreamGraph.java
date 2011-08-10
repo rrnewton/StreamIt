@@ -31,7 +31,7 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
     // Stores the multiplicities as returned by the scheduler...
     // An optimization that creates new SIROperator's may cause this
     // information to becom partial:
-    private HashMap<SIROperator,int[]>[] executionCounts;
+    private Map<SIROperator, int[]>[] executionCounts;
 
     
     
@@ -217,7 +217,7 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
      }
 
      /** get the multiplicity map for the give stage as SIROperator -> int[] */
-     public HashMap<SIROperator,int[]> getSIRExecutions(boolean init) {
+     public Map<SIROperator, int[]> getSIRExecutions(boolean init) {
          if (! executionCountsValid) {
              executionCountsValid = true;
              scheduleAndCreateMults();
@@ -232,7 +232,7 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
              scheduleAndCreateMults();
          }
 
-         final HashMap<SIROperator,int[]> strmap = init ? executionCounts[0] : executionCounts[1];
+         final Map<SIROperator, int[]> strmap = init ? executionCounts[0] : executionCounts[1];
          final HashMap<FlatNode,int[]> nodemap = new HashMap<FlatNode,int[]>();
          topLevel.accept(new FlatVisitor(){
              public void visitNode(FlatNode node) {

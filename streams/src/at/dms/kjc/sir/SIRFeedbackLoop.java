@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * This represents a feedback loop construct.
@@ -87,7 +88,7 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
         return getBody().getInputType();
     }
 
-    public int getPushForSchedule(HashMap[] counts) {
+    public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
         // get what the body pushes
         int bodyPush = getBody().getPushForSchedule(counts);
         // scale it by what is lost in the splitter
@@ -103,7 +104,7 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
         }
     }
 
-    public int getPopForSchedule(HashMap[] counts) {
+    public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
         // get what body pops
         int bodyPop = getBody().getPopForSchedule(counts);
         // scale it by what is channeled through the joiner

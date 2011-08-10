@@ -2,7 +2,6 @@ package at.dms.kjc.sir;
 
 import at.dms.kjc.lir.LIRStreamType;
 import at.dms.kjc.*;
-import java.util.HashMap;
 import java.util.*;
 
 /**
@@ -20,12 +19,12 @@ public class SIRGlobal extends SIRStream
     {
         at.dms.util.Utils.fail(ident + ": attempt to add a work function to a Global");
     }
-    public int getPushForSchedule(HashMap[] counts)
+    public int getPushForSchedule(Map<SIROperator, int[]>[] counts)
     {
         at.dms.util.Utils.fail(ident + ": attempt to call getPushForSchedule for Global");
         return -1;
     }
-    public int getPopForSchedule(HashMap[] counts)
+    public int getPopForSchedule(Map<SIROperator, int[]>[] counts)
     {
         at.dms.util.Utils.fail(ident + ": attempt to call getPopForSchedule for Global");
         return -1;

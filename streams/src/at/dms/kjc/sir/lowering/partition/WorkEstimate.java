@@ -17,7 +17,7 @@ import at.dms.kjc.cluster.CodeEstimate;
 public class WorkEstimate {
     /** If true, attempt to fully unroll the filter before we estimate its work */
     public static boolean UNROLL_FOR_WORK_EST = false;
-    private HashMap executionCounts;
+    private Map<SIROperator, int[]> executionCounts;
     
     /**
      * Maps stream constructs to a WorkInfo node.
@@ -54,7 +54,7 @@ public class WorkEstimate {
      * @return the execution counts that were used to create this
      * work estimation.
      */
-    public HashMap getExecutionCounts() {
+    public Map<SIROperator, int[]> getExecutionCounts() {
         return executionCounts;   
     }
     
@@ -63,7 +63,7 @@ public class WorkEstimate {
      */
     private WorkList buildWorkList(final HashMap<SIROperator, Object> map) {
         // first make a treemap to do the sorting for us
-        TreeMap<SIROperator, Object> treeMap = new TreeMap<SIROperator, Object>(new Comparator() {
+        TreeMap<SIROperator, Object> treeMap = new TreeMap<SIROperator, Object>(new Comparator<Object>() {
                 public int compare(Object o1, Object o2) {
                     // assume these are map.entry's
                     long work1 = ((WorkInfo)map.get(o1)).getTotalWork();
