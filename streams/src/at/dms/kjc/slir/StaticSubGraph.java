@@ -30,10 +30,7 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
  * 
  */
 public class StaticSubGraph {
-
-	/** A Map for all edges (so you don't create multiple copies) */
-	private Map<OutputNode, HashMap<InputNode, InterFilterEdge>> edges;
-
+	
 	/** The list of filters in the StaticSubGraph */
 	private List<Filter> filterList = null;
 
@@ -69,11 +66,7 @@ public class StaticSubGraph {
 	 * 
 	 */
 	public StaticSubGraph() {
-		filterList = new LinkedList<Filter>();
-		edges = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
-		workEstimation = new HashMap<WorkNodeContent, Long>();
-		topFilters = new LinkedList<Filter>();
-		sirToContent = new HashMap<SIRFilter, WorkNodeContent>();
+
 	}
 
 	/**
@@ -272,6 +265,13 @@ public class StaticSubGraph {
 					outEdges.add(edge);
 					outWeights.add(node.weights[i]);
 				}
+				
+				
+				assert newEdges != null : "newEdges is null";
+				assert output != null : "output is null";
+				assert edges != null : "edges is null";
+
+				
 				edges.put(output, newEdges);
 
 				LinkedList<LinkedList<InterFilterEdge>> translatedEdges = new LinkedList<LinkedList<InterFilterEdge>>();
@@ -311,10 +311,19 @@ public class StaticSubGraph {
 				LinkedList<InterFilterEdge> inEdges = new LinkedList<InterFilterEdge>();
 				for (int i = 0; i < node.inputs; i++) {
 					if (node.incomingWeights[i] == 0)
-						continue;
+						continue;					
+					
+					/** This may be null, if the DummySource/Sink have been removed */
+//					if (null == edges.get(filterNodes.outputNodes.get(node.incoming[i].contents))) {
+//						continue;
+//					}
+//					
+//					assert edges.get(filterNodes.outputNodes.get(node.incoming[i].contents)) != null : "edges.get(filterNodes.outputNodes.get(node.incoming[i].contents))";
+
+					
+					
 					inEdges.add(edges.get(
-							filterNodes.outputNodes
-									.get(node.incoming[i].contents)).get(input));
+							filterNodes.outputNodes.get(node.incoming[i].contents)).get(input));
 					inWeights.add(node.incomingWeights[i]);
 				}
 				input.set(inWeights, inEdges, SchedulingPhase.STEADY);
@@ -542,6 +551,12 @@ public class StaticSubGraph {
 		this.parent = parent;
 		this.inputPort = inputPort;
 		this.outputPort = outputPort;
+		
+		filterList = new LinkedList<Filter>();
+		workEstimation = new HashMap<WorkNodeContent, Long>();
+		topFilters = new LinkedList<Filter>();
+		sirToContent = new HashMap<SIRFilter, WorkNodeContent>();
+		Map<OutputNode, HashMap<InputNode, InterFilterEdge>> edges = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
 
 		Map<SIROperator, int[]>[] executionCounts = SIRScheduler
 				.getExecutionCounts(str);
