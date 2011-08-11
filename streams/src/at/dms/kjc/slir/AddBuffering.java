@@ -258,7 +258,10 @@ public class AddBuffering {
         newOutput.setPrevious(filter);
         
         //the new slice
-        Filter bufferingSlice = new Filter(newInput);
+        Filter bufferingSlice = new Filter();
+        bufferingSlice.setInputNode(newInput);
+        bufferingSlice.setOutputNode(newOutput);
+        bufferingSlice.setWorkNode(filter);
         bufferingSlice.finish();
         
         //create the new edge that will exist between the new slice and the

@@ -98,7 +98,10 @@ public class FlattenAndPartition  {
 			assert input != null && output != null && filterNode != null;
 
 			// set up the slice
-			Filter slice = new Filter(input);
+			Filter slice = new Filter();
+			slice.setInputNode(input);
+			slice.setOutputNode(output);
+			slice.setWorkNode(filterNode);
 			input.setNext(filterNode);
 			filterNode.setPrevious(input);
 			filterNode.setNext(output);

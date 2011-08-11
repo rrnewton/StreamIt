@@ -244,7 +244,10 @@ public class MultiLevelSplitsJoins {
         output.setPrevious(filter);
         
         //the new trace
-        Filter slice = new Filter(node);
+        Filter slice = new Filter();
+        slice.setInputNode(node);
+        slice.setOutputNode(output);
+        slice.setWorkNode(filter);
         slice.finish();
         
         return slice;
@@ -519,7 +522,10 @@ public class MultiLevelSplitsJoins {
         WorkNode filter = 
             new WorkNode(new WorkNodeContent(identity));
                 
-        Filter slice = new Filter(input);
+        Filter slice = new Filter();
+        slice.setInputNode(input);
+        slice.setOutputNode(output);
+        slice.setWorkNode(filter);
         
         //set up the intra-trace connections
         input.setNext(filter);
