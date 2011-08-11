@@ -23,6 +23,7 @@ import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.SIRScheduler;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 
+
 /**
  * 
  * 
@@ -219,6 +220,8 @@ public class StaticSubGraph {
 		while (dataFlow.hasNext()) {
 			FlatNode node = dataFlow.next();
 
+			System.out.println(this.getClass().getCanonicalName() + ".flatten() FlatNode node=" + node.getName());
+			
 			if (node.getName().contains("DummySource") ||
 					node.getName().contains("DummySink") ) {
 				System.out.println("<<<<<<<<<<<< Skipping the node: " + node.getName());
@@ -548,6 +551,8 @@ public class StaticSubGraph {
 	public StaticSubGraph init(StreamGraph parent, SIRStream str,
 			InputPort inputPort, OutputPort outputPort) {
 
+
+				
 		this.parent = parent;
 		this.inputPort = inputPort;
 		this.outputPort = outputPort;
@@ -558,28 +563,22 @@ public class StaticSubGraph {
 		sirToContent = new HashMap<SIRFilter, WorkNodeContent>();
 		Map<OutputNode, HashMap<InputNode, InterFilterEdge>> edges = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
 
+	
+		GraphFlattener fg = new GraphFlattener(str);
+		SIRToFilterNodes filterNodes = new SIRToFilterNodes();
 		Map<SIROperator, int[]>[] executionCounts = SIRScheduler
 				.getExecutionCounts(str);
-
+		filterNodes.createNodes(fg.top, executionCounts);
+				
 		work = WorkEstimate.getWorkEstimate(str);
 
 		// Print out computation to communication ratio.
 		double CCRatio = CompCommRatio.ratio(str, work, executionCounts[1]);
 		System.out.println("Comp/Comm Ratio of SIR graph: " + CCRatio);
 
-		// use FlatGraph to eliminate intermediate levels of pipelines
-		// when looking at stream.
-		GraphFlattener fg = new GraphFlattener(str);
-		SIRToFilterNodes filterNodes = new SIRToFilterNodes();
-		filterNodes.createNodes(fg.top, executionCounts);
-
 		flatten(filterNodes, fg.top, edges, workEstimation, work, filterList,
 				topFilters);
-
-		for (WorkNode id : filterNodes.generatedIds) {
-			IDFilterRemoval.doit(id.getParent());
-		}
-
+	
 		this.setGeneratedIds(filterNodes.generatedIds);
 		return this;
 	}

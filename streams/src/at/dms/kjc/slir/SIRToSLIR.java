@@ -43,6 +43,9 @@ public class SIRToSLIR {
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			InputPort inputPort = new UnaryInputPort();
 			OutputPort outputPort = new UnaryOutputPort();
+			
+			log(this.getClass().getCanonicalName() + " str=" + str.getName());
+			
 			streamGraph.addSSG(new StaticSubGraph().init(streamGraph, str, inputPort, outputPort));		
 		}
 

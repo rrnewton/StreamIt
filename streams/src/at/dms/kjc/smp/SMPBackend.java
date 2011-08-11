@@ -51,14 +51,14 @@ public class SMPBackend {
         streamGraph.simplifyFilters(chip.size());
         
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
-        	runSSG(ssg, commonPasses);
+        	runSSG(ssg);
         }
         
         emitCode();
     
     }
         
-    private static void runSSG(StaticSubGraph ssg, CommonPasses commonPasses) {        	            
+    private static void runSSG(StaticSubGraph ssg) {//, CommonPasses commonPasses) {        	            
       
         // dump slice graph to dot file
         ssg.dumpGraph("traces.dot", null);
