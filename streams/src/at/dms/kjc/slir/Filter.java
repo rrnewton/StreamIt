@@ -28,33 +28,11 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      */
 
     /**
-     * Create slice with an InputSliceNode.
-     * "head" is expected to be linked to a FilterSliceNode by the time finish is called.
-     * @{link {@link #finish() finish} } will tack on an OutputSliceNode if missing.
-     * @param head  the InputSliceNode
+     * Create filter with no internal nodes.
      */
-    public Filter(InputNode head) {
-        this.head = head;
-        head.setParent(this);
+    public Filter() {
     }
 
-    /**
-     * Create slice with a FilterSliceNode.
-     * Creates an InputSliceNode automatically and links it with the FilterSliceNode.
-     * @param node
-     */
-    public Filter(InternalFilterNode node) {
-        if (!(node instanceof WorkNode))
-            Utils.fail("FilterSliceNode expected: " + node);
-        head = new InputNode();
-        head.setParent(this);
-        head.setNext(node);
-        node.setPrevious(head);
-       
-    }
-
-    protected Filter() {
-    }
     
     /**
      * After a slice has been cloned, set up the fields of the slicenodes included 
@@ -138,6 +116,15 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         node.setParent(this);
     }
 
+    /**
+     * Set this filter's work node to <node>
+     * 
+     * @param node The node 
+     */
+    public void setWorkNode(WorkNode node) {
+    	this.workNode = node;
+    }
+    
     public WorkNodeContent getWorkNodeContent() {
     	return workNode.getFilter();
     }

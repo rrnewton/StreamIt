@@ -220,7 +220,6 @@ public class StaticSubGraph {
 		while (dataFlow.hasNext()) {
 			FlatNode node = dataFlow.next();
 
-			System.out.println(this.getClass().getCanonicalName() + ".flatten() FlatNode node=" + node.getName());
 			
 			if (node.getName().contains("DummySource") ||
 					node.getName().contains("DummySink") ) {
@@ -236,7 +235,7 @@ public class StaticSubGraph {
 			assert input != null && output != null && filterNode != null;
 
 			// set up the slice
-			Filter filter = new Filter(input);
+			Filter filter = new Filter();
 			input.setNext(filterNode);
 			filterNode.setPrevious(input);
 			filterNode.setNext(output);
@@ -244,6 +243,9 @@ public class StaticSubGraph {
 			input.setParent(filter);
 			output.setParent(filter);
 			filterNode.setParent(filter);
+			filter.setInputNode(input);	
+			filter.setOutputNode(output);
+			filter.setWorkNode(filterNode);
 
 			// System.out.println("  outputs: " + node.ways);
 			if (node.ways != 0) {

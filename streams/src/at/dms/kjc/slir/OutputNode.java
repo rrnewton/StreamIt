@@ -138,7 +138,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
             LinkedList<LinkedList<InterFilterEdge>> dests, SchedulingPhase phase) {
         int[] newWeights;
         InterFilterEdge[][] newDests;
-
+        
         if (weights.size() == 1) 
             newWeights = new int[]{1};
         else {
