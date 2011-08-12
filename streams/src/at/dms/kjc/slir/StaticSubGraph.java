@@ -22,6 +22,8 @@ import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.SIRScheduler;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.sir.SIRDummySource;
+import at.dms.kjc.sir.SIRDummySink;
 
 
 /**
@@ -248,7 +250,13 @@ public class StaticSubGraph {
 			filter.setWorkNode(filterNode);
 
 			// System.out.println("  outputs: " + node.ways);
-			if (node.ways != 0) {
+			//check to see if this node is feeding a dummy sink, if so, then don't create an edge
+			//to the dummy sink because it will not be generated in the SLIR
+			if (node.ways > 0 && node.getEdges()[0].contents instanceof SIRDummySink) {
+				assert node.ways == 1;
+				output.setWeights(new int[0]);
+				output.setDests(new InterFilterEdge[0][0]);
+			} else if (node.ways != 0) {
 				assert node.ways == node.getEdges().length
 						&& node.ways == node.weights.length;
 
@@ -314,7 +322,14 @@ public class StaticSubGraph {
 			
 			// set up the joining, the edges should exist already from upstream
 			// System.out.println("  inputs: " + node.inputs);
-			if (node.inputs != 0) {
+			
+			//there might have been a dummy source before this node, if so, handle this specially
+			//and don't create an edge to the dummy source because it is not translated into an SLIR node
+			if (node.inputs > 0 && node.incoming[0].contents instanceof SIRDummySource) {
+				assert node.inputs == 1;
+				input.setWeights(new int[0]);
+				input.setSources(new InterFilterEdge[0]);	
+			} else if (node.inputs != 0) {
 				assert node.inputs == node.incoming.length
 						&& node.inputs == node.incomingWeights.length;
 
@@ -324,14 +339,7 @@ public class StaticSubGraph {
 					if (node.incomingWeights[i] == 0)
 						continue;					
 					
-					/** This may be null, if the DummySource/Sink have been removed */
-//					if (null == edges.get(filterNodes.outputNodes.get(node.incoming[i].contents))) {
-//						continue;
-//					}
-					
-//					assert edges.get(filterNodes.outputNodes.get(node.incoming[i].contents)) != null : "edges.get(filterNodes.outputNodes.get(node.incoming[i].contents))";
-
-					
+					HashMap<InputNode, InterFilterEdge> alreadyCreateNodeEdges = edges.get(filterNodes.outputNodes.get(node.incoming[i].contents));
 					
 					inEdges.add(edges.get(
 							filterNodes.outputNodes.get(node.incoming[i].contents)).get(input));

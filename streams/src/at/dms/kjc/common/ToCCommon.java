@@ -890,14 +890,17 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     }
     
     /**
-     * Process a Print statment, table driven to allow several backends
+     * Process a Print statement, table driven to allow several backends
      * Deals with the problem of string concatenation in Java not translating
      * to our output languages C or C++
      */
     
     public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression exp) { 
-        printExp(exp);
+    	
+    	System.out.println("HERE: " + exp);
+    	printExp(exp);
+        
         if (self.getNewline()) {
             p.print("printf(\"\\n\");\n");
         }
