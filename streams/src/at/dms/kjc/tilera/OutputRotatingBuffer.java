@@ -34,7 +34,7 @@ import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.WorkNodeInfo;
-import at.dms.kjc.backendSupport.BasicSpaceTimeScheduleX;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
     /** the output slice node for this output buffer */
@@ -49,8 +49,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * 
      * @param slices The steady-state schedule of slices
      */
-    public static void createOutputBuffers(BasicSpaceTimeScheduleX schedule) {
-        for (Filter slice : schedule.getScheduleList()) {
+    public static void createOutputBuffers(BasicSpaceTimeSchedule graphSchedule) {
+        for (Filter slice : graphSchedule.getScheduleList()) {
         	//don't do anything for file readers or writers,
             //for file readers the output buffer is allocated in processfilereader
             if (slice.getInputNode().getNextFilter().isPredefined())
@@ -80,7 +80,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
                     //hashmap
                     
                     OutputRotatingBuffer buf = new OutputRotatingBuffer(slice.getWorkNode(), parent);
-                    buf.setRotationLength(schedule);
+                    buf.setRotationLength(graphSchedule);
                     buf.setBufferSize();
                     buf.createInitCode(false);
 
@@ -126,12 +126,12 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         }
     }
     
-    public void setRotationLength(BasicSpaceTimeScheduleX schedule) {
+    public void setRotationLength(BasicSpaceTimeSchedule graphSchedule) {
         //calculate the rotation length
-        int srcMult = schedule.getPrimePumpMult(filterNode.getParent());
+        int srcMult = graphSchedule.getPrimePumpMult(filterNode.getParent());
         int maxRotLength = 0;
         for (Filter dest : filterNode.getParent().getOutputNode().getDestSlices(SchedulingPhase.STEADY)) {
-            int diff = srcMult - schedule.getPrimePumpMult(dest);
+            int diff = srcMult - graphSchedule.getPrimePumpMult(dest);
             assert diff >= 0;
             if (diff > maxRotLength)
                 maxRotLength = diff;

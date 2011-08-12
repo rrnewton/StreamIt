@@ -25,19 +25,19 @@ import at.dms.kjc.KjcOptions;
  * Else schedule in decreasing order by amount of work (CompareSliceBNWork / Partitioner)
  */
 public class BasicGenerateSteadyStateSchedule {
-    private BasicSpaceTimeScheduleX spaceTime;
+    private BasicSpaceTimeSchedule spaceTime;
     private StaticSubGraph ssg;
     private LinkedList<Filter> schedule;
     
     /**
      * 
-     * @param sts
+     * @param schedule2
      * @param layout The layout of filterTraceNode->RawTile, this could
      * be null if we are --noanneal. 
      */
-    public BasicGenerateSteadyStateSchedule(BasicSpaceTimeScheduleX sts, StaticSubGraph slicer) {
+    public BasicGenerateSteadyStateSchedule(BasicSpaceTimeSchedule schedule2, StaticSubGraph slicer) {
       
-        spaceTime = sts;
+        spaceTime = schedule2;
         this.ssg = slicer;
         schedule = new LinkedList<Filter>();
     }

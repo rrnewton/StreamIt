@@ -16,7 +16,7 @@ import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.backendSupport.BasicSpaceTimeScheduleX;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 /**
  * @author mgordon
@@ -24,18 +24,18 @@ import at.dms.kjc.backendSupport.BasicSpaceTimeScheduleX;
  */
 public class TileraBackEndScaffold extends BackEndScaffold {
     
-    protected void beforeScheduling(BasicSpaceTimeScheduleX schedule,
+    protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
     
-    protected void betweenScheduling(BasicSpaceTimeScheduleX schedule,
+    protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
     
    
-    protected void afterScheduling(BasicSpaceTimeScheduleX schedule,
+    protected void afterScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do.
     }
@@ -62,7 +62,7 @@ public class TileraBackEndScaffold extends BackEndScaffold {
      * @param computeNodes
      * @param resources The instance of BackEndFactory to be used for callbacks, data.
      */
-    public void run(BasicSpaceTimeScheduleX schedule, BackEndFactory resources) {
+    public void run(BasicSpaceTimeSchedule schedule, BackEndFactory resources) {
    
         ComputeNodesI computeNodes = resources.getComputeNodes();
         this.resources = resources;

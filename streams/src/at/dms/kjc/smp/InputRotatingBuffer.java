@@ -57,7 +57,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * 
      * @param schedule The spacetime schedule of the slices 
      */
-    public static void createInputBuffers(BasicSpaceTimeScheduleX schedule) {
+    public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
         for (Filter slice : schedule.getScheduleList()) {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
@@ -72,7 +72,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         }
     }
 
-    public static void createInputBuffer(Filter slice, BasicSpaceTimeScheduleX schedule) {
+    public static void createInputBuffer(Filter slice, BasicSpaceTimeSchedule schedule) {
              
         if (!slice.getInputNode().noInputs()) {
             assert slice.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
@@ -132,7 +132,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /**
      * Set the rotation length of this rotating buffer
      */
-    protected void setRotationLength(BasicSpaceTimeScheduleX schedule) {
+    protected void setRotationLength(BasicSpaceTimeSchedule schedule) {
         //calculate the rotation length
 
         int destMult;

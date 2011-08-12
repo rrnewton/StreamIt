@@ -58,10 +58,10 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * for the filter of the slice.  Also set the rotation lengths based on the 
      * prime pump schedule.
      * 
-     * @param schedule The spacetime schedule of the slices 
+     * @param graphSchedule The spacetime schedule of the slices 
      */
-    public static void createInputBuffers(BasicSpaceTimeScheduleX schedule) {
-        for (Filter slice : schedule.getScheduleList()) {
+    public static void createInputBuffers(BasicSpaceTimeSchedule graphSchedule) {
+        for (Filter slice : graphSchedule.getScheduleList()) {
         	if (!slice.getInputNode().noInputs()) {
                 assert slice.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
                 Tile parent = TileraBackend.backEndBits.getLayout().getComputeNode(slice.getWorkNode());
@@ -69,7 +69,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
                 //hashmap
                 InputRotatingBuffer buf = new InputRotatingBuffer(slice.getWorkNode(), parent);
                                   
-                buf.setRotationLength(schedule);
+                buf.setRotationLength(graphSchedule);
                 buf.createInitCode(true);
                 buf.createAddressBufs();
                 //System.out.println("Setting input buf " + buf.getFilterNode() + " to " + buf.rotationLength);
@@ -275,17 +275,17 @@ public class InputRotatingBuffer extends RotatingBuffer {
     
     /**
      * 
-     * @param schedule
+     * @param graphSchedule
      */
-    protected void setRotationLength(BasicSpaceTimeScheduleX schedule) {
+    protected void setRotationLength(BasicSpaceTimeSchedule graphSchedule) {
         //now set the rotation length
-        int destMult = schedule.getPrimePumpMult(filterNode.getParent());
+        int destMult = graphSchedule.getPrimePumpMult(filterNode.getParent());
         //first find the max rotation length given the prime pump 
         //mults of all the sources
         int maxRotationLength = 0;
         
         for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
-            int diff = schedule.getPrimePumpMult(src) - destMult; 
+            int diff = graphSchedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
             if (diff > maxRotationLength) {
                 maxRotationLength = diff;

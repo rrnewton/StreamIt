@@ -98,13 +98,13 @@ public abstract class RotatingBuffer extends Channel {
      * This call also creates code for allocating the rotating buffers and 
      * communicating the addresses of shared buffers.
      * 
-     * @param schedule  The spacetime schedule of the application
+     * @param graphSchedule  The spacetime schedule of the application
      */
-    public static void createBuffers(BasicSpaceTimeScheduleX schedule) {
+    public static void createBuffers(BasicSpaceTimeSchedule graphSchedule) {
         //have to create input buffers first because when we have a lack of a 
         //shared input buffer, we create an output buffer
-        InputRotatingBuffer.createInputBuffers(schedule);
-        OutputRotatingBuffer.createOutputBuffers(schedule);
+        InputRotatingBuffer.createInputBuffers(graphSchedule);
+        OutputRotatingBuffer.createOutputBuffers(graphSchedule);
         
         //now that all the buffers are created, create the pointers to them
         //that live on other tiles, and create the transfer commands

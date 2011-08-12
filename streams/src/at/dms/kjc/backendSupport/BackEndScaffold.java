@@ -26,12 +26,12 @@ public class BackEndScaffold  {
      * @param schedule
      * @param resources the BackEndFactory used to redirect to correct code generation routines.
      */
-    protected void beforeScheduling(BasicSpaceTimeScheduleX schedule,
+    protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
     
-    protected void betweenScheduling(BasicSpaceTimeScheduleX schedule,
+    protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
@@ -42,7 +42,7 @@ public class BackEndScaffold  {
     * @param schedule
      * @param resources
      */
-    protected void afterScheduling(BasicSpaceTimeScheduleX schedule,
+    protected void afterScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do.
     }
@@ -71,7 +71,7 @@ public class BackEndScaffold  {
      * @param computeNodes
      * @param resources The instance of BackEndFactory to be used for callbacks, data.
      */
-    public void run(BasicSpaceTimeScheduleX schedule, BackEndFactory resources) {
+    public void run(BasicSpaceTimeSchedule schedule, BackEndFactory resources) {
    
         ComputeNodesI computeNodes = resources.getComputeNodes();
         this.resources = resources;

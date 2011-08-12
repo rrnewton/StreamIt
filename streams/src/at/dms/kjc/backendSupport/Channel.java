@@ -163,7 +163,7 @@ public class Channel {
      * Also adds in extracount to set up double-bufferring if desired.
      * @param sched BasicSpaceTimeSchedule gives primePump multiplicities.
      */
-    public static void setRotationLengths(BasicSpaceTimeScheduleX sched) {
+    public static void setRotationLengths(BasicSpaceTimeSchedule sched) {
         for (Channel buf : getBuffers()) {
             setRotationLength(buf, sched);
         }
@@ -176,7 +176,7 @@ public class Channel {
      * 
      * @param buffer
      */
-    private static void setRotationLength(Channel buffer, BasicSpaceTimeScheduleX spaceTimeSchedule) {
+    private static void setRotationLength(Channel buffer, BasicSpaceTimeSchedule spaceTimeSchedule) {
         int sourceMult = spaceTimeSchedule.getPrimePumpMult(buffer.getSource().getParent());
         int destMult = spaceTimeSchedule.getPrimePumpMult(buffer.getDest().getParent());
 
