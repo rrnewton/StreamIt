@@ -36,7 +36,7 @@ public class DataFlowOrder {
             while (!queue.isEmpty()) {
                 Filter slice = queue.removeFirst();
                 if (!visited.contains(slice)) {
-                    visited.add(slice);
+                    visited.add(slice);                                                         
                     for (Edge destEdge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
                         Filter current = destEdge.getDest().getParent();
                         if (!visited.contains(current)) {

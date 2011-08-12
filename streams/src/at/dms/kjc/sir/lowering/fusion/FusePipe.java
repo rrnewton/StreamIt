@@ -282,12 +282,12 @@ public class FusePipe {
 
 		
 		
-//		if (filter.getName().contains("DummySource") ||
-//				filter.getName().contains("DummySink") ) {
-//			System.err.println("filter " + filter.getName()
-//					+ " is not fusable because it is a dummy");
-//			return false;
-//		}		
+		if (filter.getName().contains("DummySource") ||
+				filter.getName().contains("DummySink") ) {
+			System.err.println("filter " + filter.getName()
+					+ " is not fusable because it is a dummy");
+			return false;
+		}		
 
 		
 		// special case: identity filters are fusable (even though

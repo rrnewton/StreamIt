@@ -97,7 +97,7 @@ public class StaticSubGraph {
 	 * Force creation of kopi methods and fields for predefined filters.
 	 */
 	public void createPredefinedContent() {
-		for (Filter s : getFilterGraph()) {
+		for (Filter s : getFilterGraph()) {			
 			if (s.getWorkNode().getFilter() instanceof PredefinedContent) {
 				((PredefinedContent) s.getWorkNode().getFilter())
 						.createContent();
@@ -258,6 +258,10 @@ public class StaticSubGraph {
 				LinkedList<Integer> outWeights = new LinkedList<Integer>();
 				HashMap<InputNode, InterFilterEdge> newEdges = new HashMap<InputNode, InterFilterEdge>();
 				for (int i = 0; i < node.ways; i++) {
+
+					System.out.println(this.getClass().getCanonicalName() + ". in for loop iteration=" + i);
+					System.out.println(this.getClass().getCanonicalName() + ". node.weights[i]=" + node.weights[i]);
+					
 					if (node.weights[i] == 0)
 						continue;
 					InterFilterEdge edge = new InterFilterEdge(
@@ -306,6 +310,8 @@ public class StaticSubGraph {
 				}
 			}
 
+			System.out.println("+++++ StaticSubGraph.flatten() Filter node=" + node.getName());
+			
 			// set up the joining, the edges should exist already from upstream
 			// System.out.println("  inputs: " + node.inputs);
 			if (node.inputs != 0) {
@@ -322,7 +328,7 @@ public class StaticSubGraph {
 //					if (null == edges.get(filterNodes.outputNodes.get(node.incoming[i].contents))) {
 //						continue;
 //					}
-//					
+					
 //					assert edges.get(filterNodes.outputNodes.get(node.incoming[i].contents)) != null : "edges.get(filterNodes.outputNodes.get(node.incoming[i].contents))";
 
 					

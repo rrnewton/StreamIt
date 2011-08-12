@@ -245,6 +245,10 @@ public class TMDBinPackFissAll extends Scheduler {
     public void calculateFizzAmounts(int totalTiles) {
     	LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
     	
+    	
+    	System.out.println("**************************" + slices.size());
+    	
+    	
     	// Look for fizzable filters
     	for(Filter slice : slices) {
     		WorkNode fsn = slice.getWorkNode();
