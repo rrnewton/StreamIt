@@ -34,7 +34,7 @@ import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.WorkNodeInfo;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeScheduleX;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
     /** the output slice node for this output buffer */
@@ -49,7 +49,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * 
      * @param slices The steady-state schedule of slices
      */
-    public static void createOutputBuffers(BasicSpaceTimeSchedule schedule) {
+    public static void createOutputBuffers(BasicSpaceTimeScheduleX schedule) {
         for (Filter slice : schedule.getScheduleList()) {
         	//don't do anything for file readers or writers,
             //for file readers the output buffer is allocated in processfilereader
@@ -126,7 +126,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         }
     }
     
-    public void setRotationLength(BasicSpaceTimeSchedule schedule) {
+    public void setRotationLength(BasicSpaceTimeScheduleX schedule) {
         //calculate the rotation length
         int srcMult = schedule.getPrimePumpMult(filterNode.getParent());
         int maxRotLength = 0;

@@ -63,7 +63,7 @@ public class SMPBackend {
         ssg.dumpGraph("traces.dot", null);
         
         // partition the slice graph based on the scheduling policy
-        SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(ssg);
+        BasicSpaceTimeSchedule graphSchedule = new BasicSpaceTimeSchedule(ssg);
         scheduler.setGraphSchedule(graphSchedule);
         scheduler.run(chip.size());
         WorkNodeInfo.reset();
@@ -139,7 +139,7 @@ public class SMPBackend {
     	
     }
     
-    private static void calculateCompCommRatio(SpaceTimeScheduleAndSSG graphSchedule) {
+    private static void calculateCompCommRatio(BasicSpaceTimeSchedule graphSchedule) {
         LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
         HashSet<Filter> compProcessed = new HashSet<Filter>();
         HashSet<Filter> commProcessed = new HashSet<Filter>();
@@ -229,7 +229,7 @@ public class SMPBackend {
      *
      * @return a Scheduler from which the schedules for the phases may be extracted. 
      */
-    public static void scheduleSlices(SpaceTimeScheduleAndSSG schedule) {
+    public static void scheduleSlices(BasicSpaceTimeSchedule schedule) {
         StaticSubGraph slicer = schedule.getSSG();
         
         // set init schedule in standard order

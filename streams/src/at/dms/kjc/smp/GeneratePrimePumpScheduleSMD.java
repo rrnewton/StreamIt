@@ -4,7 +4,7 @@ package at.dms.kjc.smp;
  */
 
 import java.util.*;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSSG;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.KjcOptions;
@@ -19,13 +19,13 @@ import at.dms.kjc.KjcOptions;
  *
  */
 public class GeneratePrimePumpScheduleSMD {
-    private SpaceTimeScheduleAndSSG spaceTimeSchedule;
+    private BasicSpaceTimeSchedule spaceTimeSchedule;
     //the execution count for each trace during the calculation of the schedule
     private HashMap<Object, Integer> exeCounts;
     
     
    
-    public GeneratePrimePumpScheduleSMD(SpaceTimeScheduleAndSSG sts) {
+    public GeneratePrimePumpScheduleSMD(BasicSpaceTimeSchedule sts) {
         spaceTimeSchedule = sts;
         exeCounts = new HashMap<Object, Integer>();
     }

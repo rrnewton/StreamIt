@@ -17,7 +17,7 @@ import at.dms.kjc.KjcOptions;
  */
 public abstract class Scheduler implements Layout<Core> {
     
-    protected SpaceTimeScheduleAndSSG graphSchedule;
+    protected BasicSpaceTimeSchedule graphSchedule;
     protected HashMap<InternalFilterNode, Core> layoutMap;
     
     public Scheduler() {
@@ -33,7 +33,7 @@ public abstract class Scheduler implements Layout<Core> {
         return (this instanceof TMD);
     }
     
-    public void setGraphSchedule(SpaceTimeScheduleAndSSG graphSchedule) {
+    public void setGraphSchedule(BasicSpaceTimeSchedule graphSchedule) {
         this.graphSchedule = graphSchedule;
     }
     
@@ -41,7 +41,7 @@ public abstract class Scheduler implements Layout<Core> {
 
     public SIRStream SIRFusion(SIRStream str, int tiles) {return str;};
     
-    public SpaceTimeScheduleAndSSG getGraphSchedule() {
+    public BasicSpaceTimeSchedule getGraphSchedule() {
         return graphSchedule;
     }
 }

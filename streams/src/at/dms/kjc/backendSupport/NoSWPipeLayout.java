@@ -23,7 +23,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     /** from assignment when done with simulated annealing */
     private HashMap<InternalFilterNode, T> layout;
     
-    public NoSWPipeLayout(SpaceTimeScheduleAndSSG spaceTime, Ts chip) {
+    public NoSWPipeLayout(BasicSpaceTimeSchedule spaceTime, Ts chip) {
         this.chip = chip;
         this.slicer = (StaticSubGraph)spaceTime.getSSG();
         scheduleOrder = 

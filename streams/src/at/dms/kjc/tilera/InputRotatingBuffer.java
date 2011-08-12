@@ -60,7 +60,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * 
      * @param schedule The spacetime schedule of the slices 
      */
-    public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
+    public static void createInputBuffers(BasicSpaceTimeScheduleX schedule) {
         for (Filter slice : schedule.getScheduleList()) {
         	if (!slice.getInputNode().noInputs()) {
                 assert slice.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
@@ -277,7 +277,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * 
      * @param schedule
      */
-    protected void setRotationLength(BasicSpaceTimeSchedule schedule) {
+    protected void setRotationLength(BasicSpaceTimeScheduleX schedule) {
         //now set the rotation length
         int destMult = schedule.getPrimePumpMult(filterNode.getParent());
         //first find the max rotation length given the prime pump 

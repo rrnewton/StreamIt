@@ -16,7 +16,7 @@ import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeScheduleX;
 
 /**
  * @author mgordon
@@ -24,18 +24,18 @@ import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
  */
 public class TileraBackEndScaffold extends BackEndScaffold {
     
-    protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
+    protected void beforeScheduling(BasicSpaceTimeScheduleX schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
     
-    protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
+    protected void betweenScheduling(BasicSpaceTimeScheduleX schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
     
    
-    protected void afterScheduling(BasicSpaceTimeSchedule schedule,
+    protected void afterScheduling(BasicSpaceTimeScheduleX schedule,
             BackEndFactory resources) {
         // nothing to do.
     }
@@ -56,13 +56,13 @@ public class TileraBackEndScaffold extends BackEndScaffold {
     }
     
     /**
-     * Pass in a {@link BasicSpaceTimeSchedule schedule}, and get a set of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s
+     * Pass in a {@link BasicSpaceTimeScheduleX schedule}, and get a set of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s
      * and a set of (underspecified) {@link at.dms.kjc.backendSupport.Channel Buffer}s filled in.
      * @param schedule
      * @param computeNodes
      * @param resources The instance of BackEndFactory to be used for callbacks, data.
      */
-    public void run(BasicSpaceTimeSchedule schedule, BackEndFactory resources) {
+    public void run(BasicSpaceTimeScheduleX schedule, BackEndFactory resources) {
    
         ComputeNodesI computeNodes = resources.getComputeNodes();
         this.resources = resources;

@@ -15,7 +15,7 @@ import at.dms.kjc.slir.*;
  */
 public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
     private HashMap<InternalFilterNode, T> assignment;
-    private SpaceTimeScheduleAndSSG spaceTime;
+    private BasicSpaceTimeSchedule spaceTime;
     private int numBins;
     private LinkedList<InternalFilterNode>[] bins;
     private int[] binWeight;
@@ -29,7 +29,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
      * @param spaceTime
      * @param nodes
      */
-    public BasicGreedyLayout(SpaceTimeScheduleAndSSG spaceTime, T[] nodes) {
+    public BasicGreedyLayout(BasicSpaceTimeSchedule spaceTime, T[] nodes) {
         this.ssg = (StaticSubGraph)spaceTime.getSSG();
         this.spaceTime = spaceTime;
         this.nodes = nodes;

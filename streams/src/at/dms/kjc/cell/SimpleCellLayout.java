@@ -3,17 +3,17 @@ package at.dms.kjc.cell;
 import java.util.HashMap;
 
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSSG;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InternalFilterNode;
 
 public class SimpleCellLayout implements Layout<CellPU> {
 
     private HashMap<InternalFilterNode,CellPU> layout;
-    SpaceTimeScheduleAndSSG spaceTime;
+    BasicSpaceTimeSchedule spaceTime;
     CellChip cellChip;
     
-    public SimpleCellLayout(SpaceTimeScheduleAndSSG spaceTime, CellChip cellChip) {
+    public SimpleCellLayout(BasicSpaceTimeSchedule spaceTime, CellChip cellChip) {
         this.spaceTime = spaceTime;
         this.cellChip = cellChip;
     }

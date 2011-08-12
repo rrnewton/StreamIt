@@ -1,147 +1,79 @@
-//$Id$
+//$Id: SpaceTimeScheduleAndSlicer.java,v 1.2 2008-09-04 18:53:25 mgordon Exp $
 /**
  * Extracts the "schedule" part of Mike's SpaceTimeSchedule.
  * 
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.Vector;
 
-import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.WorkNodeInfo;
-import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.slir.*;
 
 /**
- * Collects initialization schedule, prime-pump schedule
+ * Extend BasicSpaceTimeSchedule by storing a slicer.
+ * 
+ * BasicSpaceTimeSchedule collects initialization schedule, prime-pump schedule
  * and steady-state schedule in one place.
  * This is purely a data structure: it is operated on by 
  * other classes to generate these schedules.
+ * 
+ * It is convenient for classes performing layout to keep the slicer with
+ * the schedule.  The slicer supplies the initial slice graph and includes
+ * a map from filters to the amount of work that they perform, which is needed
+ * to partition.
+ * 
  * @author mgordon (refactored dimock)
  */
-public class BasicSpaceTimeSchedule {
-    //the initialization schedule
-    private Filter[] initSchedule;
-    //the preloop schedule!
-    private Filter[][] primePumpSchedule; 
-    //a list of the execution order of slices    
-    private Filter[] schedule;
-    //the multiplicities of the slices in the primepump
-    //Filter->Integer
-    private HashMap<Filter, Integer> primePumpMult;
- 
-    /**
-     * Constructor
-     */
-    public BasicSpaceTimeSchedule() {
-        primePumpMult = new HashMap<Filter, Integer>();
-    }
-    /**
-     * @param is The initSchedule to set.
-     */
-    final public void setInitSchedule(LinkedList<Filter> is) {
-        this.initSchedule = (Filter[])is.toArray(new Filter[0]);
-    }
-
-    /**
-     * @return Returns the initSchedule.
-     */
-    final public Filter[] getInitSchedule() {
-        return initSchedule;
-    }
-
-    /**
-     * Return a linked list representation of the
-     * steady state schedule;
-     * 
-     * @return a linked list representation of the
-     * steady state schedule;
-     */
-    final public LinkedList<Filter> getScheduleList() {
-        LinkedList<Filter> list = new LinkedList<Filter>();
-        for (int i = 0; i < schedule.length; i++)
-            list.add(schedule[i]);
-        
-        return list;
-    }
+public class BasicSpaceTimeSchedule extends BasicSpaceTimeScheduleX {
+    /** Partitioner stored with schedule. */
+    private StaticSubGraph ssg;
     
-    /**
-     * @return Returns the steady state schedule.
-     */
-    final public Filter[] getSchedule() {
-        return schedule;
-    }
-
-    /**
-     * @param schedule The steady-state schedule to set.
-     */
-    final public void setSchedule(LinkedList<Filter> schedule) {
-        this.schedule = schedule.toArray(new Filter[0]);
+    public BasicSpaceTimeSchedule(StaticSubGraph ssg) {
+        super(ssg);
+        this.ssg = ssg;
     }
     
     
     /**
-     * @return Returns the primePumpSchedule.
+     * Return the number of outputs that are written to file writers during the 
+     * steady-state.
+     *  
+     * @return the number of outputs that are written to file writers during the 
+     * steady-state.
      */
-    final public Filter[][] getPrimePumpSchedule() {
-        return primePumpSchedule;
-    }
-
-    /** 
-     * @return A flat (one-dimensional) array of the primepump schedule.
-     */
-    final public Filter[] getPrimePumpScheduleFlat() {
-        LinkedList<Filter> pp = new LinkedList<Filter>();
+    public int outputsPerSteady() {
+        int outputs = 0;
         
-        for (int i = 0; i < primePumpSchedule.length; i++) 
-            for (int j = 0; j < primePumpSchedule[i].length; j++) 
-                pp.add(primePumpSchedule[i][j]);
+        //get all the file writers
+        Vector<Filter> fileWriters = new Vector<Filter>();
+        for (int i = 0; i < getSSG().io.length; i++) 
+            if (getSSG().io[i].getInputNode().isFileOutput())
+                fileWriters.add(getSSG().io[i]);
         
+        for (int i = 0; i < fileWriters.size(); i++) {
+            WorkNode node = (WorkNode)fileWriters.get(i).getInputNode().getNext();
+            WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(node);
+            assert node.getFilter().getInputType().isNumeric() :
+                "non-numeric type for input to filewriter";
         
-        return pp.toArray(new Filter[0]);
-    }
-    
-    /**
-     * @param preLoopSchedule The primePumpSchedule to set.
-     */
-    final public void setPrimePumpSchedule(LinkedList<LinkedList<Filter>> preLoopSchedule) {
-        //      convert into an array for easier access...
-        //CommonUtils.println_debugging("Setting primepump schedule:");   
-        primePumpSchedule = new Filter[preLoopSchedule.size()][];
-        for (int i = 0; i < preLoopSchedule.size(); i++ ) {
-            LinkedList schStep = preLoopSchedule.get(i);
-            primePumpSchedule[i] = new Filter[schStep.size()];
-            for (int j = 0; j < schStep.size(); j++) {
-                Filter current = (Filter)schStep.get(j);
-                //CommonUtils.println_debugging(current.toString());
-                primePumpSchedule[i][j] = current;
-                //generate the prime pump multiplicity map
-                if (!primePumpMult.containsKey(current))
-                    primePumpMult.put(current, new Integer(1));
-                else 
-                    primePumpMult.put(current, 
-                            new Integer(primePumpMult.get(current).intValue() + 1));
-            }
+            outputs += fi.totalItemsReceived(SchedulingPhase.STEADY);
         }
+        return outputs;
     }
- 
+    
+
+    
     /** 
-     * @param slice
-     * @return Return the number of times this slice fires in the prime pump schedule.
+     * @param ssg
      */
-    final public int getPrimePumpMult(Filter slice) {
-        if (!primePumpMult.containsKey(slice))
-            return 0;
-        return primePumpMult.get(slice).intValue();
+    public void setSSG(StaticSubGraph ssg) {
+        this.ssg = ssg;
     }
 
     /**
-     * @param f
-     * @return The total number of times this filter fires in the prime pump stage
-     * so this accounts for the number number of times that a slice if called in the
-     * prime pump stage to fill the rotating buffers.
+     * @return the partitioner associated with this schedule.
      */
-    final public int getPrimePumpTotalMult(WorkNodeInfo f) {
-        return getPrimePumpMult(f.sliceNode.getParent()) * f.steadyMult;
+    public StaticSubGraph getSSG() {
+        return ssg;
     }
-
 }

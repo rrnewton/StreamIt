@@ -50,7 +50,7 @@ public class UniBackEnd {
     	
    
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
-        SpaceTimeScheduleAndSSG schedule = commonPasses.scheduleSlices(ssg);
+        BasicSpaceTimeSchedule schedule = commonPasses.scheduleSlices(ssg);
       
 
         // create a collection of (very uninformative) processor descriptions.

@@ -190,7 +190,7 @@ public class CommonPasses {
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
 			str = doStaticPassSIRStream(str);
-			optimizedGraph.addPipe(str);
+			optimizedGraph.addToSegmentedGraph(str);
 		}
 		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
 		return streamGraph;
@@ -396,10 +396,10 @@ public class CommonPasses {
 	 * @return a Scheduler from which the schedules for the phases may be
 	 *         extracted.
 	 */
-	public SpaceTimeScheduleAndSSG scheduleSlices(StaticSubGraph ssg) {
+	public BasicSpaceTimeSchedule scheduleSlices(StaticSubGraph ssg) {
 		// Set schedules for initialization, priming (if --spacetime), and
 		// steady state.
-		SpaceTimeScheduleAndSSG schedule = new SpaceTimeScheduleAndSSG(ssg);
+		BasicSpaceTimeSchedule schedule = new BasicSpaceTimeSchedule(ssg);
 		// set init schedule in standard order
 		schedule.setInitSchedule(DataFlowOrder.getTraversal(ssg
 				.getFilterGraph()));

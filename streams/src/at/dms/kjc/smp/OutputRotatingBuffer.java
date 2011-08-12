@@ -22,7 +22,7 @@ import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.slir.fission.FissionGroup;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeScheduleX;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
 
@@ -48,7 +48,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * 
      * @param slices The steady-state schedule of slices
      */
-    public static void createOutputBuffers(BasicSpaceTimeSchedule schedule) {
+    public static void createOutputBuffers(BasicSpaceTimeScheduleX schedule) {
         for (Filter slice : schedule.getScheduleList()) {
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
@@ -63,7 +63,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         }
     }
 
-    public static void createOutputBuffer(Filter slice, BasicSpaceTimeSchedule schedule) {
+    public static void createOutputBuffer(Filter slice, BasicSpaceTimeScheduleX schedule) {
                 
         //don't do anything for file readers or writers,
         //for file readers the output buffer is allocated in ProcessFileReader
@@ -283,7 +283,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /**
      * Set the rotation length of this rotating buffer
      */
-    public void setRotationLength(BasicSpaceTimeSchedule schedule) {
+    public void setRotationLength(BasicSpaceTimeScheduleX schedule) {
         //calculate the rotation length
 
         int srcMult;

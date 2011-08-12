@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSSG;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.spacedynamic.RawTile;
@@ -23,7 +23,7 @@ public class HandLayout implements Layout {
     protected LinkedList<Filter> scheduleOrder;
     protected HashMap<InternalFilterNode, Tile> assignment;    
         
-    public HandLayout(SpaceTimeScheduleAndSSG spaceTime, TileraChip chip) {
+    public HandLayout(BasicSpaceTimeSchedule spaceTime, TileraChip chip) {
         this.chip = chip;
         this.slicer = spaceTime.getSSG();
         scheduleOrder = 

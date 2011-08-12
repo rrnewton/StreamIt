@@ -49,7 +49,7 @@ public class TileraBackend {
 		
 		ssg.dumpGraph("traces.dot", null);
 
-		SpaceTimeScheduleAndSSG graphSchedule = new SpaceTimeScheduleAndSSG(ssg);
+		BasicSpaceTimeSchedule graphSchedule = new BasicSpaceTimeSchedule(ssg);
 		scheduler.setGraphSchedule(graphSchedule);
 
 		// partition the slice graph based on the scheduling policy
@@ -92,7 +92,7 @@ public class TileraBackend {
 	 * @return a Scheduler from which the schedules for the phases may be
 	 *         extracted.
 	 */
-	public static void scheduleSlices(SpaceTimeScheduleAndSSG schedule) {
+	public static void scheduleSlices(BasicSpaceTimeSchedule schedule) {
 		StaticSubGraph slicer = schedule.getSSG();
 
 		// set init schedule in standard order

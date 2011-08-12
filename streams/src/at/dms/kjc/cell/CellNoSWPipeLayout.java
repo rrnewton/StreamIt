@@ -10,7 +10,7 @@ import at.dms.kjc.slir.*;
  *
  */
 public class CellNoSWPipeLayout extends NoSWPipeLayout<CellPU,CellChip> {
-    public CellNoSWPipeLayout(SpaceTimeScheduleAndSSG spaceTime, CellChip chip) {
+    public CellNoSWPipeLayout(BasicSpaceTimeSchedule spaceTime, CellChip chip) {
         super(spaceTime,chip);
     }
     

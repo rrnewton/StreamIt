@@ -17,13 +17,13 @@ import java.util.*;
  *
  */
 public class GeneratePrimePump {
-    private SpaceTimeScheduleAndSSG spaceTimeSchedule;
+    private BasicSpaceTimeSchedule spaceTimeSchedule;
     //the execution count for each trace during the calculation of the schedule
     private HashMap<Filter, Integer> exeCounts;
     
     
    
-    public GeneratePrimePump(SpaceTimeScheduleAndSSG sts) {
+    public GeneratePrimePump(BasicSpaceTimeSchedule sts) {
         spaceTimeSchedule = sts;
         exeCounts = new HashMap<Filter, Integer>();
     }

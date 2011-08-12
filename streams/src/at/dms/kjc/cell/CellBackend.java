@@ -14,7 +14,7 @@ import at.dms.kjc.backendSupport.CommonPasses;
 import at.dms.kjc.backendSupport.DumpSlicesAndChannels;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.MultiLevelSplitsJoins;
-import at.dms.kjc.backendSupport.SpaceTimeScheduleAndSSG;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
@@ -77,7 +77,7 @@ public class CellBackend {
         ssg.dumpGraph("traces-after-multi.dot");
         
         // Set schedules for initialization, prime-pump (if KjcOptions.spacetime), and steady state.
-        SpaceTimeScheduleAndSSG schedule = commonPasses.scheduleSlices(ssg);
+        BasicSpaceTimeSchedule schedule = commonPasses.scheduleSlices(ssg);
 
         // create a collection of (very uninformative) processor descriptions.
         CellChip cellChip = new CellChip(numCores);

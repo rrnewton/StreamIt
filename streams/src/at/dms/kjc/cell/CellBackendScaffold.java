@@ -16,13 +16,13 @@ import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InternalFilterNode;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.BasicSpaceTimeScheduleX;
 import at.dms.util.Utils;
 
 public class CellBackendScaffold extends BackEndScaffold {
     
     @Override
-    public void beforeScheduling(BasicSpaceTimeSchedule schedule,
+    public void beforeScheduling(BasicSpaceTimeScheduleX schedule,
             BackEndFactory resources) {
         ComputeNodesI computeNodes = resources.getComputeNodes();        
         Filter slices[] = schedule.getInitSchedule();
@@ -46,7 +46,7 @@ public class CellBackendScaffold extends BackEndScaffold {
      * Creates the code to set up the static schedule.
      */
     @Override
-    protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
+    protected void betweenScheduling(BasicSpaceTimeScheduleX schedule,
             BackEndFactory resources) {
         
         // not used for dynamic scheduler
