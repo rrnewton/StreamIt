@@ -140,7 +140,7 @@ public class SMPBackend {
     }
     
     private static void calculateCompCommRatio(BasicSpaceTimeSchedule graphSchedule) {
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         HashSet<Filter> compProcessed = new HashSet<Filter>();
         HashSet<Filter> commProcessed = new HashSet<Filter>();
         
@@ -247,7 +247,7 @@ public class SMPBackend {
             new GeneratePrimePump(schedule).schedule(slicer.getFilterGraph());
 
         //Still need to generate the steady state schedule!
-        schedule.setSchedule(DataFlowOrder.getTraversal(slicer.getTopSlices()));
+        schedule.setSchedule(DataFlowOrder.getTraversal(slicer.getTopFilters()));
     }
     
     /**

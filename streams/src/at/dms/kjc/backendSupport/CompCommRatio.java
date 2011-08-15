@@ -95,7 +95,7 @@ public class CompCommRatio {
         int comp = 0, comm = 0;
         // get the slice node travesal
         Iterator<InternalFilterNode> sliceNodeIt = Util.sliceNodeTraversal(DataFlowOrder
-                                                       .getTraversal(SSG.getTopSlices()));
+                                                       .getTraversal(SSG.getTopFilters()));
 
         while (sliceNodeIt.hasNext()) {
             InternalFilterNode sliceNode = sliceNodeIt.next();

@@ -61,7 +61,7 @@ public class TMDBinPackFissAll extends Scheduler {
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
         
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         HashSet<Filter> fizzedSlices = new HashSet<Filter>();
         HashSet<Filter> unfizzedSlices = new HashSet<Filter>();
         
@@ -175,7 +175,7 @@ public class TMDBinPackFissAll extends Scheduler {
         if (KjcOptions.dup == 1 || KjcOptions.optfile != null) {
         	System.out.println("***** Not using TMD scheduler since an SIR partitioner was used *****!");
         	//multiply steady multiplicity of each filter by KjcOptions.steadyMult
-		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
 
 		    for (Filter slice : slices) {
 		    	WorkNodeContent filter = slice.getWorkNode().getFilter();
@@ -195,7 +195,7 @@ public class TMDBinPackFissAll extends Scheduler {
         System.out.println("Using fission steady multiplicity factor: " + factor);
                 
         //go through and multiply the steady multiplicity of each filter by factor        
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
 
         for (Filter slice : slices) {
             WorkNodeContent filter = slice.getWorkNode().getFilter();
@@ -243,11 +243,7 @@ public class TMDBinPackFissAll extends Scheduler {
      * filters that meet specific criteria are all fizzed by <totalTiles>
      */
     public void calculateFizzAmounts(int totalTiles) {
-    	LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
-    	
-    	
-    	System.out.println("**************************" + slices.size());
-    	
+    	LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
     	
     	// Look for fizzable filters
     	for(Filter slice : slices) {
@@ -306,7 +302,7 @@ public class TMDBinPackFissAll extends Scheduler {
      */
     private int multiplicityFactor(int tiles) {
         int maxFactor = 1;
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         
         //find minimum steady-state multiplicity factor necessary to meet
         //copyDown and duplication constraints of fission

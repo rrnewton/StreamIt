@@ -72,7 +72,7 @@ public class TMD extends Scheduler {
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
         
-        lsg = new LevelizeSSG(graphSchedule.getSSG().getTopSlices());
+        lsg = new LevelizeSSG(graphSchedule.getSSG().getTopFilters());
         Filter[][] levels = lsg.getLevels();
         
         
@@ -351,7 +351,7 @@ public class TMD extends Scheduler {
         int factor = multiplicityFactor(tiles);
         System.out.println("Using fission steady multiplicty factor: " + factor);
         
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         
         //go through and multiply the steady multiplicity of each filter by factor
         for (Filter slice : slices) {
@@ -409,7 +409,7 @@ public class TMD extends Scheduler {
      * 
      */
     public void calculateFizzAmounts(int totalTiles) {
-        Filter[][] origLevels = new LevelizeSSG(graphSchedule.getSSG().getTopSlices()).getLevels();
+        Filter[][] origLevels = new LevelizeSSG(graphSchedule.getSSG().getTopFilters()).getLevels();
         long peekingWork = 0;
         long totalWork = 0;
         //assume that level 0 has a file reader and the last level has a file writer
@@ -543,7 +543,7 @@ public class TMD extends Scheduler {
      */
     private int multiplicityFactor(int tiles) {
         int maxFactor = 1;
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopSlices());
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         
         for (Filter slice : slices) {
          

@@ -28,6 +28,7 @@ public class BackEndScaffold  {
      */
     protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
+    	System.out.println("===========> " + this.getClass().getCanonicalName() + ".beforeScheduling()");
         // nothing to do in default case.
     }
     

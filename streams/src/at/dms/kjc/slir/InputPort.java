@@ -6,7 +6,52 @@ import java.util.List;
 public abstract class InputPort {
 	protected List<InterSSGEdge> links;
 	
-	protected InputPort() {
+	private StaticSubGraph ssg;
+	
+	/**
+	 * Create a new InputPort
+	 * @param ssg 
+	 */
+	protected InputPort(StaticSubGraph ssg) {
+		this.setSSH(ssg);
 		links = new LinkedList<InterSSGEdge>();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Link> getLinks() {
+		return links;
+	}
+
+	/**
+	 * 
+	 * @param links
+	 */
+	public void setLinks(List<Link> links) {
+		this.links = links;
+	}
+
+	/**
+	 * @param link
+	 */
+	public void addLink(Link link) {
+		links.add(link);
+	}
+
+	public StaticSubGraph getSSH() {
+		return ssg;
+	}
+
+	public void setSSH(StaticSubGraph ssg) {
+		this.ssg = ssg;
+	}
+	
+	public OutputPort getAdjacentPort(int i) {
+		if (links.size() <= i) {
+			return null;
+		}
+		return links.get(i).getOutputPort();		
 	}
 }

@@ -29,7 +29,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
 
     /** scheduler used by backend */
     private static Scheduler scheduler;
-    /** splits the slicegraph into levels */
+	/** splits the slicegraph into levels */
     private static LevelizeSSG lsg; 
     /** the number of filters that we have yet to process from a level the init stage */
     private static HashMap<Integer, Integer> levelLeftToProcessInit;
@@ -43,7 +43,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
 
         if (scheduler.isTMD()) {
         	//levelize the slicegraph
-        	lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSSG().getTopSlices());
+        	lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSSG().getTopFilters());
 
             //fill the left to process maps with the number of filters in a level
             levelLeftToProcessInit = new HashMap<Integer, Integer>();
@@ -125,6 +125,23 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
         return chip;
     }
 
+    /**
+     * Return the scheduler used by the backend factory
+     * @return Scheduler
+     */
+    public Scheduler getScheduler() {
+		return scheduler;
+	}
+
+    /**
+     * Set the scheduler used by the backend factory
+     * @param scheduler
+     */
+	public static void setScheduler(Scheduler scheduler) {
+		SMPBackEndFactory.scheduler = scheduler;
+	}
+
+    
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.BackEndFactory#processFilterSliceNode(at.dms.kjc.slicegraph.FilterSliceNode, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
@@ -140,6 +157,9 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
             }
         } 
         else {
+        	System.out.println("BackEndFactory.processFilterSliceNode()");
+        	System.out.println("BackEndFactory.processFilterSliceNode() backendBits==this");
+        	      
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter.getParent())) {
                 for(Filter slice : FissionGroupStore.getFizzedSlices(filter.getParent())) {
                     (new ProcessFilterSliceNode(slice.getWorkNode(), whichPhase, this)).processFilterSliceNode();

@@ -2,8 +2,8 @@ package at.dms.kjc.slir;
 
 public class UnaryOutputPort extends OutputPort {
 	
-	public UnaryOutputPort() {
-		super();
+	public UnaryOutputPort(StaticSubGraph ssg) {
+		super(ssg);
 	}
 	
 	public void setLink(InterSSGEdge l) {

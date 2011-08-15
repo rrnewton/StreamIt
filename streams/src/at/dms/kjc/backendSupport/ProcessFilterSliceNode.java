@@ -1,10 +1,27 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRBeginMarker;
+import at.dms.kjc.sir.SIREndMarker;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
  * Process a FilterSliceNode creating code in the code store and buffers for connectivity.
@@ -234,7 +251,10 @@ public class ProcessFilterSliceNode {
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
             IntraSSGChannel inputChannel, IntraSSGChannel outputChannel,
             BackEndFactory backEndBits) {
-        
+
+    	System.out.println("ProcessFilterSliceNode.makeFilterCode()");
+
+    	
         final String peekName;
 
         final String popName;
@@ -312,7 +332,7 @@ public class ProcessFilterSliceNode {
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
             IntraSSGChannel inputChannel, IntraSSGChannel outputChannel, BackEndFactory backEndBits) {
-        CodeStoreHelper filter_code = CodeStoreHelper.findHelperForSliceNode(filter);
+    	CodeStoreHelper filter_code = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filter_code == null) {
             filter_code = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);
             CodeStoreHelper.addHelperForSliceNode(filter, filter_code);

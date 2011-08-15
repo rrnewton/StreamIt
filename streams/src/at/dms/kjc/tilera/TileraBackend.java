@@ -114,7 +114,7 @@ public class TileraBackend {
 			new GeneratePrimePump(schedule).schedule(slicer.getFilterGraph());
 
 		// Still need to generate the steady state schedule!
-		schedule.setSchedule(DataFlowOrder.getTraversal(slicer.getTopSlices()));
+		schedule.setSchedule(DataFlowOrder.getTraversal(slicer.getTopFilters()));
 
 	}
 

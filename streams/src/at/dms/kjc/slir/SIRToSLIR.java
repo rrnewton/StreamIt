@@ -40,13 +40,27 @@ public class SIRToSLIR {
 		log(this.getClass().getCanonicalName() + " translate()");
 
 		StreamGraph streamGraph = new StreamGraph();
-		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
-			InputPort inputPort = new UnaryInputPort();
-			OutputPort outputPort = new UnaryOutputPort();
+		InputPort inputPort = null;
+		OutputPort outputPort = null;
+		OutputPort prevOutputPort = null;
+		// TODO: Change this to look up connectivity in the segmentedGraph 
+		// This incorrectly assumes a pipeline
+		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {			
+			StaticSubGraph ssg = new StaticSubGraph();
+			inputPort = new UnaryInputPort(ssg);			
+			outputPort = new UnaryOutputPort(ssg);		
 			
-			log(this.getClass().getCanonicalName() + " str=" + str.getName());
+			if (prevOutputPort != null) {
+				Link link = new Link(inputPort, prevOutputPort);				
+				inputPort.addLink(link);
+				prevOutputPort.addLink(link);
+			}
+
+
 			
+			log(this.getClass().getCanonicalName() + " str=" + str.getName());						
 			streamGraph.addSSG(new StaticSubGraph().init(streamGraph, str, inputPort, outputPort));		
+			prevOutputPort = outputPort;
 		}
 
 		return streamGraph;

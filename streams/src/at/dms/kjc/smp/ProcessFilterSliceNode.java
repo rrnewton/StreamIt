@@ -53,11 +53,14 @@ public class ProcessFilterSliceNode {
      * for other slice nodes.
      */
     public void processFilterSliceNode() {
-        doit();
+    	System.out.println("smp.processFilterSliceNode()");
+    	doit();
     }
     
     protected void doit() {
-        filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
+    	System.out.println("smp.ProcessFilterSliceNode.doit()");
+    	
+    	filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
         // We should only generate code once for a filter node.
         
         if (filterCode == null) {
@@ -71,13 +74,21 @@ public class ProcessFilterSliceNode {
                     ", has_downstream_channel " + backEndBits.sliceHasDownstreamChannel(filterNode.getParent()));
             }
             
-            RotatingBuffer inputBuffer = null;
+            Channel inputBuffer = null;
             
-            if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
-                inputBuffer = InputRotatingBuffer.getInputBuffer(filterNode);
+            System.out.println("TODO: smp.ProcessFilterSliceNode.doit() set a dynamicBuffer if approproate!!!");
+
+            
+            StaticSubGraph ssg = backEndBits.getScheduler().getGraphSchedule().getSSG();
+            
+            
+        	if (ssg.hasDynamicInput()) {
+        		inputBuffer = DynamicBuffer.getInputBuffer(filterNode, ssg);
+        	} else if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
+            	inputBuffer = InputRotatingBuffer.getInputBuffer(filterNode);
             }
             
-            RotatingBuffer outputBuffer = null;
+            Channel outputBuffer = null;
             
             if (backEndBits.sliceHasDownstreamChannel(filterNode.getParent())) {
                 outputBuffer = OutputRotatingBuffer.getOutputBuffer(filterNode);
@@ -234,6 +245,8 @@ public class ProcessFilterSliceNode {
             IntraSSGChannel inputChannel, IntraSSGChannel outputChannel,
             SMPBackEndFactory backEndBits) {
         
+    	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode()");
+    	
         final String peekName;
 
         final String popName;
@@ -311,8 +324,11 @@ public class ProcessFilterSliceNode {
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
         IntraSSGChannel inputChannel, IntraSSGChannel outputChannel, SMPBackEndFactory backEndBits) {
-        CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
+    	System.out.println("smp.ProcessFilterSliceNode.getFilterCode()");
+    	
+    	CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {
+        	System.out.println("smp.ProcessFilterSliceNode.getFilterCode() filterCode==null");
             filterCode = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);
             CodeStoreHelper.addHelperForSliceNode(filter, filterCode);
         }
