@@ -397,7 +397,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
 
     /** @return total weight on all connections to a single Edge. 
      * @param out The Edge that we are interested in*/
-    public int getWeight(Edge out, SchedulingPhase phase) {
+    public int getWeight(IntraSSGEdge out, SchedulingPhase phase) {
         int sum = 0;
 
         for (int i = 0; i < getSources(phase).length; i++)
@@ -472,7 +472,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * @param edge
      * @return  0.0 if totalWeights() == 0, else ratio.
      */
-    public double ratio(Edge edge, SchedulingPhase phase) {
+    public double ratio(IntraSSGEdge edge, SchedulingPhase phase) {
         if (totalWeights(phase) == 0)
             return 0.0;
         return ((double) getWeight(edge, phase) / (double) totalWeights(phase));

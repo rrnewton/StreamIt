@@ -27,7 +27,7 @@ import java.util.HashMap;
  * @author mgordon
  *
  */
-public abstract class RotatingBuffer extends Channel {
+public abstract class RotatingBuffer extends IntraSSGChannel {
 
     /** the core this buffer is mapped to */
     protected Core parent;
@@ -61,7 +61,7 @@ public abstract class RotatingBuffer extends Channel {
         outputBuffers = new HashMap<WorkNode, OutputRotatingBuffer>();
     }
     
-    protected RotatingBuffer(Edge edge, WorkNode fsn, Core parent) {
+    protected RotatingBuffer(IntraSSGEdge edge, WorkNode fsn, Core parent) {
         super(edge);
         
         this.parent = parent;

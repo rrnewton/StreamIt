@@ -10,7 +10,7 @@ import java.util.HashMap;
  * @author mgordon
  *
  */
-public class InterFilterEdge extends Edge implements at.dms.kjc.DeepCloneable, Comparable<InterFilterEdge>{
+public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepCloneable, Comparable<InterFilterEdge>{
     private static HashMap<EdgeDescriptor, InterFilterEdge> edges =
         new HashMap<EdgeDescriptor, InterFilterEdge>();
     

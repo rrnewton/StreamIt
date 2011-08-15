@@ -288,7 +288,7 @@ public class ProcessOutputSliceNode {
                 int i = 0;
                 for (int j = 0; j < splitter.getWeights(SchedulingPhase.STEADY).length; j++) {
                     if (splitter.getWeights(SchedulingPhase.STEADY)[j] != 0) {
-                        Edge[] edges = splitter.getDests(SchedulingPhase.STEADY)[j];
+                        IntraSSGEdge[] edges = splitter.getDests(SchedulingPhase.STEADY)[j];
                         JStatement[] pushes = new JStatement[edges.length + 1];
                         for (int k = 0; k < edges.length; k++) {
                             pushes[k] = new JExpressionStatement(

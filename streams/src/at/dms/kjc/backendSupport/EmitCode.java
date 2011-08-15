@@ -69,23 +69,23 @@ public class EmitCode {
         codegen.setDeclOnly(false);
 
         // generate code for ends of channels that connect to code on this ComputeNode
-        Set<Channel> upstreamEnds = getUpstreamEnds(n);
-        Set<Channel> downstreamEnds = getDownstreamEnds(n);
+        Set<IntraSSGChannel> upstreamEnds = getUpstreamEnds(n);
+        Set<IntraSSGChannel> downstreamEnds = getDownstreamEnds(n);
         
         // externs
-        for (Channel c : upstreamEnds) {
+        for (IntraSSGChannel c : upstreamEnds) {
             if (c.writeDeclsExtern() != null) {
                 for (JStatement d : c.writeDeclsExtern()) { d.accept(codegen); }
             }
         }
        
-        for (Channel c : downstreamEnds) {
+        for (IntraSSGChannel c : downstreamEnds) {
             if (c.readDeclsExtern() != null) {
                 for (JStatement d : c.readDeclsExtern()) { d.accept(codegen); }
             }
         }
 
-        for (Channel c : upstreamEnds) {
+        for (IntraSSGChannel c : upstreamEnds) {
             if (c.dataDecls() != null) {
                 // wrap in #ifndef for case where different ends have
                 // are in different files that eventually get concatenated.
@@ -98,7 +98,7 @@ public class EmitCode {
             }
         }
         
-        for (Channel c : downstreamEnds) {
+        for (IntraSSGChannel c : downstreamEnds) {
             if (c.dataDecls() != null && ! upstreamEnds.contains(c)) {
                 p.println("#ifndef " + c.getIdent() + "_CHANNEL_DATA");
                 for (JStatement d : c.dataDecls()) { d.accept(codegen); }
@@ -108,7 +108,7 @@ public class EmitCode {
             }
         }
 
-        for (Channel c : upstreamEnds) {
+        for (IntraSSGChannel c : upstreamEnds) {
             p.println("/* upstream end of " + c + "(" + c.getIdent() + ") */");
             p.println("/* " + upstreamDescription(c) + " -> " + downstreamDescription(c) + " */");
             if (c.writeDecls() != null) {
@@ -117,7 +117,7 @@ public class EmitCode {
             if (c.pushMethod() != null) { c.pushMethod().accept(codegen); }
         }
 
-        for (Channel c : downstreamEnds) {
+        for (IntraSSGChannel c : downstreamEnds) {
             p.println("/* downstream end of " + c + "(" + c.getIdent() + ") */");
             p.println("/* " + upstreamDescription(c) + " -> " + downstreamDescription(c) + " */");
             if (c.readDecls() != null) {
@@ -149,11 +149,11 @@ public class EmitCode {
      * @param n 
      * @return A collection of channels.
      */
-    private Set<Channel> getUpstreamEnds (ComputeNode n) {
-        Set<Channel> retval = new HashSet<Channel>();
+    private Set<IntraSSGChannel> getUpstreamEnds (ComputeNode n) {
+        Set<IntraSSGChannel> retval = new HashSet<IntraSSGChannel>();
         Layout l = backendbits.getLayout();
-        Collection<Channel> channels = backendbits.getChannels();
-        for (Channel c : channels) {
+        Collection<IntraSSGChannel> channels = backendbits.getChannels();
+        for (IntraSSGChannel c : channels) {
             InternalFilterNode s = c.getSource();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
@@ -168,11 +168,11 @@ public class EmitCode {
      * @param n 
      * @return A collection of channels.
      */
-    private Set<Channel> getDownstreamEnds (ComputeNode n) {
-        Set<Channel> retval = new HashSet<Channel>();
+    private Set<IntraSSGChannel> getDownstreamEnds (ComputeNode n) {
+        Set<IntraSSGChannel> retval = new HashSet<IntraSSGChannel>();
         Layout l = backendbits.getLayout();
-        Collection<Channel> channels = backendbits.getChannels();
-        for (Channel c : channels) {
+        Collection<IntraSSGChannel> channels = backendbits.getChannels();
+        for (IntraSSGChannel c : channels) {
             InternalFilterNode s = c.getDest();
             if (l.getComputeNode(s) == n) {
                 retval.add(c);
@@ -182,12 +182,12 @@ public class EmitCode {
     }
     
     /** representation of upstream end of channel for debugging */
-    private String upstreamDescription(Channel c) {
+    private String upstreamDescription(IntraSSGChannel c) {
         return c.getSource().toString();
     }
     
     /** representation of downstream end of channel for debugging */
-    private String downstreamDescription(Channel c) {
+    private String downstreamDescription(IntraSSGChannel c) {
         return c.getDest().toString();
     }
     

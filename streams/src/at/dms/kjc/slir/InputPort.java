@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class InputPort {
-	protected List<Link> links;
+	protected List<InterSSGEdge> links;
 	
 	protected InputPort() {
-		links = new LinkedList<Link>();
+		links = new LinkedList<InterSSGEdge>();
 	}
 }

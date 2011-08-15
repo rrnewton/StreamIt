@@ -4,9 +4,9 @@
 package at.dms.kjc.tilera;
 
 import at.dms.kjc.backendSupport.BackEndFactory;
-import at.dms.kjc.backendSupport.Channel;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
@@ -40,7 +40,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#getChannel(at.dms.kjc.slicegraph.Edge)
      */
     @Override
-    public Channel getChannel(Edge e) {
+    public IntraSSGChannel getChannel(IntraSSGEdge e) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -49,7 +49,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#getChannel(at.dms.kjc.slicegraph.SliceNode, at.dms.kjc.slicegraph.SliceNode)
      */
     @Override
-    public Channel getChannel(InternalFilterNode src, InternalFilterNode dst) {
+    public IntraSSGChannel getChannel(InternalFilterNode src, InternalFilterNode dst) {
         // TODO Auto-generated method stub
         return null;
     }

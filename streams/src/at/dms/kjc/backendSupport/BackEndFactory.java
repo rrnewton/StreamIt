@@ -31,7 +31,7 @@ public abstract class BackEndFactory<
      ComputeNodeSelectorArgType extends Object>
 {
     /**
-     * @return Singleton to generate {@link Channel}s and
+     * @return Singleton to generate {@link IntraSSGChannel}s and
      *         {@link ComputeCodeStore}s for the {@link ComputeNodes}.
      * @param <...> needs same parameterization as this so as to be able to refer to this.
      */
@@ -126,8 +126,8 @@ public abstract class BackEndFactory<
      * This function should return that collection of channels.
      * @return some collection of Channel s for the code emitter's use.
      */
-    public Collection<Channel> getChannels() {
-        return Channel.getBuffers();
+    public Collection<IntraSSGChannel> getChannels() {
+        return IntraSSGChannel.getBuffers();
     }
         
     /**
@@ -137,7 +137,7 @@ public abstract class BackEndFactory<
      * @return a channel: preexisting or newly created.
      */
     
-    public abstract Channel getChannel(Edge e);
+    public abstract IntraSSGChannel getChannel(IntraSSGEdge e);
     
     /**
      * Back end needs to generate subclasses of channel.
@@ -146,7 +146,7 @@ public abstract class BackEndFactory<
      * @param dst
      * @return a channel: preexisting or newly created.
      */
-    public abstract Channel getChannel(InternalFilterNode src, InternalFilterNode dst);
+    public abstract IntraSSGChannel getChannel(InternalFilterNode src, InternalFilterNode dst);
 
     /**
      * Select a CodeStoreHelper subclass given a SliceNode.

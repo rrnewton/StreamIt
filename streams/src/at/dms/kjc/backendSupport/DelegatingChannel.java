@@ -22,20 +22,20 @@ import at.dms.kjc.slir.*;
  *  
  * @author dimock
  */
-public class DelegatingChannel extends Channel {
+public class DelegatingChannel extends IntraSSGChannel {
     
-    private Channel other;
+    private IntraSSGChannel other;
     /**
      * Make a new Channel or return an already-made channel.
      * @param edge     The edge that this channel implements.
      * @param other    The channel that this delegates to.
      * @return A channel for this edge, that 
      */
-    public static DelegatingChannel getChannel(Edge edge, Channel other) {
-        Channel oldChan = Channel.bufferStore.get(edge);
+    public static DelegatingChannel getChannel(IntraSSGEdge edge, IntraSSGChannel other) {
+        IntraSSGChannel oldChan = IntraSSGChannel.bufferStore.get(edge);
         if (oldChan == null) {
             DelegatingChannel chan = new DelegatingChannel(edge, other);
-            Channel.bufferStore.put(edge, chan);
+            IntraSSGChannel.bufferStore.put(edge, chan);
             return chan;
        } else {
             assert oldChan instanceof DelegatingChannel; 
@@ -43,7 +43,7 @@ public class DelegatingChannel extends Channel {
         }
     }
     
-    private DelegatingChannel(Edge edge, Channel other) {
+    private DelegatingChannel(IntraSSGEdge edge, IntraSSGChannel other) {
         super(edge);
         this.other = other;
     }

@@ -34,7 +34,7 @@ import java.util.HashMap;
  * @author mgordon
  *
  */
-public abstract class RotatingBuffer extends Channel {
+public abstract class RotatingBuffer extends IntraSSGChannel {
     
     /** array size in elements of each buffer of the rotation*/
     protected int bufSize;
@@ -80,7 +80,7 @@ public abstract class RotatingBuffer extends Channel {
         
     }
     
-    protected RotatingBuffer(Edge edge, WorkNode fsn, Tile parent) {
+    protected RotatingBuffer(IntraSSGEdge edge, WorkNode fsn, Tile parent) {
         super(edge);
         this.parent = parent;
         filterNode = fsn;

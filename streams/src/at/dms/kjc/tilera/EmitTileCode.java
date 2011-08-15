@@ -8,7 +8,7 @@ import java.util.Set;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.backendSupport.Channel;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
 import at.dms.kjc.common.CodegenPrintWriter;

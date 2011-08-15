@@ -57,7 +57,7 @@ public class TileraBackEndScaffold extends BackEndScaffold {
     
     /**
      * Pass in a {@link BasicSpaceTimeScheduleX schedule}, and get a set of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s
-     * and a set of (underspecified) {@link at.dms.kjc.backendSupport.Channel Buffer}s filled in.
+     * and a set of (underspecified) {@link at.dms.kjc.backendSupport.IntraSSGChannel Buffer}s filled in.
      * @param schedule
      * @param computeNodes
      * @param resources The instance of BackEndFactory to be used for callbacks, data.

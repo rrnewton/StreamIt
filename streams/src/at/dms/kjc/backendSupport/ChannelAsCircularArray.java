@@ -24,11 +24,11 @@ public class ChannelAsCircularArray extends ChannelAsArray {
      * @param other    The channel that this delegates to.
      * @return A channel for this edge, that 
      */
-    public static ChannelAsCircularArray getChannel(Edge edge) {
-        Channel oldChan = Channel.bufferStore.get(edge);
+    public static ChannelAsCircularArray getChannel(IntraSSGEdge edge) {
+        IntraSSGChannel oldChan = IntraSSGChannel.bufferStore.get(edge);
         if (oldChan == null) {
             ChannelAsCircularArray chan = new ChannelAsCircularArray(edge);
-            Channel.bufferStore.put(edge, chan);
+            IntraSSGChannel.bufferStore.put(edge, chan);
             return chan;
        } else {
             assert oldChan instanceof ChannelAsArray; 
@@ -39,7 +39,7 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     /** Constructor 
      * @param edge should give enough information (indirectly) to calculate buffer size
      */
-    public ChannelAsCircularArray(Edge edge) {
+    public ChannelAsCircularArray(IntraSSGEdge edge) {
         super(edge);
         // fix up buffer size to be next power of 2
         bufSize = CommonUtils.nextPow2(bufSize);

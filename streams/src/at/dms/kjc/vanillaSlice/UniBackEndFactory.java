@@ -2,7 +2,7 @@ package at.dms.kjc.vanillaSlice;
 
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
-import at.dms.kjc.backendSupport.Channel;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.CodeStoreHelperJoiner;
 import at.dms.kjc.backendSupport.CodeStoreHelperSimple;
@@ -11,7 +11,7 @@ import at.dms.kjc.backendSupport.GetOrMakeChannel;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.backendSupport.ProcessInputSliceNode;
 import at.dms.kjc.backendSupport.ProcessOutputSliceNode;
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.OutputNode;
@@ -140,12 +140,12 @@ public class UniBackEndFactory extends BackEndFactory<
     private GetOrMakeChannel channelTypeSelector = new GetOrMakeChannel(this);
     
     @Override
-    public Channel getChannel(Edge e) {
+    public IntraSSGChannel getChannel(IntraSSGEdge e) {
         return channelTypeSelector.getOrMakeChannel(e);
     }
 
     @Override
-    public Channel getChannel(InternalFilterNode src, InternalFilterNode dst) {
+    public IntraSSGChannel getChannel(InternalFilterNode src, InternalFilterNode dst) {
         throw new AssertionError("Getting channel by src, dst not supported.");
     }
     

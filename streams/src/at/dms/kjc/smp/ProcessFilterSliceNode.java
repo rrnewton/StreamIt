@@ -231,7 +231,7 @@ public class ProcessFilterSliceNode {
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
-            Channel inputChannel, Channel outputChannel,
+            IntraSSGChannel inputChannel, IntraSSGChannel outputChannel,
             SMPBackEndFactory backEndBits) {
         
         final String peekName;
@@ -310,7 +310,7 @@ public class ProcessFilterSliceNode {
      * @return
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
-        Channel inputChannel, Channel outputChannel, SMPBackEndFactory backEndBits) {
+        IntraSSGChannel inputChannel, IntraSSGChannel outputChannel, SMPBackEndFactory backEndBits) {
         CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {
             filterCode = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);

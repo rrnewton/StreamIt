@@ -205,7 +205,7 @@ public class TMD extends Scheduler {
                     int bestInputs = -1;
                     Set<Filter> theBest = null;;
                     
-                    for (Edge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+                    for (IntraSSGEdge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
                         if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) >= bestInputs) {
                             if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) == bestInputs) {
                                 //want to be careful about when they are equal because you want to place the 
@@ -308,7 +308,7 @@ public class TMD extends Scheduler {
         int bestInputs = -1;
            
         //add the tiles to the list that are allocated to upstream inputs
-        for (Edge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+        for (IntraSSGEdge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
             Tile upstreamTile = getComputeNode(edge.getSrc().getPrevious());
             if (upstreamTile == TileraBackend.chip.getOffChipMemory())
                 continue;

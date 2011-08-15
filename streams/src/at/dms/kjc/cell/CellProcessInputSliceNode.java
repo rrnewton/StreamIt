@@ -34,7 +34,7 @@ import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
-import at.dms.kjc.backendSupport.Channel;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
 import at.dms.kjc.backendSupport.ProcessInputSliceNode;
@@ -289,7 +289,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
         // the work function will need a temporary variable
         ALocalVariable t = ALocalVariable.makeTmp(joiner.getEdgeToNext().getType());
 
-        Channel downstream = backEndBits.getChannel(joiner.getEdgeToNext());
+        IntraSSGChannel downstream = backEndBits.getChannel(joiner.getEdgeToNext());
 
         // the body of the work method
         JBlock body = new JBlock();
@@ -331,7 +331,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
             // push(tmp);
             //
             assert joiner.getWidth(SchedulingPhase.STEADY) == 1;
-            Channel upstream = backEndBits.getChannel(joiner.getSingleEdge(SchedulingPhase.STEADY));
+            IntraSSGChannel upstream = backEndBits.getChannel(joiner.getSingleEdge(SchedulingPhase.STEADY));
 
             body.addStatement(t.getDecl());
             body.addStatement(new JExpressionStatement(

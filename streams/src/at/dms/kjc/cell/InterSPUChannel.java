@@ -9,12 +9,12 @@ import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JReturnStatement;
-import at.dms.kjc.backendSupport.Channel;
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
+import at.dms.kjc.slir.IntraSSGEdge;
 
-public class InterSPUChannel extends Channel {
+public class InterSPUChannel extends IntraSSGChannel {
 
-    public InterSPUChannel(Edge e) {
+    public InterSPUChannel(IntraSSGEdge e) {
         super(e);
     }
     

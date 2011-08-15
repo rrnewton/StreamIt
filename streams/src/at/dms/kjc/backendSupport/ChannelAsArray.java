@@ -16,7 +16,7 @@ import at.dms.kjc.*;
  * @author dimock
  *
  */
-public class ChannelAsArray extends Channel {
+public class ChannelAsArray extends IntraSSGChannel {
 
     /** array size in elements */
     protected int bufSize;
@@ -68,11 +68,11 @@ public class ChannelAsArray extends Channel {
      * @param other    The channel that this delegates to.
      * @return A channel for this edge, that 
      */
-    public static ChannelAsArray getChannel(Edge edge) {
-        Channel oldChan = Channel.bufferStore.get(edge);
+    public static ChannelAsArray getChannel(IntraSSGEdge edge) {
+        IntraSSGChannel oldChan = IntraSSGChannel.bufferStore.get(edge);
         if (oldChan == null) {
             ChannelAsArray chan = new ChannelAsArray(edge);
-            Channel.bufferStore.put(edge, chan);
+            IntraSSGChannel.bufferStore.put(edge, chan);
             return chan;
        } else {
             assert oldChan instanceof ChannelAsArray; 
@@ -83,7 +83,7 @@ public class ChannelAsArray extends Channel {
     /** Constructor 
      * @param edge should give enough information (indirectly) to calculate buffer size
      */
-    public ChannelAsArray(Edge edge) {
+    public ChannelAsArray(IntraSSGEdge edge) {
         super(edge);
         bufName = this.getIdent() + "buf";
         headName = this.getIdent() + "head";

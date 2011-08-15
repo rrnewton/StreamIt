@@ -2,7 +2,7 @@ package at.dms.kjc.backendSupport;
 
 import java.util.*;
 
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.*;
 
 /**
@@ -14,7 +14,7 @@ import at.dms.kjc.*;
  * @author dimock
  *
  */
-public class UnbufferredPopChannel extends Channel {
+public class UnbufferredPopChannel extends IntraSSGChannel {
 
     private String popName;
     
@@ -24,11 +24,11 @@ public class UnbufferredPopChannel extends Channel {
      * @param popName  The name of the pop routine that will be used.
      * @return A channel for the passed edge with a where popMethodName() returns <b>popName</b>.
      */
-    public static UnbufferredPopChannel getChannel(Edge edge, String popName) {
-        Channel chan = Channel.bufferStore.get(edge);
+    public static UnbufferredPopChannel getChannel(IntraSSGEdge edge, String popName) {
+        IntraSSGChannel chan = IntraSSGChannel.bufferStore.get(edge);
         if (chan == null) {
             chan = new UnbufferredPopChannel(edge, popName);
-            Channel.bufferStore.put(edge, chan);
+            IntraSSGChannel.bufferStore.put(edge, chan);
         } else {
             assert chan instanceof UnbufferredPopChannel
                     && chan.popMethodName().equals(popName);
@@ -36,18 +36,18 @@ public class UnbufferredPopChannel extends Channel {
         return (UnbufferredPopChannel) chan;
     }
     
-    private UnbufferredPopChannel(Edge edge, String popName) {
+    private UnbufferredPopChannel(IntraSSGEdge edge, String popName) {
         super(edge);
         this.popName = popName;
     }
     
-    private Collection<Channel> produceReadHeadersFor = new LinkedList<Channel>();
+    private Collection<IntraSSGChannel> produceReadHeadersFor = new LinkedList<IntraSSGChannel>();
 
     /** 
      * Add a channel to produce upstream (write) headers for:
      * @param c  a Channel connected to the splitter that this channel calls.
      */
-    public void addChannelForHeaders(Channel c) {
+    public void addChannelForHeaders(IntraSSGChannel c) {
         produceReadHeadersFor.add(c);
     }
 
@@ -65,7 +65,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> beginInitRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (IntraSSGChannel c : produceReadHeadersFor) {
             retval.addAll(c.beginInitRead());
         }
         return retval;
@@ -76,7 +76,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
    public List<JStatement> postPreworkInitRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (IntraSSGChannel c : produceReadHeadersFor) {
             retval.addAll(c.postPreworkInitRead());
         }
         return retval;
@@ -88,7 +88,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> endInitRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (IntraSSGChannel c : produceReadHeadersFor) {
             retval.addAll(c.endInitRead());
         }
         return retval;
@@ -100,7 +100,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> beginSteadyRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (IntraSSGChannel c : produceReadHeadersFor) {
             retval.addAll(c.beginSteadyRead());
         }
         return retval;
@@ -112,7 +112,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> endSteadyRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (IntraSSGChannel c : produceReadHeadersFor) {
             retval.addAll(c.endSteadyRead());
         }
         return retval;
@@ -124,7 +124,7 @@ public class UnbufferredPopChannel extends Channel {
     @Override
     public List<JStatement> topOfWorkSteadyRead() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceReadHeadersFor) {
+        for (IntraSSGChannel c : produceReadHeadersFor) {
             retval.addAll(c.topOfWorkSteadyRead());
         }
         return retval;

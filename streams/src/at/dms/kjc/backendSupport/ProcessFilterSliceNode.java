@@ -72,13 +72,13 @@ public class ProcessFilterSliceNode {
                     ", has_downstream_channel " + backEndBits.sliceHasDownstreamChannel(filterNode.getParent()));
             }
             
-            Channel inputChannel = null;
+            IntraSSGChannel inputChannel = null;
             
             if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
                 inputChannel = backEndBits.getChannel(filterNode.getPrevious().getEdgeToNext());
             }
             
-            Channel outputChannel = null;
+            IntraSSGChannel outputChannel = null;
             
             if (backEndBits.sliceHasDownstreamChannel(filterNode.getParent())) {
                 outputChannel = backEndBits.getChannel(filterNode.getEdgeToNext());
@@ -232,7 +232,7 @@ public class ProcessFilterSliceNode {
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
-            Channel inputChannel, Channel outputChannel,
+            IntraSSGChannel inputChannel, IntraSSGChannel outputChannel,
             BackEndFactory backEndBits) {
         
         final String peekName;
@@ -311,7 +311,7 @@ public class ProcessFilterSliceNode {
      * @return
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
-            Channel inputChannel, Channel outputChannel, BackEndFactory backEndBits) {
+            IntraSSGChannel inputChannel, IntraSSGChannel outputChannel, BackEndFactory backEndBits) {
         CodeStoreHelper filter_code = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filter_code == null) {
             filter_code = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);

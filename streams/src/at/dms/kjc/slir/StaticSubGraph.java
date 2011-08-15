@@ -458,11 +458,11 @@ public class StaticSubGraph {
 			node = node.getNext();
 		}
 		if (node instanceof OutputNode) {
-			Edge[][] dests = ((OutputNode) node)
+			IntraSSGEdge[][] dests = ((OutputNode) node)
 					.getDests(SchedulingPhase.STEADY);
 			ArrayList<Object> output = new ArrayList<Object>();
 			for (int i = 0; i < dests.length; i++) {
-				Edge[] inner = dests[i];
+				IntraSSGEdge[] inner = dests[i];
 				for (int j = 0; j < inner.length; j++) {
 					// Object next=parent.get(inner[j]);
 					Object next = inner[j].getDest().getParent();
@@ -493,10 +493,10 @@ public class StaticSubGraph {
 			node = node.getNext();
 		}
 		if (node instanceof OutputNode) {
-			Edge[][] dests = ((OutputNode) node).getDests(phase);
+			IntraSSGEdge[][] dests = ((OutputNode) node).getDests(phase);
 			ArrayList<Object> output = new ArrayList<Object>();
 			for (int i = 0; i < dests.length; i++) {
-				Edge[] inner = dests[i];
+				IntraSSGEdge[] inner = dests[i];
 				for (int j = 0; j < inner.length; j++) {
 					// Object next=parent.get(inner[j]);
 					Object next = inner[j].getDest().getParent();

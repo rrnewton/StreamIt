@@ -367,7 +367,7 @@ public class ProcessInputSliceNode {
             // the work function will need a temporary variable
             ALocalVariable t = ALocalVariable.makeTmp(joiner.getEdgeToNext().getType());
 
-            Channel downstream = backEndBits.getChannel(joiner.getEdgeToNext());
+            IntraSSGChannel downstream = backEndBits.getChannel(joiner.getEdgeToNext());
 
             // the body of the work method
             JBlock body = new JBlock();
@@ -409,7 +409,7 @@ public class ProcessInputSliceNode {
                 // push(tmp);
                 //
                 assert joiner.getWidth(SchedulingPhase.STEADY) == 1;
-                Channel upstream = backEndBits.getChannel(joiner.getSingleEdge(SchedulingPhase.STEADY));
+                IntraSSGChannel upstream = backEndBits.getChannel(joiner.getSingleEdge(SchedulingPhase.STEADY));
 
                 body.addStatement(t.getDecl());
                 body.addStatement(new JExpressionStatement(

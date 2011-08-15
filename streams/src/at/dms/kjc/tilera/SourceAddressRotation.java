@@ -19,7 +19,7 @@ public class SourceAddressRotation extends RotatingBuffer {
     /** The InputBuffer this rotation models */
     protected InputRotatingBuffer inputBuffer;
     
-    public SourceAddressRotation(Tile tile, InputRotatingBuffer buf, WorkNode dest, Edge edge) {
+    public SourceAddressRotation(Tile tile, InputRotatingBuffer buf, WorkNode dest, IntraSSGEdge edge) {
         super(edge, dest, tile);
         this.parent = tile;
         this.inputBuffer = buf;

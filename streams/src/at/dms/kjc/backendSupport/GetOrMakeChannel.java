@@ -33,8 +33,8 @@ public class GetOrMakeChannel  {
      * @param e  an edge.
      * @return an existing channel if one exists, else a newly made channel.
      */
-    public Channel getOrMakeChannel(Edge e) {
-        Channel c = Channel.findChannel(e);
+    public IntraSSGChannel getOrMakeChannel(IntraSSGEdge e) {
+        IntraSSGChannel c = IntraSSGChannel.findChannel(e);
         if (c != null) {
             return c;
         }
@@ -103,11 +103,11 @@ public class GetOrMakeChannel  {
      * @param e an Edge
      * @return a channel that implements the edge or <b>null</b> if no data passes over the edge.
      */
-    protected Channel makeIntraSliceChannel(Edge e) {
+    protected IntraSSGChannel makeIntraSliceChannel(IntraSSGEdge e) {
         InternalFilterNode src = e.getSrc();
         InternalFilterNode dst = e.getDest();
 
-        Channel c;
+        IntraSSGChannel c;
                 
         if (src instanceof InputNode) {
             assert dst instanceof WorkNode;
@@ -131,7 +131,7 @@ public class GetOrMakeChannel  {
                     }
                 } else if (backEndBits.sliceHasUpstreamChannel(s)) {
                     // no joiner at all: delegate to the channel for InputSliceNode.
-                    Channel upstream = getOrMakeChannel(((InputNode) src)
+                    IntraSSGChannel upstream = getOrMakeChannel(((InputNode) src)
                             .getSingleEdge(SchedulingPhase.STEADY));
                     c = DelegatingChannel.getChannel(e, upstream);
                 } else {
@@ -169,7 +169,7 @@ public class GetOrMakeChannel  {
             } else if (backEndBits.sliceHasDownstreamChannel(s)) {
                 // there is no splitter code, this channel has no effect except delegating
                 // to downstream channel.
-                Channel downstream = getOrMakeChannel(((OutputNode)dst).getDests(SchedulingPhase.STEADY)[0][0]);
+                IntraSSGChannel downstream = getOrMakeChannel(((OutputNode)dst).getDests(SchedulingPhase.STEADY)[0][0]);
                 c = DelegatingChannel.getChannel(e, downstream);
             } else {
                 c = null;
@@ -191,8 +191,8 @@ public class GetOrMakeChannel  {
      * </p>
      */
     
-    protected Channel makeInterSliceChannel(InterFilterEdge e) {
-        Channel c;
+    protected IntraSSGChannel makeInterSliceChannel(InterFilterEdge e) {
+        IntraSSGChannel c;
         if (e.initItems() > e.steadyItems()) {
             // items left on channel between steady states
             c = ChannelAsCircularArray.getChannel(e);

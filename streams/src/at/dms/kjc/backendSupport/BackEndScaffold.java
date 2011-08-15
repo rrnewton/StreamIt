@@ -11,7 +11,7 @@ import at.dms.kjc.KjcOptions;
  * Create code for a partitioning of {@link at.dms.kjc.slir.Filter Slice}s 
  * on a collection of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s.
  * Connections between the ComputeNode s are returned as 
- * {@link at.dms.kjc.backendSupport.Channel Buffer}s.
+ * {@link at.dms.kjc.backendSupport.IntraSSGChannel Buffer}s.
  * @author dimock
   */
 public class BackEndScaffold  {
@@ -66,7 +66,7 @@ public class BackEndScaffold  {
     
     /**
      * Pass in a {@link BasicSpaceTimeScheduleX schedule}, and get a set of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s
-     * and a set of (underspecified) {@link at.dms.kjc.backendSupport.Channel Buffer}s filled in.
+     * and a set of (underspecified) {@link at.dms.kjc.backendSupport.IntraSSGChannel Buffer}s filled in.
      * @param schedule
      * @param computeNodes
      * @param resources The instance of BackEndFactory to be used for callbacks, data.

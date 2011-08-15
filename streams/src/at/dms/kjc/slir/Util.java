@@ -114,7 +114,7 @@ public class Util {
      * @param dst  Destination SliceNode for Edge
      * @return an InterSliceEdge or Edge from src to dst
      */
-    public static Edge srcDstToEdge(InternalFilterNode src, InternalFilterNode dst, SchedulingPhase phase) {
+    public static IntraSSGEdge srcDstToEdge(InternalFilterNode src, InternalFilterNode dst, SchedulingPhase phase) {
         if (src instanceof OutputNode && dst instanceof InputNode) {
             InterFilterEdge[][] edgesedges = ((OutputNode)src).getDests(phase);
             for (InterFilterEdge[] edges : edgesedges) {
@@ -127,9 +127,9 @@ public class Util {
             }
             return new InterFilterEdge((OutputNode)src,(InputNode)dst);
         } else {
-            Edge e = src.getEdgeToNext();
+            IntraSSGEdge e = src.getEdgeToNext();
             if (e == null || e.getDest() != dst) {
-                e = new Edge(src,dst);
+                e = new IntraSSGEdge(src,dst);
             }
             return e;
         }

@@ -9,7 +9,7 @@ import java.util.*;
  * @author mgordon
  *
  */
-public class IntraFilterEdge extends Edge implements at.dms.kjc.DeepCloneable {
+public class IntraFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepCloneable {
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */

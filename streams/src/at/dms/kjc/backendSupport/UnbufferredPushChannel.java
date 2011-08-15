@@ -1,6 +1,6 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.IntraSSGEdge;
 
 import java.util.*;
 
@@ -14,7 +14,7 @@ import at.dms.kjc.JStatement;
  * @author dimock
  *
  */
-public class UnbufferredPushChannel extends Channel {
+public class UnbufferredPushChannel extends IntraSSGChannel {
 
     private String pushName;
     
@@ -24,11 +24,11 @@ public class UnbufferredPushChannel extends Channel {
      * @param pushName  The name of the push routine that will be used.
      * @return A channel for the passed edge with a where pushMethodName() returns <b>pushName</b>.
      */
-    public static UnbufferredPushChannel getChannel(Edge edge, String pushName) {
-        Channel oldChan = Channel.bufferStore.get(edge);
+    public static UnbufferredPushChannel getChannel(IntraSSGEdge edge, String pushName) {
+        IntraSSGChannel oldChan = IntraSSGChannel.bufferStore.get(edge);
         if (oldChan == null) {
             UnbufferredPushChannel chan = new UnbufferredPushChannel(edge, pushName);
-            Channel.bufferStore.put(edge, chan);
+            IntraSSGChannel.bufferStore.put(edge, chan);
             return chan;
        } else {
             assert oldChan instanceof UnbufferredPushChannel 
@@ -37,17 +37,17 @@ public class UnbufferredPushChannel extends Channel {
         }
     }
     
-    private Collection<Channel> produceWriteHeadersFor = new LinkedList<Channel>();
+    private Collection<IntraSSGChannel> produceWriteHeadersFor = new LinkedList<IntraSSGChannel>();
 
     /** 
      * Add a channel to produce upstream (write) headers for:
      * @param c  a Channel connected to the splitter that this channel calls.
      */
-    public void addChannelForHeaders(Channel c) {
+    public void addChannelForHeaders(IntraSSGChannel c) {
         produceWriteHeadersFor.add(c);
     }
     
-    private UnbufferredPushChannel(Edge edge, String pushName) {
+    private UnbufferredPushChannel(IntraSSGEdge edge, String pushName) {
         super(edge);
         this.pushName = pushName;
     }
@@ -66,7 +66,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> beginInitWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (IntraSSGChannel c : produceWriteHeadersFor) {
             retval.addAll(c.beginInitWrite());
         }
         return retval;
@@ -78,7 +78,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> endInitWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (IntraSSGChannel c : produceWriteHeadersFor) {
             retval.addAll(c.endInitWrite());
         }
         return retval;
@@ -90,7 +90,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> beginSteadyWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (IntraSSGChannel c : produceWriteHeadersFor) {
             retval.addAll(c.beginSteadyWrite());
         }
         return retval;
@@ -102,7 +102,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> endSteadyWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (IntraSSGChannel c : produceWriteHeadersFor) {
             retval.addAll(c.endSteadyWrite());
         }
         return retval;
@@ -114,7 +114,7 @@ public class UnbufferredPushChannel extends Channel {
     @Override
     public List<JStatement> topOfWorkSteadyWrite() {
         LinkedList<JStatement> retval = new LinkedList<JStatement>();
-        for (Channel c : produceWriteHeadersFor) {
+        for (IntraSSGChannel c : produceWriteHeadersFor) {
             retval.addAll(c.topOfWorkSteadyWrite());
         }
         return retval;

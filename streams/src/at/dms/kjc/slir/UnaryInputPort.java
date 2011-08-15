@@ -6,11 +6,11 @@ public class UnaryInputPort extends InputPort {
 		super();
 	}
 	
-	public void setLink(Link l) {
+	public void setLink(InterSSGEdge l) {
 		links.set(0, l);
 	}
 	
-	public Link getLink() {
+	public InterSSGEdge getLink() {
 		return links.get(0);
 	}
 }

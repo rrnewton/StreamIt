@@ -1,6 +1,6 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.WorkNodeInfo;
@@ -20,7 +20,7 @@ public class BufferSize {
      * @param theEdge
      * @return
      */
-    public static int calculateSize(Edge theEdge) {
+    public static int calculateSize(IntraSSGEdge theEdge) {
         if (theEdge.getSrc().isFilterSlice()) {  // filter->filter, filter->output
             // the init size is the max of the multiplicities for init and prime-pump
             // times the push rate
