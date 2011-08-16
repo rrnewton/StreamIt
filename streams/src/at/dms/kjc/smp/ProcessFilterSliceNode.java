@@ -89,9 +89,10 @@ public class ProcessFilterSliceNode {
             }
             
             
-            RotatingBuffer outputBuffer = null;
-            
-            if (backEndBits.sliceHasDownstreamChannel(filterNode.getParent())) {
+        	Channel outputBuffer = null;
+        	if (ssg.hasDynamicOutput()) {
+        		outputBuffer = DynamicBuffer.getOutputBuffer(filterNode, ssg);
+        	} else if (backEndBits.sliceHasDownstreamChannel(filterNode.getParent())) {
                 outputBuffer = OutputRotatingBuffer.getOutputBuffer(filterNode);
             }
 
@@ -243,7 +244,7 @@ public class ProcessFilterSliceNode {
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
-            Channel inputBuffer, IntraSSGChannel outputChannel,
+            Channel inputBuffer, Channel outputChannel,
             SMPBackEndFactory backEndBits) {
         
     	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode()");
@@ -319,17 +320,17 @@ public class ProcessFilterSliceNode {
      * If code not yet made, then makes it.
      * @param filter         A FilterSliceNode for which we want code.
      * @param inputBuffer   The input channel -- specified routines to call to replace peek, pop.
-     * @param outputChannel  The output channel -- specified routeines to call to replace push.
+     * @param outputBuffer  The output channel -- specified routeines to call to replace push.
      * @param backEndBits
      * @return
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
-        Channel inputBuffer, IntraSSGChannel outputChannel, SMPBackEndFactory backEndBits) {
+        Channel inputBuffer, Channel outputBuffer, SMPBackEndFactory backEndBits) {
     	System.out.println("smp.ProcessFilterSliceNode.getFilterCode()");
     	
     	CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {
-            filterCode = makeFilterCode(filter,inputBuffer,outputChannel,backEndBits);
+            filterCode = makeFilterCode(filter,inputBuffer,outputBuffer,backEndBits);
             CodeStoreHelper.addHelperForSliceNode(filter, filterCode);
         }
         return filterCode;

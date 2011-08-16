@@ -810,4 +810,17 @@ public class StaticSubGraph {
 		return false;
 	}
 
+	/**
+	 * @return
+	 */
+	public boolean hasDynamicOutput() {
+		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput()");
+		if (outputPort.getLinks().size() > 0) {
+			System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = true");
+			return true;
+		}
+		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = false");
+		return false;
+	}
+
 }
