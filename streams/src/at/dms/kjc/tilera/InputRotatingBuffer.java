@@ -226,7 +226,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
            if (tile == parent && hasLocalSrcFilter())
                continue;
            
-           SourceAddressRotation rot = new SourceAddressRotation(tile, this, filterNode, theEdge);
+           SourceAddressRotation rot = new SourceAddressRotation(tile, this, filterNode, (IntraSSGEdge) theEdge);
            addressBufs[i] = rot;
            addrBufMap.put(tile, rot);
            i++;

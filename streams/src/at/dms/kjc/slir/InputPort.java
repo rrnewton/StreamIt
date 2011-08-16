@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class InputPort {
+
 	protected List<InterSSGEdge> links;
 	
 	private StaticSubGraph ssg;
@@ -21,7 +22,7 @@ public abstract class InputPort {
 	 * 
 	 * @return
 	 */
-	public List<Link> getLinks() {
+	public List<InterSSGEdge> getLinks() {
 		return links;
 	}
 
@@ -29,14 +30,14 @@ public abstract class InputPort {
 	 * 
 	 * @param links
 	 */
-	public void setLinks(List<Link> links) {
+	public void setLinks(List<InterSSGEdge> links) {
 		this.links = links;
 	}
 
 	/**
 	 * @param link
 	 */
-	public void addLink(Link link) {
+	public void addLink(InterSSGEdge link) {
 		links.add(link);
 	}
 

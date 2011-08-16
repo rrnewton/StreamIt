@@ -224,4 +224,12 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
             SchedulingPhase whichPhase, SMPMachine chip) {
         // TODO Auto-generated method stub
     }
+
+    /**
+     * Return the scheduler used by the backend factory
+     * @return Scheduler
+     */
+    public Scheduler getScheduler() {
+		return scheduler;
+	}
 }

@@ -798,7 +798,6 @@ public class StaticSubGraph {
 	}
 
 	/**
-	 * @param filter
 	 * @return
 	 */
 	public boolean hasDynamicInput() {

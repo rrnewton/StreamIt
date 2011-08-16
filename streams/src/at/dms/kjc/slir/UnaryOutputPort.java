@@ -1,7 +1,7 @@
 package at.dms.kjc.slir;
 
 public class UnaryOutputPort extends OutputPort {
-	
+		
 	public UnaryOutputPort(StaticSubGraph ssg) {
 		super(ssg);
 	}

@@ -235,14 +235,14 @@ public class InputRotatingBuffer extends RotatingBuffer {
                FissionGroup group = FissionGroupStore.getFissionGroup(src);
                for(Filter fizzedSlice : group.fizzedSlices) {
                    Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
-                   SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, theEdge);
+                   SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, (IntraSSGEdge) theEdge);
                    addressBufsList.add(rot);
                    addrBufMap.put(fizzedSlice.getWorkNode(), rot);
                }
            }
            else {
                Core core = SMPBackend.scheduler.getComputeNode(src.getWorkNode());
-               SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, theEdge);
+               SourceAddressRotation rot = new SourceAddressRotation(core, this, filterNode, (IntraSSGEdge) theEdge);
                addressBufsList.add(rot);
                addrBufMap.put(src.getWorkNode(), rot);
            }

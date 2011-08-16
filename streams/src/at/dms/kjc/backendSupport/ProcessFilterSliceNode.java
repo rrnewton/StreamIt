@@ -89,7 +89,7 @@ public class ProcessFilterSliceNode {
                     ", has_downstream_channel " + backEndBits.sliceHasDownstreamChannel(filterNode.getParent()));
             }
             
-            IntraSSGChannel inputChannel = null;
+            Channel inputChannel = null;
             
             if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
                 inputChannel = backEndBits.getChannel(filterNode.getPrevious().getEdgeToNext());
@@ -249,7 +249,7 @@ public class ProcessFilterSliceNode {
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
-            IntraSSGChannel inputChannel, IntraSSGChannel outputChannel,
+            Channel inputChannel, IntraSSGChannel outputChannel,
             BackEndFactory backEndBits) {
 
     	System.out.println("ProcessFilterSliceNode.makeFilterCode()");
@@ -331,7 +331,7 @@ public class ProcessFilterSliceNode {
      * @return
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
-            IntraSSGChannel inputChannel, IntraSSGChannel outputChannel, BackEndFactory backEndBits) {
+            Channel inputChannel, IntraSSGChannel outputChannel, BackEndFactory backEndBits) {
     	CodeStoreHelper filter_code = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filter_code == null) {
             filter_code = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);

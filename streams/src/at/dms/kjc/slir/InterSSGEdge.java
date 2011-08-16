@@ -1,5 +1,7 @@
 package at.dms.kjc.slir;
 
+import at.dms.kjc.CType;
+
 /**
  * The InterSSGEdge class represents a link between two SSG's. The Rate information
  * stores the (possibly dynamic) rate information of the source and destination.
@@ -69,5 +71,32 @@ public class InterSSGEdge implements Edge {
 
 	public void setPeekRate(Rate peekRate) {
 		this.peekRate = peekRate;
+	}
+
+	/* (non-Javadoc)
+	 * @see at.dms.kjc.slir.Edge#getType()
+	 */
+	@Override
+	public CType getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see at.dms.kjc.slir.Edge#getDest()
+	 */
+	@Override
+	public Object getDest() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see at.dms.kjc.slir.Edge#getSrc()
+	 */
+	@Override
+	public Object getSrc() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

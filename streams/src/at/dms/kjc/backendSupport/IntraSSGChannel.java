@@ -20,7 +20,7 @@ import at.dms.util.Utils;
  * 
  * @author dimock
  */
-public class IntraSSGChannel implements Channel {
+public class IntraSSGChannel extends Channel {
 
     /**
      * Technical note: a Buffer in a backend implements an Edge in a slice graph
@@ -31,7 +31,7 @@ public class IntraSSGChannel implements Channel {
      * and wanting to change source and dest,
      * presumably without changing slice graph. 
      */
-    protected IntraSSGEdge theEdge;
+    //protected IntraSSGEdge theEdge;
     /** unique ident for the buffer */
     protected String ident;
     /** used to make sure ident is unique */
@@ -57,8 +57,7 @@ public class IntraSSGChannel implements Channel {
      * @param edge
      */
     protected IntraSSGChannel(IntraSSGEdge edge) {
-        assert edge != null;
-        theEdge = edge;
+        super(edge);
         edge.getType(); // side effect of catching error if source and dest types not the same
         unique_id = unique_id_generator++;
         ident = "__chan__" + unique_id + "__";
@@ -89,7 +88,7 @@ public class IntraSSGChannel implements Channel {
      * @param c Channel to add to our collection of channels. 
      */
     public static void addChannel(IntraSSGChannel c) {
-        bufferStore.put(c.theEdge, c);
+        bufferStore.put((IntraSSGEdge) c.theEdge, c);
     }
     
     /**

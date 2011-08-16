@@ -74,21 +74,22 @@ public class ProcessFilterSliceNode {
                     ", has_downstream_channel " + backEndBits.sliceHasDownstreamChannel(filterNode.getParent()));
             }
             
-            Channel inputBuffer = null;
-            
-            System.out.println("TODO: smp.ProcessFilterSliceNode.doit() set a dynamicBuffer if approproate!!!");
 
+            System.out.println("TODO: smp.ProcessFilterSliceNode.doit() set a dynamicBuffer if approproate!!!");
             
-            StaticSubGraph ssg = backEndBits.getScheduler().getGraphSchedule().getSSG();
+            Channel inputBuffer = null;            
             
-            
+            StaticSubGraph ssg = backEndBits.getScheduler().getGraphSchedule().getSSG();            
         	if (ssg.hasDynamicInput()) {
         		inputBuffer = DynamicBuffer.getInputBuffer(filterNode, ssg);
-        	} else if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
+        	} 
+        	
+        	else if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
             	inputBuffer = InputRotatingBuffer.getInputBuffer(filterNode);
             }
             
-            Channel outputBuffer = null;
+            
+            RotatingBuffer outputBuffer = null;
             
             if (backEndBits.sliceHasDownstreamChannel(filterNode.getParent())) {
                 outputBuffer = OutputRotatingBuffer.getOutputBuffer(filterNode);
@@ -237,12 +238,12 @@ public class ProcessFilterSliceNode {
      * Clones the input methods and munges on the clones, further changes to the returned code
      * will not affect the methods of the input code unit.
      * @param code           The code (fields and methods)
-     * @param inputChannel   The input channel -- specifies routines to call to replace peek, pop.
+     * @param inputBuffer   The input channel -- specifies routines to call to replace peek, pop.
      * @param outputChannel  The output channel -- specifies routines to call to replace push.
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
-            IntraSSGChannel inputChannel, IntraSSGChannel outputChannel,
+            Channel inputBuffer, IntraSSGChannel outputChannel,
             SMPBackEndFactory backEndBits) {
         
     	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode()");
@@ -253,10 +254,10 @@ public class ProcessFilterSliceNode {
         final String pushName;
         final String popManyName;
 
-        if (inputChannel != null) {
-            peekName = inputChannel.peekMethodName();
-            popName = inputChannel.popMethodName();
-            popManyName = inputChannel.popManyMethodName();
+        if (inputBuffer != null) {
+            peekName = inputBuffer.peekMethodName();
+            popName = inputBuffer.popMethodName();
+            popManyName = inputBuffer.popManyMethodName();
         } else {
             peekName = "/* peek from non-existent channel */";
             popName = "/* pop() from non-existent channel */";
@@ -317,19 +318,18 @@ public class ProcessFilterSliceNode {
      * Get code for a filter.
      * If code not yet made, then makes it.
      * @param filter         A FilterSliceNode for which we want code.
-     * @param inputChannel   The input channel -- specified routines to call to replace peek, pop.
+     * @param inputBuffer   The input channel -- specified routines to call to replace peek, pop.
      * @param outputChannel  The output channel -- specified routeines to call to replace push.
      * @param backEndBits
      * @return
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
-        IntraSSGChannel inputChannel, IntraSSGChannel outputChannel, SMPBackEndFactory backEndBits) {
+        Channel inputBuffer, IntraSSGChannel outputChannel, SMPBackEndFactory backEndBits) {
     	System.out.println("smp.ProcessFilterSliceNode.getFilterCode()");
     	
     	CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {
-        	System.out.println("smp.ProcessFilterSliceNode.getFilterCode() filterCode==null");
-            filterCode = makeFilterCode(filter,inputChannel,outputChannel,backEndBits);
+            filterCode = makeFilterCode(filter,inputBuffer,outputChannel,backEndBits);
             CodeStoreHelper.addHelperForSliceNode(filter, filterCode);
         }
         return filterCode;

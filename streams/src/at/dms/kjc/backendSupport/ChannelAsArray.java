@@ -202,12 +202,10 @@ public class ChannelAsArray extends IntraSSGChannel {
         JFormalParameter val = new JFormalParameter(
                 CStdType.Integer,
                 valName);
-        JLocalVariableExpression valRef = new JLocalVariableExpression(val);
         String offsetName = "__offset";
         JFormalParameter offset = new JFormalParameter(
                 CStdType.Integer,
                 offsetName);
-        JLocalVariableExpression offsetRef = new JLocalVariableExpression(offset);
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
