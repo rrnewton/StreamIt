@@ -40,12 +40,13 @@ public class SIRToSLIR {
 		log(this.getClass().getCanonicalName() + " translate()");
 
 		StreamGraph streamGraph = new StreamGraph();
+		OutputPort prevOutputPort = null;
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			InputPort inputPort = new UnaryInputPort(null);
 			OutputPort outputPort = new UnaryOutputPort(null);
 			
 			if (prevOutputPort != null) {
-				Link link = new Link(inputPort, prevOutputPort);				
+				InterSSGEdge link = new InterSSGEdge(inputPort, prevOutputPort);				
 				inputPort.addLink(link);
 				prevOutputPort.addLink(link);
 			}

@@ -126,14 +126,6 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
     }
 
     /**
-     * Return the scheduler used by the backend factory
-     * @return Scheduler
-     */
-    public Scheduler getScheduler() {
-		return scheduler;
-	}
-
-    /**
      * Set the scheduler used by the backend factory
      * @param scheduler
      */

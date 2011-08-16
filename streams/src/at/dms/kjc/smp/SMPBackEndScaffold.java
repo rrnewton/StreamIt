@@ -10,6 +10,7 @@ import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InputPort;
+import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.Link;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.OutputPort;
@@ -39,7 +40,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
     	
     	StaticSubGraph ssg = schedule.getSSG();
     	InputPort inputPort = ssg.getInputPort();
-    	for (Link link : inputPort.getLinks()) {
+    	for ( InterSSGEdge link  : inputPort.getLinks()) {
     		OutputPort op = link.getOutputPort();
     		System.out.println(this.getClass().getCanonicalName() + " Creating a dynamic link between InputPort=" + inputPort + "->" + op);
     		System.out.println(this.getClass().getCanonicalName() + " Creating a pop!");
@@ -67,7 +68,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
     	
     	StaticSubGraph ssg = schedule.getSSG();
     	OutputPort outputPort = ssg.getOutputPort();
-    	for (Link link : outputPort.getLinks()) {
+    	for ( InterSSGEdge link : outputPort.getLinks()) {
     		InputPort ip = link.getInputPort();
     		System.out.println(this.getClass().getCanonicalName() + "Creating a dynamic link between InputPort=" + outputPort + "->" + ip);
     		System.out.println(this.getClass().getCanonicalName() + "Creating a push!");
