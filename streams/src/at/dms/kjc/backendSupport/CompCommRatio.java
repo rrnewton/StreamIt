@@ -100,7 +100,7 @@ public class CompCommRatio {
         while (sliceNodeIt.hasNext()) {
             InternalFilterNode sliceNode = sliceNodeIt.next();
 
-            if (sliceNode.isFilterSlice()) {
+            if (sliceNode.isWorkNode()) {
                 WorkNode filter = (WorkNode) sliceNode;
                 // comm += (filter.getFilter().getSteadyMult() *
                 // filter.getFilter().getPushInt());

@@ -37,12 +37,12 @@ public class DataFlowOrder {
                 Filter slice = queue.removeFirst();
                 if (!visited.contains(slice)) {
                     visited.add(slice);                                                         
-                    for (IntraSSGEdge destEdge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
+                    for (InterFilterEdge destEdge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
                         Filter current = destEdge.getDest().getParent();
                         if (!visited.contains(current)) {
                             // only add if all sources has been visited
                             boolean addMe = true;
-                            for (IntraSSGEdge oneSource : current.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+                            for (InterFilterEdge oneSource : current.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
                                 if (!visited.contains(oneSource.getSrc().getParent())) {
                                     addMe = false;
                                     break;

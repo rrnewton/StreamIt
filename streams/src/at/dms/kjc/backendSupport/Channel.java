@@ -9,11 +9,11 @@ import at.dms.kjc.slir.Edge;
  * @author soule
  *
  */
-public class Channel {
+public abstract class Channel<E extends Edge> {
 
-    protected Edge theEdge;
+    protected E theEdge;
 	
-    protected Channel(Edge edge) {
+    protected Channel(E edge) {
         assert edge != null;
         this.theEdge = edge;
     }

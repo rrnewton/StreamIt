@@ -760,7 +760,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         inputs = getNumInputs(sliceNode);
         outputs = getNumOutputs(sliceNode);
         
-        if (sliceNode.isFilterSlice() && sliceNode.getAsFilter().getParent().getOutputNode().isDuplicateSplitter(SchedulingPhase.STEADY))
+        if (sliceNode.isWorkNode() && sliceNode.getAsFilter().getParent().getOutputNode().isDuplicateSplitter(SchedulingPhase.STEADY))
             outputs = 1;
         int filterId = CellBackend.filterIdMap.get(sliceNode);
         int poprate = sliceNode.getParent().getWorkNode().getFilter().getPopInt();
@@ -1776,7 +1776,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         if (sliceNode.isInputSlice()) {
             outputs = 1;
         }
-        else if (sliceNode.isFilterSlice()){
+        else if (sliceNode.isWorkNode()){
             if (sliceNode.getParent().getOutputNode().isSplitter(SchedulingPhase.STEADY))
                 outputs = 1;
             else outputs = sliceNode.getParent().getOutputNode().getWidth(SchedulingPhase.STEADY);
@@ -1799,7 +1799,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     private static String getFilterName(InternalFilterNode sliceNode) {
         String basename = 
             sliceNode.getParent().getWorkNode().getFilter().getName();
-        if (sliceNode.isFilterSlice())
+        if (sliceNode.isWorkNode())
             return basename;
         else if (sliceNode.isInputSlice())
             return "joiner_" + basename;

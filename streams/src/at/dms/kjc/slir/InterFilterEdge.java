@@ -10,7 +10,7 @@ import java.util.HashMap;
  * @author mgordon
  *
  */
-public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepCloneable, Comparable<InterFilterEdge>{
+public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> implements at.dms.kjc.DeepCloneable, Comparable<InterFilterEdge>{
     private static HashMap<EdgeDescriptor, InterFilterEdge> edges =
         new HashMap<EdgeDescriptor, InterFilterEdge>();
     
@@ -52,7 +52,7 @@ public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepClon
      */
     public InterFilterEdge(InputNode dest) {
         super();
-        this.dest = dest;
+        this.dst = dest;
     }
 
     public static InterFilterEdge getEdge(OutputNode src, InputNode dest) {
@@ -71,13 +71,12 @@ public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepClon
 
     @Override
     public InputNode getDest() {
-        return (InputNode)dest;
+        return (InputNode)dst;
     }
 
     @Override
-    public void setSrc(InternalFilterNode src) {
-        assert src instanceof OutputNode;
-        
+    public void setSrc(OutputNode src) {
+ 
         //make sure we did not create this edge before!
         EdgeDescriptor edgeDscr = new EdgeDescriptor((OutputNode)src, getDest());      
         InterFilterEdge edge = edges.get(edgeDscr);
@@ -89,8 +88,7 @@ public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepClon
     }
 
     @Override
-    public void setDest(InternalFilterNode dest) {
-        assert dest instanceof InputNode;
+    public void setDest(InputNode dest) {
         //make sure we did not create this edge before!
         EdgeDescriptor edgeDscr = new EdgeDescriptor(getSrc(), (InputNode)dest);      
         InterFilterEdge edge = edges.get(edgeDscr);
@@ -110,10 +108,10 @@ public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepClon
     public int initItems() {
         int itemsReceived, itemsSent;
 
-        WorkNodeInfo next = WorkNodeInfo.getFilterInfo((WorkNode) ((InputNode)dest)
+        WorkNodeInfo next = WorkNodeInfo.getFilterInfo((WorkNode) ((InputNode)dst)
                                                    .getNext());
         
-        itemsSent = (int) ((double) next.initItemsReceived() * ((InputNode)dest).ratio(this, SchedulingPhase.INIT));
+        itemsSent = (int) ((double) next.initItemsReceived() * ((InputNode)dst).ratio(this, SchedulingPhase.INIT));
         //System.out.println(next.initItemsReceived()  + " * " + ((InputSliceNode)dest).ratio(this));
         
         // calculate the items the output slice sends
@@ -131,13 +129,13 @@ public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepClon
             System.out.println("Init items Sent * Ratio: " + prev.initItemsSent() + " * " +
                     ((OutputNode)src).ratio(this, SchedulingPhase.INIT));
             System.out.println("Items Received: " + next.initItemsReceived(true));
-            System.out.println("Ratio received: " + ((InputNode)dest).ratio(this, SchedulingPhase.INIT));
+            System.out.println("Ratio received: " + ((InputNode)dst).ratio(this, SchedulingPhase.INIT));
             
         }
         
         // see if they are different
         assert (itemsSent == itemsReceived) : "Calculating init stage: items received != items send on buffer: "
-            + src + " (" + itemsSent + ") -> (" + itemsReceived + ") "+ dest;
+            + src + " (" + itemsSent + ") -> (" + itemsReceived + ") "+ dst;
 
         return itemsSent;
     }
@@ -150,9 +148,9 @@ public class InterFilterEdge extends IntraSSGEdge implements at.dms.kjc.DeepClon
         int itemsReceived, itemsSent;
 
         // calculate the items the input slice receives
-        WorkNodeInfo next = WorkNodeInfo.getFilterInfo(((InputNode)dest).getNextFilter());
-        itemsSent = (int) ((next.steadyMult * next.pop) * ((double) ((InputNode)dest)
-                                                           .getWeight(this, SchedulingPhase.STEADY) / ((InputNode)dest).totalWeights(SchedulingPhase.STEADY)));
+        WorkNodeInfo next = WorkNodeInfo.getFilterInfo(((InputNode)dst).getNextFilter());
+        itemsSent = (int) ((next.steadyMult * next.pop) * ((double) ((InputNode)dst)
+                                                           .getWeight(this, SchedulingPhase.STEADY) / ((InputNode)dst).totalWeights(SchedulingPhase.STEADY)));
 
         // calculate the items the output slice sends
         WorkNodeInfo prev = WorkNodeInfo.getFilterInfo((WorkNode) ((OutputNode)src)

@@ -466,11 +466,11 @@ public class StaticSubGraph {
 			node = node.getNext();
 		}
 		if (node instanceof OutputNode) {
-			IntraSSGEdge[][] dests = ((OutputNode) node)
+			InterFilterEdge[][] dests = ((OutputNode) node)
 					.getDests(SchedulingPhase.STEADY);
 			ArrayList<Object> output = new ArrayList<Object>();
 			for (int i = 0; i < dests.length; i++) {
-				IntraSSGEdge[] inner = dests[i];
+				InterFilterEdge[] inner = dests[i];
 				for (int j = 0; j < inner.length; j++) {
 					// Object next=parent.get(inner[j]);
 					Object next = inner[j].getDest().getParent();
@@ -501,10 +501,10 @@ public class StaticSubGraph {
 			node = node.getNext();
 		}
 		if (node instanceof OutputNode) {
-			IntraSSGEdge[][] dests = ((OutputNode) node).getDests(phase);
+			InterFilterEdge[][] dests = ((OutputNode) node).getDests(phase);
 			ArrayList<Object> output = new ArrayList<Object>();
 			for (int i = 0; i < dests.length; i++) {
-				IntraSSGEdge[] inner = dests[i];
+				InterFilterEdge[] inner = dests[i];
 				for (int j = 0; j < inner.length; j++) {
 					// Object next=parent.get(inner[j]);
 					Object next = inner[j].getDest().getParent();
@@ -710,7 +710,7 @@ public class StaticSubGraph {
 
 		node = node.getNext();
 		while (node != null) {
-			if (node.isFilterSlice()) {
+			if (node.isWorkNode()) {
 				WorkNodeContent f = node.getAsFilter().getFilter();
 				out.append("\\n" + node.toString() + "{" + getWorkEstimate(f)
 						+ "}");
@@ -763,7 +763,7 @@ public class StaticSubGraph {
 
 		node = node.getNext();
 		while (node != null) {
-			if (node.isFilterSlice()) {
+			if (node.isWorkNode()) {
 				WorkNodeContent f = node.getAsFilter().getFilter();
 				out.append("\\n" + node.toString() + "{" + "}");
 				if (f.isTwoStage())

@@ -11,7 +11,7 @@ import at.dms.kjc.CType;
  */
 
 
-public class InterSSGEdge implements Edge {
+public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 
 	/** The destination port for this link */
 	private InputPort inputPort;
@@ -29,25 +29,10 @@ public class InterSSGEdge implements Edge {
 	private Rate peekRate;
 
 	/** Create a new Link */
-	public InterSSGEdge(InputPort inputPort, OutputPort outputPort) {
-		this.inputPort = inputPort;
-		this.outputPort = outputPort;
+	public InterSSGEdge(OutputPort src, InputPort dst) {
+		super(src, dst);
 	}
 
-	public InputPort getInputPort() {
-		return inputPort;
-	}
-
-	public void setInputPort(InputPort inputPort) {
-		this.inputPort = inputPort;
-	}
-
-	public OutputPort getOutputPort() {
-		return outputPort;
-	}
-	public void setOutputPort(OutputPort outputPort) {
-		this.outputPort = outputPort;
-	}
 
 	public Rate getPushRate() {
 		return pushRate;
@@ -78,24 +63,6 @@ public class InterSSGEdge implements Edge {
 	 */
 	@Override
 	public CType getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.slir.Edge#getDest()
-	 */
-	@Override
-	public Object getDest() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see at.dms.kjc.slir.Edge#getSrc()
-	 */
-	@Override
-	public Object getSrc() {
 		// TODO Auto-generated method stub
 		return null;
 	}

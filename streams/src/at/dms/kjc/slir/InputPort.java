@@ -53,6 +53,6 @@ public abstract class InputPort {
 		if (links.size() <= i) {
 			return null;
 		}
-		return links.get(i).getOutputPort();		
+		return links.get(i).getSrc();		
 	}
 }

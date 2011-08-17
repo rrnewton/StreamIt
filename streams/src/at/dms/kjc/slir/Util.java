@@ -120,7 +120,7 @@ public class Util {
             for (InterFilterEdge[] edges : edgesedges) {
                 for (InterFilterEdge edge : edges) {
                     assert edge.src == src;
-                    if (edge.dest == dst) {
+                    if (edge.dst == dst) {
                         return edge;
                     }
                 }

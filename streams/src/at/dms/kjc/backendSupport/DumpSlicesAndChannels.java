@@ -20,8 +20,8 @@ public class DumpSlicesAndChannels {
             buf.append(slice.hashCode() + " [ " + 
                     sliceName(slice, ssg, backendbits) + 
                     "\" ];\n");
-            IntraSSGEdge[] outgoing = slice.getOutputNode().getDestList(SchedulingPhase.STEADY);
-            for (IntraSSGEdge e : outgoing) {
+            InterFilterEdge[] outgoing = slice.getOutputNode().getDestList(SchedulingPhase.STEADY);
+            for (InterFilterEdge e : outgoing) {
                 assert e != null && e.getDest() != null;
                 Filter next = e.getDest().getParent();
                 buf.append(slice.hashCode() + " -> " + next.hashCode()
@@ -84,7 +84,7 @@ public class DumpSlicesAndChannels {
         
         node = node.getNext();
         while (node != null ) {
-            if (node.isFilterSlice()) {
+            if (node.isWorkNode()) {
                 WorkNodeContent f = node.getAsFilter().getFilter();
                 out.append("\\n" + node.toString() + "{"
                         + ssg.getFilterWork(node.getAsFilter())

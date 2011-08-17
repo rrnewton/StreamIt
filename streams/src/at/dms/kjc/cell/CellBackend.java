@@ -300,7 +300,7 @@ public class CellBackend {
                     int artificialId = artificialJoinerChannels.get(inputNode);
                     readyInputs.add(artificialId);
                 }
-            } else if (sliceNode.isFilterSlice()) {
+            } else if (sliceNode.isWorkNode()) {
                 WorkNode filterNode = sliceNode.getAsFilter();
                 OutputNode outputNode = filterNode.getNext().getAsOutput();
                 if (outputNode.isRRSplitter(SchedulingPhase.STEADY)) {

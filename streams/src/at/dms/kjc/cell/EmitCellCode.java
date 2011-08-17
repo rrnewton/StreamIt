@@ -134,7 +134,7 @@ public class EmitCellCode extends EmitCode {
         else type = "int";
         p.println("#define ITEM_TYPE " + type);
         
-        if (s.isFilterSlice())
+        if (s.isWorkNode())
             handleFilterSlice(p, s.getAsFilter(), init);
         else if (s.isInputSlice())
             handleInputSlice(p, s.getAsInput(), init);

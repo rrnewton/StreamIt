@@ -151,7 +151,7 @@ public class WorkNodeInfo {
         // don't call initItemsReceived() here it
         // may cause an infinite loop because it creates filter infos
         int initItemsRec = 0;
-        if (sliceNode.getPrevious().isFilterSlice()) {
+        if (sliceNode.getPrevious().isWorkNode()) {
             WorkNodeContent filterC = ((WorkNode) sliceNode.getPrevious())
                 .getFilter();
             initItemsRec = filterC.getPushInt() * filterC.getInitMult();
@@ -272,7 +272,7 @@ public class WorkNodeInfo {
         if (debug)
             System.out.println("*****  Init items received " + this + " *****");
         
-        if (sliceNode.getPrevious().isFilterSlice()) {
+        if (sliceNode.getPrevious().isWorkNode()) {
             upStreamItems = 
                 WorkNodeInfo.getFilterInfo(
                         (WorkNode) sliceNode.getPrevious()).initItemsSent();

@@ -20,7 +20,7 @@ import at.dms.util.Utils;
  * 
  * @author dimock
  */
-public class IntraSSGChannel extends Channel {
+public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, InternalFilterNode>> {
 
     /**
      * Technical note: a Buffer in a backend implements an Edge in a slice graph

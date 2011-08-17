@@ -70,7 +70,7 @@ public class InternalFilterNode implements at.dms.kjc.DeepCloneable      {
         return this instanceof InputNode;
     }
 
-    public boolean isFilterSlice() {
+    public boolean isWorkNode() {
         return this instanceof WorkNode;
     }
 

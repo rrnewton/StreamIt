@@ -49,13 +49,13 @@ public class LevelizeSSG {
             Filter slice = queue.removeFirst();
             if (!visited.contains(slice)) {
                 visited.add(slice);
-                for (IntraSSGEdge destEdge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
+                for (InterFilterEdge destEdge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
                     Filter current = destEdge.getDest().getParent();
                     if (!visited.contains(current)) {
                         // only add if all sources has been visited
                         boolean addMe = true;
                         int maxParentLevel = 0;
-                        for (IntraSSGEdge sourceEdge : current.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+                        for (InterFilterEdge sourceEdge : current.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
                             if (!visited.contains(sourceEdge.getSrc().getParent())) {
                                 addMe = false;
                                 break;

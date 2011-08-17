@@ -41,7 +41,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
     	StaticSubGraph ssg = schedule.getSSG();
     	InputPort inputPort = ssg.getInputPort();
     	for ( InterSSGEdge link  : inputPort.getLinks()) {
-    		OutputPort op = link.getOutputPort();
+    		OutputPort op = link.getSrc();
     		System.out.println(this.getClass().getCanonicalName() + " Creating a dynamic link between InputPort=" + inputPort + "->" + op);
     		System.out.println(this.getClass().getCanonicalName() + " Creating a pop!");
     		/* This will tell us if we should pop */
@@ -69,7 +69,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
     	StaticSubGraph ssg = schedule.getSSG();
     	OutputPort outputPort = ssg.getOutputPort();
     	for ( InterSSGEdge link : outputPort.getLinks()) {
-    		InputPort ip = link.getInputPort();
+    		InputPort ip = link.getDest();
     		System.out.println(this.getClass().getCanonicalName() + "Creating a dynamic link between InputPort=" + outputPort + "->" + ip);
     		System.out.println(this.getClass().getCanonicalName() + "Creating a push!");
 

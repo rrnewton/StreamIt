@@ -1,14 +1,9 @@
 /**
  * 
  */
-package at.dms.kjc.smp;
+package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.Channel;
-import at.dms.kjc.slir.Edge;
-import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InterSSGEdge;
-import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
 
@@ -16,12 +11,12 @@ import at.dms.kjc.slir.WorkNode;
  * @author soule
  *
  */
-public class DynamicBuffer extends Channel {
+public class InterSSGChannel extends Channel<InterSSGEdge> {
 
 	/**
 	 * @param edge
 	 */
-	protected DynamicBuffer(Edge edge) {
+	protected InterSSGChannel(InterSSGEdge edge) {
 		super(edge);
 	}
 		
@@ -32,9 +27,9 @@ public class DynamicBuffer extends Channel {
      * @param ssg 
      * @return The input buffer of the filter node.
      */
-    public static DynamicBuffer getInputBuffer(WorkNode fsn, StaticSubGraph ssg) {
+    public static InterSSGChannel getInputBuffer(WorkNode fsn, StaticSubGraph ssg) {
     	InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);
-    	return new DynamicBuffer(edge);
+    	return new InterSSGChannel(edge);
     }
 
 	/**
@@ -71,6 +66,6 @@ public class DynamicBuffer extends Channel {
 			StaticSubGraph ssg) {
 		// TODO Auto-generated method stub
     	InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
-    	return new DynamicBuffer(edge);
+    	return new InterSSGChannel(edge);
 	}
 }

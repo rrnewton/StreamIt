@@ -46,7 +46,7 @@ public class SIRToSLIR {
 			OutputPort outputPort = new UnaryOutputPort(null);
 			
 			if (prevOutputPort != null) {
-				InterSSGEdge link = new InterSSGEdge(inputPort, prevOutputPort);				
+				InterSSGEdge link = new InterSSGEdge(prevOutputPort, inputPort);				
 				inputPort.addLink(link);
 				prevOutputPort.addLink(link);
 			}

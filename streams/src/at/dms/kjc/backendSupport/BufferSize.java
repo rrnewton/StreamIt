@@ -1,5 +1,6 @@
 package at.dms.kjc.backendSupport;
 
+import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InterFilterEdge;
@@ -21,14 +22,14 @@ public class BufferSize {
      * @return
      */
     public static int calculateSize(IntraSSGEdge theEdge) {
-        if (theEdge.getSrc().isFilterSlice()) {  // filter->filter, filter->output
+        if (((InternalFilterNode)theEdge.getSrc()).isWorkNode()) {  // filter->filter, filter->output
             // the init size is the max of the multiplicities for init and prime-pump
             // times the push rate
             WorkNodeInfo fi = WorkNodeInfo.getFilterInfo((WorkNode) theEdge.getSrc());
             int maxItems = Math.max(initPush(fi), steadyPush(fi));
             // steady is just pop * mult
             return maxItems;
-        } else if (theEdge.getDest().isFilterSlice()) { // joiner->filter
+        } else if (((InternalFilterNode)theEdge.getDest()).isWorkNode()) { // joiner->filter
             // calculate the maximum number of elements that we may need 
             // upstream of a filter.
             WorkNodeInfo fi = WorkNodeInfo.getFilterInfo((WorkNode) theEdge.getDest());
