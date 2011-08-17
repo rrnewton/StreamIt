@@ -13,6 +13,9 @@ import at.dms.kjc.slir.WorkNode;
  */
 public class InterSSGChannel extends Channel<InterSSGEdge> {
 
+	// TODO: Override more methods in here for declarations to be output
+	
+	
 	/**
 	 * @param edge
 	 */
