@@ -17,6 +17,7 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
+import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRCodeUnit;
 import at.dms.kjc.KjcOptions;
@@ -477,7 +478,9 @@ public class EmitSMPCode extends EmitCode {
         // generate code for ends of channels that connect to code on this ComputeNode
         Set <RotatingBuffer> outputBuffers = OutputRotatingBuffer.getOutputBuffersOnCore((Core)n);
         Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnCore((Core)n);
-        
+        Set <InterSSGChannel> dynamicInputBuffers = InterSSGChannel.getInputBuffersOnCore((Core)n);
+        Set <InterSSGChannel> dynamicOutputBuffers = InterSSGChannel.getOutputBuffersOnCore((Core)n);
+        		
         // externs
         for (RotatingBuffer c : outputBuffers) {
             if (c.writeDeclsExtern() != null) {

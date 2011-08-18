@@ -1,8 +1,5 @@
 package at.dms.kjc.slir;
 
-import at.dms.util.Utils;
-import java.util.ArrayList;
-
 /** 
  * Slice class models a slice (joiner, sequence of filters, splitter).
  * Beware: slices are linked with Edges, but the back edge of an InputSliceNode and
@@ -31,6 +28,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * Create filter with no internal nodes.
      */
     public Filter() {
+    	/* Do nothing */
     }
 
     

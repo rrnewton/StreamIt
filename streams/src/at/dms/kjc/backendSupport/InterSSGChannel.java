@@ -3,9 +3,12 @@
  */
 package at.dms.kjc.backendSupport;
 
+import java.util.Set;
+
 import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.smp.Core;
 
 /**
  * @author soule
@@ -70,5 +73,15 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		// TODO Auto-generated method stub
     	InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
     	return new InterSSGChannel(edge);
+	}
+
+	public static Set<InterSSGChannel> getInputBuffersOnCore(Core n) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Set<InterSSGChannel> getOutputBuffersOnCore(Core n) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
