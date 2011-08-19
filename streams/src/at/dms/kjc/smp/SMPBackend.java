@@ -117,6 +117,8 @@ public class SMPBackend {
 
     	printFinalWorkAssignments();
 
+    	new Queue_h().copyToFile();
+    	
     	System.exit(0);
     }
     
