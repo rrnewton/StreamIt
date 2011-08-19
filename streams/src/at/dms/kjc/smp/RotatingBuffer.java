@@ -46,12 +46,13 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
     /** the data transfer statements that are generated for this output buffer */
     protected BufferTransfers transferCommands;
     
-    /** a set of all the buffer types in the application */
-    protected static HashSet<String> types;
     /** prefix of the variable name for the rotating buffers */
     public static String rotTypeDefPrefix = "__rotating_buffer_";
 	
-    /** maps each FilterSliceNode to Input/OutputRotatingBuffers */
+    /** a set of all the buffer types in the application */
+    protected static HashSet<String> types;
+
+    /** maps each WorkNode to Input/OutputRotatingBuffers */
     protected static HashMap<WorkNode, InputRotatingBuffer> inputBuffers;
     protected static HashMap<WorkNode, OutputRotatingBuffer> outputBuffers;
 

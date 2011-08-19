@@ -81,7 +81,7 @@ public class ProcessFilterSliceNode {
             
             StaticSubGraph ssg = backEndBits.getScheduler().getGraphSchedule().getSSG();            
         	if (ssg.hasDynamicInput()) {
-        		inputBuffer = InterSSGChannel.getInputBuffer(filterNode, ssg);
+        		inputBuffer = InterSSGChannel.getInputBuffer(filterNode);
         	} 
         	
         	else if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {

@@ -5,14 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.backendSupport.ComputeNode;
@@ -480,7 +476,24 @@ public class EmitSMPCode extends EmitCode {
         Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnCore((Core)n);
         Set <InterSSGChannel> dynamicInputBuffers = InterSSGChannel.getInputBuffersOnCore((Core)n);
         Set <InterSSGChannel> dynamicOutputBuffers = InterSSGChannel.getOutputBuffersOnCore((Core)n);
-        		
+
+
+        for (InterSSGChannel c : dynamicInputBuffers) {
+        	if (c.dataDecls() != null) {
+        		for (JStatement d : c.dataDecls()) { 
+        			d.accept(codegen); p.println();
+        		}
+        	}
+        }
+        
+        for (InterSSGChannel c : dynamicOutputBuffers) {
+        	if (c.dataDecls() != null) {
+        		for (JStatement d : c.dataDecls()) { 
+        			d.accept(codegen); p.println();
+        		}
+        	}        	
+        }
+        
         // externs
         for (RotatingBuffer c : outputBuffers) {
             if (c.writeDeclsExtern() != null) {

@@ -9,7 +9,7 @@ import at.dms.kjc.slir.Edge;
  * @author soule
  *
  */
-public abstract class Channel<E extends Edge> {
+public abstract class Channel<E extends Edge<?, ?> > {
 
     protected E theEdge;
 	

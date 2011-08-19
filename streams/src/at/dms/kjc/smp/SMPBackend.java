@@ -53,6 +53,8 @@ public class SMPBackend {
         	runSSG(ssg);
         }
         
+        InterSSGChannel.createBuffers(streamGraph);
+        
         emitCode();
     
     }
