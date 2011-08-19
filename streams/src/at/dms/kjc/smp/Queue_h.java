@@ -24,6 +24,9 @@ public class Queue_h {
 		/* Do nothing */
 	}
 
+	
+	// TODO: call this dump Text file, and put all files in a static array.
+	
 	public void copyToFile() {
 		// TODO: this should be passed as a Kjc Option
 		String streamItHome = System.getenv("STREAMIT_HOME");		
