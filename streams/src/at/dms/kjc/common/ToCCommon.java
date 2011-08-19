@@ -23,7 +23,7 @@ import at.dms.kjc.common.CommonUtils;
 
 public abstract class ToCCommon extends SLIREmptyVisitor {
     
-    static public boolean alternatePrintsForTiming = true;
+    static public boolean alternatePrintsForTiming = true	;
 
     /**
      *  Controls visitPrintStatement. Can override for a backend by writing
