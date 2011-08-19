@@ -15,9 +15,11 @@ public class SMPBackend {
     public static SMPBackEndFactory backEndBits;
     public static Structs_h structs_h;
     public static int[] coreOrder = {0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15};
-
-  
     
+
+	private static boolean isDynamic = false;
+  
+	
     public static void run(SIRStream str,
                            JInterfaceDeclaration[] interfaces,
                            SIRInterfaceTable[] interfaceTables,
@@ -48,6 +50,11 @@ public class SMPBackend {
         StreamGraph streamGraph = commonPasses.run(str, interfaces, interfaceTables, structs, helpers, global, chip.size());
 
         streamGraph.simplifyFilters(chip.size());
+        
+        
+        if (streamGraph.getSSGs().size() > 1) {
+        	isDynamic = true;
+        }
         
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
         	runSSG(ssg);
@@ -117,7 +124,9 @@ public class SMPBackend {
 
     	printFinalWorkAssignments();
 
-    	new Queue_h().copyToFile();
+    	if (isDynamic) {
+    	  new Queue_h().copyToFile();
+    	}
     	
     	System.exit(0);
     }
