@@ -125,7 +125,7 @@ public class SMPBackend {
     	printFinalWorkAssignments();
 
     	if (isDynamic) {
-    	  new Queue_h().copyToFile();
+    	  new DumpText().copyToFile();
     	}
     	
     	System.exit(0);

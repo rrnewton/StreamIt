@@ -15,28 +15,26 @@ import java.nio.channels.FileChannel;
  * @author soule
  *
  */
-public class Queue_h {
+public class DumpText {
 
+	static String[] files = {"queue.h", "queue.c"};
+	
 	/**
-	 * Create a new queue.h text file.
+	 * Create a new DumpText.
 	 */
-	public Queue_h() {
+	public DumpText() {
 		/* Do nothing */
 	}
 
-	
-	// TODO: call this dump Text file, and put all files in a static array.
-	
 	public void copyToFile() {
 		// TODO: this should be passed as a Kjc Option
 		String streamItHome = System.getenv("STREAMIT_HOME");		
 		String path = streamItHome + "/src/at/dms/kjc/smp/templates";
-		String hSrcFile = path + "/queue.h";
-		String cSrcFile = path + "/queue.c";
-		String hDstFile = "queue.h";
-		String cDstFile = "queue.c";			
-		copy(hSrcFile, hDstFile);
-		copy(cSrcFile, cDstFile);
+		for (String file : files) {
+			String srcFile = path + "/" + file;
+			String dstFile = file;		
+			copy(srcFile, dstFile);
+		}
 	}
 
 	private void copy(String srcName, String dstName) {
