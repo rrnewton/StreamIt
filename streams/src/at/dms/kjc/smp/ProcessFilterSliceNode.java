@@ -78,25 +78,43 @@ public class ProcessFilterSliceNode {
             System.out.println("TODO: smp.ProcessFilterSliceNode.doit() set a dynamicBuffer if approproate!!!");
             
             Channel inputBuffer = null;            
+        	Channel outputBuffer = null;
             
-            StaticSubGraph ssg = backEndBits.getScheduler().getGraphSchedule().getSSG();            
+            StaticSubGraph ssg = backEndBits.getScheduler().getGraphSchedule().getSSG();         
+            boolean isDynamic = ssg.hasDynamicInput() || ssg.hasDynamicOutput();
         	if (ssg.hasDynamicInput()) {
         		inputBuffer = InterSSGChannel.getInputBuffer(filterNode);
-        	} 
-        	
-        	else if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
+        	} else if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
             	inputBuffer = InputRotatingBuffer.getInputBuffer(filterNode);
             }
             
             
-        	Channel outputBuffer = null;
         	if (ssg.hasDynamicOutput()) {
         		outputBuffer = InterSSGChannel.getOutputBuffer(filterNode, ssg);
         	} else if (backEndBits.sliceHasDownstreamChannel(filterNode.getParent())) {
                 outputBuffer = OutputRotatingBuffer.getOutputBuffer(filterNode);
             }
 
-            filterCode = getFilterCode(filterNode,inputBuffer,outputBuffer,backEndBits);
+        	System.out.println("**********************************************");
+        	System.out.println("smp.ProcessFilterSliceNode.doit() filterNode=" + filterNode.toString());
+        	System.out.println("smp.ProcessFilterSliceNode.doit() ssg.hasDynamicInput()=" + ssg.hasDynamicInput());
+        	System.out.println("smp.ProcessFilterSliceNode.doit() ssg.hasDynamicOutput()=" + ssg.hasDynamicOutput());
+        	
+
+            if (inputBuffer == null) {
+            	System.out.println("smp.ProcessFilterSliceNode.doit() inputBuffer=null");
+            } else {
+            	System.out.println("smp.ProcessFilterSliceNode.doit() inputBuffer=non-null");        	
+            }
+
+            if (outputBuffer == null) {
+            	System.out.println("smp.ProcessFilterSliceNode.doit() outputBuffer=null");
+            } else {
+            	System.out.println("smp.ProcessFilterSliceNode.doit() outputBuffer=non-null");        	
+            }
+        	
+            filterCode = getFilterCode(filterNode,inputBuffer,outputBuffer,backEndBits, isDynamic);
+            System.out.println("**********************************************");
         }
         
 
@@ -239,26 +257,39 @@ public class ProcessFilterSliceNode {
      * Clones the input methods and munges on the clones, further changes to the returned code
      * will not affect the methods of the input code unit.
      * @param code           The code (fields and methods)
-     * @param inputBuffer   The input channel -- specifies routines to call to replace peek, pop.
+     * @param inputChannel   The input channel -- specifies routines to call to replace peek, pop.
      * @param outputChannel  The output channel -- specifies routines to call to replace push.
      * @return a CodeStoreHelper with no push, peek, or pop instructions in the methods.
      */
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
-            Channel inputBuffer, Channel outputChannel,
-            SMPBackEndFactory backEndBits) {
+            Channel inputChannel, Channel outputChannel,
+            SMPBackEndFactory backEndBits, final boolean isDynamic) {
         
     	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode()");
-    	
+    	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode() filter=" + filter.toString());
+        if (inputChannel == null) {
+        	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode() inputChannel=null");
+        } else {
+        	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode() inputChannel=non-null");        	
+        }
+
+        if (outputChannel == null) {
+        	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode() outputChannel=null");
+        } else {
+        	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode() outputChannel=non-null");        	
+        }
+
+        
         final String peekName;
 
         final String popName;
         final String pushName;
         final String popManyName;
 
-        if (inputBuffer != null) {
-            peekName = inputBuffer.peekMethodName();
-            popName = inputBuffer.popMethodName();
-            popManyName = inputBuffer.popManyMethodName();
+        if (inputChannel != null) {
+            peekName = inputChannel.peekMethodName();
+            popName = inputChannel.popMethodName();
+            popManyName = inputChannel.popManyMethodName();
         } else {
             peekName = "/* peek from non-existent channel */";
             popName = "/* pop() from non-existent channel */";
@@ -286,10 +317,18 @@ public class ProcessFilterSliceNode {
                         return new JMethodCallExpression(popManyName, 
                                 new JExpression[]{new JIntLiteral(self.getNumPop())});
                     } else {
-                        JExpression methodCall = new JMethodCallExpression(popName, 
-                                new JExpression[0]);
-                        methodCall.setType(tapeType);
-                        return methodCall;
+                    	if (isDynamic) {
+                    		JExpression dyn_queue  = new JEmittedTextExpression("dyn_queue");   
+                    		JExpression methodCall = new JMethodCallExpression(popName, new JExpression[]{dyn_queue});
+                    		methodCall.setType(tapeType);
+                    		return methodCall;
+                    	} else {
+
+                    		JExpression methodCall = new JMethodCallExpression(popName, 
+                    				new JExpression[0]);
+                    		methodCall.setType(tapeType);
+                    		return methodCall;
+                    	}
                     }
                     
                 }
@@ -309,7 +348,13 @@ public class ProcessFilterSliceNode {
                         CType tapeType,
                         JExpression arg) {
                     JExpression newArg = (JExpression)arg.accept(this);
-                    return new JMethodCallExpression(pushName, new JExpression[]{newArg});
+                    if (isDynamic) {
+                    	JExpression dyn_queue  = new JEmittedTextExpression("dyn_queue");                    
+                    	return new JMethodCallExpression(pushName, new JExpression[]{dyn_queue, newArg});
+                    } else {
+                    	return new JMethodCallExpression(pushName, new JExpression[]{newArg});
+
+                    }
                 }
             });
             // Add markers to code for debugging of emitted code:
@@ -325,18 +370,33 @@ public class ProcessFilterSliceNode {
      * Get code for a filter.
      * If code not yet made, then makes it.
      * @param filter         A FilterSliceNode for which we want code.
-     * @param inputBuffer   The input channel -- specified routines to call to replace peek, pop.
-     * @param outputBuffer  The output channel -- specified routeines to call to replace push.
+     * @param inputChannel   The input channel -- specified routines to call to replace peek, pop.
+     * @param outputChannel  The output channel -- specified routeines to call to replace push.
      * @param backEndBits
      * @return
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
-        Channel inputBuffer, Channel outputBuffer, SMPBackEndFactory backEndBits) {
+        Channel inputChannel, Channel outputChannel, SMPBackEndFactory backEndBits, boolean isDynamic) {
     	System.out.println("smp.ProcessFilterSliceNode.getFilterCode()");
+    	
+    	
+    	System.out.println("smp.ProcessFilterSliceNode.getFilterCode() filter=" + filter.toString());
+        if (inputChannel == null) {
+        	System.out.println("smp.ProcessFilterSliceNode.getFilterCode() inputChannel=null");
+        } else {
+        	System.out.println("smp.ProcessFilterSliceNode.getFilterCode() inputChannel=non-null");        	
+        }
+
+        if (outputChannel == null) {
+        	System.out.println("smp.ProcessFilterSliceNode.getFilterCode() outputChannel=null");
+        } else {
+        	System.out.println("smp.ProcessFilterSliceNode.getFilterCode() outputChannel=non-null");        	
+        }
+
     	
     	CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {
-            filterCode = makeFilterCode(filter,inputBuffer,outputBuffer,backEndBits);
+            filterCode = makeFilterCode(filter,inputChannel,outputChannel,backEndBits, isDynamic);
             CodeStoreHelper.addHelperForSliceNode(filter, filterCode);
         }
         return filterCode;

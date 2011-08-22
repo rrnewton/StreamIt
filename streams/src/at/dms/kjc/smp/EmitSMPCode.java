@@ -5,7 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodDeclaration;
@@ -28,13 +30,17 @@ public class EmitSMPCode extends EmitCode {
     
     public static final String MAIN_FILE = "main.c";
     
+	private static boolean isDynamic = false;
+    
     public EmitSMPCode(SMPBackEndFactory backendBits) {
         super(backendBits);
     }
     
-    public static void doit(SMPBackEndFactory backendBits) {
+    public static void doit(SMPBackEndFactory backendBits, boolean isDynamic) {
         try {
 
+        	EmitSMPCode.isDynamic = isDynamic;
+        	
             // if load balancing, instrument steady-state loop before steady-state barrier
             if(KjcOptions.loadbalance) {
                 LoadBalancer.instrumentSteadyStateLoopsBeforeBarrier();
@@ -154,6 +160,19 @@ public class EmitSMPCode extends EmitCode {
             p.println();
         }
 
+        // TODO: RJS put upper bounds
+        if (isDynamic) {
+        	for (int i = 0; i < 1; i++) {
+        		p.println("queue_ctx_ptr dyn_queue;");
+        	}
+        }
+
+        p.println();
+        p.println("int iterationCount = 0;");
+        p.println();
+
+        
+        
         p.println("// Global barrier");
         p.println("barrier_t barrier;");
         p.println();
@@ -184,6 +203,17 @@ public class EmitSMPCode extends EmitCode {
         p.println("// Initialize barrier");
         p.println("barrier_init(&barrier, " + barrier_count + ");");
 
+        // TODO: RJS put upper bounds
+        if (isDynamic) {
+        	p.println();
+        	p.println("// Initialize dynamic queues");
+        	for (int i = 0; i < 1; i++) {
+        		p.println("dyn_queue = queue_create(QUEUE_SIZE);");
+        	}
+        }
+
+        
+        
         if(KjcOptions.loadbalance) {
             p.println();
             p.println("// Initalize load balancer");
@@ -368,11 +398,13 @@ public class EmitSMPCode extends EmitCode {
     private static void generateMakefile() throws IOException {
         CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("Makefile", false)));
 
-        p.println("CC = icc");
+        // TODO : RJS
+        //p.println("CC = icc");
+        p.println("CC = g++");
         p.println("CFLAGS = -O2 -vec-report0");
         p.println("INCLUDES = ");
         p.println("LIBS = -pthread -lstdc++");
-        p.print("OBJS = main.o barrier.o ");
+        p.print("OBJS = main.o barrier.o queue.o ");
         if(KjcOptions.loadbalance) p.print("load_balancer.o ");
         for(Core core : SMPBackend.chip.getCores()) {
             if(!core.getComputeCode().shouldGenerateCode())
@@ -399,6 +431,11 @@ public class EmitSMPCode extends EmitCode {
         p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c barrier.c");
         p.println();
 
+        p.println("queue.o: queue.c");
+        p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c queue.c");
+        p.println();
+
+        
         if(KjcOptions.loadbalance) {
             p.println("load_balancer.o: load_balancer.c");
             p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c load_balancer.c");
@@ -438,12 +475,23 @@ public class EmitSMPCode extends EmitCode {
         p.println("#include \"rdtsc.h\"");
         p.println("#include \"structs.h\"");
 
+        if (isDynamic) {
+        	p.println("#include \"queue.h\"");
+        }
+        
         if(KjcOptions.loadbalance)
             p.println("#include \"load_balancer.h\"");
 
         if(KjcOptions.fixedpoint)
             p.println("#include \"fixed.h\"");
 
+        p.println();
+        p.println();
+        
+        if (isDynamic) {
+        	p.println("#define QUEUE_SIZE 2");
+        }
+        
         p.println();
         p.println();
     }
@@ -477,18 +525,20 @@ public class EmitSMPCode extends EmitCode {
         Set <InterSSGChannel> dynamicInputBuffers = InterSSGChannel.getInputBuffersOnCore((Core)n);
         Set <InterSSGChannel> dynamicOutputBuffers = InterSSGChannel.getOutputBuffersOnCore((Core)n);
 
-
+        JStatement itercount = new JExpressionStatement(new JEmittedTextExpression("extern int iterationCount"));
+        itercount.accept(codegen); p.println();
+        
         for (InterSSGChannel c : dynamicInputBuffers) {
-        	if (c.dataDecls() != null) {
-        		for (JStatement d : c.dataDecls()) { 
+        	if (c.readDeclsExtern() != null) {
+        		for (JStatement d : c.readDeclsExtern()) { 
         			d.accept(codegen); p.println();
         		}
         	}
         }
         
         for (InterSSGChannel c : dynamicOutputBuffers) {
-        	if (c.dataDecls() != null) {
-        		for (JStatement d : c.dataDecls()) { 
+        	if (c.writeDeclsExtern() != null) {
+        		for (JStatement d : c.writeDeclsExtern()) { 
         			d.accept(codegen); p.println();
         		}
         	}        	
@@ -571,6 +621,7 @@ public class EmitSMPCode extends EmitCode {
         p.println("void setCPUAffinity(int core) {");
         p.indent();
         
+        p.println("/*");
         p.println("cpu_set_t cpu_set;");
         p.println("CPU_ZERO(&cpu_set);");
         p.println("CPU_SET(core, &cpu_set);");
@@ -583,6 +634,7 @@ public class EmitSMPCode extends EmitCode {
         p.outdent();
         p.println("}");
         
+        p.println("*/");
         p.outdent();
         p.println("}");
         p.println();

@@ -54,6 +54,8 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
      * @return The input buffer of the filter node.
      */
     public static InterSSGChannel getInputBuffer(WorkNode fsn) {
+    	System.out.println("InterSSGChannel.getgetInputBuffer fsn=" + fsn.toString() + " " + 
+    	((null == inputBuffers.get(fsn)) ? "null" : "non-null"));
     	return inputBuffers.get(fsn);
     }
 
@@ -68,7 +70,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public String popMethodName() {
-		return "dynamic_buffer_pop";				
+		return "queue_pop";				
 	}
 
 	/**
@@ -79,7 +81,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	}
 
 	public String pushMethodName() {
-		return "dynamic_buffer_push";				
+		return "queue_push";				
 	}
 	
 	/**
@@ -125,6 +127,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param buf
 	 */
 	public static void setInputBuffer(WorkNode node, InterSSGChannel buf) {
+		System.out.println("===> InterSSGChannel::setInputBuffer node=" + node.toString());
 		inputBuffers.put(node, buf);
 	}
 	
@@ -145,19 +148,44 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
      */
 	public static Set<InterSSGChannel> getOutputBuffersOnCore(Core n) {
 		System.out.println("InterSSGChannel::getOutputBuffersOnCore(n)");
-		return new HashSet<InterSSGChannel>();
+		System.out.println("InterSSGChannel::getOutputBuffersOnCore(n) outputBuffers.size()==" + outputBuffers.size());
+		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();        
+		for (InterSSGChannel b : outputBuffers.values()) {
+			//if (SMPBackend.scheduler.getComputeNode(b.getFilterNode()).equals(t))
+				set.add(b);
+		}
+		return set;
 	}
 
 	/**
 	 * @return
 	 */
 	public List<JStatement> dataDecls() {
-		System.out.println("InterSSGChannel::dataDecls()");
+		//		System.out.println("InterSSGChannel::dataDecls()");
+		//		List<JStatement> statements = new LinkedList<JStatement>();
+		//        JStatement stmt = new JExpressionStatement(new JEmittedTextExpression("queue ctx"));
+		//        statements.add(stmt);
+		//		return statements;		
+		return new LinkedList<JStatement>();
+	}
+
+	public List<JStatement> writeDeclsExtern() {
+		System.out.println("InterSSGChannel::writeDeclsExtern()");
 		List<JStatement> statements = new LinkedList<JStatement>();
-        JStatement stmt = new JExpressionStatement(new JEmittedTextExpression("queue ctx"));
-        statements.add(stmt);
+		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression("extern queue_ctx_ptr dyn_queue"));
+		statements.add(stmt);
 		return statements;
 	}
+
+	public List<JStatement> readDeclsExtern() {
+		System.out.println("InterSSGChannel::readDeclsExtern()");
+		List<JStatement> statements = new LinkedList<JStatement>();
+		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression("extern queue_ctx_ptr dyn_queue"));
+		statements.add(stmt);
+		return statements;
+	}
+
+	 	 
 
 	/**
 	 * @param streamGraph
@@ -173,16 +201,31 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param streamGraph
 	 */
 	private static void createInputBuffers(StreamGraph streamGraph) {
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+		System.out.println("InterSSGChannel::createInputBuffers()");
+		System.out.println("InterSSGChannel::createInputBuffers()  streamGraph.getSSGs().size=" +  streamGraph.getSSGs().size());
+		int i = 0;
 		for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
+			System.out.println("InterSSGChannel::createInputBuffers()  ssg=" +  i);
+			i++;
+			Filter top = ssg.getTopFilters()[0];
+			if (ssg.getTopFilters() != null) {
+				System.out.println("InterSSGChannel::createInputBuffers()  top=" +  top.getWorkNode().toString());
+			} else {
+				System.out.println("InterSSGChannel::createInputBuffers()  top=null");
+			}
+			
 			List<InterSSGEdge> links = ssg.getInputPort().getLinks();
+			System.out.println("InterSSGChannel::createInputBuffers()  links.size()=" + links.size());
 			if (links.size() == 0) {
 				continue;
 			}
 			InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);		    
 			InterSSGChannel channel = new InterSSGChannel(edge);
 			if (ssg.getTopFilters() != null) {
-				Filter top = ssg.getTopFilters()[0];
-				inputBuffers.put(top.getWorkNode(), channel);
+				top = ssg.getTopFilters()[0];
+				setInputBuffer(top.getWorkNode(), channel);
+				//inputBuffers.put(top.getWorkNode(), channel);
 			} else {
 				assert false : "InterSSGChannel::createInputBuffers() : ssg.getTopFilters() is null";			
 			}

@@ -56,11 +56,13 @@ public class SMPBackend {
         	isDynamic = true;
         }
         
+        InterSSGChannel.createBuffers(streamGraph);
+        
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
         	runSSG(ssg);
         }
         
-        InterSSGChannel.createBuffers(streamGraph);
+
         
         emitCode();
     
@@ -117,7 +119,7 @@ public class SMPBackend {
     		chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
 
     	// emit c code for all cores
-    	EmitSMPCode.doit(backEndBits);
+    	EmitSMPCode.doit(backEndBits, isDynamic);
 
     	// dump structs.h file
     	structs_h.writeToFile();
