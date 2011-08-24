@@ -5,7 +5,9 @@ void->int stateful filter Source {
      count = 0;
   }
   work push * {
-    push(count++);
+    int i;
+    for(i=0; i < count%10; i++)
+             push(count++);
   }
 }
 
