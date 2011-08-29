@@ -64,12 +64,13 @@ public class EmitSMPCode extends EmitCode {
             if(KjcOptions.profile) {
                 Profiler.instrumentAfterBarrier();
             }
-
+            
             // make sure each thread exits properly
             for (Core core : SMPBackend.chip.getCores()) {
                 if (!core.getComputeCode().shouldGenerateCode())
                     continue;
 
+               // core.getComputeCode().addSteadyLoopStatement(Util.toStmt("foo(NULL)"));
                 core.getComputeCode().addCleanupStatement(Util.toStmt("pthread_exit(NULL)"));
             }
 
@@ -162,9 +163,20 @@ public class EmitSMPCode extends EmitCode {
 
         // TODO: RJS put upper bounds
         if (isDynamic) {
+        	// TODO fix number of threads
+        	int numThreads = 3;
+        	int numFilters = 4;
         	for (int i = 0; i < 1; i++) {
         		p.println("queue_ctx_ptr dyn_queue;");
-        	}
+        	}       
+            p.println();
+        	p.println("#define NUM_THREADS  " + numThreads);
+        	p.println("#define NUM_FILTERS  " + numFilters);
+        	p.println("pthread_cond_t        thread_conds    [NUM_THREADS];");
+        	p.println("pthread_mutex_t       thread_mutexes  [NUM_THREADS];");
+        	p.println("int                   thread_to_sleep [NUM_THREADS];");
+        	p.println("int                   MULTIPLIERS     [NUM_FILTERS][2];");
+        	p.println("int                   mflag ;");        
         }
 
         p.println();
@@ -210,10 +222,28 @@ public class EmitSMPCode extends EmitCode {
         	for (int i = 0; i < 1; i++) {
         		p.println("dyn_queue = queue_create(QUEUE_SIZE);");
         	}
+        	p.println();
+        	p.println("// Initialize mutexes and condition variables");
+        	p.println();
+        	p.println("int i = 0;");
+        	p.println("for (i = 0; i < NUM_THREADS; i++) {");
+        	p.indent();
+        	p.println("pthread_cond_init(&thread_conds[i], NULL);");
+        	p.println("pthread_mutex_init(&thread_mutexes[i], NULL);");
+        	p.println("thread_to_sleep[i] = 1; /* 1 is asleep */");
+        	p.outdent();
+        	p.println("}");
+        	p.println();
+        	p.println("mflag = 0;");
+        	p.println();
+        	p.println("for (i = 0; i < NUM_FILTERS; i++) {");
+        	p.indent();
+        	p.println("MULTIPLIERS[i][0] = 2;");
+        	p.println("MULTIPLIERS[i][1] = 2;");
+        	p.outdent();
+        	p.println("}");        	
         }
-
-        
-        
+                
         if(KjcOptions.loadbalance) {
             p.println();
             p.println("// Initalize load balancer");
@@ -611,6 +641,7 @@ public class EmitSMPCode extends EmitCode {
         
         // generate functions for methods
         codegen.setDeclOnly(false);
+        
         for (JMethodDeclaration method : fieldsAndMethods.getMethods()) {
             method.accept(codegen);
         }
