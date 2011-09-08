@@ -1,0 +1,41 @@
+
+void->int filter A {
+   work push 1 {
+     println(1);
+   }
+}
+
+int->int stateful filter B {
+  int count;
+  init {
+     count = 0;
+  }
+    work pop 1 push 1 {
+      push(count++);      
+   }
+}
+
+int->int stateful filter C {
+  int count;
+  init {
+     count = 0;
+  }
+    work pop 1 push 1 {
+      push(count++);      
+   }
+}
+
+int->void filter D {
+   work pop 1 {
+     println(pop());
+   }
+}
+
+
+void->void pipeline test5 {
+    add A();
+    add B();
+    add C();
+    add D();
+}
+
