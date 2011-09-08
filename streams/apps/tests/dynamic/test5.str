@@ -16,12 +16,8 @@ int->int stateful filter B {
 }
 
 int->int stateful filter C {
-  int count;
-  init {
-     count = 0;
-  }
-    work pop 1 push 1 {
-      push(count++);      
+   work pop 1 push 1 {
+      push(pop());      
    }
 }
 
