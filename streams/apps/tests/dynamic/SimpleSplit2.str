@@ -1,0 +1,37 @@
+void->void pipeline SimpleSplit2 {
+    add void->int stateful filter {
+	int count = 0;
+	work push 1 {
+	    push(count++);
+	}
+    }
+    add int->int splitjoin {
+	split roundrobin();
+	add straight();
+	add reverse();
+	join roundrobin();
+    }
+    add int->void filter {
+	work pop 1 {
+	    println(pop());
+	}
+    }
+}
+
+int->int stateful filter straight {
+    int count = 0;
+    work pop 2 push 2 {
+	push(count++);
+	push(pop());
+    }
+}
+
+int->int stateful filter reverse {
+    int count = 0;
+    work pop 2 push 2 {
+	int i1 = pop();
+	int i2 = pop();
+	push(i2);
+	push(i1 + count++);
+    }
+}
