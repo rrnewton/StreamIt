@@ -1,7 +1,11 @@
 
 void->float filter A {
    work push 1 {
-     println(1);
+     int c;
+     for (int i = 0; i < 100000; i++) {
+       c += i;
+     }   
+     println(c);
    }
 }
 
@@ -29,6 +33,10 @@ float->float stateful filter C {
 
 float->void filter D {
    work pop 1 {
+     int c;
+     for (int i = 0; i < 100000; i++) {
+       c += i;
+     }
      println(pop());
    }
 }
