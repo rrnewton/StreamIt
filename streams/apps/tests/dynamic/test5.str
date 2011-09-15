@@ -11,6 +11,7 @@ int->int stateful filter B {
      count = 0;
   }
     work pop 1 push 1 {
+      pop()
       push(count++);      
    }
 }
