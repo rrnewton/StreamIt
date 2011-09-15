@@ -1,12 +1,12 @@
 
-void->int filter A {
+void->float filter A {
    work push 1 {
      println(1);
    }
 }
 
-int->int stateful filter B {
-  int count;
+float->float stateful filter B {
+  float count;
   init {
      count = 0;
   }
@@ -16,13 +16,18 @@ int->int stateful filter B {
    }
 }
 
-int->int filter C {
-   work pop 1 push 1 {
-      push(pop());      
+float->float stateful filter C {
+  float count;
+  init {
+     count = 0;
+  }
+    work pop 1 push 1 {
+      pop();
+      push(count++);      
    }
 }
 
-int->void filter D {
+float->void filter D {
    work pop 1 {
      println(pop());
    }
