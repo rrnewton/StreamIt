@@ -15,7 +15,7 @@ int->int stateful filter B {
    }
 }
 
-int->int stateful filter C {
+int->int filter C {
    work pop 1 push 1 {
       push(pop());      
    }
