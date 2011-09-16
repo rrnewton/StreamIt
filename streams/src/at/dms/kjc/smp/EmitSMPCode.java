@@ -434,7 +434,10 @@ public class EmitSMPCode extends EmitCode {
         p.println("CFLAGS = -O2 -vec-report0");
         p.println("INCLUDES = ");
         p.println("LIBS = -pthread -lstdc++");
-        p.print("OBJS = main.o barrier.o queue.o ");
+        p.print("OBJS = main.o barrier.o ");
+        if (isDynamic) {       
+        	p.print("queue.o ");
+        } 
         if(KjcOptions.loadbalance) p.print("load_balancer.o ");
         for(Core core : SMPBackend.chip.getCores()) {
             if(!core.getComputeCode().shouldGenerateCode())
