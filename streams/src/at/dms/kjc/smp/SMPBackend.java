@@ -84,6 +84,10 @@ public class SMPBackend {
 
         // generate layout for filters
         scheduler.runLayout();
+        
+        // TODO: add a pass that maps to layout, to map filters to threads
+        // Store the mapping from Filter to Thread inside the core code store.
+
 
         // dump final slice graph to dot file
         graphSchedule.getSSG().dumpGraph("after_slice_partition.dot", scheduler);
