@@ -57,9 +57,12 @@ public class TMDBinPackFissAll extends Scheduler {
      * Assign the filternodes of the slice graph to tiles on the chip based on the levels
      * of the graph. 
      */
-    public void runLayout() {
+    public void runLayout() {    	
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
+        
+        System.out.println("TMDBinPackFissAll::runLayout");	
+        System.out.println("TMDBinPackFissAll::");	
         
         LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         HashSet<Filter> fizzedSlices = new HashSet<Filter>();

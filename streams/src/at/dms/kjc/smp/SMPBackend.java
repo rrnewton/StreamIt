@@ -58,8 +58,10 @@ public class SMPBackend {
         
         InterSSGChannel.createBuffers(streamGraph);
         
+        Map<Filter, Integer> threadMap = new HashMap<Filter, Integer>();
+        
         for ( StaticSubGraph ssg : streamGraph.getSSGs()) {
-        	runSSG(ssg);
+        	runSSG(ssg, threadMap);
         }
         
 
@@ -68,7 +70,7 @@ public class SMPBackend {
     
     }
         
-    private static void runSSG(StaticSubGraph ssg) {//, CommonPasses commonPasses) {        	            
+    private static void runSSG(StaticSubGraph ssg, Map<Filter, Integer> threadMap) {//, CommonPasses commonPasses) {        	            
       
         // dump slice graph to dot file
         ssg.dumpGraph("traces.dot", null);
@@ -87,6 +89,7 @@ public class SMPBackend {
         
         // TODO: add a pass that maps to layout, to map filters to threads
         // Store the mapping from Filter to Thread inside the core code store.
+        new ThreadMapper().assignThreads(graphSchedule, threadMap);
 
 
         // dump final slice graph to dot file
@@ -231,11 +234,15 @@ public class SMPBackend {
      * policy.
      */
     private static void setScheduler() {
+    	System.out.println("********************* scheduler setScheduler called!");
         if (KjcOptions.partitioner.equals("tmd")) {
-            scheduler = new TMDBinPackFissAll();
+        	System.out.println("********************* scheduler is TMDBinPackFissAll!");
+        	scheduler = new TMDBinPackFissAll();
         } else if (KjcOptions.partitioner.equals("oldtmd")) {
+        	System.out.println("********************* scheduler is oldtmd!");
             scheduler = new TMD();
         } else if (KjcOptions.partitioner.equals("smd")) {
+        	System.out.println("********************* scheduler is smd!");
             scheduler = new SMD();
         } else {
             System.err.println("Unknown Scheduler Type!");
