@@ -148,17 +148,17 @@ public class SIRSplitJoin extends SIRContainer implements Cloneable {
      * <children> before.  Only clears the argument list if there are
      * a different number of streams than before.
      */
-    public void setParallelStreams(LinkedList<Object> children) {
-        if (size()==children.size()) {
+    public void setParallelStreams(LinkedList<SIRStream> linkedList) {
+        if (size()==linkedList.size()) {
             // same size
-            for (int i=0; i<children.size(); i++) {
-                set(i, (SIRStream)children.get(i));
+            for (int i=0; i<linkedList.size(); i++) {
+                set(i, (SIRStream)linkedList.get(i));
             }
         } else {
             // not same size
             clear();
-            for (int i=0; i<children.size(); i++) {
-                add((SIRStream)children.get(i));
+            for (int i=0; i<linkedList.size(); i++) {
+                add((SIRStream)linkedList.get(i));
             }
             rescale();
         }

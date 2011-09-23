@@ -121,10 +121,10 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
      * Sets children of this to be all the children of <children>, and
      * set all the parent fields in <children> to be this.
      */
-    public void setChildren(LinkedList<Object> children) {
+    public void setChildren(List<SIRStream> children) {
         clear();
         for (int i=0; i<children.size(); i++) {
-            add((SIRStream)children.get(i));
+            add(children.get(i));
         }
     }
 

@@ -45,7 +45,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	private int pipelineId = 0;
 
 	/** These are the child nodes of the pipeline currently being created */
-	private LinkedList<Object> pipelineMembers = null;
+	private List<SIRStream> pipelineChildren = null;
 
 	/** This is the list of all pipelines created */
 	private List<SIRStream> staticSubGraphs = null;
@@ -96,16 +96,21 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		return staticSubGraphs;
 	}
 
-	public SegmentedSIRGraph init(SIRStream str, boolean isDynamic) {		
+	public SegmentedSIRGraph init(SIRStream str, boolean isDynamic) {	
+		System.out.println("SegmentedSIRGraph.init, isDynamic=" + isDynamic);
 		if (!isDynamic) {
 			this.addToSegmentedGraph(str);
 			return this;
 		} 
 
-		pipelineMembers = new LinkedList<Object>();
+		
 
+		startPipeline();
+		
 		IterFactory.createFactory().createIter(str).accept(this);
 
+		endPipeline();  	
+		
 		// This section is for debugging
 //		log("*********************************");
 //		int j = 0;
@@ -171,52 +176,110 @@ public class SegmentedSIRGraph implements StreamVisitor {
 
 	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
-		log(this.getClass().getCanonicalName() + " visitFilter()");
-		log(this.getClass().getCanonicalName() + " self.getPopString="
-				+ self.getPopString());
-		log(this.getClass().getCanonicalName() + " self.getPushString="
-				+ self.getPushString());
-		log(this.getClass().getCanonicalName() + " self.getPeekString="
-				+ self.getPeekString());
-		log(this.getClass().getCanonicalName() + " isDynamicPush="
-				+ isDynamicPush(self));
-		log(this.getClass().getCanonicalName() + " isDynamicPop="
-				+ isDynamicPop(self));
-		log(this.getClass().getCanonicalName() + " iter.getPos="
-				+ iter.getPos());
+		log(this.getClass().getCanonicalName() + " visitFilter() " + self.getName() 		
+		+ " isDynamicPush=" + isDynamicPush(self) 
+		+ " isDynamicPop="  + isDynamicPop(self)
+		+ " iter.getPos="	+ iter.getPos());
 
 		SIRFilter filter = (SIRFilter) ObjectDeepCloner.deepCopy(self);
 
-		// If its a dynamic push, then add this filter, and create
-		// a new pipeline
-		if (isDynamicPush(filter)) {
-			filter.setPush(new JIntLiteral(1));
-			if (isSource(filter)) {
-				filter.setPop(new JIntLiteral(1));
-				filter.setPeek(new JIntLiteral(1));
-			}
-			pipelineMembers.add(filter);
-			finishPipeline(filter, iter);
-			return;
+		
+		// If this is a completely static filter, then we 
+		// just add it to the current pipeline
+		if (!isDynamicPush(filter) && !(isDynamicPop(filter))) {
+			addToPipeline(filter);
+		}
+		
+		
+		else if (isDynamicPush(filter) && !(isDynamicPop(filter))) {
+			filter.setPush(new JIntLiteral(1));	
+			addToPipeline(filter);
+			pipelineChildren.add(createSink(self, iter));
+			endPipeline();  			
+			startPipeline();
 		}
 
-		// If its a dynamic pop, check to see if there is anything
-		// preceeding the filter that should be in its own pipeline
-		if (isDynamicPop(filter)) {
-			if (pipelineMembers.size() > 0) {
-				finishPipeline(filter, iter);
-				return;
-			}
+		else if (!isDynamicPush(filter) && (isDynamicPop(filter))) {
+			endPipeline();  
+			startPipeline();
+			pipelineChildren.add(createSource(filter));
 			filter.setPop(new JIntLiteral(1));
 			filter.setPeek(new JIntLiteral(1));
-			pipelineMembers.add(filter);
-			if (isSink(filter)) {
-				finishPipeline(filter, iter);
-				return;
-			}
+			addToPipeline(filter);
 		}
+
+		else { // if (isDynamicPush(filter) && (isDynamicPop(filter))) {
+			endPipeline();  
+			startPipeline();
+			pipelineChildren.add(createSource(filter));
+			filter.setPop(new JIntLiteral(1));
+			filter.setPeek(new JIntLiteral(1));
+			filter.setPush(new JIntLiteral(1));	
+			addToPipeline(filter);
+			pipelineChildren.add(createSink(self, iter));
+			endPipeline();  			
+			startPipeline();			
+		}
+
+		
+//		// If its a dynamic push, then add this filter, and create
+//		// a new pipeline
+//		if (isDynamicPush(filter)) {
+//			filter.setPush(new JIntLiteral(1));
+//			if (isSource(filter)) {
+//				filter.setPop(new JIntLiteral(1));
+//				filter.setPeek(new JIntLiteral(1));
+//			}
+//			pipelineChildren.add(filter);
+//			finishPipeline(filter, iter);
+//			return;
+//		}
+//
+//		// If its a dynamic pop, check to see if there is anything
+//		// preceeding the filter that should be in its own pipeline
+//		if (isDynamicPop(filter)) {
+//			if (pipelineChildren.size() > 0) {
+//				finishPipeline(filter, iter);
+//				return;
+//			}
+//			filter.setPop(new JIntLiteral(1));
+//			filter.setPeek(new JIntLiteral(1));
+//			pipelineChildren.add(filter);
+//			if (isSink(filter)) {
+//				finishPipeline(filter, iter);
+//				return;
+//			}
+//		}
+//		// If it is neither a dynamic push nor pop, just add it to the 
+//		// current pipeline
+//		 	
+//		pipelineChildren.add(filter);	
+		
+		
+	}
+	
+
+	private void endPipeline() {
+		if (pipelineChildren.size() == 0) {
+			return;
+		}
+		// Create a new empty list of pipeline children		
+		SIRPipeline pipeline = new SIRPipeline(null, uniquePipelineName());
+		pipeline.setInit(SIRStream.makeEmptyInit());
+		this.setChildren(pipeline, pipelineChildren);		
+		addToSegmentedGraph(pipeline);		
+	}
+	
+	
+	private void startPipeline() {
+		// Create a new empty list of pipeline children
+		pipelineChildren = new LinkedList<SIRStream>();	
+
 	}
 
+	private void addToPipeline(SIRFilter child) {
+		pipelineChildren.add(child);
+	}
 
 
 	@Override
@@ -231,33 +294,42 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		return sink;
 	}
 
-	private SIRFilter createSource(SIRFilter succ, SIRFilterIter iter) {
+	private SIRFilter createSource(SIRFilter succ) {
 		SIRFilter source = new SIRDummySource(succ.getInputType());
 		log(this.getClass().getCanonicalName() + " createSource()");
 		return source;
 	}
 
-	private void finishPipeline(SIRFilter self, SIRFilterIter iter) {
-		/* add the source and sink */
-		if (!isSink(self)) {
-			log(this.getClass().getCanonicalName() + " adding a sink after "
-					+ self.getName());
-			pipelineMembers.add(createSink(self, iter));
-		}
-		if (!isSource(self)) {
-			log(this.getClass().getCanonicalName() + " adding a source before "
-					+ self.getName());
-			pipelineMembers.add(0, createSource((SIRFilter) pipelineMembers.get(0), iter));
-		}
-		SIRPipeline pipeline = new SIRPipeline(null, uniquePipelineName());
-		pipeline.setInit(SIRStream.makeEmptyInit());
-		pipeline.setChildren(pipelineMembers);
-		addToSegmentedGraph(pipeline);
-		pipelineMembers = new LinkedList<Object>();
-		log(this.getClass().getCanonicalName() + " pipeline.size()="
-				+ pipeline.size());
-	}
+//	private void finishPipeline(SIRFilter self, SIRFilterIter iter) {
+//		/* add the source and sink */
+//		if (!isSink(self)) {
+//			log(this.getClass().getCanonicalName() + " adding a sink after "
+//					+ self.getName());
+//			pipelineChildren.add(createSink(self, iter));
+//		}
+//		
+//		if (!isSource(pipelineChildren.get(0))) {
+//		
+//		//if (!isSource(self)) {
+//			log(this.getClass().getCanonicalName() + " adding a source before "
+//					+ self.getName());
+//			pipelineChildren.add(0, createSource((SIRFilter) pipelineChildren.get(0)));
+//		}
+//		SIRPipeline pipeline = new SIRPipeline(null, uniquePipelineName());
+//		pipeline.setInit(SIRStream.makeEmptyInit());
+//		this.setChildren(pipeline, pipelineChildren);		
+//		addToSegmentedGraph(pipeline);
+//		
+//		pipelineChildren = new LinkedList<SIRStream>();
+//		log(this.getClass().getCanonicalName() + " pipeline.size()="
+//				+ pipeline.size());
+//	}
 
+	
+	private void setChildren(SIRPipeline pipeline, List<SIRStream> children) {
+		pipeline.setChildren(pipelineChildren);	
+	}
+	
 	private boolean isDynamicPop(SIRFilter self) {
 		return self.getPop().isDynamic();
 	}
@@ -266,13 +338,13 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		return self.getPush().isDynamic();
 	}
 
-	private boolean isSink(SIRFilter self) {
-		return (self.getOutputType() == CStdType.Void);
-	}
-
-	private boolean isSource(SIRFilter self) {
-		return (self.getInputType() == CStdType.Void);
-	}
+//	private boolean isSink(SIRStream self) {
+//		return (self.getOutputType() == CStdType.Void);
+//	}
+//
+//	private boolean isSource(SIRStream self) {
+//		return (self.getInputType() == CStdType.Void);
+//	}
 
 	private void log(String str) {
 		if (debug)

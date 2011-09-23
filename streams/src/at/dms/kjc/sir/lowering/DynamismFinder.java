@@ -109,7 +109,7 @@ public class DynamismFinder implements StreamVisitor {
 	 */
 	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
-		log(this.getClass().getCanonicalName() + " visitFilter()");
+		log(this.getClass().getCanonicalName() + " visitFilter() " + self.getName());
 		if (isDynamicPop(self)) {
 			result.setDynamic(true);
 			result.addDynamicFilter(self);

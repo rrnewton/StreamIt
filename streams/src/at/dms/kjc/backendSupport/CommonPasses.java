@@ -186,7 +186,9 @@ public class CommonPasses {
 	 * @return The SLIR representation of each optimized SSG
 	 */
 	private StreamGraph doStaticPassesSegmentedSIRGraph(SegmentedSIRGraph segmentedGraph) {
+		System.out.println("CommonPasses::doStaticPassesSegmentedSIRGraph");
 		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
+		System.out.println("CommonPasses::segmentedGraph.getStaticSubGraphs().size()=" + segmentedGraph.getStaticSubGraphs().size());
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
 			str = doStaticPassSIRStream(str);

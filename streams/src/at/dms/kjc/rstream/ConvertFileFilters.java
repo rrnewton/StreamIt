@@ -2,6 +2,7 @@ package at.dms.kjc.rstream;
 
 import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
+
 import java.util.LinkedList;
 import java.util.Iterator;
 
@@ -45,11 +46,11 @@ public class ConvertFileFilters extends EmptyAttributeStreamVisitor
                                 JMethodDeclaration[] methods,
                                 JMethodDeclaration init) {
         /** visit each child. **/
-        LinkedList<Object> newChildren = new LinkedList<Object>();
+        LinkedList<SIRStream> newChildren = new LinkedList<SIRStream>();
         Iterator childIter = self.getChildren().iterator();
         while(childIter.hasNext()) {
             SIROperator currentChild = (SIROperator)childIter.next();
-            newChildren.add(currentChild.accept(this));
+            newChildren.add((SIRStream)currentChild.accept(this));
         }
         self.setChildren(newChildren);
         return self;
@@ -65,7 +66,7 @@ public class ConvertFileFilters extends EmptyAttributeStreamVisitor
                                  JMethodDeclaration init,
                                  SIRSplitter splitter,
                                  SIRJoiner joiner) {
-        LinkedList<Object> newChildren = new LinkedList<Object>();
+        LinkedList<SIRStream> newChildren = new LinkedList<SIRStream>();
         // visit splitter
         self.getSplitter().accept(this);
         // visit children
@@ -76,7 +77,7 @@ public class ConvertFileFilters extends EmptyAttributeStreamVisitor
             if (currentChild instanceof SIRSplitter || 
                 currentChild instanceof SIRJoiner)
                 continue;
-            newChildren.add(currentChild.accept(this));
+            newChildren.add((SIRStream) currentChild.accept(this));
         }
         // visit joiner 
         self.getJoiner().accept(this);

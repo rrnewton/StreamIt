@@ -1,6 +1,7 @@
 package at.dms.kjc.sir.lowering;
 
 import java.util.*;
+
 import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.common.ArrayCopy;
@@ -294,7 +295,7 @@ public class ConstantProp {
         /**
          * List of children of parent stream.
          */
-        private LinkedList<Object> children;
+        private LinkedList<SIRStream> children;
         /**
          * The parent stream.
          */
@@ -304,7 +305,7 @@ public class ConstantProp {
          * Makes a new one of these.
          */
         private GetChildren(SIRStream str) {
-            this.children = new LinkedList<Object>();
+            this.children = new LinkedList<SIRStream>();
             this.parent = str;
         }
 
@@ -312,7 +313,7 @@ public class ConstantProp {
          * Re-inspects the init function of <str> to see who its children
          * are.
          */
-        public static LinkedList<Object> getChildren(SIRStream str) {
+        public static LinkedList<SIRStream> getChildren(SIRStream str) {
             GetChildren gc = new GetChildren(str);
             if (str.getInit()!=null) {
                 str.getInit().accept(gc);

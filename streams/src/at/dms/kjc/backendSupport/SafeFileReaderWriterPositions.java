@@ -111,7 +111,7 @@ public class SafeFileReaderWriterPositions {
                 && readerBeforeSplitter.contains(self)) {
                 CType outputType = self.getOutputType();
                 SIRContainer parent = (SIRContainer)iter.getParent().getStream();
-                LinkedList<Object> pipeChildren = new LinkedList<Object>();
+                LinkedList<SIRStream> pipeChildren = new LinkedList<SIRStream>();
                 SIRFilter id = makeIdentityFilter(outputType);
                 //SIRFilter id = new SIRIdentity(outputType);
                 RenameAll.renameAllFilters(id);
@@ -122,7 +122,7 @@ public class SafeFileReaderWriterPositions {
                     && writerAfterJoiner.contains(self)) {
                 CType inputType = self.getInputType();
                 SIRContainer parent = (SIRContainer)iter.getParent().getStream();
-                LinkedList<Object> pipeChildren = new LinkedList<Object>();
+                LinkedList<SIRStream> pipeChildren = new LinkedList<SIRStream>();
                 SIRFilter id = makeIdentityFilter(inputType);
                 //SIRFilter id = new SIRIdentity(inputType);
                 RenameAll.renameAllFilters(id);
@@ -133,7 +133,7 @@ public class SafeFileReaderWriterPositions {
         }
     }
  
-    private void makePipeline(SIRFilter self, SIRContainer parent, LinkedList/*<SIRFilter>*/<Object>pipeChildren) {
+    private void makePipeline(SIRFilter self, SIRContainer parent, LinkedList/*<SIRFilter>*/<SIRStream>pipeChildren) {
         JMethodDeclaration init = makeInit();
         SIRPipeline pipe = new SIRPipeline(parent,
                 "generatedPipeline"+makeNewSuffix(),

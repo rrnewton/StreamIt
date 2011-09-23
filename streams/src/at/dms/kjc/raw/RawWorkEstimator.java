@@ -55,7 +55,7 @@ public class RawWorkEstimator extends EmptyStreamVisitor
         //new cloned filter
         SIRFilter filter = (SIRFilter)ObjectDeepCloner.deepCopy(oldFilter);
         SIRPipeline pipe = new SIRPipeline("top");
-        LinkedList<Object> list = new LinkedList<Object>();
+        LinkedList<SIRStream> list = new LinkedList<SIRStream>();
         list.add(filter);
         pipe.setChildren(list);
 
