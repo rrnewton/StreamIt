@@ -1,82 +1,70 @@
 #include "queue.h"
 #include <stdlib.h>
+#include <string.h>
 
-struct queue_ctx {
-  int*   buffer;
-  int    size;
-  int    first;
-  int    last;
-  int    capacity;
-};
+#define CAPACITY 1024
 
 queue_ctx_ptr 
-queue_create(int capacity) { 
+// queue_create(int capacity) { 
+queue_create() { 
   queue_ctx_ptr q;  
-  log("queue_::queue_create");
-  if (capacity < 0) {
-    error("queue_::queue_create capacity is too small");
-    exit(1);
-  }
-  q = (queue_ctx*)malloc(sizeof(struct queue_ctx));
+  /* if (capacity < 0) { */
+  /*   error("queue_::queue_create capacity is too small"); */
+  /*   exit(1); */
+  /* } */
+  q = (queue_ctx_ptr)malloc(sizeof(struct queue_ctx));
   if (q == NULL) {
     error("queue_::queue_create unable to allocate memory");
     exit(1);
   }
-  q->buffer = (int*)malloc(sizeof(int) * capacity);
+  q->buffer = (TYPE*)malloc(sizeof(TYPE) * CAPACITY);
   if (q->buffer == NULL) {
     error("queue_::queue_create unable to allocate memory");
     exit(1);
   }
-  q->capacity = capacity;
+  q->capacity = CAPACITY;
+  q->max = CAPACITY - 1 ;
   queue_clear(q);
   return q;
 }
 
 void        
 queue_destroy(queue_ctx_ptr q) { 
-  log("queue_::queue_destroy");
   if (q != NULL) {
     free(q->buffer);
     free(q);
   }
 }
 
-static int next(int i, queue_ctx_ptr q) {
-  //return (++i) % q->capacity;
-  if (++i == q->capacity) {
-    i = 0;
-  }
-  return i;
-}
-
 int        
-queue_push(queue_ctx_ptr q, int elem) { 
-  // log("queue::queue_push");
-  if (queue_is_full(q)) {
-    error("queue::queue_push queue is full.");
-    return 1;
-  } else {
-    q->size++;
-    q->last = next(q->last, q);
-    q->buffer[q->last] = elem;
-    // printf("queue::queue_push first %d\n", q->first);
-    // printf("queue::queue_push last %d\n", q->last);
-    return 0;
-  }
+queue_push(queue_ctx_ptr q, TYPE elem) { 
+  if (q->size == q->capacity) {
+    queue_grow(q);
+  } 
+  q->size++;
+
+  q->last = (q->last + 1) & q->max ; 
+
+  //  if (++(q->last) == q->last) {
+  //  q->last = 0;
+  // }
+
+  q->buffer[q->last] = elem;
+  return 0;  
 }
 
-int       
-queue_pop(queue_ctx_ptr q) { 
-  // log("queue::queue_pop");
-  if (queue_is_empty(q)) {
+TYPE       
+queue_pop(queue_ctx_ptr q, int * success) { 
+  if (q->size == 0) {
     error("queue::queue_pop queue is empty.");
-    return NULL;
+    *success = 0;
+    return 0;
   } else {
-    int elem = q->buffer[q->first];
-    // printf("queue::queue_pop first %d\n", q->first);
-    // printf("queue::queue_pop last %d\n", q->last);
+    TYPE elem = q->buffer[q->first];
     q->size--;
-    q->first = next(q->first, q);
+
+    q->first = (q->first + 1) & q->max ; 
+    *success = 1;
     return elem;
   }
 }
@@ -88,13 +76,47 @@ queue_clear(queue_ctx_ptr q) {
   q->last = 0;
 }
 
-int         
-queue_is_empty(queue_ctx_ptr q) { 
-  return (q->size == 0); 
+int        
+queue_grow(queue_ctx_ptr q) { 
+
+  int old_first = q->first;
+  int old_last = q->last;
+  int old_capacity = q->capacity;
+  int old_size = q->size;
+  TYPE* old_buffer = q->buffer;
+
+  int capacity = q->capacity * 2;  
+  q->buffer = (TYPE*)malloc(sizeof(TYPE) * capacity );
+  if (q->buffer == NULL) {
+    error("queue_::queue_grow unable to allocate memory");
+    exit(1);
+  }
+  q->capacity = capacity;
+  q->max = capacity - 1;
+  q->size = 0;
+  q->first = 1;
+  q->last = 0;
+  if (old_last < old_first) {
+    memcpy(&q->buffer[1], &old_buffer[old_first], (old_capacity - old_first) * sizeof(TYPE));
+    memcpy(&q->buffer[(old_capacity - old_first) + 1], &old_buffer[0], (old_last + 1) * sizeof(TYPE));
+  } else {
+    memcpy(&q->buffer[1], &old_buffer[1], old_size * sizeof(TYPE));
+  }
+  q->first = 1;
+  q->last = old_size ;
+  q->size = old_size;  
+  return capacity;
 }
 
-int         
-queue_is_full(queue_ctx_ptr q) { 
-  return (q->size == q->capacity); 
+void queue_print(queue_ctx_ptr q) { 
+  int i, j = 0;
+  j = q->first;
+  printf ("first = %d, size = %d capacity = %d :: ", j, q->size, q->capacity);
+  for (i=0; i < q->capacity; i++) {
+    printf ("%d ", q->buffer[j]);
+    if (++j == q->capacity) {
+      j = 0;
+    }
+  }
+  printf ("\n");
 }
-

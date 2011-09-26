@@ -164,19 +164,17 @@ public class EmitSMPCode extends EmitCode {
         // TODO: RJS put upper bounds
         if (isDynamic) {
         	// TODO fix number of threads
-        	int numThreads = 3;
-        	int numFilters = 4;
+        	int numDynamicReaders = 1;
         	for (int i = 0; i < 1; i++) {
         		p.println("queue_ctx_ptr dyn_queue;");
         	}       
             p.println();
-        	p.println("#define NUM_THREADS  " + numThreads);
-        	p.println("#define NUM_FILTERS  " + numFilters);
-        	p.println("pthread_cond_t        thread_conds    [NUM_THREADS];");
-        	p.println("pthread_mutex_t       thread_mutexes  [NUM_THREADS];");
-        	p.println("int                   thread_to_sleep [NUM_THREADS];");
-        	p.println("int                   MULTIPLIERS     [NUM_FILTERS][2];");
-        	p.println("int                   mflag ;");        
+        	p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
+        	p.println("#define ASLEEP          0");
+        	p.println("#define AWAKE           1");
+        	p.println("pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");		
+        	p.println("pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
+        	p.println("int                   thread_to_sleep [DYNAMIC_READERS][2];");
         }
 
         p.println();
@@ -220,28 +218,25 @@ public class EmitSMPCode extends EmitCode {
         	p.println();
         	p.println("// Initialize dynamic queues");
         	for (int i = 0; i < 1; i++) {
-        		p.println("dyn_queue = queue_create(QUEUE_SIZE);");
+        		p.println("dyn_queue = queue_create();");
         	}
         	p.println();
         	p.println("// Initialize mutexes and condition variables");
         	p.println();
-        	p.println("int i = 0;");
-        	p.println("for (i = 0; i < NUM_THREADS; i++) {");
+        	p.println("int i, j = 0;");
+        	p.println("for (i = 0; i < DYNAMIC_READERS; i++) {");
         	p.indent();
-        	p.println("pthread_cond_init(&thread_conds[i], NULL);");
-        	p.println("pthread_mutex_init(&thread_mutexes[i], NULL);");
-        	p.println("thread_to_sleep[i] = 1; /* 1 is asleep */");
+        	p.println("for (j = 0; j < 2; j++) {");
+        	p.indent();
+
+        	p.println("pthread_cond_init(&thread_conds[i][j], NULL);");
+        	p.println("pthread_mutex_init(&thread_mutexes[i][j], NULL);");
+        	p.println("thread_to_sleep[i][j] = ASLEEP; /* 1 is asleep */");
         	p.outdent();
         	p.println("}");
-        	p.println();
-        	p.println("mflag = 0;");
-        	p.println();
-        	p.println("for (i = 0; i < NUM_FILTERS; i++) {");
-        	p.indent();
-        	p.println("MULTIPLIERS[i][0] = 2;");
-        	p.println("MULTIPLIERS[i][1] = 2;");
         	p.outdent();
-        	p.println("}");        	
+        	p.println("}");
+        	p.println();           
         }
                 
         if(KjcOptions.loadbalance) {
@@ -560,6 +555,10 @@ public class EmitSMPCode extends EmitCode {
 
         JStatement itercount = new JExpressionStatement(new JEmittedTextExpression("extern int iterationCount"));
         itercount.accept(codegen); p.println();
+
+        JStatement success = new JExpressionStatement(new JEmittedTextExpression("static int success"));
+        success.accept(codegen); p.println();
+
         
         for (InterSSGChannel c : dynamicInputBuffers) {
         	if (c.readDeclsExtern() != null) {

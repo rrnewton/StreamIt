@@ -81,7 +81,7 @@ public class ProcessFilterSliceNode {
         	Channel outputBuffer = null;
             
             StaticSubGraph ssg = backEndBits.getScheduler().getGraphSchedule().getSSG();         
-            boolean isDynamic = ssg.hasDynamicInput() || ssg.hasDynamicOutput();
+            //boolean isDynamic = ssg.hasDynamicInput() || ssg.hasDynamicOutput();
         	if (ssg.hasDynamicInput()) {
         		inputBuffer = InterSSGChannel.getInputBuffer(filterNode);
         	} else if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
@@ -113,7 +113,7 @@ public class ProcessFilterSliceNode {
             	System.out.println("smp.ProcessFilterSliceNode.doit() outputBuffer=non-null");        	
             }
         	
-            filterCode = getFilterCode(filterNode,inputBuffer,outputBuffer,backEndBits, isDynamic);
+            filterCode = getFilterCode(filterNode,inputBuffer,outputBuffer,backEndBits, ssg.hasDynamicInput(), ssg.hasDynamicOutput() );
             System.out.println("**********************************************");
         }
         
@@ -263,7 +263,7 @@ public class ProcessFilterSliceNode {
      */
     private static CodeStoreHelper makeFilterCode(WorkNode filter, 
             Channel inputChannel, Channel outputChannel,
-            SMPBackEndFactory backEndBits, final boolean isDynamic) {
+            SMPBackEndFactory backEndBits, final boolean isDynamicPop, final boolean isDynamicPush) {
         
     	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode()");
     	System.out.println("smp.ProcessFilterSliceNode.makeFilterCode() filter=" + filter.toString());
@@ -317,9 +317,10 @@ public class ProcessFilterSliceNode {
                         return new JMethodCallExpression(popManyName, 
                                 new JExpression[]{new JIntLiteral(self.getNumPop())});
                     } else {
-                    	if (isDynamic) {
+                    	if (isDynamicPop) {
                     		JExpression dyn_queue  = new JEmittedTextExpression("dyn_queue");   
-                    		JExpression methodCall = new JMethodCallExpression(popName, new JExpression[]{dyn_queue});
+                    		JExpression success  = new JEmittedTextExpression("&success");   
+                    		JExpression methodCall = new JMethodCallExpression(popName, new JExpression[]{dyn_queue, success});
                     		methodCall.setType(tapeType);
                     		return methodCall;
                     	} else {
@@ -348,7 +349,7 @@ public class ProcessFilterSliceNode {
                         CType tapeType,
                         JExpression arg) {
                     JExpression newArg = (JExpression)arg.accept(this);
-                    if (isDynamic) {
+                    if (isDynamicPush) {
                     	JExpression dyn_queue  = new JEmittedTextExpression("dyn_queue");                    
                     	return new JMethodCallExpression(pushName, new JExpression[]{dyn_queue, newArg});
                     } else {
@@ -376,7 +377,7 @@ public class ProcessFilterSliceNode {
      * @return
      */
     public static  CodeStoreHelper getFilterCode(WorkNode filter, 
-        Channel inputChannel, Channel outputChannel, SMPBackEndFactory backEndBits, boolean isDynamic) {
+        Channel inputChannel, Channel outputChannel, SMPBackEndFactory backEndBits, boolean isDynamicPop, boolean isDynamicPush) {
     	System.out.println("smp.ProcessFilterSliceNode.getFilterCode()");
     	
     	
@@ -396,7 +397,7 @@ public class ProcessFilterSliceNode {
     	
     	CodeStoreHelper filterCode = CodeStoreHelper.findHelperForSliceNode(filter);
         if (filterCode == null) {
-            filterCode = makeFilterCode(filter,inputChannel,outputChannel,backEndBits, isDynamic);
+            filterCode = makeFilterCode(filter,inputChannel,outputChannel,backEndBits, isDynamicPop, isDynamicPush);
             CodeStoreHelper.addHelperForSliceNode(filter, filterCode);
         }
         return filterCode;
