@@ -181,7 +181,6 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         other.head = (at.dms.kjc.slir.InputNode)at.dms.kjc.AutoCloner.cloneToplevel(this.head);
         other.tail = (at.dms.kjc.slir.OutputNode)at.dms.kjc.AutoCloner.cloneToplevel(this.tail);
         other.workNode = (at.dms.kjc.slir.WorkNode)at.dms.kjc.AutoCloner.cloneToplevel(this.workNode);
-        //System.out.println(other.filterNodes[0].hashCode() + " " + filterNodes[0].hashCode());
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

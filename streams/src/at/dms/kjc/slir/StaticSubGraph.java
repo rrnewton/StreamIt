@@ -823,4 +823,29 @@ public class StaticSubGraph {
 		return false;
 	}
 
+
+    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
+
+    /** Returns a deep clone of this object. */
+    public Object deepClone() {
+        at.dms.kjc.slir.StaticSubGraph other = new at.dms.kjc.slir.StaticSubGraph();
+        at.dms.kjc.AutoCloner.register(this, other);
+        deepCloneInto(other);
+        return other;
+    }
+
+    /** Clones all fields of this into <pre>other</pre> */
+    protected void deepCloneInto(at.dms.kjc.slir.StaticSubGraph other) {
+        other.generatedIds = (java.util.HashSet)at.dms.kjc.AutoCloner.cloneToplevel(this.generatedIds);
+        other.inputPort = (at.dms.kjc.slir.InputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.inputPort);
+        other.io = (at.dms.kjc.slir.Filter[])at.dms.kjc.AutoCloner.cloneToplevel(this.io);
+        other.outputPort = (at.dms.kjc.slir.OutputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.outputPort);
+        other.parent = (at.dms.kjc.slir.StreamGraph)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
+        other.sirToContent = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.sirToContent);
+        other.topFilters = (java.util.LinkedList)at.dms.kjc.AutoCloner.cloneToplevel(this.topFilters);
+        other.work = (at.dms.kjc.sir.lowering.partition.WorkEstimate)at.dms.kjc.AutoCloner.cloneToplevel(this.work);
+        other.workEstimation = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.workEstimation);
+    }
+
+    /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

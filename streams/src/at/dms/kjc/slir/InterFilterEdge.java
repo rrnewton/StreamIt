@@ -224,4 +224,21 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
             return src.hashCode() + dest.hashCode();
         }
     }
+
+    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
+
+    /** Returns a deep clone of this object. */
+    public Object deepClone() {
+        at.dms.kjc.slir.InterFilterEdge other = new at.dms.kjc.slir.InterFilterEdge();
+        at.dms.kjc.AutoCloner.register(this, other);
+        deepCloneInto(other);
+        return other;
+    }
+
+    /** Clones all fields of this into <pre>other</pre> */
+    protected void deepCloneInto(at.dms.kjc.slir.InterFilterEdge other) {
+        super.deepCloneInto(other);
+    }
+
+    /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

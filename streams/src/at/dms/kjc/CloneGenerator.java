@@ -611,6 +611,8 @@ public class CloneGenerator {
         "at.dms.kjc.slir.StaticSubGraph",
         "at.dms.kjc.slir.StreamGraph",
         "at.dms.kjc.slir.UnaryOutputPort",
-        "at.dms.kjc.slir.UnaryInputPort"
+        "at.dms.kjc.slir.UnaryInputPort",
+        "at.dms.kjc.sir.SIRDummySource",
+        "at.dms.kjc.sir.SIRDummySink"
     };
 }

@@ -30,6 +30,10 @@ public class Link {
 		this.outputPort = outputPort;
 	}
 		
+	public Link() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public InputPort getInputPort() {
 		return inputPort;
 	}
@@ -70,4 +74,25 @@ public class Link {
 		this.peekRate = peekRate;
 	}
 
+
+    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
+
+    /** Returns a deep clone of this object. */
+    public Object deepClone() {
+        at.dms.kjc.slir.Link other = new at.dms.kjc.slir.Link();
+        at.dms.kjc.AutoCloner.register(this, other);
+        deepCloneInto(other);
+        return other;
+    }
+
+    /** Clones all fields of this into <pre>other</pre> */
+    protected void deepCloneInto(at.dms.kjc.slir.Link other) {
+        other.inputPort = (at.dms.kjc.slir.InputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.inputPort);
+        other.outputPort = (at.dms.kjc.slir.OutputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.outputPort);
+        other.pushRate = (at.dms.kjc.slir.Rate)at.dms.kjc.AutoCloner.cloneToplevel(this.pushRate);
+        other.popRate = (at.dms.kjc.slir.Rate)at.dms.kjc.AutoCloner.cloneToplevel(this.popRate);
+        other.peekRate = (at.dms.kjc.slir.Rate)at.dms.kjc.AutoCloner.cloneToplevel(this.peekRate);
+    }
+
+    /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

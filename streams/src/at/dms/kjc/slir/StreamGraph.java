@@ -103,4 +103,22 @@ public class StreamGraph {
 	}
 
 
+
+    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
+
+    /** Returns a deep clone of this object. */
+    public Object deepClone() {
+        at.dms.kjc.slir.StreamGraph other = new at.dms.kjc.slir.StreamGraph();
+        at.dms.kjc.AutoCloner.register(this, other);
+        deepCloneInto(other);
+        return other;
+    }
+
+    /** Clones all fields of this into <pre>other</pre> */
+    protected void deepCloneInto(at.dms.kjc.slir.StreamGraph other) {
+        other.steadyMult = this.steadyMult;
+        other.ssgs = (java.util.List)at.dms.kjc.AutoCloner.cloneToplevel(this.ssgs);
+    }
+
+    /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }
