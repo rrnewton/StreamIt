@@ -64,7 +64,9 @@ public class SMPBackend {
         	runSSG(ssg, threadMap);
         }
         
-
+    	
+        chip.setThreadMap(threadMap);
+    	
         
         emitCode();
     
@@ -89,8 +91,7 @@ public class SMPBackend {
         
         // TODO: add a pass that maps to layout, to map filters to threads
         // Store the mapping from Filter to Thread inside the core code store.
-        new ThreadMapper().assignThreads(graphSchedule, threadMap);
-
+        ThreadMapper.getMapper().assignThreads(graphSchedule, threadMap);
 
         // dump final slice graph to dot file
         graphSchedule.getSSG().dumpGraph("after_slice_partition.dot", scheduler);

@@ -39,6 +39,27 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     /** used if no joining is performed */
     private static InterFilterEdge[] EMPTY_SRCS = new InterFilterEdge[0];
 
+    /** Constructor: no edges, no weights */
+    public InputNode() {
+        // this.parent = parent;
+        sources = EMPTY_SRCS;
+        weights = EMPTY_WEIGHTS;
+        ident = "input" + unique;
+        unique++;
+    }
+
+    /** Constructor: weights, edges to be set later. */
+    public InputNode(int[] weights) {
+        // this.parent = parent;
+        sources = EMPTY_SRCS;
+        if (weights.length == 1)
+            this.weights = new int[]{1};
+        else 
+            this.weights = weights;
+        ident = "input" + unique;
+        unique++;
+    }
+
     /** Creator */
     public InputNode(int[] weights, InterFilterEdge[] sources) {
         // this.parent = parent;
@@ -67,27 +88,6 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
             this.weights = new int[]{1};
         else 
             this.weights = weights;
-        ident = "input" + unique;
-        unique++;
-    }
-
-    /** Constructor: weights, edges to be set later. */
-    public InputNode(int[] weights) {
-        // this.parent = parent;
-        sources = EMPTY_SRCS;
-        if (weights.length == 1)
-            this.weights = new int[]{1};
-        else 
-            this.weights = weights;
-        ident = "input" + unique;
-        unique++;
-    }
-
-    /** Constructor: no edges, no weights */
-    public InputNode() {
-        // this.parent = parent;
-        sources = EMPTY_SRCS;
-        weights = EMPTY_WEIGHTS;
         ident = "input" + unique;
         unique++;
     }
@@ -164,368 +164,6 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
     */
     
-    /** InputSliceNode is FileOutput if FilterSliceNode is FileOutput.*/
-    public boolean isFileOutput() {
-        return ((WorkNode) getNext()).isFileOutput();
-    }
-
-    /** Returns unique string identifying slice. */
-    public String getIdent() {
-        return ident;
-    }
-
-    public boolean singleAppearance() {
-        return singleAppearance(SchedulingPhase.STEADY) && singleAppearance(SchedulingPhase.INIT);
-    }
-    
-    /**
-     * @return true if each input edge appears only once in the schedule of joining
-     */
-    public boolean singleAppearance(SchedulingPhase phase) {
-        return getSourceSet(phase).size() == getSourceList(phase).size();
-    }
-    
-    /**
-     * Return true if this input slice node has an incoming edge from <node> in <phase>.
-     */
-    public boolean hasEdgeFrom(SchedulingPhase phase, WorkNode node) {
-        for (InterFilterEdge edge : getSourceSet(phase)) {
-            if (edge.getSrc().getPrevFilter() == node) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * return the edge that goes from node's outputslicenode to this inputslicenode
-     * 
-     */
-    public InterFilterEdge getEdgeFrom(SchedulingPhase phase, WorkNode node) {
-        InterFilterEdge ret = null;
-        
-        for (InterFilterEdge edge : getSourceSet(phase)) {
-            if (edge.getSrc().getPrevFilter() == node) {
-                assert ret == null;
-                ret = edge;
-            }
-        }
-        
-        assert ret != null : "cannot find edge to " + node + " in getEdgeFrom() in " + this + " InputSliceNode for " + phase;
-        return ret;
-    }
-    
-    /**
-     * return the sum of the weights that appear before index in the joining schedule
-     */
-    public int weightBefore(int index, SchedulingPhase phase) {
-        assert index < weights.length;
-        int total = 0;
-        
-        for (int i = 0; i < index; i++) {
-            total += getWeights(phase)[i];
-        }
- 
-        return total;
-    }
-    
-    /**
-     * return the sum of the weights that appear before this edge in the joining schedule
-     * 
-     * @param edge the edge in question
-     * 
-     * @return the sum of the weights before edge
-     */
-    public int weightBefore(InterFilterEdge edge, SchedulingPhase phase) {
-        assert singleAppearance(phase);
-        
-        int total = 0;
-        for (int i = 0; i < getWeights(phase).length; i++) {
-            if (getSources(phase)[i] == edge) 
-                return total;
-            
-            total += getWeights(phase)[i];
-        }
-        assert false;
-        return 0;
-    }
-    
-    /**
-     * Return the number of unique inputs (Edges) to this join.
-     * 
-     * @return The width of the join.
-     */
-    public int getWidth(SchedulingPhase phase) {
-        return getSourceSet(phase).size();
-    }
-    
-    /**
-     * Return the number of items that traverse this edge
-     * on one iteration of this input slice node, remember
-     * that a single edge can appear multiple times in the joining
-     * pattern.
-     * 
-     * @param edge The edge to query.
-     * @return The number of items passing on the edge.
-     */
-    public int getItems(InterFilterEdge edge, SchedulingPhase phase) {
-        int items = 0;
-        
-        for (int i = 0; i < getSources(phase).length; i++) {
-            if (getSources(phase)[i] == edge) {
-                items += getWeights(phase)[i];
-            }
-        }
-        
-        return items;
-    }
-
-    /** @return array of edge weights */
-    public int[] getWeights(SchedulingPhase phase) {
-        if (phase == SchedulingPhase.INIT && initWeights != null)
-            return initWeights;
-        
-        return weights;
-    }
-
-    /** @return array of edges */
-    public InterFilterEdge[] getSources(SchedulingPhase phase) {
-        if (phase == SchedulingPhase.INIT && initSources != null)
-            return initSources;
-        
-        return sources;
-    }
-
-
-    /** @return array of edge weights for the init schedule */
-    public int[] getInitWeights() {
-        return initWeights;
-    }
-
-    /** @return array of edges for the init schedule*/
-    public InterFilterEdge[] getInitSources() {
-        return initSources;
-    }
-
-    
-    /**
-     * Set the weights and sources array of this input slice node
-     * to the weights list and the edges list.
-     * 
-     * @param weights The list of weights (Integer).
-     * @param edges The list of edges.
-     */
-    public void set(LinkedList<Integer> weights, 
-            LinkedList<InterFilterEdge> edges, SchedulingPhase phase) {
-        int[] intArr = new int[weights.size()]; 
-        
-        for (int i = 0; i < weights.size(); i++)
-            intArr[i] = weights.get(i).intValue();
-        if (SchedulingPhase.INIT == phase) {
-            setInitWeights(intArr);
-            setInitSources(edges.toArray(new InterFilterEdge[edges.size()]));
-        } else {
-            setWeights(intArr);
-            setSources(edges.toArray(new InterFilterEdge[edges.size()]));
-        }
-    }
-
-    /**
-     * Set the weights and sources array of this input slice node
-     * to the weights list and the edges list.
-     * 
-     * @param weights The array of weights (integer).
-     * @param edges The array of edges.
-     */
-    public void set(int[] weights, InterFilterEdge[] edges, SchedulingPhase phase) {
-        if (SchedulingPhase.INIT == phase) {
-            setInitWeights(weights);
-            setInitSources(edges);
-        } else {
-            setWeights(weights);
-            setSources(edges);
-        }
-    }
-    
-    /**
-     * Set the initialization weights.
-     * 
-     * @param newWeights The new weights
-     */
-    public void setInitWeights(int[] newWeights) {
-        if (newWeights != null && newWeights.length == 1)
-            this.initWeights = new int[]{1};
-        else 
-            this.initWeights = newWeights;
-    }
-    
-    /**
-     * If the initialization pattern needs to be different from steady,
-     * set the weights to newWeights.
-     * 
-     * @param newWeights
-     */
-    public void setWeights(int[] newWeights) {
-        if (newWeights.length == 1)
-            this.weights = new int[]{1};
-        else 
-            this.weights = newWeights;
-    }
-    
-    /** Set the source edges. (shares, does not copy.) */
-    public void setSources(InterFilterEdge[] sources) {
-        this.sources = sources;
-    }
-
-    /**
-     * If the initialization pattern needs to be different from steady,
-     * set the sources to newSrcs.  (shares, does not copy)
-     * 
-     * @param newSrcs The new sources.
-     */
-    public void setInitSources(InterFilterEdge[] newSrcs) {
-        this.initSources = newSrcs;
-    }
-    
-    /** @return total weight of all edges */
-    public int totalWeights(SchedulingPhase phase) {
-        int sum = 0;
-        for (int i = 0; i < getWeights(phase).length; i++)
-            sum += getWeights(phase)[i];
-        return sum;
-    }
-
-    /** @return total weight on all connections to a single Edge. 
-     * @param out The Edge that we are interested in*/
-    public int getWeight(IntraSSGEdge out, SchedulingPhase phase) {
-        int sum = 0;
-
-        for (int i = 0; i < getSources(phase).length; i++)
-            if (getSources(phase)[i] == out)
-                sum += getWeights(phase)[i];
-
-        return sum;
-    }
-    
-    /**
-     * Does sources have a single element in phase
-     *  
-     * @return true if there is a single element in sources. */
-    public boolean oneInput(SchedulingPhase phase) {
-        return getSources(phase).length == 1;
-    }
-    
-    /** don't call me, only here so that the spacetime compiler can compile */
-    public boolean oneInput() {
-        assert false;
-        return false;
-    }
-    
-    /** 
-     * Is a joiner if there are at least 2 sources (even if same Edge object).
-     * @return is a joiner.
-     */
-    public boolean isJoiner(SchedulingPhase phase) {
-        return getSources(phase).length >= 2;
-    }
-
-    /** Get the singleton edge. 
-     * Must have only one input in sources.
-     * @return the edge, or throw AssertionError
-     */
-    public InterFilterEdge getSingleEdge(SchedulingPhase phase) {
-        assert oneInput(phase) : "Calling getSingeEdge() on InputSlice with less/more than one input";
-        return getSources(phase)[0];
-    }
-
-    /** 
-     * Get the following FilterSliceNode.
-     * @return
-     */
-    public WorkNode getNextFilter() {
-        return (WorkNode) getNext();
-    }
-
-    /** Are there no inputs?
-     * 
-     * @return
-     */
-    public boolean noInputs(SchedulingPhase phase) {
-        return getSources(phase).length == 0;
-    }
-    
-    public boolean noInputs() {
-        return noInputs(SchedulingPhase.INIT) && noInputs(SchedulingPhase.STEADY);
-    }
-
-    public int itemsReceivedOn(InterFilterEdge edge, SchedulingPhase phase) {
-        double totalItems = WorkNodeInfo.getFilterInfo(getNextFilter()).totalItemsReceived(phase);
-        
-        double items = totalItems * ratio(edge, phase);
-        assert items == Math.floor(items);
-        
-        return (int)items;
-    }
-    
-    /** return ratio of weight of edge to totalWeights().
-     * 
-     * @param edge
-     * @return  0.0 if totalWeights() == 0, else ratio.
-     */
-    public double ratio(IntraSSGEdge edge, SchedulingPhase phase) {
-        if (totalWeights(phase) == 0)
-            return 0.0;
-        return ((double) getWeight(edge, phase) / (double) totalWeights(phase));
-    }
-
-    /**
-     * Return a list of the edges with each edge appearing once
-     * and ordered by the order in which each edge appears in the
-     * join pattern.
-     * 
-     * @return The list.
-     */
-    public LinkedList<InterFilterEdge> getSourceSequence(SchedulingPhase phase) {
-        LinkedList<InterFilterEdge> list = new LinkedList<InterFilterEdge>();
-        for (int i = 0; i < getSources(phase).length; i++) {
-            if (!list.contains(getSources(phase)[i]))
-                list.add(getSources(phase)[i]);
-        }
-        return list;
-    }
-    
-    /**
-     * Return a set of all the slices that are inputs to this slice.
-     * 
-     * @return a set of all the slices that are inputs to this slice.
-     */
-    public Set<Filter> getSourceSlices(SchedulingPhase phase) {
-        HashSet<Filter> slices = new HashSet<Filter>();
-        for (InterFilterEdge edge : getSourceList(phase)) {
-            slices.add(edge.getSrc().getParent());
-        }
-        return slices;
-    }
-    
-    /**
-     * Return a linked list of the sources pattern.
-     * 
-     * @return The linked list of the sources pattern.
-     */
-    public LinkedList<InterFilterEdge> getSourceList(SchedulingPhase phase) {
-       LinkedList<InterFilterEdge> list = new LinkedList<InterFilterEdge>();
-       for (int i = 0; i < getSources(phase).length; i++)
-           list.add(getSources(phase)[i]);
-       return list;
-    }
-    
-    public Set<InterFilterEdge> getSourceSet(SchedulingPhase phase) {
-        HashSet<InterFilterEdge> set = new HashSet<InterFilterEdge>();
-        for (int i = 0; i < getSources(phase).length; i++)
-            set.add(getSources(phase)[i]);
-        return set;
-    }
-    
     /**
      * Return a string that gives some information for this input slice node.
      * If escape is true, then escape the new lines "\\n".
@@ -559,6 +197,198 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
         return buf.toString();
     }
 
+    /** Returns a deep clone of this object. */
+    public Object deepClone() {
+        at.dms.kjc.slir.InputNode other = new at.dms.kjc.slir.InputNode();
+        at.dms.kjc.AutoCloner.register(this, other);
+        deepCloneInto(other);
+        return other;
+    }
+    
+    /** Clones all fields of this into <pre>other</pre> */
+    protected void deepCloneInto(at.dms.kjc.slir.InputNode other) {
+        super.deepCloneInto(other);
+        other.weights = this.weights;
+        other.sources = this.sources;
+        other.initWeights = this.initWeights;
+        other.initSources = this.initSources;
+        other.ident = (java.lang.String)at.dms.kjc.AutoCloner.cloneToplevel(this.ident);
+    }
+    
+    /**
+     * return the edge that goes from node's outputslicenode to this inputslicenode
+     * 
+     */
+    public InterFilterEdge getEdgeFrom(SchedulingPhase phase, WorkNode node) {
+        InterFilterEdge ret = null;
+        
+        for (InterFilterEdge edge : getSourceSet(phase)) {
+            if (edge.getSrc().getPrevFilter() == node) {
+                assert ret == null;
+                ret = edge;
+            }
+        }
+        
+        assert ret != null : "cannot find edge to " + node + " in getEdgeFrom() in " + this + " InputSliceNode for " + phase;
+        return ret;
+    }
+    
+    /** Returns unique string identifying slice. */
+    public String getIdent() {
+        return ident;
+    }
+    
+    /** @return array of edges for the init schedule*/
+    public InterFilterEdge[] getInitSources() {
+        return initSources;
+    }
+    
+    /** @return array of edge weights for the init schedule */
+    public int[] getInitWeights() {
+        return initWeights;
+    }
+    
+    /**
+     * Return the number of items that traverse this edge
+     * on one iteration of this input slice node, remember
+     * that a single edge can appear multiple times in the joining
+     * pattern.
+     * 
+     * @param edge The edge to query.
+     * @return The number of items passing on the edge.
+     */
+    public int getItems(InterFilterEdge edge, SchedulingPhase phase) {
+        int items = 0;
+        
+        for (int i = 0; i < getSources(phase).length; i++) {
+            if (getSources(phase)[i] == edge) {
+                items += getWeights(phase)[i];
+            }
+        }
+        
+        return items;
+    }
+    
+    /** 
+     * Get the following FilterSliceNode.
+     * @return
+     */
+    public WorkNode getNextFilter() {
+        return (WorkNode) getNext();
+    }
+
+    /** Get the singleton edge. 
+     * Must have only one input in sources.
+     * @return the edge, or throw AssertionError
+     */
+    public InterFilterEdge getSingleEdge(SchedulingPhase phase) {
+        assert oneInput(phase) : "Calling getSingeEdge() on InputSlice with less/more than one input";
+        return getSources(phase)[0];
+    }
+
+    /**
+     * Return a linked list of the sources pattern.
+     * 
+     * @return The linked list of the sources pattern.
+     */
+    public LinkedList<InterFilterEdge> getSourceList(SchedulingPhase phase) {
+       LinkedList<InterFilterEdge> list = new LinkedList<InterFilterEdge>();
+       for (int i = 0; i < getSources(phase).length; i++)
+           list.add(getSources(phase)[i]);
+       return list;
+    }
+
+
+    /** @return array of edges */
+    public InterFilterEdge[] getSources(SchedulingPhase phase) {
+        if (phase == SchedulingPhase.INIT && initSources != null)
+            return initSources;
+        
+        return sources;
+    }
+
+    /**
+     * Return a list of the edges with each edge appearing once
+     * and ordered by the order in which each edge appears in the
+     * join pattern.
+     * 
+     * @return The list.
+     */
+    public LinkedList<InterFilterEdge> getSourceSequence(SchedulingPhase phase) {
+        LinkedList<InterFilterEdge> list = new LinkedList<InterFilterEdge>();
+        for (int i = 0; i < getSources(phase).length; i++) {
+            if (!list.contains(getSources(phase)[i]))
+                list.add(getSources(phase)[i]);
+        }
+        return list;
+    }
+
+    
+    public Set<InterFilterEdge> getSourceSet(SchedulingPhase phase) {
+        HashSet<InterFilterEdge> set = new HashSet<InterFilterEdge>();
+        for (int i = 0; i < getSources(phase).length; i++)
+            set.add(getSources(phase)[i]);
+        return set;
+    }
+
+    /**
+     * Return a set of all the slices that are inputs to this slice.
+     * 
+     * @return a set of all the slices that are inputs to this slice.
+     */
+    public Set<Filter> getSourceSlices(SchedulingPhase phase) {
+        HashSet<Filter> slices = new HashSet<Filter>();
+        for (InterFilterEdge edge : getSourceList(phase)) {
+            slices.add(edge.getSrc().getParent());
+        }
+        return slices;
+    }
+    
+    public CType getType() {
+        return getNextFilter().getFilter().getInputType();
+    }
+    
+    /** @return total weight on all connections to a single Edge. 
+     * @param out The Edge that we are interested in*/
+    public int getWeight(IntraSSGEdge out, SchedulingPhase phase) {
+        int sum = 0;
+
+        for (int i = 0; i < getSources(phase).length; i++)
+            if (getSources(phase)[i] == out)
+                sum += getWeights(phase)[i];
+
+        return sum;
+    }
+    
+    /** @return array of edge weights */
+    public int[] getWeights(SchedulingPhase phase) {
+        if (phase == SchedulingPhase.INIT && initWeights != null)
+            return initWeights;
+        
+        return weights;
+    }
+
+    /**
+     * Return the number of unique inputs (Edges) to this join.
+     * 
+     * @return The width of the join.
+     */
+    public int getWidth(SchedulingPhase phase) {
+        return getSourceSet(phase).size();
+    }
+    
+    /**
+     * Return true if this input slice node has an incoming edge from <node> in <phase>.
+     */
+    public boolean hasEdgeFrom(SchedulingPhase phase, WorkNode node) {
+        for (InterFilterEdge edge : getSourceSet(phase)) {
+            if (edge.getSrc().getPrevFilter() == node) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasFileInput() {
         for (int i = 0; i < sources.length; i++) {
             if (sources[i].getSrc().isFileInput())
@@ -566,7 +396,66 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
         }
         return false;
     }
+    
+    /** InputSliceNode is FileOutput if FilterSliceNode is FileOutput.*/
+    public boolean isFileOutput() {
+        return ((WorkNode) getNext()).isFileOutput();
+    }
+    
+    /** 
+     * Is a joiner if there are at least 2 sources (even if same Edge object).
+     * @return is a joiner.
+     */
+    public boolean isJoiner(SchedulingPhase phase) {
+        return getSources(phase).length >= 2;
+    }
+    
+    public int itemsReceivedOn(InterFilterEdge edge, SchedulingPhase phase) {
+        double totalItems = WorkNodeInfo.getFilterInfo(getNextFilter()).totalItemsReceived(phase);
+        
+        double items = totalItems * ratio(edge, phase);
+        assert items == Math.floor(items);
+        
+        return (int)items;
+    }
 
+    public boolean noInputs() {
+        return noInputs(SchedulingPhase.INIT) && noInputs(SchedulingPhase.STEADY);
+    }
+
+    /** Are there no inputs?
+     * 
+     * @return
+     */
+    public boolean noInputs(SchedulingPhase phase) {
+        return getSources(phase).length == 0;
+    }
+
+    /** don't call me, only here so that the spacetime compiler can compile */
+    public boolean oneInput() {
+        assert false;
+        return false;
+    }
+    
+    /**
+     * Does sources have a single element in phase
+     *  
+     * @return true if there is a single element in sources. */
+    public boolean oneInput(SchedulingPhase phase) {
+        return getSources(phase).length == 1;
+    }
+
+    /** return ratio of weight of edge to totalWeights().
+     * 
+     * @param edge
+     * @return  0.0 if totalWeights() == 0, else ratio.
+     */
+    public double ratio(IntraSSGEdge edge, SchedulingPhase phase) {
+        if (totalWeights(phase) == 0)
+            return 0.0;
+        return ((double) getWeight(edge, phase) / (double) totalWeights(phase));
+    }
+    
     /**
      * In the sources array for the input, replace all instances of 
      * oldEdge with newEdge.
@@ -590,29 +479,140 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
         }
     }
 
-    public CType getType() {
-        return getNextFilter().getFilter().getInputType();
+    /**
+     * Set the weights and sources array of this input slice node
+     * to the weights list and the edges list.
+     * 
+     * @param weights The array of weights (integer).
+     * @param edges The array of edges.
+     */
+    public void set(int[] weights, InterFilterEdge[] edges, SchedulingPhase phase) {
+        if (SchedulingPhase.INIT == phase) {
+            setInitWeights(weights);
+            setInitSources(edges);
+        } else {
+            setWeights(weights);
+            setSources(edges);
+        }
+    }
+    
+    /**
+     * Set the weights and sources array of this input slice node
+     * to the weights list and the edges list.
+     * 
+     * @param weights The list of weights (Integer).
+     * @param edges The list of edges.
+     */
+    public void set(LinkedList<Integer> weights, 
+            LinkedList<InterFilterEdge> edges, SchedulingPhase phase) {
+        int[] intArr = new int[weights.size()]; 
+        
+        for (int i = 0; i < weights.size(); i++)
+            intArr[i] = weights.get(i).intValue();
+        if (SchedulingPhase.INIT == phase) {
+            setInitWeights(intArr);
+            setInitSources(edges.toArray(new InterFilterEdge[edges.size()]));
+        } else {
+            setWeights(intArr);
+            setSources(edges.toArray(new InterFilterEdge[edges.size()]));
+        }
+    }
+    
+    /**
+     * If the initialization pattern needs to be different from steady,
+     * set the sources to newSrcs.  (shares, does not copy)
+     * 
+     * @param newSrcs The new sources.
+     */
+    public void setInitSources(InterFilterEdge[] newSrcs) {
+        this.initSources = newSrcs;
+    }
+    
+    /**
+     * Set the initialization weights.
+     * 
+     * @param newWeights The new weights
+     */
+    public void setInitWeights(int[] newWeights) {
+        if (newWeights != null && newWeights.length == 1)
+            this.initWeights = new int[]{1};
+        else 
+            this.initWeights = newWeights;
+    }
+    
+    /** Set the source edges. (shares, does not copy.) */
+    public void setSources(InterFilterEdge[] sources) {
+        this.sources = sources;
+    }
+
+    /**
+     * If the initialization pattern needs to be different from steady,
+     * set the weights to newWeights.
+     * 
+     * @param newWeights
+     */
+    public void setWeights(int[] newWeights) {
+        if (newWeights.length == 1)
+            this.weights = new int[]{1};
+        else 
+            this.weights = newWeights;
+    }
+
+    public boolean singleAppearance() {
+        return singleAppearance(SchedulingPhase.STEADY) && singleAppearance(SchedulingPhase.INIT);
+    }
+
+    /**
+     * @return true if each input edge appears only once in the schedule of joining
+     */
+    public boolean singleAppearance(SchedulingPhase phase) {
+        return getSourceSet(phase).size() == getSourceList(phase).size();
+    }
+
+    /** @return total weight of all edges */
+    public int totalWeights(SchedulingPhase phase) {
+        int sum = 0;
+        for (int i = 0; i < getWeights(phase).length; i++)
+            sum += getWeights(phase)[i];
+        return sum;
     }
 
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
-    /** Returns a deep clone of this object. */
-    public Object deepClone() {
-        at.dms.kjc.slir.InputNode other = new at.dms.kjc.slir.InputNode();
-        at.dms.kjc.AutoCloner.register(this, other);
-        deepCloneInto(other);
-        return other;
+    /**
+     * return the sum of the weights that appear before index in the joining schedule
+     */
+    public int weightBefore(int index, SchedulingPhase phase) {
+        assert index < weights.length;
+        int total = 0;
+        
+        for (int i = 0; i < index; i++) {
+            total += getWeights(phase)[i];
+        }
+ 
+        return total;
     }
 
-    /** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.InputNode other) {
-        super.deepCloneInto(other);
-        other.weights = this.weights;
-        other.sources = this.sources;
-        other.initWeights = this.initWeights;
-        other.initSources = this.initSources;
-        other.ident = (java.lang.String)at.dms.kjc.AutoCloner.cloneToplevel(this.ident);
+    /**
+     * return the sum of the weights that appear before this edge in the joining schedule
+     * 
+     * @param edge the edge in question
+     * 
+     * @return the sum of the weights before edge
+     */
+    public int weightBefore(InterFilterEdge edge, SchedulingPhase phase) {
+        assert singleAppearance(phase);
+        
+        int total = 0;
+        for (int i = 0; i < getWeights(phase).length; i++) {
+            if (getSources(phase)[i] == edge) 
+                return total;
+            
+            total += getWeights(phase)[i];
+        }
+        assert false;
+        return 0;
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

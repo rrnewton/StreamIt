@@ -156,6 +156,8 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
 
     @Override
     public JBlock getSteadyBlock() {
+    	    
+    	
         JBlock statements = new JBlock();
         // channel code before work block
         if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {

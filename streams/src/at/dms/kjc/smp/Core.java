@@ -1,15 +1,19 @@
 package at.dms.kjc.smp;
 
+import java.util.Map;
+
 import at.dms.kjc.CStdType;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.common.ALocalVariable;
+import at.dms.kjc.slir.Filter;
 
 public class Core extends ComputeNode<CoreCodeStore> {
     /** the core ID */
     protected int coreID;
     /** the parent machine */
     protected SMPMachine machine;
+	private Map<Filter, Integer> threadMap;
 
     /**
      * Construct a new ComputeNode of chip. 
@@ -53,4 +57,9 @@ public class Core extends ComputeNode<CoreCodeStore> {
     public boolean isComputeNode() {
         return true;
     }
+
+	public void setThreadMap(Map<Filter, Integer> threadMap) {
+		// TODO Auto-generated method stub
+		this.threadMap = threadMap;
+	}
 }

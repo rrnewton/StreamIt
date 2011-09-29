@@ -126,9 +126,10 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
         for (Core ownerCore : SMPBackend.chip.getCores()) {
             CoreCodeStore cs = ownerCore.getComputeCode();
             
-            for (WorkNode filter : cs.getFilters())
+            for (WorkNode filter : cs.getFilters()) {
                 communicateAddressesForFilter(filter, ownerCore);
-        }
+            }
+        }	
         
         //now handle the file writers
         for (WorkNode fileWriter : ProcessFileWriter.getFileWriterFilters())

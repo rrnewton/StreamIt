@@ -93,6 +93,11 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
         }
     }
     
+    
+    public void addReaderThread() {
+    	
+    }
+    
     /**
      * Append a barrier instruction to all of the cores in the init/primepump
      * stage.

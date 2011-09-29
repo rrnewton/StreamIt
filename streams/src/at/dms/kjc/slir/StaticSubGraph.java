@@ -104,6 +104,27 @@ public class StaticSubGraph {
 
 	}
 
+	/** Returns a deep clone of this object. */
+    public Object deepClone() {
+        at.dms.kjc.slir.StaticSubGraph other = new at.dms.kjc.slir.StaticSubGraph();
+        at.dms.kjc.AutoCloner.register(this, other);
+        deepCloneInto(other);
+        return other;
+    }
+
+	/** Clones all fields of this into <pre>other</pre> */
+    protected void deepCloneInto(at.dms.kjc.slir.StaticSubGraph other) {
+        other.generatedIds = (java.util.HashSet)at.dms.kjc.AutoCloner.cloneToplevel(this.generatedIds);
+        other.inputPort = (at.dms.kjc.slir.InputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.inputPort);
+        other.io = (at.dms.kjc.slir.Filter[])at.dms.kjc.AutoCloner.cloneToplevel(this.io);
+        other.outputPort = (at.dms.kjc.slir.OutputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.outputPort);
+        other.parent = (at.dms.kjc.slir.StreamGraph)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
+        other.sirToContent = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.sirToContent);
+        other.topFilters = (java.util.LinkedList)at.dms.kjc.AutoCloner.cloneToplevel(this.topFilters);
+        other.work = (at.dms.kjc.sir.lowering.partition.WorkEstimate)at.dms.kjc.AutoCloner.cloneToplevel(this.work);
+        other.workEstimation = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.workEstimation);
+    }
+
 	/**
 	 * Dump the the completed partition to a dot file
 	 */
@@ -134,14 +155,6 @@ public class StaticSubGraph {
 		} catch (Exception e) {
 			System.err.println("Could not print extracted slices");
 		}
-	}
-
-	public StreamGraph getParent() {
-		return parent;
-	}
-
-	public void setParent(StreamGraph parent) {
-		this.parent = parent;
 	}
 
 	/**
@@ -196,6 +209,50 @@ public class StaticSubGraph {
 		} catch (Exception e) {
 			System.err.println("Could not print extracted slices");
 		}
+	}
+
+	/**
+	 * Return a string with all of the names of the filter nodes and blue if
+	 * linear
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	protected String filterName(Filter filter) {
+		InternalFilterNode node = filter.getInputNode();
+
+		StringBuffer out = new StringBuffer();
+
+		// do something fancy for linear slices!!!
+		if (((WorkNode) node.getNext()).getFilter().getArray() != null)
+			out.append("color=cornflowerblue, style=filled, ");
+
+		out.append("label=\"" + node.getAsInput().debugString(true));// toString());
+
+		node = node.getNext();
+		while (node != null) {
+			if (node.isWorkNode()) {
+				WorkNodeContent f = node.getAsFilter().getFilter();
+				out.append("\\n" + node.toString() + "{" + getWorkEstimate(f)
+						+ "}");
+				if (f.isTwoStage())
+					out.append("\\npre:(peek, pop, push): ("
+							+ f.getPreworkPeek() + ", " + f.getPreworkPop()
+							+ "," + f.getPreworkPush());
+				out.append(")\\n(peek, pop, push: (" + f.getPeekInt() + ", "
+						+ f.getPopInt() + ", " + f.getPushInt() + ")");
+				out.append("\\nMult: init " + f.getInitMult() + ", steady "
+						+ f.getSteadyMult());
+				out.append("\\n *** ");
+			} else {
+				out.append("\\n" + node.getAsOutput().debugString(true));
+			}
+			/*
+			 * else { //out.append("\\n" + node.toString()); }
+			 */
+			node = node.getNext();
+		}
+		return out.toString();
 	}
 
 	/**
@@ -526,6 +583,10 @@ public class StaticSubGraph {
 		return outputPort;
 	}
 
+	public StreamGraph getParent() {
+		return parent;
+	}
+
 	/**
 	 * Get just top level filters in the filter graph.
 	 * 
@@ -556,6 +617,32 @@ public class StaticSubGraph {
 	public long getWorkEstOneFiring(WorkNode node) {
 		return (getFilterWork(node) / (node.getFilter().getSteadyMult() / parent
 				.getSteadyMult()));
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean hasDynamicInput() {
+		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput()");
+		if (inputPort.getLinks().size() > 0) {
+			System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput() = true");
+			return true;
+		}
+		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput() = false");
+		return false;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean hasDynamicOutput() {
+		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput()");
+		if (outputPort.getLinks().size() > 0) {
+			System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = true");
+			return true;
+		} 
+		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = false");
+		return false;
 	}
 
 	/**
@@ -661,7 +748,14 @@ public class StaticSubGraph {
 		this.outputPort = outputPort;
 	}
 
-	/**
+	public void setParent(StreamGraph parent) {
+		this.parent = parent;
+	}
+
+
+    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
+
+    /**
 	 * Set the slice graph to slices, where the only difference between the
 	 * previous slice graph and the new slice graph is the addition of identity
 	 * slices (meaning slices with only an identities filter).
@@ -690,51 +784,7 @@ public class StaticSubGraph {
 		}
 	}
 
-	/**
-	 * Return a string with all of the names of the filter nodes and blue if
-	 * linear
-	 * 
-	 * @param filter
-	 * @return
-	 */
-	protected String filterName(Filter filter) {
-		InternalFilterNode node = filter.getInputNode();
-
-		StringBuffer out = new StringBuffer();
-
-		// do something fancy for linear slices!!!
-		if (((WorkNode) node.getNext()).getFilter().getArray() != null)
-			out.append("color=cornflowerblue, style=filled, ");
-
-		out.append("label=\"" + node.getAsInput().debugString(true));// toString());
-
-		node = node.getNext();
-		while (node != null) {
-			if (node.isWorkNode()) {
-				WorkNodeContent f = node.getAsFilter().getFilter();
-				out.append("\\n" + node.toString() + "{" + getWorkEstimate(f)
-						+ "}");
-				if (f.isTwoStage())
-					out.append("\\npre:(peek, pop, push): ("
-							+ f.getPreworkPeek() + ", " + f.getPreworkPop()
-							+ "," + f.getPreworkPush());
-				out.append(")\\n(peek, pop, push: (" + f.getPeekInt() + ", "
-						+ f.getPopInt() + ", " + f.getPushInt() + ")");
-				out.append("\\nMult: init " + f.getInitMult() + ", steady "
-						+ f.getSteadyMult());
-				out.append("\\n *** ");
-			} else {
-				out.append("\\n" + node.getAsOutput().debugString(true));
-			}
-			/*
-			 * else { //out.append("\\n" + node.toString()); }
-			 */
-			node = node.getNext();
-		}
-		return out.toString();
-	}
-
-	/**
+    /**
 	 * Return a string with all of the names of the filter nodes and blue if
 	 * linear
 	 * 
@@ -796,56 +846,6 @@ public class StaticSubGraph {
 		}
 		return out.toString();
 	}
-
-	/**
-	 * @return
-	 */
-	public boolean hasDynamicInput() {
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput()");
-		if (inputPort.getLinks().size() > 0) {
-			System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput() = true");
-			return true;
-		}
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput() = false");
-		return false;
-	}
-
-	/**
-	 * @return
-	 */
-	public boolean hasDynamicOutput() {
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput()");
-		if (outputPort.getLinks().size() > 0) {
-			System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = true");
-			return true;
-		} 
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = false");
-		return false;
-	}
-
-
-    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
-
-    /** Returns a deep clone of this object. */
-    public Object deepClone() {
-        at.dms.kjc.slir.StaticSubGraph other = new at.dms.kjc.slir.StaticSubGraph();
-        at.dms.kjc.AutoCloner.register(this, other);
-        deepCloneInto(other);
-        return other;
-    }
-
-    /** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.StaticSubGraph other) {
-        other.generatedIds = (java.util.HashSet)at.dms.kjc.AutoCloner.cloneToplevel(this.generatedIds);
-        other.inputPort = (at.dms.kjc.slir.InputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.inputPort);
-        other.io = (at.dms.kjc.slir.Filter[])at.dms.kjc.AutoCloner.cloneToplevel(this.io);
-        other.outputPort = (at.dms.kjc.slir.OutputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.outputPort);
-        other.parent = (at.dms.kjc.slir.StreamGraph)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
-        other.sirToContent = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.sirToContent);
-        other.topFilters = (java.util.LinkedList)at.dms.kjc.AutoCloner.cloneToplevel(this.topFilters);
-        other.work = (at.dms.kjc.sir.lowering.partition.WorkEstimate)at.dms.kjc.AutoCloner.cloneToplevel(this.work);
-        other.workEstimation = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.workEstimation);
-    }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }
