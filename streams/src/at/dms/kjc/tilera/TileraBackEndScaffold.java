@@ -65,7 +65,7 @@ public class TileraBackEndScaffold extends BackEndScaffold {
     public void run(BasicSpaceTimeSchedule schedule, BackEndFactory resources) {
    
         ComputeNodesI computeNodes = resources.getComputeNodes();
-        this.resources = resources;
+        this.backEndFactory = resources;
         
         Filter slices[];
 
@@ -104,13 +104,13 @@ public class TileraBackEndScaffold extends BackEndScaffold {
         for (int i = 0; i < slices.length; i++) {
             slice = (Filter) slices[i];
             //create code for joining input to the trace
-            resources.processInputSliceNode((InputNode)slice.getInputNode(),
+            backEndFactory.processFilterInputNode((InputNode)slice.getInputNode(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
-            resources.processFilterSliceNode(slice.getWorkNode(), whichPhase, computeNodes);
+            backEndFactory.processFilterWorkNode(slice.getWorkNode(), whichPhase, computeNodes);
             //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputNode)slice.getOutputNode(),
+            backEndFactory.processFilterOutputNode((OutputNode)slice.getOutputNode(),
                     whichPhase, computeNodes);
             
         }

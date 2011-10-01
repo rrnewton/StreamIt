@@ -14,7 +14,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
-import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
+import at.dms.kjc.backendSupport.ProcessFilterWorkNode;
 import at.dms.kjc.backendSupport.ProcessOutputSliceNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
@@ -154,7 +154,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
     
     private static void makeSplitterCode(OutputNode splitter, 
             BackEndFactory backEndBits, CodeStoreHelper helper) {
-        String splitter_name = "_splitter_" + ProcessFilterSliceNode.getUid();
+        String splitter_name = "_splitter_" + ProcessFilterWorkNode.getUid();
         String splitter_method_name =  splitter_name + splitter.getPrevFilter().getFilter().getName();
 
         // size is number of edges with non-zero weight.

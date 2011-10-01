@@ -229,7 +229,7 @@ public class ProcessInputSliceNode {
          */
         private static  void makeJoinerCode(InputNode joiner,
                 BackEndFactory backEndBits, CodeStoreHelper helper) {
-            String joiner_name = "_joiner_" + ProcessFilterSliceNode.getUid();
+            String joiner_name = "_joiner_" + ProcessFilterWorkNode.getUid();
             String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
             
             // size is number of edges with non-zero weight.

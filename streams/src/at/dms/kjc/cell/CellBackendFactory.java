@@ -125,7 +125,7 @@ public class CellBackendFactory
     }
 
     @Override
-    public void processFilterSliceNode(WorkNode filter,
+    public void processFilterWorkNode(WorkNode filter,
             SchedulingPhase whichPhase, CellChip computeNodes) {
         new CellProcessFilterSliceNode(filter, whichPhase, this).processFilterSliceNode();
     }
@@ -137,13 +137,13 @@ public class CellBackendFactory
     }
 
     @Override
-    public void processInputSliceNode(InputNode input,
+    public void processFilterInputNode(InputNode input,
             SchedulingPhase whichPhase, CellChip computeNodes) {
          new CellProcessInputSliceNode(input, whichPhase, this).processInputSliceNode();
     }
 
     @Override
-    public void processOutputSliceNode(OutputNode output,
+    public void processFilterOutputNode(OutputNode output,
             SchedulingPhase whichPhase, CellChip computeNodes) {
         new CellProcessOutputSliceNode(output, whichPhase, this).processOutputSliceNode();
     }

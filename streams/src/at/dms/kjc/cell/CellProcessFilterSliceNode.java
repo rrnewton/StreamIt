@@ -9,7 +9,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
+import at.dms.kjc.backendSupport.ProcessFilterWorkNode;
 import at.dms.kjc.slir.FileOutputContent;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
@@ -19,7 +19,7 @@ import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.WorkNodeInfo;
 
-public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
+public class CellProcessFilterSliceNode extends ProcessFilterWorkNode {
     
     private CellComputeCodeStore ppuCS;
     private CellComputeCodeStore initCodeStore;
@@ -67,13 +67,13 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
                 cpu = l.indexOf(filterId);
         }
         if (cpu == -1) return null;
-        return (CellPU)backEndBits.getComputeNode(cpu + 1);
+        return (CellPU)backEndFactory.getComputeNode(cpu + 1);
     }
     
     @Override
     protected void setLocationAndCodeStore() {
         //if (whichPhase == SchedulingPhase.PREINIT) return;
-        location = backEndBits.getLayout().getComputeNode(filterNode);
+        location = backEndFactory.getLayout().getComputeNode(filterNode);
         assert location != null;
         codeStore = ((CellPU)location).getComputeCodeStore(filterNode);
         initCodeStore = ((CellPU)location).getInitComputeCodeStore(filterNode);
@@ -165,7 +165,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterSliceNode {
         
         
         if (KjcOptions.celldyn) {
-            PPU ppu = ((CellBackendFactory) backEndBits).getPPU();
+            PPU ppu = ((CellBackendFactory) backEndFactory).getPPU();
             CellComputeCodeStore ppuCS = ppu.getComputeCode();
 
             //ppuCS.dynSetupFilter(filterNode, CellBackend.numfilters, inputs, outputs, inputnums, outputnums);

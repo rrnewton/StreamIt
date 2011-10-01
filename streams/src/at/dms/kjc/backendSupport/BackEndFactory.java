@@ -46,7 +46,7 @@ public abstract class BackEndFactory<
      * @param computeNodes    the available compute nodes.
      * 
      */
-    public abstract void processInputSliceNode(InputNode input,
+    public abstract void processFilterInputNode(InputNode input,
             SchedulingPhase whichPhase, ComputeNodesType computeNodes);
     
     /**
@@ -67,7 +67,7 @@ public abstract class BackEndFactory<
      * @param computeNodes    the available compute nodes.
      */
 
-    public abstract void processFilterSliceNode(WorkNode filter,
+    public abstract void processFilterWorkNode(WorkNode filter,
             SchedulingPhase whichPhase, ComputeNodesType computeNodes);
    
     /**
@@ -77,7 +77,7 @@ public abstract class BackEndFactory<
      * @param whichPhase      INIT / PRIMEPUMP / STEADY
      * @param computeNodes    the available compute nodes.
      */
-    public abstract void processOutputSliceNode(OutputNode output,
+    public abstract void processFilterOutputNode(OutputNode output,
             SchedulingPhase whichPhase, ComputeNodesType computeNodes);
 
      /**

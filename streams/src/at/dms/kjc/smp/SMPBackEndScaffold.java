@@ -11,8 +11,6 @@ import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
-import at.dms.kjc.slir.Link;
-import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
@@ -23,60 +21,23 @@ import at.dms.kjc.slir.StaticSubGraph;
  */
 public class SMPBackEndScaffold extends BackEndScaffold {
     
-    protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
+    @Override
+	protected void afterScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
-        // nothing to do in default case.
-    	System.out.println(this.getClass().getCanonicalName() + ".beforeScheduling()");    	
-    	System.out.println(this.getClass().getCanonicalName() + " TODO: Add the dynamic links!");    	
-
-    	// TODO:
-    	// get the Filter, then get it's WorkNode
-    	// WorkNode filter
-    	// Channel inputChannel
-    	// Set the following:
-    	// peekName = inputChannel.peekMethodName();
-        // popName = inputChannel.popMethodName();
-        // popManyName = inputChannel.popManyMethodName();
-    	
-    	StaticSubGraph ssg = schedule.getSSG();
-    	InputPort inputPort = ssg.getInputPort();
-    	for ( InterSSGEdge link  : inputPort.getLinks()) {
-    		OutputPort op = link.getSrc();
-    		System.out.println(this.getClass().getCanonicalName() + " Creating a dynamic link between InputPort=" + inputPort + "->" + op);
-    		System.out.println(this.getClass().getCanonicalName() + " Creating a pop!");
-    		/* This will tell us if we should pop */
-    	}
-    	
+    	// nothing to do in default case.
     }
     
-    protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
+    @Override
+	protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
-        // nothing to do in default case.
+    	// nothing to do in default case.
     }
     
    
-    protected void afterScheduling(BasicSpaceTimeSchedule schedule,
+    @Override
+	protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
-    	System.out.println(this.getClass().getCanonicalName() + ".afterScheduling()");
-        // nothing to do.
-    	// TODO:
-    	// get the Filter, then get it's WorkNode
-    	// WorkNode filter
-    	// Channel inputChannel
-    	// Set the following:    	
-        // pushName = outputChannel.pushMethodName();
-    	
-    	StaticSubGraph ssg = schedule.getSSG();
-    	OutputPort outputPort = ssg.getOutputPort();
-    	for ( InterSSGEdge link : outputPort.getLinks()) {
-    		InputPort ip = link.getDest();
-    		System.out.println(this.getClass().getCanonicalName() + "Creating a dynamic link between InputPort=" + outputPort + "->" + ip);
-    		System.out.println(this.getClass().getCanonicalName() + "Creating a push!");
-
-    		//ssg.getTopFilters()[0].get
-    		
-    	}
-
+        // nothing to do in default case.
     }
     
     /**
@@ -90,17 +51,42 @@ public class SMPBackEndScaffold extends BackEndScaffold {
      * @param input InputSliceNode to consider for to a joiner.
      * @return
      */
-    protected boolean doNotCreateJoiner(InputNode input) {
+    @Override
+	protected boolean doNotCreateJoiner(InputNode input) {
         return false;
     }
     
     /**
+     * Iterate over the schedule of slices and over each node of each slice and 
+     * generate the code necessary to fire the schedule.  Generate splitters and 
+     * joiners intermixed with the trace execution...
+     * 
+     * @param filters The schedule to execute.
+     * @param whichPhase True if the init stage.
+     * @param computeNodes The collection of compute nodes.
+     */
+    @Override
+    protected void iterateInorder(Filter filters[], SchedulingPhase whichPhase,
+                                       ComputeNodesI computeNodes) {
+        Filter filter;
+
+        for (int i = 0; i < filters.length; i++) {
+            filter = filters[i];
+            //create code for joining input to the trace
+            backEndFactory.processFilterInputNode(filter.getInputNode(),
+                    whichPhase, computeNodes);
+            //create the compute code and the communication code for the
+            //filters of the trace
+            backEndFactory.processFilterWorkNode(filter.getWorkNode(), whichPhase, computeNodes);
+            //create communication code for splitting the output
+            backEndFactory.processFilterOutputNode(filter.getOutputNode(),
+                    whichPhase, computeNodes);
+        }
+    }
+ 
+    /**
      * Pass in a {@link BasicSpaceTimeScheduleX schedule}, and get a set of {@link at.dms.kjc.backendSupport.ComputeNode ComputeNode}s
-<<<<<<< .mine
-     * and a set of (under-specified) {@link at.dms.kjc.backendSupport.Channel Buffer}s filled in.
-=======
      * and a set of (underspecified) {@link at.dms.kjc.backendSupport.IntraSSGChannel Buffer}s filled in.
->>>>>>> .r11313
      * @param schedule
      * @param computeNodes
      * @param resources The instance of BackEndFactory to be used for callbacks, data.
@@ -109,7 +95,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
     public void run(BasicSpaceTimeSchedule schedule, BackEndFactory resources) {
    
         ComputeNodesI computeNodes = resources.getComputeNodes();
-        this.resources = resources;
+        this.backEndFactory = resources;
         
         Filter slices[];
 
@@ -130,33 +116,5 @@ public class SMPBackEndScaffold extends BackEndScaffold {
         iterateInorder(slices, SchedulingPhase.STEADY, computeNodes);
         
         afterScheduling(schedule, resources);
-    }
- 
-    /**
-     * Iterate over the schedule of slices and over each node of each slice and 
-     * generate the code necessary to fire the schedule.  Generate splitters and 
-     * joiners intermixed with the trace execution...
-     * 
-     * @param slices The schedule to execute.
-     * @param whichPhase True if the init stage.
-     * @param computeNodes The collection of compute nodes.
-     */
-    @Override
-    protected void iterateInorder(Filter slices[], SchedulingPhase whichPhase,
-                                       ComputeNodesI computeNodes) {
-        Filter slice;
-
-        for (int i = 0; i < slices.length; i++) {
-            slice = (Filter) slices[i];
-            //create code for joining input to the trace
-            resources.processInputSliceNode((InputNode)slice.getInputNode(),
-                    whichPhase, computeNodes);
-            //create the compute code and the communication code for the
-            //filters of the trace
-            resources.processFilterSliceNode(slice.getWorkNode(), whichPhase, computeNodes);
-            //create communication code for splitting the output
-            resources.processOutputSliceNode((OutputNode)slice.getOutputNode(),
-                    whichPhase, computeNodes);
-        }
     }  
 }

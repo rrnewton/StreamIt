@@ -97,7 +97,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#processFilterSliceNode(at.dms.kjc.slicegraph.FilterSliceNode, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processFilterSliceNode(WorkNode filter,
+    public void processFilterWorkNode(WorkNode filter,
             SchedulingPhase whichPhase, TileraChip chip) {
         //System.out.println("Processing: " + filter + " on tile " + layout.getComputeNode(filter).getTileNumber() + "(" + whichPhase + ")");
         if (filter.isPredefined()) {
@@ -125,7 +125,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#processInputSliceNode(at.dms.kjc.slicegraph.InputSliceNode, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processInputSliceNode(InputNode input,
+    public void processFilterInputNode(InputNode input,
             SchedulingPhase whichPhase, TileraChip chip) {
         // TODO Auto-generated method stub
         //System.out.println("Processing: " + input);
@@ -137,7 +137,7 @@ public class TileraBackEndFactory extends BackEndFactory<TileraChip, Tile, TileC
      * @see at.dms.kjc.backendSupport.BackEndFactory#processOutputSliceNode(at.dms.kjc.slicegraph.OutputSliceNode, at.dms.kjc.backendSupport.SchedulingPhase, at.dms.kjc.backendSupport.ComputeNodesI)
      */
     @Override
-    public void processOutputSliceNode(OutputNode output,
+    public void processFilterOutputNode(OutputNode output,
             SchedulingPhase whichPhase, TileraChip chip) {
         // TODO Auto-generated method stub
         //System.out.println("Processing: " + output);

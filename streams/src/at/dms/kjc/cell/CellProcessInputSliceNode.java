@@ -36,7 +36,7 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
-import at.dms.kjc.backendSupport.ProcessFilterSliceNode;
+import at.dms.kjc.backendSupport.ProcessFilterWorkNode;
 import at.dms.kjc.backendSupport.ProcessInputSliceNode;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.slir.WorkNode;
@@ -240,7 +240,7 @@ public class CellProcessInputSliceNode extends ProcessInputSliceNode {
     
     private static  void makeJoinerCode(InputNode joiner,
             BackEndFactory backEndBits, CodeStoreHelper helper) {
-        String joiner_name = "_joiner_" + ProcessFilterSliceNode.getUid();
+        String joiner_name = "_joiner_" + ProcessFilterWorkNode.getUid();
         String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
 
         // size is number of edges with non-zero weight.
