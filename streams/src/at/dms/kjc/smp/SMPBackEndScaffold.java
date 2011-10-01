@@ -24,13 +24,34 @@ public class SMPBackEndScaffold extends BackEndScaffold {
     @Override
 	protected void afterScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
-    	// nothing to do in default case.
+    	    
     }
     
     @Override
 	protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
-    	// nothing to do in default case.
+        // nothing to do in default case.
+    	System.out.println(this.getClass().getCanonicalName() + ".beforeScheduling()");    	
+    	System.out.println(this.getClass().getCanonicalName() + " TODO: Add the dynamic links!");    	
+
+    	// TODO:
+    	// get the Filter, then get it's WorkNode
+    	// WorkNode filter
+    	// Channel inputChannel
+    	// Set the following:
+    	// peekName = inputChannel.peekMethodName();
+        // popName = inputChannel.popMethodName();
+        // popManyName = inputChannel.popManyMethodName();
+    	
+    	StaticSubGraph ssg = schedule.getSSG();
+    	InputPort inputPort = ssg.getInputPort();
+    	for ( InterSSGEdge link  : inputPort.getLinks()) {
+    		OutputPort op = link.getSrc();
+    		System.out.println(this.getClass().getCanonicalName() + " Creating a dynamic link between InputPort=" + inputPort + "->" + op);
+    		System.out.println(this.getClass().getCanonicalName() + " Creating a pop!");
+    		/* This will tell us if we should pop */
+    	}
+    	
     }
     
    
