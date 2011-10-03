@@ -284,6 +284,9 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
         case OPE_GE:
             p.print(" >= ");
             break;
+        case OPE_EQ:
+            p.print(" == ");
+            break;
         default:
             Utils.fail("Unknown relational expression"); // only difference from LIRToC
         }
