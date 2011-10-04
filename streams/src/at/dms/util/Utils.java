@@ -1561,11 +1561,18 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @param state
      */
     public static JBlock addSetFlag(JBlock block, String lockName, String flagName, String state) {	
-		JLocalVariableExpression lock = makeJLocalVariableExpression(lockName);
-		JLocalVariableExpression flag = makeJLocalVariableExpression(flagName);
+    	JLocalVariableExpression lock = makeJLocalVariableExpression(lockName);
+		JLocalVariableExpression flagVar = makeJLocalVariableExpression(flagName);
 		JLocalVariableExpression asleep = makeJLocalVariableExpression(state);
 		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
-		block.addStatement(new JExpressionStatement(new JAssignmentExpression(flag, new JIntLiteral(0))));
+		
+		// TODO: I don't understand what the bug here is, but if I use flagVar as the
+		// first argument, then the print out does not appear.
+		block.addStatement(new JExpressionStatement(
+		   new JAssignmentExpression(null,
+				   new JEmittedTextExpression(flagName),
+                   asleep)));
+				
 		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
 		return block;
 	}

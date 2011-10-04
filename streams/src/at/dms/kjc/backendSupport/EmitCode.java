@@ -270,12 +270,16 @@ assert false : "This feature is unsupported for iteration count";
                                           JExpression left,
                                           JExpression right) {
 
+    	System.out.println("******* RJS I'm here **********");
+    	
         //do not print class creation expression
         if (passParentheses(right) instanceof JQualifiedInstanceCreation ||
             passParentheses(right) instanceof JUnqualifiedInstanceCreation ||
             passParentheses(right) instanceof JQualifiedAnonymousCreation ||
-            passParentheses(right) instanceof JUnqualifiedAnonymousCreation)
+            passParentheses(right) instanceof JUnqualifiedAnonymousCreation) {
+        	System.out.println("******* RJS class creation expression return **********");
             return;
+        }
 
         //we are assigning an array to an array in C, we want to do 
         //element-wise copy!!
@@ -283,17 +287,20 @@ assert false : "This feature is unsupported for iteration count";
         
         if ((left.getType() != null && left.getType().isArrayType()) ||
             (right.getType() != null && right.getType().isArrayType())) {
-        
+        	System.out.println("******* RJS array return **********");
             arrayCopy(left, right);
             return;
         }
 
+        System.out.print(" RJS: ");
         lastLeft=left;
         printLParen();
         left.accept(this);
         p.print(" = ");
+        System.out.print(" = ");
         right.accept(this);
         printRParen();
+        System.out.println();
     }
 
 

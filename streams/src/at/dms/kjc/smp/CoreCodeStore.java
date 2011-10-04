@@ -424,13 +424,13 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		System.out.println("CoreCodeStore.addThreadHelper called()");
 		JBlock block = new JBlock();
 		Utils.addCondWait(block, "helperLock", "helperMutex", "helperCond", 
-				Utils.makeEqualityCondition("ASLEEP", "helper_to_sleep_flag"));	
+				Utils.makeEqualityCondition("ASLEEP", "helperFlag"));	
 
 		JBlock body = new JBlock();
-		Utils.addSetFlag(body, "masterLock", "master_to_sleep_flag", "AWAKE");
+		Utils.addSetFlag(body, "masterLock", "masterFlag", "AWAKE");
 		Utils.addSignal(body, "masterCond");	
 		Utils.addCondWait(body, "masterLock", "masterMutex", "masterCond", 
-				Utils.makeEqualityCondition("ASLEEP", "master_to_sleep_flag"));				
+				Utils.makeEqualityCondition("ASLEEP", "masterFlag"));				
 		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), body);						
 		//block.addStatement(ifStatement);	
 		
@@ -454,11 +454,11 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 	// TODO: Fix this so that it calls the thread function
 	public void addSteadyThreadCall() {
 		System.out.println("CoreCodeStore.addSteadyThreadCall called()");
-		Utils.addSetFlag(steadyLoop, "masterLock", "master_to_sleep_flag", "ALSEEP");
-		Utils.addSetFlag(steadyLoop, "helperLock", "reader_to_sleep_flag", "AWAKE");
+		Utils.addSetFlag(steadyLoop, "masterLock", "masterFlag", "ALSEEP");
+		Utils.addSetFlag(steadyLoop, "helperLock", "readerFlag", "AWAKE");
 		Utils.addSignal(steadyLoop, "helperCond");	
 		Utils.addCondWait(steadyLoop, "masterLock", "masterMutex", "masterCond", 
-					Utils.makeEqualityCondition("ASLEEP", "master_to_sleep_flag"));		
+					Utils.makeEqualityCondition("ASLEEP", "masterFlag"));		
 	}
 		
 }
