@@ -23,6 +23,7 @@ package at.dms.util;
 import java.io.*;
 
 import at.dms.compiler.JavaStyleComment;
+import at.dms.compiler.TokenReference;
 import at.dms.kjc.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.LoweringConstants;
@@ -1501,7 +1502,95 @@ public abstract class Utils implements Serializable, DeepCloneable {
         }
         return false;
     }
+    
+    /**
+     * Returns a new JRelational equality expression comparing to variables.
+     * @param leftVar the variable on the left hand side of the expression.
+     * @param rightVar the variable on the right hand side of the expression.
+     * @return the new JRelationalExpression
+     */
+    public static JExpression makeEqualityCondition(String leftVar, String rightVar) {			
+		return new JRelationalExpression(null,
+						Constants.OPE_EQ,
+						makeJLocalVariableExpression(leftVar), 
+						makeJLocalVariableExpression(rightVar));
+	}
 
+    /**
+     * Returns a new variable local variable expression. The type is an integer, and 
+     * its initial value is set to 0, although that information is not used.
+     * @param var the name of the variable.
+     * @return the new JLocalVariableExpression.
+     */
+    public static JLocalVariableExpression makeJLocalVariableExpression(String var) {
+		return new JLocalVariableExpression(new JVariableDefinition(null,
+				0,
+				CStdType.Integer,
+				var,
+				new JIntLiteral(0)));
+	}	
+    
+    /**
+     * Adds a sequence of statments to block that acquire a lock, wait on a condition variable, 
+     * and release the lock.
+     * @param block the block of code to add the statements to
+     * @param  lockName the name of the lock variable
+     * @param  mutexName the name of the mutex variable
+     * @param  condVarName the name of the condition variable
+     * @param cond The condition to check in the condition wait statement
+     * @return the modified block
+     */
+    public static JBlock addCondWait(JBlock block, String lockName, String mutexName, String condVarName, JExpression cond) {	
+		JLocalVariableExpression lock = makeJLocalVariableExpression(lockName);
+		JLocalVariableExpression mutex = makeJLocalVariableExpression(mutexName);
+		JLocalVariableExpression condVar = makeJLocalVariableExpression(condVarName);
+		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
+		JBlock loopBody = new JBlock();
+		loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{mutex, condVar})));		 
+		JWhileStatement whileStmt = new JWhileStatement(null, cond, loopBody, new JavaStyleComment[0]);		
+		block.addStatement(whileStmt); 	
+		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
+		return block;
+	}
+
+    /**
+     * 
+     * @param block
+     * @param lockName
+     * @param flagName
+     * @param state
+     */
+    public static JBlock addSetFlag(JBlock block, String lockName, String flagName, String state) {	
+		JLocalVariableExpression lock = makeJLocalVariableExpression(lockName);
+		JLocalVariableExpression flag = makeJLocalVariableExpression(flagName);
+		JLocalVariableExpression asleep = makeJLocalVariableExpression(state);
+		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
+		block.addStatement(new JExpressionStatement(new JAssignmentExpression(flag, new JIntLiteral(0))));
+		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
+		return block;
+	}
+	
+    /**
+     * Add a call to block to pthread_cond_signal
+     * @param block The block to add to
+     * @param condName the name of the condition variable
+     * @return the modified block
+     */
+    public static JBlock addSignal(JBlock block, String condName) {	
+		JLocalVariableExpression condVar = makeJLocalVariableExpression(condName);
+		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_signal", new JExpression[]{condVar})));
+		return block;
+	}
+
+
+    public static JIfStatement makeIfStatement(JExpression cond, JBlock body) {    	
+    	return new JIfStatement(null,
+    			cond,
+    			body,
+    			null,
+    			new JavaStyleComment[0]);
+    
+    }
     // ----------------------------------------------------------------------
     // DATA MEMBERS
     // ----------------------------------------------------------------------

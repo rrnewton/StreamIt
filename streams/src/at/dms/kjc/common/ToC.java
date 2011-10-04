@@ -194,7 +194,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
         }
         p.print("}");
     }
-
+    
+    
     /*
      * prints a compound statement: 2-argument form
      * visitCompoundStatement in ToCCommon
@@ -293,7 +294,7 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
         right.accept(this);
         p.print(")");
     }
-
+      
 
     /*
      * prints an array allocator expression

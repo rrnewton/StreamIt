@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import at.dms.kjc.slir.*;
+import at.dms.util.Utils;
 
 public class CoreCodeStore extends ComputeCodeStore<Core> {
 	/**
@@ -422,64 +423,42 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 	public void addThreadHelper(JStatement steadyBlock) {
 		System.out.println("CoreCodeStore.addThreadHelper called()");
 		JBlock block = new JBlock();
-		block = this.addCondWait(block, makeEqualityCondition("ASLEEP", "thread_to_sleep_flag"));
+		Utils.addCondWait(block, "helperLock", "helperMutex", "helperCond", 
+				Utils.makeEqualityCondition("ASLEEP", "helper_to_sleep_flag"));	
+
+		JBlock body = new JBlock();
+		Utils.addSetFlag(body, "masterLock", "master_to_sleep_flag", "AWAKE");
+		Utils.addSignal(body, "masterCond");	
+		Utils.addCondWait(body, "masterLock", "masterMutex", "masterCond", 
+				Utils.makeEqualityCondition("ASLEEP", "master_to_sleep_flag"));				
+		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), body);						
+		//block.addStatement(ifStatement);	
+		
+		//JForStatement.
+		
+//		addStatement(new JWhileStatement(null, new JBooleanLiteral(
+//				null, true), steadyLoop, null));
+		
+		//addSteadyLoopStatement(ifStatement);
+		
 		block.addStatement(steadyBlock);
+						
+		
+		
 		JMethodDeclaration threadHelper = new JMethodDeclaration(CStdType.Void, "runMyThread", new JFormalParameter[0],
 				block);
-		addMethod(threadHelper);
 		
+		addMethod(threadHelper);		
 	}	
 
 	// TODO: Fix this so that it calls the thread function
 	public void addSteadyThreadCall() {
 		System.out.println("CoreCodeStore.addSteadyThreadCall called()");
-		JMethodCallExpression expr = new JMethodCallExpression("runMyThread", new JExpression[0]);
-		JStatement stmt = new JExpressionStatement(expr);
-		steadyLoop.addStatement(stmt);
+		Utils.addSetFlag(steadyLoop, "masterLock", "master_to_sleep_flag", "ALSEEP");
+		Utils.addSetFlag(steadyLoop, "helperLock", "reader_to_sleep_flag", "AWAKE");
+		Utils.addSignal(steadyLoop, "helperCond");	
+		Utils.addCondWait(steadyLoop, "masterLock", "masterMutex", "masterCond", 
+					Utils.makeEqualityCondition("ASLEEP", "master_to_sleep_flag"));		
 	}
-	
-	private JExpression makeEqualityCondition(String leftVar, String rightVar) {			
-		return new JRelationalExpression(null,
-						Constants.OPE_EQ,
-						makeJLocalVariableExpression(leftVar), 
-						makeJLocalVariableExpression(rightVar));
-	}
-
-	private JLocalVariableExpression makeJLocalVariableExpression(String var) {
-		return new JLocalVariableExpression(new JVariableDefinition(null,
-				0,
-				CStdType.Integer,
-				var,
-				new JIntLiteral(0)));
-	}
-	
-	private JBlock addCondWait(JBlock block, JExpression cond) {	
-		JLocalVariableExpression lock = makeJLocalVariableExpression("mylock");
-		JLocalVariableExpression mutex = makeJLocalVariableExpression("mymutex");
-		JLocalVariableExpression condVar = makeJLocalVariableExpression("mycond");
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
-		JBlock loopBody = new JBlock();
-		loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{mutex, condVar})));		 
-		JWhileStatement whileStmt = new JWhileStatement(null, cond, loopBody, new JavaStyleComment[0]);		
-		block.addStatement(whileStmt); 	
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
-		return block;
-	}
-
-	private JBlock addSetFlag(JBlock block, String lockName, String flagName, String state) {	
-		JLocalVariableExpression lock = makeJLocalVariableExpression(lockName);
-		JLocalVariableExpression flag = makeJLocalVariableExpression(flagName);
-		JLocalVariableExpression asleep = makeJLocalVariableExpression(state);
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
-		block.addStatement(new JExpressionStatement(new JAssignmentExpression(flag, asleep)));
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
-		return block;
-	}
-	
-	private JBlock addSignal(JBlock block, String condName) {	
-		JLocalVariableExpression condVar = makeJLocalVariableExpression(condName);
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_signal", new JExpression[]{condVar})));
-		return block;
-	}
-
+		
 }
