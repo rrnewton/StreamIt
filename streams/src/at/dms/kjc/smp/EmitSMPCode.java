@@ -534,10 +534,7 @@ public class EmitSMPCode extends EmitCode {
 	 */
 	public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
 			ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
-
-		
-		System.out.println("RJS emitCodeForComputeStore");
-		
+				
 		p.println("// code for core " + n.getUniqueId());
 		p.println(((Core)n).getComputeCode().getGlobalText());
 

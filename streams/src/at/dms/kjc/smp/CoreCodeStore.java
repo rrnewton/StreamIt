@@ -422,31 +422,44 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 	// TODO: fix this to add more code into the thread
 	public void addThreadHelper(JStatement steadyBlock) {
 		System.out.println("CoreCodeStore.addThreadHelper called()");
-		JBlock block = new JBlock();
-		Utils.addCondWait(block, "helperLock", "helperMutex", "helperCond", 
+		
+		JBlock methodBody = new JBlock();
+		JBlock whileBody = new JBlock();
+		JBlock ifBody = new JBlock();
+				
+		Utils.addCondWait(whileBody, "helperLock", "helperMutex", "helperCond", 
 				Utils.makeEqualityCondition("ASLEEP", "helperFlag"));	
 
-		JBlock body = new JBlock();
-		Utils.addSetFlag(body, "masterLock", "masterFlag", "AWAKE");
-		Utils.addSignal(body, "masterCond");	
-		Utils.addCondWait(body, "masterLock", "masterMutex", "masterCond", 
+		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
+
+		Utils.addSetFlag(ifBody, "masterLock", "masterFlag", "AWAKE");
+		Utils.addSignal(ifBody, "masterCond");	
+		Utils.addCondWait(ifBody, "masterLock", "masterMutex", "masterCond", 
 				Utils.makeEqualityCondition("ASLEEP", "masterFlag"));				
-		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), body);						
+
+		JBlock block = (JBlock)steadyBlock;
+		
+		ifBody.addStatement(steadyBlock);
+		
+		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), ifBody);						
+		
+		
+		
 		//block.addStatement(ifStatement);	
 		
-		//JForStatement.
+		whileBody.addStatement(steadyBlock);
 		
-//		addStatement(new JWhileStatement(null, new JBooleanLiteral(
-//				null, true), steadyLoop, null));
+		JStatement whileLoop = new JWhileStatement(null, new JBooleanLiteral(
+				null, true), whileBody, null);
 		
 		//addSteadyLoopStatement(ifStatement);
 		
-		block.addStatement(steadyBlock);
+		// block.addStatement(steadyBlock);
 						
-		
+		methodBody.addStatement(whileLoop);
 		
 		JMethodDeclaration threadHelper = new JMethodDeclaration(CStdType.Void, "runMyThread", new JFormalParameter[0],
-				block);
+				methodBody);
 		
 		addMethod(threadHelper);		
 	}	
