@@ -170,12 +170,9 @@ public class ProcessFilterWorkNode {
 					} else {
 						if (isDynamicPop) {
 							JExpression dyn_queue = new JEmittedTextExpression(
-									"dyn_queue");
-							JExpression success = new JEmittedTextExpression(
-									"&success");
+									"dyn_read_current");						
 							JExpression methodCall = new JMethodCallExpression(
-									popName, new JExpression[] { dyn_queue,
-											success });
+									popName, new JExpression[] { dyn_queue});
 							methodCall.setType(tapeType);
 							return methodCall;
 						} else {
@@ -195,7 +192,7 @@ public class ProcessFilterWorkNode {
 					JExpression newArg = (JExpression) arg.accept(this);
 					if (isDynamicPush) {
 						JExpression dyn_queue = new JEmittedTextExpression(
-								"dyn_queue");
+								"dyn_write_current");
 						return new JMethodCallExpression(pushName,
 								new JExpression[] { dyn_queue, newArg });
 					} else {

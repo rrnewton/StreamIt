@@ -9,7 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import at.dms.kjc.CEmittedTextType;
 import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpressionStatement;
@@ -183,12 +185,15 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 */
 	public List<JStatement> dataDecls() {
 		// System.out.println("InterSSGChannel::dataDecls()");
-		// List<JStatement> statements = new LinkedList<JStatement>();
-		// JStatement stmt = new JExpressionStatement(new
-		// JEmittedTextExpression("queue ctx"));
-		// statements.add(stmt);
-		// return statements;
-		return new LinkedList<JStatement>();
+		List<JStatement> statements = new LinkedList<JStatement>();
+		JStatement stmt = new JExpressionStatement(new
+				JEmittedTextExpression("static queue_ctx_ptr dyn_read_current;"));
+		statements.add(stmt);		
+		stmt = new JExpressionStatement(new
+				JEmittedTextExpression("static queue_ctx_ptr dyn_write_current;"));
+		statements.add(stmt);		
+		return statements;
+		//return new LinkedList<JStatement>();
 	}
 
 	/**
@@ -229,42 +234,58 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		for (String str : types) {
 			System.out.print("Type is: " + str);
 		}
-		
-		
+				
 		JBlock methodBody = new JBlock();
 		JBlock ifBody = new JBlock();
 		
 		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
+		ifBody.addStatement(Util.toStmt("/* *write_d_multiplier  = 0; */"));
 
-		Utils.addSetFlag(ifBody, "masterLock", "masterFlag", "AWAKE");
-		Utils.addSignal(ifBody, "masterCond");	
-		Utils.addCondWait(ifBody, "masterLock", "masterMutex", "masterCond", 
-				Utils.makeEqualityCondition("ASLEEP", "masterFlag"));				
+		Utils.addSetFlag(ifBody, 0, "MASTER", "MASTER", "AWAKE");
+		Utils.addSignal(ifBody, 0, "MASTER");	
+		
+		Utils.addCondWait(ifBody, 0, "DYN_READER", "DYN_READER", 
+				Utils.makeEqualityCondition("q->size", "0"));				
 				
-		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), ifBody);						
+		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("q->size", "0"), ifBody);						
 				
 		methodBody.addStatement(ifStatement);	
 		
+		String formalParamName = "q";
+		CType formalParamType = new CEmittedTextType("queue_ctx_ptr");
+
+		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("int elem = q->buffer[q->first]")));
+		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("q->size--")));
+		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("q->first = (q->first + 1) & q->max")));
+		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("return elem")));
+
+		//		queue_pop(queue_ctx_ptr q, TYPE * retval) {
+
+		new JFormalParameter(formalParamType, formalParamName);
 		
-		JMethodDeclaration popMethod = new JMethodDeclaration(CStdType.Void, "queue_pop", new JFormalParameter[0],
+		//JFormalParameter param = 
+		JMethodDeclaration popMethod = new JMethodDeclaration(CStdType.Integer, "queue_pop", 				
+				new JFormalParameter[]{new JFormalParameter(formalParamType, formalParamName)},
 				methodBody);
 		return popMethod;		
 	}
 
 	public List<JStatement> readDeclsExtern() {
-		List<JStatement> statements = new LinkedList<JStatement>();
-		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-				"extern queue_ctx_ptr dyn_queue"));
-		statements.add(stmt);
-		return statements;
+//		List<JStatement> statements = new LinkedList<JStatement>();
+//		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
+//				"extern queue_ctx_ptr dyn_queue"));
+//		statements.add(stmt);
+//		return statements;
+		return new LinkedList<JStatement>();
 	}
 
 	public List<JStatement> writeDeclsExtern() {
-		List<JStatement> statements = new LinkedList<JStatement>();
-		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-				"extern queue_ctx_ptr dyn_queue"));
-		statements.add(stmt);
-		return statements;
+//		List<JStatement> statements = new LinkedList<JStatement>();
+//		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
+//				"extern queue_ctx_ptr dyn_queue"));
+//		statements.add(stmt);
+//		return statements;
+		return new LinkedList<JStatement>();
 	}
 
 }

@@ -427,27 +427,21 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		JBlock whileBody = new JBlock();
 		// JBlock ifBody = new JBlock();
 				
-		Utils.addCondWait(whileBody, "helperLock", "helperMutex", "helperCond", 
-				Utils.makeEqualityCondition("ASLEEP", "helperFlag"));	
-
-		//ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
-
-		//Utils.addSetFlag(ifBody, "masterLock", "masterFlag", "AWAKE");
-		//Utils.addSignal(ifBody, "masterCond");	
-		//Utils.addCondWait(ifBody, "masterLock", "masterMutex", "masterCond", 
-		//		Utils.makeEqualityCondition("ASLEEP", "masterFlag"));				
-
-		//JBlock block = (JBlock)steadyBlock;
-		
-		// ifBody.addStatement(steadyBlock);
-		
-		// JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), ifBody);						
-		
-		
-		
-		//block.addStatement(ifStatement);	
-		
+		Utils.addCondWait(whileBody, 0, "DYN_READER", "DYN_READER", 
+				Utils.makeEqualityCondition("ASLEEP", "DYN_READER"));	
+				
 		whileBody.addStatement(steadyBlock);
+		
+
+		Utils.addSetFlag(whileBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
+		Utils.addSetFlag(whileBody, 0, "MASTER", "MASTER", "AWAKE");
+		Utils.addSignal(whileBody, 0, "MASTER");	
+
+		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("queue_ctx_ptr tmp")));
+		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("tmp =  dyn_read_current")));
+		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("dyn_read_current = dyn_write_current")));
+		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("dyn_write_current = tmp")));
+
 		
 		JStatement whileLoop = new JWhileStatement(null, new JBooleanLiteral(
 				null, true), whileBody, null);
@@ -458,20 +452,19 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 						
 		methodBody.addStatement(whileLoop);
 		
-		JMethodDeclaration threadHelper = new JMethodDeclaration(CStdType.Void, "runMyThread", new JFormalParameter[0],
+		JMethodDeclaration threadHelper = new JMethodDeclaration(CStdType.Void, "helper", new JFormalParameter[0],
 				methodBody);
 		
 		addMethod(threadHelper);		
 	}	
 
 	// TODO: Fix this so that it calls the thread function
-	public void addSteadyThreadCall() {
-		System.out.println("CoreCodeStore.addSteadyThreadCall called()");
-		Utils.addSetFlag(steadyLoop, "masterLock", "masterFlag", "ALSEEP");
-		Utils.addSetFlag(steadyLoop, "helperLock", "readerFlag", "AWAKE");
-		Utils.addSignal(steadyLoop, "helperCond");	
-		Utils.addCondWait(steadyLoop, "masterLock", "masterMutex", "masterCond", 
-					Utils.makeEqualityCondition("ASLEEP", "masterFlag"));		
+	public void addSteadyThreadCall() {		
+		Utils.addSetFlag(steadyLoop, 0, "MASTER", "MASTER", "ASLEEP");
+		Utils.addSetFlag(steadyLoop, 0, "DYN_READER", "DYN_READER", "AWAKE");
+		Utils.addSignal(steadyLoop, 0, "DYN_READER");	
+		Utils.addCondWait(steadyLoop, 0, "MASTER", "MASTER", 
+					Utils.makeEqualityCondition("ASLEEP", "MASTER"));		
 	}
 		
 }

@@ -1526,13 +1526,12 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @param cond The condition to check in the condition wait statement
      * @return the modified block
      */
-    public static JBlock addCondWait(JBlock block, String lockName, String mutexName, String condVarName, JExpression cond) {	
-    	JFieldAccessExpression lock = new JFieldAccessExpression(lockName);
-    	JFieldAccessExpression mutex = new JFieldAccessExpression(mutexName);
-    	JFieldAccessExpression condVar = new JFieldAccessExpression(condVarName);
+    public static JBlock addCondWait(JBlock block, int index, String lockName, String condVarName, JExpression cond) {	   
+    	JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + index + "][" + lockName + "]");    	
+    	JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + index + "][" + condVarName + "]");		    	    	
 		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
 		JBlock loopBody = new JBlock();
-		loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{mutex, condVar})));		 
+		loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{condVar, lock})));		 
 		JWhileStatement whileStmt = new JWhileStatement(null, cond, loopBody, new JavaStyleComment[0]);		
 		block.addStatement(whileStmt); 	
 		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
@@ -1546,28 +1545,32 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @param flagName
      * @param state
      */
-    public static JBlock addSetFlag(JBlock block, String lockName, String flagName, String state) {	
-    	JFieldAccessExpression lock = new JFieldAccessExpression(lockName);
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));				
+    public static JBlock addSetFlag(JBlock block, int index, String lockName, String flagName, String state) {	
+    	JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + index + "][" + lockName + "]");
+    	JEmittedTextExpression flag = new JEmittedTextExpression("thread_to_sleep[" + index + "][" + flagName + "]");
 		block.addStatement(new JExpressionStatement(
-		   new JAssignmentExpression(null,
-				   new JFieldAccessExpression(flagName),
-				   new JFieldAccessExpression(state))));
-				   
-				
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
+					new JMethodCallExpression("pthread_mutex_lock", 
+							new JExpression[]{lock})));				
+		block.addStatement(new JExpressionStatement(
+		   new JAssignmentExpression(null,		
+				   flag,
+				   new JFieldAccessExpression(state))));				   				
+		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", 
+				new JExpression[]{lock})));
 		return block;
 	}
 	
     /**
      * Add a call to block to pthread_cond_signal
      * @param block The block to add to
+     * @param index 
      * @param condName the name of the condition variable
      * @return the modified block
      */
-    public static JBlock addSignal(JBlock block, String condName) {	
-    	JFieldAccessExpression condVar = new JFieldAccessExpression(condName);
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_signal", new JExpression[]{condVar})));
+    public static JBlock addSignal(JBlock block, int index, String condName) {	
+    	JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + index + "][" + condName + "]");		    	    	    	
+		block.addStatement(new JExpressionStatement(
+				new JMethodCallExpression("pthread_cond_signal", new JExpression[]{condVar})));
 		return block;
 	}
 

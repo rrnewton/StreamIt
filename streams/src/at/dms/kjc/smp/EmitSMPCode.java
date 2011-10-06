@@ -300,6 +300,7 @@ public class EmitSMPCode extends EmitCode {
 
 		p.println("#include \"barrier.h\"");
 		p.println("#include \"structs.h\"");
+		p.println("#include \"queue.h\"");
 		p.println("#include <stdint.h>");
 		p.println();
 
@@ -319,6 +320,23 @@ public class EmitSMPCode extends EmitCode {
 		p.println("// Global barrier");
 		p.println("extern barrier_t barrier;");
 		p.println();
+					
+		// TODO: RJS put upper bounds
+		if (isDynamic) {
+			// TODO fix number of threads
+			int numDynamicReaders = 1;
+			p.println();
+			p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
+			p.println("#define ASLEEP          0");
+			p.println("#define AWAKE           1");
+			p.println("#define DYN_READER      0");
+			p.println("#define MASTER          1");
+			p.println("extern queue_ctx_ptr   dyn_buf_0;");	
+			p.println("extern queue_ctx_ptr   dyn_buf_1;");			
+			p.println("extern pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");		
+			p.println("extern pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
+			p.println("extern int                   thread_to_sleep [DYNAMIC_READERS][2];");
+		}
 
 		p.println("// Shared buffers");
 		p.println(SMPBackend.chip.getOffChipMemory().getComputeCode().getGlobalText());
@@ -576,6 +594,16 @@ public class EmitSMPCode extends EmitCode {
 			}        	
 		}
 
+
+		for (InterSSGChannel c : dynamicInputBuffers) {
+			if (c.readDeclsExtern() != null) {
+				for (JStatement d : c.dataDecls()) { 
+					d.accept(codegen); p.println();
+				}
+			}
+		}
+
+				
 		// externs
 		for (RotatingBuffer c : outputBuffers) {
 			if (c.writeDeclsExtern() != null) {
