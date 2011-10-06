@@ -1512,24 +1512,10 @@ public abstract class Utils implements Serializable, DeepCloneable {
     public static JExpression makeEqualityCondition(String leftVar, String rightVar) {			
 		return new JEqualityExpression(null,
 						true,
-						makeJLocalVariableExpression(leftVar), 
-						makeJLocalVariableExpression(rightVar));
+						new JFieldAccessExpression(leftVar), 
+						new JFieldAccessExpression(rightVar));
 	}
-
-    /**
-     * Returns a new variable local variable expression. The type is an integer, and 
-     * its initial value is set to 0, although that information is not used.
-     * @param var the name of the variable.
-     * @return the new JLocalVariableExpression.
-     */
-    public static JLocalVariableExpression makeJLocalVariableExpression(String var) {
-		return new JLocalVariableExpression(new JVariableDefinition(null,
-				0,
-				CStdType.Integer,
-				var,
-				new JIntLiteral(0)));
-	}	
-    
+   
     /**
      * Adds a sequence of statments to block that acquire a lock, wait on a condition variable, 
      * and release the lock.
@@ -1541,9 +1527,9 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @return the modified block
      */
     public static JBlock addCondWait(JBlock block, String lockName, String mutexName, String condVarName, JExpression cond) {	
-		JLocalVariableExpression lock = makeJLocalVariableExpression(lockName);
-		JLocalVariableExpression mutex = makeJLocalVariableExpression(mutexName);
-		JLocalVariableExpression condVar = makeJLocalVariableExpression(condVarName);
+    	JFieldAccessExpression lock = new JFieldAccessExpression(lockName);
+    	JFieldAccessExpression mutex = new JFieldAccessExpression(mutexName);
+    	JFieldAccessExpression condVar = new JFieldAccessExpression(condVarName);
 		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
 		JBlock loopBody = new JBlock();
 		loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{mutex, condVar})));		 
@@ -1562,10 +1548,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
      */
     public static JBlock addSetFlag(JBlock block, String lockName, String flagName, String state) {	
     	JFieldAccessExpression lock = new JFieldAccessExpression(lockName);
-		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));	
-		
-		// TODO: I don't understand what the bug here is, but if I use flagVar as the
-		// first argument, then the print out does not appear.
+		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock})));				
 		block.addStatement(new JExpressionStatement(
 		   new JAssignmentExpression(null,
 				   new JFieldAccessExpression(flagName),
@@ -1583,7 +1566,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @return the modified block
      */
     public static JBlock addSignal(JBlock block, String condName) {	
-		JLocalVariableExpression condVar = makeJLocalVariableExpression(condName);
+    	JFieldAccessExpression condVar = new JFieldAccessExpression(condName);
 		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_signal", new JExpression[]{condVar})));
 		return block;
 	}

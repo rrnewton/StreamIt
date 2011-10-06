@@ -630,6 +630,13 @@ public class EmitSMPCode extends EmitCode {
 			if (c.popManyMethod() != null) { c.popManyMethod().accept(codegen); }
 		}
 		p.println("");
+		
+		for (InterSSGChannel c : dynamicInputBuffers) {
+			System.out.println("--> InterSSGChannel");
+			if (c.popMethod() != null) { c.popMethod().accept(codegen); }
+		}
+
+		p.println("");
 
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {

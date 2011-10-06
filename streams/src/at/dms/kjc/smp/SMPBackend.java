@@ -19,6 +19,124 @@ public class SMPBackend {
 
 	private static boolean isDynamic = false;
 
+	private static void calculateCompCommRatio(
+			BasicSpaceTimeSchedule graphSchedule) {
+		LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule
+				.getSSG().getTopFilters());
+		HashSet<Filter> compProcessed = new HashSet<Filter>();
+		HashSet<Filter> commProcessed = new HashSet<Filter>();
+
+		long comp = 0;
+		long comm = 0;
+
+		for (Filter slice : slices) {
+			if (compProcessed.contains(slice))
+				continue;
+
+			comp += FilterWorkEstimate.getWork(slice);
+			compProcessed.add(slice);
+		}
+
+		// Simple communication estimation
+		for (Filter slice : slices) {
+			if (commProcessed.contains(slice))
+				continue;
+
+			WorkNodeInfo info = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
+			int totalItemsReceived = info
+					.totalItemsReceived(SchedulingPhase.STEADY);
+
+			if (totalItemsReceived == 0)
+				continue;
+
+			comm += totalItemsReceived;
+
+			if (FissionGroupStore.isFizzed(slice)) {
+				assert info.peek >= info.pop;
+				comm += (info.peek - info.pop) * KjcOptions.smp;
+			}
+
+			commProcessed.add(slice);
+		}
+
+		System.out.println("Final Computation: " + comp);
+		System.out.println("Final Communication: " + comm);
+		System.out.println("Final Comp/Comm Ratio: " + (float) comp
+				/ (float) comm);
+
+	}
+
+	/**
+	 * Check arguments to backend to make sure that they are valid
+	 */
+	private static void checkArguments() {
+		// if debugging and number of iterations unspecified, limit number of
+		// iterations
+		if (KjcOptions.debug && KjcOptions.iterations == -1)
+			KjcOptions.iterations = 100;
+
+		// if load-balancing, enable shared buffers
+		if (KjcOptions.loadbalance)
+			KjcOptions.sharedbufs = true;
+
+		// if load-balancing, but only 1 core, disable load-balancing
+		if (KjcOptions.loadbalance && KjcOptions.smp == 1)
+			KjcOptions.loadbalance = false;
+
+		// if using old TMD, make sure not using sharedbufs since they're
+		// incompatible
+		if (KjcOptions.partitioner.equals("oldtmd")) {
+			if (KjcOptions.sharedbufs) {
+				System.out
+						.println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
+				KjcOptions.sharedbufs = false;
+			}
+		}
+	}
+
+	private static void emitCode() {
+
+		// generate code for file writer
+		CoreCodeStore.generatePrintOutputCode();
+
+		if (KjcOptions.numbers > 0)
+			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
+
+		// emit c code for all cores
+		EmitSMPCode.doit(backEndFactory, isDynamic);
+
+		// dump structs.h file
+		structs_h.writeToFile();
+
+		printFinalWorkAssignments();
+
+		if (isDynamic) {
+			new DumpText().copyToFile();
+		}
+
+		System.exit(0);
+	}
+
+	private static void printFinalWorkAssignments() {
+		// display final assignment of filters to cores
+		System.out.println("Final filter assignments:");
+		System.out.println("========================================");
+		for (int x = 0; x < KjcOptions.smp; x++) {
+			Core core = chip.getNthComputeNode(x);
+			Set<WorkNode> filters = core.getComputeCode().getFilters();
+			long totalWork = 0;
+
+			System.out.println("Core " + core.getCoreID() + ": ");
+			for (WorkNode filter : filters) {
+				long work = FilterWorkEstimate.getWork(filter.getParent());
+				System.out.format("%16d | " + filter + "\n", work);
+				totalWork += work;
+			}
+			System.out.format("%16d | Total\n", totalWork);
+		}
+
+	}
+
 	public static void run(SIRStream str, JInterfaceDeclaration[] interfaces,
 			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
 			SIRHelper[] helpers, SIRGlobal global) {
@@ -114,147 +232,6 @@ public class SMPBackend {
 
 	}
 
-	private static void emitCode() {
-
-		// generate code for file writer
-		CoreCodeStore.generatePrintOutputCode();
-
-		if (KjcOptions.numbers > 0)
-			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
-
-		// emit c code for all cores
-		EmitSMPCode.doit(backEndFactory, isDynamic);
-
-		// dump structs.h file
-		structs_h.writeToFile();
-
-		printFinalWorkAssignments();
-
-		if (isDynamic) {
-			new DumpText().copyToFile();
-		}
-
-		System.exit(0);
-	}
-
-	private static void printFinalWorkAssignments() {
-		// display final assignment of filters to cores
-		System.out.println("Final filter assignments:");
-		System.out.println("========================================");
-		for (int x = 0; x < KjcOptions.smp; x++) {
-			Core core = chip.getNthComputeNode(x);
-			Set<WorkNode> filters = core.getComputeCode().getFilters();
-			long totalWork = 0;
-
-			System.out.println("Core " + core.getCoreID() + ": ");
-			for (WorkNode filter : filters) {
-				long work = FilterWorkEstimate.getWork(filter.getParent());
-				System.out.format("%16d | " + filter + "\n", work);
-				totalWork += work;
-			}
-			System.out.format("%16d | Total\n", totalWork);
-		}
-
-	}
-
-	private static void calculateCompCommRatio(
-			BasicSpaceTimeSchedule graphSchedule) {
-		LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule
-				.getSSG().getTopFilters());
-		HashSet<Filter> compProcessed = new HashSet<Filter>();
-		HashSet<Filter> commProcessed = new HashSet<Filter>();
-
-		long comp = 0;
-		long comm = 0;
-
-		for (Filter slice : slices) {
-			if (compProcessed.contains(slice))
-				continue;
-
-			comp += FilterWorkEstimate.getWork(slice);
-			compProcessed.add(slice);
-		}
-
-		// Simple communication estimation
-		for (Filter slice : slices) {
-			if (commProcessed.contains(slice))
-				continue;
-
-			WorkNodeInfo info = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
-			int totalItemsReceived = info
-					.totalItemsReceived(SchedulingPhase.STEADY);
-
-			if (totalItemsReceived == 0)
-				continue;
-
-			comm += totalItemsReceived;
-
-			if (FissionGroupStore.isFizzed(slice)) {
-				assert info.peek >= info.pop;
-				comm += (info.peek - info.pop) * KjcOptions.smp;
-			}
-
-			commProcessed.add(slice);
-		}
-
-		System.out.println("Final Computation: " + comp);
-		System.out.println("Final Communication: " + comm);
-		System.out.println("Final Comp/Comm Ratio: " + (float) comp
-				/ (float) comm);
-
-	}
-
-	/**
-	 * Check arguments to backend to make sure that they are valid
-	 */
-	private static void checkArguments() {
-		// if debugging and number of iterations unspecified, limit number of
-		// iterations
-		if (KjcOptions.debug && KjcOptions.iterations == -1)
-			KjcOptions.iterations = 100;
-
-		// if load-balancing, enable shared buffers
-		if (KjcOptions.loadbalance)
-			KjcOptions.sharedbufs = true;
-
-		// if load-balancing, but only 1 core, disable load-balancing
-		if (KjcOptions.loadbalance && KjcOptions.smp == 1)
-			KjcOptions.loadbalance = false;
-
-		// if using old TMD, make sure not using sharedbufs since they're
-		// incompatible
-		if (KjcOptions.partitioner.equals("oldtmd")) {
-			if (KjcOptions.sharedbufs) {
-				System.out
-						.println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
-				KjcOptions.sharedbufs = false;
-			}
-		}
-	}
-
-	/**
-	 * Set the scheduler field to the correct leaf class that implements a
-	 * scheduling policy.
-	 */
-	private static void setScheduler() {
-		System.out
-				.println("********************* scheduler setScheduler called!");
-		if (KjcOptions.partitioner.equals("tmd")) {
-			System.out
-					.println("********************* scheduler is TMDBinPackFissAll!");
-			scheduler = new TMDBinPackFissAll();
-		} else if (KjcOptions.partitioner.equals("oldtmd")) {
-			System.out.println("********************* scheduler is oldtmd!");
-			scheduler = new TMD();
-		} else if (KjcOptions.partitioner.equals("smd")) {
-			System.out.println("********************* scheduler is smd!");
-			scheduler = new SMD();
-		} else {
-			System.err.println("Unknown Scheduler Type!");
-			System.exit(1);
-		}
-	}
-
 	/**
 	 * Create schedules for init, prime-pump and steady phases.
 	 * 
@@ -284,6 +261,29 @@ public class SMPBackend {
 
 		// Still need to generate the steady state schedule!
 		schedule.setSchedule(DataFlowOrder.getTraversal(slicer.getTopFilters()));
+	}
+
+	/**
+	 * Set the scheduler field to the correct leaf class that implements a
+	 * scheduling policy.
+	 */
+	private static void setScheduler() {
+		System.out
+				.println("********************* scheduler setScheduler called!");
+		if (KjcOptions.partitioner.equals("tmd")) {
+			System.out
+					.println("********************* scheduler is TMDBinPackFissAll!");
+			scheduler = new TMDBinPackFissAll();
+		} else if (KjcOptions.partitioner.equals("oldtmd")) {
+			System.out.println("********************* scheduler is oldtmd!");
+			scheduler = new TMD();
+		} else if (KjcOptions.partitioner.equals("smd")) {
+			System.out.println("********************* scheduler is smd!");
+			scheduler = new SMD();
+		} else {
+			System.err.println("Unknown Scheduler Type!");
+			System.exit(1);
+		}
 	}
 
 	/**
