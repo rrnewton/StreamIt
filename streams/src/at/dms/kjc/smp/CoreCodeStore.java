@@ -425,23 +425,23 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		
 		JBlock methodBody = new JBlock();
 		JBlock whileBody = new JBlock();
-		JBlock ifBody = new JBlock();
+		// JBlock ifBody = new JBlock();
 				
 		Utils.addCondWait(whileBody, "helperLock", "helperMutex", "helperCond", 
 				Utils.makeEqualityCondition("ASLEEP", "helperFlag"));	
 
-		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
+		//ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
 
-		Utils.addSetFlag(ifBody, "masterLock", "masterFlag", "AWAKE");
-		Utils.addSignal(ifBody, "masterCond");	
-		Utils.addCondWait(ifBody, "masterLock", "masterMutex", "masterCond", 
-				Utils.makeEqualityCondition("ASLEEP", "masterFlag"));				
+		//Utils.addSetFlag(ifBody, "masterLock", "masterFlag", "AWAKE");
+		//Utils.addSignal(ifBody, "masterCond");	
+		//Utils.addCondWait(ifBody, "masterLock", "masterMutex", "masterCond", 
+		//		Utils.makeEqualityCondition("ASLEEP", "masterFlag"));				
 
-		JBlock block = (JBlock)steadyBlock;
+		//JBlock block = (JBlock)steadyBlock;
 		
-		ifBody.addStatement(steadyBlock);
+		// ifBody.addStatement(steadyBlock);
 		
-		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), ifBody);						
+		// JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("size", "0"), ifBody);						
 		
 		
 		

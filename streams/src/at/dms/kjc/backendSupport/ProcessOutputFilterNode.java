@@ -10,7 +10,7 @@ import at.dms.kjc.slir.*;
  * @author dimock
  *
  */
-public class ProcessOutputSliceNode {
+public class ProcessOutputFilterNode {
     /** set of filters for which we have written basic code. */
     // uses WeakHashMap to be self-cleaning, but now have to insert some value.
     protected static Map<InternalFilterNode,Boolean>  basicCodeWritten = new WeakHashMap<InternalFilterNode,Boolean>();
@@ -28,7 +28,7 @@ public class ProcessOutputSliceNode {
      * @param whichPhase   a scheduling phase {@link SchedulingPhase}
      * @param backEndBits  a BackEndFactory to access layout, etc.
      */
-    public ProcessOutputSliceNode(OutputNode outputNode, 
+    public ProcessOutputFilterNode(OutputNode outputNode, 
             SchedulingPhase whichPhase, BackEndFactory backEndBits) {
         this.outputNode = outputNode;
         this.whichPhase = whichPhase;

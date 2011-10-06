@@ -9,8 +9,8 @@ import at.dms.kjc.backendSupport.CodeStoreHelperSimple;
 import at.dms.kjc.backendSupport.CodeStoreHelperSplitter;
 import at.dms.kjc.backendSupport.GetOrMakeChannel;
 import at.dms.kjc.backendSupport.ProcessFilterWorkNode;
-import at.dms.kjc.backendSupport.ProcessInputSliceNode;
-import at.dms.kjc.backendSupport.ProcessOutputSliceNode;
+import at.dms.kjc.backendSupport.ProcessInputFilterNode;
+import at.dms.kjc.backendSupport.ProcessOutputFilterNode;
 import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
@@ -92,7 +92,7 @@ public class UniBackEndFactory extends BackEndFactory<
     @Override
     public void processFilterInputNode(InputNode input,
             SchedulingPhase whichPhase, UniProcessors computeNodes) {
-        new ProcessInputSliceNode(input,whichPhase,this).processInputSliceNode();
+        new ProcessInputFilterNode(input,whichPhase,this).processInputSliceNode();
 
     }
     
@@ -133,7 +133,7 @@ public class UniBackEndFactory extends BackEndFactory<
     @Override
     public void processFilterOutputNode(OutputNode output,
             SchedulingPhase whichPhase, UniProcessors computeNodes) {
-        new ProcessOutputSliceNode(output,whichPhase,this).processOutputSliceNode();
+        new ProcessOutputFilterNode(output,whichPhase,this).processOutputSliceNode();
 
     }
 

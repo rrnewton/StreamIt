@@ -1510,8 +1510,8 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @return the new JRelationalExpression
      */
     public static JExpression makeEqualityCondition(String leftVar, String rightVar) {			
-		return new JRelationalExpression(null,
-						Constants.OPE_EQ,
+		return new JEqualityExpression(null,
+						true,
 						makeJLocalVariableExpression(leftVar), 
 						makeJLocalVariableExpression(rightVar));
 	}

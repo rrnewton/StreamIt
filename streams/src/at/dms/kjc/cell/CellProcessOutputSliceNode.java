@@ -15,11 +15,11 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ProcessFilterWorkNode;
-import at.dms.kjc.backendSupport.ProcessOutputSliceNode;
+import at.dms.kjc.backendSupport.ProcessOutputFilterNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 
-public class CellProcessOutputSliceNode extends ProcessOutputSliceNode {
+public class CellProcessOutputSliceNode extends ProcessOutputFilterNode {
 
     private CellComputeCodeStore ppuCS;
     private CellComputeCodeStore initCodeStore; 

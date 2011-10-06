@@ -102,12 +102,9 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
-		System.out.println("InterSSGChannel::getInputBuffersOnCore(n)");
-		System.out.println("InterSSGChannel::getInputBuffersOnCore(n) inputBuffers.size()==" + inputBuffers.size());
 		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();        
 		for (InterSSGChannel b : inputBuffers.values()) {
-			//if (SMPBackend.scheduler.getComputeNode(b.getFilterNode()).equals(t))
-				set.add(b);
+			set.add(b);
 		}
 		return set;
 	}
@@ -127,7 +124,6 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param buf
 	 */
 	public static void setInputBuffer(WorkNode node, InterSSGChannel buf) {
-		System.out.println("===> InterSSGChannel::setInputBuffer node=" + node.toString());
 		inputBuffers.put(node, buf);
 	}
 	

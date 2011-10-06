@@ -122,7 +122,7 @@ public class GetOrMakeChannel  {
                 if (backEndBits.sliceNeedsJoinerCode(s)) {
                     // joiner code connected directly to filter via a channel
                     // containing no storage
-                    String popName = ProcessInputSliceNode.getJoinerCode(
+                    String popName = ProcessInputFilterNode.getJoinerCode(
                             (InputNode) src, backEndBits)
                             .getMethods()[0].getName();
                     c = UnbufferredPopChannel.getChannel(e, popName);
@@ -160,7 +160,7 @@ public class GetOrMakeChannel  {
                 // the channel just needs to provide the name of the splitter entry point
                 // for push() from the filter.
                 String pushName = 
-                    ProcessOutputSliceNode.getSplitterCode((OutputNode)dst,backEndBits).
+                    ProcessOutputFilterNode.getSplitterCode((OutputNode)dst,backEndBits).
                         getMethods()[0].getName();
                 c = UnbufferredPushChannel.getChannel(e,pushName);
                 for (InterFilterEdge joiner_edge : ((OutputNode) dst).getDestSequence(SchedulingPhase.STEADY)) {
