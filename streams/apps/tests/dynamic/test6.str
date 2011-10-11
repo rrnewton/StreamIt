@@ -31,17 +31,15 @@ int->int stateful filter C {
      count = 0;
   }    
     work pop * push 1 {
-      int amount = pop();
-      int i;
-      for(i=0; i < amount; i++)
-          pop();
-      push(count++);      
+      count++;
+      push(pop());      
    }
 }
 
 int->void filter D {
    work pop 1 {
-     println(pop());
+     int amount = pop() + 1; 
+     println(amount);
    }
 }
 
