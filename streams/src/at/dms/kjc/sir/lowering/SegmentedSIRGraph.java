@@ -114,18 +114,18 @@ public class SegmentedSIRGraph implements StreamVisitor {
 
 	@Override
 	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) { /*
-	 * Do
-	 * nothing
-	 * yet
-	 */
+																			 * Do
+																			 * nothing
+																			 * yet
+																			 */
 	}
 
 	@Override
 	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) { /*
-	 * Do
-	 * nothing
-	 * yet
-	 */
+																				 * Do
+																				 * nothing
+																				 * yet
+																				 */
 	}
 
 	@Override
@@ -135,23 +135,24 @@ public class SegmentedSIRGraph implements StreamVisitor {
 
 	@Override
 	public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) { /*
-	 * Do
-	 * nothing
-	 * yet
-	 */
+																			 * Do
+																			 * nothing
+																			 * yet
+																			 */
 	}
 
 	@Override
 	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
-		/* Do nothing yet */	
+		/* Do nothing yet */
 	}
 
 	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
-		//		System.out.println(this.getClass().getCanonicalName() + " visitFilter() "
-		//				+ self.getName() + " isDynamicPush=" + isDynamicPush(self)
-		//				+ " isDynamicPop=" + isDynamicPop(self) + " iter.getPos="
-		//				+ iter.getPos());
+		// System.out.println(this.getClass().getCanonicalName() +
+		// " visitFilter() "
+		// + self.getName() + " isDynamicPush=" + isDynamicPush(self)
+		// + " isDynamicPop=" + isDynamicPop(self) + " iter.getPos="
+		// + iter.getPos());
 
 		SIRFilter filter = (SIRFilter) ObjectDeepCloner.deepCopy(self);
 
@@ -189,7 +190,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 			pipelineChildren.add(createSink(self, iter));
 			endPipeline();
 			startPipeline();
-		}		
+		}
 	}
 
 	private void endPipeline() {
