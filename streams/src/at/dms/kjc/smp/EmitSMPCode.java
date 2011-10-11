@@ -654,17 +654,13 @@ public class EmitSMPCode extends EmitCode {
 			if (c.assignFromPopMethod() != null) { c.assignFromPopMethod().accept(codegen); }
 			if (c.popManyMethod() != null) { c.popManyMethod().accept(codegen); }
 		}
-		p.println("");
+		p.println("");				
 		
-		System.out.println("--> Spot E");
-		
-		for (InterSSGChannel c : dynamicInputBuffers) {			
-			if (c.popMethod() != null) { c.popMethod().accept(codegen); }
+		for (InterSSGChannel c : dynamicInputBuffers) {						
+			c.popMethod().accept(codegen); 
 		}
-
+		
 		p.println("");
-
-		System.out.println("--> Spot F");
 		
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
@@ -675,17 +671,14 @@ public class EmitSMPCode extends EmitCode {
 		//handle the buffer initialization method separately because we do not want it
 		//optimized (it is not in the methods list of the code store
 		((Core)n).getComputeCode().getBufferInitMethod().accept(codegen);
-
-		System.out.println("--> Spot G");
 		
 		// generate functions for methods
 		codegen.setDeclOnly(false);
-
+		
 		for (JMethodDeclaration method : fieldsAndMethods.getMethods()) {
 			method.accept(codegen);
 		}
 		
-		System.out.println("--> Spot H");
 	}
 
 	public static void generateSetAffinity(CodegenPrintWriter p) {

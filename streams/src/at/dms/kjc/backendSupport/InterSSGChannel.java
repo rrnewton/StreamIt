@@ -281,13 +281,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 						new JEmittedTextExpression(
 								"q->first = (q->first + 1) & q->max")));
 		methodBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression("return elem")));
-
-		// queue_pop(queue_ctx_ptr q, TYPE * retval) {
+				new JEmittedTextExpression("return elem")));		
 
 		new JFormalParameter(formalParamType, formalParamName);
 
-		// JFormalParameter param =
 		JMethodDeclaration popMethod = new JMethodDeclaration(CStdType.Integer,
 				"queue_pop", new JFormalParameter[] { new JFormalParameter(
 						formalParamType, formalParamName) }, methodBody);

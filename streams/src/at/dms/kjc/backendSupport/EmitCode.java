@@ -294,7 +294,7 @@ assert false : "This feature is unsupported for iteration count";
         p.print(" = ");
         right.accept(this);
         printRParen();
-        System.out.println();
+       
     }
 
 
