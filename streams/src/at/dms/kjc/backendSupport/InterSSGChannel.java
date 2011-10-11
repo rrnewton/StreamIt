@@ -20,11 +20,14 @@ import at.dms.kjc.JIfStatement;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
+import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.smp.Core;
+import at.dms.kjc.smp.SMPBackend;
 import at.dms.kjc.smp.Util;
 import at.dms.util.Utils;
 
@@ -62,8 +65,8 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	private static void createInputBuffers(StreamGraph streamGraph) {
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
 			Filter top = ssg.getTopFilters()[0];
-			List<InterSSGEdge> links = ssg.getInputPort().getLinks();
-			if (links.size() == 0) {
+			InputPort inputPort = ssg.getInputPort();
+			if (inputPort == null) {
 				continue;
 			}
 			InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);
@@ -83,6 +86,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 */
 	private static void createOutputBuffers(StreamGraph streamGraph) {
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
+			OutputPort outputPort = ssg.getOutputPort();
+			if (outputPort == null) {
+				continue;
+			}
 			List<InterSSGEdge> links = ssg.getOutputPort().getLinks();
 			if (links.size() == 0) {
 				continue;
@@ -117,10 +124,25 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 */
 	public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
 		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
+		System.out
+				.println("InterSSGChannel.getInputBuffersOnCore inputBuffers.values().size()="
+						+ inputBuffers.values().size());
 		for (InterSSGChannel b : inputBuffers.values()) {
-			set.add(b);
+
+			InterSSGEdge edge = b.getEdge();
+			InputPort iport = edge.getDest();
+			StaticSubGraph ssg = iport.getSSG();
+			Filter top[] = ssg.getFilterGraph();
+
+			if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
+					.equals(t))
+				set.add(b);
 		}
 		return set;
+	}
+
+	private InterSSGEdge getEdge() {
+		return theEdge;
 	}
 
 	/**
@@ -130,6 +152,9 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 */
 	public static Channel<InterSSGEdge> getOutputBuffer(WorkNode filterNode,
 			StaticSubGraph ssg) {
+		if (ssg.getOutputPort() == null) {
+			return null;
+		}
 		InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
 		return new InterSSGChannel(edge);
 	}
@@ -139,16 +164,18 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param n
 	 * @return
 	 */
-	public static Set<InterSSGChannel> getOutputBuffersOnCore(Core n) {
-		System.out.println("InterSSGChannel::getOutputBuffersOnCore(n)");
-		System.out
-				.println("InterSSGChannel::getOutputBuffersOnCore(n) outputBuffers.size()=="
-						+ outputBuffers.size());
+	public static Set<InterSSGChannel> getOutputBuffersOnCore(Core t) {
 		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
 		for (InterSSGChannel b : outputBuffers.values()) {
-			// if
-			// (SMPBackend.scheduler.getComputeNode(b.getFilterNode()).equals(t))
-			set.add(b);
+
+			InterSSGEdge edge = b.getEdge();
+			OutputPort port = edge.getSrc();
+			StaticSubGraph ssg = port.getSSG();
+			Filter top[] = ssg.getFilterGraph();
+
+			if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
+					.equals(t))
+				set.add(b);
 		}
 		return set;
 	}
@@ -171,7 +198,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		outputBuffers.put(node, buf);
 	}
 
-	private WorkNode filterNode;
+	// private WorkNode filterNode;
 
 	/**
 	 * @param edge
@@ -186,23 +213,13 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	public List<JStatement> dataDecls() {
 		// System.out.println("InterSSGChannel::dataDecls()");
 		List<JStatement> statements = new LinkedList<JStatement>();
-		JStatement stmt = new JExpressionStatement(new
-				JEmittedTextExpression("static queue_ctx_ptr dyn_read_current;"));
-		statements.add(stmt);		
-		stmt = new JExpressionStatement(new
-				JEmittedTextExpression("static queue_ctx_ptr dyn_write_current;"));
-		statements.add(stmt);		
-		return statements;
-		//return new LinkedList<JStatement>();
-	}
-
-	/**
-	 * Return the filter this buffer is associated with.
-	 * 
-	 * @return Return the filter this buffer is associated with.
-	 */
-	public WorkNode getFilterNode() {
-		return filterNode;
+		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
+				"static queue_ctx_ptr dyn_read_current;"));
+		statements.add(stmt);
+		stmt = new JExpressionStatement(new JEmittedTextExpression(
+				"static queue_ctx_ptr dyn_write_current;"));
+		statements.add(stmt);
+		return statements;		
 	}
 
 	/**
@@ -231,60 +248,70 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	}
 
 	public JMethodDeclaration popMethod() {
-		for (String str : types) {
-			System.out.print("Type is: " + str);
-		}
-				
+		// for (String str : types) {
+		// System.out.print("Type is: " + str);
+		// }
+		System.out.println("popMethod");
 		JBlock methodBody = new JBlock();
 		JBlock ifBody = new JBlock();
-		
+
 		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
 		ifBody.addStatement(Util.toStmt("/* *write_d_multiplier  = 0; */"));
 
 		Utils.addSetFlag(ifBody, 0, "MASTER", "MASTER", "AWAKE");
-		Utils.addSignal(ifBody, 0, "MASTER");	
-		
-		Utils.addCondWait(ifBody, 0, "DYN_READER", "DYN_READER", 
-				Utils.makeEqualityCondition("q->size", "0"));				
-				
-		JIfStatement ifStatement = Utils.makeIfStatement(Utils.makeEqualityCondition("q->size", "0"), ifBody);						
-				
-		methodBody.addStatement(ifStatement);	
-		
+		Utils.addSignal(ifBody, 0, "MASTER");
+
+		Utils.addCondWait(ifBody, 0, "DYN_READER", "DYN_READER",
+				Utils.makeEqualityCondition("q->size", "0"));
+
+		JIfStatement ifStatement = Utils.makeIfStatement(
+				Utils.makeEqualityCondition("q->size", "0"), ifBody);
+
+		methodBody.addStatement(ifStatement);
+
 		String formalParamName = "q";
 		CType formalParamType = new CEmittedTextType("queue_ctx_ptr");
 
-		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("int elem = q->buffer[q->first]")));
-		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("q->size--")));
-		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("q->first = (q->first + 1) & q->max")));
-		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("return elem")));
+		methodBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression("int elem = q->buffer[q->first]")));
+		methodBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression("q->size--")));
+		methodBody
+				.addStatement(new JExpressionStatement(
+						new JEmittedTextExpression(
+								"q->first = (q->first + 1) & q->max")));
+		methodBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression("return elem")));
 
-		//		queue_pop(queue_ctx_ptr q, TYPE * retval) {
+		// queue_pop(queue_ctx_ptr q, TYPE * retval) {
 
 		new JFormalParameter(formalParamType, formalParamName);
-		
-		//JFormalParameter param = 
-		JMethodDeclaration popMethod = new JMethodDeclaration(CStdType.Integer, "queue_pop", 				
-				new JFormalParameter[]{new JFormalParameter(formalParamType, formalParamName)},
-				methodBody);
-		return popMethod;		
+
+		// JFormalParameter param =
+		JMethodDeclaration popMethod = new JMethodDeclaration(CStdType.Integer,
+				"queue_pop", new JFormalParameter[] { new JFormalParameter(
+						formalParamType, formalParamName) }, methodBody);
+		System.out.println("leaving popMethod");
+		return popMethod;
 	}
 
 	public List<JStatement> readDeclsExtern() {
-//		List<JStatement> statements = new LinkedList<JStatement>();
-//		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-//				"extern queue_ctx_ptr dyn_queue"));
-//		statements.add(stmt);
-//		return statements;
+		// List<JStatement> statements = new LinkedList<JStatement>();
+		// JStatement stmt = new JExpressionStatement(new
+		// JEmittedTextExpression(
+		// "extern queue_ctx_ptr dyn_queue"));
+		// statements.add(stmt);
+		// return statements;
 		return new LinkedList<JStatement>();
 	}
 
 	public List<JStatement> writeDeclsExtern() {
-//		List<JStatement> statements = new LinkedList<JStatement>();
-//		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-//				"extern queue_ctx_ptr dyn_queue"));
-//		statements.add(stmt);
-//		return statements;
+		// List<JStatement> statements = new LinkedList<JStatement>();
+		// JStatement stmt = new JExpressionStatement(new
+		// JEmittedTextExpression(
+		// "extern queue_ctx_ptr dyn_queue"));
+		// statements.add(stmt);
+		// return statements;
 		return new LinkedList<JStatement>();
 	}
 

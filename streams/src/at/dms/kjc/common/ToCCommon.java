@@ -898,7 +898,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression exp) { 
     	
-    	System.out.println("HERE: " + exp);
+    	System.out.println("ToCCommon.visitPrintStatement(self, exp), exp=" + exp);
     	printExp(exp);
         
         if (self.getNewline()) {

@@ -325,8 +325,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
      * Return the set of all the InputBuffers that are mapped to Core t.
      */
     public static Set<InputRotatingBuffer> getInputBuffersOnCore(Core t) {
-        HashSet<InputRotatingBuffer> set = new HashSet<InputRotatingBuffer>();
-        
+        HashSet<InputRotatingBuffer> set = new HashSet<InputRotatingBuffer>();        
         for (InputRotatingBuffer b : inputBuffers.values()) {
             if (SMPBackend.scheduler.getComputeNode(b.getFilterNode()).equals(t))
                 set.add(b);

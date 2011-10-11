@@ -15,7 +15,7 @@ public class SMPBackend {
 	public static SMPBackEndFactory backEndFactory;
 	public static Structs_h structs_h;
 	public static int[] coreOrder = { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13,
-			6, 14, 7, 15 };
+		6, 14, 7, 15 };
 
 	private static boolean isDynamic = false;
 
@@ -88,7 +88,7 @@ public class SMPBackend {
 		if (KjcOptions.partitioner.equals("oldtmd")) {
 			if (KjcOptions.sharedbufs) {
 				System.out
-						.println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
+				.println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
 				KjcOptions.sharedbufs = false;
 			}
 		}
@@ -140,7 +140,6 @@ public class SMPBackend {
 	public static void run(SIRStream str, JInterfaceDeclaration[] interfaces,
 			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
 			SIRHelper[] helpers, SIRGlobal global) {
-		System.out.println("Entry to SMP Backend...");
 
 		checkArguments();
 		setScheduler();
@@ -209,7 +208,7 @@ public class SMPBackend {
 
 		// dump final slice graph to dot file
 		graphSchedule.getSSG()
-				.dumpGraph("after_slice_partition.dot", scheduler);
+		.dumpGraph("after_slice_partition.dot", scheduler);
 		graphSchedule.getSSG().dumpGraph("slice_graph.dot", scheduler, false);
 
 		// if load balancing, find candidiate fission groups to load balance
@@ -255,7 +254,7 @@ public class SMPBackend {
 		// when ready
 		if (at.dms.kjc.smp.SMPBackend.scheduler.isSMD())
 			new at.dms.kjc.smp.GeneratePrimePumpScheduleSMD(schedule)
-					.schedule(slicer.getFilterGraph());
+		.schedule(slicer.getFilterGraph());
 		else
 			new GeneratePrimePump(schedule).schedule(slicer.getFilterGraph());
 
@@ -268,17 +267,13 @@ public class SMPBackend {
 	 * scheduling policy.
 	 */
 	private static void setScheduler() {
-		System.out
-				.println("********************* scheduler setScheduler called!");
 		if (KjcOptions.partitioner.equals("tmd")) {
-			System.out
-					.println("********************* scheduler is TMDBinPackFissAll!");
 			scheduler = new TMDBinPackFissAll();
 		} else if (KjcOptions.partitioner.equals("oldtmd")) {
-			System.out.println("********************* scheduler is oldtmd!");
+
 			scheduler = new TMD();
 		} else if (KjcOptions.partitioner.equals("smd")) {
-			System.out.println("********************* scheduler is smd!");
+
 			scheduler = new SMD();
 		} else {
 			System.err.println("Unknown Scheduler Type!");

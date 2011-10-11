@@ -283,13 +283,10 @@ public class StaticSubGraph {
 			FlatNode node = dataFlow.next();
 
 			if (node.getName().contains("DummySource")
-					|| node.getName().contains("DummySink")) {
-				System.out.println("<<<<<<<<<<<< Skipping the node: "
-						+ node.getName());
+					|| node.getName().contains("DummySink")) {				
 				continue;
 			}
 
-			// System.out.println(node);
 			InputNode input = filterNodes.inputNodes.get(node.contents);
 			OutputNode output = filterNodes.outputNodes.get(node.contents);
 			WorkNode filterNode = filterNodes.filterNodes.get(node.contents);
@@ -327,13 +324,7 @@ public class StaticSubGraph {
 				LinkedList<InterFilterEdge> outEdges = new LinkedList<InterFilterEdge>();
 				LinkedList<Integer> outWeights = new LinkedList<Integer>();
 				HashMap<InputNode, InterFilterEdge> newEdges = new HashMap<InputNode, InterFilterEdge>();
-				for (int i = 0; i < node.ways; i++) {
-
-					System.out.println(this.getClass().getCanonicalName()
-							+ ". in for loop iteration=" + i);
-					System.out.println(this.getClass().getCanonicalName()
-							+ ". node.weights[i]=" + node.weights[i]);
-
+				for (int i = 0; i < node.ways; i++) {			
 					if (node.weights[i] == 0)
 						continue;
 					InterFilterEdge edge = new InterFilterEdge(
@@ -379,10 +370,7 @@ public class StaticSubGraph {
 					output.setDests(new InterFilterEdge[0][0]);
 				}
 			}
-
-			System.out.println("+++++ StaticSubGraph.flatten() Filter node="
-					+ node.getName());
-
+	
 			// set up the joining, the edges should exist already from upstream
 			// System.out.println("  inputs: " + node.inputs);
 
@@ -622,27 +610,21 @@ public class StaticSubGraph {
 	/**
 	 * @return
 	 */
-	public boolean hasDynamicInput() {
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput()");
-		if (inputPort.getLinks().size() > 0) {
-			System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput() = true");
-			return true;
-		}
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicInput() = false");
-		return false;
-	}
+	public boolean hasDynamicInput() {		
+		if (inputPort == null) {
+			return false;
+		}				
+		return true;
+	}		
 
 	/**
 	 * @return
 	 */
 	public boolean hasDynamicOutput() {
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput()");
-		if (outputPort.getLinks().size() > 0) {
-			System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = true");
-			return true;
-		} 
-		System.out.println(this.getClass().getCanonicalName() + ".hasDynamicOutput() = false");
-		return false;
+		if (outputPort == null) {
+			return false;
+		}
+		return true;		
 	}
 
 	/**

@@ -27,7 +27,7 @@ public abstract class OutputPort {
 		links.add(link);		
 	}
 
-	public StaticSubGraph getSGG() {
+	public StaticSubGraph getSSG() {
 		return ssg;
 	}
 

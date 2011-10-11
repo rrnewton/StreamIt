@@ -78,24 +78,13 @@ public class DynamismFinder implements StreamVisitor {
 	public DynamismFinder() {
 		// Do nothing
 	}
-	
-	/**
-	 * Remove when stable.
-	 * @param str
-	 */
-	private void log(String str) {
-		boolean debug = true;
-		if (debug)
-			System.out.println(str);
-	}	
 
 	/**
 	 * Vists all filters in str to check for dynamic rates.
 	 * @param str the stream to check for dynamic rates.
 	 * @return true if str contains a dynamic rate.
 	 */
-	public Result find(SIRStream str) {
-		log(this.getClass().getCanonicalName() + " find()");
+	public Result find(SIRStream str) {		
 		result = new Result();		
 		IterFactory.createFactory().createIter(str).accept(this);
 		return result;
@@ -109,7 +98,6 @@ public class DynamismFinder implements StreamVisitor {
 	 */
 	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
-		log(this.getClass().getCanonicalName() + " visitFilter() " + self.getName());
 		if (isDynamicPop(self)) {
 			result.setDynamic(true);
 			result.addDynamicFilter(self);

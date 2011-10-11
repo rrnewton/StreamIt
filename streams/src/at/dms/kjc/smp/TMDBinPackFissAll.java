@@ -59,10 +59,7 @@ public class TMDBinPackFissAll extends Scheduler {
      */
     public void runLayout() {    	
         assert graphSchedule != null : 
-            "Must set the graph schedule (multiplicities) before running layout";
-        
-        System.out.println("TMDBinPackFissAll::runLayout");	
-        System.out.println("TMDBinPackFissAll::");	
+            "Must set the graph schedule (multiplicities) before running layout";            	
         
         LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         HashSet<Filter> fizzedSlices = new HashSet<Filter>();

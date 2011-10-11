@@ -65,26 +65,7 @@ public class ProcessFilterWorkNode {
 			Channel inputChannel, Channel outputChannel,
 			SMPBackEndFactory backEndBits, boolean isDynamicPop,
 			boolean isDynamicPush) {
-		System.out.println("smp.ProcessFilterSliceNode.getFilterCode()");
-
-		System.out.println("smp.ProcessFilterSliceNode.getFilterCode() filter="
-				+ filter.toString());
-		if (inputChannel == null) {
-			System.out
-					.println("smp.ProcessFilterSliceNode.getFilterCode() inputChannel=null");
-		} else {
-			System.out
-					.println("smp.ProcessFilterSliceNode.getFilterCode() inputChannel=non-null");
-		}
-
-		if (outputChannel == null) {
-			System.out
-					.println("smp.ProcessFilterSliceNode.getFilterCode() outputChannel=null");
-		} else {
-			System.out
-					.println("smp.ProcessFilterSliceNode.getFilterCode() outputChannel=non-null");
-		}
-
+		
 		CodeStoreHelper filterCode = CodeStoreHelper
 				.findHelperForSliceNode(filter);
 		if (filterCode == null) {
@@ -260,7 +241,7 @@ public class ProcessFilterWorkNode {
 		// remember that this tile has code that needs to execute
 		codeStore.setHasCode();		
 		
-		System.out.println("smp.ProcessFilterSliceNode.doit()");
+		System.out.println("smp.ProcessFilterWorkNode.doit()");
 
 		filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
 		// We should only generate code once for a filter node.
@@ -290,13 +271,13 @@ public class ProcessFilterWorkNode {
 
 //			System.out
 //					.println("**********************************************");
-//			System.out.println("smp.ProcessFilterSliceNode.doit() filterNode="
+//			System.out.println("smp.ProcessFilterWorkNode.doit() filterNode="
 //					+ filterNode.toString());
 //			System.out
-//					.println("smp.ProcessFilterSliceNode.doit() ssg.hasDynamicInput()="
+//					.println("smp.ProcessFilterWorkNode.doit() ssg.hasDynamicInput()="
 //							+ ssg.hasDynamicInput());
 //			System.out
-//					.println("smp.ProcessFilterSliceNode.doit() ssg.hasDynamicOutput()="
+//					.println("smp.ProcessFilterWorkNode.doit() ssg.hasDynamicOutput()="
 //							+ ssg.hasDynamicOutput());
 			
 

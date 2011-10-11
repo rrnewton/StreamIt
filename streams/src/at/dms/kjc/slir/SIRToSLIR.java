@@ -3,6 +3,8 @@
  */
 package at.dms.kjc.slir;
 
+import java.util.List;
+
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
 
@@ -13,13 +15,7 @@ import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
 public class SIRToSLIR {
 
 	public SIRToSLIR() {
-		log(this.getClass().getCanonicalName() + " SIRToSLIR()");
-	}
-
-	private void log(String str) {
-		boolean debug = true;
-		if (debug)
-			System.out.println(str);
+		/* do nothing */
 	}
 
 	/**
@@ -37,25 +33,31 @@ public class SIRToSLIR {
 	 * @return
 	 */
 	public StreamGraph translate(SegmentedSIRGraph segmentedGraph, int numCores) {
-		log(this.getClass().getCanonicalName() + " translate()");
 
+		List<SIRStream> ssgs = segmentedGraph.getStaticSubGraphs();
+		
+		/* StreamGraph contains all of the StaticSubGraphs */
 		StreamGraph streamGraph = new StreamGraph();
-		OutputPort prevOutputPort = null;
-		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
-			InputPort inputPort = new UnaryInputPort(null);
-			OutputPort outputPort = new UnaryOutputPort(null);
 			
-			if (prevOutputPort != null) {
-				InterSSGEdge link = new InterSSGEdge(prevOutputPort, inputPort);				
-				inputPort.addLink(link);
-				prevOutputPort.addLink(link);
-			}
-
-
-			
-			log(this.getClass().getCanonicalName() + " str=" + str.getName());						
-			streamGraph.addSSG(new StaticSubGraph().init(streamGraph, str, inputPort, outputPort));		
-			prevOutputPort = outputPort;
+		SIRStream str = ssgs.get(0);		
+		InputPort inputPort = null;
+		OutputPort outputPort = null;
+		StaticSubGraph src = new StaticSubGraph().init(streamGraph, str, inputPort, outputPort);
+		streamGraph.addSSG(src);
+		
+		for (int i = 1; i < ssgs.size(); i++) {
+								
+			StaticSubGraph dst = new StaticSubGraph();		
+			outputPort = new UnaryOutputPort(dst);			
+			src.setOutputPort(outputPort);			
+			inputPort = new UnaryInputPort(src);			
+			str = ssgs.get(i);
+			dst.init(streamGraph, str, inputPort, null);			
+			InterSSGEdge link = new InterSSGEdge(outputPort, inputPort);				
+			inputPort.addLink(link);
+			outputPort.addLink(link);						
+			streamGraph.addSSG(dst);						
+			src = dst;
 		}
 
 		return streamGraph;

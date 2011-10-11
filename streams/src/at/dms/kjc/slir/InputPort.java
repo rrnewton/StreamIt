@@ -41,7 +41,7 @@ public abstract class InputPort {
 		links.add(link);
 	}
 
-	public StaticSubGraph getSSH() {
+	public StaticSubGraph getSSG() {
 		return ssg;
 	}
 

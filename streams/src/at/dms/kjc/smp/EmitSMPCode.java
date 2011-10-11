@@ -576,8 +576,7 @@ public class EmitSMPCode extends EmitCode {
 
 		JStatement success = new JExpressionStatement(new JEmittedTextExpression("static int success"));
 		success.accept(codegen); p.println();
-
-
+				
 		for (InterSSGChannel c : dynamicInputBuffers) {
 			if (c.readDeclsExtern() != null) {
 				for (JStatement d : c.readDeclsExtern()) { 
@@ -585,7 +584,7 @@ public class EmitSMPCode extends EmitCode {
 				}
 			}
 		}
-
+		
 		for (InterSSGChannel c : dynamicOutputBuffers) {
 			if (c.writeDeclsExtern() != null) {
 				for (JStatement d : c.writeDeclsExtern()) { 
@@ -593,7 +592,6 @@ public class EmitSMPCode extends EmitCode {
 				}
 			}        	
 		}
-
 
 		for (InterSSGChannel c : dynamicInputBuffers) {
 			if (c.readDeclsExtern() != null) {
@@ -603,7 +601,6 @@ public class EmitSMPCode extends EmitCode {
 			}
 		}
 
-				
 		// externs
 		for (RotatingBuffer c : outputBuffers) {
 			if (c.writeDeclsExtern() != null) {
@@ -659,13 +656,16 @@ public class EmitSMPCode extends EmitCode {
 		}
 		p.println("");
 		
-		for (InterSSGChannel c : dynamicInputBuffers) {
-			System.out.println("--> InterSSGChannel");
+		System.out.println("--> Spot E");
+		
+		for (InterSSGChannel c : dynamicInputBuffers) {			
 			if (c.popMethod() != null) { c.popMethod().accept(codegen); }
 		}
 
 		p.println("");
 
+		System.out.println("--> Spot F");
+		
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
 			field.accept(codegen);
@@ -676,12 +676,16 @@ public class EmitSMPCode extends EmitCode {
 		//optimized (it is not in the methods list of the code store
 		((Core)n).getComputeCode().getBufferInitMethod().accept(codegen);
 
+		System.out.println("--> Spot G");
+		
 		// generate functions for methods
 		codegen.setDeclOnly(false);
 
 		for (JMethodDeclaration method : fieldsAndMethods.getMethods()) {
 			method.accept(codegen);
 		}
+		
+		System.out.println("--> Spot H");
 	}
 
 	public static void generateSetAffinity(CodegenPrintWriter p) {
