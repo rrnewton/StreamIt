@@ -175,6 +175,7 @@ public class SMPBackend {
 		Map<Filter, Integer> threadMap = new HashMap<Filter, Integer>();
 
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
+			
 			runSSG(ssg, threadMap);
 		}
 
@@ -187,6 +188,10 @@ public class SMPBackend {
 	private static void runSSG(StaticSubGraph ssg,
 			Map<Filter, Integer> threadMap) {// , CommonPasses commonPasses) {
 
+		System.out.println("SMPBackend.runSSG ssg=" +
+				ssg.getTopFilters()[0].getWorkNode() 				
+				);
+		
 		// dump slice graph to dot file
 		ssg.dumpGraph("traces.dot", null);
 

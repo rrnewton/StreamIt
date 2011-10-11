@@ -123,17 +123,12 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
-		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
-		System.out
-				.println("InterSSGChannel.getInputBuffersOnCore inputBuffers.values().size()="
-						+ inputBuffers.values().size());
+		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();		
 		for (InterSSGChannel b : inputBuffers.values()) {
-
 			InterSSGEdge edge = b.getEdge();
 			InputPort iport = edge.getDest();
 			StaticSubGraph ssg = iport.getSSG();
 			Filter top[] = ssg.getFilterGraph();
-
 			if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
 					.equals(t))
 				set.add(b);
@@ -214,10 +209,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		// System.out.println("InterSSGChannel::dataDecls()");
 		List<JStatement> statements = new LinkedList<JStatement>();
 		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-				"static queue_ctx_ptr dyn_read_current;"));
+				"static queue_ctx_ptr dyn_read_current = dyn_buf_0"));
 		statements.add(stmt);
 		stmt = new JExpressionStatement(new JEmittedTextExpression(
-				"static queue_ctx_ptr dyn_write_current;"));
+				"static queue_ctx_ptr dyn_write_current = dyn_buf_1"));
 		statements.add(stmt);
 		return statements;		
 	}
@@ -251,7 +246,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		// for (String str : types) {
 		// System.out.print("Type is: " + str);
 		// }
-		System.out.println("popMethod");
+
 		JBlock methodBody = new JBlock();
 		JBlock ifBody = new JBlock();
 
@@ -288,7 +283,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		JMethodDeclaration popMethod = new JMethodDeclaration(CStdType.Integer,
 				"queue_pop", new JFormalParameter[] { new JFormalParameter(
 						formalParamType, formalParamName) }, methodBody);
-		System.out.println("leaving popMethod");
+
 		return popMethod;
 	}
 

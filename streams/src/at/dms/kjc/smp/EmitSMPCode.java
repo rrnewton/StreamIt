@@ -80,7 +80,7 @@ public class EmitSMPCode extends EmitCode {
 					continue;
 
 				core.getComputeCode().addFunctionCallFirst(core.getComputeCode().getBufferInitMethod(), new JExpression[0]);
-
+										
 				if(!KjcOptions.nobind) {
 					JExpression[] setAffinityArgs = new JExpression[1];
 					setAffinityArgs[0] = new JIntLiteral(core.getCoreID());
@@ -165,8 +165,8 @@ public class EmitSMPCode extends EmitCode {
 		if (isDynamic) {
 			// TODO fix number of threads
 			int numDynamicReaders = 1;
-			for (int i = 0; i < 1; i++) {
-				p.println("queue_ctx_ptr dyn_queue;");
+			for (int i = 0; i < 2; i++) {
+				p.println("queue_ctx_ptr dyn_buf_" + i + ";");
 			}       
 			p.println();
 			p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
@@ -217,8 +217,8 @@ public class EmitSMPCode extends EmitCode {
 				if (isDynamic) {
 					p.println();
 					p.println("// Initialize dynamic queues");
-					for (int i = 0; i < 1; i++) {
-						p.println("dyn_queue = queue_create();");
+					for (int i = 0; i < 2; i++) {
+						p.println("dyn_buf_" + i + " = queue_create();");
 					}
 					p.println();
 					p.println("// Initialize mutexes and condition variables");
@@ -267,6 +267,19 @@ public class EmitSMPCode extends EmitCode {
 					p.outdent();
 				}
 
+				
+				
+				if (isDynamic) {
+					p.println();
+					p.println("pthread_t helper" + ";");
+					p.println("if ((rc = pthread_create(&helper" + ", NULL, " +
+							"helper__3" + ", (void *)NULL)) < 0)");
+					p.indent();
+					p.println("printf(\"Error creating helper " +  ": %d\\n\", rc);");
+					p.outdent();
+					
+				}
+				
 				p.println();
 				p.println("pthread_attr_destroy(&attr);");
 
@@ -358,7 +371,14 @@ public class EmitSMPCode extends EmitCode {
 			p.println("extern void *" + core.getComputeCode().getMyMainName() + "(void * arg);");
 		}
 		p.println();
-
+		
+		p.println("// Helper entry points");
+		// TODO: Why is this names helper__3??
+		for(int i = 0; i < 1; i++) {		
+			p.println("extern void * helper__3 " +  "(void * arg);");
+		}
+		p.println();
+		
 		p.println("#endif");
 		p.close();
 	}

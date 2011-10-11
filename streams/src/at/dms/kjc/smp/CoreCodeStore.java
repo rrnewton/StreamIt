@@ -257,6 +257,11 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		this.setHasCode();
 	}
 
+	
+	public void addExpressionFirst(JExpression expr) {
+		mainMethod.addStatementFirst(new JExpressionStatement(expr));
+	}
+	
 	/**
 	 * Add txt to the beginning of the method that will perform the allocation
 	 * of buffers and receive addresses of buffers from downstream cores. Don't
@@ -421,10 +426,16 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 
 	// TODO: fix this to add more code into the thread
 	public void addThreadHelper(JStatement steadyBlock) {
-		if (1 < 2) {
-			return;
-		}
+		
+		
 		System.out.println("CoreCodeStore.addThreadHelper called()");
+		
+		// TODO check this
+	
+		// Make Sure that the buffers are set
+		addExpressionFirst(new JEmittedTextExpression("dyn_read_current = dyn_buf_0"));
+		addExpressionFirst(new JEmittedTextExpression("dyn_write_current = dyn_buf_1"));
+	
 		
 		JBlock methodBody = new JBlock();
 		JBlock whileBody = new JBlock();
@@ -454,8 +465,12 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		// block.addStatement(steadyBlock);
 						
 		methodBody.addStatement(whileLoop);
-		
-		JMethodDeclaration threadHelper = new JMethodDeclaration(CStdType.Void, "helper", new JFormalParameter[0],
+
+		JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
+                		
+		JMethodDeclaration threadHelper = 
+				new JMethodDeclaration(CVoidPtrType.VoidPtr, "helper", 
+						new JFormalParameter[]{p},
 				methodBody);
 		
 		addMethod(threadHelper);		
@@ -463,9 +478,8 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 
 	// TODO: Fix this so that it calls the thread function
 	public void addSteadyThreadCall() {		
-		if (1 < 2) {
-			return;
-		}
+	
+		
 		Utils.addSetFlag(steadyLoop, 0, "MASTER", "MASTER", "ASLEEP");
 		Utils.addSetFlag(steadyLoop, 0, "DYN_READER", "DYN_READER", "AWAKE");
 		Utils.addSignal(steadyLoop, 0, "DYN_READER");	
