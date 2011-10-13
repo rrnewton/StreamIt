@@ -427,17 +427,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		return hasCode;
 	}
 
-	/**
-	 * Return the helper thread methods
-	 * @return
-	 */
-	public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {
-		return helperThreadMethods;
-	}
 	
-	public void setDynamicThreadHelperMethods(Set<JMethodDeclaration> methods) {
-		helperThreadMethods = methods;
-	}
 		
 	/**
 	 * 
