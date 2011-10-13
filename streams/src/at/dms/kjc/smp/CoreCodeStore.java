@@ -1,12 +1,12 @@
 package at.dms.kjc.smp;
 
-import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.TokenReference;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import at.dms.kjc.slir.*;
@@ -132,6 +132,8 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 	/** set of FilterSliceNodes that are mapped to this core */
 	protected HashSet<WorkNode> filters;
 
+	private Set<JMethodDeclaration> helperThreadMethods;
+
 	/**
 	 * Constructor: steady state loops indefinitely, no pointer back to compute
 	 * node.
@@ -158,6 +160,8 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		super(nodeType);
 		setMyMainName("__main__");
 		filters = new HashSet<WorkNode>();
+		helperThreadMethods = new HashSet<JMethodDeclaration>();
+
 		createBufferInitMethod();
 
 		mainMethod.addParameter(new JFormalParameter(CVoidPtrType.VoidPtr,
@@ -257,11 +261,10 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		this.setHasCode();
 	}
 
-	
 	public void addExpressionFirst(JExpression expr) {
 		mainMethod.addStatementFirst(new JExpressionStatement(expr));
 	}
-	
+
 	/**
 	 * Add txt to the beginning of the method that will perform the allocation
 	 * of buffers and receive addresses of buffers from downstream cores. Don't
@@ -424,67 +427,70 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		return hasCode;
 	}
 
-	// TODO: fix this to add more code into the thread
-	public void addThreadHelper(JStatement steadyBlock) {
-		
-		
-		System.out.println("CoreCodeStore.addThreadHelper called()");
-		
-		// TODO check this
+	/**
+	 * Return the helper thread methods
+	 * @return
+	 */
+	public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {
+		return helperThreadMethods;
+	}
 	
-		// Make Sure that the buffers are set
-		addExpressionFirst(new JEmittedTextExpression("dyn_read_current = dyn_buf_0"));
-		addExpressionFirst(new JEmittedTextExpression("dyn_write_current = dyn_buf_1"));
-	
-		
-		JBlock methodBody = new JBlock();
-		JBlock whileBody = new JBlock();
-		// JBlock ifBody = new JBlock();
-				
-		Utils.addCondWait(whileBody, 0, "DYN_READER", "DYN_READER", 
-				Utils.makeEqualityCondition("ASLEEP", "DYN_READER"));	
-				
-		whileBody.addStatement(steadyBlock);
-		
-
-		Utils.addSetFlag(whileBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
-		Utils.addSetFlag(whileBody, 0, "MASTER", "MASTER", "AWAKE");
-		Utils.addSignal(whileBody, 0, "MASTER");	
-
-		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("queue_ctx_ptr tmp")));
-		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("tmp =  dyn_read_current")));
-		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("dyn_read_current = dyn_write_current")));
-		whileBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("dyn_write_current = tmp")));
-
-		
-		JStatement whileLoop = new JWhileStatement(null, new JBooleanLiteral(
-				null, true), whileBody, null);
-		
-		//addSteadyLoopStatement(ifStatement);
-		
-		// block.addStatement(steadyBlock);
-						
-		methodBody.addStatement(whileLoop);
-
-		JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
-                		
-		JMethodDeclaration threadHelper = 
-				new JMethodDeclaration(CVoidPtrType.VoidPtr, "helper", 
-						new JFormalParameter[]{p},
-				methodBody);
-		
-		addMethod(threadHelper);		
-	}	
-
-	// TODO: Fix this so that it calls the thread function
-	public void addSteadyThreadCall() {		
-	
-		
-		Utils.addSetFlag(steadyLoop, 0, "MASTER", "MASTER", "ASLEEP");
-		Utils.addSetFlag(steadyLoop, 0, "DYN_READER", "DYN_READER", "AWAKE");
-		Utils.addSignal(steadyLoop, 0, "DYN_READER");	
-		Utils.addCondWait(steadyLoop, 0, "MASTER", "MASTER", 
-					Utils.makeEqualityCondition("ASLEEP", "MASTER"));		
+	public void setDynamicThreadHelperMethods(Set<JMethodDeclaration> methods) {
+		helperThreadMethods = methods;
 	}
 		
+	/**
+	 * 
+	 * @param steadyBlock
+	 */
+	public void addThreadHelper(JStatement steadyBlock) {
+
+		System.out.println("CoreCodeStore.addThreadHelper called()");
+		
+		// TODO Make Sure that the buffers are set
+		addExpressionFirst(new JEmittedTextExpression(
+				"dyn_read_current = dyn_buf_0"));
+		addExpressionFirst(new JEmittedTextExpression(
+				"dyn_write_current = dyn_buf_1"));
+		JBlock methodBody = new JBlock();
+		JBlock whileBody = new JBlock();
+		Utils.addCondWait(whileBody, 0, "DYN_READER", "DYN_READER",
+				Utils.makeEqualityCondition("ASLEEP", "DYN_READER"));
+		whileBody.addStatement(steadyBlock);
+		Utils.addSetFlag(whileBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
+		Utils.addSetFlag(whileBody, 0, "MASTER", "MASTER", "AWAKE");
+		Utils.addSignal(whileBody, 0, "MASTER");
+		whileBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression("queue_ctx_ptr tmp")));
+		whileBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression("tmp =  dyn_read_current")));
+		whileBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression(
+						"dyn_read_current = dyn_write_current")));
+		whileBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression("dyn_write_current = tmp")));
+		JStatement whileLoop = new JWhileStatement(null, new JBooleanLiteral(
+				null, true), whileBody, null);
+		methodBody.addStatement(whileLoop);
+		JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
+		JMethodDeclaration threadHelper = new JMethodDeclaration(
+				CVoidPtrType.VoidPtr, "helper", new JFormalParameter[] { p },
+				methodBody);
+		addHelperThreadMethod(threadHelper);
+	}
+
+	private void addHelperThreadMethod(JMethodDeclaration threadHelper) {
+		helperThreadMethods.add(threadHelper);
+		addMethod(threadHelper);
+	}
+	
+	
+	public void addSteadyThreadCall() {
+		Utils.addSetFlag(steadyLoop, 0, "MASTER", "MASTER", "ASLEEP");
+		Utils.addSetFlag(steadyLoop, 0, "DYN_READER", "DYN_READER", "AWAKE");
+		Utils.addSignal(steadyLoop, 0, "DYN_READER");
+		Utils.addCondWait(steadyLoop, 0, "MASTER", "MASTER",
+				Utils.makeEqualityCondition("ASLEEP", "MASTER"));
+	}
+
 }

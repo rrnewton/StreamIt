@@ -1,6 +1,8 @@
 package at.dms.kjc.backendSupport;
 
 //import java.util.*;
+import java.util.Set;
+
 import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
@@ -107,6 +109,8 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	protected JBlock initBlock;
 	/** the block executed after the steadyLoop */
 	protected JBlock cleanupBlock;
+
+	private Set<JMethodDeclaration> helperThreadMethods;
 
 	/**
 	 * Constructor: steady state loops indefinitely, no pointer back to compute
@@ -398,6 +402,24 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	@Override
 	public JMethodDeclaration[] getMethods() {
 		return methods;
+	}
+	
+	/**
+	 * Return the helper thread methods in this store;
+	 * 
+	 * @return the helper thread methods in this store;
+	 */
+	public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {
+		return helperThreadMethods;
+	}
+	
+	/**
+	 * Set the helper thread methods in this store;
+	 * 
+	 * @param methods the helper thread methods in this store;
+	 */
+	public void setDynamicThreadHelperMethods(Set<JMethodDeclaration> methods) {
+		helperThreadMethods = methods;
 	}
 
 	/**

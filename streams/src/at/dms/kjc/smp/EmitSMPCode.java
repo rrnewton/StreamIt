@@ -265,14 +265,28 @@ public class EmitSMPCode extends EmitCode {
 
 				
 				
-				if (isDynamic) {
-					p.println();
-					p.println("pthread_t helper" + ";");
-					p.println("if ((rc = pthread_create(&helper" + ", NULL, " +
-							"helper__3" + ", (void *)NULL)) < 0)");
-					p.indent();
-					p.println("printf(\"Error creating helper " +  ": %d\\n\", rc);");
-					p.outdent();
+				if (isDynamic) {					
+					// TODO: How to get the appropriate unique name for the helper thread method name?
+					for (Core core : SMPBackend.chip.getCores()) {
+						Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
+						int i = 0;
+						for (JMethodDeclaration decl : helperMethods) {
+							String varName = "helperThread" + i;
+							i++;
+							p.println();
+							p.println("pthread_t " + varName + ";");
+							p.println("if ((rc = pthread_create(&" + varName + ", NULL, " +
+									decl.getName() + ", (void *)NULL)) < 0)");
+							p.indent();
+							p.println("printf(\"Error creating helper " +  ": %d\\n\", rc);");
+							p.outdent();
+
+						}
+					}
+					
+//					p.println("if ((rc = pthread_create(&helper" + ", NULL, " +
+//							"helper__3" + ", (void *)NULL)) < 0)");
+					
 					
 				}
 				

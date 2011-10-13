@@ -66,7 +66,7 @@ public class ProcessFilterWorkNode {
 			Channel inputChannel, Channel outputChannel,
 			SMPBackEndFactory backEndBits, boolean isDynamicPop,
 			boolean isDynamicPush) {
-		
+
 		CodeStoreHelper filterCode = CodeStoreHelper
 				.findHelperForSliceNode(filter);
 		if (filterCode == null) {
@@ -108,8 +108,6 @@ public class ProcessFilterWorkNode {
 		final String pushName;
 		final String popManyName;
 
-		
-		
 		if (inputChannel != null) {
 			peekName = inputChannel.peekMethodName();
 			popName = inputChannel.popMethodName();
@@ -120,8 +118,9 @@ public class ProcessFilterWorkNode {
 			popManyName = "/* pop(N) from non-existent channel */";
 		}
 
-		System.out.println("ProcessFitlerWorkNode.makeFilterCode filter=" + filter + " popName=" + popName);
-		
+		System.out.println("ProcessFitlerWorkNode.makeFilterCode filter="
+				+ filter + " popName=" + popName);
+
 		if (outputChannel != null) {
 			pushName = outputChannel.pushMethodName();
 		} else {
@@ -156,9 +155,9 @@ public class ProcessFilterWorkNode {
 					} else {
 						if (isDynamicPop) {
 							JExpression dyn_queue = new JEmittedTextExpression(
-									"dyn_read_current");						
+									"dyn_read_current");
 							JExpression methodCall = new JMethodCallExpression(
-									popName, new JExpression[] { dyn_queue});
+									popName, new JExpression[] { dyn_queue });
 							methodCall.setType(tapeType);
 							return methodCall;
 						} else {
@@ -231,9 +230,13 @@ public class ProcessFilterWorkNode {
 	 * Create code for a FilterSliceNode. May request creation of channels, and
 	 * cause Process{Input/Filter/Output}SliceNode to be called for other slice
 	 * nodes.
-	 * @param filterNode the filterNode that needs code generated.
-	 * @param whichPhase a scheduling phase {@link SchedulingPhase}
-	 * @param backEndFactory a BackEndFactory to access layout, etc.
+	 * 
+	 * @param filterNode
+	 *            the filterNode that needs code generated.
+	 * @param whichPhase
+	 *            a scheduling phase {@link SchedulingPhase}
+	 * @param backEndFactory
+	 *            a BackEndFactory to access layout, etc.
 	 */
 	public void doit(WorkNode filterNode, SchedulingPhase whichPhase,
 			SMPBackEndFactory backEndFactory) {
@@ -244,38 +247,39 @@ public class ProcessFilterWorkNode {
 		assert location != null;
 		codeStore = location.getComputeCode();
 		// remember that this tile has code that needs to execute
-		codeStore.setHasCode();		
-		
-		System.out.println("smp.ProcessFilterWorkNode.doit(), filter=" + filterNode);
+		codeStore.setHasCode();
+
+		System.out.println("smp.ProcessFilterWorkNode.doit(), filter="
+				+ filterNode);
 
 		filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
 		// We should only generate code once for a filter node.
 
-		StaticSubGraph ssg = backEndFactory.getScheduler().getGraphSchedule().getSSG();		
+		StaticSubGraph ssg = backEndFactory.getScheduler().getGraphSchedule()
+				.getSSG();
 		boolean hasDynamicInput = false;
 		boolean hasDynamicOutput = false;
 		Filter tops[] = ssg.getTopFilters();
 		int last = tops.length - 1;
-		
+
 		// A particular filter will only have dynamic input if it is
 		// the top node of an SSG, and if the SSG has dynamic input.
-		if (filterNode.equals(tops[0].getWorkNode() )) {
-			hasDynamicInput = ssg.hasDynamicInput();			
+		if (filterNode.equals(tops[0].getWorkNode())) {
+			hasDynamicInput = ssg.hasDynamicInput();
 		}
-		
-		if (filterNode.equals(tops[last].getWorkNode() )) {
-			hasDynamicOutput = ssg.hasDynamicOutput();		
+
+		if (filterNode.equals(tops[last].getWorkNode())) {
+			hasDynamicOutput = ssg.hasDynamicOutput();
 		}
-				
-		
+
 		if (filterCode == null) {
 
 			Channel inputBuffer = null;
 			Channel outputBuffer = null;
-			
+
 			// boolean isDynamic = ssg.hasDynamicInput() ||
 			// ssg.hasDynamicOutput();
-			
+
 			if (hasDynamicInput) {
 				inputBuffer = InterSSGChannel.getInputBuffer(filterNode);
 			} else if (backEndFactory.sliceHasUpstreamChannel(filterNode
@@ -289,22 +293,20 @@ public class ProcessFilterWorkNode {
 					.getParent())) {
 				outputBuffer = OutputRotatingBuffer.getOutputBuffer(filterNode);
 			}
-			
-			System.out.println("ProcessFitlerWorkNode.doit filter=" + filterNode + " filterCode=null");
-			System.out.println("ProcessFitlerWorkNode.doit filter=" + filterNode +
-					" inputBuffer is null == " + (inputBuffer==null));
 
-			
+			System.out.println("ProcessFitlerWorkNode.doit filter="
+					+ filterNode + " filterCode=null");
+			System.out.println("ProcessFitlerWorkNode.doit filter="
+					+ filterNode + " inputBuffer is null == "
+					+ (inputBuffer == null));
+
 			filterCode = getFilterCode(filterNode, inputBuffer, outputBuffer,
-					backEndFactory, hasDynamicInput, hasDynamicOutput);			
+					backEndFactory, hasDynamicInput, hasDynamicOutput);
 		}
 
 		// TODO: Check here if I should be printing the steady state
 		// or if I should start a thread.
 
-	
-
-		
 		switch (whichPhase) {
 		case PREINIT:
 			standardPreInitProcessing();
@@ -366,8 +368,10 @@ public class ProcessFilterWorkNode {
 
 	protected void standardSteadyProcessing(boolean isDynamicPop) {
 		JStatement steadyBlock = filterCode.getSteadyBlock();
-		// helper has now been used for the last time, so we can write the basic code.
-		// write code deemed useful by the helper into the correct ComputeCodeStore.
+		// helper has now been used for the last time, so we can write the basic
+		// code.
+		// write code deemed useful by the helper into the correct
+		// ComputeCodeStore.
 		// write only once if multiple calls for steady state.
 		if (!basicCodeWritten.containsKey(filterNode)) {
 			codeStore.addFields(filterCode.getUsefulFields());
@@ -378,18 +382,22 @@ public class ProcessFilterWorkNode {
 			}
 			basicCodeWritten.put(filterNode, true);
 		}
-	
 
 		// TODO:
-		// Check to see if we are dynamic or not. If we aren't process normally. If we are, then
+		// Check to see if we are dynamic or not. If we aren't process normally.
+		// If we are, then
 		// add the addSteadyLoopStatement(steadyBlock) to a threaded method
 		// and here we want to add a call to start the thread.
-		
-		System.out.println("ProcessFilterWorkNode.standardSteadyProcessing Filter" + filterNode.getFilter().getName() + " isDynamicPop=" + isDynamicPop);
-		if (isDynamicPop) {			
+
+		System.out
+				.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
+						+ filterNode.getFilter().getName()
+						+ " isDynamicPop="
+						+ isDynamicPop);
+		if (isDynamicPop) {
 			codeStore.addThreadHelper(steadyBlock);
 			codeStore.addSteadyThreadCall();
-			
+
 		} else {
 			codeStore.addSteadyLoopStatement(steadyBlock);
 		}
