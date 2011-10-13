@@ -1,6 +1,7 @@
 package at.dms.kjc.backendSupport;
 
 //import java.util.*;
+import java.util.HashSet;
 import java.util.Set;
 
 import at.dms.classfile.Constants;
@@ -110,13 +111,13 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	/** the block executed after the steadyLoop */
 	protected JBlock cleanupBlock;
 
-	private Set<JMethodDeclaration> helperThreadMethods;
+	private Set<JMethodDeclaration> helperThreadMethods = new HashSet<JMethodDeclaration>();
 
 	/**
 	 * Constructor: steady state loops indefinitely, no pointer back to compute
 	 * node.
 	 */
-	public ComputeCodeStore() {
+	public ComputeCodeStore() {		
 		constructorCommon();
 		addSteadyLoop();
 		getMainFunction().addStatement(cleanupBlock);
