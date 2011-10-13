@@ -176,12 +176,8 @@ public class EmitSMPCode extends EmitCode {
 			p.println("pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
 			p.println("int                   thread_to_sleep [DYNAMIC_READERS][2];");
 		}
-
+		
 		p.println();
-		p.println("int iterationCount = 0;");
-		p.println();
-
-
 
 		p.println("// Global barrier");
 		p.println("barrier_t barrier;");
@@ -590,10 +586,7 @@ public class EmitSMPCode extends EmitCode {
 		Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnCore((Core)n);
 		Set <InterSSGChannel> dynamicInputBuffers = InterSSGChannel.getInputBuffersOnCore((Core)n);
 		Set <InterSSGChannel> dynamicOutputBuffers = InterSSGChannel.getOutputBuffersOnCore((Core)n);
-
-		JStatement itercount = new JExpressionStatement(new JEmittedTextExpression("extern int iterationCount"));
-		itercount.accept(codegen); p.println();
-
+		
 		JStatement success = new JExpressionStatement(new JEmittedTextExpression("static int success"));
 		success.accept(codegen); p.println();
 				
