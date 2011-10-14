@@ -444,7 +444,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		JBlock methodBody = new JBlock();
 		JBlock loopBody = new JBlock();
 		Utils.addCondWait(loopBody, 0, "DYN_READER", "DYN_READER",
-				Utils.makeEqualityCondition("ASLEEP", "DYN_READER"));
+				Utils.makeEqualityCondition("ASLEEP","thread_to_sleep[" + 0 + "][DYN_READER]"));
 		loopBody.addStatement(steadyBlock);
 		Utils.addSetFlag(loopBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
 		Utils.addSetFlag(loopBody, 0, "MASTER", "MASTER", "AWAKE");
@@ -488,7 +488,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		Utils.addSetFlag(steadyLoop, 0, "DYN_READER", "DYN_READER", "AWAKE");
 		Utils.addSignal(steadyLoop, 0, "DYN_READER");
 		Utils.addCondWait(steadyLoop, 0, "MASTER", "MASTER",
-				Utils.makeEqualityCondition("ASLEEP", "MASTER"));
+				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep[" + 0 + "][MASTER]"));
 	}
 
 }

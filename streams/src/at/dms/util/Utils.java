@@ -1512,8 +1512,8 @@ public abstract class Utils implements Serializable, DeepCloneable {
     public static JExpression makeEqualityCondition(String leftVar, String rightVar) {			
 		return new JEqualityExpression(null,
 						true,
-						new JFieldAccessExpression(leftVar), 
-						new JFieldAccessExpression(rightVar));
+						new JEmittedTextExpression(leftVar), 
+						new JEmittedTextExpression(rightVar));
 	}
    
     /**
