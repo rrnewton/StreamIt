@@ -317,7 +317,7 @@ public class ProcessFilterWorkNode {
 			additionalInitProcessing();
 			break;
 		case PRIMEPUMP:
-			standardPrimePumpProcessing();
+			standardPrimePumpProcessing(hasDynamicInput);
 			additionalPrimePumpProcessing();
 			break;
 		case STEADY:
@@ -349,8 +349,12 @@ public class ProcessFilterWorkNode {
 
 	}
 
-	protected void standardPrimePumpProcessing() {
-
+	protected void standardPrimePumpProcessing(boolean hasDynamicInput) {
+		// TODO: We need to change this so we have the correct prime pump processing.
+		System.out.println("ProcessFilterWorkNode.standardPrimePumpProcessing, hasDynamicInput=" + hasDynamicInput);		
+		if (hasDynamicInput) {
+			return;
+		}		
 		JMethodDeclaration primePump = filterCode.getPrimePumpMethod();
 		if (primePump != null && !codeStore.hasMethod(primePump)) {
 			// Add method -- but only once

@@ -270,7 +270,11 @@ public class EmitSMPCode extends EmitCode {
 					for (Core core : SMPBackend.chip.getCores()) {
 						Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
 						int i = 0;
+
+						System.out.println("about to gnerate helper threads! helperMethods.size=" + helperMethods.size());
 						for (JMethodDeclaration decl : helperMethods) {
+							
+							
 							String varName = "helperThread" + i;
 							i++;
 							p.println();

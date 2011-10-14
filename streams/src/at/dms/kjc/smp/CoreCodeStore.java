@@ -132,7 +132,6 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 	/** set of FilterSliceNodes that are mapped to this core */
 	protected HashSet<WorkNode> filters;
 
-	private Set<JMethodDeclaration> helperThreadMethods;
 
 	/**
 	 * Constructor: steady state loops indefinitely, no pointer back to compute

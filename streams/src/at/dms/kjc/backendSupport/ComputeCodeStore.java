@@ -111,7 +111,8 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	/** the block executed after the steadyLoop */
 	protected JBlock cleanupBlock;
 
-	private Set<JMethodDeclaration> helperThreadMethods = new HashSet<JMethodDeclaration>();
+	/** set of JMethodDeclaration for the helper thread on this core */
+	protected Set<JMethodDeclaration> helperThreadMethods = new HashSet<JMethodDeclaration>();
 
 	/**
 	 * Constructor: steady state loops indefinitely, no pointer back to compute
