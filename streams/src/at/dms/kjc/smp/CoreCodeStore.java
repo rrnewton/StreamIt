@@ -442,25 +442,34 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		addExpressionFirst(new JEmittedTextExpression(
 				"dyn_write_current = dyn_buf_1"));
 		JBlock methodBody = new JBlock();
-		JBlock whileBody = new JBlock();
-		Utils.addCondWait(whileBody, 0, "DYN_READER", "DYN_READER",
+		JBlock loopBody = new JBlock();
+		Utils.addCondWait(loopBody, 0, "DYN_READER", "DYN_READER",
 				Utils.makeEqualityCondition("ASLEEP", "DYN_READER"));
-		whileBody.addStatement(steadyBlock);
-		Utils.addSetFlag(whileBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
-		Utils.addSetFlag(whileBody, 0, "MASTER", "MASTER", "AWAKE");
-		Utils.addSignal(whileBody, 0, "MASTER");
-		whileBody.addStatement(new JExpressionStatement(
+		loopBody.addStatement(steadyBlock);
+		Utils.addSetFlag(loopBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
+		Utils.addSetFlag(loopBody, 0, "MASTER", "MASTER", "AWAKE");
+		Utils.addSignal(loopBody, 0, "MASTER");
+		loopBody.addStatement(new JExpressionStatement(
 				new JEmittedTextExpression("queue_ctx_ptr tmp")));
-		whileBody.addStatement(new JExpressionStatement(
+		loopBody.addStatement(new JExpressionStatement(
 				new JEmittedTextExpression("tmp =  dyn_read_current")));
-		whileBody.addStatement(new JExpressionStatement(
+		loopBody.addStatement(new JExpressionStatement(
 				new JEmittedTextExpression(
 						"dyn_read_current = dyn_write_current")));
-		whileBody.addStatement(new JExpressionStatement(
+		loopBody.addStatement(new JExpressionStatement(
 				new JEmittedTextExpression("dyn_write_current = tmp")));
-		JStatement whileLoop = new JWhileStatement(null, new JBooleanLiteral(
-				null, true), whileBody, null);
-		methodBody.addStatement(whileLoop);
+		
+		JStatement loop = null;
+		if(KjcOptions.iterations != -1) {
+			//addSteadyLoop(iterationBound);		
+			ALocalVariable var = ALocalVariable.makeVar(CStdType.Integer, "maxSteadyIter");			
+			loop = at.dms.util.Utils.makeForLoop(loopBody,var.getRef());
+			
+		} else {		
+			loop = new JWhileStatement(null, new JBooleanLiteral(null, true), loopBody, null);
+		}
+		methodBody.addStatement(loop);
+		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("pthread_exit(NULL)")));
 		JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
 		JMethodDeclaration threadHelper = new JMethodDeclaration(
 				CVoidPtrType.VoidPtr, "helper", new JFormalParameter[] { p },
