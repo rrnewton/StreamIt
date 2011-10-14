@@ -3,18 +3,7 @@ import os
 import subprocess
 import glob
 import filecmp
-
-# def print_header():
-#     print('#%s\t%s\t%s\t%s\t%s' % ('iter', 'mult', 'cost', 'static', 'dynamic'))
-
-
-# def write_header(f):
-#     f.write('#%s\t%s\t%s\t%s\t%s\n' % ('iter', 'mult', 'cost', 'static', 'dynamic'))
-
-
-# def print_result(f, mult, i, cost, sta_avg, dyn_avg):    
-#     print('%d\t%d\t%d\t%f\t%f' % (i, mult, cost, sta_avg, dyn_avg))
-#     f.write('%d\t%d\t%d\t%f\t%f\n' % (i, mult, cost, sta_avg, dyn_avg))
+import sys 
 
 def run_strc(filename):
     cmd = ["strc", "-smp", "2", "-i", "10", filename]
@@ -34,61 +23,51 @@ def cleanup():
     print cmd + '\n'
     os.system(cmd)
 
-
 def compare(f1, f2):
     if (filecmp.cmp(f1, f2)):
         return 'success'
     else:
         return "FAIL"
 
-# def plot_cost_fixed(cost):
-#     f = open('./tmp.gnu', 'w')
-#     cmd = "plot \"cost-fixed%d.dat\" u 2:4 t \'static\' w linespoints, \"cost-fixed%d.dat\" u 2:5 t \'dynamic\' w linespoints" % (cost, cost)
-#     f.write('set terminal postscript\n')
-#     f.write('set output \"cost-fixed%d.ps\"\n' % cost)
-#     f.write('set title \"Static vs Dynamic, Iterations=1000, Cost=%d,\"\n' % cost)
-#     f.write('set xlabel \"Multiplicity\"\n');
-#     f.write('set ylabel \"Clock Cycles\"\n');
-#     f.write(cmd)
-#     f.close()
-#     os.system('gnuplot ./tmp.gnu')
+def run_one(infile):
+    print "current file is: " + infile
+    print "Compile StreamIt code."
+    p = run_strc(infile)
+    p.wait()
+    print "Compile C code."
+    p = run_make(infile)
+    p.wait()
 
-# def plot_mult_fixed(mult):
-#     f = open('./tmp.gnu', 'w')
-#     cmd = "plot \"mult-fixed%d.dat\" u 3:4 t \'static\' w linespoints, \"mult-fixed%d.dat\" u 3:5 t \'dynamic\' w linespoints" % (mult, mult)
-#     f.write('set terminal postscript\n')
-#     f.write('set output \"mult-fixed%d.ps\"\n' % mult)
-#     f.write('set title \"Static vs Dynamic, Iterations=1000, Mult=%d,\"\n' % mult)
-#     f.write('set xlabel \"Cost\"\n');
-#     f.write('set ylabel \"Clock Cycles\"\n');
-#     f.write(cmd)
-#     f.close()
-#     os.system('gnuplot ./tmp.gnu')
+def run_test(infile):
+    print "current file is: " + infile
+    print "Compile StreamIt code."
+    p = run_strc(infile)
+    p.wait()
+    print "Compile C code."
+    p = run_make(infile)
+    p.wait()
+    run_exe(infile)        
+    ret = infile + ' : ' + compare(infile + '.out', infile + '.exp')
+    cleanup()
+    return ret
 
-
-
-def main():
+def run_all():
     path = 'cases/'
     results = []
     for infile in glob.glob( os.path.join(path, '*.str') ):
-        print "current file is: " + infile
-        print "Compile StreamIt code."
-        p = run_strc(infile)
-        p.wait()
-        print "Compile C code."
-        p = run_make(infile)
-        p.wait()
-        run_exe(infile)        
-        ret = compare(infile + '.out', infile + '.exp')
-        results.append(infile + ' : ' + ret)
-        cleanup()
-    print '**********************************'
+        results.append(run_test(infile))
     t = '\n'
-    print t.join(results)
+    return t.join(results)
 
-        
-       
-        
+def main():
+    if (len(sys.argv) > 1):
+        if (sys.argv[1] == 'clean'):
+            cleanup()
+        else:
+            run_one(sys.argv[1])
+    else: 
+        print(run_all())
+                    
 if __name__ == "__main__":
     main()
 
