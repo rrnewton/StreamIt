@@ -353,6 +353,7 @@ public class ProcessFilterWorkNode {
 		// TODO: We need to change this so we have the correct prime pump processing.
 		System.out.println("ProcessFilterWorkNode.standardPrimePumpProcessing, hasDynamicInput=" + hasDynamicInput);		
 		if (hasDynamicInput) {
+			System.out.println("WARNING: need to change ProcessFilterWorkNode.standardPrimePumpProcessing to have the correct schedule");		
 			return;
 		}		
 		JMethodDeclaration primePump = filterCode.getPrimePumpMethod();

@@ -105,9 +105,10 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 		findDecls(str.getFields());
 		findDecls(str.getMethods());
 
-		Set<JMethodDeclaration> oldHelperThreadMethods = str.getDynamicThreadHelperMethods();
+		Set<JMethodDeclaration> oldHelperThreadMethods = str
+				.getDynamicThreadHelperMethods();
 		Set<JMethodDeclaration> newHelperThreadMethods = new HashSet<JMethodDeclaration>();
-		
+
 		JFieldDeclaration[] newFields = new JFieldDeclaration[str.getFields().length];
 		for (int i = 0; i < str.getFields().length; i++)
 			newFields[i] = (JFieldDeclaration) str.getFields()[i].accept(this);
@@ -116,25 +117,21 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 				.getMethods().length];
 		for (int i = 0; i < str.getMethods().length; i++) {
 			JMethodDeclaration oldMeth = str.getMethods()[i];
-			JMethodDeclaration newMeth = 
-					(JMethodDeclaration) oldMeth.accept(this);
+			JMethodDeclaration newMeth = (JMethodDeclaration) oldMeth
+					.accept(this);
 			newMethods[i] = newMeth;
+			if (oldHelperThreadMethods.contains(oldMeth)) {
+				newHelperThreadMethods.add(newMeth);
+			}
 
-			System.out.println("CodeStoreRenameAll.renameCodeStore oldMeth=" + oldMeth.getName() + " newMeth="+ newMeth.getName());
-			
-				if (oldHelperThreadMethods.contains(oldMeth)) {
-					newHelperThreadMethods.add(newMeth);
-				}
-			
 			if (oldMeth.equals(str.getMainFunction()))
 				str.setMainFunction(newMeth);
 		}
-		
 
 		str.setFields(newFields);
 		str.setMethods(newMethods);
 		str.setDynamicThreadHelperMethods(newHelperThreadMethods);
-		
+
 		symtab = ost;
 	}
 
