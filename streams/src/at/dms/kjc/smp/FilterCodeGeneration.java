@@ -382,21 +382,24 @@ public class FilterCodeGeneration extends CodeStoreHelper {
                 CStdType.Integer,
                 workCounter,
                 null);
-
+        
+        String multiplierVar = filterNode.toString() + "_multiplier"; 
+        JExpression multiplier = new JFieldAccessExpression(multiplierVar);
+        
         JStatement loop;
         if(KjcOptions.loadbalance && LoadBalancer.isLoadBalanced(filterNode.getParent())) {
             FissionGroup group = FissionGroupStore.getFissionGroup(filterNode.getParent());
 
             loop = 
                 Utils.makeForLoopLocalIndex(workStmt, 
-                                            loopCounter, 
+                                            loopCounter,                                           
                                             new JNameExpression(
                                                 null,
                                                 LoadBalancer.getNumItersRef(group,
                                                                             filterNode.getParent())));
         }
         else {
-            loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new JIntLiteral(mult));
+            loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, multiplier, new JIntLiteral(mult));
         }
 
         block.addStatement(new JVariableDeclarationStatement(null,
