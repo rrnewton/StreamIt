@@ -3,7 +3,6 @@ package at.dms.kjc.smp;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
 import at.dms.kjc.JAddExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
@@ -29,8 +28,6 @@ import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.common.ALocalVariable;
 import at.dms.util.Utils;
 import at.dms.kjc.KjcOptions;
 

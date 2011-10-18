@@ -386,10 +386,12 @@ public class EmitSMPCode extends EmitCode {
 		}
 		p.println();
 		
-		p.println("// Helper entry points");
-		// TODO: Why is this names helper__3??
-		for(int i = 0; i < 1; i++) {		
-			p.println("extern void * helper__3 " +  "(void * arg);");
+		p.println("// Helper entry points");		
+		for (Core core : SMPBackend.chip.getCores()) {
+			Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
+			for (JMethodDeclaration decl : helperMethods) {
+				p.println("extern void * " + decl.getName()  +  "(void * arg);");				
+			}
 		}
 		p.println();
 		
@@ -692,7 +694,7 @@ public class EmitSMPCode extends EmitCode {
 		
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
-			System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: " + field.toString());
+			System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: " + field.getVariable().getIdent());
 			field.accept(codegen);
 		}
 		p.println("");
