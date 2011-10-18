@@ -60,7 +60,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
      * @param node          A filter slice node to wrap code for.
      * @param backEndFactory   The back end factory as a source of data and back end specific functions.
      */
-    public FilterCodeGeneration(WorkNode node, SMPBackEndFactory backEndFactory) {
+    public FilterCodeGeneration(WorkNode node, SMPBackEndFactory backEndFactory, CoreCodeStore codeStore) {
         super(node,node.getAsFilter().getFilter(),backEndFactory);
         filterNode = node;
         filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
@@ -408,9 +408,10 @@ public class FilterCodeGeneration extends CodeStoreHelper {
                                                 LoadBalancer.getNumItersRef(group,
                                                                             filterNode.getParent())));
         }
-        else 
-            loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new JFieldAccessExpression(multiplierVar.getIdent()), new JIntLiteral(mult));
-        
+        else {
+        	   //loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new JFieldAccessExpression(multiplierVar.getIdent()), new JIntLiteral(mult));
+        	   loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new JIntLiteral(mult));
+        }
 
         block.addStatement(new JVariableDeclarationStatement(null,
                 loopCounter,

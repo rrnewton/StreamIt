@@ -332,7 +332,7 @@ public class ProcessFilterWorkNode {
 		// write code deemed useful by the helper into the correct ComputeCodeStore.
 		// write only once if multiple calls for steady state.
 		if (!basicCodeWritten.containsKey(filterNode)) {
-			codeStore.addFields(filter_code.getUsefulFields());
+			codeStore.addFields(filter_code.getFields());
 			codeStore.addMethods(filter_code.getUsefulMethods());
 			if (filterNode.getFilter() instanceof FileOutputContent) {
 				codeStore.addCleanupStatement(((FileOutputContent) filterNode

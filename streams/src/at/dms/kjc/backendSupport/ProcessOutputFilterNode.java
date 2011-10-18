@@ -113,7 +113,7 @@ public class ProcessOutputFilterNode {
         // write code deemed useful by the helper into the corrrect ComputeCodeStore.
         // write only once if multiple calls for steady state.
         if (!basicCodeWritten.containsKey(outputNode)) {
-            codeStore.addFields(splitter_code.getUsefulFields());
+            codeStore.addFields(splitter_code.getFields());
             codeStore.addMethods(splitter_code.getUsefulMethods());
             basicCodeWritten.put(outputNode,true);
         }

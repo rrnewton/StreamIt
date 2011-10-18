@@ -144,18 +144,6 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		setMyMainName("__main__");
 	}
 
-	/**
-	 * Constructor: caller will add code to bound number of iterations, no
-	 * pointer back to compute node.
-	 * 
-	 * @param iterationBound
-	 *            a variable that will be defined locally by
-	 *            <code>getMainFunction().addAllStatments(0,stmts);</code>
-	 */
-	public CoreCodeStore(ALocalVariable iterationBound) {
-		super(iterationBound);
-		setMyMainName("__main__");
-	}
 
 	public CoreCodeStore(Core nodeType) {
 		super(nodeType);

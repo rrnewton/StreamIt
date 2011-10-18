@@ -1,16 +1,34 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import at.dms.classfile.Constants;
-import at.dms.kjc.*;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
-import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.util.Utils;
-import java.util.List;
 
 /**
  * For creation of additional code necessary to getting filter / joiner /
@@ -18,7 +36,7 @@ import java.util.List;
  * 
  * @author dimock / concept and stolen code from mgordon
  */
-public abstract class CodeStoreHelper extends MinCodeUnit {
+public abstract class CodeStoreHelper { 
 	/** possible prefix for functions in initialization */
 	public static String initStage = "__INITSTAGE__";
 	/** possible prefix for functions in steady state */
@@ -92,7 +110,9 @@ public abstract class CodeStoreHelper extends MinCodeUnit {
 
 	/** General constructor: need to add fields and methods later. */
 	public CodeStoreHelper(InternalFilterNode node, BackEndFactory backEndFactory) {
-		super(new JFieldDeclaration[0], new JMethodDeclaration[0]);
+		//super(new JFieldDeclaration[0], new JMethodDeclaration[0]);
+		fields  = new ArrayList<JFieldDeclaration>();
+		methods  = new ArrayList<JMethodDeclaration>();		
 		internalFilterNode = node;
 		this.backEndFactory = backEndFactory;
 		uniqueID = getUniqueID();
@@ -121,7 +141,8 @@ public abstract class CodeStoreHelper extends MinCodeUnit {
 			}
 		}
 	}
-
+	
+	
 	/**
 	 * @return get init method, may be null since some SliceNodes may only
 	 *         generate helper methods.
@@ -202,13 +223,9 @@ public abstract class CodeStoreHelper extends MinCodeUnit {
 	 */
 	public abstract JBlock getSteadyBlock();
 
-	/**
-	 * @return all fields that are needed in the ComputeCodeStore: both those
-	 *         from underlying code and those generated in this class
-	 */
-	public JFieldDeclaration[] getUsefulFields() {
-		return getFields();
-	}
+	
+
+	
 
 	/**
 	 * @return all methods that are needed in the ComputeCodeStore: may decide to
@@ -330,4 +347,49 @@ public abstract class CodeStoreHelper extends MinCodeUnit {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/********** TODO Refactoring all of this code! ************/
+	
+	protected List<JFieldDeclaration> fields ; //= new ArrayList<JFieldDeclaration>();
+	protected List<JMethodDeclaration> methods ; // = new ArrayList<JMethodDeclaration>();
+	
+	
+	public void setFields(JFieldDeclaration[] deepCopy) {
+		fields = new ArrayList<JFieldDeclaration>();
+		fields.addAll(Arrays.asList(deepCopy));	
+	}
+
+	public void setMethods(JMethodDeclaration[] deepCopy) {		
+		methods = new ArrayList<JMethodDeclaration>();
+		methods.addAll(Arrays.asList(deepCopy));			
+	}
+
+	public JMethodDeclaration[] getMethods() {
+		return methods.toArray(new JMethodDeclaration[methods.size()]);
+	}
+
+	public void addField(JFieldDeclaration field) {
+		fields.add(field);		
+	}
+
+	public void addFields(JFieldDeclaration[] deepCopy) {		
+		fields.addAll(Arrays.asList(deepCopy));	
+	}
+
+	public void addMethod(JMethodDeclaration method) {
+		methods.add(method);
+	}
+
+	/**
+	 * @return all fields that are needed in the ComputeCodeStore: both those
+	 *         from underlying code and those generated in this class
+	 */
+	public JFieldDeclaration[] getFields() {
+		return fields.toArray(new JFieldDeclaration[fields.size()]);	
+	}	
+	
+
+	
+	
+	
 }

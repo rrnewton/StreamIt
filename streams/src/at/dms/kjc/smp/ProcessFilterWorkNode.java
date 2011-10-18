@@ -388,7 +388,7 @@ public class ProcessFilterWorkNode {
 		// ComputeCodeStore.
 		// write only once if multiple calls for steady state.
 		if (!basicCodeWritten.containsKey(filterNode)) {
-			codeStore.addFields(filterCode.getUsefulFields());
+			codeStore.addFields(filterCode.getFields());
 			codeStore.addMethods(filterCode.getUsefulMethods());
 			if (filterNode.getFilter() instanceof FileOutputContent) {
 				codeStore.addCleanupStatement(((FileOutputContent) filterNode

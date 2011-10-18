@@ -175,7 +175,7 @@ public class ProcessInputFilterNode {
         // write code deemed useful by the helper into the corrrect ComputeCodeStore.
         // write only once if multiple calls for steady state.
         if (!basicCodeWritten.containsKey(inputNode)) {
-            codeStore.addFields(joiner_code.getUsefulFields());
+            codeStore.addFields(joiner_code.getFields());
             codeStore.addMethods(joiner_code.getUsefulMethods());
             basicCodeWritten.put(inputNode,true);
         }

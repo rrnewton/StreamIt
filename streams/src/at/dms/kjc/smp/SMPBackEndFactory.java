@@ -22,8 +22,7 @@ import java.util.HashMap;
  * @author mgordon
  * 
  */
-public class SMPBackEndFactory extends
-		BackEndFactory<SMPMachine, Core, CoreCodeStore, Integer> {
+public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCodeStore, Integer> {
 
 	/**
 	 * Set the scheduler used by the backend factory
@@ -126,7 +125,7 @@ public class SMPBackEndFactory extends
 	public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
 		if (node instanceof WorkNode) {
 			// simply do appropriate wrapping of calls...
-			return new FilterCodeGeneration((WorkNode) node, this);
+			return new FilterCodeGeneration((WorkNode) node, this, scheduler.getComputeNode(node).getComputeCode());
 		} else {
 			return null;
 		}

@@ -60,7 +60,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputFilterNode {
     
     @Override
     public void additionalInitProcessing() {
-        initCodeStore.addFields(splitter_code.getUsefulFields());
+        initCodeStore.addFields(splitter_code.getFields());
         initCodeStore.addMethods(splitter_code.getUsefulMethods());
     }
     

@@ -228,7 +228,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterWorkNode {
         // write code deemed useful by the helper into the corrrect ComputeCodeStore.
         // write only once if multiple calls for steady state.
         if (!basicCodeWritten.containsKey(filterNode)) {
-            codeStore.addFields(filter_code.getUsefulFields());
+            codeStore.addFields(filter_code.getFields());
             codeStore.addMethods(filter_code.getUsefulMethods());
             basicCodeWritten.put(filterNode,true);
         }
