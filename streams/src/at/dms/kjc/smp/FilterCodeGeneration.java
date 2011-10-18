@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import at.dms.classfile.Constants;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
@@ -22,412 +23,433 @@ import at.dms.kjc.JMinusExpression;
 import at.dms.kjc.JNameExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.slir.fission.*;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
+import at.dms.kjc.slir.WorkNodeInfo;
+import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.util.Utils;
-import at.dms.kjc.KjcOptions;
 
 public class FilterCodeGeneration extends CodeStoreHelper {
- 
-    private WorkNode filterNode;
-    private WorkNodeInfo filterInfo;
-    private static String exeIndex1Name = "__EXEINDEX__1__";
-    private JVariableDefinition exeIndex1;
-    private boolean exeIndex1Used;
-    /** this variable massages init mult to assume that every filter is a two stage */
-    private int initMult;
-    
-    private JVariableDefinition useExeIndex1() {
-        if (exeIndex1Used) return exeIndex1;
-        else {
-            exeIndex1 = new JVariableDefinition(null, 
-                    0, 
-                    CStdType.Integer,
-                    exeIndex1Name + uniqueID,
-                    null);
-            exeIndex1Used = true;
-            this.addField(new JFieldDeclaration(exeIndex1));
-            return exeIndex1;
-        }
-    }
-    
-    /**
-     * Constructor
-     * @param node          A filter slice node to wrap code for.
-     * @param backEndFactory   The back end factory as a source of data and back end specific functions.
-     */
-    public FilterCodeGeneration(WorkNode node, SMPBackEndFactory backEndFactory, CoreCodeStore codeStore) {
-        super(node,node.getAsFilter().getFilter(),backEndFactory);
-        filterNode = node;
-        filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
-        //assume that every filter is a two-stage and prework is called
-        initMult = filterInfo.initMult;
-        if (!filterInfo.isTwoStage()) {
-            initMult++;
-        }
-    }
 
-    /**
-     * Calculate and return the method that implements the init stage 
-     * computation for this filter.  It should be called only once in the 
-     * generated code.
-     * <p>
-     * This does not include the call to the init function of the filter.
-     * That is done in {@link RawComputeCodeStore#addInitFunctionCall}. 
-     * 
-     * @return The method that implements the init stage for this filter.
-     */
-    @Override
-    public JMethodDeclaration getInitStageMethod() {
-        JBlock statements = new JBlock();
-        assert internalFilterNode instanceof WorkNode;
-        WorkNodeContent filter = ((WorkNode) internalFilterNode).getFilter();
+	private WorkNode filterNode;
+	private WorkNodeInfo filterInfo;
+	private static String exeIndex1Name = "__EXEINDEX__1__";
+	private JVariableDefinition exeIndex1;
+	private boolean exeIndex1Used;
+	private CoreCodeStore codeStore;
+	/**
+	 * this variable massages init mult to assume that every filter is a two
+	 * stage
+	 */
+	private int initMult;
 
-        // channel code before work block
-        //slice has input, so we 
-        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).beginInitRead()) {
-                statements.addStatement(stmt);
-            }
-        }
-        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).beginInitWrite()) {
-                statements.addStatement(stmt);
-            }
-        }
-        // add the calls for the work function in the initialization stage
-        if (WorkNodeInfo.getFilterInfo((WorkNode) internalFilterNode).isTwoStage()) {
+	/**
+	 * Constructor
+	 * 
+	 * @param node
+	 *            A filter slice node to wrap code for.
+	 * @param backEndFactory
+	 *            The back end factory as a source of data and back end specific
+	 *            functions.
+	 */
+	public FilterCodeGeneration(WorkNode node,
+			SMPBackEndFactory backEndFactory, CoreCodeStore codeStore) {
+		super(node, node.getAsFilter().getFilter(), backEndFactory);
+		filterNode = node;
+		filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
+		this.codeStore = codeStore;
+		// assume that every filter is a two-stage and prework is called
+		initMult = filterInfo.initMult;
+		if (!filterInfo.isTwoStage()) {
+			initMult++;
+		}
+	}
 
-            JMethodCallExpression initWorkCall = new JMethodCallExpression(
-                    null, new JThisExpression(null), filter.getInitWork()
-                            .getName(), new JExpression[0]);
+	/**
+	 * Code returned by this function will be appended to the methods for the
+	 * init, primepump, and steady stages for this filter.
+	 * 
+	 * @return The block of code to append
+	 */
+	protected JBlock endSchedulingPhase(SchedulingPhase phase) {
+		JBlock block = new JBlock();
+		return block;
+	}
 
-            statements.addStatement(new JExpressionStatement(initWorkCall));
+	/**
+	 * Generate the loop for the work function firings in the initialization
+	 * schedule. This does not include receiving the necessary items for the
+	 * first firing. This is handled in
+	 * {@link DirectCommunication#getInitStageMethod}. This block will generate
+	 * code to receive items for all subsequent calls of the work function in
+	 * the init stage plus the class themselves.
+	 * 
+	 * @param filter
+	 *            The filter
+	 * @param generatedVariables
+	 *            The vars to use.
+	 * 
+	 * @return The code to fire the work function in the init stage.
+	 */
+	private JStatement generateInitWorkLoop(WorkNodeContent filter) {
+		JBlock block = new JBlock();
 
-            if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
-                for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).postPreworkInitRead()) {
-                    statements.addStatement(stmt);
-                }
-            }
-        }
+		// clone the work function and inline it
+		JStatement workBlock = getWorkFunctionCall();		
 
-        statements.addStatement(generateInitWorkLoop(filter));
+		if (workBlock == null) {
+			workBlock = new SIRBeginMarker("Empty Work Block!!");
+		}
+		block.addStatement(workBlock);
 
-        //determine if in the init there is a file writer slice downstream 
-        //of the slice that contains this filter
-        boolean dsFileWriter = false;
-        for (InterFilterEdge edge : filterNode.getParent().getOutputNode().getDestSet(SchedulingPhase.INIT)) {
-            if (edge.getDest().getParent().getWorkNode().isFileOutput()) {
-                dsFileWriter = true;
-                break;
-            }
-        }
-        if (dsFileWriter && filterInfo.totalItemsSent(SchedulingPhase.INIT) > 0) {
-            assert filterNode.getParent().getOutputNode().getDestSet(SchedulingPhase.INIT).size() == 1;
-            WorkNode fileW = 
-                filterNode.getParent().getOutputNode().getDestList(SchedulingPhase.INIT)[0].getDest().getParent().getWorkNode();
-            
-            InputRotatingBuffer buf = InputRotatingBuffer.getInputBuffer(fileW);
-            int outputs = filterInfo.totalItemsSent(SchedulingPhase.INIT);
-            String type = ((FileOutputContent)fileW.getFilter()).getType() == CStdType.Integer ? "%d" : "%f";
-            String cast = ((FileOutputContent)fileW.getFilter()).getType() == CStdType.Integer ? "(int)" : "(float)";
-            String bufferName = buf.getAddressRotation(filterNode).currentWriteBufName;
-            //create the loop
-            statements.addStatement(Util.toStmt(
-                    "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) fprintf(output, \"" + type + "\\n\", " + cast + 
-                    bufferName +"[_i_])"));
-            
-        }
-        
-        // channel code after work block
-        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).endInitRead()) {
-                statements.addStatement(stmt);
-            }
-        }
-        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).endInitWrite()) {
-                statements.addStatement(stmt);
-            }
-        }
+		// return the for loop that executes the block init - 1
+		// times (because the 1st execution is of prework)
+		return Utils.makeForLoopFieldIndex(block, useExeIndex1(),
+				new JIntLiteral(initMult - 1), false);
+	}
 
-        statements.addAllStatements(endSchedulingPhase(SchedulingPhase.INIT));
-        
-        return new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
-                CStdType.Void, initStage + uniqueID, JFormalParameter.EMPTY,
-                CClassType.EMPTY, statements, null, null);
-    }
+	/**
+	 * Calculate and return the method that implements the init stage
+	 * computation for this filter. It should be called only once in the
+	 * generated code.
+	 * <p>
+	 * This does not include the call to the init function of the filter. That
+	 * is done in {@link RawComputeCodeStore#addInitFunctionCall}.
+	 * 
+	 * @return The method that implements the init stage for this filter.
+	 */
+	@Override
+	public JMethodDeclaration getInitStageMethod() {
+		JBlock statements = new JBlock();
+		assert internalFilterNode instanceof WorkNode;
+		WorkNodeContent filter = ((WorkNode) internalFilterNode).getFilter();
 
-    /**
-     * Generate the loop for the work function firings in the initialization
-     * schedule. This does not include receiving the necessary items for the
-     * first firing. This is handled in
-     * {@link DirectCommunication#getInitStageMethod}. This block will generate
-     * code to receive items for all subsequent calls of the work function in
-     * the init stage plus the class themselves.
-     * 
-     * @param filter
-     *            The filter
-     * @param generatedVariables
-     *            The vars to use.
-     * 
-     * @return The code to fire the work function in the init stage.
-     */
-    private JStatement generateInitWorkLoop(WorkNodeContent filter)
-    {
-        JBlock block = new JBlock();
+		// channel code before work block
+		// slice has input, so we
+		if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getInputBuffer(filterNode)
+					.beginInitRead()) {
+				statements.addStatement(stmt);
+			}
+		}
+		if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getOutputBuffer(filterNode)
+					.beginInitWrite()) {
+				statements.addStatement(stmt);
+			}
+		}
+		// add the calls for the work function in the initialization stage
+		if (WorkNodeInfo.getFilterInfo((WorkNode) internalFilterNode)
+				.isTwoStage()) {
 
-        //clone the work function and inline it
-        JStatement workBlock = getWorkFunctionCall();
-    
-        //if we are in debug mode, print out that the filter is firing
-//        if (SpaceTimeBackend.FILTER_DEBUG_MODE) {
-//            block.addStatement
-//                (new SIRPrintStatement(null,
-//                                       new JStringLiteral(null, filter.getName() + " firing (init)."),
-//                                       null));
-//        }
+			JMethodCallExpression initWorkCall = new JMethodCallExpression(
+					null, new JThisExpression(null), filter.getInitWork()
+							.getName(), new JExpression[0]);
 
-        if (workBlock == null) {
-            workBlock = new SIRBeginMarker("Empty Work Block!!");
-        }
-        block.addStatement(workBlock);
-    
-        //return the for loop that executes the block init - 1
-        //times (because the 1st execution is of prework)
-        return Utils.makeForLoopFieldIndex(block, useExeIndex1(), 
-                           new JIntLiteral(initMult - 1), false);
-    }
+			statements.addStatement(new JExpressionStatement(initWorkCall));
 
-    public JMethodDeclaration getPrimePumpMethod() {
-        if (primePumpMethod != null) {
-            return primePumpMethod;
-        }
-        
-        JBlock statements = new JBlock();
-        // channel code before work block
-        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).beginPrimePumpRead()) {
-                statements.addStatement(stmt);
-            }
-        }
-        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).beginPrimePumpWrite()) {
-                statements.addStatement(stmt);
-            }
-        }
-        // add the calls to the work function for the priming of the pipeline
-        statements.addStatement(getWorkFunctionBlock(filterInfo.steadyMult));
-        // channel code after work block
-        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).endPrimePumpRead()) {
-                statements.addStatement(stmt);
-            }
-        }
-        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).endPrimePumpWrite()) {
-                statements.addStatement(stmt);
-            }
-        }
-        statements.addAllStatements(endSchedulingPhase(SchedulingPhase.PRIMEPUMP));
-        //return the method
-        primePumpMethod = new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
-                                      CStdType.Void,
-                                      primePumpStage + uniqueID,
-                                      JFormalParameter.EMPTY,
-                                      CClassType.EMPTY,
-                                      statements,
-                                      null,
-                                      null);
-        return primePumpMethod;
-    }
+			if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode
+					.getParent())) {
+				for (JStatement stmt : RotatingBuffer
+						.getInputBuffer(filterNode).postPreworkInitRead()) {
+					statements.addStatement(stmt);
+				}
+			}
+		}
 
-    @Override
-    public JBlock getSteadyBlock() {
-        JBlock statements = new JBlock();
-        
-        // channel code before work block
-        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).beginSteadyRead()) {
-                statements.addStatement(stmt);
-            }
-        }
-        
-        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).beginSteadyWrite()) {
-                statements.addStatement(stmt);
-            }
-        }
+		statements.addStatement(generateInitWorkLoop(filter));
 
-        // Load balancing variables
-        JVariableDefinition startCycleVar = null;
-        JVariableDefinition endCycleVar = null;
+		// determine if in the init there is a file writer slice downstream
+		// of the slice that contains this filter
+		boolean dsFileWriter = false;
+		for (InterFilterEdge edge : filterNode.getParent().getOutputNode()
+				.getDestSet(SchedulingPhase.INIT)) {
+			if (edge.getDest().getParent().getWorkNode().isFileOutput()) {
+				dsFileWriter = true;
+				break;
+			}
+		}
+		if (dsFileWriter && filterInfo.totalItemsSent(SchedulingPhase.INIT) > 0) {
+			assert filterNode.getParent().getOutputNode()
+					.getDestSet(SchedulingPhase.INIT).size() == 1;
+			WorkNode fileW = filterNode.getParent().getOutputNode()
+					.getDestList(SchedulingPhase.INIT)[0].getDest().getParent()
+					.getWorkNode();
 
-        // load balancing code before filter execution
-        if(KjcOptions.loadbalance && LoadBalancer.isLoadBalanced(filterNode.getParent())) {
-            startCycleVar = 
-                new JVariableDefinition(null,
-                                        0,
-                                        CInt64Type.Int64,
-                                        "startCycle__" + uniqueID,
-                                        null);
+			InputRotatingBuffer buf = RotatingBuffer.getInputBuffer(fileW);
+			int outputs = filterInfo.totalItemsSent(SchedulingPhase.INIT);
+			String type = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "%d"
+					: "%f";
+			String cast = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "(int)"
+					: "(float)";
+			String bufferName = buf.getAddressRotation(filterNode).currentWriteBufName;
+			// create the loop
+			statements.addStatement(Util.toStmt("for (int _i_ = 0; _i_ < "
+					+ outputs + "; _i_++) fprintf(output, \"" + type
+					+ "\\n\", " + cast + bufferName + "[_i_])"));
 
-            statements.addStatement(new JVariableDeclarationStatement(startCycleVar));
+		}
 
-            statements.addStatement(
-                new JIfStatement(null,
-                                 new JEqualityExpression(null,
-                                                         true,
-                                                         new JLocalVariableExpression(
-                                                             LoadBalancer.getSampleBoolVar(
-                                                                 SMPBackend.scheduler.getComputeNode(filterNode))),
-                                                         new JBooleanLiteral(true)),
-                                 new JExpressionStatement(
-                                     new JAssignmentExpression(
-                                         new JLocalVariableExpression(startCycleVar),
-                                         new JMethodCallExpression("rdtsc",
-                                                                   new JExpression[0]))),
-                                 new JBlock(),
-                                 new JavaStyleComment[0]));
-        }
-        
-        // iterate work function as needed
-        statements.addStatement(getWorkFunctionBlock(WorkNodeInfo
-                .getFilterInfo((WorkNode) internalFilterNode).steadyMult));
+		// channel code after work block
+		if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getInputBuffer(filterNode)
+					.endInitRead()) {
+				statements.addStatement(stmt);
+			}
+		}
+		if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getOutputBuffer(filterNode)
+					.endInitWrite()) {
+				statements.addStatement(stmt);
+			}
+		}
 
-        // load balancing code after filter execution
-        if(KjcOptions.loadbalance && LoadBalancer.isLoadBalanced(filterNode.getParent())) {
-            endCycleVar =
-                new JVariableDefinition(null,
-                                        0,
-                                        CInt64Type.Int64,
-                                        "endCycle__" + uniqueID,
-                                        null);
+		statements.addAllStatements(endSchedulingPhase(SchedulingPhase.INIT));
 
-            statements.addStatement(new JVariableDeclarationStatement(endCycleVar));
+		return new JMethodDeclaration(null, Constants.ACC_PUBLIC,
+				CStdType.Void, initStage + uniqueID, JFormalParameter.EMPTY,
+				CClassType.EMPTY, statements, null, null);
+	}
 
-            String cycleCountRef = 
-                LoadBalancer.getFilterCycleCountRef(
-                    FissionGroupStore.getFissionGroup(filterNode.getParent()),
-                    filterNode.getParent());
+	@Override
+	public JMethodDeclaration getPrimePumpMethod() {
+		if (primePumpMethod != null) {
+			return primePumpMethod;
+		}
 
-            JBlock ifSampleThen = new JBlock();
-            ifSampleThen.addStatement(
-                new JExpressionStatement(
-                    new JAssignmentExpression(
-                        new JLocalVariableExpression(endCycleVar),
-                        new JMethodCallExpression("rdtsc",
-                                                  new JExpression[0]))));
-            ifSampleThen.addStatement(
-                new JExpressionStatement(
-                    new JAssignmentExpression(
-                        new JFieldAccessExpression(cycleCountRef),
-                        new JAddExpression(
-                            new JFieldAccessExpression(cycleCountRef),
-                            new JMinusExpression(
-                                null,
-                                new JLocalVariableExpression(endCycleVar),
-                                new JLocalVariableExpression(startCycleVar))))));
+		JBlock statements = new JBlock();
+		// channel code before work block
+		if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getInputBuffer(filterNode)
+					.beginPrimePumpRead()) {
+				statements.addStatement(stmt);
+			}
+		}
+		if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getOutputBuffer(filterNode)
+					.beginPrimePumpWrite()) {
+				statements.addStatement(stmt);
+			}
+		}
+		// add the calls to the work function for the priming of the pipeline
+		statements.addStatement(getWorkFunctionBlock(filterInfo.steadyMult));
+		// channel code after work block
+		if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getInputBuffer(filterNode)
+					.endPrimePumpRead()) {
+				statements.addStatement(stmt);
+			}
+		}
+		if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getOutputBuffer(filterNode)
+					.endPrimePumpWrite()) {
+				statements.addStatement(stmt);
+			}
+		}
+		statements
+				.addAllStatements(endSchedulingPhase(SchedulingPhase.PRIMEPUMP));
+		// return the method
+		primePumpMethod = new JMethodDeclaration(null, Constants.ACC_PUBLIC,
+				CStdType.Void, primePumpStage + uniqueID,
+				JFormalParameter.EMPTY, CClassType.EMPTY, statements, null,
+				null);
+		return primePumpMethod;
+	}
 
-            JStatement ifSampleStatement =
-                new JIfStatement(null,
-                                 new JEqualityExpression(null,
-                                                         true,
-                                                         new JLocalVariableExpression(
-                                                             LoadBalancer.getSampleBoolVar(
-                                                                 SMPBackend.scheduler.getComputeNode(filterNode))),
-                                                         new JBooleanLiteral(true)),
-                                 ifSampleThen,
-                                 new JBlock(),
-                                 new JavaStyleComment[0]);
+	@Override
+	public JBlock getSteadyBlock() {
+		JBlock statements = new JBlock();
 
-            statements.addStatement(ifSampleStatement);
-        }
+		// channel code before work block
+		if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getInputBuffer(filterNode)
+					.beginSteadyRead()) {
+				statements.addStatement(stmt);
+			}
+		}
 
-        
-        // channel code after work block
-        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).endSteadyRead()) {
-                statements.addStatement(stmt);
-            }
-        }
-        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
-            for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).endSteadyWrite()) {
-                statements.addStatement(stmt);
-            }
-        }
-        statements.addAllStatements(endSchedulingPhase(SchedulingPhase.STEADY));
-    
-        return statements;
-    }
+		if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getOutputBuffer(filterNode)
+					.beginSteadyWrite()) {
+				statements.addStatement(stmt);
+			}
+		}
 
-    /**
-     * Return a JBlock that iterates <b>mult</b> times the result of calling 
-     * <b>getWorkFunctionCall()</b>.
-     * @param mult Number of times to iterate work function.
-     * @return as described, or <b>null</b> if <b>getWorkFunctionCall()</b> returns null;
-     */
-    @Override
-    protected JBlock getWorkFunctionBlock(int mult) {
-        if (getWorkMethod() == null) { return null; }
-        JBlock block = new JBlock();
-        JStatement workStmt = getWorkFunctionCall();
-        JVariableDefinition loopCounter = new JVariableDefinition(null,
-                0,
-                CStdType.Integer,
-                workCounter,
-                null);
-        
-        String multiplierName = filterNode.toString() + "_multiplier"; 
-       System.out.println("FilterCodeGeneration.getWorkFunctionBlock: addField multiplier " + multiplierName);
-        //ALocalVariable multiplierVar = ALocalVariable.makeVar(CStdType.Integer, multiplierName);   
-        //System.out.println("11111111111111111111111111111: " + multiplierVar.getVarDefn().getI;
-        //this.addField(new JFieldDeclaration(multiplierVar.getVarDefn()));
-        
-        JVariableDefinition multiplierVar = new JVariableDefinition(null, 
-                0, 
-                CStdType.Integer,
-                multiplierName,
-                null);
-        this.addField(new JFieldDeclaration(multiplierVar));
-        
-        
-        JStatement loop;
-        if(KjcOptions.loadbalance && LoadBalancer.isLoadBalanced(filterNode.getParent())) {
-            FissionGroup group = FissionGroupStore.getFissionGroup(filterNode.getParent());
-            
-            loop = 
-                Utils.makeForLoopLocalIndex(workStmt, 
-                                            loopCounter,                                           
-                                            new JNameExpression(
-                                                null,
-                                                LoadBalancer.getNumItersRef(group,
-                                                                            filterNode.getParent())));
-        }
-        else {
-        	   //loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new JFieldAccessExpression(multiplierVar.getIdent()), new JIntLiteral(mult));
-        	   loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new JIntLiteral(mult));
-        }
+		// Load balancing variables
+		JVariableDefinition startCycleVar = null;
+		JVariableDefinition endCycleVar = null;
 
-        block.addStatement(new JVariableDeclarationStatement(null,
-                loopCounter,
-                null));
-        block.addStatement(loop);
-        return block;
-    }
-    
-    /**
-     * Code returned by this function will be appended to the methods for the init, primepump, and
-     * steady stages for this filter.
-     * 
-     * @return  The block of code to append
-     */
-    protected JBlock endSchedulingPhase(SchedulingPhase phase) {
-        JBlock block = new JBlock();
-        return block;
-    }
+		// load balancing code before filter execution
+		if (KjcOptions.loadbalance
+				&& LoadBalancer.isLoadBalanced(filterNode.getParent())) {
+			startCycleVar = new JVariableDefinition(null, 0, CInt64Type.Int64,
+					"startCycle__" + uniqueID, null);
+
+			statements.addStatement(new JVariableDeclarationStatement(
+					startCycleVar));
+
+			statements.addStatement(new JIfStatement(null,
+					new JEqualityExpression(null, true,
+							new JLocalVariableExpression(LoadBalancer
+									.getSampleBoolVar(SMPBackend.scheduler
+											.getComputeNode(filterNode))),
+							new JBooleanLiteral(true)),
+					new JExpressionStatement(new JAssignmentExpression(
+							new JLocalVariableExpression(startCycleVar),
+							new JMethodCallExpression("rdtsc",
+									new JExpression[0]))), new JBlock(),
+					new JavaStyleComment[0]));
+		}
+
+		// iterate work function as needed
+		statements.addStatement(getWorkFunctionBlock(WorkNodeInfo
+				.getFilterInfo((WorkNode) internalFilterNode).steadyMult));
+
+		// load balancing code after filter execution
+		if (KjcOptions.loadbalance
+				&& LoadBalancer.isLoadBalanced(filterNode.getParent())) {
+			endCycleVar = new JVariableDefinition(null, 0, CInt64Type.Int64,
+					"endCycle__" + uniqueID, null);
+
+			statements.addStatement(new JVariableDeclarationStatement(
+					endCycleVar));
+
+			String cycleCountRef = LoadBalancer.getFilterCycleCountRef(
+					FissionGroupStore.getFissionGroup(filterNode.getParent()),
+					filterNode.getParent());
+
+			JBlock ifSampleThen = new JBlock();
+			ifSampleThen.addStatement(new JExpressionStatement(
+					new JAssignmentExpression(new JLocalVariableExpression(
+							endCycleVar), new JMethodCallExpression("rdtsc",
+							new JExpression[0]))));
+			ifSampleThen.addStatement(new JExpressionStatement(
+					new JAssignmentExpression(new JFieldAccessExpression(
+							cycleCountRef),
+							new JAddExpression(new JFieldAccessExpression(
+									cycleCountRef),
+									new JMinusExpression(null,
+											new JLocalVariableExpression(
+													endCycleVar),
+											new JLocalVariableExpression(
+													startCycleVar))))));
+
+			JStatement ifSampleStatement = new JIfStatement(null,
+					new JEqualityExpression(null, true,
+							new JLocalVariableExpression(LoadBalancer
+									.getSampleBoolVar(SMPBackend.scheduler
+											.getComputeNode(filterNode))),
+							new JBooleanLiteral(true)), ifSampleThen,
+					new JBlock(), new JavaStyleComment[0]);
+
+			statements.addStatement(ifSampleStatement);
+		}
+
+		// channel code after work block
+		if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getInputBuffer(filterNode)
+					.endSteadyRead()) {
+				statements.addStatement(stmt);
+			}
+		}
+		if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
+				.getParent())) {
+			for (JStatement stmt : RotatingBuffer.getOutputBuffer(filterNode)
+					.endSteadyWrite()) {
+				statements.addStatement(stmt);
+			}
+		}
+		statements.addAllStatements(endSchedulingPhase(SchedulingPhase.STEADY));
+
+		return statements;
+	}
+
+	/**
+	 * Return a JBlock that iterates <b>mult</b> times the result of calling
+	 * <b>getWorkFunctionCall()</b>.
+	 * 
+	 * @param mult
+	 *            Number of times to iterate work function.
+	 * @return as described, or <b>null</b> if <b>getWorkFunctionCall()</b>
+	 *         returns null;
+	 */
+	@Override
+	protected JBlock getWorkFunctionBlock(int mult) {
+		if (getWorkMethod() == null) {
+			return null;
+		}
+		JBlock block = new JBlock();
+		JStatement workStmt = getWorkFunctionCall();
+		JVariableDefinition loopCounter = new JVariableDefinition(null, 0,
+				CStdType.Integer, workCounter, null);
+
+		String multiplierName = filterNode.toString() + "_multiplier";
+		System.out
+				.println("FilterCodeGeneration.getWorkFunctionBlock: addField multiplier "
+						+ multiplierName);
+		// ALocalVariable multiplierVar =
+		// ALocalVariable.makeVar(CStdType.Integer, multiplierName);
+		// System.out.println("11111111111111111111111111111: " +
+		// multiplierVar.getVarDefn().getI;
+		// this.addField(new JFieldDeclaration(multiplierVar.getVarDefn()));
+
+		JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
+				CStdType.Integer, multiplierName, null);
+		codeStore.addField(new JFieldDeclaration(multiplierVar));
+
+		JStatement loop;
+		if (KjcOptions.loadbalance
+				&& LoadBalancer.isLoadBalanced(filterNode.getParent())) {
+			FissionGroup group = FissionGroupStore.getFissionGroup(filterNode
+					.getParent());
+
+			loop = Utils.makeForLoopLocalIndex(
+					workStmt,
+					loopCounter,
+					new JNameExpression(null, LoadBalancer.getNumItersRef(
+							group, filterNode.getParent())));
+		} else {
+			// loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new
+			// JFieldAccessExpression(multiplierVar.getIdent()), new
+			// JIntLiteral(mult));
+			loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter,
+					new JIntLiteral(mult));
+		}
+
+		block.addStatement(new JVariableDeclarationStatement(null, loopCounter,
+				null));
+		block.addStatement(loop);
+		return block;
+	}
+
+	private JVariableDefinition useExeIndex1() {
+		if (exeIndex1Used)
+			return exeIndex1;
+		else {
+			exeIndex1 = new JVariableDefinition(null, 0, CStdType.Integer,
+					exeIndex1Name + uniqueID, null);
+			exeIndex1Used = true;
+			codeStore.addField(new JFieldDeclaration(exeIndex1));
+			return exeIndex1;
+		}
+	}
 }
