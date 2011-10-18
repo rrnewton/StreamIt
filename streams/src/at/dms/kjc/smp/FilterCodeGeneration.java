@@ -386,9 +386,18 @@ public class FilterCodeGeneration extends CodeStoreHelper {
                 null);
         
         String multiplierName = filterNode.toString() + "_multiplier"; 
-        System.out.println("FilterCodeGeneration.getWorkFunctionBlock: addField multiplier " + multiplierName);
-        ALocalVariable multiplierVar = ALocalVariable.makeVar(CStdType.Integer, multiplierName);                
-        addField(new JFieldDeclaration(multiplierVar.getVarDefn()));
+       System.out.println("FilterCodeGeneration.getWorkFunctionBlock: addField multiplier " + multiplierName);
+        //ALocalVariable multiplierVar = ALocalVariable.makeVar(CStdType.Integer, multiplierName);   
+        //System.out.println("11111111111111111111111111111: " + multiplierVar.getVarDefn().getI;
+        //this.addField(new JFieldDeclaration(multiplierVar.getVarDefn()));
+        
+        JVariableDefinition multiplierVar = new JVariableDefinition(null, 
+                0, 
+                CStdType.Integer,
+                multiplierName,
+                null);
+        this.addField(new JFieldDeclaration(multiplierVar));
+        
         
         JStatement loop;
         if(KjcOptions.loadbalance && LoadBalancer.isLoadBalanced(filterNode.getParent())) {
@@ -402,9 +411,9 @@ public class FilterCodeGeneration extends CodeStoreHelper {
                                                 LoadBalancer.getNumItersRef(group,
                                                                             filterNode.getParent())));
         }
-        else {
-            loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, multiplierVar.getRef(), new JIntLiteral(mult));
-        }
+        else 
+            loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new JFieldAccessExpression(multiplierVar.getIdent()), new JIntLiteral(mult));
+        
 
         block.addStatement(new JVariableDeclarationStatement(null,
                 loopCounter,
