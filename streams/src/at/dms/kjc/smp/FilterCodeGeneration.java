@@ -3,6 +3,7 @@ package at.dms.kjc.smp;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
 import at.dms.kjc.JAddExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
@@ -29,6 +30,7 @@ import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.*;
 import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.common.ALocalVariable;
 import at.dms.util.Utils;
 import at.dms.kjc.KjcOptions;
 
@@ -59,10 +61,10 @@ public class FilterCodeGeneration extends CodeStoreHelper {
     /**
      * Constructor
      * @param node          A filter slice node to wrap code for.
-     * @param backEndBits   The back end factory as a source of data and back end specific functions.
+     * @param backEndFactory   The back end factory as a source of data and back end specific functions.
      */
-    public FilterCodeGeneration(WorkNode node, SMPBackEndFactory backEndBits) {
-        super(node,node.getAsFilter().getFilter(),backEndBits);
+    public FilterCodeGeneration(WorkNode node, SMPBackEndFactory backEndFactory) {
+        super(node,node.getAsFilter().getFilter(),backEndFactory);
         filterNode = node;
         filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
         //assume that every filter is a two-stage and prework is called
@@ -85,23 +87,23 @@ public class FilterCodeGeneration extends CodeStoreHelper {
     @Override
     public JMethodDeclaration getInitStageMethod() {
         JBlock statements = new JBlock();
-        assert sliceNode instanceof WorkNode;
-        WorkNodeContent filter = ((WorkNode) sliceNode).getFilter();
+        assert internalFilterNode instanceof WorkNode;
+        WorkNodeContent filter = ((WorkNode) internalFilterNode).getFilter();
 
         // channel code before work block
         //slice has input, so we 
-        if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).beginInitRead()) {
                 statements.addStatement(stmt);
             }
         }
-        if (backEndBits.sliceHasDownstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).beginInitWrite()) {
                 statements.addStatement(stmt);
             }
         }
         // add the calls for the work function in the initialization stage
-        if (WorkNodeInfo.getFilterInfo((WorkNode) sliceNode).isTwoStage()) {
+        if (WorkNodeInfo.getFilterInfo((WorkNode) internalFilterNode).isTwoStage()) {
 
             JMethodCallExpression initWorkCall = new JMethodCallExpression(
                     null, new JThisExpression(null), filter.getInitWork()
@@ -109,7 +111,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
 
             statements.addStatement(new JExpressionStatement(initWorkCall));
 
-            if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
+            if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
                 for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).postPreworkInitRead()) {
                     statements.addStatement(stmt);
                 }
@@ -145,12 +147,12 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         }
         
         // channel code after work block
-        if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).endInitRead()) {
                 statements.addStatement(stmt);
             }
         }
-        if (backEndBits.sliceHasDownstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).endInitWrite()) {
                 statements.addStatement(stmt);
             }
@@ -211,12 +213,12 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         
         JBlock statements = new JBlock();
         // channel code before work block
-        if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).beginPrimePumpRead()) {
                 statements.addStatement(stmt);
             }
         }
-        if (backEndBits.sliceHasDownstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).beginPrimePumpWrite()) {
                 statements.addStatement(stmt);
             }
@@ -224,12 +226,12 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         // add the calls to the work function for the priming of the pipeline
         statements.addStatement(getWorkFunctionBlock(filterInfo.steadyMult));
         // channel code after work block
-        if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).endPrimePumpRead()) {
                 statements.addStatement(stmt);
             }
         }
-        if (backEndBits.sliceHasDownstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).endPrimePumpWrite()) {
                 statements.addStatement(stmt);
             }
@@ -252,13 +254,13 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         JBlock statements = new JBlock();
         
         // channel code before work block
-        if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).beginSteadyRead()) {
                 statements.addStatement(stmt);
             }
         }
         
-        if (backEndBits.sliceHasDownstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).beginSteadyWrite()) {
                 statements.addStatement(stmt);
             }
@@ -298,7 +300,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
         
         // iterate work function as needed
         statements.addStatement(getWorkFunctionBlock(WorkNodeInfo
-                .getFilterInfo((WorkNode) sliceNode).steadyMult));
+                .getFilterInfo((WorkNode) internalFilterNode).steadyMult));
 
         // load balancing code after filter execution
         if(KjcOptions.loadbalance && LoadBalancer.isLoadBalanced(filterNode.getParent())) {
@@ -351,12 +353,12 @@ public class FilterCodeGeneration extends CodeStoreHelper {
 
         
         // channel code after work block
-        if (backEndBits.sliceHasUpstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : InputRotatingBuffer.getInputBuffer(filterNode).endSteadyRead()) {
                 statements.addStatement(stmt);
             }
         }
-        if (backEndBits.sliceHasDownstreamChannel(sliceNode.getParent())) {
+        if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode.getParent())) {
             for (JStatement stmt : OutputRotatingBuffer.getOutputBuffer(filterNode).endSteadyWrite()) {
                 statements.addStatement(stmt);
             }
@@ -383,13 +385,15 @@ public class FilterCodeGeneration extends CodeStoreHelper {
                 workCounter,
                 null);
         
-        String multiplierVar = filterNode.toString() + "_multiplier"; 
-        JExpression multiplier = new JFieldAccessExpression(multiplierVar);
+        String multiplierName = filterNode.toString() + "_multiplier"; 
+        System.out.println("FilterCodeGeneration.getWorkFunctionBlock: addField multiplier " + multiplierName);
+        ALocalVariable multiplierVar = ALocalVariable.makeVar(CStdType.Integer, multiplierName);                
+        addField(new JFieldDeclaration(multiplierVar.getVarDefn()));
         
         JStatement loop;
         if(KjcOptions.loadbalance && LoadBalancer.isLoadBalanced(filterNode.getParent())) {
             FissionGroup group = FissionGroupStore.getFissionGroup(filterNode.getParent());
-
+            
             loop = 
                 Utils.makeForLoopLocalIndex(workStmt, 
                                             loopCounter,                                           
@@ -399,7 +403,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
                                                                             filterNode.getParent())));
         }
         else {
-            loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, multiplier, new JIntLiteral(mult));
+            loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, multiplierVar.getRef(), new JIntLiteral(mult));
         }
 
         block.addStatement(new JVariableDeclarationStatement(null,

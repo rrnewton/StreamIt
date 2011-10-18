@@ -22,26 +22,26 @@ public class CodeStoreHelperSplitter extends CodeStoreHelper {
         // if we have a work method, iterate it enough
         // for downstream filter.
         JBlock statements = new JBlock();
-        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(sliceNode.getPrevious().getAsFilter());
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(internalFilterNode.getPrevious().getAsFilter());
 
         // channel code before work block
-        for (InterFilterEdge e : sliceNode.getAsOutput().getDestList(SchedulingPhase.INIT)) {
-            for (JStatement stmt : backEndBits.getChannel(e).beginInitWrite()) {
+        for (InterFilterEdge e : internalFilterNode.getAsOutput().getDestList(SchedulingPhase.INIT)) {
+            for (JStatement stmt : backEndFactory.getChannel(e).beginInitWrite()) {
                 statements.addStatement(stmt);
             }
         }
-        for (JStatement stmt : backEndBits.getChannel(sliceNode.getEdgeToNext()).beginInitWrite()) {
+        for (JStatement stmt : backEndFactory.getChannel(internalFilterNode.getEdgeToNext()).beginInitWrite()) {
             statements.addStatement(stmt);
         }
         // work block
         statements.addStatement(getWorkFunctionBlock(filterInfo.initItemsReceived()));
         // channel code after work block
-        for (InterFilterEdge e : sliceNode.getAsOutput().getDestList(SchedulingPhase.INIT)) {
-            for (JStatement stmt : backEndBits.getChannel(e).endInitWrite()) {
+        for (InterFilterEdge e : internalFilterNode.getAsOutput().getDestList(SchedulingPhase.INIT)) {
+            for (JStatement stmt : backEndFactory.getChannel(e).endInitWrite()) {
                 statements.addStatement(stmt);
             }
         }
-        for (JStatement stmt : backEndBits.getChannel(sliceNode.getEdgeToNext()).endInitWrite()) {
+        for (JStatement stmt : backEndFactory.getChannel(internalFilterNode.getEdgeToNext()).endInitWrite()) {
             statements.addStatement(stmt);
         }
         
@@ -63,26 +63,26 @@ public class CodeStoreHelperSplitter extends CodeStoreHelper {
             return primePumpMethod;
         }
         JBlock statements = new JBlock();
-        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(internalFilterNode.getNext().getAsFilter());
         
         // channel code before work block
-        for (InterFilterEdge e : sliceNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
-            for (JStatement stmt : backEndBits.getChannel(e).beginSteadyWrite()) {
+        for (InterFilterEdge e : internalFilterNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
+            for (JStatement stmt : backEndFactory.getChannel(e).beginSteadyWrite()) {
                 statements.addStatement(stmt);
             }
         }
-        for (JStatement stmt : backEndBits.getChannel(sliceNode.getEdgeToNext()).beginSteadyWrite()) {
+        for (JStatement stmt : backEndFactory.getChannel(internalFilterNode.getEdgeToNext()).beginSteadyWrite()) {
             statements.addStatement(stmt);
         }
         // code for a steady-state iteration
         statements.addStatement(getWorkFunctionBlock(filterInfo.totalItemsReceived(SchedulingPhase.PRIMEPUMP)));
         // channel code after work block
-        for (InterFilterEdge e : sliceNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
-            for (JStatement stmt : backEndBits.getChannel(e).endSteadyWrite()) {
+        for (InterFilterEdge e : internalFilterNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
+            for (JStatement stmt : backEndFactory.getChannel(e).endSteadyWrite()) {
                 statements.addStatement(stmt);
             }
         }
-        for (JStatement stmt : backEndBits.getChannel(sliceNode.getEdgeToNext()).endSteadyWrite()) {
+        for (JStatement stmt : backEndFactory.getChannel(internalFilterNode.getEdgeToNext()).endSteadyWrite()) {
             statements.addStatement(stmt);
         }
 
@@ -102,27 +102,27 @@ public class CodeStoreHelperSplitter extends CodeStoreHelper {
     @Override
     public JBlock getSteadyBlock() {
         JBlock statements = new JBlock();
-        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(sliceNode.getNext().getAsFilter());
+        WorkNodeInfo filterInfo = WorkNodeInfo.getFilterInfo(internalFilterNode.getNext().getAsFilter());
         
         // channel code before work block
-        for (InterFilterEdge e : sliceNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
-            for (JStatement stmt : backEndBits.getChannel(e).beginSteadyWrite()) {
+        for (InterFilterEdge e : internalFilterNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
+            for (JStatement stmt : backEndFactory.getChannel(e).beginSteadyWrite()) {
                 statements.addStatement(stmt);
             }
         }
-        for (JStatement stmt : backEndBits.getChannel(sliceNode.getEdgeToNext()).beginSteadyWrite()) {
+        for (JStatement stmt : backEndFactory.getChannel(internalFilterNode.getEdgeToNext()).beginSteadyWrite()) {
             statements.addStatement(stmt);
         }
         // work block / work call
         JStatement work = getWorkFunctionBlock(filterInfo.totalItemsReceived(SchedulingPhase.STEADY));
         if (work != null) { statements.addStatement(work); }
         // channel code after work block
-        for (InterFilterEdge e : sliceNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
-            for (JStatement stmt : backEndBits.getChannel(e).endSteadyWrite()) {
+        for (InterFilterEdge e : internalFilterNode.getAsOutput().getDestList(SchedulingPhase.STEADY)) {
+            for (JStatement stmt : backEndFactory.getChannel(e).endSteadyWrite()) {
                 statements.addStatement(stmt);
             }
         }
-        for (JStatement stmt : backEndBits.getChannel(sliceNode.getEdgeToNext()).endSteadyWrite()) {
+        for (JStatement stmt : backEndFactory.getChannel(internalFilterNode.getEdgeToNext()).endSteadyWrite()) {
             statements.addStatement(stmt);
         }
         return statements;

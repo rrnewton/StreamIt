@@ -597,17 +597,14 @@ public class EmitSMPCode extends EmitCode {
 			method.accept(codegen);
 		}
 		p.println("");
-		codegen.setDeclOnly(false);
+		codegen.setDeclOnly(false);		
 
 		// generate code for ends of channels that connect to code on this ComputeNode
 		Set <RotatingBuffer> outputBuffers = OutputRotatingBuffer.getOutputBuffersOnCore((Core)n);
 		Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnCore((Core)n);
 		Set <InterSSGChannel> dynamicInputBuffers = InterSSGChannel.getInputBuffersOnCore((Core)n);
 		Set <InterSSGChannel> dynamicOutputBuffers = InterSSGChannel.getOutputBuffersOnCore((Core)n);
-		
-		JStatement success = new JExpressionStatement(new JEmittedTextExpression("static int success"));
-		success.accept(codegen); p.println();
-				
+						
 		for (InterSSGChannel c : dynamicInputBuffers) {
 			if (c.readDeclsExtern() != null) {
 				for (JStatement d : c.readDeclsExtern()) { 
@@ -695,6 +692,7 @@ public class EmitSMPCode extends EmitCode {
 		
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
+			System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: " + field.toString());
 			field.accept(codegen);
 		}
 		p.println("");

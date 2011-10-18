@@ -131,6 +131,8 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 
 	/** set of FilterSliceNodes that are mapped to this core */
 	protected HashSet<WorkNode> filters;
+	
+	private List<String> multipliers;
 
 
 	/**
@@ -489,6 +491,6 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		Utils.addSignal(steadyLoop, 0, "DYN_READER");
 		Utils.addCondWait(steadyLoop, 0, "MASTER", "MASTER",
 				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep[" + 0 + "][MASTER]"));
-	}
+	}	
 
 }

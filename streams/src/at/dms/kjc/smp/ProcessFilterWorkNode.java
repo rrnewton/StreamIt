@@ -1,21 +1,26 @@
 package at.dms.kjc.smp;
 
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.InterSSGChannel;
+import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.sir.SIRPeekExpression;
@@ -373,6 +378,10 @@ public class ProcessFilterWorkNode {
 
 	protected void standardSteadyProcessing(boolean isDynamicPop) {
 		JStatement steadyBlock = filterCode.getSteadyBlock();
+
+//		ALocalVariable multiplierVar = ALocalVariable.makeVar(CStdType.Integer, "mymultiplier");                
+//		codeStore.addField(new JFieldDeclaration(multiplierVar.getVarDefn()));			
+		
 		// helper has now been used for the last time, so we can write the basic
 		// code.
 		// write code deemed useful by the helper into the correct
