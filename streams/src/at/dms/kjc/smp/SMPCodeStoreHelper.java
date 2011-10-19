@@ -37,7 +37,7 @@ import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.util.Utils;
 
-public class FilterCodeGeneration extends CodeStoreHelper {
+public class SMPCodeStoreHelper extends CodeStoreHelper {
 
 	private WorkNode filterNode;
 	private WorkNodeInfo filterInfo;
@@ -60,7 +60,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
 	 *            The back end factory as a source of data and back end specific
 	 *            functions.
 	 */
-	public FilterCodeGeneration(WorkNode node,
+	public SMPCodeStoreHelper(WorkNode node,
 			SMPBackEndFactory backEndFactory, CoreCodeStore codeStore) {
 		super(node, node.getAsFilter().getFilter(), backEndFactory);
 		filterNode = node;

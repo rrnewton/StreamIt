@@ -114,7 +114,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 			newFields[i] = (JFieldDeclaration) str.getFields()[i].accept(this);
 
 		JMethodDeclaration[] newMethods = new JMethodDeclaration[str
-				.getMethods().length];
+		                                                         .getMethods().length];
 		for (int i = 0; i < str.getMethods().length; i++) {
 			JMethodDeclaration oldMeth = str.getMethods()[i];
 			JMethodDeclaration newMeth = (JMethodDeclaration) oldMeth
@@ -127,6 +127,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 			if (oldMeth.equals(str.getMainFunction()))
 				str.setMainFunction(newMeth);
 		}
+
 
 		str.setFields(newFields);
 		str.setMethods(newMethods);

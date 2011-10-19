@@ -125,7 +125,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
 	public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
 		if (node instanceof WorkNode) {
 			// simply do appropriate wrapping of calls...
-			return new FilterCodeGeneration((WorkNode) node, this, scheduler.getComputeNode(node).getComputeCode());
+			return new SMPCodeStoreHelper((WorkNode) node, this, scheduler.getComputeNode(node).getComputeCode());
 		} else {
 			return null;
 		}
