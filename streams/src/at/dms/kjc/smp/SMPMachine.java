@@ -6,7 +6,7 @@ import java.util.Map;
 import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.kjc.slir.Filter;
 
-public class SMPMachine implements ComputeNodesI<CoreCodeStore> {
+public class SMPMachine implements ComputeNodesI<SMPComputeCodeStore> {
     protected int numCores;
     protected Core[] cores;
     protected OffChipMemory offChipMemory;

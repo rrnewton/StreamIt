@@ -53,7 +53,7 @@ public class EmitSMPCode extends EmitCode {
 
 			// for all the cores, add a barrier at the end of the steady state, do it here 
 			// because we are done with all code gen
-			CoreCodeStore.addBarrierSteady();
+			SMPComputeCodeStore.addBarrierSteady();
 
 			// if load balancing, instrument steady-state loop after steady-state barrier
 			if(KjcOptions.loadbalance) {
@@ -80,7 +80,7 @@ public class EmitSMPCode extends EmitCode {
 					continue;
 
 				core.getComputeCode().addFunctionCallFirst(core.getComputeCode().getBufferInitMethod(), new JExpression[0]);
-										
+
 				if(!KjcOptions.nobind) {
 					JExpression[] setAffinityArgs = new JExpression[1];
 					setAffinityArgs[0] = new JIntLiteral(core.getCoreID());
@@ -99,7 +99,7 @@ public class EmitSMPCode extends EmitCode {
 			}
 
 			// make sure that variables and methods are unique across cores
-			List<ComputeCodeStore<?>> codeStores = new LinkedList<ComputeCodeStore<?>>();
+			List<SMPComputeCodeStore> codeStores = new LinkedList<SMPComputeCodeStore>();
 			for (Core core : SMPBackend.chip.getCores()) {
 				if (!core.getComputeCode().shouldGenerateCode())
 					continue;
@@ -176,9 +176,17 @@ public class EmitSMPCode extends EmitCode {
 			p.println("pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
 			p.println("int                   thread_to_sleep [DYNAMIC_READERS][2];");
 		}
-		
+
 		p.println();
 
+		for (Core core : SMPBackend.chip.getCores()) {
+			for (JFieldDeclaration fieldDecl : core.getComputeCode().getExternFields().values()) {
+				p.println(fieldDecl.getType() + " " + fieldDecl.getVariable().getIdent() + ";");
+			}
+		}
+		
+		p.println();
+		
 		p.println("// Global barrier");
 		p.println("barrier_t barrier;");
 		p.println();
@@ -234,6 +242,12 @@ public class EmitSMPCode extends EmitCode {
 					p.println("}");
 					p.println();           
 				}
+				
+				for (Core core : SMPBackend.chip.getCores()) {
+					for (JFieldDeclaration fieldDecl : core.getComputeCode().getExternFields().values()) {
+						p.println(fieldDecl.getVariable().getIdent() + " = 1;");
+					}
+				}
 
 				if(KjcOptions.loadbalance) {
 					p.println();
@@ -263,8 +277,7 @@ public class EmitSMPCode extends EmitCode {
 					p.outdent();
 				}
 
-				
-				
+
 				if (isDynamic) {					
 					// TODO: How to get the appropriate unique name for the helper thread method name?
 					for (Core core : SMPBackend.chip.getCores()) {
@@ -273,8 +286,7 @@ public class EmitSMPCode extends EmitCode {
 
 						System.out.println("about to gnerate helper threads! helperMethods.size=" + helperMethods.size());
 						for (JMethodDeclaration decl : helperMethods) {
-							
-							
+
 							String varName = "helperThread" + i;
 							i++;
 							p.println();
@@ -287,13 +299,8 @@ public class EmitSMPCode extends EmitCode {
 
 						}
 					}
-					
-//					p.println("if ((rc = pthread_create(&helper" + ", NULL, " +
-//							"helper__3" + ", (void *)NULL)) < 0)");
-					
-					
 				}
-				
+
 				p.println();
 				p.println("pthread_attr_destroy(&attr);");
 
@@ -347,7 +354,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println("// Global barrier");
 		p.println("extern barrier_t barrier;");
 		p.println();
-					
+
 		// TODO: RJS put upper bounds
 		if (isDynamic) {
 			// TODO fix number of threads
@@ -385,7 +392,7 @@ public class EmitSMPCode extends EmitCode {
 			p.println("extern void *" + core.getComputeCode().getMyMainName() + "(void * arg);");
 		}
 		p.println();
-		
+
 		p.println("// Helper entry points");		
 		for (Core core : SMPBackend.chip.getCores()) {
 			Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
@@ -394,7 +401,12 @@ public class EmitSMPCode extends EmitCode {
 			}
 		}
 		p.println();
-		
+		for (Core core : SMPBackend.chip.getCores()) {
+			for (JFieldDeclaration fieldDecl : core.getComputeCode().getExternFields().values()) {
+				p.println("extern " + fieldDecl.getType() + " " + fieldDecl.getVariable().getIdent() + ";");
+			}
+		}
+
 		p.println("#endif");
 		p.close();
 	}
@@ -588,7 +600,7 @@ public class EmitSMPCode extends EmitCode {
 	 */
 	public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
 			ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
-				
+
 		p.println("// code for core " + n.getUniqueId());
 		p.println(((Core)n).getComputeCode().getGlobalText());
 
@@ -606,7 +618,7 @@ public class EmitSMPCode extends EmitCode {
 		Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnCore((Core)n);
 		Set <InterSSGChannel> dynamicInputBuffers = InterSSGChannel.getInputBuffersOnCore((Core)n);
 		Set <InterSSGChannel> dynamicOutputBuffers = InterSSGChannel.getOutputBuffersOnCore((Core)n);
-						
+
 		for (InterSSGChannel c : dynamicInputBuffers) {
 			if (c.readDeclsExtern() != null) {
 				for (JStatement d : c.readDeclsExtern()) { 
@@ -614,7 +626,7 @@ public class EmitSMPCode extends EmitCode {
 				}
 			}
 		}
-		
+
 		for (InterSSGChannel c : dynamicOutputBuffers) {
 			if (c.writeDeclsExtern() != null) {
 				for (JStatement d : c.writeDeclsExtern()) { 
@@ -685,13 +697,13 @@ public class EmitSMPCode extends EmitCode {
 			if (c.popManyMethod() != null) { c.popManyMethod().accept(codegen); }
 		}
 		p.println("");				
-		
+
 		for (InterSSGChannel c : dynamicInputBuffers) {						
 			c.popMethod().accept(codegen); 
 		}
-		
+
 		p.println("");
-		
+
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
 			System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: " + field.getVariable().getIdent());
@@ -702,14 +714,14 @@ public class EmitSMPCode extends EmitCode {
 		//handle the buffer initialization method separately because we do not want it
 		//optimized (it is not in the methods list of the code store
 		((Core)n).getComputeCode().getBufferInitMethod().accept(codegen);
-		
+
 		// generate functions for methods
 		codegen.setDeclOnly(false);
-		
+
 		for (JMethodDeclaration method : fieldsAndMethods.getMethods()) {
 			method.accept(codegen);
 		}
-		
+
 	}
 
 	public static void generateSetAffinity(CodegenPrintWriter p) {

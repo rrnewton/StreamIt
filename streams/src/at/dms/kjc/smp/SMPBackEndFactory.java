@@ -22,7 +22,7 @@ import java.util.HashMap;
  * @author mgordon
  * 
  */
-public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCodeStore, Integer> {
+public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPComputeCodeStore, Integer> {
 
 	/**
 	 * Set the scheduler used by the backend factory
@@ -139,7 +139,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
 	 * .backendSupport.ComputeNode)
 	 */
 	@Override
-	public CoreCodeStore getComputeCodeStore(Core parent) {
+	public SMPComputeCodeStore getComputeCodeStore(Core parent) {
 		return parent.getComputeCode();
 	}
 
@@ -266,14 +266,14 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, CoreCode
 					leftToProcess--;
 					levelLeftToProcessInit.put(level, leftToProcess);
 					if (leftToProcess == 0)
-						CoreCodeStore.addBarrierInit();
+						SMPComputeCodeStore.addBarrierInit();
 				} else if (whichPhase == SchedulingPhase.PRIMEPUMP) {
 					int level = lsg.getLevel(filter.getParent());
 					int leftToProcess = levelLeftToProcessPP.get(level);
 					leftToProcess--;
 					levelLeftToProcessPP.put(level, leftToProcess);
 					if (leftToProcess == 0) {
-						CoreCodeStore.addBarrierInit();
+						SMPComputeCodeStore.addBarrierInit();
 						levelLeftToProcessPP.put(level,
 								lsg.getLevels()[level].length);
 					}

@@ -203,7 +203,7 @@ public class ProcessFilterWorkNode {
 	}
 
 	protected CodeStoreHelper filterCode;
-	protected CoreCodeStore codeStore;
+	protected SMPComputeCodeStore codeStore;
 	protected WorkNode filterNode;
 	protected SchedulingPhase whichPhase;
 

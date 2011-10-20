@@ -8,7 +8,7 @@ import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.slir.Filter;
 
-public class Core extends ComputeNode<CoreCodeStore> {
+public class Core extends ComputeNode<SMPComputeCodeStore> {
     /** the core ID */
     protected int coreID;
     /** the parent machine */
@@ -28,9 +28,9 @@ public class Core extends ComputeNode<CoreCodeStore> {
         setUniqueId(coreID);
         
         if(KjcOptions.iterations == -1)
-        	computeCode = new CoreCodeStore(this);
+        	computeCode = new SMPComputeCodeStore(this);
         else
-        	computeCode = new CoreCodeStore(this, ALocalVariable.makeVar(CStdType.Integer, "maxSteadyIter"));
+        	computeCode = new SMPComputeCodeStore(this, ALocalVariable.makeVar(CStdType.Integer, "maxSteadyIter"));
     }
     
     /**
@@ -50,7 +50,7 @@ public class Core extends ComputeNode<CoreCodeStore> {
         return machine;
     }
     
-    public CoreCodeStore getComputeCode() {
+    public SMPComputeCodeStore getComputeCode() {
         return computeCode;
     }
     

@@ -44,7 +44,7 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	private static String exeIndex1Name = "__EXEINDEX__1__";
 	private JVariableDefinition exeIndex1;
 	private boolean exeIndex1Used;
-	private CoreCodeStore codeStore;
+	private SMPComputeCodeStore codeStore;
 	/**
 	 * this variable massages init mult to assume that every filter is a two
 	 * stage
@@ -61,7 +61,7 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	 *            functions.
 	 */
 	public SMPCodeStoreHelper(WorkNode node,
-			SMPBackEndFactory backEndFactory, CoreCodeStore codeStore) {
+			SMPBackEndFactory backEndFactory, SMPComputeCodeStore codeStore) {
 		super(node, node.getAsFilter().getFilter(), backEndFactory);
 		filterNode = node;
 		filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
@@ -404,7 +404,7 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 
 		String multiplierName = filterNode.toString() + "_multiplier";
 		System.out
-				.println("FilterCodeGeneration.getWorkFunctionBlock: addField multiplier "
+				.println("SMPCodeStoreHelper.getWorkFunctionBlock: addField multiplier "
 						+ multiplierName);
 		// ALocalVariable multiplierVar =
 		// ALocalVariable.makeVar(CStdType.Integer, multiplierName);
@@ -414,8 +414,10 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 
 		JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
 				CStdType.Integer, multiplierName, null);
-		codeStore.addField(new JFieldDeclaration(multiplierVar));
+		// codeStore.addField(new JFieldDeclaration(multiplierVar));
 
+		codeStore.addExternField(new JFieldDeclaration(multiplierVar));
+		
 		JStatement loop;
 		if (KjcOptions.loadbalance
 				&& LoadBalancer.isLoadBalanced(filterNode.getParent())) {
@@ -428,11 +430,9 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 					new JNameExpression(null, LoadBalancer.getNumItersRef(
 							group, filterNode.getParent())));
 		} else {
-			// loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new
-			// JFieldAccessExpression(multiplierVar.getIdent()), new
-			// JIntLiteral(mult));
-			loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter,
-					new JIntLiteral(mult));
+			loop = Utils.makeForLoopLocalIndex(workStmt, loopCounter, new
+					JFieldAccessExpression(multiplierVar.getIdent()), new
+					JIntLiteral(mult));		
 		}
 
 		block.addStatement(new JVariableDeclarationStatement(null, loopCounter,

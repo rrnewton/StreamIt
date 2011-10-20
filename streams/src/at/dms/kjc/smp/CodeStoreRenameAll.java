@@ -89,15 +89,15 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 	}
 
 	public static void renameOverAllCodeStores(
-			List<ComputeCodeStore<?>> codeStores) {
+			List<SMPComputeCodeStore> codeStores) {
 		// reset the global renamer
 		globalRenamer = new CodeStoreRenameAll();
 
-		for (ComputeCodeStore<?> codeStore : codeStores)
+		for (SMPComputeCodeStore codeStore : codeStores)
 			globalRenamer.renameCodeStore(codeStore);
 	}
 
-	private void renameCodeStore(ComputeCodeStore<?> str) {
+	private void renameCodeStore(SMPComputeCodeStore str) {
 		RASymbolTable ost = symtab;
 		symtab = new RASymbolTable(ost);
 		classsymtab = symtab;

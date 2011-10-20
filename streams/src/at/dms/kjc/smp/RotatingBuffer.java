@@ -100,7 +100,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
         rotTypeDefs();
         //now that all the buffers are allocated, we create a barrier on all the cores
         //so that we wait for all the shared memory to be allocated
-        CoreCodeStore.addBufferInitBarrier();
+        SMPComputeCodeStore.addBufferInitBarrier();
         //generate the code for the address communication stage
         communicateAddresses();
     }
@@ -124,7 +124,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
         //handle all the filters that are mapped to compute cores
     	//this will handle all filters except file writers and file readers
         for (Core ownerCore : SMPBackend.chip.getCores()) {
-            CoreCodeStore cs = ownerCore.getComputeCode();
+            SMPComputeCodeStore cs = ownerCore.getComputeCode();
             
             for (WorkNode filter : cs.getFilters()) {
                 communicateAddressesForFilter(filter, ownerCore);
@@ -198,7 +198,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
      */
     protected void allocBuffers() {
     	for (int i = 0; i < rotationLength; i++) {
-    		CoreCodeStore cs;
+    		SMPComputeCodeStore cs;
 
     		//if we have a file writer then the code has to be put on the allocating core not the off chip memory!
     		//else we are dealing with a regular buffer on a core, put on parent core

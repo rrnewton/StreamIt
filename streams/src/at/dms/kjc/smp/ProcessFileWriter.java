@@ -13,7 +13,7 @@ public class ProcessFileWriter {
     protected WorkNode filterNode;
     protected SchedulingPhase phase;
     protected SMPBackEndFactory factory;
-    protected CoreCodeStore codeStore;
+    protected SMPComputeCodeStore codeStore;
     protected FileOutputContent fileOutput;
     protected static HashMap<WorkNode, Core> allocatingCores;
     protected Core allocatingCore; 

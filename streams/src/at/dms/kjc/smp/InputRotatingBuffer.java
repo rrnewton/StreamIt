@@ -283,7 +283,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      */
     protected void setupRotation() {
         String temp = "__temp__";
-        CoreCodeStore cs; 
+        SMPComputeCodeStore cs; 
         
         //this is the typedef we will use for this buffer rotation structure
         String rotType = rotTypeDefPrefix + getType().toString();

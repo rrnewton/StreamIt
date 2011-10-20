@@ -71,7 +71,7 @@ public class SourceAddressRotation extends RotatingBuffer {
     public void declareBuffers() {
         for (int i = 0; i < rotationLength; i++) {
             
-            CoreCodeStore cs = this.parent.getComputeCode();
+            SMPComputeCodeStore cs = this.parent.getComputeCode();
             
             //create the pointer that will point to the buffer constituent on the dest core
             //cs.addStatementToBufferInit(new JExpressionStatement(new JEmittedTextExpression("// Generated in SourceAddressRotation.declareBuffers()")));
@@ -86,7 +86,7 @@ public class SourceAddressRotation extends RotatingBuffer {
      */
     protected void setupRotation() {
         String temp = "__temp__";
-        CoreCodeStore cs = parent.getComputeCode();
+        SMPComputeCodeStore cs = parent.getComputeCode();
         //this is the typedef we will use for this buffer rotation structure
         String rotType = rotTypeDefPrefix + getType().toString();
         

@@ -54,8 +54,8 @@ public class JFieldDeclaration extends JMemberDeclaration {
 
         this.variable = variable;
     }
-
-    public JFieldDeclaration(JVariableDefinition variable) {
+  
+	public JFieldDeclaration(JVariableDefinition variable) {
         this(null, variable, null, null);
     }
     

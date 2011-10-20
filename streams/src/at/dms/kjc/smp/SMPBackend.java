@@ -97,7 +97,7 @@ public class SMPBackend {
 	private static void emitCode() {
 
 		// generate code for file writer
-		CoreCodeStore.generatePrintOutputCode();
+		SMPComputeCodeStore.generatePrintOutputCode();
 
 		if (KjcOptions.numbers > 0)
 			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();

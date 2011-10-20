@@ -4,15 +4,15 @@ import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import at.dms.kjc.slir.*;
 import at.dms.util.Utils;
 
-public class CoreCodeStore extends ComputeCodeStore<Core> {
+public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	/**
 	 * Append a barrier instruction to all of the cores in the init/primepump
 	 * stage.
@@ -23,7 +23,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		// return;
 
 		for (int t = 0; t < SMPBackend.chip.size(); t++) {
-			CoreCodeStore cs = SMPBackend.chip.getNthComputeNode(t)
+			SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(t)
 					.getComputeCode();
 			cs.addInitStatement(Util.toStmt("barrier_wait(&barrier)"));
 			cs.setHasCode();
@@ -40,7 +40,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 			return;
 
 		for (int t = 0; t < SMPBackend.chip.size(); t++) {
-			CoreCodeStore cs = SMPBackend.chip.getNthComputeNode(t)
+			SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(t)
 					.getComputeCode();
 			cs.addSteadyLoopStatement(Util.toStmt("/* Steady-State Barrier */"));
 			cs.addSteadyLoopStatement(Util.toStmt("barrier_wait(&barrier)"));
@@ -58,7 +58,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 			return;
 
 		for (int t = 0; t < SMPBackend.chip.size(); t++) {
-			CoreCodeStore cs = SMPBackend.chip.getNthComputeNode(t)
+			SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(t)
 					.getComputeCode();
 			cs.addStatementToBufferInit("barrier_wait(&barrier)");
 			cs.setHasCode();
@@ -98,7 +98,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 
 			Core core = SMPBackend.scheduler.getComputeNode(firstInputFilter);
 
-			CoreCodeStore codeStore = core.getComputeCode();
+			SMPComputeCodeStore codeStore = core.getComputeCode();
 
 			FileOutputContent fileOutput = (FileOutputContent) fileW
 					.getFilter();
@@ -130,22 +130,29 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 	private StringBuffer globalTxt = new StringBuffer();
 
 	/** set of FilterSliceNodes that are mapped to this core */
-	protected HashSet<WorkNode> filters;
+	protected Set<WorkNode> filters;
 	
-	private List<String> multipliers;
+	/** set of JMethodDeclaration for the helper thread on this core */
+	protected Set<JMethodDeclaration> helperThreadMethods = new HashSet<JMethodDeclaration>();
 
+	/** 
+	 * Set of fields that should be externally defined on this core. I am using a Map
+	 * to store values because JFieldDeclaration does not define equals and hashCode, 
+	 * so storing in a Set does not prevent duplicates correctly.
+	 */
+	protected Map<String, JFieldDeclaration> externFields = new HashMap<String, JFieldDeclaration>();
 
 	/**
 	 * Constructor: steady state loops indefinitely, no pointer back to compute
 	 * node.
 	 */
-	public CoreCodeStore() {
+	public SMPComputeCodeStore() {
 		super();
 		setMyMainName("__main__");
 	}
 
 
-	public CoreCodeStore(Core nodeType) {
+	public SMPComputeCodeStore(Core nodeType) {
 		super(nodeType);
 		setMyMainName("__main__");
 		filters = new HashSet<WorkNode>();
@@ -167,7 +174,7 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 	 * @param iterationBound
 	 *            a variable that will be defined locally in
 	 */
-	public CoreCodeStore(Core parent, ALocalVariable iterationBound) {
+	public SMPComputeCodeStore(Core parent, ALocalVariable iterationBound) {
 		super(parent, iterationBound);
 		setMyMainName("__main__");
 		filters = new HashSet<WorkNode>();
@@ -479,6 +486,39 @@ public class CoreCodeStore extends ComputeCodeStore<Core> {
 		Utils.addSignal(steadyLoop, 0, "DYN_READER");
 		Utils.addCondWait(steadyLoop, 0, "MASTER", "MASTER",
 				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep[" + 0 + "][MASTER]"));
+	}
+
+	public void addExternField(JFieldDeclaration jFieldDeclaration) {
+		// There is a problem with this code. We do not want to store
+		// duplicates of the same jFieldDeclaration. However, the JFieldDeclaration
+		// class does not define equals and hashCode, so the Set implementation
+		// does not know about duplicate entries. Rather than changing the 
+		// Kopi compiler, I'm going to check for equality here by comparing
+		// the names and types.
+		externFields.put(jFieldDeclaration.getVariable().getIdent(), jFieldDeclaration);		
 	}	
 
+	public  Map<String, JFieldDeclaration> getExternFields() {
+		return externFields;
+	}	
+
+	/**
+	 * Return the helper thread methods in this store;
+	 * 
+	 * @return the helper thread methods in this store;
+	 */
+	public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {
+		return helperThreadMethods;
+	}
+	
+	/**
+	 * Set the helper thread methods in this store;
+	 * 
+	 * @param methods the helper thread methods in this store;
+	 */
+	public void setDynamicThreadHelperMethods(Set<JMethodDeclaration> methods) {
+		helperThreadMethods = methods;
+	}
+
+	
 }

@@ -15,7 +15,7 @@ public class ProcessFileReader {
     protected WorkNode filterNode;
     protected SchedulingPhase phase;
     protected SMPBackEndFactory factory;
-    protected CoreCodeStore codeStore;
+    protected SMPComputeCodeStore codeStore;
     protected FileInputContent fileInput;
     protected Core allocatingCore;
     protected OutputNode fileOutput;
@@ -78,7 +78,7 @@ public class ProcessFileReader {
             fileReaderCodeStore.put(frcKey, fileReaderCode);
         }
         
-        CoreCodeStore codeStore = SMPBackend.scheduler.getComputeNode(dsFilter).getComputeCode();
+        SMPComputeCodeStore codeStore = SMPBackend.scheduler.getComputeNode(dsFilter).getComputeCode();
         
         switch (phase) {
         case INIT : generateInitCode(fileReaderCode, codeStore, destBuf); break;
@@ -87,7 +87,7 @@ public class ProcessFileReader {
         }
     }
     
-    private void generateInitCode(FileReaderCode fileReaderCode, CoreCodeStore codeStore, 
+    private void generateInitCode(FileReaderCode fileReaderCode, SMPComputeCodeStore codeStore, 
             InputRotatingBuffer destBuf) {
 
         JBlock statements = new JBlock(fileReaderCode.commandsInit);
@@ -108,7 +108,7 @@ public class ProcessFileReader {
                         initMethod.getName(), new JExpression[0]), null));
     }
 
-    private void generatePPCode(WorkNode node, FileReaderCode fileReaderCode, CoreCodeStore codeStore, 
+    private void generatePPCode(WorkNode node, FileReaderCode fileReaderCode, SMPComputeCodeStore codeStore, 
             InputRotatingBuffer destBuf) {
 
         FileReaderCodeKey frcKey = new FileReaderCodeKey(filterNode, node);
@@ -135,7 +135,7 @@ public class ProcessFileReader {
                         PPMethodStore.get(frcKey).getName(), new JExpression[0]), null));
     }
     
-    private void generateSteadyCode(FileReaderCode fileReaderCode, CoreCodeStore codeStore, 
+    private void generateSteadyCode(FileReaderCode fileReaderCode, SMPComputeCodeStore codeStore, 
             InputRotatingBuffer destBuf) {
         
         JBlock steadyBlock = new JBlock(fileReaderCode.commandsSteady);

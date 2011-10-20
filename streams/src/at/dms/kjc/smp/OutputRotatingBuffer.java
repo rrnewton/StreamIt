@@ -611,7 +611,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
             return;
 
         String temp = "__temp__";
-        CoreCodeStore cs = parent.getComputeCode();
+        SMPComputeCodeStore cs = parent.getComputeCode();
         //this is the typedef we will use for this buffer rotation structure
         String rotType = rotTypeDefPrefix + getType().toString();
         

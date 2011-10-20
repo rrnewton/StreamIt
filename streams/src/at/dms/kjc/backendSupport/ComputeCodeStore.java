@@ -111,9 +111,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	/** the block executed after the steadyLoop */
 	protected JBlock cleanupBlock;
 
-	/** set of JMethodDeclaration for the helper thread on this core */
-	protected Set<JMethodDeclaration> helperThreadMethods = new HashSet<JMethodDeclaration>();
-
+	
 	/**
 	 * Constructor: steady state loops indefinitely, no pointer back to compute
 	 * node.
@@ -405,25 +403,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	public JMethodDeclaration[] getMethods() {
 		return methods;
 	}
-	
-	/**
-	 * Return the helper thread methods in this store;
-	 * 
-	 * @return the helper thread methods in this store;
-	 */
-	public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {
-		return helperThreadMethods;
-	}
-	
-	/**
-	 * Set the helper thread methods in this store;
-	 * 
-	 * @param methods the helper thread methods in this store;
-	 */
-	public void setDynamicThreadHelperMethods(Set<JMethodDeclaration> methods) {
-		helperThreadMethods = methods;
-	}
-
+		
 	/**
 	 * get name for MAIN method in this code store.
 	 * 
