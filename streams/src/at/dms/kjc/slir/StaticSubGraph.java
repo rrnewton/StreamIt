@@ -78,15 +78,15 @@ public class StaticSubGraph {
 	/**
 	 * Does the the slice graph contain slice (perform a simple linear search).
 	 * 
-	 * @param slice
-	 *            The slice to query.
+	 * @param filter
+	 *            The filter to query.
 	 * 
-	 * @return True if the slice graph contains slice.
+	 * @return True if the static sub graph contains filter.
 	 */
-	public boolean containsSlice(Filter slice) {
-		Filter[] sliceGraph = getFilterGraph();
-		for (int i = 0; i < sliceGraph.length; i++)
-			if (sliceGraph[i] == slice)
+	public boolean containsFilter(Filter filter) {
+		Filter[] filterGraph = getFilterGraph();
+		for (int i = 0; i < filterGraph.length; i++)
+			if (filterGraph[i] == filter)
 				return true;
 		return false;
 	}
@@ -748,7 +748,7 @@ public class StaticSubGraph {
 	public void setSliceGraphNewIds(Filter[] slices) {
 		// add the new filters to the necessary structures...
 		for (int i = 0; i < slices.length; i++) {
-			if (!containsSlice(slices[i])) {
+			if (!containsFilter(slices[i])) {
 				WorkNode filter = slices[i].getWorkNode();
 				assert filter.toString().startsWith("Identity");
 

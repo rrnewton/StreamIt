@@ -25,7 +25,6 @@ public class EmitCode {
      * @param backendbits indicates BackEndFactory containing all useful info.
      */
     public EmitCode (BackEndFactory backendbits) {
-        super();
         this.backendbits = backendbits;
         codegen = null;
     }
