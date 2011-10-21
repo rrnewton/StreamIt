@@ -12,6 +12,7 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
+import at.dms.kjc.common.LowerIterationExpression;
 import at.dms.kjc.common.ConvertLocalsToFields;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRGlobal;
@@ -175,6 +176,10 @@ public class CommonPasses {
 		// done after fusion, and should not affect fusable
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
+
+                LowerIterationExpression.doIt(str);
+                
+
 		DynamismFinder.Result result = new DynamismFinder().find(str);
 		return doStaticPassesSegmentedSIRGraph(new SegmentedSIRGraph().init(str, result.isDynamic()));
 	}
