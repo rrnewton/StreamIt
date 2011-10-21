@@ -1,31 +1,25 @@
 package at.dms.kjc.smp;
 
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.InterSSGChannel;
-import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.sir.SIRPrintStatement;
 import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.kjc.slir.FileOutputContent;
 import at.dms.kjc.slir.Filter;
@@ -195,6 +189,8 @@ public class ProcessFilterWorkNode {
 			// Add markers to code for debugging of emitted code:
 			String methodName = "filter " + filter.getFilter().getName() + "."
 					+ method.getName();
+			
+			
 			method.addStatementFirst(new SIRBeginMarker(methodName));
 			method.addStatement(new SIREndMarker(methodName));
 		}

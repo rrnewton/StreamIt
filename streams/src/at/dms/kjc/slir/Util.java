@@ -127,9 +127,9 @@ public class Util {
             }
             return new InterFilterEdge((OutputNode)src,(InputNode)dst);
         } else {
-            IntraSSGEdge e = src.getEdgeToNext();
+        	IntraSSGEdge<InternalFilterNode, InternalFilterNode> e = src.getEdgeToNext();
             if (e == null || e.getDest() != dst) {
-                e = new IntraSSGEdge(src,dst);
+                e = new IntraSSGEdge<InternalFilterNode, InternalFilterNode>(src,dst);
             }
             return e;
         }

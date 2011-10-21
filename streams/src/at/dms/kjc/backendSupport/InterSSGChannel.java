@@ -244,30 +244,17 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	}
 
 	public JMethodDeclaration popMethod(Map<String, String> dominators) {
-		// for (String str : types) {
-		// System.out.print("Type is: " + str);
-		// }
-		
 		
 		OutputPort outputPort = this.theEdge.getSrc();
 		StaticSubGraph ssg = outputPort.getSSG();
-		Filter[] topFilters = ssg.getTopFilters();
-		for (Filter top : topFilters) {
-			System.out.println("InterSSGChannel.popMethod, top=" + top.getWorkNodeContent().getName());
-		//	System.out.println("InterSSGChannel.popMethod, top dominates " + dominators.get(top.getWorkNodeContent().getName() + "_multiplier"));
-		}
-
-			
 		String dominantFilter = ssg.getTopFilters()[0].getWorkNodeContent().getName();
 
 		JBlock methodBody = new JBlock();
 		JBlock ifBody = new JBlock();
-
-		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
-		
+		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));		
 		String dominated = dominators.get(dominantFilter);
 		if (dominated != null) {
-			ifBody.addStatement(Util.toStmt(dominated + "_multiplier = 0;"));
+			ifBody.addStatement(Util.toStmt(dominated + "_multiplier = 0"));
 		}		
 
 		Utils.addSetFlag(ifBody, 0, "MASTER", "MASTER", "AWAKE");
@@ -292,6 +279,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				.addStatement(new JExpressionStatement(
 						new JEmittedTextExpression(
 								"q->first = (q->first + 1) & q->max")));
+		if (dominated != null) {
+			methodBody.addStatement(Util.toStmt(dominated + "_multiplier = 1"));
+		}		
+		
 		methodBody.addStatement(new JExpressionStatement(
 				new JEmittedTextExpression("return elem")));		
 
