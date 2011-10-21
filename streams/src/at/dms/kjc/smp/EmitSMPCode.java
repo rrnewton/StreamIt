@@ -5,14 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
 import at.dms.kjc.backendSupport.InterSSGChannel;
@@ -32,7 +29,7 @@ public class EmitSMPCode extends EmitCode {
 	public final String MAIN_FILE = "main.c";
 
 	private boolean isDynamic = false;
-	private Map<Filter, Integer> threadMap = null;
+	// private Map<Filter, Integer> threadMap = null;
 	private Set<String> dominated = null;
 	private Map<String, String> dominators = null;
 
@@ -40,7 +37,7 @@ public class EmitSMPCode extends EmitCode {
 			Map<Filter, Integer> threadMap, Set<String> dominated, Map<String, String> dominators) {
 		super(backEndFactory);
 		this.isDynamic = isDynamic;
-		this.threadMap = threadMap;
+		//this.threadMap = threadMap;
 		this.dominated = dominated;
 		this.dominators = dominators;
 	}
@@ -271,7 +268,9 @@ public class EmitSMPCode extends EmitCode {
 		p.println("");				
 
 		for (InterSSGChannel c : dynamicInputBuffers) {						
-			c.popMethod().accept(codegen); 
+			
+			
+			c.popMethod(dominators).accept(codegen); 
 		}
 
 		p.println("");

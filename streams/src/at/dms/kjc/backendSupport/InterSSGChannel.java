@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import at.dms.kjc.CEmittedTextType;
@@ -242,10 +243,25 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		return "queue_push";
 	}
 
-	public JMethodDeclaration popMethod() {
+	public JMethodDeclaration popMethod(Map<String, String> dominators) {
 		// for (String str : types) {
 		// System.out.print("Type is: " + str);
 		// }
+		
+		
+		OutputPort outputPort = this.theEdge.getSrc();
+		StaticSubGraph ssg = outputPort.getSSG();
+		Filter[] topFilters = ssg.getTopFilters();
+		for (Filter top : topFilters) {
+			System.out.println("InterSSGChannel.popMethod, top=" + top.getWorkNodeContent().getName());
+		//	System.out.println("InterSSGChannel.popMethod, top dominates " + dominators.get(top.getWorkNodeContent().getName() + "_multiplier"));
+		}
+
+		for (String key : dominators.keySet()) {
+			System.out.println("InterSSGChannel.popMethod, key=" + key + "value=" + dominators.get(key));
+		}
+		
+		
 
 		JBlock methodBody = new JBlock();
 		JBlock ifBody = new JBlock();
