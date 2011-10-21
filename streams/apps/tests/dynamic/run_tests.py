@@ -22,8 +22,6 @@ class Command(object):
         if thread.is_alive():
             self.process.terminate()
             thread.join()
-#        print self.process.returncode
-
 
 FNULL = open('/dev/null', 'w')
 
