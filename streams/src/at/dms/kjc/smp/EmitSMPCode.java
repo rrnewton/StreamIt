@@ -129,7 +129,7 @@ public class EmitSMPCode extends EmitCode {
 
 				generateIncludes(p);
 
-				new EmitSMPCode().emitCodeForComputeNode(core, p);
+				this.emitCodeForComputeNode(core, p);
 				
 
 				p.close();

@@ -257,17 +257,18 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		//	System.out.println("InterSSGChannel.popMethod, top dominates " + dominators.get(top.getWorkNodeContent().getName() + "_multiplier"));
 		}
 
-		for (String key : dominators.keySet()) {
-			System.out.println("InterSSGChannel.popMethod, key=" + key + "value=" + dominators.get(key));
-		}
-		
-		
+			
+		String dominantFilter = ssg.getTopFilters()[0].getWorkNodeContent().getName();
 
 		JBlock methodBody = new JBlock();
 		JBlock ifBody = new JBlock();
 
 		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));
-		ifBody.addStatement(Util.toStmt("/* *write_d_multiplier  = 0; */"));
+		
+		String dominated = dominators.get(dominantFilter);
+		if (dominated != null) {
+			ifBody.addStatement(Util.toStmt(dominated + "_multiplier = 0;"));
+		}		
 
 		Utils.addSetFlag(ifBody, 0, "MASTER", "MASTER", "AWAKE");
 		Utils.addSignal(ifBody, 0, "MASTER");
