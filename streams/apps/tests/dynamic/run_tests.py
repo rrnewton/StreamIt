@@ -1,26 +1,49 @@
 #!/usr/bin/env python
+
 import os
 import subprocess
+import threading
 import glob
 import filecmp
-import sys 
+import sys
+
+class Command(object):
+    def __init__(self, cmd):
+        self.cmd = cmd
+        self.process = None
+
+    def run(self, timeout):
+        def target():
+            self.process = subprocess.Popen(self.cmd, shell=True)
+            self.process.communicate()
+        thread = threading.Thread(target=target)
+        thread.start()
+        thread.join(timeout)
+        if thread.is_alive():
+            self.process.terminate()
+            thread.join()
+#        print self.process.returncode
+
+
+FNULL = open('/dev/null', 'w')
 
 def run_strc(filename):
     cmd = ["strc", "-smp", "2", "-i", "10", filename]
-    return subprocess.Popen(cmd)
+    return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
 def run_make(filename):
     cmd = ["make"]
-    return subprocess.Popen(cmd)
+    return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
 def run_exe(filename):
     output = filename + '.out'
     cmd = './smp2 > ' + output
-    os.system(cmd)
+    command = Command(cmd)
+    command.run(timeout=10)
 
 def cleanup():
     cmd = 'rm -f *.c *.h *.dot *.java *.o smp2 Makefile cases/*.java'
-    print cmd + '\n'
+    # print cmd + '\n'
     os.system(cmd)
 
 def compare(f1, f2):
@@ -39,11 +62,11 @@ def run_one(infile):
     p.wait()
 
 def run_test(infile):
-    print "current file is: " + infile
-    print "Compile StreamIt code."
+    print "Testing with input file: " + infile + "."
+    #print "Compile StreamIt code."
     p = run_strc(infile)
     p.wait()
-    print "Compile C code."
+    #print "Compile C code."
     p = run_make(infile)
     p.wait()
     run_exe(infile)        
@@ -65,8 +88,10 @@ def main():
             cleanup()
         else:
             run_one(sys.argv[1])
-    else: 
-        print(run_all())
+    else:
+        ret = run_all();
+        print "\nRESULTS:"
+        print(ret)
                     
 if __name__ == "__main__":
     main()
