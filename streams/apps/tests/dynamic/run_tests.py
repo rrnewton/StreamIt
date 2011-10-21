@@ -92,6 +92,7 @@ def main():
         ret = run_all();
         print "\nRESULTS:"
         print(ret)
+        print ""
                     
 if __name__ == "__main__":
     main()
