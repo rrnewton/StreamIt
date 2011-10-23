@@ -39,7 +39,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
     private static int unique_id_generator;
     /** the store for all Buffers, indexed by edge.
      */
-    protected static HashMap<IntraSSGEdge, IntraSSGChannel> bufferStore;
+    protected static HashMap<IntraSSGEdge<InternalFilterNode, InternalFilterNode>, IntraSSGChannel> bufferStore;
     /** the rotation length of this buffer for software pipelining 
      * Includes any length from extraLength field. **/
     protected int rotationLength;
@@ -48,7 +48,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
 
     static {
         unique_id_generator = 0;
-        bufferStore = new HashMap<IntraSSGEdge, IntraSSGChannel>();
+        bufferStore = new HashMap<IntraSSGEdge<InternalFilterNode, InternalFilterNode>, IntraSSGChannel>();
     }
 
     /**
@@ -56,7 +56,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * Subclasses should provide factories for their channel types.
      * @param edge
      */
-    protected IntraSSGChannel(IntraSSGEdge edge) {
+    protected IntraSSGChannel(IntraSSGEdge<InternalFilterNode, InternalFilterNode> edge) {
         super(edge);
         edge.getType(); // side effect of catching error if source and dest types not the same
         unique_id = unique_id_generator++;

@@ -191,6 +191,7 @@ public class ProcessFilterWorkNode {
 					+ method.getName();
 			
 			
+			
 			method.addStatementFirst(new SIRBeginMarker(methodName));
 			method.addStatement(new SIREndMarker(methodName));
 		}
