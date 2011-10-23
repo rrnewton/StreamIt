@@ -97,7 +97,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      */
     public static void reset() {
         unique_id_generator = 0;
-        bufferStore = new HashMap<IntraSSGEdge, IntraSSGChannel>();
+        bufferStore = new HashMap<IntraSSGEdge<InternalFilterNode, InternalFilterNode>, IntraSSGChannel>();        
     }
     
     /**
