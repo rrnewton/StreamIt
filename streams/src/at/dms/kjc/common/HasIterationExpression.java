@@ -11,7 +11,7 @@ import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.partition.*;
 
 
-public class LowerIterationExpression extends SLIRReplacingVisitor {
+public class HasIterationExpression extends SLIRReplacingVisitor {
 
     private boolean found;
     private final static String ITER_VAR_NAME = "iterationCount";
