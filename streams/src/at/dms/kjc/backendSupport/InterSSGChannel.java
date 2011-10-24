@@ -207,15 +207,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public List<JStatement> dataDecls() {
-		// System.out.println("InterSSGChannel::dataDecls()");
-		List<JStatement> statements = new LinkedList<JStatement>();
-		JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-				"static queue_ctx_ptr dyn_read_current = dyn_buf_0"));
-		statements.add(stmt);
-		stmt = new JExpressionStatement(new JEmittedTextExpression(
-				"static queue_ctx_ptr dyn_write_current = dyn_buf_1"));
-		statements.add(stmt);
-		return statements;		
+		return new LinkedList<JStatement>();
 	}
 
 	/**

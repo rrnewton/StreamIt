@@ -154,7 +154,7 @@ public class ProcessFilterWorkNode {
 					} else {
 						if (isDynamicPop) {
 							JExpression dyn_queue = new JEmittedTextExpression(
-									"dyn_read_current");
+									"dyn_buf_0");
 							JExpression methodCall = new JMethodCallExpression(
 									popName, new JExpression[] { dyn_queue });
 							methodCall.setType(tapeType);
@@ -176,7 +176,7 @@ public class ProcessFilterWorkNode {
 					JExpression newArg = (JExpression) arg.accept(this);
 					if (isDynamicPush) {
 						JExpression dyn_queue = new JEmittedTextExpression(
-								"dyn_write_current");
+								"dyn_buf_0");
 						return new JMethodCallExpression(pushName,
 								new JExpression[] { dyn_queue, newArg });
 					} else {

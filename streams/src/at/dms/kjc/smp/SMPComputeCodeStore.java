@@ -433,11 +433,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
 		System.out.println("CoreCodeStore.addThreadHelper called()");
 		
-		// TODO Make Sure that the buffers are set
-		addExpressionFirst(new JEmittedTextExpression(
-				"dyn_read_current = dyn_buf_0"));
-		addExpressionFirst(new JEmittedTextExpression(
-				"dyn_write_current = dyn_buf_1"));
 		JBlock methodBody = new JBlock();
 		JBlock loopBody = new JBlock();
 		Utils.addCondWait(loopBody, 0, "DYN_READER", "DYN_READER",
@@ -446,15 +441,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		Utils.addSetFlag(loopBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
 		Utils.addSetFlag(loopBody, 0, "MASTER", "MASTER", "AWAKE");
 		Utils.addSignal(loopBody, 0, "MASTER");
-		loopBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression("queue_ctx_ptr tmp")));
-		loopBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression("tmp =  dyn_read_current")));
-		loopBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression(
-						"dyn_read_current = dyn_write_current")));
-		loopBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression("dyn_write_current = tmp")));
 		
 		JStatement loop = null;
 		if(KjcOptions.iterations != -1) {

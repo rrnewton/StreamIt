@@ -177,7 +177,7 @@ public class CommonPasses {
 		// pipelines, so do it here.
 		Lifter.liftAggressiveSync(str);
 
-                LowerIterationExpression.doIt(str);
+		//./sm	    LowerIterationExpression.doIt(str);
                 
 
 		DynamismFinder.Result result = new DynamismFinder().find(str);
