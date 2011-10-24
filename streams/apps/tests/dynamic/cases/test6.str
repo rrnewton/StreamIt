@@ -17,9 +17,8 @@ int->int stateful filter B {
   }
     work pop 1 push * {
       print("Filter B\\n");
-      pop();
       int i;     
-      int amount = count%10; 
+      int amount = pop(); 
       push(amount);     
       for(i=0; i < amount; i++)
           push(count++);
@@ -33,19 +32,22 @@ int->int stateful filter C {
      count = 0;
   }    
     work pop * push 1 {
-      print("Filter C\\n");
       int amount = pop();
-      int i;
-      int x;
-      for(i=0; i < amount; i++)
-          pop();
+      print("Filter C amount=");      
+      print(amount);    
+      print("\\n");
+      int i;   
+      for(i=0; i < amount; i++) {
+        print("\\tFilter C pop=");
+        println(pop());
+      }
       push(count++);      
    }
 }
 
 int->void filter D {
    work pop 1 {
-     print("Filter D\\n");
+     print("Filter D pop=");
      println(pop());
    }
 }
