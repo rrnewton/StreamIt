@@ -224,6 +224,7 @@ public class CommonPasses {
 			str = this.removeDummies(str);
 			
 			str = doStaticPassSIRStream(str);
+			
 			optimizedGraph.addToSegmentedGraph(str);
 		}
 		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);						

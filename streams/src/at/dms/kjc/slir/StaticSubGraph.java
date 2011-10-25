@@ -279,9 +279,17 @@ public class StaticSubGraph {
 		Iterator<FlatNode> dataFlow = DataFlowTraversal.getTraversal(top)
 				.iterator();
 
+		
+
+		
 		while (dataFlow.hasNext()) {
 			FlatNode node = dataFlow.next();
 
+			System.out.println("StaticSubGraph.flatten, examining Flatnode node=" + node.getName());
+			System.out.println("StaticSubGraph.flatten, examining Flatnode node=" + node.getName() 
+					+ " inputs.length=" + node.inputs 
+					+ " outputs.length=" + node.ways);	
+			
 			if (node.getName().contains("DummySource")
 					|| node.getName().contains("DummySink")) {										
 				// continue; /* Need to set the parent, set next, set previous */							
