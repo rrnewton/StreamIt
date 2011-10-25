@@ -275,12 +275,13 @@ public class SMPBackend {
 	 */
 	private static void setScheduler() {
 		if (KjcOptions.partitioner.equals("tmd")) {
+			System.out.println("SMPBackend.setScheduler scheduler=TMDBinPackFissAll");
 			scheduler = new TMDBinPackFissAll();
 		} else if (KjcOptions.partitioner.equals("oldtmd")) {
-
+			System.out.println("SMPBackend.setScheduler scheduler=TMD");
 			scheduler = new TMD();
 		} else if (KjcOptions.partitioner.equals("smd")) {
-
+			System.out.println("SMPBackend.setScheduler scheduler=SMD");
 			scheduler = new SMD();
 		} else {
 			System.err.println("Unknown Scheduler Type!");
