@@ -130,9 +130,18 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 			InputPort iport = edge.getDest();
 			StaticSubGraph ssg = iport.getSSG();
 			Filter top[] = ssg.getFilterGraph();
-			if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
-					.equals(t))
-				set.add(b);
+			
+			Filter filters[] = ssg.getFilterGraph();
+			
+			for (Filter f : filters) {
+				if (SMPBackend.scheduler.getComputeNode(f.getWorkNode())
+						.equals(t))
+					set.add(b);
+			}
+//			
+//			if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
+//					.equals(t))
+//				set.add(b);
 		}
 		return set;
 	}

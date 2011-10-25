@@ -85,6 +85,9 @@ public class SourceAddressRotation extends RotatingBuffer {
      * as a circular linked list.
      */
     protected void setupRotation() {
+    	
+    	System.out.println("SourceAddressRotatio.setupRotation called");
+    	
         String temp = "__temp__";
         SMPComputeCodeStore cs = parent.getComputeCode();
         //this is the typedef we will use for this buffer rotation structure

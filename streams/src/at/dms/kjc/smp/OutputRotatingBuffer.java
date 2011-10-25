@@ -49,7 +49,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * @param slices The steady-state schedule of slices
      */
     public static void createOutputBuffers(BasicSpaceTimeSchedule schedule) {
+
         for (Filter slice : schedule.getScheduleList()) {
+        	System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice=" + slice.getWorkNode().toString());
+
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
 

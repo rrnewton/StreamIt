@@ -99,7 +99,7 @@ public class ProcessFilterWorkNode {
 	 */
 	private static CodeStoreHelper makeFilterCode(WorkNode filter,
 			Channel inputChannel, Channel outputChannel,
-			SMPBackEndFactory backEndBits, final boolean isDynamicPop,
+			SMPBackEndFactory backEndFactory, final boolean isDynamicPop,
 			final boolean isDynamicPush) {
 
 		final String peekName;
@@ -117,7 +117,7 @@ public class ProcessFilterWorkNode {
 			popManyName = "/* pop(N) from non-existent channel */";
 		}
 
-		System.out.println("ProcessFitlerWorkNode.makeFilterCode filter="
+		System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
 				+ filter + " popName=" + popName);
 
 		if (outputChannel != null) {
@@ -126,7 +126,7 @@ public class ProcessFilterWorkNode {
 			pushName = "/* push() to non-existent channel */";
 		}
 
-		CodeStoreHelper helper = backEndBits.getCodeStoreHelper(filter);
+		CodeStoreHelper helper = backEndFactory.getCodeStoreHelper(filter);
 		JMethodDeclaration[] methods = helper.getMethods();
 
 		// relies on fact that a JMethodDeclaration is not replaced so

@@ -58,7 +58,13 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * @param schedule The spacetime schedule of the slices 
      */
     public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
+    	
+    	
+    	
+    	
         for (Filter slice : schedule.getScheduleList()) {
+        	System.out.println("InputRotatingBuffer.createInputBuffers calling on slice=" + slice.getWorkNode().toString());
+        	
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
 

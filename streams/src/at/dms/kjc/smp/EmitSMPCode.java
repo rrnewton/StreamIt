@@ -173,6 +173,11 @@ public class EmitSMPCode extends EmitCode {
 		p.println("// code for core " + n.getUniqueId());
 		p.println(((Core)n).getComputeCode().getGlobalText());
 
+		
+		System.out.println("EmitSMPCode.emitCodeForComputeStore, code for core=" + n.getUniqueId());	
+		
+		
+		
 		// generate function prototypes for methods so that they can call each other
 		// in C.
 		codegen.setDeclOnly(true);
@@ -268,8 +273,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println("");				
 
 		for (InterSSGChannel c : dynamicInputBuffers) {						
-			
-			
+						
 			c.popMethod(dominators).accept(codegen); 
 		}
 

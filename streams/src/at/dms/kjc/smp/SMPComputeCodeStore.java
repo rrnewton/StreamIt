@@ -48,6 +48,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		}
 	}
 
+	private static boolean addBufferInitBarrierFlag = false;
+	
 	/**
 	 * Append a barrier instruction to all of the cores in the buffer init
 	 * method.
