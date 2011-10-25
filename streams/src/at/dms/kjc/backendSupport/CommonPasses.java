@@ -3,7 +3,9 @@
  */
 package at.dms.kjc.backendSupport;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,9 +17,13 @@ import at.dms.kjc.common.CheckStatefulFilters;
 import at.dms.kjc.common.LowerIterationExpression;
 import at.dms.kjc.common.ConvertLocalsToFields;
 import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRDummySink;
+import at.dms.kjc.sir.SIRDummySource;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.sir.SIRInterfaceTable;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPortal;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
@@ -191,16 +197,71 @@ public class CommonPasses {
 	 * @return The SLIR representation of each optimized SSG
 	 */
 	private StreamGraph doStaticPassesSegmentedSIRGraph(SegmentedSIRGraph segmentedGraph) {
+
+		
+		
+		System.out.println("11111111111111111111111 CommonPasses.doStaticPassesSegmentedSIRGraph enter");
+		
+		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
+			
+			if (str instanceof SIRPipeline) {
+				System.out.println("11111111111111111111111 ==>  str is a SIRPipeline");
+				List<SIROperator> oldChildren = ((SIRPipeline) str).getChildren();
+				
+				
+				for ( SIROperator child : oldChildren ) {
+					System.out.println("11111111111111111111111 ==> child is " + child.getIdent());
+				}
+			}						
+		}
+		
+		
 		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
 		System.out.println("CommonPasses::segmentedGraph.getStaticSubGraphs().size()=" + segmentedGraph.getStaticSubGraphs().size());
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
+			
+			str = this.removeDummies(str);
+			
 			str = doStaticPassSIRStream(str);
 			optimizedGraph.addToSegmentedGraph(str);
 		}
-		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
+		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);						
+		
+		System.out.println("11111111111111111111111 CommonPasses.doStaticPassesSegmentedSIRGraph exit");
+		
 		return streamGraph;
 
+	}
+	
+	
+	private SIRStream removeDummies(SIRStream str) {
+			
+		System.out.println("11111111111111111111111 CommonPasses.removeDummies enter");
+		
+		if (str instanceof SIRPipeline) {
+
+			System.out.println("11111111111111111111111 str is a SIRPipeline");
+			List<SIROperator> oldChildren = ((SIRPipeline) str).getChildren();
+			List<SIRStream> newChildren = new ArrayList<SIRStream>();
+			SIRPipeline pipeline = new SIRPipeline(null, str.getIdent());
+			pipeline.setInit(SIRStream.makeEmptyInit());
+					
+			for ( SIROperator child : oldChildren ) {
+				System.out.println("11111111111111111111111 child is " + child.getIdent());
+				if (!(child instanceof SIRDummySource || child instanceof SIRDummySink)) {
+					newChildren.add((SIRStream)child);					
+				}
+				
+			}
+			pipeline.setChildren(newChildren);
+			return pipeline;
+		}
+		
+		System.out.println("11111111111111111111111 CommonPasses.removeDummies exit");
+
+		
+		return str;
 	}
 
 	/**

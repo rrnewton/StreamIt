@@ -5,6 +5,10 @@ package at.dms.kjc.slir;
 
 import java.util.List;
 
+import at.dms.kjc.sir.SIRDummySink;
+import at.dms.kjc.sir.SIRDummySource;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
 
@@ -45,8 +49,7 @@ public class SIRToSLIR {
 		StaticSubGraph src = new StaticSubGraph().init(streamGraph, str, inputPort, outputPort);
 		streamGraph.addSSG(src);
 		
-		for (int i = 1; i < ssgs.size(); i++) {
-								
+		for (int i = 1; i < ssgs.size(); i++) {								
 			StaticSubGraph dst = new StaticSubGraph();		
 			outputPort = new UnaryOutputPort(dst);			
 			src.setOutputPort(outputPort);			
@@ -61,7 +64,6 @@ public class SIRToSLIR {
 		}
 
 		return streamGraph;
-	}
-
+	}	
 
 }

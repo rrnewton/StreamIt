@@ -283,8 +283,8 @@ public class StaticSubGraph {
 			FlatNode node = dataFlow.next();
 
 			if (node.getName().contains("DummySource")
-					|| node.getName().contains("DummySink")) {				
-				continue;
+					|| node.getName().contains("DummySink")) {										
+				// continue; /* Need to set the parent, set next, set previous */							
 			}
 
 			InputNode input = filterNodes.inputNodes.get(node.contents);
@@ -310,12 +310,14 @@ public class StaticSubGraph {
 			// check to see if this node is feeding a dummy sink, if so, then
 			// don't create an edge
 			// to the dummy sink because it will not be generated in the SLIR
-			if (node.ways > 0
-					&& node.getEdges()[0].contents instanceof SIRDummySink) {
-				assert node.ways == 1;
-				output.setWeights(new int[0]);
-				output.setDests(new InterFilterEdge[0][0]);
-			} else if (node.ways != 0) {
+//			if (node.ways > 0) {
+//					//&& node.getEdges()[0].contents instanceof SIRDummySink) {
+//				assert node.ways == 1;
+//				output.setWeights(new int[0]);
+//				output.setDests(new InterFilterEdge[0][0]);
+//			}
+//			
+			 if (node.ways != 0) {
 				assert node.ways == node.getEdges().length
 						&& node.ways == node.weights.length;
 
@@ -378,12 +380,14 @@ public class StaticSubGraph {
 			// handle this specially
 			// and don't create an edge to the dummy source because it is not
 			// translated into an SLIR node
-			if (node.inputs > 0
-					&& node.incoming[0].contents instanceof SIRDummySource) {
-				assert node.inputs == 1;
-				input.setWeights(new int[0]);
-				input.setSources(new InterFilterEdge[0]);
-			} else if (node.inputs != 0) {
+//			if (node.inputs > 0) {
+//					//&& node.incoming[0].contents instanceof SIRDummySource) {
+//				assert node.inputs == 1;
+//				input.setWeights(new int[0]);
+//				input.setSources(new InterFilterEdge[0]);
+//			} 
+			
+			if (node.inputs != 0) {
 				assert node.inputs == node.incoming.length
 						&& node.inputs == node.incomingWeights.length;
 
@@ -393,6 +397,12 @@ public class StaticSubGraph {
 					if (node.incomingWeights[i] == 0)
 						continue;
 
+					
+					assert edges != null : "Line 398; edges==null";
+					assert filterNodes.outputNodes != null : "Line 398; outputNodes==null";
+					assert node.incoming[i].contents != null : "Line 398; node.incoming[i].contents==null" ;
+					
+					
 					inEdges.add(edges.get(
 							filterNodes.outputNodes
 									.get(node.incoming[i].contents)).get(input));
