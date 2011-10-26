@@ -1,0 +1,62 @@
+
+void->int stateful filter A {
+  int count;
+  init {
+     count = 0;
+  }
+  work push 1 {
+    print("Filter A\\n");
+    count++;
+    push(count++);
+  }
+}
+
+int->int stateful filter B {
+  int count;
+  init {
+     count = 0;
+  }
+    work pop 1 push * {
+      print("Filter B\\n");
+      int i;     
+      int amount = pop(); 
+      push(amount);     
+      for(i=0; i < amount; i++)
+          push(count++);
+   
+   }
+}
+
+int->int stateful filter C {
+  int count;
+  init {
+     count = 0;
+  }    
+    work pop * push 1 {
+      int amount = pop();
+      print("Filter C amount=");      
+      print(amount);    
+      print("\\n");
+      int i;   
+      for(i=0; i < amount; i++) {
+        print("\\tFilter C pop=");
+        println(pop());
+      }
+      push(count++);      
+   }
+}
+
+int->void filter D {
+   work pop 1 {
+     print("Filter D pop=");
+     println(pop());
+   }
+}
+
+void->void pipeline test6 {
+    add A();
+    add B();
+    add C();
+    add D();
+}
+
