@@ -125,6 +125,11 @@ public class ProcessFilterWorkNode {
 		} else {
 			pushName = "/* push() to non-existent channel */";
 		}
+		
+		System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
+				+ filter + " popName=" + popName
+				+ " pushName=" + pushName);
+		
 
 		CodeStoreHelper helper = backEndFactory.getCodeStoreHelper(filter);
 		JMethodDeclaration[] methods = helper.getMethods();
@@ -251,7 +256,7 @@ public class ProcessFilterWorkNode {
 		// remember that this tile has code that needs to execute
 		codeStore.setHasCode();
 
-		System.out.println("smp.ProcessFilterWorkNode.doit(), filter="
+		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="
 				+ filterNode);
 
 		filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
@@ -261,18 +266,33 @@ public class ProcessFilterWorkNode {
 				.getSSG();
 		boolean hasDynamicInput = false;
 		boolean hasDynamicOutput = false;
-		Filter tops[] = ssg.getTopFilters();
-		int last = tops.length - 1;
 
+		Filter[] graph = ssg.getFilterGraph();
+		int last = graph.length - 1;
+		
+		System.out.println("smp.ProcessFitlerWorkNode.doit(), graph[0].getWorkNode()="+ 
+				graph[0].getWorkNode()
+				+ "graph[last].getWorkNode()=" + graph[last].getWorkNode()
+				);
+
+		
 		// A particular filter will only have dynamic input if it is
 		// the top node of an SSG, and if the SSG has dynamic input.
-		if (filterNode.equals(tops[0].getWorkNode())) {
+		if (filterNode.equals(graph[0].getWorkNode())) {
 			hasDynamicInput = ssg.hasDynamicInput();
 		}
 
-		if (filterNode.equals(tops[last].getWorkNode())) {
+		if (filterNode.equals(graph[last].getWorkNode())) {
 			hasDynamicOutput = ssg.hasDynamicOutput();
 		}
+		
+		
+		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="+ filterNode
+				+ "hasDynamicInput=" + hasDynamicInput
+				+ " hasDynamicOutput=" + hasDynamicOutput
+				);
+
+		
 
 		if (filterCode == null) {
 
