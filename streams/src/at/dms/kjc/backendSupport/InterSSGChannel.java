@@ -126,22 +126,29 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
 		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();		
 		for (InterSSGChannel b : inputBuffers.values()) {
+			
 			InterSSGEdge edge = b.getEdge();
-			InputPort iport = edge.getDest();
-			StaticSubGraph ssg = iport.getSSG();
-			Filter top[] = ssg.getFilterGraph();
+			OutputPort iport = edge.getSrc();
+			StaticSubGraph ssg = iport.getSSG();			
 			
-			Filter filters[] = ssg.getFilterGraph();
+			Filter top[] = ssg.getTopFilters();
 			
-			for (Filter f : filters) {
+			for (Filter f : top) {
+				
+				System.out.println("InterSSGChannel.getInputBuffersOnCore core=" + t.getCoreID() 
+						+ " filter=" + f.getWorkNode().toString());
+				
+				System.out.println("InterSSGChannel.getInputBuffersOnCore computeNode=" + 
+						SMPBackend.scheduler.getComputeNode(f.getWorkNode()).getCoreID());
+				
 				if (SMPBackend.scheduler.getComputeNode(f.getWorkNode())
-						.equals(t))
+						.equals(t)) {
+					System.out.println("InterSSGChannel.getInputBuffersOnCore adding b"); 							
 					set.add(b);
+				}
+
+			
 			}
-//			
-//			if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
-//					.equals(t))
-//				set.add(b);
 		}
 		return set;
 	}

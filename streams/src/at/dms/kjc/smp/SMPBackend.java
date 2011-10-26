@@ -181,6 +181,8 @@ public class SMPBackend {
 			runSSG(ssg, threadMap, dominated, dominators);
 		}
 
+		RotatingBuffer.createTypesInitsAndAddresses();
+		
 		chip.setThreadMap(threadMap);
 
 		emitCode(threadMap, dominated, dominators);
@@ -235,7 +237,8 @@ public class SMPBackend {
 		if (KjcOptions.sharedbufs && KjcOptions.numbers > 0) {
 			calculateCompCommRatio(graphSchedule);
 		}
-
+		
+		
 	}
 
 	/**

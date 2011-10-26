@@ -79,16 +79,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 * 
 	 * @param schedule  The spacetime schedule of the application
 	 */
-	
-
-	/**
-	 *  Note: This is kind of a hack. This function should only be called once, but it
-	 * is being called multiple times because it is called once per SSG. This flag
-	 * is being used to ensure that it doesn't re-generate code.
-	 */
-	private static boolean rotTypeDefsFlag = false;
-	
-	
+		
 	public static void createBuffers(BasicSpaceTimeSchedule schedule) {
 		//have to create input buffers first because when we have a lack of a 
 		//shared input buffer, we create an output buffer
@@ -107,6 +98,15 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 		}
 
 	
+	
+
+	}
+	
+	/**
+	 * TODO: I've added this method, with the code that used to be the end if createBuffers.
+	 * This code was getting called twice, when there were multiple SSGs. 
+	 */
+	public static void createTypesInitsAndAddresses() {
 		//now add the typedefs needed for the rotating buffers to structs.h
 		rotTypeDefs();
 		
@@ -114,10 +114,10 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 		//so that we wait for all the shared memory to be allocated
 		SMPComputeCodeStore.addBufferInitBarrier();
 		//generate the code for the address communication stage
-		communicateAddresses();
-
+		communicateAddresses();	
 	}
-
+	
+	
 	public void createAddressBuffers() {
 
 	}
@@ -186,19 +186,15 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 * Create the typedef for the rotating buffer structure, one for each type 
 	 * we see in the program (each channel type).
 	 */
-	protected static void rotTypeDefs() {
-		if (!rotTypeDefsFlag) {
-			for (String type : types) {
-				SMPBackend.structs_h.addLineSC("typedef struct __rotating_struct_" + type + "__" + 
-						" *__rot_ptr_" + type + "__");
-				SMPBackend.structs_h.addText("typedef struct __rotating_struct_" + type + "__ {\n");
-				SMPBackend.structs_h.addText("\t" + type + " *buffer;\n");
-				SMPBackend.structs_h.addText("\t__rot_ptr_" + type + "__ next;\n");
-				SMPBackend.structs_h.addText("} " + rotTypeDefPrefix + type + ";\n");
-			}
-			rotTypeDefsFlag = true;
+	protected static void rotTypeDefs() {		
+		for (String type : types) {
+			SMPBackend.structs_h.addLineSC("typedef struct __rotating_struct_" + type + "__" + 
+					" *__rot_ptr_" + type + "__");
+			SMPBackend.structs_h.addText("typedef struct __rotating_struct_" + type + "__ {\n");
+			SMPBackend.structs_h.addText("\t" + type + " *buffer;\n");
+			SMPBackend.structs_h.addText("\t__rot_ptr_" + type + "__ next;\n");
+			SMPBackend.structs_h.addText("} " + rotTypeDefPrefix + type + ";\n");
 		}
-
 	}
 
 	/**

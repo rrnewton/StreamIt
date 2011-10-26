@@ -59,9 +59,6 @@ public class InputRotatingBuffer extends RotatingBuffer {
      */
     public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
     	
-    	
-    	
-    	
         for (Filter slice : schedule.getScheduleList()) {
         	System.out.println("InputRotatingBuffer.createInputBuffers calling on slice=" + slice.getWorkNode().toString());
         	
