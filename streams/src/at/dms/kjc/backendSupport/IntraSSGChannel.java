@@ -21,10 +21,7 @@ import at.dms.util.Utils;
  * @author dimock
  */
 public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, InternalFilterNode>> {
-
-	
-	public static void createTypesInitsAndAddresses() {}
-	
+		
     /**
      * Technical note: a Buffer in a backend implements an Edge in a slice graph
      * This data structure uses an Edge to store source, destination, and type information.

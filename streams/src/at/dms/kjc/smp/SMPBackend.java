@@ -179,9 +179,9 @@ public class SMPBackend {
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
 			
 			runSSG(ssg, threadMap, dominated, dominators);
-		}
-
-		RotatingBuffer.createTypesInitsAndAddresses();
+		}		
+		
+		RotatingBuffer.rotTypeDefs();
 		
 		chip.setThreadMap(threadMap);
 

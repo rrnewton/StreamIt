@@ -97,27 +97,17 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 			buf.createTransferCommands();
 		}
 
-	
-	
-
-	}
-	
-	/**
-	 * TODO: I've added this method, with the code that used to be the end if createBuffers.
-	 * This code was getting called twice, when there were multiple SSGs. 
-	 */
-	public static void createTypesInitsAndAddresses() {
 		//now add the typedefs needed for the rotating buffers to structs.h
-		rotTypeDefs();
+		//rotTypeDefs();
 		
 		//now that all the buffers are allocated, we create a barrier on all the cores
 		//so that we wait for all the shared memory to be allocated
 		SMPComputeCodeStore.addBufferInitBarrier();
 		//generate the code for the address communication stage
-		communicateAddresses();	
+		communicateAddresses(schedule);	
+	
 	}
-	
-	
+		
 	public void createAddressBuffers() {
 
 	}
@@ -132,16 +122,21 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	/**
 	 * Generate the code necessary to communicate the addresses of the shared input buffers 
 	 * of all input rotational structures to the sources that will write to the buffer
+	 * @param schedule 
 	 */
-	protected static void communicateAddresses() {
+	protected static void communicateAddresses(BasicSpaceTimeSchedule schedule) {
 		//handle all the filters that are mapped to compute cores
 		//this will handle all filters except file writers and file readers
+		
+		StaticSubGraph ssg = schedule.getSSG();
+					
 		for (Core ownerCore : SMPBackend.chip.getCores()) {
-			SMPComputeCodeStore cs = ownerCore.getComputeCode();
-
+			SMPComputeCodeStore cs = ownerCore.getComputeCode();			
 			for (WorkNode filter : cs.getFilters()) {
-				System.out.println("RotatingBuffer.communicateAddresses filter=" + filter.toString());
-				communicateAddressesForFilter(filter, ownerCore);
+				if (ssg.containsFilter(filter.getParent())) {
+					System.out.println("RotatingBuffer.communicateAddresses filter=" + filter.toString());
+					communicateAddressesForFilter(filter, ownerCore);
+				}
 			}
 		}	
 
@@ -186,7 +181,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 * Create the typedef for the rotating buffer structure, one for each type 
 	 * we see in the program (each channel type).
 	 */
-	protected static void rotTypeDefs() {		
+	public static void rotTypeDefs() {		
 		for (String type : types) {
 			SMPBackend.structs_h.addLineSC("typedef struct __rotating_struct_" + type + "__" + 
 					" *__rot_ptr_" + type + "__");

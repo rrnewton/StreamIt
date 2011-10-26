@@ -14,6 +14,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
@@ -50,7 +51,11 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      */
     public static void createOutputBuffers(BasicSpaceTimeSchedule schedule) {
 
-        for (Filter slice : schedule.getScheduleList()) {
+    	StaticSubGraph ssg = schedule.getSSG();
+    	
+        //for (Filter slice : schedule.getScheduleList()) {
+    	for (Filter slice : ssg.getFilterGraph()) {	
+
         	System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice=" + slice.getWorkNode().toString());
 
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {

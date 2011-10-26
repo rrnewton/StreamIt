@@ -59,7 +59,10 @@ public class InputRotatingBuffer extends RotatingBuffer {
      */
     public static void createInputBuffers(BasicSpaceTimeSchedule schedule) {
     	
-        for (Filter slice : schedule.getScheduleList()) {
+    	StaticSubGraph ssg = schedule.getSSG();
+    	
+        //for (Filter slice : schedule.getScheduleList()) {
+    	for (Filter slice : ssg.getFilterGraph()) {	
         	System.out.println("InputRotatingBuffer.createInputBuffers calling on slice=" + slice.getWorkNode().toString());
         	
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
