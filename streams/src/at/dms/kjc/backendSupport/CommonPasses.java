@@ -14,7 +14,6 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
-import at.dms.kjc.common.LowerIterationExpression;
 import at.dms.kjc.common.ConvertLocalsToFields;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRDummySink;
@@ -28,7 +27,6 @@ import at.dms.kjc.sir.SIRPortal;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
 import at.dms.kjc.sir.SemanticChecker;
-import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
 import at.dms.kjc.sir.lowering.ArrayInitExpander;
 import at.dms.kjc.sir.lowering.ConstantProp;
 import at.dms.kjc.sir.lowering.ConstructSIRTree;
@@ -39,6 +37,7 @@ import at.dms.kjc.sir.lowering.Flattener;
 import at.dms.kjc.sir.lowering.IntroduceMultiPops;
 import at.dms.kjc.sir.lowering.RenameAll;
 import at.dms.kjc.sir.lowering.RoundToFloor;
+import at.dms.kjc.sir.lowering.SegmentedSIRGraph;
 import at.dms.kjc.sir.lowering.SimplifyArguments;
 import at.dms.kjc.sir.lowering.SimplifyPopPeekPush;
 import at.dms.kjc.sir.lowering.StaticsProp;
@@ -51,13 +50,10 @@ import at.dms.kjc.sir.lowering.fusion.Lifter;
 import at.dms.kjc.sir.lowering.partition.ManualPartition;
 import at.dms.kjc.sir.lowering.partition.SJToPipe;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.slir.AddBuffering;
 import at.dms.kjc.slir.DataFlowOrder;
-import at.dms.kjc.slir.InstallInitDistributions;
+import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
-import at.dms.kjc.slir.SIRToSLIR;
-import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
  * Common passes, useful in new back ends.
@@ -90,185 +86,60 @@ public class CommonPasses {
 	private boolean vectorizedEarly = false;
 
 	/**
-	 * Top level method for executing passes common to some current and all
-	 * future StreamIt compilers.
-	 * 
-	 * @param str
-	 *            SIRStream from {@link at.dms.kjc.Kopi2SIR}
-	 * @param interfaces
-	 *            JInterfaceDeclaration[] from {@link at.dms.kjc.Kopi2SIR}
-	 * @param interfaceTables
-	 *            SIRInterfaceTable[] from {@link at.dms.kjc.Kopi2SIR}
-	 * @param structs
-	 *            SIRStructure[] from {@link at.dms.kjc.Kopi2SIR}
-	 * @param helpers
-	 *            SIRHelper[] from {@link at.dms.kjc.Kopi2SIR}
-	 * @param global
-	 *            SIRGlobal from {@link at.dms.kjc.Kopi2SIR}
-	 * @param numCores
-	 *            Number of {@link at.dms.kjc.backendSupport.ComputeNode}'s to
-	 *            use in partitioning.
-	 * 
-	 * @return a slice graph: the optimized program in
-	 *         {@link at.dms.kjc.slir.Filter Slice} representation.
-	 */
-	public StreamGraph run(SIRStream str, JInterfaceDeclaration[] interfaces,
-			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
-			SIRHelper[] helpers, SIRGlobal global, int numCores) {
-
-		this.numCores = numCores;
-
-		// make arguments to functions be three-address code so can replace max,
-		// min, abs
-		// and possibly others with macros, knowing that there will be no side
-		// effects.
-		SimplifyArguments.simplify(str);
-
-		// propagate constants and unroll loop
-		System.out.println("Running Constant Prop and Unroll...");
-		Set<SIRGlobal> theStatics = new HashSet<SIRGlobal>();
-		if (global != null)
-			theStatics.add(global);
-
-		associatedGlobals = StaticsProp.propagate(str, theStatics);
-		ConstantProp.propagateAndUnroll(str);
-		ConstantProp.propagateAndUnroll(str, true);
-		System.out.println("Done Constant Prop and Unroll...");
-
-		IntroduceMultiPops.doit(str);
-
-		// convert round(x) to floor(0.5+x) to avoid obscure errors
-		RoundToFloor.doit(str);
-		// add initPath functions for feedback loops
-		EnqueueToInitPath.doInitPath(str);
-
-		// construct stream hierarchy from SIRInitStatements
-		ConstructSIRTree.doit(str);
-
-		// VarDecl Raise to move array assignments up
-		new VarDeclRaiser().raiseVars(str);
-
-		// do constant propagation on fields
-		System.out.println("Running Constant Field Propagation...");
-		FieldProp.doPropagate(str);
-		System.out.println("Done Constant Field Propagation...");
-
-		// expand array initializers loaded from a file
-		ArrayInitExpander.doit(str);
-
-		// Currently do not support messages in these back ends.
-		// TODO: add support for messages.
-		if (SIRPortal.findMessageStatements(str)) {
-			throw new AssertionError(
-					"Teleport messaging is not yet supported in the Raw backend.");
-		}
-
-		// I _think_ this is not needed, that parent pointers
-		// in SIRStreams can not be incorrect at this point,
-		// but leaving from old code.
-		if (str instanceof SIRContainer) {
-			((SIRContainer) str).reclaimChildren();
-		}
-
-		// ManualPartition.printGraph(str, "numbered.dot");
-
-		// if we are gathering statistics, clone the original stream graph
-		// so that we can gather statictics on it, not on the modified graph
-		if (KjcOptions.stats) {
-			origSTR = (SIRStream) ObjectDeepCloner.deepCopy(str);
-		}
-
-		// splitjoin optimization on SIR graph can not be
-		// done after fusion, and should not affect fusable
-		// pipelines, so do it here.
-		Lifter.liftAggressiveSync(str);
-
-		//./sm	    LowerIterationExpression.doIt(str);
-                
-
-		DynamismFinder.Result result = new DynamismFinder().find(str);
-		return doStaticPassesSegmentedSIRGraph(new SegmentedSIRGraph().init(str, result.isDynamic()));
-	}
-
-	/**
 	 * Loop over each SIR in the segmentedGraph and apply optimizations
 	 * 
 	 * @param segmentedGraph
 	 * @return The SLIR representation of each optimized SSG
 	 */
-	private StreamGraph doStaticPassesSegmentedSIRGraph(SegmentedSIRGraph segmentedGraph) {
+	private StreamGraph doStaticPassesSegmentedSIRGraph(
+			SegmentedSIRGraph segmentedGraph) {
 
-		
-		
-		System.out.println("11111111111111111111111 CommonPasses.doStaticPassesSegmentedSIRGraph enter");
-		
+		System.out
+				.println("CommonPasses.doStaticPassesSegmented enter");
+
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
-			
+
 			if (str instanceof SIRPipeline) {
-				System.out.println("11111111111111111111111 ==>  str is a SIRPipeline");
-				List<SIROperator> oldChildren = ((SIRPipeline) str).getChildren();
-				
-				
-				for ( SIROperator child : oldChildren ) {
-					System.out.println("11111111111111111111111 ==> child is " + child.getIdent());
+				System.out
+						.println("CommonPasses.doStaticPasses str is a SIRPipeline");
+				List<SIROperator> oldChildren = ((SIRPipeline) str)
+						.getChildren();
+
+				for (SIROperator child : oldChildren) {
+					System.out.println("CommonPasses.doStaticPasses child is "
+							+ child.getIdent());
 				}
-			}						
+			}
 		}
-		
-		
+
+		System.out
+				.println("CommonPasses.doStaticPasses segmentedGraph.getStaticSubGraphs().size()="
+						+ segmentedGraph.getStaticSubGraphs().size());
 		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
-		System.out.println("CommonPasses::segmentedGraph.getStaticSubGraphs().size()=" + segmentedGraph.getStaticSubGraphs().size());
+
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
-			
+
 			str = this.removeDummies(str);
-			
+
 			str = doStaticPassSIRStream(str);
-			
+
 			optimizedGraph.addToSegmentedGraph(str);
 		}
-		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);						
-		
-		System.out.println("11111111111111111111111 CommonPasses.doStaticPassesSegmentedSIRGraph exit");
-		
+		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
+
+		System.out.println("CommonPasses.doStaticPassesSegmentedSIRGraph exit");
+
 		return streamGraph;
 
 	}
-	
-	
-	private SIRStream removeDummies(SIRStream str) {
-			
-		System.out.println("11111111111111111111111 CommonPasses.removeDummies enter");
-		
-		if (str instanceof SIRPipeline) {
-
-			System.out.println("11111111111111111111111 str is a SIRPipeline");
-			List<SIROperator> oldChildren = ((SIRPipeline) str).getChildren();
-			List<SIRStream> newChildren = new ArrayList<SIRStream>();
-			SIRPipeline pipeline = new SIRPipeline(null, str.getIdent());
-			pipeline.setInit(SIRStream.makeEmptyInit());
-					
-			for ( SIROperator child : oldChildren ) {
-				System.out.println("11111111111111111111111 child is " + child.getIdent());
-				if (!(child instanceof SIRDummySource || child instanceof SIRDummySink)) {
-					newChildren.add((SIRStream)child);					
-				}
-				
-			}
-			pipeline.setChildren(newChildren);
-			return pipeline;
-		}
-		
-		System.out.println("11111111111111111111111 CommonPasses.removeDummies exit");
-
-		
-		return str;
-	}
 
 	/**
-	 * Equivalent to one call of CommonPass run before re-factoring
-	 * to have multiple static subgraphs.
-	 * @param str the SIRStream on which to do the single pass
+	 * Equivalent to one call of CommonPass run before re-factoring to have
+	 * multiple static subgraphs.
+	 * 
+	 * @param str
+	 *            the SIRStream on which to do the single pass
 	 * @return The modified SIRStream
 	 */
 	private SIRStream doStaticPassSIRStream(SIRStream str) {
@@ -458,6 +329,175 @@ public class CommonPasses {
 	}
 
 	/**
+	 * Get the names of globals that may have been copied into multiple places.
+	 * 
+	 * @return
+	 */
+	public Map<String, Set<String>> getAssociatedGlobals() {
+		return associatedGlobals;
+	}
+
+	/**
+	 * Get the original stream for statistics gathering. Returns null unless
+	 * KjcOptions.stats
+	 * 
+	 * @return the stream before any graph structure modifications.
+	 */
+	public SIRStream getOrigSTR() {
+		return origSTR;
+	}
+
+	/**
+	 * Get the slicer used in
+	 * {@link #run(SIRStream, JInterfaceDeclaration[], SIRInterfaceTable[], SIRStructure[], SIRHelper[], SIRGlobal, int)
+	 * run}.
+	 * 
+	 * @return the slicer
+	 */
+	public StaticSubGraph getSSG0() {
+		assert streamGraph.getNumSSGs() == 1;
+		return streamGraph.getSSG(0);
+	}
+
+	/**
+	 * Remove the SIRDummySource and SIRDummySink operators
+	 * @param str The SIRStream from which to remove the filters.
+	 * @return The modified SIRStream
+	 */
+	private SIRStream removeDummies(SIRStream str) {
+		System.out
+				.println("CommonPasses.removeDummies enter");
+		if (str instanceof SIRPipeline) {
+
+			System.out.println("CommonPasses.removeDummies str is a SIRPipeline");
+			List<SIROperator> oldChildren = ((SIRPipeline) str).getChildren();
+			List<SIRStream> newChildren = new ArrayList<SIRStream>();
+			SIRPipeline pipeline = new SIRPipeline(null, str.getIdent());
+			pipeline.setInit(SIRStream.makeEmptyInit());
+
+			for (SIROperator child : oldChildren) {
+				System.out.println("CommonPasses.removeDummies child is "
+						+ child.getIdent());
+				if (!(child instanceof SIRDummySource || child instanceof SIRDummySink)) {
+					newChildren.add((SIRStream) child);
+				}
+			}
+			// Special case here. The pipeline should not consist of a single node. 
+			// If it does, there will be problems in the fusion optimization code.
+			if (newChildren.size() == 1) {
+				return newChildren.get(0);
+			} else {
+				pipeline.setChildren(newChildren);
+				return pipeline;
+			}
+		}
+		System.out
+				.println("CommonPasses.removeDummies exit");
+		return str;
+	}
+
+	/**
+	 * Top level method for executing passes common to some current and all
+	 * future StreamIt compilers.
+	 * 
+	 * @param str
+	 *            SIRStream from {@link at.dms.kjc.Kopi2SIR}
+	 * @param interfaces
+	 *            JInterfaceDeclaration[] from {@link at.dms.kjc.Kopi2SIR}
+	 * @param interfaceTables
+	 *            SIRInterfaceTable[] from {@link at.dms.kjc.Kopi2SIR}
+	 * @param structs
+	 *            SIRStructure[] from {@link at.dms.kjc.Kopi2SIR}
+	 * @param helpers
+	 *            SIRHelper[] from {@link at.dms.kjc.Kopi2SIR}
+	 * @param global
+	 *            SIRGlobal from {@link at.dms.kjc.Kopi2SIR}
+	 * @param numCores
+	 *            Number of {@link at.dms.kjc.backendSupport.ComputeNode}'s to
+	 *            use in partitioning.
+	 * 
+	 * @return a slice graph: the optimized program in
+	 *         {@link at.dms.kjc.slir.Filter Slice} representation.
+	 */
+	public StreamGraph run(SIRStream str, JInterfaceDeclaration[] interfaces,
+			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
+			SIRHelper[] helpers, SIRGlobal global, int numCores) {
+
+		this.numCores = numCores;
+
+		// make arguments to functions be three-address code so can replace max,
+		// min, abs
+		// and possibly others with macros, knowing that there will be no side
+		// effects.
+		SimplifyArguments.simplify(str);
+
+		// propagate constants and unroll loop
+		System.out.println("Running Constant Prop and Unroll...");
+		Set<SIRGlobal> theStatics = new HashSet<SIRGlobal>();
+		if (global != null)
+			theStatics.add(global);
+
+		associatedGlobals = StaticsProp.propagate(str, theStatics);
+		ConstantProp.propagateAndUnroll(str);
+		ConstantProp.propagateAndUnroll(str, true);
+		System.out.println("Done Constant Prop and Unroll...");
+
+		IntroduceMultiPops.doit(str);
+
+		// convert round(x) to floor(0.5+x) to avoid obscure errors
+		RoundToFloor.doit(str);
+		// add initPath functions for feedback loops
+		EnqueueToInitPath.doInitPath(str);
+
+		// construct stream hierarchy from SIRInitStatements
+		ConstructSIRTree.doit(str);
+
+		// VarDecl Raise to move array assignments up
+		new VarDeclRaiser().raiseVars(str);
+
+		// do constant propagation on fields
+		System.out.println("Running Constant Field Propagation...");
+		FieldProp.doPropagate(str);
+		System.out.println("Done Constant Field Propagation...");
+
+		// expand array initializers loaded from a file
+		ArrayInitExpander.doit(str);
+
+		// Currently do not support messages in these back ends.
+		// TODO: add support for messages.
+		if (SIRPortal.findMessageStatements(str)) {
+			throw new AssertionError(
+					"Teleport messaging is not yet supported in the Raw backend.");
+		}
+
+		// I _think_ this is not needed, that parent pointers
+		// in SIRStreams can not be incorrect at this point,
+		// but leaving from old code.
+		if (str instanceof SIRContainer) {
+			((SIRContainer) str).reclaimChildren();
+		}
+
+		// ManualPartition.printGraph(str, "numbered.dot");
+
+		// if we are gathering statistics, clone the original stream graph
+		// so that we can gather statictics on it, not on the modified graph
+		if (KjcOptions.stats) {
+			origSTR = (SIRStream) ObjectDeepCloner.deepCopy(str);
+		}
+
+		// splitjoin optimization on SIR graph can not be
+		// done after fusion, and should not affect fusable
+		// pipelines, so do it here.
+		Lifter.liftAggressiveSync(str);
+
+		// ./sm LowerIterationExpression.doIt(str);
+
+		DynamismFinder.Result result = new DynamismFinder().find(str);
+		return doStaticPassesSegmentedSIRGraph(new SegmentedSIRGraph().init(
+				str, result.isDynamic()));
+	}
+
+	/**
 	 * Create schedules for init, prime-pump and steady phases. Affected by
 	 * KjcOptions.spacetime, KjcOptions.noswpipe. Not called for Tilera!
 	 * 
@@ -480,36 +520,5 @@ public class CommonPasses {
 		// decreasing order of estimated work
 		new BasicGenerateSteadyStateSchedule(schedule, ssg).schedule();
 		return schedule;
-	}
-
-	/**
-	 * Get the slicer used in
-	 * {@link #run(SIRStream, JInterfaceDeclaration[], SIRInterfaceTable[], SIRStructure[], SIRHelper[], SIRGlobal, int)
-	 * run}.
-	 * 
-	 * @return the slicer
-	 */
-	public StaticSubGraph getSSG0() {
-		assert streamGraph.getNumSSGs() == 1;
-		return streamGraph.getSSG(0);
-	}
-
-	/**
-	 * Get the original stream for statistics gathering. Returns null unless
-	 * KjcOptions.stats
-	 * 
-	 * @return the stream before any graph structure modifications.
-	 */
-	public SIRStream getOrigSTR() {
-		return origSTR;
-	}
-
-	/**
-	 * Get the names of globals that may have been copied into multiple places.
-	 * 
-	 * @return
-	 */
-	public Map<String, Set<String>> getAssociatedGlobals() {
-		return associatedGlobals;
 	}
 }

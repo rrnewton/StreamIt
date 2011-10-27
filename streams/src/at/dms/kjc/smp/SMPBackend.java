@@ -14,6 +14,7 @@ public class SMPBackend {
 	public static SMPMachine chip;
 	public static SMPBackEndFactory backEndFactory;
 	public static Structs_h structs_h;
+	public static DynamicQueueCodeGenerator dynamicQueueCodeGenerator = new DynamicQueueCodeGenerator();
 	public static int[] coreOrder = { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13,
 		6, 14, 7, 15 };
 
@@ -110,6 +111,8 @@ public class SMPBackend {
 
 		printFinalWorkAssignments();
 
+		dynamicQueueCodeGenerator.writeToFiles();
+		
 		if (isDynamic) {
 			new DumpText().copyToFile();
 		}
@@ -182,6 +185,8 @@ public class SMPBackend {
 		}		
 		
 		RotatingBuffer.rotTypeDefs();
+
+		InterSSGChannel.createDynamicQueues();
 		
 		chip.setThreadMap(threadMap);
 

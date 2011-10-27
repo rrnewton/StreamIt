@@ -406,11 +406,6 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 		System.out
 				.println("SMPCodeStoreHelper.getWorkFunctionBlock: addField multiplier "
 						+ multiplierName);
-		// ALocalVariable multiplierVar =
-		// ALocalVariable.makeVar(CStdType.Integer, multiplierName);
-		// System.out.println("11111111111111111111111111111: " +
-		// multiplierVar.getVarDefn().getI;
-		// this.addField(new JFieldDeclaration(multiplierVar.getVarDefn()));
 
 		JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
 				CStdType.Integer, multiplierName, null);

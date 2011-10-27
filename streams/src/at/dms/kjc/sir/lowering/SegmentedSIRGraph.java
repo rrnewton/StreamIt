@@ -148,11 +148,11 @@ public class SegmentedSIRGraph implements StreamVisitor {
 
 	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
-		 System.out.println("11111111111111111111111" + this.getClass().getCanonicalName() +
-		 " visitFilter() "
-		 + self.getName() + " isDynamicPush=" + isDynamicPush(self)
-		 + " isDynamicPop=" + isDynamicPop(self) + " iter.getPos="
-		 + iter.getPos());
+		System.out.println("SegmentedSIRGraph.visitFilter"
+				+ this.getClass().getCanonicalName() + " visitFilter() "
+				+ self.getName() + " isDynamicPush=" + isDynamicPush(self)
+				+ " isDynamicPop=" + isDynamicPop(self) + " iter.getPos="
+				+ iter.getPos());
 
 		SIRFilter filter = (SIRFilter) ObjectDeepCloner.deepCopy(self);
 
@@ -163,7 +163,8 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		}
 
 		else if (isDynamicPush(filter) && !(isDynamicPop(filter))) {
-			 System.out.println("1111111111111111111111 adding the dynamic push only case ");
+			System.out
+					.println("SegmentedSIRGraph.visitFilter adding the dynamic push only case ");
 			filter.setPush(new JIntLiteral(1));
 			addToPipeline(filter);
 			pipelineChildren.add(createSink(self, iter));
@@ -200,17 +201,14 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		}
 		// Create a new empty list of pipeline children
 		String name = uniquePipelineName();
-		
-		System.out.println("11111111111111111111111 creating pipeline ");
-		
+
+		System.out.println("SegmentedSIRGraph.visitFilter creating pipeline ");
+
 		SIRPipeline pipeline = new SIRPipeline(null, name);
-				
-		
+
 		pipeline.setInit(SIRStream.makeEmptyInit());
 		this.setChildren(pipeline, pipelineChildren);
-		
-		
-		
+
 		addToSegmentedGraph(pipeline);
 	}
 

@@ -74,6 +74,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 			InterSSGChannel channel = new InterSSGChannel(edge);
 			if (ssg.getTopFilters() != null) {
 				top = ssg.getTopFilters()[0];
+				   CType bufType = top.getWorkNode().getFilter().getInputType();
+				   System.out.println("InterSSGChannel.createInputBuffers creating a dynamic buffer for type " + bufType.toString());
+				   types.add(bufType.toString());
+				
 				setInputBuffer(top.getWorkNode(), channel);
 			} else {
 				assert false : "InterSSGChannel::createInputBuffers() : ssg.getTopFilters() is null";
@@ -251,6 +255,13 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		return "queue_push";
 	}
 
+	public static void createDynamicQueues() {		
+		for (String type : types) {			
+			SMPBackend.dynamicQueueCodeGenerator.addQueueType(type);
+			
+		}
+	}
+	
 	public JMethodDeclaration popMethod(Map<String, String> dominators) {
 		
 		OutputPort outputPort = this.theEdge.getSrc();
