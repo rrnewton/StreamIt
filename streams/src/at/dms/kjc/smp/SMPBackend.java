@@ -95,7 +95,11 @@ public class SMPBackend {
 		}
 	}
 
-	private static void emitCode(Map<Filter, Integer> threadMap, Set<String> dominated, Map<String, String> dominators) {
+	private static void emitCode(
+			Map<Filter, Integer> threadMap, 
+			Set<String> dominated, 
+			Map<String, String> dominators, 
+			Map<Integer, String> threadIdToType) {
 
 		// generate code for file writer
 		SMPComputeCodeStore.generatePrintOutputCode();
@@ -104,17 +108,15 @@ public class SMPBackend {
 			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
 
 		// emit c code for all cores
-		new EmitSMPCode(backEndFactory, isDynamic, threadMap, dominated, dominators).doit();
+		new EmitSMPCode(backEndFactory, isDynamic, threadMap, dominated, dominators, threadIdToType).doit();
 
 		// dump structs.h file
 		structs_h.writeToFile();
 
 		printFinalWorkAssignments();
-
-		dynamicQueueCodeGenerator.writeToFiles();
 		
 		if (isDynamic) {
-			new DumpText().copyToFile();
+			dynamicQueueCodeGenerator.writeToFiles();
 		}
 
 		System.exit(0);
@@ -175,27 +177,35 @@ public class SMPBackend {
 
 		InterSSGChannel.createBuffers(streamGraph);
 
-		Map<Filter, Integer> threadMap = new HashMap<Filter, Integer>();
+		Map<Filter, Integer> filterToThreadId = new HashMap<Filter, Integer>();
 		Set<String> dominated = new HashSet<String>();
 		Map<String, String> dominators = new HashMap<String, String>();		
+		Map<Integer, String> threadIdToType = new HashMap<Integer, String>();	
+		
+		for (StaticSubGraph ssg : streamGraph.getSSGs()) {			
+			ThreadMapper.getMapper().assignThreads(ssg, filterToThreadId, dominated, dominators, threadIdToType);			
+		}		
 		
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
 			
-			runSSG(ssg, threadMap, dominated, dominators);
+			runSSG(ssg, filterToThreadId, dominated, dominators, threadIdToType);
 		}		
 		
 		RotatingBuffer.rotTypeDefs();
 
 		InterSSGChannel.createDynamicQueues();
 		
-		chip.setThreadMap(threadMap);
+		chip.setThreadMap(filterToThreadId);
 
-		emitCode(threadMap, dominated, dominators);
+		emitCode(filterToThreadId, dominated, dominators, threadIdToType);
 
 	}
 
 	private static void runSSG(StaticSubGraph ssg,
-			Map<Filter, Integer> threadMap, Set<String> dominated, Map<String, String> dominators) {// , CommonPasses commonPasses) {
+			Map<Filter, Integer> filterToThreadId, 
+			Set<String> dominated, 
+			Map<String, String> dominators,
+			Map<Integer, String> threadIdToType) {
 
 		System.out.println("SMPBackend.runSSG ssg=" +
 				ssg.getTopFilters()[0].getWorkNode() 				
@@ -216,10 +226,6 @@ public class SMPBackend {
 		// generate layout for filters
 		scheduler.runLayout();
 
-		// TODO: add a pass that maps to layout, to map filters to threads
-		// Store the mapping from Filter to Thread inside the core code store.
-		ThreadMapper.getMapper().assignThreads(graphSchedule, threadMap, dominated, dominators);
-
 		// dump final slice graph to dot file
 		graphSchedule.getSSG()
 		.dumpGraph("after_slice_partition.dot", scheduler);
@@ -235,7 +241,7 @@ public class SMPBackend {
 		RotatingBuffer.createBuffers(graphSchedule);
 
 		// now convert to Kopi code plus communication commands
-		backEndFactory = new SMPBackEndFactory(chip, scheduler);
+		backEndFactory = new SMPBackEndFactory(chip, scheduler, dominators, filterToThreadId);
 		backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
 
 		// calculate computation to communication ratio

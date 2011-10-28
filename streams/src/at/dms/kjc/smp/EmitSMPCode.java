@@ -29,17 +29,20 @@ public class EmitSMPCode extends EmitCode {
 	public final String MAIN_FILE = "main.c";
 
 	private boolean isDynamic = false;
-	// private Map<Filter, Integer> threadMap = null;
+	private Map<Filter, Integer> filterToThreadId = null;
 	private Set<String> dominated = null;
 	private Map<String, String> dominators = null;
+	Map<Integer, String> threadIdToType = null;
 
 	public EmitSMPCode(SMPBackEndFactory backEndFactory, boolean isDynamic,
-			Map<Filter, Integer> threadMap, Set<String> dominated, Map<String, String> dominators) {
+			Map<Filter, Integer> filterToThreadId, Set<String> dominated, Map<String, String> dominators,
+			Map<Integer, String> threadIdToType) {
 		super(backEndFactory);
 		this.isDynamic = isDynamic;
-		//this.threadMap = threadMap;
+		this.filterToThreadId = filterToThreadId;
 		this.dominated = dominated;
 		this.dominators = dominators;
+		this.threadIdToType = threadIdToType;
 	}
 
 	public EmitSMPCode() {
@@ -131,7 +134,6 @@ public class EmitSMPCode extends EmitCode {
 
 				this.emitCodeForComputeNode(core, p);
 				
-
 				p.close();
 			}
 
@@ -190,32 +192,6 @@ public class EmitSMPCode extends EmitCode {
 		// generate code for ends of channels that connect to code on this ComputeNode
 		Set <RotatingBuffer> outputBuffers = OutputRotatingBuffer.getOutputBuffersOnCore((Core)n);
 		Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnCore((Core)n);
-		Set <InterSSGChannel> dynamicInputBuffers = InterSSGChannel.getInputBuffersOnCore((Core)n);
-		Set <InterSSGChannel> dynamicOutputBuffers = InterSSGChannel.getOutputBuffersOnCore((Core)n);
-
-		for (InterSSGChannel c : dynamicInputBuffers) {
-			if (c.readDeclsExtern() != null) {
-				for (JStatement d : c.readDeclsExtern()) { 
-					d.accept(codegen); p.println();
-				}
-			}
-		}
-
-		for (InterSSGChannel c : dynamicOutputBuffers) {
-			if (c.writeDeclsExtern() != null) {
-				for (JStatement d : c.writeDeclsExtern()) { 
-					d.accept(codegen); p.println();
-				}
-			}        	
-		}
-
-		for (InterSSGChannel c : dynamicInputBuffers) {
-			if (c.readDeclsExtern() != null) {
-				for (JStatement d : c.dataDecls()) { 
-					d.accept(codegen); p.println();
-				}
-			}
-		}
 
 		// externs
 		for (RotatingBuffer c : outputBuffers) {
@@ -271,12 +247,7 @@ public class EmitSMPCode extends EmitCode {
 			if (c.popManyMethod() != null) { c.popManyMethod().accept(codegen); }
 		}
 		p.println("");				
-
-		for (InterSSGChannel c : dynamicInputBuffers) {						
-						
-			c.popMethod(dominators).accept(codegen); 
-		}
-
+		
 		p.println("");
 
 		// generate declarations for fields
@@ -383,7 +354,8 @@ public class EmitSMPCode extends EmitCode {
 
 		p.println("#include \"barrier.h\"");
 		p.println("#include \"structs.h\"");
-		p.println("#include \"queue.h\"");
+		p.println("#include \"pthread.h\"");
+		p.println("#include \"dynamic_queue.h\"");
 		p.println("#include <stdint.h>");
 		p.println();
 
@@ -403,19 +375,22 @@ public class EmitSMPCode extends EmitCode {
 		p.println("// Global barrier");
 		p.println("extern barrier_t barrier;");
 		p.println();
-
-		// TODO: RJS put upper bounds
-		if (isDynamic) {
-			// TODO fix number of threads
-			int numDynamicReaders = 1;
+	
+		if (isDynamic) {															
+			int numDynamicReaders =  threadIdToType.keySet().size();	
 			p.println();
 			p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
 			p.println("#define ASLEEP          0");
 			p.println("#define AWAKE           1");
 			p.println("#define DYN_READER      0");
 			p.println("#define MASTER          1");
-			p.println("extern queue_ctx_ptr   dyn_buf_0;");	
-			p.println("extern queue_ctx_ptr   dyn_buf_1;");			
+			
+			for (Integer threadId : threadIdToType.keySet()) {
+				String type = threadIdToType.get(threadId);				
+				System.out.println("EmitSMPCode.generateGlobalHeader " + "extern " + type + "queue_ctx_ptr   dyn_buf_" + threadId + ";");	
+				p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
+			}
+							
 			p.println("extern pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");		
 			p.println("extern pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
 			p.println("extern int                   thread_to_sleep [DYNAMIC_READERS][2];");
@@ -484,7 +459,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println("#include \"structs.h\"");
 
 		if (isDynamic) {
-			p.println("#include \"queue.h\"");
+			p.println("#include \"dynamic_queue.h\"");
 		}
 
 		if(KjcOptions.loadbalance)
@@ -514,14 +489,14 @@ public class EmitSMPCode extends EmitCode {
 			p.println("int maxSteadyIter = " + KjcOptions.iterations + ";");
 			p.println();
 		}
-
-		// TODO: RJS put upper bounds
+	
 		if (isDynamic) {
-			// TODO fix number of threads
-			int numDynamicReaders = 1;
-			for (int i = 0; i < 2; i++) {
-				p.println("queue_ctx_ptr dyn_buf_" + i + ";");
-			}       
+			int numDynamicReaders = threadIdToType.keySet().size();					
+			for (Integer threadId : threadIdToType.keySet()) {
+				String type = threadIdToType.get(threadId);				
+				p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
+			}
+			
 			p.println();
 			p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
 			p.println("#define ASLEEP          0");
@@ -570,14 +545,15 @@ public class EmitSMPCode extends EmitCode {
 				p.println();
 				p.println("// Initialize barrier");
 				p.println("barrier_init(&barrier, " + barrier_count + ");");
-
-				// TODO: RJS put upper bounds
+				
 				if (isDynamic) {
 					p.println();
 					p.println("// Initialize dynamic queues");
-					for (int i = 0; i < 2; i++) {
-						p.println("dyn_buf_" + i + " = queue_create();");
-					}
+
+					for (Integer threadId : filterToThreadId.values()) {
+						String type = threadIdToType.get(threadId);				
+						p.println("dyn_buf_" + threadId + " = " + type + "_queue_create();");	
+					}					
 					p.println();
 					p.println("// Initialize mutexes and condition variables");
 					p.println();
@@ -638,7 +614,6 @@ public class EmitSMPCode extends EmitCode {
 
 
 				if (isDynamic) {					
-					// TODO: How to get the appropriate unique name for the helper thread method name?
 					for (Core core : SMPBackend.chip.getCores()) {
 						Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
 						int i = 0;
@@ -686,8 +661,7 @@ public class EmitSMPCode extends EmitCode {
 
 	private void generateMakefile() throws IOException {
 		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("Makefile", false)));
-
-		// TODO : RJS
+		
 		//p.println("CC = icc");
 		p.println("CC = g++");
 		p.println("CFLAGS = -O2 -vec-report0");
@@ -695,7 +669,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println("LIBS = -pthread -lstdc++");
 		p.print("OBJS = main.o barrier.o ");
 		if (isDynamic) {       
-			p.print("queue.o ");
+			p.print("dynamic_queue.o ");
 		} 
 		if(KjcOptions.loadbalance) p.print("load_balancer.o ");
 		for(Core core : SMPBackend.chip.getCores()) {
@@ -723,8 +697,8 @@ public class EmitSMPCode extends EmitCode {
 		p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c barrier.c");
 		p.println();
 
-		p.println("queue.o: queue.c");
-		p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c queue.c");
+		p.println("dynamic_queue.o: dynamic_queue.c");
+		p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c dynamic_queue.c");
 		p.println();
 
 

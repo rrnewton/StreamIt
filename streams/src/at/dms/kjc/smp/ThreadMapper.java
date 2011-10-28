@@ -1,10 +1,13 @@
 package at.dms.kjc.smp;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import at.dms.kjc.CType;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.StaticSubGraph;
 
 public class ThreadMapper {
@@ -23,13 +26,12 @@ public class ThreadMapper {
 		return mapper;
 	}
 
-	public void assignThreads(BasicSpaceTimeSchedule graphSchedule,
-			Map<Filter, Integer> threadMap,
+	public void assignThreads(StaticSubGraph ssg,
+			Map<Filter, Integer> filterToThreadId,
 			Set<String> dominated, 
-			Map<String, String> dominators
+			Map<String, String> dominators,
+			Map<Integer, String> threadIdToType
 			) {
-
-		StaticSubGraph ssg = graphSchedule.getSSG();
 						
 		/* Check if it has a dynamic pop rate */
 		if (ssg.hasDynamicInput()) {
@@ -40,8 +42,20 @@ public class ThreadMapper {
 				System.out.println("ThreadMapper.assignThreads Filter "
 						+ dynamicReader.getWorkNodeContent().getName()
 						+ " is a dynamic reader");
-				threadMap.put(dynamicReader, threadId);
 				
+				List<InterSSGEdge> links = ssg.getInputPort().getLinks();
+				for (InterSSGEdge edge : links) {
+					System.out.println("ThreadMapper.assignThreads edge = " + edge.toString());
+					Filter[] connectedGraph  = edge.getDest().getSSG().getFilterGraph();
+					Filter connected = connectedGraph[connectedGraph.length - 1];
+					System.out.println("ThreadMapper.assignThreads edge filter = " + connected.getWorkNode().toString());
+					filterToThreadId.put(connected, threadId);
+
+				}				
+				CType type = dynamicReader.getWorkNodeContent().getOutputType();
+				filterToThreadId.put(dynamicReader, threadId);
+				threadIdToType.put(threadId, type.toString());
+												
 				Filter[] filterGraph = ssg.getFilterGraph();
 				
 				for (Filter filter : filterGraph) {

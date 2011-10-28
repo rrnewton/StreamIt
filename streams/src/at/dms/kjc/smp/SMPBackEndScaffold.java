@@ -3,6 +3,8 @@
  */
 package at.dms.kjc.smp;
 
+import java.util.Map;
+
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
@@ -20,7 +22,13 @@ import at.dms.kjc.slir.StaticSubGraph;
  *
  */
 public class SMPBackEndScaffold extends BackEndScaffold {
-    
+	
+	private Map<String, String> dominators;
+	
+	public SMPBackEndScaffold(Map<String, String> dominators) {
+		this.dominators = dominators;
+	}
+	
     @Override
 	protected void afterScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {

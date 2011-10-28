@@ -3,6 +3,7 @@
  */
 package at.dms.kjc.backendSupport;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,6 +46,9 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	protected static HashMap<WorkNode, InterSSGChannel> inputBuffers;
 	protected static HashMap<WorkNode, InterSSGChannel> outputBuffers;
 
+	protected static HashMap<String, String> bufferVariables;	
+	protected static HashMap<String, String> createMethods;	
+
 	static {
 		types = new HashSet<String>();
 		inputBuffers = new HashMap<WorkNode, InterSSGChannel>();
@@ -60,6 +64,15 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	}
 
 	/**
+	 * Create the implementation for queues of different types
+	 */
+	public static void createDynamicQueues() {		
+		for (String type : types) {			
+			SMPBackend.dynamicQueueCodeGenerator.addQueueType(type);
+		}
+	}
+
+	/**
 	 * 
 	 * @param streamGraph
 	 */
@@ -71,14 +84,16 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				continue;
 			}
 			InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);
-			InterSSGChannel channel = new InterSSGChannel(edge);
+			
+			System.out.println("InterSSGChannel.createInputBuffers edge=" + edge.toString());
+
+			InterSSGChannel channel = new InterSSGChannel(edge);			
 			if (ssg.getTopFilters() != null) {
 				top = ssg.getTopFilters()[0];
-				   CType bufType = top.getWorkNode().getFilter().getInputType();
-				   System.out.println("InterSSGChannel.createInputBuffers creating a dynamic buffer for type " + bufType.toString());
-				   types.add(bufType.toString());
-				
-				setInputBuffer(top.getWorkNode(), channel);
+				CType bufType = top.getWorkNode().getFilter().getInputType();
+				System.out.println("InterSSGChannel.createInputBuffers creating a dynamic buffer for type " + bufType.toString());
+				types.add(bufType.toString());							
+				inputBuffers.put(top.getWorkNode(), channel);
 			} else {
 				assert false : "InterSSGChannel::createInputBuffers() : ssg.getTopFilters() is null";
 			}
@@ -100,6 +115,9 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				continue;
 			}
 			InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
+			
+			System.out.println("InterSSGChannel.createOutputBuffers edge=" + edge.toString());
+			
 			InterSSGChannel channel = new InterSSGChannel(edge);
 			if (ssg.getTopFilters() != null) {
 				Filter top = ssg.getTopFilters()[0];
@@ -109,6 +127,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 			}
 		}
 
+	}
+
+	public static Collection<InterSSGChannel> getInterSSGChannels() {
+		return inputBuffers.values();
 	}
 
 	/**
@@ -130,35 +152,31 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
 		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();		
 		for (InterSSGChannel b : inputBuffers.values()) {
-			
+
 			InterSSGEdge edge = b.getEdge();
 			OutputPort iport = edge.getSrc();
 			StaticSubGraph ssg = iport.getSSG();			
-			
+
 			Filter top[] = ssg.getTopFilters();
-			
+
 			for (Filter f : top) {
-				
+
 				System.out.println("InterSSGChannel.getInputBuffersOnCore core=" + t.getCoreID() 
 						+ " filter=" + f.getWorkNode().toString());
-				
+
 				System.out.println("InterSSGChannel.getInputBuffersOnCore computeNode=" + 
 						SMPBackend.scheduler.getComputeNode(f.getWorkNode()).getCoreID());
-				
+
 				if (SMPBackend.scheduler.getComputeNode(f.getWorkNode())
 						.equals(t)) {
 					System.out.println("InterSSGChannel.getInputBuffersOnCore adding b"); 							
 					set.add(b);
 				}
 
-			
+
 			}
 		}
 		return set;
-	}
-
-	private InterSSGEdge getEdge() {
-		return theEdge;
 	}
 
 	/**
@@ -197,26 +215,6 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	}
 
 	/**
-	 * 
-	 * @param node
-	 * @param buf
-	 */
-	public static void setInputBuffer(WorkNode node, InterSSGChannel buf) {
-		inputBuffers.put(node, buf);
-	}
-
-	/**
-	 * 
-	 * @param node
-	 * @param buf
-	 */
-	public static void setOutputBuffer(WorkNode node, InterSSGChannel buf) {
-		outputBuffers.put(node, buf);
-	}
-
-	// private WorkNode filterNode;
-
-	/**
 	 * @param edge
 	 */
 	protected InterSSGChannel(InterSSGEdge edge) {
@@ -228,6 +226,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 */
 	public List<JStatement> dataDecls() {
 		return new LinkedList<JStatement>();
+	}
+
+	private InterSSGEdge getEdge() {
+		return theEdge;
 	}
 
 	/**
@@ -248,90 +250,13 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public String popMethodName() {
-		return "queue_pop";
+		String type = theEdge.getType().toString();
+		return type + "_queue_pop";
 	}
 
 	public String pushMethodName() {
-		return "queue_push";
-	}
-
-	public static void createDynamicQueues() {		
-		for (String type : types) {			
-			SMPBackend.dynamicQueueCodeGenerator.addQueueType(type);
-			
-		}
-	}
-	
-	public JMethodDeclaration popMethod(Map<String, String> dominators) {
-		
-		OutputPort outputPort = this.theEdge.getSrc();
-		StaticSubGraph ssg = outputPort.getSSG();
-		String dominantFilter = ssg.getTopFilters()[0].getWorkNodeContent().getName();
-
-		JBlock methodBody = new JBlock();
-		JBlock ifBody = new JBlock();
-		ifBody.addStatement(Util.toStmt("/* Set Downstream Multiplier */"));		
-		String dominated = dominators.get(dominantFilter);
-		if (dominated != null) {
-			ifBody.addStatement(Util.toStmt(dominated + "_multiplier = 0"));
-		}		
-
-		Utils.addSetFlag(ifBody, 0, "MASTER", "MASTER", "AWAKE");
-		Utils.addSignal(ifBody, 0, "MASTER");
-
-		Utils.addCondWait(ifBody, 0, "DYN_READER", "DYN_READER",
-				Utils.makeEqualityCondition("q->size", "0"));
-
-		JIfStatement ifStatement = Utils.makeIfStatement(
-				Utils.makeEqualityCondition("q->size", "0"), ifBody);
-
-		methodBody.addStatement(ifStatement);
-
-		String formalParamName = "q";
-		CType formalParamType = new CEmittedTextType("queue_ctx_ptr");
-
-		methodBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression("int elem = q->buffer[q->first]")));
-		methodBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression("q->size--")));
-		methodBody
-				.addStatement(new JExpressionStatement(
-						new JEmittedTextExpression(
-								"q->first = (q->first + 1) & q->max")));
-		if (dominated != null) {
-			methodBody.addStatement(Util.toStmt(dominated + "_multiplier = 1"));
-		}		
-		
-		methodBody.addStatement(new JExpressionStatement(
-				new JEmittedTextExpression("return elem")));		
-
-		new JFormalParameter(formalParamType, formalParamName);
-
-		JMethodDeclaration popMethod = new JMethodDeclaration(CStdType.Integer,
-				"queue_pop", new JFormalParameter[] { new JFormalParameter(
-						formalParamType, formalParamName) }, methodBody);
-
-		return popMethod;
-	}
-
-	public List<JStatement> readDeclsExtern() {
-		// List<JStatement> statements = new LinkedList<JStatement>();
-		// JStatement stmt = new JExpressionStatement(new
-		// JEmittedTextExpression(
-		// "extern queue_ctx_ptr dyn_queue"));
-		// statements.add(stmt);
-		// return statements;
-		return new LinkedList<JStatement>();
-	}
-
-	public List<JStatement> writeDeclsExtern() {
-		// List<JStatement> statements = new LinkedList<JStatement>();
-		// JStatement stmt = new JExpressionStatement(new
-		// JEmittedTextExpression(
-		// "extern queue_ctx_ptr dyn_queue"));
-		// statements.add(stmt);
-		// return statements;
-		return new LinkedList<JStatement>();
+		String type = theEdge.getType().toString();
+		return  type + "_queue_push";
 	}
 
 }

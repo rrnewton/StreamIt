@@ -13,6 +13,7 @@ public abstract class Edge<S,T> {
 
 	protected S src;
 	protected T dst;
+	protected CType type;
 	
 	/**
 	 * @return

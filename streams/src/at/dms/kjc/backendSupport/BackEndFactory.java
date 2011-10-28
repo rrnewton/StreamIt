@@ -4,6 +4,7 @@ import at.dms.kjc.slir.*;
 import at.dms.util.Utils;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Factor out parts of back end that need matching types.
@@ -253,4 +254,5 @@ public abstract class BackEndFactory<
     public boolean sliceNeedsSplitterWorkFunction(Filter s) {
         return false;
     }
+	
 }

@@ -22,11 +22,7 @@ import at.dms.kjc.CType;
 public class IntraSSGEdge<S extends InternalFilterNode,T extends InternalFilterNode> 
 	extends Edge<S, T> implements at.dms.kjc.DeepCloneable {
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "src", "dst" };
-  
-    /**
-     * Caches type for {@link #getType()} calls
-     */
-    private CType type;
+   
 
     /**
      * Full constructor, (type will be inferred from src / dest).

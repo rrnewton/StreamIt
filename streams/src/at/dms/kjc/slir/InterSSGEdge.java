@@ -33,6 +33,13 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 		super(src, dst);
 	}
 
+	public String toString() {
+		Filter[] inputFilterGraph = src.getSSG().getFilterGraph();
+		Filter[] outputFilterGraph = dst.getSSG().getFilterGraph();
+		WorkNodeContent srcContent = inputFilterGraph[0].getWorkNodeContent();
+		WorkNodeContent dstContent = outputFilterGraph[outputFilterGraph.length - 1].getWorkNodeContent();		
+		return "InterSSGEdge " +  srcContent + " -> " + dstContent + "(type=" + getType() + ")";		
+	}
 
 	public Rate getPushRate() {
 		return pushRate;
@@ -63,7 +70,27 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 	 */
 	@Override
 	public CType getType() {
-		// TODO Auto-generated method stub
-		return null;
+		if (type != null) {
+			return type;
+		}
+
+		Filter[] inputFilterGraph = src.getSSG().getFilterGraph();
+		Filter[] outputFilterGraph = dst.getSSG().getFilterGraph();
+		WorkNodeContent srcContent = inputFilterGraph[0].getWorkNodeContent();
+		WorkNodeContent dstContent = outputFilterGraph[outputFilterGraph.length - 1].getWorkNodeContent();
+		CType srcType = srcContent.getOutputType();
+		CType dstType = dstContent.getOutputType();
+		type = dstType;
+		
+		System.out.println( "InterSSGEdge.getType() calculating type: " + 
+				srcContent + " -> " + dstContent + "has type=" + type);		
+		
+		assert srcType.equals(dstType) : "InterSSGEdge.getType() Error calculating type: " + 
+		srcContent + " -> " + dstContent;
+		return type;
+
 	}
+
+
+
 }

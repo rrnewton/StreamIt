@@ -5,6 +5,7 @@ package at.dms.kjc.smp;
 
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
+import at.dms.kjc.backendSupport.BackEndScaffold;
 import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.slir.IntraSSGEdge;
@@ -17,6 +18,7 @@ import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InternalFilterNode;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author mgordon
@@ -40,6 +42,9 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	private static Scheduler scheduler;
 	/** splits the slicegraph into levels */
 	private static LevelizeSSG lsg;
+
+	private Map<String, String> dominators;
+	private Map<Filter, Integer> filterToThreadId;
 	/**
 	 * the number of filters that we have yet to process from a level the init
 	 * stage
@@ -52,11 +57,16 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	 */
 	private static HashMap<Integer, Integer> levelLeftToProcessPP;
 
-	public SMPBackEndFactory(SMPMachine chip, Scheduler scheduler) {
+	public SMPBackEndFactory(SMPMachine chip, 
+			Scheduler scheduler, 
+			Map<String, String> dominators,
+			Map<Filter, Integer> filterToThreadId) {
 		this.chip = chip;
 		SMPBackEndFactory.scheduler = scheduler;
 		this.setLayout(scheduler);
-
+		this.dominators = dominators;
+		this.filterToThreadId = filterToThreadId;
+		
 		if (scheduler.isTMD()) {
 			// levelize the slicegraph
 			lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSSG()
@@ -74,7 +84,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 			}
 		}
 
-		scaffold = new SMPBackEndScaffold();
+		scaffold = new SMPBackEndScaffold(dominators);
 	}
 
 	/*
@@ -82,9 +92,11 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	 * 
 	 * @see at.dms.kjc.backendSupport.BackEndFactory#getBackEndMain()
 	 */
+	
+	@SuppressWarnings("unchecked")
 	@Override
-	public SMPBackEndScaffold getBackEndMain() {
-		return scaffold;
+	public <T extends BackEndScaffold> T getBackEndMain() {
+		return (T) scaffold;
 	}
 
 	/*
@@ -226,7 +238,6 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	 * at.dms.kjc.backendSupport.SchedulingPhase,
 	 * at.dms.kjc.backendSupport.ComputeNodesI)
 	 */
-	@Override
 	public void processFilterWorkNode(WorkNode filter,
 			SchedulingPhase whichPhase, SMPMachine chip) {
 
@@ -280,5 +291,21 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 				}
 			}
 		}
+	}
+
+	public Map<String, String> getDominators() {
+		return dominators;
+	}
+
+	public void setDominators(Map<String, String> dominators) {
+		this.dominators = dominators;
+	}
+
+	public Map<Filter, Integer> getFilterToThreadId() {
+		return filterToThreadId;
+	}
+
+	public void setFilterToThreadId(Map<Filter, Integer> filterToThreadId) {
+		this.filterToThreadId = filterToThreadId;
 	}
 }
