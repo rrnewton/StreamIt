@@ -22,8 +22,6 @@ import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.SIRScheduler;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.sir.SIRDummySource;
-import at.dms.kjc.sir.SIRDummySink;
 
 /**
  * 
