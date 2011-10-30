@@ -1605,9 +1605,9 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	 * @param flagName
 	 * @param state
 	 */
-	public static JBlock addSetFlag(JBlock block, int index, String lockName, String flagName, String state) {	
-		JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + index + "][" + lockName + "]");
-		JEmittedTextExpression flag = new JEmittedTextExpression("thread_to_sleep[" + index + "][" + flagName + "]");
+	public static JBlock addSetFlag(JBlock block, int threadIndex, String lockName, String flagName, String state) {	
+		JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + threadIndex + "][" + lockName + "]");
+		JEmittedTextExpression flag = new JEmittedTextExpression("thread_to_sleep[" + threadIndex + "][" + flagName + "]");
 		block.addStatement(new JExpressionStatement(
 				new JMethodCallExpression("pthread_mutex_lock", 
 						new JExpression[]{lock})));				
@@ -1623,12 +1623,12 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	/**
 	 * Add a call to block to pthread_cond_signal
 	 * @param block The block to add to
-	 * @param index 
+	 * @param threadIndex 
 	 * @param condName the name of the condition variable
 	 * @return the modified block
 	 */
-	public static JBlock addSignal(JBlock block, int index, String condName) {	
-		JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + index + "][" + condName + "]");		    	    	    	
+	public static JBlock addSignal(JBlock block, int threadIndex, String condName) {	
+		JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + threadIndex + "][" + condName + "]");		    	    	    	
 		block.addStatement(new JExpressionStatement(
 				new JMethodCallExpression("pthread_cond_signal", new JExpression[]{condVar})));
 		return block;

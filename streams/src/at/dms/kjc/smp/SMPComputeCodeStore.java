@@ -431,18 +431,18 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	 * 
 	 * @param steadyBlock
 	 */
-	public void addThreadHelper(JStatement steadyBlock) {
+	public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
 
 		System.out.println("CoreCodeStore.addThreadHelper called()");
 		
 		JBlock methodBody = new JBlock();
 		JBlock loopBody = new JBlock();
-		Utils.addCondWait(loopBody, 0, "DYN_READER", "DYN_READER",
-				Utils.makeEqualityCondition("ASLEEP","thread_to_sleep[" + 0 + "][DYN_READER]"));
+		Utils.addCondWait(loopBody, threadIndex, "DYN_READER", "DYN_READER",
+				Utils.makeEqualityCondition("ASLEEP","thread_to_sleep[" + threadIndex + "][DYN_READER]"));
 		loopBody.addStatement(steadyBlock);
-		Utils.addSetFlag(loopBody, 0, "DYN_READER", "DYN_READER", "ASLEEP");
-		Utils.addSetFlag(loopBody, 0, "MASTER", "MASTER", "AWAKE");
-		Utils.addSignal(loopBody, 0, "MASTER");
+		Utils.addSetFlag(loopBody, threadIndex, "DYN_READER", "DYN_READER", "ASLEEP");
+		Utils.addSetFlag(loopBody, threadIndex, "MASTER", "MASTER", "AWAKE");
+		Utils.addSignal(loopBody, threadIndex, "MASTER");
 		
 		JStatement loop = null;
 		if(KjcOptions.iterations != -1) {
@@ -468,12 +468,12 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	}
 	
 	
-	public void addSteadyThreadCall() {
-		Utils.addSetFlag(steadyLoop, 0, "MASTER", "MASTER", "ASLEEP");
-		Utils.addSetFlag(steadyLoop, 0, "DYN_READER", "DYN_READER", "AWAKE");
-		Utils.addSignal(steadyLoop, 0, "DYN_READER");
-		Utils.addCondWait(steadyLoop, 0, "MASTER", "MASTER",
-				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep[" + 0 + "][MASTER]"));
+	public void addSteadyThreadCall(int threadIndex) {
+		Utils.addSetFlag(steadyLoop, threadIndex, "MASTER", "MASTER", "ASLEEP");
+		Utils.addSetFlag(steadyLoop, threadIndex, "DYN_READER", "DYN_READER", "AWAKE");
+		Utils.addSignal(steadyLoop, threadIndex, "DYN_READER");
+		Utils.addCondWait(steadyLoop, threadIndex, "MASTER", "MASTER",
+				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep[" + threadIndex + "][MASTER]"));
 	}
 
 	public void addExternField(JFieldDeclaration jFieldDeclaration) {
