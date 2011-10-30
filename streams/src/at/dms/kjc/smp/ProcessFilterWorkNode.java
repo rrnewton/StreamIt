@@ -38,6 +38,93 @@ import at.dms.kjc.slir.WorkNodeInfo;
  */
 public class ProcessFilterWorkNode {
 
+	private static class PushPopReplacingVisitor extends SLIRReplacingVisitor {
+
+		String peekName;
+		String popManyName;
+		String popName;
+		String pushName;
+		Map<Filter, Integer> filterToThreadId;
+		boolean isDynamicPop;
+		boolean isDynamicPush;
+		WorkNode filter;
+		Map<String, String> dominators;
+
+		public void init(WorkNode filter, String peekName, String popManyName,
+				String popName, String pushName,
+				Map<Filter, Integer> filterToThreadId,
+				Map<String, String> dominators, boolean isDynamicPop,
+				boolean isDynamicPush) {
+			this.filter = filter;
+			this.peekName = peekName;
+			this.popManyName = popManyName;
+			this.popName = popName;
+			this.pushName = pushName;
+			this.filterToThreadId = filterToThreadId;
+			this.dominators = dominators;
+			this.isDynamicPop = isDynamicPop;
+			this.isDynamicPush = isDynamicPush;
+		}
+
+		@Override
+		public Object visitPeekExpression(SIRPeekExpression self,
+				CType tapeType, JExpression arg) {
+			JExpression newArg = (JExpression) arg.accept(this);
+			JExpression methodCall = new JMethodCallExpression(peekName,
+					new JExpression[] { newArg });
+			methodCall.setType(tapeType);
+			return methodCall;
+		}
+
+		@Override
+		public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
+
+			if (self.getNumPop() > 1) {
+				return new JMethodCallExpression(popManyName,
+						new JExpression[] { new JIntLiteral(self.getNumPop()) });
+			} else {
+				if (isDynamicPop) {
+					String threadId = filterToThreadId.get(filter.getParent())
+							.toString();
+					String buffer = "dyn_buf_" + threadId;
+					JExpression dyn_queue = new JEmittedTextExpression(buffer);
+					JExpression index = new JEmittedTextExpression(threadId);
+					JExpression dominated = new JEmittedTextExpression("&"
+							+ dominators.get(filter.toString()) + "_multiplier");
+
+					JExpression methodCall = new JMethodCallExpression(popName,
+							new JExpression[] { dyn_queue, index, dominated });
+					methodCall.setType(tapeType);
+					return methodCall;
+				} else {
+					JExpression methodCall = new JMethodCallExpression(popName,
+							new JExpression[0]);
+					methodCall.setType(tapeType);
+					return methodCall;
+				}
+			}
+		}
+
+		@Override
+		public Object visitPushExpression(SIRPushExpression self,
+				CType tapeType, JExpression arg) {
+			JExpression newArg = (JExpression) arg.accept(this);
+			if (isDynamicPush) {
+				String threadId = filterToThreadId.get(filter.getParent())
+						.toString();
+				String buffer = "dyn_buf_" + threadId;
+				JExpression dyn_queue = new JEmittedTextExpression(buffer);
+				return new JMethodCallExpression(pushName, new JExpression[] {
+						dyn_queue, newArg });
+			} else {
+				return new JMethodCallExpression(pushName,
+						new JExpression[] { newArg });
+
+			}
+		}
+
+	}
+
 	/** print debugging info? */
 	public static boolean debug = false;
 
@@ -46,6 +133,8 @@ public class ProcessFilterWorkNode {
 	/** set of filters for which we have written basic code. */
 	// uses WeakHashMap to be self-cleaning, but now have to insert some value.
 	protected static Map<InternalFilterNode, Boolean> basicCodeWritten = new WeakHashMap<InternalFilterNode, Boolean>();
+
+	private static PushPopReplacingVisitor pushPopReplacingVisitor = new PushPopReplacingVisitor();
 
 	/**
 	 * Get code for a filter. If code not yet made, then makes it.
@@ -81,8 +170,6 @@ public class ProcessFilterWorkNode {
 	public static int getUid() {
 		return uid++;
 	}
-
-	private static PushPopReplacingVisitor pushPopReplacingVisitor = new PushPopReplacingVisitor();
 
 	/**
 	 * Take a code unit (here a FilterContent) and return one with all push,
@@ -157,8 +244,6 @@ public class ProcessFilterWorkNode {
 
 		for (JMethodDeclaration method : methods) {
 
-			//
-
 			method.accept(pushPopReplacingVisitor);
 
 			// Add markers to code for debugging of emitted code:
@@ -175,6 +260,7 @@ public class ProcessFilterWorkNode {
 	protected CodeStoreHelper filterCode;
 	protected SMPComputeCodeStore codeStore;
 	protected WorkNode filterNode;
+
 	protected SchedulingPhase whichPhase;
 
 	protected SMPBackEndFactory backEndFactory;
@@ -270,14 +356,14 @@ public class ProcessFilterWorkNode {
 				inputBuffer = InterSSGChannel.getInputBuffer(filterNode);
 			} else if (backEndFactory.sliceHasUpstreamChannel(filterNode
 					.getParent())) {
-				inputBuffer = InputRotatingBuffer.getInputBuffer(filterNode);
+				inputBuffer = RotatingBuffer.getInputBuffer(filterNode);
 			}
 
 			if (hasDynamicOutput) {
 				outputBuffer = InterSSGChannel.getOutputBuffer(filterNode, ssg);
 			} else if (backEndFactory.sliceHasDownstreamChannel(filterNode
 					.getParent())) {
-				outputBuffer = OutputRotatingBuffer.getOutputBuffer(filterNode);
+				outputBuffer = RotatingBuffer.getOutputBuffer(filterNode);
 			}
 
 			System.out.println("ProcessFitlerWorkNode.doit filter="
@@ -364,7 +450,6 @@ public class ProcessFilterWorkNode {
 	protected void standardSteadyProcessing(boolean isDynamicPop) {
 		JStatement steadyBlock = filterCode.getSteadyBlock();
 
-				
 		if (!basicCodeWritten.containsKey(filterNode)) {
 			codeStore.addFields(filterCode.getFields());
 			codeStore.addMethods(filterCode.getUsefulMethods());
@@ -382,7 +467,7 @@ public class ProcessFilterWorkNode {
 						+ isDynamicPop);
 		if (isDynamicPop) {
 			Map<Filter, Integer> filterToThreadId = backEndFactory
-					.getFilterToThreadId();		
+					.getFilterToThreadId();
 			String threadId = filterToThreadId.get(filterNode.getParent())
 					.toString();
 			int threadIndex = Integer.parseInt(threadId);
@@ -420,92 +505,6 @@ public class ProcessFilterWorkNode {
 					+ WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(
 							SchedulingPhase.STEADY));
 			System.err.println(")");
-		}
-
-	}
-
-	private static class PushPopReplacingVisitor extends SLIRReplacingVisitor {
-
-		String peekName;
-		String popManyName;
-		String popName;
-		String pushName;
-		Map<Filter, Integer> filterToThreadId;
-		boolean isDynamicPop;
-		boolean isDynamicPush;
-		WorkNode filter;
-		Map<String, String> dominators;
-
-		public void init(WorkNode filter, String peekName, String popManyName,
-				String popName, String pushName,
-				Map<Filter, Integer> filterToThreadId,
-				Map<String, String> dominators, boolean isDynamicPop,
-				boolean isDynamicPush) {
-			this.filter = filter;
-			this.peekName = peekName;
-			this.popManyName = popManyName;
-			this.popName = popName;
-			this.pushName = pushName;
-			this.filterToThreadId = filterToThreadId;
-			this.dominators = dominators;
-			this.isDynamicPop = isDynamicPop;
-			this.isDynamicPush = isDynamicPush;
-		}
-
-		public Object visitPeekExpression(SIRPeekExpression self,
-				CType tapeType, JExpression arg) {
-			JExpression newArg = (JExpression) arg.accept(this);
-			JExpression methodCall = new JMethodCallExpression(peekName,
-					new JExpression[] { newArg });
-			methodCall.setType(tapeType);
-			return methodCall;
-		}
-
-		@Override
-		public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
-
-			if (self.getNumPop() > 1) {
-				return new JMethodCallExpression(popManyName,
-						new JExpression[] { new JIntLiteral(self.getNumPop()) });
-			} else {
-				if (isDynamicPop) {
-					String threadId = filterToThreadId.get(filter.getParent())
-							.toString();
-					String buffer = "dyn_buf_" + threadId;
-					JExpression dyn_queue = new JEmittedTextExpression(buffer);
-					JExpression index = new JEmittedTextExpression(threadId);
-					JExpression dominated = new JEmittedTextExpression("&"
-							+ dominators.get(filter.toString()) + "_multiplier");
-
-					JExpression methodCall = new JMethodCallExpression(popName,
-							new JExpression[] { dyn_queue, index, dominated });
-					methodCall.setType(tapeType);
-					return methodCall;
-				} else {
-					JExpression methodCall = new JMethodCallExpression(popName,
-							new JExpression[0]);
-					methodCall.setType(tapeType);
-					return methodCall;
-				}
-			}
-		}
-
-		@Override
-		public Object visitPushExpression(SIRPushExpression self,
-				CType tapeType, JExpression arg) {
-			JExpression newArg = (JExpression) arg.accept(this);
-			if (isDynamicPush) {
-				String threadId = filterToThreadId.get(filter.getParent())
-						.toString();
-				String buffer = "dyn_buf_" + threadId;
-				JExpression dyn_queue = new JEmittedTextExpression(buffer);
-				return new JMethodCallExpression(pushName, new JExpression[] {
-						dyn_queue, newArg });
-			} else {
-				return new JMethodCallExpression(pushName,
-						new JExpression[] { newArg });
-
-			}
 		}
 
 	}
