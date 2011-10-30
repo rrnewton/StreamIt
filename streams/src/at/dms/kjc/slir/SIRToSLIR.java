@@ -39,31 +39,32 @@ public class SIRToSLIR {
 	public StreamGraph translate(SegmentedSIRGraph segmentedGraph, int numCores) {
 
 		List<SIRStream> ssgs = segmentedGraph.getStaticSubGraphs();
-		
+
 		/* StreamGraph contains all of the StaticSubGraphs */
 		StreamGraph streamGraph = new StreamGraph();
-			
-		SIRStream str = ssgs.get(0);		
+
+		SIRStream str = ssgs.get(0);
 		InputPort inputPort = null;
 		OutputPort outputPort = null;
-		StaticSubGraph src = new StaticSubGraph().init(streamGraph, str, inputPort, outputPort);
+		StaticSubGraph src = new StaticSubGraph().init(streamGraph, str,
+				inputPort, outputPort);
 		streamGraph.addSSG(src);
-		
-		for (int i = 1; i < ssgs.size(); i++) {								
-			StaticSubGraph dst = new StaticSubGraph();		
-			outputPort = new UnaryOutputPort(dst);			
-			src.setOutputPort(outputPort);			
-			inputPort = new UnaryInputPort(src);			
+
+		for (int i = 1; i < ssgs.size(); i++) {
+			StaticSubGraph dst = new StaticSubGraph();
+			outputPort = new UnaryOutputPort(dst);
+			src.setOutputPort(outputPort);
+			inputPort = new UnaryInputPort(src);
 			str = ssgs.get(i);
-			dst.init(streamGraph, str, inputPort, null);			
-			InterSSGEdge link = new InterSSGEdge(outputPort, inputPort);				
+			dst.init(streamGraph, str, inputPort, null);
+			InterSSGEdge link = new InterSSGEdge(outputPort, inputPort);
 			inputPort.addLink(link);
-			outputPort.addLink(link);						
-			streamGraph.addSSG(dst);						
+			outputPort.addLink(link);
+			streamGraph.addSSG(dst);
 			src = dst;
 		}
 
 		return streamGraph;
-	}	
+	}
 
 }

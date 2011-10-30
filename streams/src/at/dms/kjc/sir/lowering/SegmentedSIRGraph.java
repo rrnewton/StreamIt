@@ -80,12 +80,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	public Map<SIRStream, List<SIRStream>> getConnections() {
 		return connections;
 	}
-
-	public SIRStream getStaticSubGraph0() {
-		assert staticSubGraphs.size() == 1 : "SegmentedGraph.getStaticSubGraph0 staticSubGraph should have only one subsection in static case.";
-		return staticSubGraphs.get(0);
-	}
-
+	
 	/**
 	 * Returns the list of static subsections
 	 * 
@@ -151,17 +146,30 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		System.out.println("SegmentedSIRGraph.visitFilter"
 				+ this.getClass().getCanonicalName() + " visitFilter() "
 				+ self.getName() + " isDynamicPush=" + isDynamicPush(self)
-				+ " isDynamicPop=" + isDynamicPop(self) + " iter.getPos="
-				+ iter.getPos());
+				+ " isDynamicPop=" + isDynamicPop(self) 
+				+ " isStateful=" + self.isStateful()				
+				+ " iter.getPos=" + iter.getPos());
 
 		SIRFilter filter = (SIRFilter) ObjectDeepCloner.deepCopy(self);
 
+				
 		// If this is a completely static filter, then we
 		// just add it to the current pipeline
-		if (!isDynamicPush(filter) && !(isDynamicPop(filter))) {
+		//if (!isDynamicPush(filter) && !(isDynamicPop(filter))) {
+		if (!isDynamicPush(filter) && !(isDynamicPop(filter)) 
+					&& !filter.isStateful()){					
 			addToPipeline(filter);
 		}
 
+		else if (filter.isStateful()) {
+			endPipeline();
+			startPipeline();
+			pipelineChildren.add(createSource(filter));
+			filter.setPop(new JIntLiteral(1));
+			filter.setPeek(new JIntLiteral(1));
+			addToPipeline(filter);			
+		}
+		
 		else if (isDynamicPush(filter) && !(isDynamicPop(filter))) {
 			System.out
 					.println("SegmentedSIRGraph.visitFilter adding the dynamic push only case ");

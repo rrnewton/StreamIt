@@ -105,25 +105,40 @@ public class StaticSubGraph {
 	}
 
 	/** Returns a deep clone of this object. */
-    public Object deepClone() {
-        at.dms.kjc.slir.StaticSubGraph other = new at.dms.kjc.slir.StaticSubGraph();
-        at.dms.kjc.AutoCloner.register(this, other);
-        deepCloneInto(other);
-        return other;
-    }
+	public Object deepClone() {
+		at.dms.kjc.slir.StaticSubGraph other = new at.dms.kjc.slir.StaticSubGraph();
+		at.dms.kjc.AutoCloner.register(this, other);
+		deepCloneInto(other);
+		return other;
+	}
 
-	/** Clones all fields of this into <pre>other</pre> */
-    protected void deepCloneInto(at.dms.kjc.slir.StaticSubGraph other) {
-        other.generatedIds = (java.util.HashSet)at.dms.kjc.AutoCloner.cloneToplevel(this.generatedIds);
-        other.inputPort = (at.dms.kjc.slir.InputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.inputPort);
-        other.io = (at.dms.kjc.slir.Filter[])at.dms.kjc.AutoCloner.cloneToplevel(this.io);
-        other.outputPort = (at.dms.kjc.slir.OutputPort)at.dms.kjc.AutoCloner.cloneToplevel(this.outputPort);
-        other.parent = (at.dms.kjc.slir.StreamGraph)at.dms.kjc.AutoCloner.cloneToplevel(this.parent);
-        other.sirToContent = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.sirToContent);
-        other.topFilters = (java.util.LinkedList)at.dms.kjc.AutoCloner.cloneToplevel(this.topFilters);
-        other.work = (at.dms.kjc.sir.lowering.partition.WorkEstimate)at.dms.kjc.AutoCloner.cloneToplevel(this.work);
-        other.workEstimation = (java.util.HashMap)at.dms.kjc.AutoCloner.cloneToplevel(this.workEstimation);
-    }
+	/**
+	 * Clones all fields of this into
+	 * 
+	 * <pre>
+	 * other
+	 * </pre>
+	 */
+	protected void deepCloneInto(at.dms.kjc.slir.StaticSubGraph other) {
+		other.generatedIds = (java.util.HashSet) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.generatedIds);
+		other.inputPort = (at.dms.kjc.slir.InputPort) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.inputPort);
+		other.io = (at.dms.kjc.slir.Filter[]) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.io);
+		other.outputPort = (at.dms.kjc.slir.OutputPort) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.outputPort);
+		other.parent = (at.dms.kjc.slir.StreamGraph) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.parent);
+		other.sirToContent = (java.util.HashMap) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.sirToContent);
+		other.topFilters = (java.util.LinkedList) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.topFilters);
+		other.work = (at.dms.kjc.sir.lowering.partition.WorkEstimate) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.work);
+		other.workEstimation = (java.util.HashMap) at.dms.kjc.AutoCloner
+				.cloneToplevel(this.workEstimation);
+	}
 
 	/**
 	 * Dump the the completed partition to a dot file
@@ -279,20 +294,21 @@ public class StaticSubGraph {
 		Iterator<FlatNode> dataFlow = DataFlowTraversal.getTraversal(top)
 				.iterator();
 
-		
-
-		
 		while (dataFlow.hasNext()) {
 			FlatNode node = dataFlow.next();
 
-			System.out.println("StaticSubGraph.flatten, examining Flatnode node=" + node.getName());
-			System.out.println("StaticSubGraph.flatten, examining Flatnode node=" + node.getName() 
-					+ " inputs.length=" + node.inputs 
-					+ " outputs.length=" + node.ways);	
-			
+			System.out
+					.println("StaticSubGraph.flatten, examining Flatnode node="
+							+ node.getName());
+			System.out
+					.println("StaticSubGraph.flatten, examining Flatnode node="
+							+ node.getName() + " inputs.length=" + node.inputs
+							+ " outputs.length=" + node.ways);
+
 			if (node.getName().contains("DummySource")
-					|| node.getName().contains("DummySink")) {										
-				// continue; /* Need to set the parent, set next, set previous */							
+					|| node.getName().contains("DummySink")) {
+				// continue; /* Need to set the parent, set next, set previous
+				// */
 			}
 
 			InputNode input = filterNodes.inputNodes.get(node.contents);
@@ -318,14 +334,14 @@ public class StaticSubGraph {
 			// check to see if this node is feeding a dummy sink, if so, then
 			// don't create an edge
 			// to the dummy sink because it will not be generated in the SLIR
-//			if (node.ways > 0) {
-//					//&& node.getEdges()[0].contents instanceof SIRDummySink) {
-//				assert node.ways == 1;
-//				output.setWeights(new int[0]);
-//				output.setDests(new InterFilterEdge[0][0]);
-//			}
-//			
-			 if (node.ways != 0) {
+			// if (node.ways > 0) {
+			// //&& node.getEdges()[0].contents instanceof SIRDummySink) {
+			// assert node.ways == 1;
+			// output.setWeights(new int[0]);
+			// output.setDests(new InterFilterEdge[0][0]);
+			// }
+			//
+			if (node.ways != 0) {
 				assert node.ways == node.getEdges().length
 						&& node.ways == node.weights.length;
 
@@ -334,7 +350,7 @@ public class StaticSubGraph {
 				LinkedList<InterFilterEdge> outEdges = new LinkedList<InterFilterEdge>();
 				LinkedList<Integer> outWeights = new LinkedList<Integer>();
 				HashMap<InputNode, InterFilterEdge> newEdges = new HashMap<InputNode, InterFilterEdge>();
-				for (int i = 0; i < node.ways; i++) {			
+				for (int i = 0; i < node.ways; i++) {
 					if (node.weights[i] == 0)
 						continue;
 					InterFilterEdge edge = new InterFilterEdge(
@@ -380,7 +396,7 @@ public class StaticSubGraph {
 					output.setDests(new InterFilterEdge[0][0]);
 				}
 			}
-	
+
 			// set up the joining, the edges should exist already from upstream
 			// System.out.println("  inputs: " + node.inputs);
 
@@ -388,13 +404,13 @@ public class StaticSubGraph {
 			// handle this specially
 			// and don't create an edge to the dummy source because it is not
 			// translated into an SLIR node
-//			if (node.inputs > 0) {
-//					//&& node.incoming[0].contents instanceof SIRDummySource) {
-//				assert node.inputs == 1;
-//				input.setWeights(new int[0]);
-//				input.setSources(new InterFilterEdge[0]);
-//			} 
-			
+			// if (node.inputs > 0) {
+			// //&& node.incoming[0].contents instanceof SIRDummySource) {
+			// assert node.inputs == 1;
+			// input.setWeights(new int[0]);
+			// input.setSources(new InterFilterEdge[0]);
+			// }
+
 			if (node.inputs != 0) {
 				assert node.inputs == node.incoming.length
 						&& node.inputs == node.incomingWeights.length;
@@ -405,12 +421,10 @@ public class StaticSubGraph {
 					if (node.incomingWeights[i] == 0)
 						continue;
 
-					
 					assert edges != null : "Line 398; edges==null";
 					assert filterNodes.outputNodes != null : "Line 398; outputNodes==null";
-					assert node.incoming[i].contents != null : "Line 398; node.incoming[i].contents==null" ;
-					
-					
+					assert node.incoming[i].contents != null : "Line 398; node.incoming[i].contents==null";
+
 					inEdges.add(edges.get(
 							filterNodes.outputNodes
 									.get(node.incoming[i].contents)).get(input));
@@ -628,12 +642,12 @@ public class StaticSubGraph {
 	/**
 	 * @return
 	 */
-	public boolean hasDynamicInput() {		
+	public boolean hasDynamicInput() {
 		if (inputPort == null) {
 			return false;
-		}				
+		}
 		return true;
-	}		
+	}
 
 	/**
 	 * @return
@@ -642,7 +656,7 @@ public class StaticSubGraph {
 		if (outputPort == null) {
 			return false;
 		}
-		return true;		
+		return true;
 	}
 
 	/**
@@ -752,10 +766,9 @@ public class StaticSubGraph {
 		this.parent = parent;
 	}
 
+	/** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
-    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
-
-    /**
+	/**
 	 * Set the slice graph to slices, where the only difference between the
 	 * previous slice graph and the new slice graph is the addition of identity
 	 * slices (meaning slices with only an identities filter).
@@ -784,7 +797,7 @@ public class StaticSubGraph {
 		}
 	}
 
-    /**
+	/**
 	 * Return a string with all of the names of the filter nodes and blue if
 	 * linear
 	 * 
@@ -847,5 +860,5 @@ public class StaticSubGraph {
 		return out.toString();
 	}
 
-    /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
+	/** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }
