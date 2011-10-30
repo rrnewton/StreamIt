@@ -33,8 +33,14 @@ public class ThreadMapper {
 			Map<Integer, String> threadIdToType
 			) {
 						
+		
+		boolean isDynamicInput = ssg.hasDynamicInput();
+		Filter f = ssg.getTopFilters()[0];
+		
+		
+		
 		/* Check if it has a dynamic pop rate */
-		if (ssg.hasDynamicInput()) {
+		if (isDynamicInput) {
 			Filter[] topFilters = ssg.getTopFilters();
 
 			for (int i = 0; i < topFilters.length; i++) {
@@ -50,14 +56,19 @@ public class ThreadMapper {
 					Filter connected = connectedGraph[connectedGraph.length - 1];
 					System.out.println("ThreadMapper.assignThreads edge filter = " + connected.getWorkNode().toString());
 					filterToThreadId.put(connected, threadId);
-
 				}				
-				CType type = dynamicReader.getWorkNodeContent().getOutputType();
-				filterToThreadId.put(dynamicReader, threadId);
-				threadIdToType.put(threadId, type.toString());
-												
-				Filter[] filterGraph = ssg.getFilterGraph();
 				
+				//CType type = dynamicReader.getWorkNodeContent().getOutputType();
+				CType type = dynamicReader.getWorkNodeContent().getInputType();
+
+				System.out.println("ThreadMapper.assignThreads filter = " + dynamicReader.getWorkNode().toString()
+						+ " has threadId=" + threadId
+						+ " and type=" + type.toString()
+						);
+				
+				filterToThreadId.put(dynamicReader, threadId);
+				threadIdToType.put(threadId, type.toString());												
+				Filter[] filterGraph = ssg.getFilterGraph();				
 				for (Filter filter : filterGraph) {
 					if (dynamicReader.getWorkNodeContent().getName().equals(filter.getWorkNodeContent().getName()))
 						continue;		

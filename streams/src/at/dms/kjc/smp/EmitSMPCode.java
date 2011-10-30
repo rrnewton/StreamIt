@@ -387,7 +387,7 @@ public class EmitSMPCode extends EmitCode {
 			
 			for (Integer threadId : threadIdToType.keySet()) {
 				String type = threadIdToType.get(threadId);				
-				System.out.println("EmitSMPCode.generateGlobalHeader " + "extern " + type + "queue_ctx_ptr   dyn_buf_" + threadId + ";");	
+				System.out.println("EmitSMPCode.generateGlobalHeader " + "extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
 				p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
 			}
 							
@@ -430,6 +430,8 @@ public class EmitSMPCode extends EmitCode {
 				p.println("extern " + fieldDecl.getType() + " " + fieldDecl.getVariable().getIdent() + ";");
 			}
 		}
+		
+		p.println("extern int dummy_multiplier;");
 
 		p.println("#endif");
 		p.close();
@@ -514,6 +516,8 @@ public class EmitSMPCode extends EmitCode {
 			}
 		}
 		
+		p.println("int dummy_multiplier;");
+		
 		p.println();
 		
 		p.println("// Global barrier");
@@ -583,6 +587,7 @@ public class EmitSMPCode extends EmitCode {
 						}
 					}
 				}
+				p.println("dummy_multiplier = 1;");
 
 				if(KjcOptions.loadbalance) {
 					p.println();

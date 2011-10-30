@@ -78,15 +78,15 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 		Filter[] outputFilterGraph = dst.getSSG().getFilterGraph();
 		WorkNodeContent srcContent = inputFilterGraph[0].getWorkNodeContent();
 		WorkNodeContent dstContent = outputFilterGraph[outputFilterGraph.length - 1].getWorkNodeContent();
-		CType srcType = srcContent.getOutputType();
+		CType srcType = srcContent.getInputType();
 		CType dstType = dstContent.getOutputType();
-		type = dstType;
+		type = srcType;
 		
 		System.out.println( "InterSSGEdge.getType() calculating type: " + 
 				srcContent + " -> " + dstContent + "has type=" + type);		
 		
 		assert srcType.equals(dstType) : "InterSSGEdge.getType() Error calculating type: " + 
-		srcContent + " -> " + dstContent;
+		srcContent + "(" + srcType  + ") -> " + dstContent + "(" + dstType  + ")";
 		return type;
 
 	}

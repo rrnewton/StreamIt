@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.iterator.IterFactory;
@@ -152,30 +154,46 @@ public class SegmentedSIRGraph implements StreamVisitor {
 
 		SIRFilter filter = (SIRFilter) ObjectDeepCloner.deepCopy(self);
 
+
+		boolean isSource = CStdType.Void == filter.getInputType();			
+		boolean isSink = CStdType.Void == filter.getOutputType();			
+
 				
 		// If this is a completely static filter, then we
 		// just add it to the current pipeline
 		//if (!isDynamicPush(filter) && !(isDynamicPop(filter))) {
 		if (!isDynamicPush(filter) && !(isDynamicPop(filter)) 
 					&& !filter.isStateful()){					
-			addToPipeline(filter);
+			pipelineChildren.add(filter);
 		}
-
-		else if (filter.isStateful()) {
-			endPipeline();
-			startPipeline();
-			pipelineChildren.add(createSource(filter));
-			filter.setPop(new JIntLiteral(1));
-			filter.setPeek(new JIntLiteral(1));
-			addToPipeline(filter);			
+							
+		else if (filter.isStateful()) {			
+			if (isSource) {
+				filter.setPush(new JIntLiteral(1));
+				pipelineChildren.add(filter);
+				pipelineChildren.add(createSink(filter, iter));
+				endPipeline();
+				startPipeline();
+			} else {
+				endPipeline();
+				startPipeline();
+				pipelineChildren.add(createSource(filter));
+				filter.setPop(new JIntLiteral(1));
+				filter.setPeek(new JIntLiteral(1));
+				filter.setPush(new JIntLiteral(1));
+				pipelineChildren.add(filter);
+				pipelineChildren.add(createSink(self, iter));
+				endPipeline();
+				startPipeline();
+			}
 		}
 		
 		else if (isDynamicPush(filter) && !(isDynamicPop(filter))) {
 			System.out
 					.println("SegmentedSIRGraph.visitFilter adding the dynamic push only case ");
 			filter.setPush(new JIntLiteral(1));
-			addToPipeline(filter);
-			pipelineChildren.add(createSink(self, iter));
+			pipelineChildren.add(filter);
+			pipelineChildren.add(createSink(filter, iter));
 			endPipeline();
 			startPipeline();
 		}
@@ -186,7 +204,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 			pipelineChildren.add(createSource(filter));
 			filter.setPop(new JIntLiteral(1));
 			filter.setPeek(new JIntLiteral(1));
-			addToPipeline(filter);
+			pipelineChildren.add(filter);
 		}
 
 		else { // if (isDynamicPush(filter) && (isDynamicPop(filter))) {
@@ -196,8 +214,8 @@ public class SegmentedSIRGraph implements StreamVisitor {
 			filter.setPop(new JIntLiteral(1));
 			filter.setPeek(new JIntLiteral(1));
 			filter.setPush(new JIntLiteral(1));
-			addToPipeline(filter);
-			pipelineChildren.add(createSink(self, iter));
+			pipelineChildren.add(filter);
+			pipelineChildren.add(createSink(filter, iter));
 			endPipeline();
 			startPipeline();
 		}
@@ -224,10 +242,6 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		// Create a new empty list of pipeline children
 		pipelineChildren = new LinkedList<SIRStream>();
 
-	}
-
-	private void addToPipeline(SIRFilter child) {
-		pipelineChildren.add(child);
 	}
 
 	@Override
