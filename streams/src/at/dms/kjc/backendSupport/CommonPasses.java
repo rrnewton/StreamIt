@@ -18,6 +18,7 @@ import at.dms.kjc.common.ConvertLocalsToFields;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRDummySink;
 import at.dms.kjc.sir.SIRDummySource;
+import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.sir.SIRInterfaceTable;
@@ -144,6 +145,11 @@ public class CommonPasses {
 	 */
 	private SIRStream doStaticPassSIRStream(SIRStream str) {
 
+	
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+		
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
 		CheckStatefulFilters.doit(str);
@@ -236,6 +242,9 @@ public class CommonPasses {
 			}
 		}
 
+			
+		
+		
 		// If not software-pipelining, don't expect to
 		// split the stream graph horizontally so fuse
 		// pipelines down into individual filters.
@@ -247,8 +256,19 @@ public class CommonPasses {
 
 		// this must run before vertical fission
 		str = Flattener.doLinearAnalysis(str);
+		
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream AAAA str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+
+		
 		str = Flattener.doStateSpaceAnalysis(str);
 
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream BBBN str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+		
+		
 		// vertical fission requested.
 		if (KjcOptions.fission > 1) {
 			System.out.println("Running Vertical Fission...");
@@ -257,12 +277,24 @@ public class CommonPasses {
 			System.out.println("Done Vertical Fission...");
 		}
 
+		
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream CCCC str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+		
+		
 		// run user-defined transformations if enabled
 		if (KjcOptions.optfile != null) {
 			System.err.println("Running User-Defined Transformations...");
 			str = ManualPartition.doit(str);
 			System.err.println("Done User-Defined Transformations...");
 		}
+		
+		
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream DDDD str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+		
 
 		/* StaticsProp.propagateIntoFilters(str,theStatics); */
 
@@ -272,6 +304,10 @@ public class CommonPasses {
 			SJToPipe.doit(str);
 		}
 
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream EEEE str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+		
 		StreamItDot.printGraph(str, "before-partition.dot");
 
 		// VarDecl Raise to move array assignments up
@@ -281,10 +317,18 @@ public class CommonPasses {
 		// ?? does this really need to be done twice?
 		new VarDeclRaiser().raiseVars(str);
 
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream FFFF str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+		
 		// Make sure all variables have different names.
 		// This must be run now, later pass rely on distinct names.
 		RenameAll.renameOverAllFilters(str);
 
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream YYYY str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+		
 		// Raise all pushes, pops, peeks to statement level
 		// (several phases above introduce new peeks, pops, pushes
 		// including but not limited to doLinearAnalysis)
@@ -306,6 +350,11 @@ public class CommonPasses {
 							+ "by setting types in linear analysis, or by adding type inference.");
 			System.exit(1);
 		}
+		
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream ZZZZ str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+
 
 		// If vectorization enabled, create (fused streams of) vectorized
 		// filters.
@@ -324,6 +373,13 @@ public class CommonPasses {
 			ConvertLocalsToFields.doit(str);
 		}
 
+		
+
+		if (str instanceof SIRFilter) {
+    		System.out.println("CommonPasses.doStaticPassSIRStream after str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+	
+		
 		return str;
 
 	}

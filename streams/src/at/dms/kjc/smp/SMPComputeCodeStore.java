@@ -433,7 +433,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	 */
 	public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
 
-		System.out.println("CoreCodeStore.addThreadHelper called()");
+		System.out.println("SMPComputeCodeStore.addThreadHelper called()");
 		
 		JBlock methodBody = new JBlock();
 		JBlock loopBody = new JBlock();
@@ -459,7 +459,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
 		String threadName = "helper_" + threadIndex;		
 		
-		System.out.println("CoreCodeStore.addThreadHelper creating JMethodDeclaration=" + threadName);
+		System.out.println("SMPComputeCodeStore.addThreadHelper creating JMethodDeclaration=" + threadName);
 		
 		JMethodDeclaration threadHelper = new JMethodDeclaration(
 				CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },

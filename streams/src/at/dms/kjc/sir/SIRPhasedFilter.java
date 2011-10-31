@@ -129,7 +129,7 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     public boolean isStateful() {
         return stateful;
     }
-    public void setStateful(boolean stateful) {
+    public void setStateful(boolean stateful) {    
         this.stateful = stateful;
     }
 

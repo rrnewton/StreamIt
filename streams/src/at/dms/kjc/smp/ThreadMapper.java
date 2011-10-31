@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.slir.Filter;
@@ -51,17 +52,25 @@ public class ThreadMapper {
 						+ dynamicReader.getWorkNodeContent().getName()
 						+ " is a dynamic reader");
 				
-				List<InterSSGEdge> links = ssg.getInputPort().getLinks();
-				for (InterSSGEdge edge : links) {
-					System.out.println("ThreadMapper.assignThreads edge = " + edge.toString());
-					Filter[] connectedGraph  = edge.getDest().getSSG().getFilterGraph();
-					Filter connected = connectedGraph[connectedGraph.length - 1];
-					System.out.println("ThreadMapper.assignThreads edge filter = " + connected.getWorkNode().toString());
-					filterToThreadId.put(connected, threadId);
-				}				
+				//List<InterSSGEdge> links = ssg.getInputPort().getLinks();
+//				if (ssg.getInputPort() != null) {
+//				List<InterSSGEdge> links = ssg.getInputPort().getLinks();
+//				
+//					for (InterSSGEdge edge : links) {
+//						System.out.println("ThreadMapper.assignThreads edge = "
+//								+ edge.toString());
+//						Filter[] connectedGraph = edge.getDest().getSSG()
+//								.getFilterGraph();
+//						Filter connected = connectedGraph[connectedGraph.length - 1];
+//						System.out
+//								.println("ThreadMapper.assignThreads edge filter = "
+//										+ connected.getWorkNode().toString());
+//						filterToThreadId.put(connected, threadId);
+//					}				
+//				}
 				
-				//CType type = dynamicReader.getWorkNodeContent().getOutputType();
-				CType type = dynamicReader.getWorkNodeContent().getInputType();
+				CType type = dynamicReader.getWorkNodeContent().getOutputType();
+				//CType type = dynamicReader.getWorkNodeContent().getInputType();
 
 				System.out.println("ThreadMapper.assignThreads filter = " + dynamicReader.getWorkNode().toString()
 						+ " has threadId=" + threadId
@@ -69,21 +78,26 @@ public class ThreadMapper {
 						);
 				
 				filterToThreadId.put(dynamicReader, threadId);
-				threadIdToType.put(threadId, type.toString());												
-				Filter[] filterGraph = ssg.getFilterGraph();				
-				for (Filter filter : filterGraph) {
-					if (dynamicReader.getWorkNodeContent().getName().equals(filter.getWorkNodeContent().getName()))
-						continue;		
-					System.out.println("ThreadMapper.assignThreads Filter "
-						+ dynamicReader.getWorkNodeContent().getName()
-						+ " dominates "
-						+ filter.getWorkNodeContent().getName()
-						);
-					dominated.add(filter.getWorkNodeContent().getName());
-					dominators.put(dynamicReader.getWorkNodeContent().getName(), filter.getWorkNodeContent().getName());
+				
+				
+				if (type != CStdType.Void && type != null) {
+
+					
+					threadIdToType.put(threadId, type.toString());												
+					Filter[] filterGraph = ssg.getFilterGraph();				
+					for (Filter filter : filterGraph) {
+						if (dynamicReader.getWorkNodeContent().getName().equals(filter.getWorkNodeContent().getName()))
+							continue;		
+						System.out.println("ThreadMapper.assignThreads Filter "
+								+ dynamicReader.getWorkNodeContent().getName()
+								+ " dominates "
+								+ filter.getWorkNodeContent().getName()
+								);
+						dominated.add(filter.getWorkNodeContent().getName());
+						dominators.put(dynamicReader.getWorkNodeContent().getName(), filter.getWorkNodeContent().getName());
+					}
+				
 				}
-				
-				
 				threadId++;
 			}
 

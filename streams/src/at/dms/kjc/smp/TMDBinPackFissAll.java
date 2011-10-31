@@ -356,7 +356,7 @@ public class TMDBinPackFissAll extends Scheduler {
         if(false)
             return str;
 
-        System.out.println("Performing fusion of stateful filters");
+        System.out.println("TMDBinPackFissAll.SIRFusion Performing fusion of stateful filters");
 
         SIRStream oldStr;
         //get the first work estimate
@@ -371,13 +371,24 @@ public class TMDBinPackFissAll extends Scheduler {
         //the percentage change
         double workChange;
 
+        System.out.println("TMDBinPackFissAll.SIRFusion called on str=" + str.getName() );
+    	if (str instanceof SIRFilter) {
+    		System.out.println("TMDBinPackFissAll.SIRFusion before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+    	}
+    	
+        
         if(StatefulFusion.countStatefulFilters(str) < KjcOptions.smp) {
             return str;
         }
         
         do {
+        	
+    		
             oldStr = (SIRStream)ObjectDeepCloner.deepCopy(str);
 
+        	
+
+            
             int numStatefulFilters = StatefulFusion.countStatefulFilters(str);
             int minTiles = at.dms.kjc.sir.lowering.partition.Partitioner.estimateFuseAllResult(str);
 

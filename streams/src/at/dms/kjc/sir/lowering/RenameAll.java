@@ -253,7 +253,10 @@ public class RenameAll extends SLIRReplacingVisitor
         // replace any init call to <str> in the parent with an init
         // call to <nf> -- DON'T DO THIS since it messes up mutation case.
         // replaceParentInit(str, nf);
-
+        
+        nf.setStateful(str.isStateful());
+        
+        
         nf.setInit(newInit);
         symtab = ost;
         return nf;

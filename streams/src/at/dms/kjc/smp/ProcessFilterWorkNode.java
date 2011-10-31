@@ -3,6 +3,8 @@ package at.dms.kjc.smp;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import com.jgraph.graph.Edge;
+
 import at.dms.kjc.CType;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
@@ -23,7 +25,10 @@ import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.kjc.slir.FileOutputContent;
 import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputPort;
+import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
@@ -44,13 +49,17 @@ public class ProcessFilterWorkNode {
 		String popManyName;
 		String popName;
 		String pushName;
+		Channel inputChannel;
+		Channel outputChannel;
 		Map<Filter, Integer> filterToThreadId;
 		boolean isDynamicPop;
 		boolean isDynamicPush;
 		WorkNode filter;
 		Map<String, String> dominators;
 
-		public void init(WorkNode filter, String peekName, String popManyName,
+		public void init(WorkNode filter, 
+				Channel inputChannel, Channel outputChannel,
+				String peekName, String popManyName,
 				String popName, String pushName,
 				Map<Filter, Integer> filterToThreadId,
 				Map<String, String> dominators, boolean isDynamicPop,
@@ -60,6 +69,8 @@ public class ProcessFilterWorkNode {
 			this.popManyName = popManyName;
 			this.popName = popName;
 			this.pushName = pushName;
+			this.inputChannel = inputChannel;
+			this.outputChannel = outputChannel;
 			this.filterToThreadId = filterToThreadId;
 			this.dominators = dominators;
 			this.isDynamicPop = isDynamicPop;
@@ -84,8 +95,29 @@ public class ProcessFilterWorkNode {
 						new JExpression[] { new JIntLiteral(self.getNumPop()) });
 			} else {
 				if (isDynamicPop) {
-					String threadId = filterToThreadId.get(filter.getParent())
-							.toString();
+					
+					
+					
+					
+					InterSSGEdge edge = ((InterSSGChannel)inputChannel).getEdge();
+					OutputPort outputPort = edge.getSrc();
+					InputPort inputPort = edge.getDest();
+					String threadId = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]).toString();
+					
+					System.out.println("PushPopReplacingVisitor.visitPopExpression filter=" 
+							+ filter.getParent().toString() 
+							+ " outputPort.getSSG().getTopFilters()[0]=" 
+							+ outputPort.getSSG().getTopFilters()[0]
+									+ " inputPort.getSSG().getTopFilters()[0]=" 
+									+ inputPort.getSSG().getTopFilters()[0]
+
+							);
+					
+					
+					//String threadId = filterToThreadId.get(filter.getParent())
+					//		.toString();
+
+					
 					String buffer = "dyn_buf_" + threadId;
 					JExpression dyn_queue = new JEmittedTextExpression(buffer);
 					JExpression index = new JEmittedTextExpression(threadId);
@@ -244,7 +276,12 @@ public class ProcessFilterWorkNode {
 		// relies on fact that a JMethodDeclaration is not replaced so
 		// work, init, preWork are still identifiable after replacement.
 
-		pushPopReplacingVisitor.init(filter, peekName, popManyName, popName,
+		
+		//Edge e = inputChannel.getEdge();		
+		
+		pushPopReplacingVisitor.init(filter, 
+				 inputChannel, outputChannel,
+				peekName, popManyName, popName,
 				pushName, filterToThreadId, dominators, isDynamicPop,
 				isDynamicPush);
 
@@ -479,19 +516,20 @@ public class ProcessFilterWorkNode {
 			for (Filter f : filterToThreadId.keySet()) {
 				System.out
 				.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" + f.toString()
-						+ " has thread index=" + filterToThreadId.get(f));					
+						+ " has thread index=" + filterToThreadId.get(f).toString());					
 			}
 			
 			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode="+ filterNode.toString());
 			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getAsFilter()="+ filterNode.getAsFilter());
+			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getParent()="+ filterNode.getParent());
 			
-			/*
 			
-			String threadId = filterToThreadId.get(filterNode.getFilter())
+			
+			
+			String threadId = filterToThreadId.get(filterNode.getParent())
 					.toString();
-*/
 			
-			String threadId = "0";
+			
 			
 			int threadIndex = Integer.parseInt(threadId);
 			System.out

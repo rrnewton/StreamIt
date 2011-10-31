@@ -228,9 +228,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		return new LinkedList<JStatement>();
 	}
 
-	private InterSSGEdge getEdge() {
-		return theEdge;
-	}
+	
 
 	/**
 	 * @return

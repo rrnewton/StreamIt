@@ -4,6 +4,7 @@
 package at.dms.kjc.backendSupport;
 
 import at.dms.kjc.slir.Edge;
+import at.dms.kjc.slir.InterSSGEdge;
 
 /**
  * @author soule
@@ -17,6 +18,10 @@ public abstract class Channel<E extends Edge<?, ?> > {
         assert edge != null;
         this.theEdge = edge;
     }
+    
+    public E getEdge() {
+		return theEdge;
+	}
 
 	/**
 	 * @return

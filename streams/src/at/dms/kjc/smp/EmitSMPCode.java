@@ -379,7 +379,7 @@ public class EmitSMPCode extends EmitCode {
 		if (isDynamic) {															
 			int numDynamicReaders =  threadIdToType.keySet().size();	
 			p.println();
-			p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
+			p.println("#define DYNAMIC_READERS  " + numDynamicReaders + 1);
 			p.println("#define ASLEEP          0");
 			p.println("#define AWAKE           1");
 			p.println("#define DYN_READER      0");
@@ -500,7 +500,7 @@ public class EmitSMPCode extends EmitCode {
 			}
 			
 			p.println();
-			p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
+			p.println("#define DYNAMIC_READERS  " + numDynamicReaders + 1);
 			p.println("#define ASLEEP          0");
 			p.println("#define AWAKE           1");
 			p.println("pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");		
@@ -554,10 +554,12 @@ public class EmitSMPCode extends EmitCode {
 					p.println();
 					p.println("// Initialize dynamic queues");
 
-					for (Integer threadId : filterToThreadId.values()) {
+											
+					for (Integer threadId : threadIdToType.keySet()) {
 						String type = threadIdToType.get(threadId);				
 						p.println("dyn_buf_" + threadId + " = " + type + "_queue_create();");	
-					}					
+					}
+													
 					p.println();
 					p.println("// Initialize mutexes and condition variables");
 					p.println();
