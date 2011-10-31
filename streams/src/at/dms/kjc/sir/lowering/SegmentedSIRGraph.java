@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.iterator.IterFactory;
@@ -259,32 +258,6 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		SIRFilter source = new SIRDummySource(succ.getInputType());
 		return source;
 	}
-
-	// private void finishPipeline(SIRFilter self, SIRFilterIter iter) {
-	// /* add the source and sink */
-	// if (!isSink(self)) {
-	// log(this.getClass().getCanonicalName() + " adding a sink after "
-	// + self.getName());
-	// pipelineChildren.add(createSink(self, iter));
-	// }
-	//
-	// if (!isSource(pipelineChildren.get(0))) {
-	//
-	// //if (!isSource(self)) {
-	// log(this.getClass().getCanonicalName() + " adding a source before "
-	// + self.getName());
-	// pipelineChildren.add(0, createSource((SIRFilter)
-	// pipelineChildren.get(0)));
-	// }
-	// SIRPipeline pipeline = new SIRPipeline(null, uniquePipelineName());
-	// pipeline.setInit(SIRStream.makeEmptyInit());
-	// this.setChildren(pipeline, pipelineChildren);
-	// addToSegmentedGraph(pipeline);
-	//
-	// pipelineChildren = new LinkedList<SIRStream>();
-	// log(this.getClass().getCanonicalName() + " pipeline.size()="
-	// + pipeline.size());
-	// }
 
 	private void setChildren(SIRPipeline pipeline, List<SIRStream> children) {
 		pipeline.setChildren(pipelineChildren);

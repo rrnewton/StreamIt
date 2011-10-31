@@ -456,8 +456,13 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		methodBody.addStatement(loop);
 		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("pthread_exit(NULL)")));
 		JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
+
+		String threadName = "helper_" + threadIndex;		
+		
+		System.out.println("CoreCodeStore.addThreadHelper creating JMethodDeclaration=" + threadName);
+		
 		JMethodDeclaration threadHelper = new JMethodDeclaration(
-				CVoidPtrType.VoidPtr, "helper", new JFormalParameter[] { p },
+				CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
 				methodBody);
 		addHelperThreadMethod(threadHelper);
 	}

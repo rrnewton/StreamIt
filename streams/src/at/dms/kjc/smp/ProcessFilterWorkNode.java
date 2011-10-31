@@ -474,9 +474,30 @@ public class ProcessFilterWorkNode {
 		if (isDynamicPop) {
 			Map<Filter, Integer> filterToThreadId = backEndFactory
 					.getFilterToThreadId();
-			String threadId = filterToThreadId.get(filterNode.getParent())
+			//String threadId = filterToThreadId.get(filterNode.getParent())
+
+			for (Filter f : filterToThreadId.keySet()) {
+				System.out
+				.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" + f.toString()
+						+ " has thread index=" + filterToThreadId.get(f));					
+			}
+			
+			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode="+ filterNode.toString());
+			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getAsFilter()="+ filterNode.getAsFilter());
+			
+			/*
+			
+			String threadId = filterToThreadId.get(filterNode.getFilter())
 					.toString();
+*/
+			
+			String threadId = "0";
+			
 			int threadIndex = Integer.parseInt(threadId);
+			System.out
+			.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
+					+ filterNode.getFilter().getName() +
+					" calling codeStore.addThreadHelper");
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
 			codeStore.addSteadyThreadCall(threadIndex);
 
