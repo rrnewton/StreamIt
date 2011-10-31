@@ -48,6 +48,8 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     protected int popCount;
     /** For linear filters, the peek count **/
     protected int peek;
+    /** Is true if the filter has state **/
+    protected boolean isStateful;
 
     /////////////////////////
     //Linear Representation
@@ -104,6 +106,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         end = content.end;
         pos = content.pos;
         total = content.total;
+        isStateful = content.isStateful;
     }
 
     /**
@@ -128,6 +131,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         //is2stage = steady.length > 1;
         linear = false;
         //total=1;
+        isStateful = filter.isStateful();
     }
 
       
