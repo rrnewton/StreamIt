@@ -6,6 +6,7 @@ void->int stateful filter A {
   }
   work push 1 {
     print("Filter A\\n");
+    count++;
     push(count++);
   }
 }
