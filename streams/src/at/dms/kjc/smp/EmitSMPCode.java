@@ -355,7 +355,9 @@ public class EmitSMPCode extends EmitCode {
 		p.println("#include \"barrier.h\"");
 		p.println("#include \"structs.h\"");
 		p.println("#include \"pthread.h\"");
-		p.println("#include \"dynamic_queue.h\"");
+		if (isDynamic) {
+			p.println("#include \"dynamic_queue.h\"");
+		}
 		p.println("#include <stdint.h>");
 		p.println();
 
