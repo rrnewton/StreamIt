@@ -316,7 +316,7 @@ public class CloneGenerator {
      * For testing.
      */
     private static final String[] classes1 = {
-        "at.dms.kjc.JLocalVariable"
+        "at.dms.kjc.slir.WorkNodeContent"
     };
 
     /**

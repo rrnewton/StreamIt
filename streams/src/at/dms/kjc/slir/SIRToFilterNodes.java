@@ -42,7 +42,8 @@ class SIRToFilterNodes implements FlatVisitor {
 
 	public void visitNode(FlatNode node) {						
 		
-		// System.out.println("Creating SliceNodes: " + node);
+		System.out.println("SIRToFilterNodes.visitNode node= " + node);		
+		System.out.println("SIRToFilterNodes.visitNode node= " + node + " isStateful=" + node.getFilter().isStateful());		
 		OutputNode output = new OutputNode();
 		InputNode input = new InputNode();
 		WorkNodeContent content;

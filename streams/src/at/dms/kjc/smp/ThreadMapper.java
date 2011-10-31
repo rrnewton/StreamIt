@@ -37,10 +37,12 @@ public class ThreadMapper {
 		boolean isDynamicInput = ssg.hasDynamicInput();
 		Filter f = ssg.getTopFilters()[0];
 		
+		boolean isStateful = f.getWorkNodeContent().isStateful();
 		
+		System.out.println("ThreadMapper.assignThreads filter = " + f.getWorkNode().toString() + " isStateful=" + isStateful);
 		
 		/* Check if it has a dynamic pop rate */
-		if (isDynamicInput) {
+		if (isDynamicInput || isStateful) {
 			Filter[] topFilters = ssg.getTopFilters();
 
 			for (int i = 0; i < topFilters.length; i++) {

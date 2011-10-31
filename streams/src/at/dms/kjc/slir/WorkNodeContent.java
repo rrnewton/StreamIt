@@ -84,6 +84,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
      * @param content The FilterContent to copy.
      */
     public WorkNodeContent(WorkNodeContent content) {
+    	System.out.println("WorkNodeContent.WorkNodeContent(WorkNodeContent content)");
         my_unique_ID = unique_ID++;
         name = content.name + my_unique_ID;
         prework = content.prework;
@@ -107,6 +108,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         pos = content.pos;
         total = content.total;
         isStateful = content.isStateful;
+        System.out.println("WorkNodeContent.WorkNodeContent(WorkNodeContent content) isStateful=" + isStateful);
     }
 
     /**
@@ -114,6 +116,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
      * @param filter SIRPhasedFilter to construct from.
      */
     public WorkNodeContent(SIRPhasedFilter filter) {
+    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter)");
         my_unique_ID = unique_ID++;
         name = filter.getName();
         prework = filter.getInitPhases();
@@ -132,10 +135,14 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         linear = false;
         //total=1;
         isStateful = filter.isStateful();
+    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter) isStateful="+ filter.isStateful());
+
     }
 
       
-    
+    public boolean isStateful() {
+    	return isStateful;	
+    }
     
     public void setInputType(CType type) {
             inputType = type; 
@@ -678,6 +685,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         other.fields = (at.dms.kjc.JFieldDeclaration[])at.dms.kjc.AutoCloner.cloneToplevel(this.fields);
         other.popCount = this.popCount;
         other.peek = this.peek;
+        other.isStateful = this.isStateful;
         other.linear = this.linear;
         other.array = (double[])at.dms.kjc.AutoCloner.cloneToplevel(this.array);
         other.constant = this.constant;
