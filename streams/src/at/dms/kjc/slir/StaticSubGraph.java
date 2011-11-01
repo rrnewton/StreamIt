@@ -268,13 +268,7 @@ public class StaticSubGraph {
 					.println("StaticSubGraph.flatten, examining Flatnode node="
 							+ node.getName() + " inputs.length=" + node.inputs
 							+ " outputs.length=" + node.ways);
-
-			if (node.getName().contains("DummySource")
-					|| node.getName().contains("DummySink")) {
-				// continue; /* Need to set the parent, set next, set previous
-				// */
-			}
-
+	
 			InputNode input = filterNodes.inputNodes.get(node.contents);
 			OutputNode output = filterNodes.outputNodes.get(node.contents);
 			WorkNode filterNode = filterNodes.filterNodes.get(node.contents);
@@ -294,17 +288,6 @@ public class StaticSubGraph {
 			filter.setOutputNode(output);
 			filter.setWorkNode(filterNode);
 
-			// System.out.println("  outputs: " + node.ways);
-			// check to see if this node is feeding a dummy sink, if so, then
-			// don't create an edge
-			// to the dummy sink because it will not be generated in the SLIR
-			// if (node.ways > 0) {
-			// //&& node.getEdges()[0].contents instanceof SIRDummySink) {
-			// assert node.ways == 1;
-			// output.setWeights(new int[0]);
-			// output.setDests(new InterFilterEdge[0][0]);
-			// }
-			//
 			if (node.ways != 0) {
 				assert node.ways == node.getEdges().length
 						&& node.ways == node.weights.length;
@@ -361,20 +344,6 @@ public class StaticSubGraph {
 				}
 			}
 
-			// set up the joining, the edges should exist already from upstream
-			// System.out.println("  inputs: " + node.inputs);
-
-			// there might have been a dummy source before this node, if so,
-			// handle this specially
-			// and don't create an edge to the dummy source because it is not
-			// translated into an SLIR node
-			// if (node.inputs > 0) {
-			// //&& node.incoming[0].contents instanceof SIRDummySource) {
-			// assert node.inputs == 1;
-			// input.setWeights(new int[0]);
-			// input.setSources(new InterFilterEdge[0]);
-			// }
-
 			if (node.inputs != 0) {
 				assert node.inputs == node.incoming.length
 						&& node.inputs == node.incomingWeights.length;
@@ -430,6 +399,14 @@ public class StaticSubGraph {
 		}
 		// topSlices = new LinkedList<Filter>();
 		topFilters.add(topFilter);
+		
+		
+		System.out.println("StaticSubGraph.flatten start printing top filters");
+		for (Filter f : topFilters) {
+			System.out.println("StaticSubGraph.flatten " + f);
+		}
+		System.out.println("StaticSubGraph.flatten start printing top filters");
+		
 		System.out.println(topFilters);
 
 		io = ioList.toArray(new Filter[ioList.size()]);
