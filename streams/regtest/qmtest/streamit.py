@@ -64,8 +64,8 @@ def context_to_dir(context):
 class BackendField(EnumerationField):
     """A field containing a StreamIt compiler backend."""
 
-    backend_names = ['Uniprocessor', 'Library', 'RAW 4x4', 'Cluster 1', 'simpleC']
-    backend_tags = ['uni', 'library', 'raw4', 'cluster', 'simpleC']    
+    backend_names = ['Uniprocessor', 'Library', 'RAW 4x4', 'Cluster 1', 'simpleC', 'SMP']
+    backend_tags = ['uni', 'library', 'raw4', 'cluster', 'simpleC', 'smp']    
 
     # TODO: think about some way to present the backend_names
     # to the user, but use the backend_tags internally.
@@ -182,6 +182,8 @@ class RunStrcTest(qm.test.test.Test):
           backend = ['--raw', '4']
       elif self.backend == 'cluster':
           backend = ['--cluster', '1']
+      elif self.backend == 'smp2':
+          backend = ['--smp', '2']
       # List of args to the program, starting with the program name,
       # and always including the iteration count:
       arguments = [path] + backend + \

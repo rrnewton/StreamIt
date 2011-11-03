@@ -1,4 +1,4 @@
-#!/usr/uns/bin/python
+#!/usr/bin/env python
 #
 # build-qmtest.py: build QMTest XML files from the StreamIt tree
 # David Maze <dmaze@cag.lcs.mit.edu>
