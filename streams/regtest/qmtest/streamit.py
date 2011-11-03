@@ -64,8 +64,8 @@ def context_to_dir(context):
 class BackendField(EnumerationField):
     """A field containing a StreamIt compiler backend."""
 
-    backend_names = ['Uniprocessor', 'Library', 'RAW 4x4', 'Cluster 1', 'simpleC', 'SMP']
-    backend_tags = ['uni', 'library', 'raw4', 'cluster', 'simpleC', 'smp']    
+    backend_names = ['Uniprocessor', 'Library', 'RAW 4x4', 'Cluster 1', 'simpleC', 'SMP 2']
+    backend_tags = ['uni', 'library', 'raw4', 'cluster', 'simpleC', 'smp2']    
 
     # TODO: think about some way to present the backend_names
     # to the user, but use the backend_tags internally.
@@ -183,17 +183,17 @@ class RunStrcTest(qm.test.test.Test):
       elif self.backend == 'cluster':
           backend = ['--cluster', '1']
       elif self.backend == 'smp2':
-          backend = ['--smp', '2']
+          backend = ['-smp', '2']
       # List of args to the program, starting with the program name,
       # and always including the iteration count:
       arguments = [path] + backend + \
                   ["--iterations", str(self.iters)] + \
                   self.options + self.filenames
 
-#      print >> sys.stderr, "ABOUT TO COMPILE"
-#      print >> sys.stderr, "dir = " + test_home_dir
-#      print >> sys.stderr, "path = " + path
-#      print >> sys.stderr, "arguments: " + (" ".join(arguments))
+      print >> sys.stderr, "ABOUT TO COMPILE"
+      print >> sys.stderr, "dir = " + test_home_dir
+      print >> sys.stderr, "path = " + path
+      print >> sys.stderr, "arguments: " + (" ".join(arguments))
       e = qm.executable.RedirectedExecutable(self.timeout)
 
       ###
@@ -271,8 +271,12 @@ class RunProgramTest(qm.test.test.Test):
           return self._RunRaw(context, result)
       elif self.backend == 'uni' or self.backend == 'simpleC' or self.backend == 'cluster':
           return self._RunUni(context, result)
+      elif self.backend == 'smp2':
+          print 'runSmp2 called'
+          return self._RunSmp2(context, result)
       else:
           result.Fail('Unknown backend: "' + self.backend + '"')
+
 
     def _RunRaw(self, context, result):
         test_home_dir = context_to_dir(context)
@@ -326,6 +330,14 @@ class RunProgramTest(qm.test.test.Test):
         #e = TimedExecutable()
         e = qm.executable.RedirectedExecutable(self.timeout)
 
+        print '_RunNamedFile ' + path 
+
+        print >> sys.stderr, "ABOUT TO RUN"
+        print >> sys.stderr, "dir = " + test_home_dir
+        print >> sys.stderr, "path = " + path
+        print >> sys.stderr, "arguments: " + (" ".join(arguments))
+
+
         ###
         ### All this retry and exception printing business:
         ### qmtest will raise an attribute not found error on __Executable__child
@@ -362,6 +374,11 @@ class RunProgramTest(qm.test.test.Test):
         
     def _RunUni(self, context, result):
         self._RunNamedFile(context, result, 'a.out')
+
+        
+    def _RunSmp2(self, context, result):
+        self._RunNamedFile(context, result, 'smp2')
+
 
 class CompareResultsTest(qm.test.test.Test):
     """Compare the results from a program run to the expected output."""

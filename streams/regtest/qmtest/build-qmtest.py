@@ -265,10 +265,11 @@ def SplitAll(path):
     returns -- A list containing the components of the directory name."""
     
     parts = []
-    while path != '':
+    while path != '/':
         (head, tail) = os.path.split(path)
         parts = [tail] + parts
         path = head
+        print 'path: ' + path
     return parts
 
 def ActuallyBuildTests(srcdir, benchdir, fileset, benchname, control, compile_time, run_time, iters):
