@@ -63,7 +63,7 @@ void->void pipeline BeamFormer1 {
 	    join roundrobin(1);
 
     }
-    /*
+    
     add float->float filter 
 	{
 	    work push 1 pop 1 
@@ -73,7 +73,7 @@ void->void pipeline BeamFormer1 {
 		    println(x);
 		}
 	}
-    */
+   
 
     add FileWriter<float>("BeamFormer1.out");
 
@@ -91,13 +91,13 @@ void->float stateful filter InputGenerate (int myChannel, int numberOfSamples, i
     work push 2 {
 	if( holdsTarget && (curSample == targetSample) ) {
 
-	     
+	     print("InputGenerate if");
 	    push(sqrt(curSample*myChannel));
 	    push(sqrt(curSample*myChannel)+1);
 
 
 	} else {
-
+	     print("InputGenerate else");
 	     
 	    push(-sqrt(curSample*myChannel));
 	    push(-(sqrt(curSample*myChannel)+1));
