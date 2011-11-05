@@ -329,11 +329,11 @@ class RunProgramTest(qm.test.test.Test):
         #e = TimedExecutable()
         e = qm.executable.RedirectedExecutable(self.timeout)
 
-        # print >> sys.stderr, "ABOUT TO RUN"
-        # print >> sys.stderr, "dir = " + test_home_dir
-        # print >> sys.stderr, "path = " + path
-        # print >> sys.stderr, "arguments: " + (" ".join(arguments))
-        # print >> sys.stderr, "filename: " + filename
+        print >> sys.stderr, "ABOUT TO RUN"
+        print >> sys.stderr, "dir = " + test_home_dir
+        print >> sys.stderr, "path = " + path
+        print >> sys.stderr, "arguments: " + (" ".join(arguments))
+        print >> sys.stderr, "filename: " + filename
             
         ###
         ### All this retry and exception printing business:
@@ -358,7 +358,6 @@ class RunProgramTest(qm.test.test.Test):
               if attemptsLeft == 0:
                   raise exctype, value
 
-
         # Dump stdout to the file; ignore stderr.
         f = open(os.path.join(test_home_dir,self.own_output), 'w')
         f.write(e.stdout)
@@ -373,27 +372,7 @@ class RunProgramTest(qm.test.test.Test):
         self._RunNamedFile(context, result, 'a.out')
 
         
-    def _RunSmp2(self, context, result):
-        status = None
-        hasRun = 0
-        attemptsLeft = 20
-        e = qm.executable.RedirectedExecutable(self.timeout)
-        test_home_dir = context_to_dir(context)
-        while hasRun==0:
-          try:
-              status = e.Run(['make'],
-                             dir=test_home_dir)
-              hasRun = 1
-          except:
-              exctype, value = sys.exc_info()[:2]
-              traceback.print_exception(exctype,value,None,None,sys.stderr)
-              time.sleep(60)
-              attemptsLeft = attemptsLeft - 1
-              if attemptsLeft == 0:
-                  raise exctype, value        
-        foo = os.path.join(test_home_dir, 'smp2')        
-        if not os.path.exists(foo):
-            raise IOError
+    def _RunSmp2(self, context, result):       
         self._RunNamedFile(context, result, 'smp2')
 
 
