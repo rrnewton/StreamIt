@@ -148,7 +148,6 @@ if ($opts{tokopi}) {
 }
 exit(1) if !$fns;
 
-# RJS :: Look  here
 # generate executable if possible
 if (! $opts{noexecutable}) {
     my $executablename = $opts{output}  || "a.out";
@@ -160,6 +159,7 @@ if (! $opts{noexecutable}) {
     } elsif ($opts{cluster}) {
 	$fns = make_to_out($fns, $executablename, "Makefile.cluster");
     } elsif ($opts{smp}) {
+        $executablename = "smp$opts{smp}";
 	$fns = make_to_out($fns, $executablename, "Makefile");
     } else { print %opts; print "\n"; }
 }
