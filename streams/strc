@@ -148,6 +148,7 @@ if ($opts{tokopi}) {
 }
 exit(1) if !$fns;
 
+# RJS :: Look  here
 # generate executable if possible
 if (! $opts{noexecutable}) {
     my $executablename = $opts{output}  || "a.out";
@@ -157,7 +158,9 @@ if (! $opts{noexecutable}) {
 	($opts{standalone} && $opts{spacetime})) {
 	$fns = c_to_out($fns, $executablename);
     } elsif ($opts{cluster}) {
-	$fns = cluster_to_out($fns, $executablename);
+	$fns = make_to_out($fns, $executablename, "Makefile.cluster");
+    } elsif ($opts{smp}) {
+	$fns = make_to_out($fns, $executablename, "Makefile");
     } else { print %opts; print "\n"; }
 }
 exit(1) if !$fns;
@@ -842,15 +845,14 @@ sub c_to_out
 
 ###
 #
-# Take output of --cluster and create executable.
+# Take output of --cluster or -smp and create executable.
 #
 ###
 
-sub cluster_to_out {
-    my ($fns, $target) = @_;
-    #return [] if !@$fns;
+sub make_to_out {
+    my ($fns, $target, $makefile) = @_;
     call("$rm $target") if -e $target; 	# remove existing output file if any.
-    my $result = call("$make -f Makefile.cluster");
+    my $result = call("$make -f $makefile");
     return undef if $result != 0;
     return undef unless -e $target;
     return [$target];
