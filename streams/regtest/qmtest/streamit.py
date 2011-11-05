@@ -329,11 +329,11 @@ class RunProgramTest(qm.test.test.Test):
         #e = TimedExecutable()
         e = qm.executable.RedirectedExecutable(self.timeout)
 
-        print >> sys.stderr, "ABOUT TO RUN"
-        print >> sys.stderr, "dir = " + test_home_dir
-        print >> sys.stderr, "path = " + path
-        print >> sys.stderr, "arguments: " + (" ".join(arguments))
-        print >> sys.stderr, "filename: " + filename
+        #print >> sys.stderr, "ABOUT TO RUN"
+        #print >> sys.stderr, "dir = " + test_home_dir
+        #print >> sys.stderr, "path = " + path
+        #print >> sys.stderr, "arguments: " + (" ".join(arguments))
+        #print >> sys.stderr, "filename: " + filename
             
         ###
         ### All this retry and exception printing business:
