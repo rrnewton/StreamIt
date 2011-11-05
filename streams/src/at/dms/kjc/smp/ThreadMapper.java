@@ -40,7 +40,7 @@ public class ThreadMapper {
 
 		boolean isStateful = f.getWorkNodeContent().isStateful();
 
-		System.out.println("ThreadMapper.assignThreads filter = " + f.getWorkNode().toString() + " isStateful=" + isStateful);
+//		System.out.println("ThreadMapper.assignThreads filter = " + f.getWorkNode().toString() + " isStateful=" + isStateful);
 
 		/* Check if it has a dynamic pop rate */
 		if (isDynamicInput || isStateful) {
@@ -48,34 +48,17 @@ public class ThreadMapper {
 
 			for (int i = 0; i < topFilters.length; i++) {
 				Filter dynamicReader = topFilters[i];
-				System.out.println("ThreadMapper.assignThreads Filter "
-						+ dynamicReader.getWorkNodeContent().getName()
-						+ " is a dynamic reader");
+//				System.out.println("ThreadMapper.assignThreads Filter "
+//						+ dynamicReader.getWorkNodeContent().getName()
+//						+ " is a dynamic reader");
+				
 
-				//List<InterSSGEdge> links = ssg.getInputPort().getLinks();
-				//				if (ssg.getInputPort() != null) {
-				//				List<InterSSGEdge> links = ssg.getInputPort().getLinks();
-				//				
-				//					for (InterSSGEdge edge : links) {
-				//						System.out.println("ThreadMapper.assignThreads edge = "
-				//								+ edge.toString());
-				//						Filter[] connectedGraph = edge.getDest().getSSG()
-				//								.getFilterGraph();
-				//						Filter connected = connectedGraph[connectedGraph.length - 1];
-				//						System.out
-				//								.println("ThreadMapper.assignThreads edge filter = "
-				//										+ connected.getWorkNode().toString());
-				//						filterToThreadId.put(connected, threadId);
-				//					}				
-				//				}
+				CType type = dynamicReader.getWorkNodeContent().getOutputType();				
 
-				CType type = dynamicReader.getWorkNodeContent().getOutputType();
-				//CType type = dynamicReader.getWorkNodeContent().getInputType();
-
-				System.out.println("ThreadMapper.assignThreads filter = " + dynamicReader.getWorkNode().toString()
-						+ " has threadId=" + threadId
-						+ " and type=" + type.toString()
-						);
+//				System.out.println("ThreadMapper.assignThreads filter = " + dynamicReader.getWorkNode().toString()
+//						+ " has threadId=" + threadId
+//						+ " and type=" + type.toString()
+//						);
 
 				filterToThreadId.put(dynamicReader, threadId);
 
@@ -86,11 +69,11 @@ public class ThreadMapper {
 					for (Filter filter : filterGraph) {
 						if (dynamicReader.getWorkNodeContent().getName().equals(filter.getWorkNodeContent().getName()))
 							continue;		
-						System.out.println("ThreadMapper.assignThreads Filter "
-								+ dynamicReader.getWorkNodeContent().getName()
-								+ " dominates "
-								+ filter.getWorkNodeContent().getName()
-								);
+//						System.out.println("ThreadMapper.assignThreads Filter "
+//								+ dynamicReader.getWorkNodeContent().getName()
+//								+ " dominates "
+//								+ filter.getWorkNodeContent().getName()
+//								);
 						if (isDynamicInput) {
 							dominated.add(filter.getWorkNodeContent().getName());
 						}

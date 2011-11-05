@@ -84,7 +84,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
      * @param content The FilterContent to copy.
      */
     public WorkNodeContent(WorkNodeContent content) {
-    	System.out.println("WorkNodeContent.WorkNodeContent(WorkNodeContent content)");
+//    	System.out.println("WorkNodeContent.WorkNodeContent(WorkNodeContent content)");
         my_unique_ID = unique_ID++;
         name = content.name + my_unique_ID;
         prework = content.prework;
@@ -108,7 +108,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         pos = content.pos;
         total = content.total;
         isStateful = content.isStateful;
-        System.out.println("WorkNodeContent.WorkNodeContent(WorkNodeContent content) isStateful=" + isStateful);
+//        System.out.println("WorkNodeContent.WorkNodeContent(WorkNodeContent content) isStateful=" + isStateful);
     }
 
     /**
@@ -116,7 +116,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
      * @param filter SIRPhasedFilter to construct from.
      */
     public WorkNodeContent(SIRPhasedFilter filter) {
-    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter)");
+//    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter)");
         my_unique_ID = unique_ID++;
         name = filter.getName();
         prework = filter.getInitPhases();
@@ -135,7 +135,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         linear = false;
         //total=1;
         isStateful = filter.isStateful();
-    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter) isStateful="+ filter.isStateful());
+//    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter) isStateful="+ filter.isStateful());
 
     }
 
@@ -430,7 +430,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
      * @return the number of items produced in the init stage.
      */
     public int initItemsPushed() {
-    	System.out.println(name);
+//    	System.out.println(name);
         int items = steady[0].getPushInt() * initMult;
         if (isTwoStage()) {
             items -= steady[0].getPushInt();

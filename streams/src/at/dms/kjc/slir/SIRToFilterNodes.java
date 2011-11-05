@@ -32,7 +32,7 @@ class SIRToFilterNodes implements FlatVisitor {
 
 	public void createNodes(FlatNode top, Map<SIROperator, int[]>[] executionCounts) {
 		
-		System.out.println("SIRToFilterNodes.createNodes top= " + top);				
+//		System.out.println("SIRToFilterNodes.createNodes top= " + top);				
 		
 		inputNodes = new HashMap<SIROperator, InputNode>();
 		outputNodes = new HashMap<SIROperator, OutputNode>();
@@ -45,7 +45,7 @@ class SIRToFilterNodes implements FlatVisitor {
 
 	public void visitNode(FlatNode node) {						
 		
-		System.out.println("SIRToFilterNodes.visitNode node= " + node);				
+//		System.out.println("SIRToFilterNodes.visitNode node= " + node);				
 		OutputNode output = new OutputNode();
 		InputNode input = new InputNode();
 		WorkNodeContent content;

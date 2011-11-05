@@ -88,7 +88,6 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
         } else {
                 long work = getWork(slice, slice.getWorkNode().getFilter().getWork()) *                
                 slice.getWorkNode().getFilter().getSteadyMult();
-                System.out.println(slice + ": " + work);    
                 return work;
         }
         

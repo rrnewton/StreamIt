@@ -95,27 +95,27 @@ public class CommonPasses {
 	private StreamGraph doStaticPassesSegmentedSIRGraph(
 			SegmentedSIRGraph segmentedGraph) {
 
-		System.out
-				.println("CommonPasses.doStaticPassesSegmented enter");
-
-		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
-
-			if (str instanceof SIRPipeline) {
-				System.out
-						.println("CommonPasses.doStaticPasses str is a SIRPipeline");
-				List<SIROperator> oldChildren = ((SIRPipeline) str)
-						.getChildren();
-
-				for (SIROperator child : oldChildren) {
-					System.out.println("CommonPasses.doStaticPasses child is "
-							+ child.getIdent());
-				}
-			}
-		}
-
-		System.out
-				.println("CommonPasses.doStaticPasses segmentedGraph.getStaticSubGraphs().size()="
-						+ segmentedGraph.getStaticSubGraphs().size());
+		//System.out
+		//		.println("CommonPasses.doStaticPassesSegmented enter");
+//
+//		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
+//
+//			if (str instanceof SIRPipeline) {
+//				System.out
+//						.println("CommonPasses.doStaticPasses str is a SIRPipeline");
+//				List<SIROperator> oldChildren = ((SIRPipeline) str)
+//						.getChildren();
+//
+//				for (SIROperator child : oldChildren) {
+//					System.out.println("CommonPasses.doStaticPasses child is "
+//							+ child.getIdent());
+//				}
+//			}
+//		}
+//
+//		System.out
+//				.println("CommonPasses.doStaticPasses segmentedGraph.getStaticSubGraphs().size()="
+//						+ segmentedGraph.getStaticSubGraphs().size());
 		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
 
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
@@ -129,7 +129,7 @@ public class CommonPasses {
 		}
 		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
 
-		System.out.println("CommonPasses.doStaticPassesSegmentedSIRGraph exit");
+		// System.out.println("CommonPasses.doStaticPassesSegmentedSIRGraph exit");
 
 		return streamGraph;
 
@@ -146,9 +146,9 @@ public class CommonPasses {
 	private SIRStream doStaticPassSIRStream(SIRStream str) {
 
 	
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
+//		if (str instanceof SIRFilter) {
+//    		System.out.println("CommonPasses.doStaticPassSIRStream before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+//    	}
 		
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
@@ -177,10 +177,10 @@ public class CommonPasses {
 		if (KjcOptions.tilera != -1) {
 			// running the tilera backend
 
-			System.out.println("SIR Filters: "
-					+ at.dms.kjc.tilera.TMD.countFilters(str));
-			System.out.println("SIR Peeking Filters: "
-					+ at.dms.kjc.tilera.TMD.countPeekingFilters(str));
+//			System.out.println("SIR Filters: "
+//					+ at.dms.kjc.tilera.TMD.countFilters(str));
+//			System.out.println("SIR Peeking Filters: "
+//					+ at.dms.kjc.tilera.TMD.countPeekingFilters(str));
 
 			DuplicateBottleneck dup = new DuplicateBottleneck();
 			dup.percentStateless(str);
@@ -201,10 +201,10 @@ public class CommonPasses {
 		} else if (KjcOptions.smp != -1) {
 			// running the smp backend
 
-			System.out.println("SIR Filters: "
-					+ at.dms.kjc.smp.TMD.countFilters(str));
-			System.out.println("SIR Peeking Filters: "
-					+ at.dms.kjc.smp.TMD.countPeekingFilters(str));
+//			System.out.println("SIR Filters: "
+//					+ at.dms.kjc.smp.TMD.countFilters(str));
+//			System.out.println("SIR Peeking Filters: "
+//					+ at.dms.kjc.smp.TMD.countPeekingFilters(str));
 
 			DuplicateBottleneck dup = new DuplicateBottleneck();
 			dup.percentStateless(str);
@@ -257,17 +257,7 @@ public class CommonPasses {
 		// this must run before vertical fission
 		str = Flattener.doLinearAnalysis(str);
 		
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream AAAA str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
-
-		
 		str = Flattener.doStateSpaceAnalysis(str);
-
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream BBBN str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
-		
 		
 		// vertical fission requested.
 		if (KjcOptions.fission > 1) {
@@ -276,12 +266,6 @@ public class CommonPasses {
 			Lifter.lift(str);
 			System.out.println("Done Vertical Fission...");
 		}
-
-		
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream CCCC str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
-		
 		
 		// run user-defined transformations if enabled
 		if (KjcOptions.optfile != null) {
@@ -289,11 +273,6 @@ public class CommonPasses {
 			str = ManualPartition.doit(str);
 			System.err.println("Done User-Defined Transformations...");
 		}
-		
-		
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream DDDD str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
 		
 
 		/* StaticsProp.propagateIntoFilters(str,theStatics); */
@@ -304,10 +283,6 @@ public class CommonPasses {
 			SJToPipe.doit(str);
 		}
 
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream EEEE str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
-		
 		StreamItDot.printGraph(str, "before-partition.dot");
 
 		// VarDecl Raise to move array assignments up
@@ -316,18 +291,10 @@ public class CommonPasses {
 		// constant prop propagates the peek buffer index
 		// ?? does this really need to be done twice?
 		new VarDeclRaiser().raiseVars(str);
-
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream FFFF str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
 		
 		// Make sure all variables have different names.
 		// This must be run now, later pass rely on distinct names.
 		RenameAll.renameOverAllFilters(str);
-
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream YYYY str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
 		
 		// Raise all pushes, pops, peeks to statement level
 		// (several phases above introduce new peeks, pops, pushes
@@ -350,11 +317,6 @@ public class CommonPasses {
 							+ "by setting types in linear analysis, or by adding type inference.");
 			System.exit(1);
 		}
-		
-		if (str instanceof SIRFilter) {
-    		System.out.println("CommonPasses.doStaticPassSIRStream ZZZZ str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
-
 
 		// If vectorization enabled, create (fused streams of) vectorized
 		// filters.
@@ -421,19 +383,19 @@ public class CommonPasses {
 	 * @return The modified SIRStream
 	 */
 	private SIRStream removeDummies(SIRStream str) {
-		System.out
-				.println("CommonPasses.removeDummies enter");
+//		System.out
+//				.println("CommonPasses.removeDummies enter");
 		if (str instanceof SIRPipeline) {
 
-			System.out.println("CommonPasses.removeDummies str is a SIRPipeline");
+//			System.out.println("CommonPasses.removeDummies str is a SIRPipeline");
 			List<SIROperator> oldChildren = ((SIRPipeline) str).getChildren();
 			List<SIRStream> newChildren = new ArrayList<SIRStream>();
 			SIRPipeline pipeline = new SIRPipeline(null, str.getIdent());
 			pipeline.setInit(SIRStream.makeEmptyInit());
 
 			for (SIROperator child : oldChildren) {
-				System.out.println("CommonPasses.removeDummies child is "
-						+ child.getIdent());
+//				System.out.println("CommonPasses.removeDummies child is "
+//						+ child.getIdent());
 				if (!(child instanceof SIRDummySource || child instanceof SIRDummySink)) {
 					newChildren.add((SIRStream) child);
 				}
@@ -447,8 +409,8 @@ public class CommonPasses {
 				return pipeline;
 			}
 		}
-		System.out
-				.println("CommonPasses.removeDummies exit");
+//		System.out
+//				.println("CommonPasses.removeDummies exit");
 		return str;
 	}
 

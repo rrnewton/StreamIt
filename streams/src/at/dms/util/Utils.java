@@ -1315,8 +1315,6 @@ public abstract class Utils implements Serializable, DeepCloneable {
 			JExpression count) {
 		if (body == null)
 			return new JEmptyStatement(null, null);
-
-		System.out.println("**** Utils.makeForLoopLocalIndex");
 		
 		// make init statement - assign zero to <pre>var</pre>.  We need to use
 		// an expression list statement to follow the convention of

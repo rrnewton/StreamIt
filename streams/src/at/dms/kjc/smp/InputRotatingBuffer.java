@@ -63,7 +63,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
     	
         //for (Filter slice : schedule.getScheduleList()) {
     	for (Filter slice : ssg.getFilterGraph()) {	
-        	System.out.println("InputRotatingBuffer.createInputBuffers calling on slice=" + slice.getWorkNode().toString());
+//        	System.out.println("InputRotatingBuffer.createInputBuffers calling on slice=" + slice.getWorkNode().toString());
         	
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);

@@ -65,8 +65,6 @@ public class SynchRemover {
     private void createSSSequences() {
         for (Filter current : slicelist) {
 
-            System.out.println(current.toString());
-
             for (int i=0; i<current.getInputNode().getWeights(SchedulingPhase.STEADY).length; i++) {
                 System.out.println(current.getInputNode().getWeights(SchedulingPhase.STEADY)[i]);
             }

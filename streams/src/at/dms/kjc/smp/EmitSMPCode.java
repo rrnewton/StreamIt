@@ -176,7 +176,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println(((Core)n).getComputeCode().getGlobalText());
 
 		
-		System.out.println("EmitSMPCode.emitCodeForComputeStore, code for core=" + n.getUniqueId());	
+		//System.out.println("EmitSMPCode.emitCodeForComputeStore, code for core=" + n.getUniqueId());	
 		
 		
 		
@@ -252,7 +252,7 @@ public class EmitSMPCode extends EmitCode {
 
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
-			System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: " + field.getVariable().getIdent());
+//			System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: " + field.getVariable().getIdent());
 			field.accept(codegen);
 		}
 		p.println("");
@@ -389,7 +389,7 @@ public class EmitSMPCode extends EmitCode {
 			
 			for (Integer threadId : threadIdToType.keySet()) {
 				String type = threadIdToType.get(threadId);				
-				System.out.println("EmitSMPCode.generateGlobalHeader " + "extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
+//				System.out.println("EmitSMPCode.generateGlobalHeader " + "extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
 				p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
 			}
 							
@@ -627,7 +627,7 @@ public class EmitSMPCode extends EmitCode {
 						Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
 						int i = 0;
 
-						System.out.println("EmitSMPCode.generateMainFile about to gnerate helper threads! helperMethods.size=" + helperMethods.size());
+						//System.out.println("EmitSMPCode.generateMainFile about to gnerate helper threads! helperMethods.size=" + helperMethods.size());
 						for (JMethodDeclaration decl : helperMethods) {
 
 							String varName = "helperThread" + i;

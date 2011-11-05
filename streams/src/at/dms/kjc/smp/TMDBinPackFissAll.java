@@ -58,20 +58,19 @@ public class TMDBinPackFissAll extends Scheduler {
      * of the graph. 
      */
     public void runLayout() {    	
-    	System.out.println("TMDBinPackFissAll.runLayout");
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";            	
         
         LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         HashSet<Filter> fizzedSlices = new HashSet<Filter>();
         HashSet<Filter> unfizzedSlices = new HashSet<Filter>();
-        
+        	
         // Get work estimates for all slices
         HashMap<WorkNode, Long> workEsts = new HashMap<WorkNode, Long>();
         for(Filter slice : slices) {
         	long workEst = FilterWorkEstimate.getWork(slice);
         	workEsts.put(slice.getWorkNode(), workEst);
-        }
+        }    
         
         // Categorize slices into predefined, fizzed and unfizzed slices
         // Predefined filters are automatically added to off-chip memory
@@ -218,7 +217,7 @@ public class TMDBinPackFissAll extends Scheduler {
                     StatelessFissioner.doit(slice, graphSchedule.getSSG(), fizzAmount.get(slice));
 
                 if(fissionGroup != null) {
-                    System.out.println("Fissing " + slice.getWorkNode() + " by " + fizzAmount.get(slice));
+//                    System.out.println("Fissing " + slice.getWorkNode() + " by " + fizzAmount.get(slice));
                     if (fizzAmount.get(slice) > maxFission)
                         maxFission = fizzAmount.get(slice);
 
@@ -352,11 +351,9 @@ public class TMDBinPackFissAll extends Scheduler {
     }
 
     @Override
-    public SIRStream SIRFusion(SIRStream str, int tiles) {
-        if(false)
-            return str;
+    public SIRStream SIRFusion(SIRStream str, int tiles) {      
 
-        System.out.println("TMDBinPackFissAll.SIRFusion Performing fusion of stateful filters");
+//        System.out.println("TMDBinPackFissAll.SIRFusion Performing fusion of stateful filters");
 
         SIRStream oldStr;
         //get the first work estimate
@@ -371,10 +368,10 @@ public class TMDBinPackFissAll extends Scheduler {
         //the percentage change
         double workChange;
 
-        System.out.println("TMDBinPackFissAll.SIRFusion called on str=" + str.getName() );
-    	if (str instanceof SIRFilter) {
-    		System.out.println("TMDBinPackFissAll.SIRFusion before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-    	}
+//        System.out.println("TMDBinPackFissAll.SIRFusion called on str=" + str.getName() );
+//    	if (str instanceof SIRFilter) {
+//    		System.out.println("TMDBinPackFissAll.SIRFusion before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+//    	}
     	
         
         if(StatefulFusion.countStatefulFilters(str) < KjcOptions.smp) {

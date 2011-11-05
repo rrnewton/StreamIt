@@ -163,7 +163,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     }
     
     public String toString() {
-        return "Slice: " + head + "->" + head.getNext() + "->...";
+        return "Filter: " + head + "->" + head.getNext() + "->...";
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

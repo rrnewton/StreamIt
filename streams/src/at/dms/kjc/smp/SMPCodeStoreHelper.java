@@ -403,9 +403,9 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 				CStdType.Integer, workCounter, null);
 
 		String multiplierName = filterNode.toString() + "_multiplier";
-		System.out
-				.println("SMPCodeStoreHelper.getWorkFunctionBlock: addField multiplier "
-						+ multiplierName);
+//		System.out
+//				.println("SMPCodeStoreHelper.getWorkFunctionBlock: addField multiplier "
+//						+ multiplierName);
 
 		JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
 				CStdType.Integer, multiplierName, null);

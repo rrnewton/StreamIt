@@ -261,13 +261,13 @@ public class StaticSubGraph {
 		while (dataFlow.hasNext()) {
 			FlatNode node = dataFlow.next();
 
-			System.out
-					.println("StaticSubGraph.flatten, examining Flatnode node="
-							+ node.getName());
-			System.out
-					.println("StaticSubGraph.flatten, examining Flatnode node="
-							+ node.getName() + " inputs.length=" + node.inputs
-							+ " outputs.length=" + node.ways);
+//			System.out
+//					.println("StaticSubGraph.flatten, examining Flatnode node="
+//							+ node.getName());
+//			System.out
+//					.println("StaticSubGraph.flatten, examining Flatnode node="
+//							+ node.getName() + " inputs.length=" + node.inputs
+//							+ " outputs.length=" + node.ways);
 	
 			InputNode input = filterNodes.inputNodes.get(node.contents);
 			OutputNode output = filterNodes.outputNodes.get(node.contents);
@@ -401,13 +401,13 @@ public class StaticSubGraph {
 		topFilters.add(topFilter);
 		
 		
-		System.out.println("StaticSubGraph.flatten start printing top filters");
-		for (Filter f : topFilters) {
-			System.out.println("StaticSubGraph.flatten " + f);
-		}
-		System.out.println("StaticSubGraph.flatten start printing top filters");
-		
-		System.out.println(topFilters);
+//		System.out.println("StaticSubGraph.flatten start printing top filters");
+//		for (Filter f : topFilters) {
+//			System.out.println("StaticSubGraph.flatten " + f);
+//		}
+//		System.out.println("StaticSubGraph.flatten start printing top filters");
+//		
+//		System.out.println(topFilters);
 
 		io = ioList.toArray(new Filter[ioList.size()]);
 	}
@@ -627,16 +627,15 @@ public class StaticSubGraph {
 		Map<OutputNode, HashMap<InputNode, InterFilterEdge>> edges = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
 
 		
-		if (str instanceof SIRFilter) {
-			System.out.println("StaticSubGraph.init() str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-		}
-		
+//		if (str instanceof SIRFilter) {
+//			System.out.println("StaticSubGraph.init() str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
+//		}
+//		
 		GraphFlattener fg = new GraphFlattener(str);
 		SIRToFilterNodes filterNodes = new SIRToFilterNodes();
 		Map<SIROperator, int[]>[] executionCounts = SIRScheduler
 				.getExecutionCounts(str);
-		
-		System.out.println("StaticSubGraph.init() ");
+				
 		filterNodes.createNodes(fg.top, executionCounts);
 
 		work = WorkEstimate.getWorkEstimate(str);

@@ -56,7 +56,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         //for (Filter slice : schedule.getScheduleList()) {
     	for (Filter slice : ssg.getFilterGraph()) {	
 
-        	System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice=" + slice.getWorkNode().toString());
+//        	System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice=" + slice.getWorkNode().toString());
 
             if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
                 assert FissionGroupStore.isUnfizzedSlice(slice);
@@ -102,10 +102,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         bufType = filterNode.getFilter().getOutputType();
 
         checkDirectWrite();
-		if(directWrite)
-			System.out.println(filterNode + " has directWrite to " + directWriteFilter);
-		else
-			System.out.println(filterNode + " does not have directWrite");
+//		if(directWrite)
+//			System.out.println(filterNode + " has directWrite to " + directWriteFilter);
+//		else
+//			System.out.println(filterNode + " does not have directWrite");
         
 //         if(directWrite)
 //             this.ident = InputRotatingBuffer.getInputBuffer(directWriteFilter).getIdent();

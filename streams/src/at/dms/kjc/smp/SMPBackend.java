@@ -16,7 +16,7 @@ public class SMPBackend {
 	public static Structs_h structs_h;
 	public static DynamicQueueCodeGenerator dynamicQueueCodeGenerator = new DynamicQueueCodeGenerator();
 	public static int[] coreOrder = { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13,
-		6, 14, 7, 15 };
+			6, 14, 7, 15 };
 
 	private static boolean isDynamic = false;
 
@@ -89,16 +89,14 @@ public class SMPBackend {
 		if (KjcOptions.partitioner.equals("oldtmd")) {
 			if (KjcOptions.sharedbufs) {
 				System.out
-				.println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
+						.println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
 				KjcOptions.sharedbufs = false;
 			}
 		}
 	}
 
-	private static void emitCode(
-			Map<Filter, Integer> threadMap, 
-			Set<String> dominated, 
-			Map<String, String> dominators, 
+	private static void emitCode(Map<Filter, Integer> threadMap,
+			Set<String> dominated, Map<String, String> dominators,
 			Map<Integer, String> threadIdToType) {
 
 		// generate code for file writer
@@ -108,13 +106,14 @@ public class SMPBackend {
 			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
 
 		// emit c code for all cores
-		new EmitSMPCode(backEndFactory, isDynamic, threadMap, dominated, dominators, threadIdToType).doit();
+		new EmitSMPCode(backEndFactory, isDynamic, threadMap, dominated,
+				dominators, threadIdToType).doit();
 
 		// dump structs.h file
 		structs_h.writeToFile();
 
 		printFinalWorkAssignments();
-		
+
 		if (isDynamic) {
 			dynamicQueueCodeGenerator.writeToFiles();
 		}
@@ -179,22 +178,23 @@ public class SMPBackend {
 
 		Map<Filter, Integer> filterToThreadId = new HashMap<Filter, Integer>();
 		Set<String> dominated = new HashSet<String>();
-		Map<String, String> dominators = new HashMap<String, String>();		
-		Map<Integer, String> threadIdToType = new HashMap<Integer, String>();	
-		
-		for (StaticSubGraph ssg : streamGraph.getSSGs()) {			
-			ThreadMapper.getMapper().assignThreads(ssg, filterToThreadId, dominated, dominators, threadIdToType);			
-		}		
-		
+		Map<String, String> dominators = new HashMap<String, String>();
+		Map<Integer, String> threadIdToType = new HashMap<Integer, String>();
+
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			
+			ThreadMapper.getMapper().assignThreads(ssg, filterToThreadId,
+					dominated, dominators, threadIdToType);
+		}
+
+		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
+
 			runSSG(ssg, filterToThreadId, dominated, dominators, threadIdToType);
-		}		
-		
+		}
+
 		RotatingBuffer.rotTypeDefs();
 
 		InterSSGChannel.createDynamicQueues();
-		
+
 		chip.setThreadMap(filterToThreadId);
 
 		emitCode(filterToThreadId, dominated, dominators, threadIdToType);
@@ -202,15 +202,12 @@ public class SMPBackend {
 	}
 
 	private static void runSSG(StaticSubGraph ssg,
-			Map<Filter, Integer> filterToThreadId, 
-			Set<String> dominated, 
-			Map<String, String> dominators,
-			Map<Integer, String> threadIdToType) {
+			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
+			Map<String, String> dominators, Map<Integer, String> threadIdToType) {
 
-		System.out.println("SMPBackend.runSSG ssg=" +
-				ssg.getTopFilters()[0].getWorkNode() 				
-				);
-		
+//		System.out.println("SMPBackend.runSSG ssg="
+//				+ ssg.getTopFilters()[0].getWorkNode());
+
 		// dump slice graph to dot file
 		ssg.dumpGraph("traces.dot", null);
 
@@ -225,12 +222,10 @@ public class SMPBackend {
 
 		// generate layout for filters
 		scheduler.runLayout();
-
 		// dump final slice graph to dot file
 		graphSchedule.getSSG()
-		.dumpGraph("after_slice_partition.dot", scheduler);
+				.dumpGraph("after_slice_partition.dot", scheduler);
 		graphSchedule.getSSG().dumpGraph("slice_graph.dot", scheduler, false);
-
 		// if load balancing, find candidiate fission groups to load balance
 		if (KjcOptions.loadbalance) {
 			LoadBalancer.findCandidates();
@@ -241,15 +236,15 @@ public class SMPBackend {
 		RotatingBuffer.createBuffers(graphSchedule);
 
 		// now convert to Kopi code plus communication commands
-		backEndFactory = new SMPBackEndFactory(chip, scheduler, dominators, filterToThreadId);
+		backEndFactory = new SMPBackEndFactory(chip, scheduler, dominators,
+				filterToThreadId);
 		backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
 
 		// calculate computation to communication ratio
 		if (KjcOptions.sharedbufs && KjcOptions.numbers > 0) {
 			calculateCompCommRatio(graphSchedule);
 		}
-		
-		
+
 	}
 
 	/**
@@ -275,12 +270,13 @@ public class SMPBackend {
 		// when ready
 		if (at.dms.kjc.smp.SMPBackend.scheduler.isSMD())
 			new at.dms.kjc.smp.GeneratePrimePumpScheduleSMD(schedule)
-		.schedule(slicer.getFilterGraph());
+					.schedule(slicer.getFilterGraph());
 		else
 			new GeneratePrimePump(schedule).schedule(slicer.getFilterGraph());
 
 		// Still need to generate the steady state schedule!
 		schedule.setSchedule(DataFlowOrder.getTraversal(slicer.getTopFilters()));
+
 	}
 
 	/**
@@ -289,13 +285,10 @@ public class SMPBackend {
 	 */
 	private static void setScheduler() {
 		if (KjcOptions.partitioner.equals("tmd")) {
-			System.out.println("SMPBackend.setScheduler scheduler=TMDBinPackFissAll");
 			scheduler = new TMDBinPackFissAll();
 		} else if (KjcOptions.partitioner.equals("oldtmd")) {
-			System.out.println("SMPBackend.setScheduler scheduler=TMD");
 			scheduler = new TMD();
 		} else if (KjcOptions.partitioner.equals("smd")) {
-			System.out.println("SMPBackend.setScheduler scheduler=SMD");
 			scheduler = new SMD();
 		} else {
 			System.err.println("Unknown Scheduler Type!");

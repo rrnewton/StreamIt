@@ -104,14 +104,14 @@ public class ProcessFilterWorkNode {
 					InputPort inputPort = edge.getDest();
 					String threadId = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]).toString();
 					
-					System.out.println("PushPopReplacingVisitor.visitPopExpression filter=" 
-							+ filter.getParent().toString() 
-							+ " outputPort.getSSG().getTopFilters()[0]=" 
-							+ outputPort.getSSG().getTopFilters()[0]
-									+ " inputPort.getSSG().getTopFilters()[0]=" 
-									+ inputPort.getSSG().getTopFilters()[0]
-
-							);
+//					System.out.println("PushPopReplacingVisitor.visitPopExpression filter=" 
+//							+ filter.getParent().toString() 
+//							+ " outputPort.getSSG().getTopFilters()[0]=" 
+//							+ outputPort.getSSG().getTopFilters()[0]
+//									+ " inputPort.getSSG().getTopFilters()[0]=" 
+//									+ inputPort.getSSG().getTopFilters()[0]
+//
+//							);
 					
 					
 					//String threadId = filterToThreadId.get(filter.getParent())
@@ -193,7 +193,7 @@ public class ProcessFilterWorkNode {
 			SMPBackEndFactory backEndBits, boolean isDynamicPop,
 			boolean isDynamicPush) {
 
-		System.out.println("ProcessFilterWorkNode.getFilterCode");
+		// System.out.println("ProcessFilterWorkNode.getFilterCode");
 
 		CodeStoreHelper filterCode = CodeStoreHelper
 				.findHelperForSliceNode(filter);
@@ -236,7 +236,7 @@ public class ProcessFilterWorkNode {
 		final String pushName;
 		final String popManyName;
 
-		System.out.println("ProcessFilterWorkNode.makeFilterCode");
+		// System.out.println("ProcessFilterWorkNode.makeFilterCode");
 
 		if (inputChannel != null) {
 			peekName = inputChannel.peekMethodName();
@@ -248,8 +248,8 @@ public class ProcessFilterWorkNode {
 			popManyName = "/* pop(N) from non-existent channel */";
 		}
 
-		System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
-				+ filter + " popName=" + popName);
+		//System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
+		//		+ filter + " popName=" + popName);
 
 		if (outputChannel != null) {
 			pushName = outputChannel.pushMethodName();
@@ -257,8 +257,8 @@ public class ProcessFilterWorkNode {
 			pushName = "/* push() to non-existent channel */";
 		}
 
-		System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
-				+ filter + " popName=" + popName + " pushName=" + pushName);
+		//System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
+		//		+ filter + " popName=" + popName + " pushName=" + pushName);
 
 		CodeStoreHelper helper = backEndFactory.getCodeStoreHelper(filter);
 		JMethodDeclaration[] methods = helper.getMethods();
@@ -267,11 +267,11 @@ public class ProcessFilterWorkNode {
 				.getFilterToThreadId();
 		Map<String, String> dominators = backEndFactory.getDominators();
 
-		System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
-				+ filter + " ID=" + filterToThreadId.get(filter.getParent()));
+		//System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
+		//		+ filter + " ID=" + filterToThreadId.get(filter.getParent()));
 
-		System.out.println("** ProcessFilterWorkNode.makeFilterCode filter="
-				+ filter + " dominates=" + dominators.get(filter.toString()));
+		//System.out.println("** ProcessFilterWorkNode.makeFilterCode filter="
+		//		+ filter + " dominates=" + dominators.get(filter.toString()));
 
 		// relies on fact that a JMethodDeclaration is not replaced so
 		// work, init, preWork are still identifiable after replacement.
@@ -353,8 +353,8 @@ public class ProcessFilterWorkNode {
 		// remember that this tile has code that needs to execute
 		codeStore.setHasCode();
 
-		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="
-				+ filterNode);
+//		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="
+//				+ filterNode);
 
 		filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
 		// We should only generate code once for a filter node.
@@ -367,11 +367,11 @@ public class ProcessFilterWorkNode {
 		Filter[] graph = ssg.getFilterGraph();
 		int last = graph.length - 1;
 
-		System.out
-				.println("smp.ProcessFitlerWorkNode.doit(), graph[0].getWorkNode()="
-						+ graph[0].getWorkNode()
-						+ "graph[last].getWorkNode()="
-						+ graph[last].getWorkNode());
+//		System.out
+//				.println("smp.ProcessFitlerWorkNode.doit(), graph[0].getWorkNode()="
+//						+ graph[0].getWorkNode()
+//						+ "graph[last].getWorkNode()="
+//						+ graph[last].getWorkNode());
 
 		// A particular filter will only have dynamic input if it is
 		// the top node of an SSG, and if the SSG has dynamic input.
@@ -383,9 +383,9 @@ public class ProcessFilterWorkNode {
 			hasDynamicOutput = ssg.hasDynamicOutput();
 		}
 
-		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="
-				+ filterNode + "hasDynamicInput=" + hasDynamicInput
-				+ " hasDynamicOutput=" + hasDynamicOutput);
+//		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="
+//				+ filterNode + "hasDynamicInput=" + hasDynamicInput
+//				+ " hasDynamicOutput=" + hasDynamicOutput);
 
 		if (filterCode == null) {
 
@@ -409,11 +409,11 @@ public class ProcessFilterWorkNode {
 				outputBuffer = RotatingBuffer.getOutputBuffer(filterNode);
 			}
 
-			System.out.println("ProcessFitlerWorkNode.doit filter="
-					+ filterNode + " filterCode=null");
-			System.out.println("ProcessFitlerWorkNode.doit filter="
-					+ filterNode + " inputBuffer is null == "
-					+ (inputBuffer == null));
+//			System.out.println("ProcessFitlerWorkNode.doit filter="
+//					+ filterNode + " filterCode=null");
+//			System.out.println("ProcessFitlerWorkNode.doit filter="
+//					+ filterNode + " inputBuffer is null == "
+//					+ (inputBuffer == null));
 
 			filterCode = getFilterCode(filterNode, inputBuffer, outputBuffer,
 					backEndFactory, hasDynamicInput, hasDynamicOutput);
@@ -467,9 +467,9 @@ public class ProcessFilterWorkNode {
 	protected void standardPrimePumpProcessing(boolean hasDynamicInput) {
 		// TODO: We need to change this so we have the correct prime pump
 		// processing.
-		System.out
-				.println("ProcessFilterWorkNode.standardPrimePumpProcessing, hasDynamicInput="
-						+ hasDynamicInput);
+//		System.out
+//				.println("ProcessFilterWorkNode.standardPrimePumpProcessing, hasDynamicInput="
+//						+ hasDynamicInput);
 		if (hasDynamicInput) {
 			System.out
 					.println("WARNING: need to change ProcessFilterWorkNode.standardPrimePumpProcessing to have the correct schedule");
@@ -503,26 +503,26 @@ public class ProcessFilterWorkNode {
 			basicCodeWritten.put(filterNode, true);
 		}
 
-		System.out
-				.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
-						+ filterNode.getFilter().getName()
-						+ " isDynamicPop="
-						+ isDynamicPop);
+//		System.out
+//				.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
+//						+ filterNode.getFilter().getName()
+//						+ " isDynamicPop="
+//						+ isDynamicPop);
 		if (isDynamicPop) {
 			Map<Filter, Integer> filterToThreadId = backEndFactory
 					.getFilterToThreadId();
 			//String threadId = filterToThreadId.get(filterNode.getParent())
 
-			for (Filter f : filterToThreadId.keySet()) {
-				System.out
-				.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" + f.toString()
-						+ " has thread index=" + filterToThreadId.get(f).toString());					
-			}
+//			for (Filter f : filterToThreadId.keySet()) {
+//				System.out
+//				.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" + f.toString()
+//						+ " has thread index=" + filterToThreadId.get(f).toString());					
+//			}
 			
-			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode="+ filterNode.toString());
-			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getAsFilter()="+ filterNode.getAsFilter());
-			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getParent()="+ filterNode.getParent());
-			
+//			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode="+ filterNode.toString());
+//			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getAsFilter()="+ filterNode.getAsFilter());
+//			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getParent()="+ filterNode.getParent());
+//			
 			
 			
 			
@@ -532,10 +532,10 @@ public class ProcessFilterWorkNode {
 			
 			
 			int threadIndex = Integer.parseInt(threadId);
-			System.out
-			.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
-					+ filterNode.getFilter().getName() +
-					" calling codeStore.addThreadHelper");
+//			System.out
+//			.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
+//					+ filterNode.getFilter().getName() +
+//					" calling codeStore.addThreadHelper");
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
 			codeStore.addSteadyThreadCall(threadIndex);
 
