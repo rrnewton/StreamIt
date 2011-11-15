@@ -1,0 +1,12 @@
+/**
+ * This tests parameterized filewriters.
+ */
+
+void->void pipeline FileReaderTest1 {
+    add FileReader< int >( "./test.in" );
+    add Sink();
+}
+
+int->void stateful filter Sink {
+    work pop 1 { println(pop()); }
+}
