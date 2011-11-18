@@ -94,6 +94,11 @@ public class StreamGraph {
 		 * ((FlattenAndPartition)getSlicer()).generatedIds) {
 		 * IDSliceRemoval.doit(id.getParent()); } }
 		 */
+		
+		//remove synchronization from the graph (remove ids added by the conversion
+		//to flatgraph
+		SynchRemoval.doit(ssg);
+		
 		InstallInitDistributions.doit(ssg.getFilterGraph());
 		// fix any rate skew introduced in conversion to Slice graph.
 		AddBuffering.doit(ssg, false, numCores);

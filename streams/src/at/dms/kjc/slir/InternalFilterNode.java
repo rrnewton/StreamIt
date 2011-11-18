@@ -103,6 +103,7 @@ public class InternalFilterNode implements at.dms.kjc.DeepCloneable      {
     }
 
     public Filter getParent() {
+        //System.out.println(this);
         assert parent != null : "parent not set for slice node";
         return parent;
     }

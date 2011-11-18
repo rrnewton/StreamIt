@@ -410,6 +410,8 @@ public class StaticSubGraph {
 //		System.out.println(topFilters);
 
 		io = ioList.toArray(new Filter[ioList.size()]);
+		
+
 	}
 
 	/**

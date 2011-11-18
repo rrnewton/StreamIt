@@ -649,6 +649,14 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         this.methods = methods;
     }
     
+    /**
+     * Return true if this node is an instance of IDFilterContent
+     * @return true if this node is an instance of IDFilterContent
+     */
+    public boolean isIdentityContent() {
+    	return this instanceof IDFilterContent;
+    }
+    
     
     
     /**
