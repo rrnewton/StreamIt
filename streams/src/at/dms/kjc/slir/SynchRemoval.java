@@ -19,6 +19,8 @@ public class SynchRemoval {
 		//loop over all the nodes in the ssg
 		//for the identity nodes, call IDRemoval on them
 		
+		System.out.println("Calling SynchRemoval on " + ssg);
+		
 		for (Filter filter : ssg.getFilterGraph()) {
 			if (filter.getWorkNodeContent().isIdentityContent()) {
 				IDFilterRemoval.doit(filter);

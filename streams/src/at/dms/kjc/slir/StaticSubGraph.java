@@ -276,7 +276,7 @@ public class StaticSubGraph {
 			assert input != null && output != null && filterNode != null;
 
 			// set up the slice
-			Filter filter = new Filter();
+			Filter filter = new Filter(this);
 			input.setNext(filterNode);
 			filterNode.setPrevious(input);
 			filterNode.setNext(output);

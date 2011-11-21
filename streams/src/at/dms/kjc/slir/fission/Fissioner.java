@@ -652,7 +652,7 @@ public class Fissioner {
     
     private void createIDInputSlice() {
         //create the ID slice
-        idInput = IDFilterContent.createIDSlice();
+        idInput = IDFilterContent.createIDSlice(slicer);
         
         //set the init mult of the id
         int items = 0;
@@ -686,7 +686,7 @@ public class Fissioner {
     }
 
     private void createIDOutputSlice() {
-        idOutput = IDFilterContent.createIDSlice();
+        idOutput = IDFilterContent.createIDSlice(slicer);
         
         //set the init mult of the id
         int initItems = fInfo.totalItemsSent(SchedulingPhase.INIT);

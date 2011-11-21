@@ -258,7 +258,7 @@ public class AddBuffering {
         newOutput.setPrevious(filter);
         
         //the new slice
-        Filter bufferingSlice = new Filter();
+        Filter bufferingSlice = new Filter(ssg);
         bufferingSlice.setInputNode(newInput);
         bufferingSlice.setOutputNode(newOutput);
         bufferingSlice.setWorkNode(filter);

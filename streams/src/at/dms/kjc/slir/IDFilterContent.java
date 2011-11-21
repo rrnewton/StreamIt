@@ -74,7 +74,7 @@ public class IDFilterContent extends WorkNodeContent {
     /**
      * Create and return a slice with a single ID filter.
      */
-    public static Filter createIDSlice() {
+    public static Filter createIDSlice(StaticSubGraph ssg) {
         InputNode input = new InputNode();
         OutputNode output = new OutputNode();
         IDFilterContent id = new IDFilterContent();
@@ -85,7 +85,7 @@ public class IDFilterContent extends WorkNodeContent {
         filter.setNext(output);
         output.setPrevious(filter);
         
-        Filter slice = new Filter();
+        Filter slice = new Filter(ssg);
         slice.setInputNode(input);
         slice.setOutputNode(output);
         slice.setWorkNode(filter);

@@ -13,6 +13,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
 	protected InputNode head;
     protected OutputNode tail;
     protected WorkNode workNode;
+    protected StaticSubGraph parent;
     
     /*
      * public Slice (Slice[] edges, Slice[] depends, InputSliceNode head) { if
@@ -27,10 +28,14 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     /**
      * Create filter with no internal nodes.
      */
-    public Filter() {
-    	/* Do nothing */
+    public Filter(StaticSubGraph parent) {
+    	this.parent = parent;
     }
 
+    
+    public StaticSubGraph getParent() {
+    	return parent;
+    }
     
     /**
      * After a slice has been cloned, set up the fields of the slicenodes included 
@@ -170,7 +175,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
 
     /** Returns a deep clone of this object. */
     public Object deepClone() {
-        at.dms.kjc.slir.Filter other = new at.dms.kjc.slir.Filter();
+        at.dms.kjc.slir.Filter other = new at.dms.kjc.slir.Filter(parent);
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);
         return other;

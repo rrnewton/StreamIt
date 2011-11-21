@@ -29,11 +29,33 @@ public class IDFilterRemoval {
         idInput = idSlice.getInputNode();
         idOutput = idSlice.getOutputNode();
         
+        //some special cases
+        if (s.getOutputNode().noOutputs() || s.getInputNode().noInputs())  
+        	removeIDNoIO();
+        
+        
         removeID(SchedulingPhase.INIT);
         removeID(SchedulingPhase.STEADY);
     }
     
+    private void removeIDNoIO() {
+    	assert idSlice.getInputNode().noInputs() && idSlice.getOutputNode().noOutputs();
+    	
+    	// if this id slice has no i/o, then we can just remove it
+    	// and the downstream filters become new roots
+    	
+    	for (InterFilterEdge edge : idSlice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
+    		idSlice.getParent().addTopSlice(edge.getDest().getParent());
+    	}
+    	
+    	//if this id was a root, remove it from the list of roots
+    	if (idSlice.getParent().isTopSlice(idSlice)) {
+    		idSlice.getParent().removeTopSlice(idSlice);
+    	}
+    }
+    
     private void removeID(SchedulingPhase phase) {
+    	
         //unroll 
         unroll(phase);
         //remove
