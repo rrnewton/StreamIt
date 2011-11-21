@@ -134,7 +134,6 @@ public class CommonPasses {
 		return streamGraph;
 
 	}
-
 	/**
 	 * Equivalent to one call of CommonPass run before re-factoring to have
 	 * multiple static subgraphs.
