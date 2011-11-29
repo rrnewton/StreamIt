@@ -212,7 +212,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * this input buffer has an address buffer for this input buffer.
      */
     protected void createAddressBufs() {
-       int addressBufsSize = filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY).size();
+       int addressBufsSize = filterNode.getParent().getInputNode().getSourceFilters(SchedulingPhase.STEADY).size();
        //if we are using this input buffer as an output buffer, then we don't need the address buffer
        //for the output buffer that is used for the upstream filter that is mapped to this tile
        if (hasLocalSrcFilter())
@@ -221,7 +221,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
        addressBufs = new SourceAddressRotation[addressBufsSize];
        
        int i = 0;
-       for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
+       for (Filter src : filterNode.getParent().getInputNode().getSourceFilters(SchedulingPhase.STEADY)) {
            Tile tile = TileraBackend.backEndBits.getLayout().getComputeNode(src.getWorkNode());
            if (tile == parent && hasLocalSrcFilter())
                continue;
@@ -284,7 +284,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         //mults of all the sources
         int maxRotationLength = 0;
         
-        for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
+        for (Filter src : filterNode.getParent().getInputNode().getSourceFilters(SchedulingPhase.STEADY)) {
             int diff = graphSchedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
             if (diff > maxRotationLength) {

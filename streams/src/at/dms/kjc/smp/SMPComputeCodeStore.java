@@ -220,7 +220,17 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		// of the filewriter buffer that is about to be written to, but was
 		// written to 2 steady-states
 		// ago
+		
 		WorkNode fileW = buf.filterNode;
+		
+		System.out.println("SMPComputeCodeStore.addPrintOutputCode filter=" + filter.toString() 
+					+ " fileW.isFileOutput()=" + fileW.isFileOutput() 
+					+ " buf=" + buf.toString()	
+					+ " buf.getRotationLength()=" +buf.getRotationLength()
+					);				
+
+		
+		
 		assert fileW.isFileOutput();
 		// because of this scene we need a rotation length of 2
 		assert buf.getRotationLength() == 2;

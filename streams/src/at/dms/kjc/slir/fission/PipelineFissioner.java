@@ -100,7 +100,7 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
         Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // If sources are fizzed
@@ -152,7 +152,7 @@ public class PipelineFissioner {
         int sliceCopyDown = filterInfo.copyDown;
 
         // Get Slice sources and dests
-        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
         Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         // Check to see if Slice is a source/sink.  Don't fizz source/sink.
@@ -193,7 +193,7 @@ public class PipelineFissioner {
 
         // Make sure that dests only pop from this Slice
         for(int x = 0 ; x < dests.length ; x++) {
-            if(dests[x].getInputNode().getSourceSlices(SchedulingPhase.STEADY).size() > 1) {
+            if(dests[x].getInputNode().getSourceFilters(SchedulingPhase.STEADY).size() > 1) {
                 if(debug) System.out.println("Can't fizz: Dests for Slice receives from other Slices");
                 return false;
             }
@@ -329,7 +329,7 @@ public class PipelineFissioner {
 
         // Get Slice sources and destinations, ordered by how they were
         // originally fizzed
-        Filter sources[] = slice.getInputNode().getSourceSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
+        Filter sources[] = slice.getInputNode().getSourceFilters(SchedulingPhase.STEADY).toArray(new Filter[0]);
         Filter dests[] = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).toArray(new Filter[0]);
 
         if(sources.length > 1)

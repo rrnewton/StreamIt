@@ -343,7 +343,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
      * 
      * @return a set of all the slices that are inputs to this slice.
      */
-    public Set<Filter> getSourceSlices(SchedulingPhase phase) {
+    public Set<Filter> getSourceFilters(SchedulingPhase phase) {
         HashSet<Filter> slices = new HashSet<Filter>();
         for (InterFilterEdge edge : getSourceList(phase)) {
             slices.add(edge.getSrc().getParent());

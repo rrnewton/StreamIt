@@ -47,6 +47,7 @@ public class ProcessFileReader {
     }
      
     public void processFileReader() {
+    	System.out.println("ProcessFileReader.processFileReader");
         if (phase == SchedulingPhase.INIT) {
             fileNames.add(fileInput.getFileName());
             allocateAndCommunicateAddrs();

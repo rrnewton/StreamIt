@@ -242,9 +242,11 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 			SchedulingPhase whichPhase, SMPMachine chip) {
 
 		if (filter.isPredefined()) {
-			if (filter.isFileInput())
+			if (filter.isFileInput()) {
+				System.out.println("SMPBackEndFactory.processFilterWorkNode filter.isFileInput()=true");
 				(new ProcessFileReader(filter, whichPhase, this))
 						.processFileReader();
+			}
 			else if (filter.isFileOutput()) {
 				(new ProcessFileWriter(filter, whichPhase, this))
 						.processFileWriter();

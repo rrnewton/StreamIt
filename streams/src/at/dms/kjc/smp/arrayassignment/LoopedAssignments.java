@@ -103,6 +103,7 @@ public class LoopedAssignments implements AAStatement {
                 return Util.toStmt(memcpy);
                 
             } else {
+            	System.out.println("LoopedAssignments.toJStmt");
                 // make a loop
                 String iv = "__ias__";
                 String srcStrideStr = (srcStride == 1 ? iv : iv + " * " + srcStride);
@@ -110,6 +111,7 @@ public class LoopedAssignments implements AAStatement {
                 String loop = "for (int " + iv + " = 0; " + iv + " < " + iterations + "; " + iv + "++) ";
                 loop += dstBufName + "[" + dstOffset + dstStartIndex + " + " + dstStrideStr + "] = " + 
                     srcBufName + "[" + srcOffset + srcStartIndex + " + " + srcStrideStr + "]";
+            	System.out.println("LoopedAssignments.toJStmt loop=" + loop);
                 return Util.toStmt(loop);
             }
         } else {

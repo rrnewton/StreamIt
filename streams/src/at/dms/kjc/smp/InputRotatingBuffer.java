@@ -140,28 +140,37 @@ public class InputRotatingBuffer extends RotatingBuffer {
      */
     protected void setRotationLength(BasicSpaceTimeSchedule schedule) {
         //calculate the rotation length
-
+    	System.out.println("InputRotatingBuffer.setRotationLength called buffer=" + this.toString());
         int destMult;
         if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filterNode.getParent())) {
             destMult = schedule.getPrimePumpMult(FissionGroupStore.getUnfizzedSlice(filterNode.getParent()));
+            System.out.println("InputRotatingBuffer.setRotationLength if IF condition destMult=" + destMult);
         }
         else {
             destMult = schedule.getPrimePumpMult(filterNode.getParent());
+            System.out.println("InputRotatingBuffer.setRotationLength if ELSE condition destMult=" + destMult);
         }
 
         //first find the max rotation length given the prime pump 
         //mults of all the sources
         int maxRotationLength = 0;
         
-        for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
-            int diff = schedule.getPrimePumpMult(src) - destMult; 
+        
+    	System.out.println("InputRotatingBuffer.setRotationLength filterNode.getParent().getInputNode().getSourceFilters(SchedulingPhase.STEADY).size()=" + filterNode.getParent().getInputNode().getSourceFilters(SchedulingPhase.STEADY).size());
+        
+        for (Filter src : filterNode.getParent().getInputNode().getSourceFilters(SchedulingPhase.STEADY)) {        	        	
+        	int diff = schedule.getPrimePumpMult(src) - destMult; 
             assert diff >= 0;
+            
+        	System.out.println("InputRotatingBuffer.setRotationLength src=" + src.toString() + " diff=" + diff);
+            
             if (diff > maxRotationLength) {
                 maxRotationLength = diff;
             }
         }
 
         rotationLength = maxRotationLength + 1;
+    	System.out.println("InputRotatingBuffer.setRotationLength rotationLength=" + rotationLength);
     }
 
     /**
@@ -236,7 +245,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
        List<SourceAddressRotation> addressBufsList = new LinkedList<SourceAddressRotation>();
 
        int i = 0;
-       for (Filter src : filterNode.getParent().getInputNode().getSourceSlices(SchedulingPhase.STEADY)) {
+       for (Filter src : filterNode.getParent().getInputNode().getSourceFilters(SchedulingPhase.STEADY)) {
            if(KjcOptions.sharedbufs && FissionGroupStore.isFizzed(src)) {
                FissionGroup group = FissionGroupStore.getFissionGroup(src);
                for(Filter fizzedSlice : group.fizzedSlices) {
