@@ -21,12 +21,15 @@ public class SynchRemoval {
 		
 		System.out.println("Calling SynchRemoval on " + ssg);
 		
+		ssg.dumpGraph("before-synchremoval-" + ssg.toString() + ".dot");
+		
 		for (Filter filter : ssg.getFilterGraph()) {
 			if (filter.getWorkNodeContent().isIdentityContent()) {
 				IDFilterRemoval.doit(filter);
 			}
 		}
 		
+		ssg.dumpGraph("after-synchremoval-" + ssg.toString() + ".dot");
 	}
 	
 }

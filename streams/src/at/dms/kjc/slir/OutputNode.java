@@ -272,9 +272,15 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
 
         InterFilterEdge[][] newEdges = new InterFilterEdge[curPort + 1][];
         int[] newWeights = new int[curPort + 1];
-
+        
         System.arraycopy(edges, 0, newEdges, 0, curPort + 1);
         System.arraycopy(weights, 0, newWeights, 0, curPort + 1);
+        
+        //if all has been reduced to a single port then the weight should be 1 on 
+        //the lone port
+        if (curPort == 0) {
+        	newWeights[0] = 1;
+        }
 
         //set the new weights and the dests
         set(newWeights, newEdges, phase);
