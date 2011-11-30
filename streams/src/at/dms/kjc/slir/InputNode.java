@@ -1,6 +1,8 @@
 package at.dms.kjc.slir;
 
 import at.dms.util.Utils;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.LinkedList;
@@ -102,6 +104,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     public void canonicalize(SchedulingPhase phase) {
         if (getWeights(phase).length == 0)
             return;
+        
+        collapse(phase);
 
         int[] weights = new int[getWeights(phase).length];
         InterFilterEdge[] edges = new InterFilterEdge[getWeights(phase).length];
@@ -137,6 +141,74 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
 
         //set the new weights and the dests
         set(newWeights, newEdges, phase);
+    }
+    
+    public void collapse(SchedulingPhase phase) {
+    	//do nothing if there are no weights or if there is only one weight/source
+    	if (this.getSources(phase).length <= 1)
+    		return;
+    	
+    	//System.out.println(this.getSources(phase).length + " " + phase + " " + getParent());
+    	
+    	InterFilterEdge[] flatEdges = getFlatEdges(phase);
+    	
+    	int ahead = 1;
+    	
+    	for (ahead = 1; ahead < flatEdges.length / 2; ahead++) {
+    		//if the repetition length does not divide the total length equally
+    		//we have no chance to collapse
+    		if (flatEdges.length % ahead != 0)
+    			continue;
+    		
+    		boolean canCollapse = true;
+    		for (int reps = 0; reps < flatEdges.length / ahead; reps ++) {
+    			for (int pos = 0; pos < ahead; pos++) {
+    				if (!flatEdges[pos].equals(flatEdges[(reps * ahead) + pos])) {
+    					canCollapse = false;
+    					break;
+    				}
+    			}
+    			if (!canCollapse)
+    				break;
+    		}
+    				
+    		if (canCollapse) {
+    			//System.out.println(" ** Can collapse weights: " + getParent());
+    			InterFilterEdge[] newEdges = new InterFilterEdge[ahead];
+    			for (int i = 0; i < ahead; i++)
+    				newEdges[i] = flatEdges[i];
+    			int[] newWeights =  new int[ahead];
+    	        Arrays.fill(newWeights, 1);
+    	        
+    	        //set the new weights and the dests
+    	        set(newWeights, newEdges, phase);
+    	        //return after the first call, it will be the most collapsed
+    	        return;
+    		}
+    	}
+    }
+    
+    
+    /**
+     * Return a source edge array that is the flat representation of this input distribution, meaning
+     * that all weights are 1, repetitions are unrolled.
+     * 
+     * @param phase The scheduling phase
+     * @return The unrolled array of edges
+     */
+    public InterFilterEdge[] getFlatEdges(SchedulingPhase phase) {
+    	InterFilterEdge[] flat = new InterFilterEdge[this.totalWeights(phase)];
+    	
+    	int pos = 0;
+    	for (int i = 0; i < this.getSources(phase).length; i++) {
+    		for (int w = 0; w < this.getWeights(phase)[i]; w++) {
+    			flat[pos++] = this.getSources(phase)[i];
+    		}
+    	}
+    	
+    	assert pos == flat.length; 
+    	
+    	return flat;
     }
 
     /*
