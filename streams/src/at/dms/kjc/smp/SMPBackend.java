@@ -145,6 +145,9 @@ public class SMPBackend {
 			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
 			SIRHelper[] helpers, SIRGlobal global) {
 
+		//turn sw pipelining off for now.
+		KjcOptions.noswpipe = true;
+		
 		checkArguments();
 		setScheduler();
 
