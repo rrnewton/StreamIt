@@ -422,6 +422,14 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     public void setInitMult(int im) {
         initMult = im;
     }
+    
+    public void setMult(SchedulingPhase phase, int im) {
+    	assert phase == SchedulingPhase.STEADY || phase == SchedulingPhase.INIT;
+    	if (phase == SchedulingPhase.STEADY)
+    		setSteadyMult(im);
+    	else
+    		setInitMult(im);
+    }
    
     
     /** 

@@ -188,7 +188,7 @@ public class WorkNodeInfo {
         }
         
         initItemsNeeded = (prePeek + bottomPeek + Math.max((initFire - 2), 0) * pop);
-        assert initItemsRec >= initItemsNeeded : initItemsRec + " " + initItemsNeeded;
+        assert initItemsRec >= initItemsNeeded : initItemsRec + " " + initItemsNeeded + " " + sliceNode;
         
         int initItemsPopped = (prePop + ((initFire - 1) * pop));
         

@@ -298,8 +298,8 @@ public class StaticSubGraph {
 				LinkedList<Integer> outWeights = new LinkedList<Integer>();
 				HashMap<InputNode, InterFilterEdge> newEdges = new HashMap<InputNode, InterFilterEdge>();
 				for (int i = 0; i < node.ways; i++) {
-					if (node.weights[i] == 0)
-						continue;
+					//if (node.weights[i] == 0)
+					//	continue;
 					InterFilterEdge edge = new InterFilterEdge(
 							output,
 							filterNodes.inputNodes.get(node.getEdges()[i].contents));
@@ -351,8 +351,8 @@ public class StaticSubGraph {
 				LinkedList<Integer> inWeights = new LinkedList<Integer>();
 				LinkedList<InterFilterEdge> inEdges = new LinkedList<InterFilterEdge>();
 				for (int i = 0; i < node.inputs; i++) {
-					if (node.incomingWeights[i] == 0)
-						continue;
+					//if (node.incomingWeights[i] == 0)
+					//	continue;
 
 					assert edges != null : "Line 398; edges==null";
 					assert filterNodes.outputNodes != null : "Line 398; outputNodes==null";

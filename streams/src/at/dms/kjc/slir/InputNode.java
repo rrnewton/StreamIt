@@ -1,7 +1,7 @@
 package at.dms.kjc.slir;
 
 import at.dms.util.Utils;
-
+import java.util.Iterator;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -425,6 +425,34 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     
     public CType getType() {
         return getNextFilter().getFilter().getInputType();
+    }
+    
+    /**
+     * return true if all of the incoming filters drive the input to the same number of executions
+     * for the given scheduling phase.
+     * 
+     * @param phase 
+     * @return
+     */
+    public boolean balancedInput(SchedulingPhase phase) {
+    	Iterator<InterFilterEdge> edges = getSourceSet(phase).iterator();
+    	if (!edges.hasNext())
+    		return true;
+    	
+    	InterFilterEdge edge = edges.next();
+    	int reps = 0;
+    	if (getWeight(edge, phase) > 0)
+    		reps = WorkNodeInfo.getFilterInfo(edge.getSrc().getPrevFilter()).totalItemsSent(phase) / getWeight(edge, phase);
+    	while (edges.hasNext()) {
+    		int currentReps = 0;
+    		edge = edges.next();
+    		if (getWeight(edge, phase) > 0)
+        		currentReps = WorkNodeInfo.getFilterInfo(edge.getSrc().getPrevFilter()).totalItemsSent(phase) / getWeight(edge, phase);
+    		if (reps != currentReps)
+    			return false;
+    	}
+    	
+    	return true;
     }
     
     /** @return total weight on all connections to a single Edge. 

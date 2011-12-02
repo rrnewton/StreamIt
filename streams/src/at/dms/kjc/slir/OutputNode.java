@@ -594,11 +594,11 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
      * Return the sum of the weights before index of the weights array.
      */
     public int weightBefore(int index, SchedulingPhase phase) {
-        assert index < weights.length;
+        assert index < getWeights(phase).length: phase + " " + this.getParent();
         int total = 0;
                 
         for (int i = 0; i < index; i++)
-            total += weights[i];
+            total += getWeights(phase)[i];
         
         return total;
     }

@@ -17,16 +17,12 @@ import at.dms.kjc.*;
  * <p>For an input slice node, each incoming edge may not have the same multiplicity 
  * and/or for an output slice node, the upstream filter may push a number of nodes 
  * that does not divide evenly by the total weights of the edges of the output node.</p> 
- * <p>The SpaceTime compiler assumes that there are no items buffered at input slice
- * nodes or output slice nodes, so to execute an integral number of times. To 
- * force this, this pass adds buffered at a slice by adding an identity filter to the 
- * end of a slice.  It will balance the incoming edges of an input slice node, and/or
- * make sure the output slice node executes an integral number of times.<p>
+ * <p>Check that neither of these cases is true.  For now, if so just die.<p>
  * 
  * @author mgordon
  *
  */
-public class AddBuffering {
+public class CheckBuffering {
     private StaticSubGraph ssg;
     private HashSet<Filter> editedSlices;
     private boolean limitTiles;
@@ -39,11 +35,11 @@ public class AddBuffering {
      * @param spaceTime The space time schedule.
      */
     public static void doit(StaticSubGraph spaceTime, boolean limitTiles, int totalTiles) {
-        System.out.println("Equalizing splits and joins by buffering...");
-        new AddBuffering(spaceTime,limitTiles,totalTiles).doitInternal();
+        System.out.println("Checking if init schedule is legal...");
+        new CheckBuffering(spaceTime,limitTiles,totalTiles).doitInternal();
     }
     
-    private AddBuffering(StaticSubGraph st, boolean limit, int tt) {
+    private CheckBuffering(StaticSubGraph st, boolean limit, int tt) {
         this.ssg = st;
         this.limitTiles = limit;
         this.totalTiles = tt;
@@ -66,7 +62,7 @@ public class AddBuffering {
             Filter slice = ssg.getFilterGraph()[t];
             //check all the outgoing edges to see if they are balanced in the init
             //and fix them if we have to
-            fixOutputNode(slice.getOutputNode());
+            checkOutputNode(slice.getOutputNode());
         }
         //don't forget to reset the filter infos after each iteration
         WorkNodeInfo.reset();
@@ -78,7 +74,7 @@ public class AddBuffering {
      * 
      * @param output The output slice node
      */
-    private void fixOutputNode(OutputNode output) {
+    private void checkOutputNode(OutputNode output) {
         WorkNode filterNode = output.getPrevFilter();
         WorkNodeContent filter = filterNode.getFilter();
         
@@ -87,20 +83,7 @@ public class AddBuffering {
             return;
         
         if (filter.initItemsPushed() % output.totalWeights(SchedulingPhase.INIT) != 0) {
-            //if the number of items of produced by the filter does not
-            //divide equal the total weights of the output slice node
-            //we have to buffer to items by adding an upstream id filter
-            int itemsToBuffer = filter.initItemsPushed() % output.totalWeights(SchedulingPhase.INIT);
-            int itemsIDShouldPass = filter.initItemsPushed() - itemsToBuffer;
-            Filter slice = output.getParent();
-            System.out.println(" * Adding buffering after " + slice.getOutputNode().getPrevious() + 
-                    " to equalize output, pass: " + itemsIDShouldPass + " buffer: " + itemsToBuffer);
-            //System.out.println("   " + filter.initItemsPushed() + " % " + 
-            //        output.totalWeights() + " != 0");
-            addIDToSlice(slice, itemsIDShouldPass);
-            
-            //remember that we have edited this slice...
-            editedSlices.add(slice);
+           assert false : "Problem with init schedule: weights not integral of push amount for " + filter;
         }
     }
     
@@ -159,15 +142,6 @@ public class AddBuffering {
             double mult = 
                 (initItemsPushed(edge) / ((double)input.getWeight(edge, SchedulingPhase.INIT)));
             
-            //System.out.print(edge + " mult: " + mult + ": ");
-            //System.out.println(initItemsPushed(edge) + " / " + input.getWeight(edge));
-            
-            //remember the mult of this edge
-            
-            //System.out.println(" * Mult for " + edge + " = " + mult +
-            //        " = " + initItemsPushed(edge) + " / " + 
-            //        input.getWeight(edge));
-            
             mults.put(edge, new Double(mult));
             //remember the min, it will be the new multiplicity for all the edges
             if (mult < minMult)
@@ -193,33 +167,7 @@ public class AddBuffering {
             double myMult = mults.get(edge).doubleValue();
             //if the mult is not equal to the target mult, we must buffer
             if (myMult != minMult) {
-                System.out.println(" * For " + input + " change " + edge + " from "  + 
-                        mults.get(edge).doubleValue() + " to " + minMult);
-                
-                changes = true;
-                Filter slice = edge.getSrc().getParent();
-                //System.out.println(" * Adding output buffering to " + slice);
-                //make sure that we have not already added buffering to this 
-                //slice, if we try to fix it will mess up the already fixed input
-                //slice node...
-                assert !editedSlices.contains(slice) : 
-                    "Trying to add different buffering amounts to " + slice;
-                //the number of items that we should let pass in the init
-                //stage for the upstream filter, the rest that it produces in the
-                //init are buffered...
-                //System.out.println("   Now pass " + itemsToPass(slice, edge, minMult));
-                int itemsToPass = itemsToPass(slice, edge, minMult);
-                if (legalToAddBufferingInSlice(slice, itemsToPass)) { 
-                    addIDToSlice(slice, itemsToPass);
-                    editedSlices.add(slice);
-                }
-                else {
-                    //since we cannot legally add the buffering inside the upstream slice
-                    //add a new buffering slice that will buffer all the items that
-                    //are produced greater than the new mult
-                    addNewBufferingSlice(slice, edge, 
-                            (int)(((double)minMult) * input.getWeight(edge, SchedulingPhase.INIT)));
-                }
+                //assert false : "Error in init stage: not all incoming edges of input node execute the same amount of times.";
             }
         }
         
@@ -373,42 +321,6 @@ public class AddBuffering {
                 ((double)edgeItems));
     }
     
-    /**
-     * Create an identity filter and add it to the end of slice.  The
-     * new identity filter will have an init multiplicity of 
-     * initMult and a steady-state multiplicity equal to the number 
-     * of items its upstream filter produces in the steady-state.
-     *   
-     * @param slice The slice to add to.
-     * @param initMult The init multiplicity of the new id filter.
-     */
-    private void addIDToSlice(Filter slice, int initMult) {
-        WorkNode oldLast = slice.getOutputNode().getPrevFilter();
-
-// removed check: can always convert to SimpleSlices
-// and check would fail for UniProcessor every time...
-       
-        //create the identity
-        SIRFilter identity = new SIRIdentity(oldLast.getFilter().getOutputType());
-        RenameAll.renameAllFilters(identity);
-        
-        //create the identity filter node...
-        WorkNode filter = 
-            new WorkNode(new WorkNodeContent(identity));
-        
-        //set the multiplicities
-        filter.getFilter().setInitMult(initMult);
-        filter.getFilter().setSteadyMult(oldLast.getFilter().getSteadyMult() *
-                oldLast.getFilter().getPushInt());
-        
-        //connect and re-finish slice
-        oldLast.setNext(filter);
-        filter.setPrevious(oldLast);
-        filter.setNext(slice.getOutputNode());
-        slice.getOutputNode().setPrevious(filter);
-        slice.finish();
-        
-    }
     
     /**
      * The number of items pushed onto this edge in the initialization

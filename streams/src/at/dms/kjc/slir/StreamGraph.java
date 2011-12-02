@@ -101,7 +101,7 @@ public class StreamGraph {
 		
 		InstallInitDistributions.doit(ssg.getFilterGraph());
 		// fix any rate skew introduced in conversion to Slice graph.
-		AddBuffering.doit(ssg, false, numCores);
+		CheckBuffering.doit(ssg, false, numCores);
 		// decompose any pipelines of filters in the Slice graph.
 		// slicer.ensureSimpleSlices();
 		return ssg;

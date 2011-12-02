@@ -28,18 +28,23 @@ public class IDFilterRemoval {
         idSlice = s;
         idInput = idSlice.getInputNode();
         idOutput = idSlice.getOutputNode();
-        
+
+        if (!idInput.balancedInput(SchedulingPhase.INIT) ||
+        		!idInput.balancedInput(SchedulingPhase.STEADY)) {
+        	System.out.println("Cannot remove ID filter: " + idSlice);
+        	return;
+        }
         //some special cases
         if (s.getOutputNode().noOutputs() || s.getInputNode().noInputs())  
         	removeIDNoIO();
         
-        
         removeID(SchedulingPhase.INIT);
         removeID(SchedulingPhase.STEADY);
     }
+  
     
     private void removeIDNoIO() {
-    	assert idSlice.getInputNode().noInputs() && idSlice.getOutputNode().noOutputs();
+    	assert idSlice.getInputNode().noInputs() || idSlice.getOutputNode().noOutputs();
     	
     	// if this id slice has no i/o, then we can just remove it
     	// and the downstream filters become new roots
@@ -55,17 +60,30 @@ public class IDFilterRemoval {
     }
     
     private void removeID(SchedulingPhase phase) {
-    	
-        //unroll 
-        unroll(phase);
-        //remove
-        remove(phase);
-        //re-roll
-        reroll(phase);
+
+    	//check to see if there is buffering in the id, if so, need to change multiplicities
+    	checkAndFixIDFilter(phase); 
+    	//unroll 
+    	unroll(phase);
+    	//remove
+    	remove(phase);
+    	//re-roll
+    	reroll(phase);
+    }
+    
+    
+    private void checkAndFixIDFilter(SchedulingPhase phase) {
+    	WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(idSlice.getWorkNode());
+    	if (fi.totalItemsReceived(phase) > fi.totalItemsSent(phase)) {
+    		
+    		//System.out.println("Needed to adjust ID multiplicity to remove it: " + idSlice + " " + phase + " " + max);
+    		idSlice.getWorkNode().getFilter().setMult(phase, fi.totalItemsReceived(phase));
+    		WorkNodeInfo.reset();
+    	}
     }
     
     private void remove(SchedulingPhase phase) {
-        assert idInput.getSources(phase).length == idOutput.getDests(phase).length : phase + " " +
+        assert idInput.getSources(phase).length == idOutput.getDests(phase).length : idSlice + " " + phase + " " +
             "input: " + idInput.getSources(phase).length + " output: " + idOutput.getDests(phase).length;
         InterFilterEdge[] idSources = idInput.getSources(phase);
         InterFilterEdge[][] idDests = idOutput.getDests(phase);
@@ -151,7 +169,9 @@ public class IDFilterRemoval {
                 return;
             }
         }
-        assert false : "Error in ID removal";
+        //no need for an assert there, because we don't have to find a dest for all items produced
+        //if we dont' find a dest, it will be buffered.
+        //assert false : "Error in ID removal: " + idSlice;
     }
     
     private InterFilterEdge[] replaceIDEdge(InterFilterEdge[] oldDests, InterFilterEdge[] toAdd) {
