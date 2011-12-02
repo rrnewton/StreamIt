@@ -233,14 +233,15 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		
 		assert fileW.isFileOutput();
 		// because of this scene we need a rotation length of 2
-		assert buf.getRotationLength() == 2;
+		//assert buf.getRotationLength() == 2: buf.getRotationLength();
 		// make sure that each of the inputs wrote to the file writer in the
 		// primepump stage
-		for (InterFilterEdge edge : fileW.getParent().getInputNode()
+		/*for (InterFilterEdge edge : fileW.getParent().getInputNode()
 				.getSourceSet(SchedulingPhase.STEADY)) {
-			assert SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult(
-					edge.getSrc().getParent()) == 1;
-		}
+			//assert SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult(
+			//		edge.getSrc().getParent()) == 1: SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult(
+			//				edge.getSrc().getParent());
+		}*/
 		int outputs = fileW.getFilter().getSteadyMult();
 		String type = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "%d"
 				: "%f";
