@@ -143,6 +143,8 @@ public class FuseSplit {
      * <sj> if it could fuse without creating fresh construct.
      */
     public static SIRStream fuse(SIRSplitJoin sj) {
+        
+    	
         // clear possible wrapper pipelines in children
         Lifter.lift(sj);
         // dispatch to simple fusion
@@ -222,6 +224,7 @@ public class FuseSplit {
      * result of the simple fusion.
      */
     private static SIRStream dispatchToSimple(SIRSplitJoin sj) {
+
         // revert to the older version of fusion if either:
 //        //   - the simplesjfusion tag is specified
         //   - there are no two stage filters AND there is no round-robin with peeking
@@ -857,6 +860,8 @@ public class FuseSplit {
                                                        SJChildInfo[] childInfo,
                                                        RepInfo rep,
                                                        Rate rate) {
+
+
         // Build the new work function; add the list of statements
         // from each of the component filters.
         JBlock newStatements = new JBlock();
@@ -985,6 +990,7 @@ public class FuseSplit {
                     // reference our var
                     JLocalVariableExpression ref = new JLocalVariableExpression(null,
                                                                                 var);
+                    
                     // Return new peek expression.
                     return new SIRPeekExpression(new JAddExpression(null, ref, arg),
                                                  oldTapeType);
@@ -1287,6 +1293,7 @@ public class FuseSplit {
                                          CType oldTapeType) {
             SIRPopExpression self = (SIRPopExpression)super.visitPopExpression(oldSelf, oldTapeType);
 
+
             // if not using the popped value, just adjust the index
             if (inExpressionStatement) {
                 JExpression lhs = new JFieldAccessExpression
@@ -1319,6 +1326,7 @@ public class FuseSplit {
                                           CType oldTapeType,
                                           JExpression oldArg) {
             SIRPeekExpression self = (SIRPeekExpression)super.visitPeekExpression(oldSelf, oldTapeType, oldArg);
+
             return FuseSplit.makeBufferPeek(childInfo.peekBuffer, self.getArg());
         }
     }

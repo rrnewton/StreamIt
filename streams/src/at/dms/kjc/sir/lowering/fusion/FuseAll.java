@@ -39,6 +39,7 @@ public class FuseAll implements StreamVisitor {
      */
     public static SIRPipeline fuse(SIRStream str, boolean strict) {
         // try fusing toplevel separately since noone contains it
+
         SIRPipeline wrapper = SIRContainer.makeWrapper(str);
         wrapper.reclaimChildren();
         FuseAll fuseAll = new FuseAll(strict);
