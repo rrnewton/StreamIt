@@ -672,6 +672,10 @@ public class EmitSMPCode extends EmitCode {
 		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("Makefile", false)));
 		
 		//p.println("CC = icc");
+		//p.println("UNAME := $(shell uname)");
+		//p.println("ifeq ($(UNAME), Darwin)");
+		//p.println("# do something for OSX");
+		//p.println("endif");
 		p.println("CC = g++");
 		p.println("CFLAGS = -O2 -vec-report0");
 		p.println("INCLUDES = ");
@@ -732,7 +736,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println("void setCPUAffinity(int core) {");
 		p.indent();
 
-		p.println("/*");
+		p.println("#ifndef __APPLE__");
 		p.println("cpu_set_t cpu_set;");
 		p.println("CPU_ZERO(&cpu_set);");
 		p.println("CPU_SET(core, &cpu_set);");
@@ -745,7 +749,7 @@ public class EmitSMPCode extends EmitCode {
 		p.outdent();
 		p.println("}");
 
-		p.println("*/");
+		p.println("#endif");
 		p.outdent();
 		p.println("}");
 		p.println();
