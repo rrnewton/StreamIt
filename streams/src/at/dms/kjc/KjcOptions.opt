@@ -745,3 +745,7 @@ longname		"sharedheap"
 /* 	   help		"For cluster, do not print out code in ifdefs that are not true for the compiled configuration." */
 
 
+longname		"regtest"
+	type		boolean
+	default		"false"
+	help		"Tell the compiler that we are compiling a test, might change decisions, like don't parallelize print statements."
