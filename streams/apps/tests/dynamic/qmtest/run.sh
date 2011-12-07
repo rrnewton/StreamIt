@@ -1,7 +1,48 @@
 #!/bin/sh
 
-# remove old tests
+tests="arrayinit 
+arraytest 
+builtins-test   
+cell   
+complex   
+complexid   
+constprop  
+dynamic  
+dynamic_rates  
+feedbackloop  
+field-init  
+field-prop  
+filereader  
+filewriter  
+fir-test  
+fission  
+flybit  
+fuse  
+fuse-test  
+fusion-scaling  
+hello-separate  
+hello-simple  
+hello-splits  
+indirect  
+lifter  
+linear-partition  
+lineartest  
+macro  
+nulljoiner  
+partition  
+peek-pipe  
+prework  
+recursive  
+rounding  
+script-ratios  
+simple-split  
+smp  
+splitjoins  
+struct  
+unroll  
+weighted-rr"
 
+# remove old tests
 if [ -d ${STREAMIT_HOME}/users.qms ]
 then
 rm -rf ${STREAMIT_HOME}/users.qms
@@ -11,11 +52,14 @@ fi
 ${STREAMIT_HOME}/regtest/qmtest/streamitqm clean
 
 # create the xml file
-echo "<regtest>
-  <test root=\"${STREAMIT_HOME}/apps/tests/complex\"/>
-  <test root=\"${STREAMIT_HOME}/apps/tests/fuse\"/>
-  <option target=\"smp2\"/>
-</regtest> " > smp.xml
+all="<regtest>\n"
+for f in ${tests}
+do
+ all+="  <test root=\"${STREAMIT_HOME}/apps/tests/${f}\"/>\n"
+done
+all+="  <option target=\"smp2\"/>\n"
+all+="</regtest>"
+echo ${all} > smp.xml
 
 #set up new test
 ${STREAMIT_HOME}/regtest/qmtest/streamitqm setup ${STREAMIT_HOME}/apps/tests/dynamic/qmtest/smp.xml
