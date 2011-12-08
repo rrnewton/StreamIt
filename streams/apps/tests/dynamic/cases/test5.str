@@ -12,12 +12,17 @@ void->float filter A {
 float->float stateful filter B {
   float count;
   init {
-     count = 0;
+     count = 0.0;
   }
-    work pop 1 push 1 {
-      pop();
-      push(count++);      
+  work pop 1 push 1 {
+   count = 0.1;
+   float x = pop();
+   for (int i = 0; i < 100000; i++) {
+     count += i - x;
    }
+
+   push(count++);      
+ }
 }
 
 float->float stateful filter C {
@@ -25,20 +30,23 @@ float->float stateful filter C {
   init {
      count = 0;
   }
-    work pop 1 push 1 {
-      pop();
-      push(count++);      
-   }
+  work pop 1 push 1 {
+    pop();
+    push(count++);      
+ }
 }
 
-float->void filter D {
+float->void stateful filter D {
+  init {
+     float y = 1.0;
+  }
    work pop 1 {
      do_work(1.0);
      println(pop());
    }
    
    float do_work(float x) {
-     float y = 1.0;
+     y = 1.0;
      for (int i = 0; i < 100000; i++) {
        y += i - x;
      }
