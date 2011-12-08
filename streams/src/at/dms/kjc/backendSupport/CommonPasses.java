@@ -15,6 +15,7 @@ import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
 import at.dms.kjc.common.ConvertLocalsToFields;
+import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRDummySink;
 import at.dms.kjc.sir.SIRDummySource;
@@ -55,6 +56,7 @@ import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
+import at.dms.util.SIRPrinter;
 
 /**
  * Common passes, useful in new back ends.
@@ -209,6 +211,10 @@ public class CommonPasses {
 			dup.percentStateless(str);
 			str = FusePipelines.fusePipelinesOfStatelessStreams(str);
 			StreamItDot.printGraph(str, "after-fuse-stateless.dot");
+			
+			SIRPrinter printer1 = new SIRPrinter("after-fuse-stateless.out");
+	        IterFactory.createFactory().createIter(str).accept(printer1);
+	        printer1.close();
 
 			// if we have a user defined partition, the user wants control
 			// otherwise, if any level is too big for the chip, then fuse
@@ -247,8 +253,8 @@ public class CommonPasses {
 		// If not software-pipelining, don't expect to
 		// split the stream graph horizontally so fuse
 		// pipelines down into individual filters.
-		if (KjcOptions.noswpipe)
-			str = FusePipelines.fusePipelinesOfFilters(str);
+		//if (KjcOptions.noswpipe)
+		//	str = FusePipelines.fusePipelinesOfFilters(str);
 
 		// Print stream graph after fissing and fusing.
 		StreamItDot.printGraph(str, "canonical-graph.dot");
