@@ -93,6 +93,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 
 	public SegmentedSIRGraph init(SIRStream str, boolean isDynamic) {
 		if (!isDynamic) {
+			System.out.println("SegmentedSIRGraph.init !Dynamic, no partitioning performed.");
 			this.addToSegmentedGraph(str);
 			return this;
 		}
