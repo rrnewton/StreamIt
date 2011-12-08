@@ -9,19 +9,15 @@ void->float filter A {
    }
 }
 
-float->float stateful filter B {
-  float count;
-  init {
-     count = 0.0;
-  }
+float->float filter B {
   work pop 1 push 1 {
-   count = 0.1;
    float x = pop();
+   int b_variable;
    for (int i = 0; i < 100000; i++) {
-     count += i - x;
-   }
+     b_variable += i;
+   }   
+   push(b_variable);
 
-   push(count++);      
  }
 }
 
@@ -36,17 +32,14 @@ float->float stateful filter C {
  }
 }
 
-float->void stateful filter D {
-  init {
-     float y = 1.0;
-  }
+float->void filter D {
    work pop 1 {
      do_work(1.0);
      println(pop());
    }
    
    float do_work(float x) {
-     y = 1.0;
+     float y = 1.0;
      for (int i = 0; i < 100000; i++) {
        y += i - x;
      }
@@ -54,7 +47,6 @@ float->void stateful filter D {
    }
 
 }
-
 
 void->void pipeline test5 {
     add A();
