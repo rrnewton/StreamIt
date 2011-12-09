@@ -240,7 +240,20 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	 */
 	public void processFilterWorkNode(WorkNode filter,
 			SchedulingPhase whichPhase, SMPMachine chip) {
+		System.out.println("SMPBackEndFactory.processFilterWorkNode()");
+		
+		switch (whichPhase) {
+			case PRIMEPUMP:
+				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PRIMEPUMP");
+			case INIT:
+				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = INIT");
+			case STEADY:
+				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = STEADY");
+			case PREINIT:
+				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PREINIT");
 
+		}
+		
 		if (filter.isPredefined()) {
 			if (filter.isFileInput()) {
 				System.out.println("SMPBackEndFactory.processFilterWorkNode filter.isFileInput()=true");
@@ -264,6 +277,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 			}
 
 			if (scheduler.isTMD()) {
+				System.out.println("SMPBackEndFactory.processFilterWorkNode() scheduler.isTMD() = true");
 				// if we are using the tmd scheduler we have to add barriers
 				// between each
 				// init/primepump call of different levels
@@ -290,8 +304,11 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 						levelLeftToProcessPP.put(level,
 								lsg.getLevels()[level].length);
 					}
+				} else if (whichPhase == SchedulingPhase.STEADY) {
+					System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase == SchedulingPhase.STEADY");
 				}
 			}
+		
 		}
 	}
 

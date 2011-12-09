@@ -190,7 +190,6 @@ public class SMPBackend {
 		}
 
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-
 			runSSG(ssg, filterToThreadId, dominated, dominators, threadIdToType);
 		}
 
@@ -207,9 +206,6 @@ public class SMPBackend {
 	private static void runSSG(StaticSubGraph ssg,
 			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
 			Map<String, String> dominators, Map<Integer, String> threadIdToType) {
-
-//		System.out.println("SMPBackend.runSSG ssg="
-//				+ ssg.getTopFilters()[0].getWorkNode());
 
 		// dump slice graph to dot file
 		ssg.dumpGraph("traces.dot", null);

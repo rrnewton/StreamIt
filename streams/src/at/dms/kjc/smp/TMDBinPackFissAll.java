@@ -58,6 +58,7 @@ public class TMDBinPackFissAll extends Scheduler {
      * of the graph. 
      */
     public void runLayout() {    	
+    	System.out.println("TMDBinPackFissAll.runLayout()");
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";            	
         

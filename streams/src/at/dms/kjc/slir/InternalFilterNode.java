@@ -11,7 +11,7 @@ public class InternalFilterNode implements at.dms.kjc.DeepCloneable      {
     private IntraFilterEdge toNext = null;  // internal to slice: remains null for OutputSliceNode
     private IntraFilterEdge toPrev = null;  // internal to slice: remains null for InputSliceNode
 
-    private Filter parent;
+    protected Filter parent;
 
     public InternalFilterNode getNext() {
         return (toNext == null)? null : toNext.getDest();

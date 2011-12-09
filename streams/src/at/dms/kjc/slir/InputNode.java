@@ -722,5 +722,11 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
         return 0;
     }
 
+	public boolean hasParent() {
+		if (parent == null)
+			return false;
+		else return true;
+	}
+
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

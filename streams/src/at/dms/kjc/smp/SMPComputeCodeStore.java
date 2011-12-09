@@ -60,6 +60,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 			return;
 
 		for (int t = 0; t < SMPBackend.chip.size(); t++) {
+			System.out.println("SMPComputeCodeStore.addBufferInitBarrier() SMPBackend.chip.size()=" + SMPBackend.chip.size());
 			SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(t)
 					.getComputeCode();
 			cs.addStatementToBufferInit("barrier_wait(&barrier)");
