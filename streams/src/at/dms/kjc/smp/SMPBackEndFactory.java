@@ -66,10 +66,9 @@ public class SMPBackEndFactory extends
 		this.setLayout(scheduler);
 		this.dominators = dominators;
 		this.filterToThreadId = filterToThreadId;
-
-		boolean isTMDBinPackFissAll = (scheduler instanceof TMDBinPackFissAll);
 		
-		if (scheduler.isTMD() || isTMDBinPackFissAll) {
+	
+		if (scheduler.isTMD()) {
 			// levelize the slicegraph
 			lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSSG()
 					.getTopFilters());
@@ -279,7 +278,7 @@ public class SMPBackEndFactory extends
 				new ProcessFilterWorkNode().doit(filter, whichPhase, this);
 			}
 
-			if (scheduler.isTMD()) {
+			if (scheduler.isTMD() && !KjcOptions.noswpipe) {
 				System.out
 						.println("SMPBackEndFactory.processFilterWorkNode() scheduler.isTMD() = true");
 				// if we are using the tmd scheduler we have to add barriers
@@ -309,29 +308,7 @@ public class SMPBackEndFactory extends
 								lsg.getLevels()[level].length);
 					}
 				}
-			}
-			if (scheduler instanceof TMDBinPackFissAll) {
-				System.out
-						.println("SMPBackEndFactory.processFilterWorkNode() scheduler.isTMDBinPackFissAll() = true");
-				if (whichPhase == SchedulingPhase.STEADY) {
-					System.out
-							.println("SMPBackEndFactory.processFilterWorkNode() whichPhase == SchedulingPhase.STEADY");
-
-					System.out
-							.println("SMPBackEndFactory.processFilterWorkNode() filter.getParent="
-									+ filter.getParent());
-					
-					int level = lsg.getLevel(filter.getParent());
-					System.out
-							.println("SMPBackEndFactory.processFilterWorkNode() level="
-									+ level);
-					int leftToProcess = levelLeftToProcessPP.get(level);
-					leftToProcess--;
-					System.out
-							.println("SMPBackEndFactory.processFilterWorkNode() leftToProcess="
-									+ leftToProcess);
-				}
-			}
+			}		
 		}
 	}
 

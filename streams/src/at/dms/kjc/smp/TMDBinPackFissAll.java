@@ -11,7 +11,7 @@ import at.dms.kjc.*;
 import java.util.LinkedList;
 import java.util.HashSet;
 
-public class TMDBinPackFissAll extends Scheduler {
+public class TMDBinPackFissAll extends TMD {
 
     public final static double FUSE_WORK_CHANGE_THRESHOLD = .90;
 
