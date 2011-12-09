@@ -24,7 +24,8 @@ import java.util.Map;
  * @author mgordon
  * 
  */
-public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPComputeCodeStore, Integer> {
+public class SMPBackEndFactory extends
+		BackEndFactory<SMPMachine, Core, SMPComputeCodeStore, Integer> {
 
 	/**
 	 * Set the scheduler used by the backend factory
@@ -57,8 +58,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	 */
 	private static HashMap<Integer, Integer> levelLeftToProcessPP;
 
-	public SMPBackEndFactory(SMPMachine chip, 
-			Scheduler scheduler, 
+	public SMPBackEndFactory(SMPMachine chip, Scheduler scheduler,
 			Map<String, String> dominators,
 			Map<Filter, Integer> filterToThreadId) {
 		this.chip = chip;
@@ -66,8 +66,10 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 		this.setLayout(scheduler);
 		this.dominators = dominators;
 		this.filterToThreadId = filterToThreadId;
+
+		boolean isTMDBinPackFissAll = (scheduler instanceof TMDBinPackFissAll);
 		
-		if (scheduler.isTMD()) {
+		if (scheduler.isTMD() || isTMDBinPackFissAll) {
 			// levelize the slicegraph
 			lsg = new LevelizeSSG(scheduler.getGraphSchedule().getSSG()
 					.getTopFilters());
@@ -92,7 +94,7 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	 * 
 	 * @see at.dms.kjc.backendSupport.BackEndFactory#getBackEndMain()
 	 */
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BackEndScaffold> T getBackEndMain() {
@@ -137,7 +139,8 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
 		if (node instanceof WorkNode) {
 			// simply do appropriate wrapping of calls...
-			return new SMPCodeStoreHelper((WorkNode) node, this, scheduler.getComputeNode(node).getComputeCode());
+			return new SMPCodeStoreHelper((WorkNode) node, this, scheduler
+					.getComputeNode(node).getComputeCode());
 		} else {
 			return null;
 		}
@@ -241,30 +244,30 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 	public void processFilterWorkNode(WorkNode filter,
 			SchedulingPhase whichPhase, SMPMachine chip) {
 		System.out.println("SMPBackEndFactory.processFilterWorkNode()");
-		
-		switch (whichPhase) {
-			case PRIMEPUMP:
-				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PRIMEPUMP");
-			case INIT:
-				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = INIT");
-			case STEADY:
-				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = STEADY");
-			case PREINIT:
-				System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PREINIT");
 
-		}
-		
+		// switch (whichPhase) {
+		// case PRIMEPUMP:
+		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PRIMEPUMP");
+		// case INIT:
+		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = INIT");
+		// case STEADY:
+		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = STEADY");
+		// case PREINIT:
+		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PREINIT");
+		//
+		// }
+
 		if (filter.isPredefined()) {
 			if (filter.isFileInput()) {
-				System.out.println("SMPBackEndFactory.processFilterWorkNode filter.isFileInput()=true");
+				System.out
+						.println("SMPBackEndFactory.processFilterWorkNode filter.isFileInput()=true");
 				(new ProcessFileReader(filter, whichPhase, this))
 						.processFileReader();
-			}
-			else if (filter.isFileOutput()) {
+			} else if (filter.isFileOutput()) {
 				(new ProcessFileWriter(filter, whichPhase, this))
 						.processFileWriter();
 			}
-		} else {		
+		} else {
 			if (KjcOptions.sharedbufs
 					&& FissionGroupStore.isFizzed(filter.getParent())) {
 				for (Filter slice : FissionGroupStore.getFizzedSlices(filter
@@ -277,7 +280,8 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 			}
 
 			if (scheduler.isTMD()) {
-				System.out.println("SMPBackEndFactory.processFilterWorkNode() scheduler.isTMD() = true");
+				System.out
+						.println("SMPBackEndFactory.processFilterWorkNode() scheduler.isTMD() = true");
 				// if we are using the tmd scheduler we have to add barriers
 				// between each
 				// init/primepump call of different levels
@@ -304,11 +308,30 @@ public class SMPBackEndFactory extends BackEndFactory<SMPMachine, Core, SMPCompu
 						levelLeftToProcessPP.put(level,
 								lsg.getLevels()[level].length);
 					}
-				} else if (whichPhase == SchedulingPhase.STEADY) {
-					System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase == SchedulingPhase.STEADY");
 				}
 			}
-		
+			if (scheduler instanceof TMDBinPackFissAll) {
+				System.out
+						.println("SMPBackEndFactory.processFilterWorkNode() scheduler.isTMDBinPackFissAll() = true");
+				if (whichPhase == SchedulingPhase.STEADY) {
+					System.out
+							.println("SMPBackEndFactory.processFilterWorkNode() whichPhase == SchedulingPhase.STEADY");
+
+					System.out
+							.println("SMPBackEndFactory.processFilterWorkNode() filter.getParent="
+									+ filter.getParent());
+					
+					int level = lsg.getLevel(filter.getParent());
+					System.out
+							.println("SMPBackEndFactory.processFilterWorkNode() level="
+									+ level);
+					int leftToProcess = levelLeftToProcessPP.get(level);
+					leftToProcess--;
+					System.out
+							.println("SMPBackEndFactory.processFilterWorkNode() leftToProcess="
+									+ leftToProcess);
+				}
+			}
 		}
 	}
 

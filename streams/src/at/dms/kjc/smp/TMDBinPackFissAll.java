@@ -9,14 +9,7 @@ import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.*;
 import java.util.LinkedList;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.iterator.IterFactory;
-import at.dms.kjc.iterator.SIRFilterIter;
-
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.HashSet;
-import java.util.List;
 
 public class TMDBinPackFissAll extends Scheduler {
 
