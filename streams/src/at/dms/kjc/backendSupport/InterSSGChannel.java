@@ -248,12 +248,12 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public String popMethodName() {
-		String type = theEdge.getType().toString();
+		String type = edge.getType().toString();
 		return type + "_queue_pop";
 	}
 
 	public String pushMethodName() {
-		String type = theEdge.getType().toString();
+		String type = edge.getType().toString();
 		return  type + "_queue_push";
 	}
 

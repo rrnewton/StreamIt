@@ -226,7 +226,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
            if (tile == parent && hasLocalSrcFilter())
                continue;
            
-           SourceAddressRotation rot = new SourceAddressRotation(tile, this, filterNode, (IntraSSGEdge) theEdge);
+           SourceAddressRotation rot = new SourceAddressRotation(tile, this, filterNode, (IntraSSGEdge) edge);
            addressBufs[i] = rot;
            addrBufMap.put(tile, rot);
            i++;
@@ -480,7 +480,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
                 /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
-                theEdge.getType(),
+                edge.getType(),
                 popMethodName(),
                 new JFormalParameter[0],
                 CClassType.EMPTY,
@@ -596,7 +596,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
                 /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
-                theEdge.getType(),
+                edge.getType(),
                 peekMethodName(),
                 new JFormalParameter[]{offset},
                 CClassType.EMPTY,

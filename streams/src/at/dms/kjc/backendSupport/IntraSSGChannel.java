@@ -88,7 +88,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * @param c Channel to add to our collection of channels. 
      */
     public static void addChannel(IntraSSGChannel c) {
-        bufferStore.put((IntraSSGEdge) c.theEdge, c);
+        bufferStore.put((IntraSSGEdge) c.edge, c);
     }
     
     /**
@@ -125,7 +125,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * @see at.dms.kjc.backendSupport.ChannelI#getType()
      */
     public CType getType() {
-        return theEdge.getType();
+        return edge.getType();
     }
 
 
@@ -147,14 +147,14 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * @see at.dms.kjc.backendSupport.ChannelI#getSource()
      */
     public InternalFilterNode getSource() {
-        return theEdge.getSrc();
+        return edge.getSrc();
     }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#getDest()
      */
     public InternalFilterNode getDest() {
-        return theEdge.getDest();
+        return edge.getDest();
     }
 
     /**

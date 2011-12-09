@@ -136,17 +136,17 @@ public class DelegatingChannel extends IntraSSGChannel {
     
     @Override
     public InternalFilterNode getDest() {
-        return theEdge.getDest();
+        return edge.getDest();
     }
 
     @Override
     public InternalFilterNode getSource() {
-        return theEdge.getSrc();
+        return edge.getSrc();
     }
 
     @Override
     public CType getType() {
-        return theEdge.getType();
+        return edge.getType();
     }
 
     @Override

@@ -117,7 +117,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
                 /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
-                theEdge.getType(),
+                edge.getType(),
                 popMethodName(),
                 new JFormalParameter[0],
                 CClassType.EMPTY,
@@ -185,7 +185,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
                 /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
-                theEdge.getType(),
+                edge.getType(),
                 peekMethodName(),
                 new JFormalParameter[]{offset},
                 CClassType.EMPTY,
@@ -226,7 +226,7 @@ public class ChannelAsArray extends IntraSSGChannel {
     public JMethodDeclaration pushMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
-                theEdge.getType(),
+                edge.getType(),
                 valName);
         JLocalVariableExpression valRef = new JLocalVariableExpression(val);
         JBlock body = new JBlock();

@@ -12,15 +12,15 @@ import at.dms.kjc.slir.InterSSGEdge;
  */
 public abstract class Channel<E extends Edge<?, ?> > {
 
-    protected E theEdge;
+    protected E edge;
 	
     protected Channel(E edge) {
         assert edge != null;
-        this.theEdge = edge;
+        this.edge = edge;
     }
     
     public E getEdge() {
-		return theEdge;
+		return edge;
 	}
 
 	/**
