@@ -404,32 +404,33 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 	@Override
 	public List<JStatement> endSteadyRead() {
-		System.out.println("InputRotatingBuffer.endSteadyRead() -- TODO: Add token write here");
+		System.out.println("+ InputRotatingBuffer.endSteadyRead() called on filterNode= " + filterNode);// + " TODO: add token write here");
+		
 		LinkedList<JStatement> list = new LinkedList<JStatement>();
 		// copy the copyDown items to the next rotation buffer
 		list.addAll(transferCommands
 				.readTransferCommands(SchedulingPhase.STEADY));
 		// rotate to the next buffer
 		list.addAll(rotateStatementsRead());
-		
-
-		
-		System.out.println("InputRotatingBuffer.endSteadyRead() filterNode= " + filterNode);						
+			
 		Core filterNodeCore =  SMPBackend.scheduler.getComputeNode(filterNode);
-		System.out.println("InputRotatingBuffer.endSteadyRead() filterNodeCore= " + filterNodeCore.coreID);		
-		Set<InterFilterEdge> destEdges = filterNode.getParent()
-				.getOutputNode().getDestSet(SchedulingPhase.STEADY);		
-		for (InterFilterEdge e : destEdges) {
-			System.out.println("InputRotatingBuffer.endSteadyRead() e.getDest()= " + e.getDest().getParent().getWorkNode());		
-			WorkNode dst = e.getDest().getParent().getWorkNode();	
-			Core srcCore = SMPBackend.scheduler.getComputeNode(dst);
-			if (!srcCore.equals(filterNodeCore)) {
-				
+		InterFilterEdge[] srcEdges = filterNode.getParent()
+				.getInputNode().getSources(SchedulingPhase.STEADY);	
+		for (InterFilterEdge e : srcEdges) {		
+			System.out.println("+   InputRotatingBuffer.endSteadyRead() src= " + e.getSrc().getParent().getWorkNode()
+					+ " --> dst=" + filterNode);		
+			WorkNode src = e.getSrc().getParent().getWorkNode();	
+			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
+			if (!srcCore.equals(filterNodeCore)) {				
 				System.out
-						.println("!!!! InputRotatingBuffer.endSteadyRead() add synch between " + filterNode + " and " + dst);
+						.println("+     TODO: InputRotatingBuffer.endSteadyRead() add token write between " + filterNode + " and " + src);
+				System.out
+				.println("+     TODO: filter " + src  + " needs a token write to " + filterNode);
+
+			
 			} 
 		}
-					
+		
 		return list;
 		// copyDownStatements(SchedulingPhase.STEADY));
 	}

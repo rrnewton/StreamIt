@@ -68,15 +68,15 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		// for (Filter slice : schedule.getScheduleList()) {
 		for (Filter filter : ssg.getFilterGraph()) {
 
-			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter="
-			 + filter.getWorkNode().toString());
-
-			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getSrc()="
-					 + filter.getWorkNode().getEdgeToNext().getSrc());
-
-			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getDest()="
-					 + filter.getWorkNode().getEdgeToNext().getDest());						
-						
+//			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter="
+//			 + filter.getWorkNode().toString());
+//
+//			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getSrc()="
+//					 + filter.getWorkNode().getEdgeToNext().getSrc());
+//
+//			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getDest()="
+//					 + filter.getWorkNode().getEdgeToNext().getDest());						
+//						
 			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter)) {
 				assert FissionGroupStore.isUnfizzedSlice(filter);
 
@@ -483,9 +483,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	 */
 	@Override
 	public List<JStatement> endSteadyWrite() {
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() -- TODO: Add busy loop here");
+	
+		System.out.println("- OutputRotatingBuffer.endSteadyWrite() called on filterNode= " + filterNode);// + " TODO: Add busy loop here");
+		
 		LinkedList<JStatement> list = new LinkedList<JStatement>();
-
 		list.addAll(transferCommands
 				.writeTransferCommands(SchedulingPhase.STEADY));
 
@@ -498,19 +499,25 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 			list.addAll(addrRot.rotateStatements());
 		}
 		
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() filterNode= " + filterNode);						
 		Core filterNodeCore =  SMPBackend.scheduler.getComputeNode(filterNode);
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() filterNodeCore= " + filterNodeCore.coreID);		
-		InterFilterEdge[] sourceEdges =  filterNode.getParent().getInputNode().getSources(SchedulingPhase.STEADY);		
-		for (InterFilterEdge e : sourceEdges) {
-			System.out.println("OutputRotatingBuffer.endSteadyWrite() e.getSrc()= " + e.getSrc().getParent().getWorkNode());		
-			WorkNode src = e.getSrc().getParent().getWorkNode();	
-			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
-			if (!srcCore.equals(filterNodeCore)) {				
+		Set<InterFilterEdge> destEdges = filterNode.getParent()
+				.getOutputNode().getDestSet(SchedulingPhase.STEADY);		
+		for (InterFilterEdge e : destEdges) {			
+			System.out.println("-   OutputRotatingBuffer.endSteadyRead() src= " + filterNode
+					+ " --> dst=" + e.getDest().getParent().getWorkNode());			
+			WorkNode dst = e.getDest().getParent().getWorkNode();	
+			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
+			if (!dstCore.equals(filterNodeCore)) {				
 				System.out
-						.println("!!!! OutputRotatingBuffer.endSteadyWrite() add synch between " + filterNode + " and " + src);
+						.println("-     TODO: OutputRotatingBuffer.endSteadyRead() add  busy loop between " + filterNode + " and " + dst);
+				System.out
+				.println("+     TODO: filter " + dst  + " needs a busy loop from " + filterNode);
+
+			
 			} 
 		}
+
+		
 		
 		return list;
 	}

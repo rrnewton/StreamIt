@@ -242,8 +242,7 @@ public class SMPBackEndFactory extends
 	 */
 	public void processFilterWorkNode(WorkNode filter,
 			SchedulingPhase whichPhase, SMPMachine chip) {
-		System.out.println("SMPBackEndFactory.processFilterWorkNode()");
-
+		
 		// switch (whichPhase) {
 		// case PRIMEPUMP:
 		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PRIMEPUMP");
