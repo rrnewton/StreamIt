@@ -427,6 +427,9 @@ public class InputRotatingBuffer extends RotatingBuffer {
 				System.out
 				.println("+     TODO: filter " + src  + " needs a token write to " + filterNode);
 
+				SMPComputeCodeStore cs = srcCore.getComputeCode();
+				cs.addSteadyLoopStatement(Util.toStmt("/** Needs a token write to " + filterNode + "**/"));
+				cs.setHasCode(); /* I don't know what this means */			
 			
 			} 
 		}

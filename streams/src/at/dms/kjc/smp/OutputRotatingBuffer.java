@@ -512,8 +512,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 						.println("-     TODO: OutputRotatingBuffer.endSteadyRead() add  busy loop between " + filterNode + " and " + dst);
 				System.out
 				.println("+     TODO: filter " + dst  + " needs a busy loop from " + filterNode);
-
-			
+				
+				SMPComputeCodeStore cs = dstCore.getComputeCode();
+				cs.addSteadyLoopStatement(Util.toStmt("/** Need a a busy loop from " + filterNode + "**/"));
+				cs.setHasCode(); /* I don't know what this means */			
 			} 
 		}
 
