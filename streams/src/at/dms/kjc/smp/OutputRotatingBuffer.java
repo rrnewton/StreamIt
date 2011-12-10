@@ -66,19 +66,25 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		StaticSubGraph ssg = schedule.getSSG();
 
 		// for (Filter slice : schedule.getScheduleList()) {
-		for (Filter slice : ssg.getFilterGraph()) {
+		for (Filter filter : ssg.getFilterGraph()) {
 
-			// System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice="
-			// + slice.getWorkNode().toString());
+			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice="
+			 + filter.getWorkNode().toString());
 
-			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
-				assert FissionGroupStore.isUnfizzedSlice(slice);
+			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice.getWorkNode().getEdgeToNext().getSrc()="
+					 + filter.getWorkNode().getEdgeToNext().getSrc());
 
-				FissionGroup group = FissionGroupStore.getFissionGroup(slice);
+			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice.getWorkNode().getEdgeToNext().getDest()="
+					 + filter.getWorkNode().getEdgeToNext().getDest());
+						
+			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter)) {
+				assert FissionGroupStore.isUnfizzedSlice(filter);
+
+				FissionGroup group = FissionGroupStore.getFissionGroup(filter);
 				for (Filter fizzedSlice : group.fizzedSlices)
 					createOutputBuffer(fizzedSlice, schedule);
 			} else {
-				createOutputBuffer(slice, schedule);
+				createOutputBuffer(filter, schedule);
 			}
 		}
 	}
