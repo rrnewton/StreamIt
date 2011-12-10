@@ -35,7 +35,7 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
         } else {
         	dstr = "null_parent";
         }
-        System.out.println("InterFilterEdge.InterFilterEdge(src, dst) : " + src.getParent().toString() + "->" + dstr);
+        //System.out.println("InterFilterEdge.InterFilterEdge(src, dst) : " + src.getParent().toString() + "->" + dstr);
         //make sure we did not create this edge before!
         EdgeDescriptor edgeDscr = new EdgeDescriptor(src, dest);      
         InterFilterEdge edge = edges.get(edgeDscr);

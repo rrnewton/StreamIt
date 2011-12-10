@@ -29,23 +29,23 @@ import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
 
-	public static void createOutputBuffer(Filter slice,
+	public static void createOutputBuffer(Filter filter,
 			BasicSpaceTimeSchedule schedule) {
 
 		// don't do anything for file readers or writers,
 		// for file readers the output buffer is allocated in ProcessFileReader
-		if (slice.getInputNode().getNextFilter().isPredefined())
+		if (filter.getInputNode().getNextFilter().isPredefined())
 			return;
 
-		if (!slice.getOutputNode().noOutputs()) {
-			assert slice.getOutputNode().totalWeights(SchedulingPhase.STEADY) > 0;
-			Core parent = SMPBackend.scheduler.getComputeNode(slice
+		if (!filter.getOutputNode().noOutputs()) {
+			assert filter.getOutputNode().totalWeights(SchedulingPhase.STEADY) > 0;
+			Core parent = SMPBackend.scheduler.getComputeNode(filter
 					.getWorkNode());
 
 			// create the new buffer, the constructor will put the buffer in the
 			// hashmap
 			OutputRotatingBuffer buf = new OutputRotatingBuffer(
-					slice.getWorkNode(), parent);
+					filter.getWorkNode(), parent);
 
 			buf.setRotationLength(schedule);
 			buf.setBufferSize();
@@ -68,14 +68,14 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		// for (Filter slice : schedule.getScheduleList()) {
 		for (Filter filter : ssg.getFilterGraph()) {
 
-			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice="
+			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter="
 			 + filter.getWorkNode().toString());
 
-			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice.getWorkNode().getEdgeToNext().getSrc()="
+			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getSrc()="
 					 + filter.getWorkNode().getEdgeToNext().getSrc());
 
-			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on slice.getWorkNode().getEdgeToNext().getDest()="
-					 + filter.getWorkNode().getEdgeToNext().getDest());
+			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getDest()="
+					 + filter.getWorkNode().getEdgeToNext().getDest());						
 						
 			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter)) {
 				assert FissionGroupStore.isUnfizzedSlice(filter);
@@ -498,39 +498,20 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 			list.addAll(addrRot.rotateStatements());
 		}
 		
-		InternalFilterNode src = edge.getSrc();
-		InternalFilterNode dst = edge.getDest();
-				
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() src= " + src);
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() dst= " + dst.getParent().getWorkNode());
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() filterNode= " + filterNode);
-		
-		IntraFilterEdge edgeToNext = filterNode.getEdgeToNext();
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() edgeToNext.getSrc()= " + edgeToNext.getSrc());
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() edgeToNext.getDest()= " + edgeToNext.getDest().getParent().getWorkNode());
-				
-		Core srcCore = SMPBackend.scheduler.getComputeNode(src);
-		Core dstCore = SMPBackend.scheduler.getComputeNode(dst.getParent().getWorkNode());
-		Core myCore =  SMPBackend.scheduler.getComputeNode(filterNode);
-		
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() srcCore= " + srcCore.coreID);
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() dstCore= " + dstCore.coreID);
-		System.out.println("OutputRotatingBuffer.endSteadyWrite() myCore= " + myCore.coreID);
-		
-		
-		if (srcCore == dstCore) {
-			System.out.println("OutputRotatingBuffer.endSteadyWrite() srcCore == dstCore");
-		} else {
-			System.out.println("OutputRotatingBuffer.endSteadyWrite() srcCore != dstCore");
+		System.out.println("OutputRotatingBuffer.endSteadyWrite() filterNode= " + filterNode);						
+		Core filterNodeCore =  SMPBackend.scheduler.getComputeNode(filterNode);
+		System.out.println("OutputRotatingBuffer.endSteadyWrite() filterNodeCore= " + filterNodeCore.coreID);		
+		InterFilterEdge[] sourceEdges =  filterNode.getParent().getInputNode().getSources(SchedulingPhase.STEADY);		
+		for (InterFilterEdge e : sourceEdges) {
+			System.out.println("OutputRotatingBuffer.endSteadyWrite() e.getSrc()= " + e.getSrc().getParent().getWorkNode());		
+			WorkNode src = e.getSrc().getParent().getWorkNode();	
+			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
+			if (!srcCore.equals(filterNodeCore)) {				
+				System.out
+						.println("!!!! OutputRotatingBuffer.endSteadyWrite() add synch between " + filterNode + " and " + src);
+			} 
 		}
 		
-		//.getWorkNode());
-
-		
-		
-		//this.parent = parent;
-		//filterNode = fsn;
-				
 		return list;
 	}
 

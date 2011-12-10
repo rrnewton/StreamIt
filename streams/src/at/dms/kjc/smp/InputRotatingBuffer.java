@@ -413,37 +413,23 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		list.addAll(rotateStatementsRead());
 		
 
-		InternalFilterNode src = edge.getSrc();
-		InternalFilterNode dst = edge.getDest();						
-		System.out.println("InputRotatingBuffer.endSteadyRead() edge.getSrc()= " + src.getParent().getWorkNode());
-		System.out.println("InputRotatingBuffer.endSteadyRead() edge.getDest()= " + dst);
-		System.out.println("InputRotatingBuffer.endSteadyRead() filterNode= " + filterNode);		
-		IntraFilterEdge edgeToNext = filterNode.getEdgeToNext();
-		InternalFilterNode next = filterNode.getNext();
-		System.out.println("InputRotatingBuffer.endSteadyRead() next= " + next.getParent().getWorkNode());
 		
-
-		
-		
-		System.out.println("InputRotatingBuffer.endSteadyRead() edgeToNext.getSrc()= " + edgeToNext.getSrc());
-		System.out.println("InputRotatingBuffer.endSteadyRead() edgeToNext.getDest()= " + edgeToNext.getDest().getParent().getWorkNode());
+		System.out.println("InputRotatingBuffer.endSteadyRead() filterNode= " + filterNode);						
+		Core filterNodeCore =  SMPBackend.scheduler.getComputeNode(filterNode);
+		System.out.println("InputRotatingBuffer.endSteadyRead() filterNodeCore= " + filterNodeCore.coreID);		
+		Set<InterFilterEdge> destEdges = filterNode.getParent()
+				.getOutputNode().getDestSet(SchedulingPhase.STEADY);		
+		for (InterFilterEdge e : destEdges) {
+			System.out.println("InputRotatingBuffer.endSteadyRead() e.getDest()= " + e.getDest().getParent().getWorkNode());		
+			WorkNode dst = e.getDest().getParent().getWorkNode();	
+			Core srcCore = SMPBackend.scheduler.getComputeNode(dst);
+			if (!srcCore.equals(filterNodeCore)) {
 				
-		Core srcCore = SMPBackend.scheduler.getComputeNode(src.getParent().getWorkNode());
-		Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
-		Core myCore =  SMPBackend.scheduler.getComputeNode(filterNode);
-		
-		System.out.println("InputRotatingBuffer.endSteadyRead() srcCore= " + srcCore.coreID);
-		System.out.println("InputRotatingBuffer.endSteadyRead() dstCore= " + dstCore.coreID);
-		System.out.println("InputRotatingBuffer.endSteadyRead() myCore= " + myCore.coreID);
-		
-		
-		if (srcCore == dstCore) {
-			System.out.println("OutputRotatingBuffer.endSteadyWrite() srcCore == dstCore");
-		} else {
-			System.out.println("OutputRotatingBuffer.endSteadyWrite() srcCore != dstCore");
+				System.out
+						.println("!!!! InputRotatingBuffer.endSteadyRead() add synch between " + filterNode + " and " + dst);
+			} 
 		}
-		
-		
+					
 		return list;
 		// copyDownStatements(SchedulingPhase.STEADY));
 	}

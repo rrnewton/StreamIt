@@ -103,14 +103,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         tail = new JFieldAccessExpression(tailName);
         tail.setType(CStdType.Integer);
     }
-
-    /** Obsolete constructor, don't use. */
-    @Deprecated
-    public ChannelAsArray(InternalFilterNode src, InternalFilterNode dst) {
-        super(src, dst);
-        throw new AssertionError("Creating ChannelAsArray from src, dst not supported.");
-    }
-
+    
     /** input_type pop(). */
     public JMethodDeclaration popMethod() {
         JBlock body = new JBlock();

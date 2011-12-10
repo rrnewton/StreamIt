@@ -30,22 +30,17 @@ class SIRToFilterNodes implements FlatVisitor {
 
 	private Map<SIROperator, int[]>[] exeCounts;
 
-	public void createNodes(FlatNode top, Map<SIROperator, int[]>[] executionCounts) {
-		
-//		System.out.println("SIRToFilterNodes.createNodes top= " + top);				
-		
+	public void createNodes(FlatNode top,
+			Map<SIROperator, int[]>[] executionCounts) {
 		inputNodes = new HashMap<SIROperator, InputNode>();
 		outputNodes = new HashMap<SIROperator, OutputNode>();
 		filterNodes = new HashMap<SIROperator, WorkNode>();
 		generatedIds = new HashSet<WorkNode>();
 		this.exeCounts = executionCounts;
-
 		top.accept(this, null, true);
 	}
 
-	public void visitNode(FlatNode node) {						
-		
-//		System.out.println("SIRToFilterNodes.visitNode node= " + node);				
+	public void visitNode(FlatNode node) {
 		OutputNode output = new OutputNode();
 		InputNode input = new InputNode();
 		WorkNodeContent content;
@@ -57,11 +52,10 @@ class SIRToFilterNodes implements FlatVisitor {
 			} else if (node.contents instanceof SIRFileReader) {
 				content = new FileInputContent((SIRFileReader) node.contents);
 			} else if (node.contents instanceof SIRIdentity) {
-				content = new IDFilterContent(((SIRIdentity)node.contents));
-			}
-			else
+				content = new IDFilterContent(((SIRIdentity) node.contents));
+			} else {
 				content = new WorkNodeContent(node.getFilter());
-
+			}
 		} else if (node.isSplitter()) {
 			CType type = CommonUtils.getOutputType(node);
 			SIRIdentity id = new SIRIdentity(type);
@@ -83,20 +77,21 @@ class SIRToFilterNodes implements FlatVisitor {
 		}
 
 		if (exeCounts[0].containsKey(node.contents)) {
-			System.out.println("** setting init mult " + node.contents + " " + mult + " " +
-					((int[]) exeCounts[0].get(node.contents))[0]);
+			System.out
+					.println("** setting init mult " + node.contents + " "
+							+ mult + " "
+							+ ((int[]) exeCounts[0].get(node.contents))[0]);
 			content.setInitMult(mult
 					* ((int[]) exeCounts[0].get(node.contents))[0]);
-		}
-		else
+		} else {
 			content.setInitMult(0);
-
+		}
 		if (exeCounts[1].containsKey(node.contents)) {
 			content.setSteadyMult(mult
 					* ((int[]) exeCounts[1].get(node.contents))[0]);
-		} else
+		} else {
 			content.setSteadyMult(0);
-
+		}
 		WorkNode filterNode = new WorkNode(content);
 		if (node.isSplitter() || node.isJoiner())
 			generatedIds.add(filterNode);
