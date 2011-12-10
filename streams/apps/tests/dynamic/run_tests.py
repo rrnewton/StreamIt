@@ -26,7 +26,7 @@ class Command(object):
 FNULL = open('/dev/null', 'w')
 
 def run_strc(filename):
-    cmd = ["strc", "-smp", "2", "-i", "10", filename]
+    cmd = ["strc", "-smp", "2", "-i", "10000", filename]
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
 def run_make(filename):
