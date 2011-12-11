@@ -139,6 +139,71 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	}
 
 	/**
+	 * Adds code to wait for a token before proceeding. This provides
+	 * synchronization when there is no software pipelining in an SSG.
+	 * @param filter
+	 * @param phase
+	 */
+	private void addIntraSSGSynch(WorkNode filter, SchedulingPhase phase) {
+		Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);
+		filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** OutputRotatingBuffer filter=" + filter + " **/"));
+				
+		Set<InterFilterEdge> destEdges = filter.getParent()
+				.getOutputNode().getDestSet(phase);				
+		
+		for (InterFilterEdge e : destEdges) {			
+			String msg = "-   OutputRotatingBuffer.addIntraSSGSynch() phase= " + phase + " src= " + filter
+					+ " --> dst=" + e.getDest().getParent().getWorkNode();
+			filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** " + msg + " **/"));
+			System.out.println(msg);
+			WorkNode dst = e.getDest().getParent().getWorkNode();	
+			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
+			if (!dstCore.equals(filterCore)) {				
+				System.out
+						.println("-     TODO: OutputRotatingBuffer.addIntraSSGSynch() add  busy loop between " + filter + " and " + dst);
+				System.out
+				.println("+     TODO: filter " + dst  + " needs a busy loop from " + filter);
+				
+//				String tokenName = filter + "_token";				
+//				SMPComputeCodeStore cs = dstCore.getComputeCode();								
+//				cs.addSteadyLoopStatement(Util.toStmt("/** Need a a busy loop from " + tokenName + "**/"));
+//				cs.addSteadyLoopStatement(Util.toStmt("while (!" + tokenName +")"));
+//				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
+//				cs.setHasCode(); 
+				
+				String tokenName = filter + "_token";	
+				SMPComputeCodeStore.addTokenName(tokenName);
+				SMPComputeCodeStore cs = filterCore.getComputeCode();
+				cs.addSteadyLoopStatement(Util
+						.toStmt("/** Needs a token write to " + tokenName + "**/"));
+				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
+				cs.setHasCode(); 
+				
+				
+			} 
+		}
+	}
+	
+	private void addIntraSSGSynchX(WorkNode filter, SchedulingPhase phase) {
+		System.out.println("-   OutputRotatingBuffer.addIntraSSGSynch() phase= " + phase + " src= " + filter);
+		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
+
+		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
+				.getSources(phase);		
+		for (InterFilterEdge e : srcEdges) {
+			System.out.println("(1)   OutputRotatingBuffer.addIntraSSGSynch() phase= " + phase
+							+ " src= "+ e.getSrc().getParent().getWorkNode() + " --> filter=" + filter);
+		}
+				
+		Set<InterFilterEdge> destEdges = filter.getParent()
+				.getOutputNode().getDestSet(phase);	
+		for (InterFilterEdge e : destEdges) {			
+			System.out.println("(2)   OutputRotatingBuffer.addIntraSSGSynch() phase= " + phase + " filter= " + filter
+					+ " --> dst=" + e.getDest().getParent().getWorkNode());		
+		}		
+	}
+
+	/**
 	 * Allocate the constituent buffers of this rotating buffer structure
 	 */
 	@Override
@@ -472,10 +537,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		for (SourceAddressRotation addrRot : addressBuffers.values()) {
 			list.addAll(addrRot.rotateStatements());
 		}
-
 		return list;
 	}
 
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -483,8 +548,6 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	 */
 	@Override
 	public List<JStatement> endSteadyWrite() {
-	
-		System.out.println("- OutputRotatingBuffer.endSteadyWrite() called on filterNode= " + filterNode);// + " TODO: Add busy loop here");
 		
 		LinkedList<JStatement> list = new LinkedList<JStatement>();
 		list.addAll(transferCommands
@@ -499,31 +562,12 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 			list.addAll(addrRot.rotateStatements());
 		}
 		
-		Core filterNodeCore =  SMPBackend.scheduler.getComputeNode(filterNode);
-		Set<InterFilterEdge> destEdges = filterNode.getParent()
-				.getOutputNode().getDestSet(SchedulingPhase.STEADY);		
-		for (InterFilterEdge e : destEdges) {			
-			System.out.println("-   OutputRotatingBuffer.endSteadyRead() src= " + filterNode
-					+ " --> dst=" + e.getDest().getParent().getWorkNode());			
-			WorkNode dst = e.getDest().getParent().getWorkNode();	
-			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
-			if (!dstCore.equals(filterNodeCore)) {				
-				System.out
-						.println("-     TODO: OutputRotatingBuffer.endSteadyRead() add  busy loop between " + filterNode + " and " + dst);
-				System.out
-				.println("+     TODO: filter " + dst  + " needs a busy loop from " + filterNode);
-				
-				SMPComputeCodeStore cs = dstCore.getComputeCode();
-				cs.addSteadyLoopStatement(Util.toStmt("/** Need a a busy loop from " + filterNode + "**/"));
-				cs.setHasCode(); /* I don't know what this means */			
-			} 
-		}
-
-		
-		
+		// Add synchronization for non-pipelined filters
+		addIntraSSGSynch(filterNode, SchedulingPhase.STEADY);				
+	
 		return list;
 	}
-
+	
 	/**
 	 * Return the address rotation that this output rotation uses for the given
 	 * input slice node

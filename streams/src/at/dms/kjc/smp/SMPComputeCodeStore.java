@@ -13,6 +13,30 @@ import at.dms.kjc.slir.*;
 import at.dms.util.Utils;
 
 public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
+
+	/**
+	 * The set of token names used for synchronization within
+	 * an SSG for non-pipelined filters.
+	 */
+	private static Set<String> tokenNames = new HashSet<String>();
+
+	/**
+	 * Get the set of token names used for intra-SSG synchronization.
+	 * @return the set of token names.
+	 */
+	public static Set<String> getTokenNames() {
+		return tokenNames;
+	}
+
+	/**
+	 * Add a new name to the set of token names used for 
+	 * intra-SSG synchronization.
+	 * @param token the token name.
+	 */
+	public static void addTokenName(String token) {
+		tokenNames.add(token);
+	}
+
 	/**
 	 * Append a barrier instruction to all of the cores in the init/primepump
 	 * stage.
@@ -49,7 +73,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	}
 
 	private static boolean addBufferInitBarrierFlag = false;
-	
+
 	/**
 	 * Append a barrier instruction to all of the cores in the buffer init
 	 * method.
@@ -133,14 +157,14 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
 	/** set of FilterSliceNodes that are mapped to this core */
 	protected Set<WorkNode> filters;
-	
+
 	/** set of JMethodDeclaration for the helper thread on this core */
 	protected Set<JMethodDeclaration> helperThreadMethods = new HashSet<JMethodDeclaration>();
 
-	/** 
-	 * Set of fields that should be externally defined on this core. I am using a Map
-	 * to store values because JFieldDeclaration does not define equals and hashCode, 
-	 * so storing in a Set does not prevent duplicates correctly.
+	/**
+	 * Set of fields that should be externally defined on this core. I am using
+	 * a Map to store values because JFieldDeclaration does not define equals
+	 * and hashCode, so storing in a Set does not prevent duplicates correctly.
 	 */
 	protected Map<String, JFieldDeclaration> externFields = new HashMap<String, JFieldDeclaration>();
 
@@ -152,7 +176,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		super();
 		setMyMainName("__main__");
 	}
-
 
 	public SMPComputeCodeStore(Core nodeType) {
 		super(nodeType);
@@ -220,28 +243,27 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		// of the filewriter buffer that is about to be written to, but was
 		// written to 2 steady-states
 		// ago
-		
-		WorkNode fileW = buf.filterNode;
-		
-		System.out.println("SMPComputeCodeStore.addPrintOutputCode filter=" + filter.toString() 
-					+ " fileW.isFileOutput()=" + fileW.isFileOutput() 
-					+ " buf=" + buf.toString()	
-					+ " buf.getRotationLength()=" +buf.getRotationLength()
-					);				
 
-		
-		
+		WorkNode fileW = buf.filterNode;
+
+		System.out.println("SMPComputeCodeStore.addPrintOutputCode filter="
+				+ filter.toString() + " fileW.isFileOutput()="
+				+ fileW.isFileOutput() + " buf=" + buf.toString()
+				+ " buf.getRotationLength()=" + buf.getRotationLength());
+
 		assert fileW.isFileOutput();
 		// because of this scene we need a rotation length of 2
-		//assert buf.getRotationLength() == 2: buf.getRotationLength();
+		// assert buf.getRotationLength() == 2: buf.getRotationLength();
 		// make sure that each of the inputs wrote to the file writer in the
 		// primepump stage
-		/*for (InterFilterEdge edge : fileW.getParent().getInputNode()
-				.getSourceSet(SchedulingPhase.STEADY)) {
-			//assert SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult(
-			//		edge.getSrc().getParent()) == 1: SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult(
-			//				edge.getSrc().getParent());
-		}*/
+		/*
+		 * for (InterFilterEdge edge : fileW.getParent().getInputNode()
+		 * .getSourceSet(SchedulingPhase.STEADY)) { //assert
+		 * SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult( //
+		 * edge.getSrc().getParent()) == 1:
+		 * SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult( //
+		 * edge.getSrc().getParent()); }
+		 */
 		int outputs = fileW.getFilter().getSteadyMult();
 		String type = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "%d"
 				: "%f";
@@ -436,8 +458,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		return hasCode;
 	}
 
-	
-		
 	/**
 	 * 
 	 * @param steadyBlock
@@ -445,33 +465,44 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
 
 		System.out.println("SMPComputeCodeStore.addThreadHelper called()");
-		
+
 		JBlock methodBody = new JBlock();
 		JBlock loopBody = new JBlock();
-		Utils.addCondWait(loopBody, threadIndex, "DYN_READER", "DYN_READER",
-				Utils.makeEqualityCondition("ASLEEP","thread_to_sleep[" + threadIndex + "][DYN_READER]"));
+		Utils.addCondWait(
+				loopBody,
+				threadIndex,
+				"DYN_READER",
+				"DYN_READER",
+				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep["
+						+ threadIndex + "][DYN_READER]"));
 		loopBody.addStatement(steadyBlock);
-		Utils.addSetFlag(loopBody, threadIndex, "DYN_READER", "DYN_READER", "ASLEEP");
+		Utils.addSetFlag(loopBody, threadIndex, "DYN_READER", "DYN_READER",
+				"ASLEEP");
 		Utils.addSetFlag(loopBody, threadIndex, "MASTER", "MASTER", "AWAKE");
 		Utils.addSignal(loopBody, threadIndex, "MASTER");
-		
+
 		JStatement loop = null;
-		if(KjcOptions.iterations != -1) {
-			//addSteadyLoop(iterationBound);		
-			ALocalVariable var = ALocalVariable.makeVar(CStdType.Integer, "maxSteadyIter");			
-			loop = at.dms.util.Utils.makeForLoop(loopBody,var.getRef());
-			
-		} else {		
-			loop = new JWhileStatement(null, new JBooleanLiteral(null, true), loopBody, null);
+		if (KjcOptions.iterations != -1) {
+			// addSteadyLoop(iterationBound);
+			ALocalVariable var = ALocalVariable.makeVar(CStdType.Integer,
+					"maxSteadyIter");
+			loop = at.dms.util.Utils.makeForLoop(loopBody, var.getRef());
+
+		} else {
+			loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
+					loopBody, null);
 		}
 		methodBody.addStatement(loop);
-		methodBody.addStatement(new JExpressionStatement(new JEmittedTextExpression("pthread_exit(NULL)")));
+		methodBody.addStatement(new JExpressionStatement(
+				new JEmittedTextExpression("pthread_exit(NULL)")));
 		JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
 
-		String threadName = "helper_" + threadIndex;		
-		
-		System.out.println("SMPComputeCodeStore.addThreadHelper creating JMethodDeclaration=" + threadName);
-		
+		String threadName = "helper_" + threadIndex;
+
+		System.out
+				.println("SMPComputeCodeStore.addThreadHelper creating JMethodDeclaration="
+						+ threadName);
+
 		JMethodDeclaration threadHelper = new JMethodDeclaration(
 				CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
 				methodBody);
@@ -482,29 +513,36 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		helperThreadMethods.add(threadHelper);
 		addMethod(threadHelper);
 	}
-	
-	
+
 	public void addSteadyThreadCall(int threadIndex) {
 		Utils.addSetFlag(steadyLoop, threadIndex, "MASTER", "MASTER", "ASLEEP");
-		Utils.addSetFlag(steadyLoop, threadIndex, "DYN_READER", "DYN_READER", "AWAKE");
+		Utils.addSetFlag(steadyLoop, threadIndex, "DYN_READER", "DYN_READER",
+				"AWAKE");
 		Utils.addSignal(steadyLoop, threadIndex, "DYN_READER");
-		Utils.addCondWait(steadyLoop, threadIndex, "MASTER", "MASTER",
-				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep[" + threadIndex + "][MASTER]"));
+		Utils.addCondWait(
+				steadyLoop,
+				threadIndex,
+				"MASTER",
+				"MASTER",
+				Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep["
+						+ threadIndex + "][MASTER]"));
 	}
 
 	public void addExternField(JFieldDeclaration jFieldDeclaration) {
 		// There is a problem with this code. We do not want to store
-		// duplicates of the same jFieldDeclaration. However, the JFieldDeclaration
+		// duplicates of the same jFieldDeclaration. However, the
+		// JFieldDeclaration
 		// class does not define equals and hashCode, so the Set implementation
-		// does not know about duplicate entries. Rather than changing the 
+		// does not know about duplicate entries. Rather than changing the
 		// Kopi compiler, I'm going to check for equality here by comparing
 		// the names and types.
-		externFields.put(jFieldDeclaration.getVariable().getIdent(), jFieldDeclaration);		
-	}	
+		externFields.put(jFieldDeclaration.getVariable().getIdent(),
+				jFieldDeclaration);
+	}
 
-	public  Map<String, JFieldDeclaration> getExternFields() {
+	public Map<String, JFieldDeclaration> getExternFields() {
 		return externFields;
-	}	
+	}
 
 	/**
 	 * Return the helper thread methods in this store;
@@ -514,15 +552,15 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {
 		return helperThreadMethods;
 	}
-	
+
 	/**
 	 * Set the helper thread methods in this store;
 	 * 
-	 * @param methods the helper thread methods in this store;
+	 * @param methods
+	 *            the helper thread methods in this store;
 	 */
 	public void setDynamicThreadHelperMethods(Set<JMethodDeclaration> methods) {
 		helperThreadMethods = methods;
 	}
 
-	
 }

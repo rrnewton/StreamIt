@@ -168,6 +168,85 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	}
 
 	/**
+	 * Adds code to write for a token before proceeding. This provides
+	 * synchronization when there is no software pipelining in an SSG.
+	 * 
+	 * @param filter
+	 * @param phase
+	 */
+	private void addIntraSSGSynch(WorkNode filter, SchedulingPhase phase) {
+		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
+		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
+				.getSources(phase);
+		
+//		filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** InputRotatingBuffer filter=" + filter + " **/"));		
+//		for (InterFilterEdge srcEdge : srcEdges) {
+//			Set<InterFilterEdge> destEdges = srcEdge.getSrc().getParent()
+//					.getOutputNode().getDestSet(phase);
+//			if (destEdges.size() > 1) {
+//				String tokenName = srcEdge.getSrc().getParent().getWorkNode()
+//						+ "_token";
+//				SMPComputeCodeStore.addTokenName(tokenName);
+//				SMPComputeCodeStore cs = filterCore.getComputeCode();
+//				cs.addSteadyLoopStatement(Util
+//						.toStmt("/** InputRotatingBuffer Needs a token write to " + tokenName + "**/"));
+//				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
+//				cs.setHasCode(); 
+//			}
+//			
+//			String msg = "+   InputRotatingBuffer.addIntraSSGSynch() phase= "
+//					+ phase
+//					+ " src= "
+//					+ srcEdge.getSrc().getParent().getWorkNode()
+//					+ " --> filter=" + filter;
+//			System.out.println(msg);
+//			filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** " + msg + " **/"));
+//		}
+
+		
+		
+		
+	
+		
+		for (InterFilterEdge e : srcEdges) {
+			String msg = "+   InputRotatingBuffer.addIntraSSGSynch() phase= "
+					+ phase
+					+ " src= "
+					+ e.getSrc().getParent().getWorkNode()
+					+ " --> dst=" + filter;
+			System.out.println(msg);
+			filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** " + msg + " **/"));
+			WorkNode src = e.getSrc().getParent().getWorkNode();
+			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
+			if (!srcCore.equals(filterCore)) {
+				System.out
+						.println("+     TODO: InputRotatingBuffer.addIntraSSGSynch() add token write between "
+								+ filter + " and " + src);
+				System.out.println("+     TODO: filter " + src
+						+ " needs a token write to " + filter);
+
+//				String tokenName = src + "_token";
+//				SMPComputeCodeStore.addTokenName(tokenName);
+//				SMPComputeCodeStore cs = srcCore.getComputeCode();
+//				cs.addSteadyLoopStatement(Util
+//						.toStmt("/** Needs a token write to " + src + "**/"));
+//				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
+//				cs.setHasCode(); /* I don't know what this means */
+				
+				String tokenName = src + "_token";				
+				SMPComputeCodeStore cs = filterCore.getComputeCode();								
+				cs.addSteadyLoopStatement(Util.toStmt("/** Need a a busy loop from " + tokenName + "**/"));
+				cs.addSteadyLoopStatement(Util.toStmt("while (!" + tokenName +")"));
+				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
+				cs.setHasCode(); 
+				
+				
+			}
+		}
+	}
+	
+
+	/**
 	 * Allocate the constituent buffers of this rotating buffer structure
 	 */
 	@Override
@@ -202,12 +281,11 @@ public class InputRotatingBuffer extends RotatingBuffer {
 				offsetName);
 		JBlock body = new JBlock();
 		JMethodDeclaration retval = new JMethodDeclaration(null,
-				/*
-				 * at.dms.kjc.Constants.ACC_PUBLIC |
-				 * at.dms.kjc.Constants.ACC_STATIC |
-				 */Constants.ACC_INLINE, CStdType.Void,
-				assignFromPeekMethodName(), new JFormalParameter[] { val,
-						offset }, CClassType.EMPTY, body, null, null);
+		/*
+		 * at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |
+		 */Constants.ACC_INLINE, CStdType.Void, assignFromPeekMethodName(),
+				new JFormalParameter[] { val, offset }, CClassType.EMPTY, body,
+				null, null);
 		body.addStatement(new JExpressionStatement(new JEmittedTextExpression(
 				"/* assignFromPeekMethod not yet implemented */")));
 		return retval;
@@ -236,12 +314,11 @@ public class InputRotatingBuffer extends RotatingBuffer {
 				parameterName);
 		JBlock body = new JBlock();
 		JMethodDeclaration retval = new JMethodDeclaration(null,
-				/*
-				 * at.dms.kjc.Constants.ACC_PUBLIC |
-				 * at.dms.kjc.Constants.ACC_STATIC |
-				 */Constants.ACC_INLINE, CStdType.Void,
-				assignFromPopMethodName(), new JFormalParameter[] { val },
-				CClassType.EMPTY, body, null, null);
+		/*
+		 * at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |
+		 */Constants.ACC_INLINE, CStdType.Void, assignFromPopMethodName(),
+				new JFormalParameter[] { val }, CClassType.EMPTY, body, null,
+				null);
 		body.addStatement(new JExpressionStatement(new JEmittedTextExpression(
 				"/* assignFromPopMethod not yet implemented */")));
 		return retval;
@@ -404,35 +481,14 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 	@Override
 	public List<JStatement> endSteadyRead() {
-		System.out.println("+ InputRotatingBuffer.endSteadyRead() called on filterNode= " + filterNode);// + " TODO: add token write here");
-		
 		LinkedList<JStatement> list = new LinkedList<JStatement>();
 		// copy the copyDown items to the next rotation buffer
 		list.addAll(transferCommands
 				.readTransferCommands(SchedulingPhase.STEADY));
 		// rotate to the next buffer
 		list.addAll(rotateStatementsRead());
-			
-		Core filterNodeCore =  SMPBackend.scheduler.getComputeNode(filterNode);
-		InterFilterEdge[] srcEdges = filterNode.getParent()
-				.getInputNode().getSources(SchedulingPhase.STEADY);	
-		for (InterFilterEdge e : srcEdges) {		
-			System.out.println("+   InputRotatingBuffer.endSteadyRead() src= " + e.getSrc().getParent().getWorkNode()
-					+ " --> dst=" + filterNode);		
-			WorkNode src = e.getSrc().getParent().getWorkNode();	
-			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
-			if (!srcCore.equals(filterNodeCore)) {				
-				System.out
-						.println("+     TODO: InputRotatingBuffer.endSteadyRead() add token write between " + filterNode + " and " + src);
-				System.out
-				.println("+     TODO: filter " + src  + " needs a token write to " + filterNode);
-
-				SMPComputeCodeStore cs = srcCore.getComputeCode();
-				cs.addSteadyLoopStatement(Util.toStmt("/** Needs a token write to " + filterNode + "**/"));
-				cs.setHasCode(); /* I don't know what this means */			
-			
-			} 
-		}
+		// add synchronization between non-pipelined ssgs
+		addIntraSSGSynch(filterNode, SchedulingPhase.STEADY);
 		
 		return list;
 		// copyDownStatements(SchedulingPhase.STEADY));
@@ -697,7 +753,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		if (KjcOptions.sharedbufs
 				&& FissionGroupStore.isFizzed(filterNode.getParent())) {
 			destMult = schedule.getPrimePumpMult(FissionGroupStore
-					.getUnfizzedSlice(filterNode.getParent()));			
+					.getUnfizzedSlice(filterNode.getParent()));
 		} else {
 			destMult = schedule.getPrimePumpMult(filterNode.getParent());
 		}
