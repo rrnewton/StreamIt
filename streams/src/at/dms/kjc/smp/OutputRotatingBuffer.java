@@ -146,7 +146,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	 */
 	private void addIntraSSGSynch(WorkNode filter, SchedulingPhase phase) {
 		Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);
-		filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** OutputRotatingBuffer filter=" + filter + " **/"));
+		//filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** OutputRotatingBuffer filter=" + filter + " **/"));
 				
 		Set<InterFilterEdge> destEdges = filter.getParent()
 				.getOutputNode().getDestSet(phase);				
@@ -175,7 +175,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 				SMPComputeCodeStore.addTokenName(tokenName);
 				SMPComputeCodeStore cs = filterCore.getComputeCode();
 				cs.addSteadyLoopStatement(Util
-						.toStmt("/** Needs a token write to " + tokenName + "**/"));
+						.toStmt("/** OutputRotatingBuffer says Needs a token write to " + tokenName + "**/"));
 				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
 				cs.setHasCode(); 
 				

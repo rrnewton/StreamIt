@@ -179,34 +179,77 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
 				.getSources(phase);
 		
-//		filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** InputRotatingBuffer filter=" + filter + " **/"));		
+//		String msg = "InputRotatingBuffer filter=" + filter;
+//		filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** " + msg + " **/"));		
+//		System.out.println(msg);
 //		for (InterFilterEdge srcEdge : srcEdges) {
 //			Set<InterFilterEdge> destEdges = srcEdge.getSrc().getParent()
 //					.getOutputNode().getDestSet(phase);
-//			if (destEdges.size() > 1) {
-//				String tokenName = srcEdge.getSrc().getParent().getWorkNode()
-//						+ "_token";
-//				SMPComputeCodeStore.addTokenName(tokenName);
-//				SMPComputeCodeStore cs = filterCore.getComputeCode();
-//				cs.addSteadyLoopStatement(Util
-//						.toStmt("/** InputRotatingBuffer Needs a token write to " + tokenName + "**/"));
-//				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
-//				cs.setHasCode(); 
+//
+//			for (InterFilterEdge destEdge : destEdges) {
+//				System.out.println("--> destEdge.getSrc = " +
+//				destEdge.getSrc().getParent().getWorkNode());
+//
+//				System.out.println("--> destEdge.getSrc = " +
+//						destEdge.getSrc().getParent().getWorkNode()  + "---->" +
+//						"destEdge.getDest = " +
+//						destEdge.getDest().getParent().getWorkNode() 
+//						);
+//				
+//				WorkNode src = destEdge.getSrc().getParent().getWorkNode();				
+//				WorkNode dest = destEdge.getDest().getParent().getWorkNode();
+//				Core srcCore = SMPBackend.scheduler.getComputeNode(src);
+//				Core destCore = SMPBackend.scheduler.getComputeNode(dest);
+//				
+//				if (dest == filterNode) {
+//					System.out.println("OPTION 1");
+//					System.out
+//							.println("--> DEST==FILTERNODE destEdge.getSrc = "
+//									+ destEdge.getSrc().getParent()
+//											.getWorkNode()
+//									+ "---->"
+//									+ "destEdge.getDest = "
+//									+ destEdge.getDest().getParent()
+//											.getWorkNode());
+//					if (!srcCore.equals(destCore)) {
+//						System.out.println("-+> writing destEdge.getSrc = "
+//								+ destEdge.getSrc().getParent().getWorkNode());
+//
+//						String tokenName = src + "_token";
+//						SMPComputeCodeStore cs = srcCore.getComputeCode();
+//						SMPComputeCodeStore.addTokenName(tokenName);
+//						cs.addSteadyLoopStatement(Util
+//								.toStmt("/** InputRotatingBuffer Needs a token write to "
+//										+ tokenName + "**/"));
+//						cs.addSteadyLoopStatement(Util.toStmt(tokenName
+//								+ " = 1;"));
+//					}
+//					break;
+//				} 
+//				else {					
+//					System.out.println("OPTION 2");
+//					if (!srcCore.equals(filterCore)
+//							&& (destEdge.getDest().getParent().getWorkNode() != filterNode)) {
+//
+//						System.out.println("-+> writing destEdge.getSrc = "
+//								+ destEdge.getSrc().getParent().getWorkNode());
+//
+//						String tokenName = src + "_token";
+//						SMPComputeCodeStore cs = srcCore.getComputeCode();
+//						SMPComputeCodeStore.addTokenName(tokenName);
+//						cs.addSteadyLoopStatement(Util
+//								.toStmt("/** InputRotatingBuffer Needs a token write to "
+//										+ tokenName + "**/"));
+//						cs.addSteadyLoopStatement(Util.toStmt(tokenName
+//								+ " = 1;"));
+//						cs.setHasCode();
+//						break;					
+//					}
+//				}
 //			}
 //			
-//			String msg = "+   InputRotatingBuffer.addIntraSSGSynch() phase= "
-//					+ phase
-//					+ " src= "
-//					+ srcEdge.getSrc().getParent().getWorkNode()
-//					+ " --> filter=" + filter;
-//			System.out.println(msg);
-//			filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** " + msg + " **/"));
 //		}
 
-		
-		
-		
-	
 		
 		for (InterFilterEdge e : srcEdges) {
 			String msg = "+   InputRotatingBuffer.addIntraSSGSynch() phase= "
