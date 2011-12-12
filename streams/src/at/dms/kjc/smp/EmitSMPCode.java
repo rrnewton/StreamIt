@@ -438,7 +438,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
-			p.println("extern char " + str + ";");
+			p.println("extern int " + str + ";");
 		}
 
 		p.println("#endif");
@@ -536,9 +536,9 @@ public class EmitSMPCode extends EmitCode {
 		p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
-			p.println("char " + str + " = 0;");
+			p.println("int " + str + ";");
 		}
-
+		p.println();
 		
 		generateSetAffinity(p);
 
@@ -606,6 +606,15 @@ public class EmitSMPCode extends EmitCode {
 					}
 				}
 				p.println("dummy_multiplier = 1;");
+				
+				p.println();
+				p.println("// Intra-SSG synchronization tokens");
+				for (String str : SMPComputeCodeStore.getTokenNames()) {
+					p.println(str + " = 0;");
+				}
+				p.println();
+
+				
 
 				if(KjcOptions.loadbalance) {
 					p.println();

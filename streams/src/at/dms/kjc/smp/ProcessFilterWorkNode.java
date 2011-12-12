@@ -1,6 +1,7 @@
 package at.dms.kjc.smp;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import com.jgraph.graph.Edge;
@@ -26,6 +27,7 @@ import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.kjc.slir.FileOutputContent;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.OutputPort;
@@ -314,20 +316,38 @@ public class ProcessFilterWorkNode {
 		/* do nothing */
 	}
 
-	protected void additionalInitProcessing() {
-
+	private void addTokenWrite(WorkNode filter, SchedulingPhase phase) {
+		Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);					
+		Set<InterFilterEdge> destEdges = filter.getParent()
+				.getOutputNode().getDestSet(phase);						
+		for (InterFilterEdge e : destEdges) {			
+			WorkNode dst = e.getDest().getParent().getWorkNode();	
+			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
+			if (!dstCore.equals(filterCore)) {								
+				String tokenName = filter + "_token";	
+				SMPComputeCodeStore.addTokenName(tokenName);
+				SMPComputeCodeStore cs = filterCore.getComputeCode();				
+				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
+				cs.setHasCode(); 								
+			} 
+		}
 	}
-
-	protected void additionalPreInitProcessing() {
-
-	}
-
-	protected void additionalPrimePumpProcessing() {
-
-	}
-
-	protected void additionalSteadyProcessing() {
-
+		
+	private void addTokenWait(WorkNode filter, SchedulingPhase phase) {
+		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
+		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
+				.getSources(phase);		
+		for (InterFilterEdge e : srcEdges) {
+			WorkNode src = e.getSrc().getParent().getWorkNode();
+			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
+			if (!srcCore.equals(filterCore)) {				
+				String tokenName = src + "_token";				
+				SMPComputeCodeStore cs = filterCore.getComputeCode();								
+				cs.addSteadyLoopStatement(Util.toStmt("while (" + tokenName + " == 0)"));
+				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
+				cs.setHasCode(); 
+			}
+		}
 	}
 
 	/**
@@ -408,13 +428,7 @@ public class ProcessFilterWorkNode {
 					.getParent())) {
 				outputBuffer = RotatingBuffer.getOutputBuffer(filterNode);
 			}
-
-//			System.out.println("ProcessFitlerWorkNode.doit filter="
-//					+ filterNode + " filterCode=null");
-//			System.out.println("ProcessFitlerWorkNode.doit filter="
-//					+ filterNode + " inputBuffer is null == "
-//					+ (inputBuffer == null));
-
+			
 			filterCode = getFilterCode(filterNode, inputBuffer, outputBuffer,
 					backEndFactory, hasDynamicInput, hasDynamicOutput);
 		}
@@ -425,21 +439,55 @@ public class ProcessFilterWorkNode {
 		switch (whichPhase) {
 		case PREINIT:
 			standardPreInitProcessing();
-			additionalPreInitProcessing();
+			postPreInitProcessing();
 			break;
 		case INIT:
 			standardInitProcessing();
-			additionalInitProcessing();
+			postInitProcessing();
 			break;
 		case PRIMEPUMP:
 			standardPrimePumpProcessing(hasDynamicInput);
-			additionalPrimePumpProcessing();
+			postPrimePumpProcessing();
 			break;
 		case STEADY:
+			preSteadyProcessing();
 			standardSteadyProcessing(hasDynamicInput);
-			additionalSteadyProcessing();
+			postSteadyProcessing();
 			break;
 		}
+	}
+
+	protected void postInitProcessing() {
+
+	}
+
+	protected void postPreInitProcessing() {
+
+	}
+
+
+	protected void postPrimePumpProcessing() {
+
+	}
+
+	protected void postSteadyProcessing() {
+		addTokenWrite(filterNode, SchedulingPhase.STEADY);
+	}
+
+	protected void preInitProcessing() {
+
+	}
+
+	protected void prePreInitProcessing() {
+
+	}
+	
+	protected void prePrimePumpProcessing() {
+
+	}
+
+	protected void preSteadyProcessing() {
+		addTokenWait(filterNode, SchedulingPhase.STEADY);
 	}
 
 	protected void standardInitProcessing() {
@@ -467,9 +515,6 @@ public class ProcessFilterWorkNode {
 	protected void standardPrimePumpProcessing(boolean hasDynamicInput) {
 		// TODO: We need to change this so we have the correct prime pump
 		// processing.
-//		System.out
-//				.println("ProcessFilterWorkNode.standardPrimePumpProcessing, hasDynamicInput="
-//						+ hasDynamicInput);
 		if (hasDynamicInput) {
 			System.out
 					.println("WARNING: need to change ProcessFilterWorkNode.standardPrimePumpProcessing to have the correct schedule");
@@ -503,39 +548,12 @@ public class ProcessFilterWorkNode {
 			basicCodeWritten.put(filterNode, true);
 		}
 
-//		System.out
-//				.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
-//						+ filterNode.getFilter().getName()
-//						+ " isDynamicPop="
-//						+ isDynamicPop);
 		if (isDynamicPop) {
 			Map<Filter, Integer> filterToThreadId = backEndFactory
-					.getFilterToThreadId();
-			//String threadId = filterToThreadId.get(filterNode.getParent())
-
-//			for (Filter f : filterToThreadId.keySet()) {
-//				System.out
-//				.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" + f.toString()
-//						+ " has thread index=" + filterToThreadId.get(f).toString());					
-//			}
-			
-//			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode="+ filterNode.toString());
-//			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getAsFilter()="+ filterNode.getAsFilter());
-//			System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filterNode.getParent()="+ filterNode.getParent());
-//			
-			
-			
-			
+					.getFilterToThreadId();								
 			String threadId = filterToThreadId.get(filterNode.getParent())
 					.toString();
-			
-			
-			
 			int threadIndex = Integer.parseInt(threadId);
-//			System.out
-//			.println("ProcessFilterWorkNode.standardSteadyProcessing Filter"
-//					+ filterNode.getFilter().getName() +
-//					" calling codeStore.addThreadHelper");
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
 			codeStore.addSteadyThreadCall(threadIndex);
 

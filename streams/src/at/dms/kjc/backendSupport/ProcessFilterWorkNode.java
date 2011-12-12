@@ -22,6 +22,7 @@ import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeInfo;
+import at.dms.kjc.smp.Util;
 
 /**
  * Process a FilterSliceNode creating code in the code store and buffers for
@@ -326,7 +327,7 @@ public class ProcessFilterWorkNode {
 
 	}
 
-	protected void standardSteadyProcessing() {
+	protected void standardSteadyProcessing() {		
 		JStatement steadyBlock = filter_code.getSteadyBlock();
 		// helper has now been used for the last time, so we can write the basic code.
 		// write code deemed useful by the helper into the correct ComputeCodeStore.
@@ -342,6 +343,7 @@ public class ProcessFilterWorkNode {
 		}
 
 		codeStore.addSteadyLoopStatement(steadyBlock);
+			
 
 		if (debug) {
 			// debug info only: expected splitter and joiner firings.
