@@ -438,7 +438,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
-			p.println("extern int " + str + ";");
+			p.println("extern volatile int " + str + ";");
 		}
 
 		p.println("#endif");
@@ -536,7 +536,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
-			p.println("int " + str + ";");
+			p.println("volatile int " + str + ";");
 		}
 		p.println();
 		
