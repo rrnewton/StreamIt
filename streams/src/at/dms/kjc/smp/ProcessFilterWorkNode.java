@@ -324,7 +324,7 @@ public class ProcessFilterWorkNode {
 			WorkNode dst = e.getDest().getParent().getWorkNode();	
 			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
 			if (!dstCore.equals(filterCore)) {								
-				String tokenName = filter + "_token";	
+				String tokenName = filter + "_to_" + dst + "_token";	
 				SMPComputeCodeStore.addTokenName(tokenName);
 				SMPComputeCodeStore cs = filterCore.getComputeCode();				
 				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
@@ -340,8 +340,8 @@ public class ProcessFilterWorkNode {
 		for (InterFilterEdge e : srcEdges) {
 			WorkNode src = e.getSrc().getParent().getWorkNode();
 			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
-			if (!srcCore.equals(filterCore)) {				
-				String tokenName = src + "_token";				
+			if (!srcCore.equals(filterCore)) {	
+				String tokenName = src + "_to_" + filter + "_token";	
 				SMPComputeCodeStore cs = filterCore.getComputeCode();								
 				cs.addSteadyLoopStatement(Util.toStmt("while (" + tokenName + " == 0)"));
 				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
