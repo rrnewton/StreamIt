@@ -467,7 +467,7 @@ public class ProcessFilterWorkNode {
 
 
 	protected void postPrimePumpProcessing() {
-
+		addTokenWrite(filterNode, SchedulingPhase.PRIMEPUMP);
 	}
 
 	protected void postSteadyProcessing() {
@@ -483,7 +483,7 @@ public class ProcessFilterWorkNode {
 	}
 	
 	protected void prePrimePumpProcessing() {
-
+		addTokenWait(filterNode, SchedulingPhase.PRIMEPUMP);
 	}
 
 	protected void preSteadyProcessing() {
