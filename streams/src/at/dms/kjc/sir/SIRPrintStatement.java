@@ -24,8 +24,6 @@ import at.dms.kjc.*;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
 import at.dms.compiler.JavaStyleComment;
-import at.dms.util.MessageDescription;
-import at.dms.util.InconsistencyException;
 
 /**
  * This represents a print statement, originally formulated with
@@ -33,7 +31,12 @@ import at.dms.util.InconsistencyException;
  */
 public class SIRPrintStatement extends JStatement {
 
-    /**
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * The argument to the print statement: expression to be printed.
      */
     protected JExpression arg;

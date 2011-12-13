@@ -7,7 +7,6 @@ package at.dms.kjc;
 
 import java.util.List;
 
-import at.dms.kjc.*;
 import at.dms.kjc.lir.*;
 import at.dms.kjc.sir.*;
 import at.dms.kjc.sir.lowering.JVectorLiteral;

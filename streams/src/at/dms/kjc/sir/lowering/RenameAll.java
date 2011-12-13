@@ -255,7 +255,7 @@ public class RenameAll extends SLIRReplacingVisitor
         // replaceParentInit(str, nf);
         
         nf.setStateful(str.isStateful());
-        
+        nf.setIO(str.hasIO());
         
         nf.setInit(newInit);
         symtab = ost;

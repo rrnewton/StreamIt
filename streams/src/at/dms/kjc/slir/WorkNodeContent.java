@@ -50,7 +50,8 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     protected int peek;
     /** Is true if the filter has state **/
     protected boolean isStateful;
-
+    /** Is true if the filter has print statements **/
+    protected boolean hasIO;
     /////////////////////////
     //Linear Representation
     /////////////////////////
@@ -72,6 +73,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /** if this filter is linear, the total number of filters in the pipeline of 
         fissed filters that were generated from the original linear filter **/
     private int total;
+
     
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
@@ -108,6 +110,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         pos = content.pos;
         total = content.total;
         isStateful = content.isStateful;
+        hasIO = content.hasIO;
 //        System.out.println("WorkNodeContent.WorkNodeContent(WorkNodeContent content) isStateful=" + isStateful);
     }
 
@@ -135,11 +138,15 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         linear = false;
         //total=1;
         isStateful = filter.isStateful();
+        hasIO = filter.hasIO();
 //    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter) isStateful="+ filter.isStateful());
 
     }
 
-      
+    public boolean hasIO() {
+    	return hasIO;	
+    }
+          
     public boolean isStateful() {
     	return isStateful;	
     }
@@ -702,6 +709,7 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         other.popCount = this.popCount;
         other.peek = this.peek;
         other.isStateful = this.isStateful;
+        other.hasIO = this.hasIO;
         other.linear = this.linear;
         other.array = (double[])at.dms.kjc.AutoCloner.cloneToplevel(this.array);
         other.constant = this.constant;

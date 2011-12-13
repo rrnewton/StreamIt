@@ -72,6 +72,11 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
     {
         return (filter instanceof FileOutputContent);
     }
+    
+    public boolean hasIO() {
+    	
+    	return filter.hasIO();    	
+	}
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
@@ -90,6 +95,7 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
         other.predefined = this.predefined;
         other.laidout = this.laidout;
     }
+	
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

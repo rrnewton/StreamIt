@@ -349,6 +349,7 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
     protected void deepCloneInto(at.dms.kjc.sir.SIRFilter other) {
         super.deepCloneInto(other);
     }
+	
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

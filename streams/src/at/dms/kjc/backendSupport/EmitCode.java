@@ -320,6 +320,9 @@ assert false : "This feature is unsupported for iteration count";
         //  assert getDim(left.getType()) == getDim(right.getType()) :
         //    "Array dimensions of variables of array assignment do not match";
     
+        System.out.println("EmitCode.arrayCopy left=" + left + " right=" + right);
+        
+        
         //find the number of dimensions
         int rbound = ((CArrayType)right.getType()).getArrayBound();
         int lbound = ((CArrayType)var.getType()).getArrayBound();

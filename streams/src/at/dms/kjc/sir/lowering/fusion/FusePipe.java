@@ -280,7 +280,11 @@ public class FusePipe {
 		}
 		SIRFilter filter = (SIRFilter) str;
 
-		
+		if (filter.hasIO()) {
+			System.out.println("TODO: FusePipe.isFusable filter " + filter.getName()
+					+ " is not fusable because it has IO.");
+			// return false;
+		}
 		
 		if (filter.getName().contains("DummySource") ||
 				filter.getName().contains("DummySink") ) {

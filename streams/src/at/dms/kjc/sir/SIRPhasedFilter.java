@@ -37,6 +37,11 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
      */
     private JMethodDeclaration[] initPhases, phases;
 
+    /**
+     * Indicates whether the filter has a print statement or not.
+     */
+	protected boolean hasIO;
+
     public SIRPhasedFilter() 
     {
         this(null);
@@ -66,6 +71,7 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         this.phases = phases;
         this.inputType = inputType;
         this.outputType = outputType;
+        this.hasIO = false;
     }
 
     /**
@@ -94,6 +100,7 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         this.phases = other.phases;
         this.ident = other.ident;
         this.stateful = other.stateful;
+        this.hasIO = other.hasIO;
     }
     
     /**
@@ -129,10 +136,27 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     public boolean isStateful() {
         return stateful;
     }
+    
     public void setStateful(boolean stateful) {    
         this.stateful = stateful;
     }
+    
+    /**
+     * returns true is filter has a print statement.
+     */
+    public boolean hasIO() {
+    	return hasIO;
+    }
 
+    /**
+     * Set the filters flag for determining if it has a print statement.
+     * @param hasIO
+     */
+    public void setIO(boolean hasIO) {
+    	this.hasIO = hasIO;
+    }
+
+    
     public JMethodDeclaration[] getInitPhases() {
         return initPhases;
     }
@@ -185,6 +209,7 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         other.inputType = (at.dms.kjc.CType)at.dms.kjc.AutoCloner.cloneToplevel(this.inputType);
         other.outputType = (at.dms.kjc.CType)at.dms.kjc.AutoCloner.cloneToplevel(this.outputType);
         other.stateful = this.stateful;
+        other.hasIO = this.hasIO;
         other.initPhases = (at.dms.kjc.JMethodDeclaration[])at.dms.kjc.AutoCloner.cloneToplevel(this.initPhases);
         other.phases = (at.dms.kjc.JMethodDeclaration[])at.dms.kjc.AutoCloner.cloneToplevel(this.phases);
     }

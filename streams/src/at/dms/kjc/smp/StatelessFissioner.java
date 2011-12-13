@@ -105,6 +105,12 @@ public class StatelessFissioner {
             return false;
         }
         
+        if (filter.hasIO()) {
+        	 System.out.println("TODO: StatelessFissioner.canFizz()  " + slice);
+        	 System.out.println("Can't fizz: Filter contains print functions, presently unsupported: " + slice);
+        	 return false;
+        }
+        
         //TODO: make sure the rates match between the slice and its inputs and the slices 
         //and its outputs
 
