@@ -96,29 +96,12 @@ public class ProcessFilterWorkNode {
 				return new JMethodCallExpression(popManyName,
 						new JExpression[] { new JIntLiteral(self.getNumPop()) });
 			} else {
-				if (isDynamicPop) {
-					
-					
-					
+				if (isDynamicPop) {					
 					
 					InterSSGEdge edge = ((InterSSGChannel)inputChannel).getEdge();
 					OutputPort outputPort = edge.getSrc();
 					InputPort inputPort = edge.getDest();
-					String threadId = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]).toString();
-					
-//					System.out.println("PushPopReplacingVisitor.visitPopExpression filter=" 
-//							+ filter.getParent().toString() 
-//							+ " outputPort.getSSG().getTopFilters()[0]=" 
-//							+ outputPort.getSSG().getTopFilters()[0]
-//									+ " inputPort.getSSG().getTopFilters()[0]=" 
-//									+ inputPort.getSSG().getTopFilters()[0]
-//
-//							);
-					
-					
-					//String threadId = filterToThreadId.get(filter.getParent())
-					//		.toString();
-
+					String threadId = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]).toString();					
 					
 					String buffer = "dyn_buf_" + threadId;
 					JExpression dyn_queue = new JEmittedTextExpression(buffer);
@@ -337,11 +320,15 @@ public class ProcessFilterWorkNode {
 		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
 		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
 				.getSources(phase);		
-		for (InterFilterEdge e : srcEdges) {
+		for (InterFilterEdge e : srcEdges) {			
+			System.out.println("PricessFilterWorkNode.addTokenWait filter=" + filter + " phase=" + phase);			
 			WorkNode src = e.getSrc().getParent().getWorkNode();
 			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
 			if (!srcCore.equals(filterCore)) {	
 				String tokenName = src + "_to_" + filter + "_token";	
+				System.out.println("PricessFilterWorkNode.addTokenWait tokenName=" + tokenName);
+				System.out.println("TODO: Why is this called twice for simple split test case?");
+				
 				SMPComputeCodeStore cs = filterCore.getComputeCode();								
 				cs.addSteadyLoopStatement(Util.toStmt("while (" + tokenName + " == 0)"));
 				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));

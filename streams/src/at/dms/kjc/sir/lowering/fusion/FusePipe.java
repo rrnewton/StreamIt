@@ -283,7 +283,7 @@ public class FusePipe {
 		if (filter.hasIO()) {
 			System.out.println("TODO: FusePipe.isFusable filter " + filter.getName()
 					+ " is not fusable because it has IO.");
-			// return false;
+			 return false;
 		}
 		
 		if (filter.getName().contains("DummySource") ||
