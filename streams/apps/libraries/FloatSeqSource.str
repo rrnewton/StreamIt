@@ -17,7 +17,7 @@
  * first, first + increment, first + 2*increment, ... 
  */
 
-void->float filter FloatSeqSource(float first, float increment) {
+void->float stateful filter FloatSeqSource(float first, float increment) {
     float i = first;
 
     work push 1 pop 0 {
