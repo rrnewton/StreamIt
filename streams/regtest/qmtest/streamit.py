@@ -187,7 +187,7 @@ class RunStrcTest(qm.test.test.Test):
       # List of args to the program, starting with the program name,
       # and always including the iteration count:
       arguments = [path] + backend + \
-                  ["--iterations", str(self.iters)] + \
+                  ["--iterations", str(self.iters), '--regtest'] + \
                   self.options + self.filenames
 
       # print >> sys.stderr, "ABOUT TO COMPILE"
