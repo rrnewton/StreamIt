@@ -274,11 +274,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		addSteadyLoopStatement(Util.toStmt("for (int _i_ = 0; _i_ < " + outputs
 				+ "; _i_++) fprintf(output, \"" + type + "\\n\", " + cast
 				+ bufferName + "[_i_])"));
-	}
-
-	public void addReaderThread() {
-
-	}
+	}	
 
 	/**
 	 * Add stmt to the beginning of the method that will perform the allocation

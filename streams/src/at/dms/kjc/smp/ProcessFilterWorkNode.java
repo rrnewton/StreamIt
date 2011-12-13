@@ -328,10 +328,14 @@ public class ProcessFilterWorkNode {
 		}				
 		for (InterFilterEdge e : edgeSet) {			
 			System.out.println("PricessFilterWorkNode.addTokenWait filter=" + filter + " phase=" + phase);			
-			WorkNode src = e.getSrc().getParent().getWorkNode();
+			WorkNode src = e.getSrc().getParent().getWorkNode();			
+			// Need to special case for FileReaders, which won't be parallelized.
+			if (src.isFileInput()) {
+				continue;
+			} 						
 			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
 			if (!srcCore.equals(filterCore)) {	
-				String tokenName = src + "_to_" + filter + "_token";	
+				String tokenName = src + "_to_" + filter + "_token";													
 				System.out.println("PricessFilterWorkNode.addTokenWait tokenName=" + tokenName);
 				System.out.println("TODO: Why is this called twice for simple split test case?");
 				
