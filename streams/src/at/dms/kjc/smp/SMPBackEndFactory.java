@@ -270,10 +270,13 @@ public class SMPBackEndFactory extends
 					&& FissionGroupStore.isFizzed(filter.getParent())) {
 				for (Filter slice : FissionGroupStore.getFizzedSlices(filter
 						.getParent())) {
+					System.out.println("SMPBackEndFactory.processFilterWorkNode() sharedbufs && isFizzed");
+					
 					new ProcessFilterWorkNode().doit(slice.getWorkNode(),
 							whichPhase, this);
 				}
 			} else {
+				System.out.println("SMPBackEndFactory.processFilterWorkNode() else");
 				new ProcessFilterWorkNode().doit(filter, whichPhase, this);
 			}
 

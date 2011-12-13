@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -320,7 +321,12 @@ public class ProcessFilterWorkNode {
 		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
 		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
 				.getSources(phase);		
+		Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
+		// remove duplicate edges if they exist
 		for (InterFilterEdge e : srcEdges) {			
+			edgeSet.add(e);
+		}				
+		for (InterFilterEdge e : edgeSet) {			
 			System.out.println("PricessFilterWorkNode.addTokenWait filter=" + filter + " phase=" + phase);			
 			WorkNode src = e.getSrc().getParent().getWorkNode();
 			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
@@ -360,8 +366,8 @@ public class ProcessFilterWorkNode {
 		// remember that this tile has code that needs to execute
 		codeStore.setHasCode();
 
-//		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="
-//				+ filterNode);
+		System.out.println("== smp.ProcessFitlerWorkNode.doit(), filter="
+				+ filterNode);
 
 		filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
 		// We should only generate code once for a filter node.
@@ -433,6 +439,7 @@ public class ProcessFilterWorkNode {
 			postInitProcessing();
 			break;
 		case PRIMEPUMP:
+			preSteadyProcessing();
 			standardPrimePumpProcessing(hasDynamicInput);
 			postPrimePumpProcessing();
 			break;
@@ -442,6 +449,7 @@ public class ProcessFilterWorkNode {
 			postSteadyProcessing();
 			break;
 		}
+		System.out.println("== leaving ==");
 	}
 
 	protected void postInitProcessing() {
