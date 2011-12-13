@@ -11,6 +11,11 @@
 void->void pipeline FileBitcopy {
     add FileReader<bit>("bit.in");
     add bit->bit filter {
+	work push 1 pop 1 {
+	    push(pop());
+	}
+    }
+    add bit->bit filter {
 	work pop 1 push 1 {
 	    push(pop());
 	}

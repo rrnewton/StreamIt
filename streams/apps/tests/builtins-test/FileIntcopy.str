@@ -10,5 +10,10 @@
 
 void->void pipeline FileIntcopy {
     add FileReader<int>("int.in");
+    add int->int filter {
+	work push 1 pop 1 {
+	    push(pop());
+	}
+    }
     add FileWriter<int>("int.out");
 }

@@ -10,5 +10,10 @@
 
 void->void pipeline FileFloatcopy {
     add FileReader<float>("float.in");
+    add float->float filter {
+	work push 1 pop 1 {
+	    push(pop());
+	}
+    }
     add FileWriter<float>("float.out");
 }
