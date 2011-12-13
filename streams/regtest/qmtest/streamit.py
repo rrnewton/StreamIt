@@ -325,7 +325,7 @@ class RunProgramTest(qm.test.test.Test):
         # stderr to files in case internal QMTest error obscured error
         # in running program.  Didn't seem to help...
         path = os.path.join('.', filename)
-        arguments = [path, '-i ' + str(self.iters)]
+        arguments = [path, '-i ' + str(self.iters), '--regtest']
         #e = TimedExecutable()
         e = qm.executable.RedirectedExecutable(self.timeout)
 
