@@ -1,90 +1,111 @@
 #!/usr/bin/env python
-
 import os
 import subprocess
-import threading
-import glob
-import filecmp
-import sys
+import time
+import gplot
+import re
 
-class Command(object):
-    def __init__(self, cmd):
-        self.cmd = cmd
-        self.process = None
+streamit_home = os.environ['STREAMIT_HOME']
+strc          = os.path.join(streamit_home, 'strc')
+test_root     = os.path.join(streamit_home, 'apps', 'tests', 'dynamic')
+test_cases    = os.path.join(test_root, 'cases')
+tests        = [ ('test9.str', 'test10.str') ]
 
-    def run(self, timeout):
-        def target():
-            self.process = subprocess.Popen(self.cmd, shell=True)
-            self.process.communicate()
-        thread = threading.Thread(target=target)
-        thread.start()
-        thread.join(timeout)
-        if thread.is_alive():
-            self.process.terminate()
-            thread.join()
+def print_header():
+    print('#%s\t%s\t%s' % ('cost', 'static', 'dynamic'))
 
-FNULL = open('/dev/null', 'w')
+def write_header(f):
+    f.write('#%s\t%s\t%s\n' % ('cost', 'static', 'dynamic'))
 
-def run_strc(filename):
-    cmd = ["strc", "-smp", "2", "-N", "1", "-i", "10", filename]
-    return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
+def print_result(cost, sta_avg, dyn_avg):    
+    print('%d\t%f\t%f' % (cost, sta_avg, dyn_avg))
+    #f.write('%d\t%f\t%f' % (cost, sta_avg, dyn_avg))
 
-def run_make(filename):
-    cmd = ["make"]
-    return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
+def compile(num_cores, num_iters, n, test):
+    target = os.path.join(test_cases, test)
+    exe = os.path.join(test_root, 'smp' + str(num_cores))
+    cmd = [strc, '-smp', str(num_cores), '-N', str(1), '-i', str(num_iters), target ]
+    subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
+    assert os.path.exists(exe)
 
-def run_exe(filename):
-    output = filename + '.out'
-    cmd = './smp2 > ' + output
-    command = Command(cmd)
-    command.run(timeout=10)
-
-def cleanup():
-    cmd = 'rm -f *.c *.h *.dot *.java *.o smp2 Makefile cases/*.java'
-    # print cmd + '\n'
-    os.system(cmd)
-
-def compare(f1, f2):
-    if (filecmp.cmp(f1, f2)):
-        return 'success'
-    else:
-        return "FAIL"
-
-def run_one(infile):
-    print "current file is: " + infile
-    print "Compile StreamIt code."
-    p = run_strc(infile)
-    p.wait()
-    p.wait()
-
-def run_test(infile):
-    print "Testing with input file: " + infile + "."
-    #print "Compile StreamIt code."
-    p = run_strc(infile)
-    p.wait()
-    run_exe(infile)        
-    return 'foo'
-
-def run_all():
-    path = 'cases/'
+def run_one(num_cores, test_dir):
+    exe = os.path.join(test_root, 'smp' + str(num_cores))
+    (output, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    regex = re.compile('Average cycles per SS for 1 iterations: (\d+)')
     results = []
-    for infile in glob.glob( os.path.join(path, '*9.str') ):
-        results.append(run_test(infile))
-    t = '\n'
-    return t.join(results)
+    for m in regex.finditer(output):
+        results.append(m.group(1));
+    avg = reduce(lambda x, y: float(x) + float(y), results) / len(results)  
+    return avg
+
+def get_result(num_cores, test):
+    results = []
+    for run in range(3):
+        results.append(run_one(num_cores, test))
+    avg = reduce(lambda x, y: float(x) + float(y), results) / len(results)
+    return avg
 
 def main():
-    if (len(sys.argv) > 1):
-        if (sys.argv[1] == 'clean'):
-            cleanup()
-        else:
-            run_one(sys.argv[1])
-    else:
-        ret = run_all();
-        print "\nRESULTS:"
-        print(ret)
-        print ""
-                    
+    cores = [2]
+    iterations = [10]
+    nvalues = [1]
+    print_header()
+    for n in nvalues:
+        for num_cores in cores:
+            for num_iters in iterations:
+                for (dynamic_test, static_test) in tests:
+                    compile(num_cores, num_iters, n, dynamic_test)
+                    dynamic_avg = get_result(num_cores, dynamic_test)
+                    static_avg = get_result(num_cores, static_test)
+                    #print 'dynamic_avg time is %f' % dynamic_avg
+                    #print 'static_avg time is %f' % static_avg
+                    print_result(10, static_avg, dynamic_avg)    
+                   
+
+
+
+
+    # i = 1000
+    # mults = [1, 10, 100, 250, 500, 750, 1000]
+    # cost = [1, 10, 100, 250, 500, 750, 1000]
+    # print_header()
+
+    # dyn_avg_result = []
+    # sta_avg_result = []
+    # for c in cost:
+    #     f = open('./cost-fixed' + str(c) + '.dat', 'w')
+    #     write_header(f)
+    #     for mult in mults:
+    #         dyn_result = []
+    #         sta_result = []
+    #         for run in range(3):
+    #             sta_result.append(run_one('streamit/smp2', mult, i, c))
+    #         for run in range(3):
+    #             dyn_result.append(run_one('streamit_dynamic/smp2', mult, i, c))
+    #         sta_avg = reduce(lambda x, y: float(x) + float(y), sta_result) / len(sta_result)
+    #         dyn_avg = reduce(lambda x, y: float(x) + float(y), dyn_result) / len(dyn_result)    
+    #         print_result(f, mult, i, c, sta_avg, dyn_avg)
+    #         dyn_avg_result.append(dyn_avg)
+    #         sta_avg_result.append(sta_avg);
+    #     f.close()
+    #     plot_cost_fixed(c)
+
+    # print_header()
+
+    # m = 0;
+    # for mult in mults:
+    #     f = open('./mult-fixed' + str(mult) + '.dat', 'w')
+    #     write_header(f)
+    #     n = 0;
+    #     for c in cost:            
+    #         sta_avg = sta_avg_result[m + n]
+    #         dyn_avg = dyn_avg_result[m + n]
+    #         print_result(f, mult, i, c, sta_avg, dyn_avg)
+    #         n = n + len(mults)
+    #     f.close()
+    #     plot_mult_fixed(mult)
+    #     m = m + 1
+    
 if __name__ == "__main__":
     main()
 
