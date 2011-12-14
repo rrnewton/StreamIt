@@ -1,0 +1,49 @@
+
+void->float stateful filter Source {
+  float count;
+  init {
+     count = 0.0;
+  }
+  work push * {
+    push(count++);
+  }
+}
+
+float->float stateful filter B {
+  int cost;
+  int state;
+  init {
+     cost = 10;
+     state = 0;
+  }
+  work pop 1 push 1 {
+    state++;
+    float amount = pop(); 
+    float w = doWork(amount);
+    push(amount * 2.0 - w);     
+   }
+
+   float doWork(float x) {
+      int i;
+      float y = 1.0;
+      for (i = 0; i < cost; i++) {
+        y += i - x;
+      }
+      return y;
+    }
+}
+
+float->void filter Sink {
+   work pop 1 {
+     // pop();
+     println(pop());
+   }
+}
+
+void->void pipeline test10 {
+    add Source();
+    add B();
+    add B();
+    add Sink();
+}
+
