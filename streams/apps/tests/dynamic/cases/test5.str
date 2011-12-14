@@ -2,7 +2,7 @@
 void->float filter A {
    work push 1 {
      int c;
-     for (int i = 0; i < 100000; i++) {
+     for (int i = 0; i < 10; i++) {
        c += i;
      }   
      push(c);
@@ -13,7 +13,7 @@ float->float filter B {
   work pop 1 push 1 {
    float x = pop();
    int b_variable;
-   for (int i = 0; i < 100000; i++) {
+   for (int i = 0; i < 10; i++) {
      b_variable += i;
    }   
    push(b_variable);
@@ -35,12 +35,12 @@ float->float stateful filter C {
 float->void filter D {
    work pop 1 {
      do_work(1.0);
-     println(pop());
+     print(pop());
    }
    
    float do_work(float x) {
      float y = 1.0;
-     for (int i = 0; i < 100000; i++) {
+     for (int i = 0; i < 10; i++) {
        y += i - x;
      }
      return y;
