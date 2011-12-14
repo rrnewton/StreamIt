@@ -50,16 +50,14 @@ def main():
     iterations = [10]
     nvalues = [1]
     print_header()
-    for n in nvalues:
-        for num_cores in cores:
-            for num_iters in iterations:
-                for (dynamic_test, static_test) in tests:
-                    compile(num_cores, num_iters, n, dynamic_test)
-                    dynamic_avg = get_result(num_cores, dynamic_test)
-                    static_avg = get_result(num_cores, static_test)
-                    #print 'dynamic_avg time is %f' % dynamic_avg
-                    #print 'static_avg time is %f' % static_avg
-                    print_result(10, static_avg, dynamic_avg)    
+    for num_cores in cores:
+        for (dynamic_test, static_test) in tests:
+            compile(num_cores, 10, 1, dynamic_test)
+            dynamic_avg = get_result(num_cores, dynamic_test)
+            static_avg = get_result(num_cores, static_test)
+            #print 'dynamic_avg time is %f' % dynamic_avg
+            #print 'static_avg time is %f' % static_avg
+            print_result(10, static_avg, dynamic_avg)    
                    
 
 
