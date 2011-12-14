@@ -45,19 +45,32 @@ def get_result(num_cores, test):
     avg = reduce(lambda x, y: float(x) + float(y), results) / len(results)
     return avg
 
+def replace(test, cost):
+    target = os.path.join(test_cases, test)
+    out = os.path.join(test_cases, test)
+    o = open(out,"w")
+    data = open(target + ".template").read()
+    o.write( re.sub("COST_VALUE",str(cost),data)  )
+    o.close()
+
 def main():
     cores = [2]
     iterations = [10]
     nvalues = [1]
+    costs = [1, 10, 100, 1000]
     print_header()
-    for num_cores in cores:
-        for (dynamic_test, static_test) in tests:
-            compile(num_cores, 10, 1, dynamic_test)
-            dynamic_avg = get_result(num_cores, dynamic_test)
-            static_avg = get_result(num_cores, static_test)
-            #print 'dynamic_avg time is %f' % dynamic_avg
-            #print 'static_avg time is %f' % static_avg
-            print_result(10, static_avg, dynamic_avg)    
+    for cost in costs:
+        for num_cores in cores:
+            for (dynamic_test, static_test) in tests:
+                replace(dynamic_test, cost);
+                replace(static_test, cost);
+                compile(num_cores, 10, 1, dynamic_test)
+                dynamic_avg = get_result(num_cores, dynamic_test)
+                compile(num_cores, 10, 1, static_test)
+                static_avg = get_result(num_cores, static_test)
+                #print 'dynamic_avg time is %f' % dynamic_avg
+                #print 'static_avg time is %f' % static_avg
+                print_result(cost, static_avg, dynamic_avg)    
                    
 
 
