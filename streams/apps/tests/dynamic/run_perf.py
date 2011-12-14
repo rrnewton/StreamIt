@@ -2,7 +2,6 @@
 import os
 import subprocess
 import time
-import gplot
 import re
 
 streamit_home = os.environ['STREAMIT_HOME']
