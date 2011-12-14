@@ -13,7 +13,7 @@ float->float stateful filter B {
   int cost;
   int state;
   init {
-     cost = 10;
+     cost = COST_VALUE;
      state = 0;
   }
   work pop * push * {
