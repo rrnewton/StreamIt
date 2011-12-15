@@ -80,7 +80,6 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	 * @return The block of code to append
 	 */
 	protected JBlock endSchedulingPhase(SchedulingPhase phase) {
-		System.out.println("SMPCodeStoreHeler.endSchedulingPhase()");
 		JBlock block = new JBlock();
 		return block;
 	}

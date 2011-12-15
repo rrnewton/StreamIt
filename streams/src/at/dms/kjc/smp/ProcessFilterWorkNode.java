@@ -327,7 +327,6 @@ public class ProcessFilterWorkNode {
 			edgeSet.add(e);
 		}				
 		for (InterFilterEdge e : edgeSet) {			
-			System.out.println("PricessFilterWorkNode.addTokenWait filter=" + filter + " phase=" + phase);			
 			WorkNode src = e.getSrc().getParent().getWorkNode();			
 			// Need to special case for FileReaders, which won't be parallelized.
 			if (src.isFileInput()) {
@@ -336,9 +335,6 @@ public class ProcessFilterWorkNode {
 			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
 			if (!srcCore.equals(filterCore)) {	
 				String tokenName = src + "_to_" + filter + "_token";													
-				System.out.println("PricessFilterWorkNode.addTokenWait tokenName=" + tokenName);
-				System.out.println("TODO: Why is this called twice for simple split test case?");
-				
 				SMPComputeCodeStore cs = filterCore.getComputeCode();								
 				cs.addSteadyLoopStatement(Util.toStmt("while (" + tokenName + " == 0)"));
 				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
@@ -369,10 +365,7 @@ public class ProcessFilterWorkNode {
 		codeStore = location.getComputeCode();
 		// remember that this tile has code that needs to execute
 		codeStore.setHasCode();
-
-		System.out.println("== smp.ProcessFitlerWorkNode.doit(), filter="
-				+ filterNode);
-
+		
 		filterCode = CodeStoreHelper.findHelperForSliceNode(filterNode);
 		// We should only generate code once for a filter node.
 
@@ -384,12 +377,6 @@ public class ProcessFilterWorkNode {
 		Filter[] graph = ssg.getFilterGraph();
 		int last = graph.length - 1;
 
-//		System.out
-//				.println("smp.ProcessFitlerWorkNode.doit(), graph[0].getWorkNode()="
-//						+ graph[0].getWorkNode()
-//						+ "graph[last].getWorkNode()="
-//						+ graph[last].getWorkNode());
-
 		// A particular filter will only have dynamic input if it is
 		// the top node of an SSG, and if the SSG has dynamic input.
 		if (filterNode.equals(graph[0].getWorkNode())) {
@@ -399,10 +386,6 @@ public class ProcessFilterWorkNode {
 		if (filterNode.equals(graph[last].getWorkNode())) {
 			hasDynamicOutput = ssg.hasDynamicOutput();
 		}
-
-//		System.out.println("smp.ProcessFitlerWorkNode.doit(), filter="
-//				+ filterNode + "hasDynamicInput=" + hasDynamicInput
-//				+ " hasDynamicOutput=" + hasDynamicOutput);
 
 		if (filterCode == null) {
 
@@ -453,7 +436,7 @@ public class ProcessFilterWorkNode {
 			postSteadyProcessing();
 			break;
 		}
-		System.out.println("== leaving ==");
+
 	}
 
 	protected void postInitProcessing() {

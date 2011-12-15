@@ -1793,11 +1793,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	 */
 	public Object visitMethodCallExpression(JMethodCallExpression self,
 			JExpression prefix, String ident, JExpression[] args) {
-
-		System.out
-				.println("Kopi2SIR.visitMethodCallExpression() self.getIdent()="
-						+ self.getIdent());
-
+	
 		// Save method we were processing
 		String parentMethod = currentMethod;
 		blockStart("MethodCallExpression: " + self.getIdent(), self);
@@ -1810,10 +1806,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 			currentMethod = parentMethod;
 			JPhylum jphylum = newSIRExp(self, args);
 			if (this.isPrintExpr(self)) {
-				if (parentStream instanceof SIRFilter) {
-					System.out
-					.println("Kopi2SIR.visitMethodCallExpression() parentStream.setIO()=true!");
-							
+				if (parentStream instanceof SIRFilter) {					
 					((SIRFilter) parentStream).setIO(true);
 				}
 			}

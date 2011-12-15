@@ -105,9 +105,8 @@ public class StatelessFissioner {
             return false;
         }
         
-        if (filter.hasIO() && KjcOptions.regtest) {
-        	 System.out.println("TODO: StatelessFissioner.canFizz()  " + slice);
-        	 System.out.println("Can't fizz: Filter contains print functions, presently unsupported: " + slice);
+        if (filter.hasIO() && KjcOptions.regtest) {        	 
+        	if(debug) System.out.println("Can't fizz: Filter contains print functions, presently unsupported: " + slice);
         	 return false;
         }
         
