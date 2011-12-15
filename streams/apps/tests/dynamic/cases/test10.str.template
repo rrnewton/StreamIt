@@ -4,7 +4,7 @@ void->float stateful filter Source {
   init {
      count = 0.0;
   }
-  work push * {
+  work push 1 {
     push(count++);
   }
 }
