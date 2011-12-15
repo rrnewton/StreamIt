@@ -33,10 +33,14 @@ float->float stateful filter B {
     }
 }
 
-float->void filter Sink {
+float->void stateful filter Sink {
+  float count;
+  init {
+     count = 0.0;
+  }
    work pop 1 {
-     // pop();
-     println(pop());
+     count++;
+     pop();
    }
 }
 
