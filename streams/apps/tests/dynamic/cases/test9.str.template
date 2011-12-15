@@ -47,7 +47,6 @@ float->void stateful filter Sink {
 void->void pipeline test9 {
     add Source();
     add B();
-    add B();
     add Sink();
 }
 

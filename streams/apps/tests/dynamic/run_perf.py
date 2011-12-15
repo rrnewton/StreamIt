@@ -68,7 +68,7 @@ def main():
     cores = [2]
     iterations = [10]
     nvalues = [1]
-    costs = [1, 10, 100, 1000]    
+    costs = [100, 250, 500, 750, 1000]    
     f = open('./results.dat', 'w')
     write_header(f)
     print_header()
@@ -87,50 +87,6 @@ def main():
     f.close()
     plot()
 
-
-
-
-    # i = 1000
-    # mults = [1, 10, 100, 250, 500, 750, 1000]
-    # cost = [1, 10, 100, 250, 500, 750, 1000]
-    # print_header()
-
-    # dyn_avg_result = []
-    # sta_avg_result = []
-    # for c in cost:
-    #     f = open('./cost-fixed' + str(c) + '.dat', 'w')
-    #     write_header(f)
-    #     for mult in mults:
-    #         dyn_result = []
-    #         sta_result = []
-    #         for run in range(3):
-    #             sta_result.append(run_one('streamit/smp2', mult, i, c))
-    #         for run in range(3):
-    #             dyn_result.append(run_one('streamit_dynamic/smp2', mult, i, c))
-    #         sta_avg = reduce(lambda x, y: float(x) + float(y), sta_result) / len(sta_result)
-    #         dyn_avg = reduce(lambda x, y: float(x) + float(y), dyn_result) / len(dyn_result)    
-    #         print_result(f, mult, i, c, sta_avg, dyn_avg)
-    #         dyn_avg_result.append(dyn_avg)
-    #         sta_avg_result.append(sta_avg);
-    #     f.close()
-    #     plot_cost_fixed(c)
-
-    # print_header()
-
-    # m = 0;
-    # for mult in mults:
-    #     f = open('./mult-fixed' + str(mult) + '.dat', 'w')
-    #     write_header(f)
-    #     n = 0;
-    #     for c in cost:            
-    #         sta_avg = sta_avg_result[m + n]
-    #         dyn_avg = dyn_avg_result[m + n]
-    #         print_result(f, mult, i, c, sta_avg, dyn_avg)
-    #         n = n + len(mults)
-    #     f.close()
-    #     plot_mult_fixed(mult)
-    #     m = m + 1
-    
 if __name__ == "__main__":
     main()
 
