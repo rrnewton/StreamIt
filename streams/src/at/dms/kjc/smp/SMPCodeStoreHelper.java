@@ -58,7 +58,6 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	 *            A filter slice node to wrap code for.
 	 * @param backEndFactory
 	 *            The back end factory as a source of data and back end specific
-	 *            functions.
 	 */
 	public SMPCodeStoreHelper(WorkNode node,
 			SMPBackEndFactory backEndFactory, SMPComputeCodeStore codeStore) {

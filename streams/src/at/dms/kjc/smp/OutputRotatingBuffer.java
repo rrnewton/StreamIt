@@ -14,18 +14,16 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.slir.InternalFilterNode;
-import at.dms.kjc.slir.IntraFilterEdge;
-import at.dms.kjc.slir.StaticSubGraph;
-import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.slir.fission.FissionGroup;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
 
@@ -68,15 +66,15 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		// for (Filter slice : schedule.getScheduleList()) {
 		for (Filter filter : ssg.getFilterGraph()) {
 
-//			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter="
-//			 + filter.getWorkNode().toString());
-//
-//			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getSrc()="
-//					 + filter.getWorkNode().getEdgeToNext().getSrc());
-//
-//			System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getDest()="
-//					 + filter.getWorkNode().getEdgeToNext().getDest());						
-//						
+			// System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter="
+			// + filter.getWorkNode().toString());
+			//
+			// System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getSrc()="
+			// + filter.getWorkNode().getEdgeToNext().getSrc());
+			//
+			// System.out.println("OutputRotatingBuffer.createOutputBuffers calling on filter.getWorkNode().getEdgeToNext().getDest()="
+			// + filter.getWorkNode().getEdgeToNext().getDest());
+			//
 			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter)) {
 				assert FissionGroupStore.isUnfizzedSlice(filter);
 
@@ -139,51 +137,29 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	}
 
 	/**
-	 * Adds code to wait for a token before proceeding. This provides
-	 * synchronization when there is no software pipelining in an SSG.
-	 * @param filter
-	 * @param phase
+	 * Adds a write to a token after an operator finishes executing.
+	 * This provides synchronization when there is no software pipelining in an SSG.
+	 * 
+	 * @param filter The filter that must finish before the write.
+	 * @param phase The phase of the schedule that is executing.
+	 * @return 
 	 */
-//	private void addIntraSSGSynch(WorkNode filter, SchedulingPhase phase) {
-//		Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);
-//		//filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** OutputRotatingBuffer filter=" + filter + " **/"));
-//				
-//		Set<InterFilterEdge> destEdges = filter.getParent()
-//				.getOutputNode().getDestSet(phase);				
-//		
-//		for (InterFilterEdge e : destEdges) {			
-//			String msg = "-   OutputRotatingBuffer.addIntraSSGSynch() phase= " + phase + " src= " + filter
-//					+ " --> dst=" + e.getDest().getParent().getWorkNode();
-//			filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** " + msg + " **/"));
-//			System.out.println(msg);
-//			WorkNode dst = e.getDest().getParent().getWorkNode();	
-//			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
-//			if (!dstCore.equals(filterCore)) {				
-//				System.out
-//						.println("-     TODO: OutputRotatingBuffer.addIntraSSGSynch() add  busy loop between " + filter + " and " + dst);
-//				System.out
-//				.println("+     TODO: filter " + dst  + " needs a busy loop from " + filter);
-//				
-////				String tokenName = filter + "_token";				
-////				SMPComputeCodeStore cs = dstCore.getComputeCode();								
-////				cs.addSteadyLoopStatement(Util.toStmt("/** Need a a busy loop from " + tokenName + "**/"));
-////				cs.addSteadyLoopStatement(Util.toStmt("while (!" + tokenName +")"));
-////				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
-////				cs.setHasCode(); 
-//				
-//				String tokenName = filter + "_token";	
-//				SMPComputeCodeStore.addTokenName(tokenName);
-//				SMPComputeCodeStore cs = filterCore.getComputeCode();
-//				cs.addSteadyLoopStatement(Util
-//						.toStmt("/** OutputRotatingBuffer says Needs a token write to " + tokenName + "**/"));
-//				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
-//				cs.setHasCode(); 
-//				
-//				
-//			} 
-//		}
-//	}		
-
+	private List<JStatement> addTokenWrite(WorkNode filter, SchedulingPhase phase, List<JStatement> list) {
+		Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);					
+		Set<InterFilterEdge> destEdges = filter.getParent()
+				.getOutputNode().getDestSet(phase);						
+		for (InterFilterEdge e : destEdges) {			
+			WorkNode dst = e.getDest().getParent().getWorkNode();	
+			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
+			if (!dstCore.equals(filterCore)) {								
+				String tokenName = filter + "_to_" + dst + "_token";	
+				SMPComputeCodeStore.addTokenName(tokenName);
+				list.add(Util.toStmt(tokenName + " = 1"));
+			} 
+		}
+		return list;
+	}
+	
 	/**
 	 * Allocate the constituent buffers of this rotating buffer structure
 	 */
@@ -507,7 +483,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 
 	@Override
 	public List<JStatement> endPrimePumpWrite() {
-		LinkedList<JStatement> list = new LinkedList<JStatement>();
+		List<JStatement> list = new LinkedList<JStatement>();
 
 		// add the transfer commands for the data that was just computed
 		list.addAll(transferCommands
@@ -518,10 +494,12 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 		for (SourceAddressRotation addrRot : addressBuffers.values()) {
 			list.addAll(addrRot.rotateStatements());
 		}
+		
+		list = addTokenWrite(filterNode, SchedulingPhase.PRIMEPUMP, list);
+		
 		return list;
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -529,26 +507,26 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	 */
 	@Override
 	public List<JStatement> endSteadyWrite() {
-		
-		LinkedList<JStatement> list = new LinkedList<JStatement>();
+
+		List<JStatement> list = new LinkedList<JStatement>();
 		list.addAll(transferCommands
 				.writeTransferCommands(SchedulingPhase.STEADY));
 
 		// generate the rotate statements for this output buffer
 		list.addAll(rotateStatements());
-		
-		// generate the rotation statements for the address 
+
+		// generate the rotation statements for the address
 		// buffers that this output buffer uses
 		for (SourceAddressRotation addrRot : addressBuffers.values()) {
 			list.addAll(addrRot.rotateStatements());
 		}
-		
+
 		// Add synchronization for non-pipelined filters
-		//addIntraSSGSynch(filterNode, SchedulingPhase.STEADY);				
-	
+		list = addTokenWrite(filterNode, SchedulingPhase.STEADY, list);
+		
 		return list;
 	}
-	
+
 	/**
 	 * Return the address rotation that this output rotation uses for the given
 	 * input slice node

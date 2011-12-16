@@ -168,46 +168,38 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	}
 
 	/**
-	 * Adds code to write for a token before proceeding. This provides
-	 * synchronization when there is no software pipelining in an SSG.
-	 * 
-	 * @param filter
-	 * @param phase
+	 * Adds code to wait for a token before proceeding. This provides
+	 * synchronization when there is no software pipelining in an SSG
+	 * @param filter The filter that must wait before executing.
+	 * @param phase The phase of the schedule that is executing
 	 */
-//	private void addIntraSSGSynch(WorkNode filter, SchedulingPhase phase) {
-//		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
-//		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
-//				.getSources(phase);		
-//		for (InterFilterEdge e : srcEdges) {
-//			String msg = "+   InputRotatingBuffer.addIntraSSGSynch() phase= "
-//					+ phase
-//					+ " src= "
-//					+ e.getSrc().getParent().getWorkNode()
-//					+ " --> dst=" + filter;
-//			System.out.println(msg);
-//			filterCore.getComputeCode().addSteadyLoopStatement(Util.toStmt("/** " + msg + " **/"));
-//			WorkNode src = e.getSrc().getParent().getWorkNode();
-//			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
-//			if (!srcCore.equals(filterCore)) {
-//				System.out
-//						.println("+     TODO: InputRotatingBuffer.addIntraSSGSynch() add token write between "
-//								+ filter + " and " + src);
-//				System.out.println("+     TODO: filter " + src
-//						+ " needs a token write to " + filter);
-//				
-//				String tokenName = src + "_token";				
-//				SMPComputeCodeStore cs = filterCore.getComputeCode();								
-//				cs.addSteadyLoopStatement(Util.toStmt("/** Need a a busy loop from " + tokenName + "**/"));
-//				cs.addSteadyLoopStatement(Util.toStmt("while (!" + tokenName +")"));
-//				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
-//				cs.setHasCode(); 
-//				
-//				
-//			}
-//		}
-//	}
+	private List<JStatement> addTokenWait(WorkNode filter, SchedulingPhase phase,  List<JStatement> list) {
+		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
+		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
+				.getSources(phase);
+		Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
+		// remove duplicate edges if they exist
+		for (InterFilterEdge e : srcEdges) {
+			edgeSet.add(e);
+		}
+		for (InterFilterEdge e : edgeSet) {
+			WorkNode src = e.getSrc().getParent().getWorkNode();
+			// Need to special case for FileReaders, which won't be
+			// parallelized.
+			if (src.isFileInput()) {
+				continue;
+			}
+			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
+			if (!srcCore.equals(filterCore)) {
+				String tokenName = src + "_to_" + filter + "_token";
+				list.add(Util.toStmt("while (" + tokenName
+						+ " == 0)"));
+				list.add(Util.toStmt(tokenName + " = 0"));
+			}
+		}
+		return list;
+	}
 	
-
 	/**
 	 * Allocate the constituent buffers of this rotating buffer structure
 	 */
@@ -322,7 +314,10 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 	@Override
 	public List<JStatement> beginPrimePumpRead() {
-		return beginSteadyRead();
+		List<JStatement> list = new LinkedList<JStatement>();
+		list.add(transferCommands.zeroOutTail(SchedulingPhase.PRIMEPUMP));
+		list = addTokenWait(filterNode, SchedulingPhase.PRIMEPUMP, list);
+		return list;
 	}
 
 	@Override
@@ -333,8 +328,9 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 	@Override
 	public List<JStatement> beginSteadyRead() {
-		LinkedList<JStatement> list = new LinkedList<JStatement>();
+		List<JStatement> list = new LinkedList<JStatement>();
 		list.add(transferCommands.zeroOutTail(SchedulingPhase.STEADY));
+		list = addTokenWait(filterNode, SchedulingPhase.STEADY, list);
 		return list;
 	}
 
@@ -358,7 +354,6 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	protected void createAddressBufs() {
 		List<SourceAddressRotation> addressBufsList = new LinkedList<SourceAddressRotation>();
 
-		int i = 0;
 		for (Filter src : filterNode.getParent().getInputNode()
 				.getSourceFilters(SchedulingPhase.STEADY)) {
 			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(src)) {
@@ -450,8 +445,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		// rotate to the next buffer
 		list.addAll(rotateStatementsRead());
 		// add synchronization between non-pipelined ssgs
-		//addIntraSSGSynch(filterNode, SchedulingPhase.STEADY);
-		
+		// addIntraSSGSynch(filterNode, SchedulingPhase.STEADY);
+
 		return list;
 		// copyDownStatements(SchedulingPhase.STEADY));
 	}

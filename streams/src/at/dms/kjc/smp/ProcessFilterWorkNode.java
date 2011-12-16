@@ -1,11 +1,7 @@
 package at.dms.kjc.smp;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
-
-import com.jgraph.graph.Edge;
 
 import at.dms.kjc.CType;
 import at.dms.kjc.JEmittedTextExpression;
@@ -28,10 +24,8 @@ import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.kjc.slir.FileOutputContent;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
-import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.InternalFilterNode;
-import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
@@ -53,7 +47,6 @@ public class ProcessFilterWorkNode {
 		String popName;
 		String pushName;
 		Channel inputChannel;
-		Channel outputChannel;
 		Map<Filter, Integer> filterToThreadId;
 		boolean isDynamicPop;
 		boolean isDynamicPush;
@@ -73,7 +66,6 @@ public class ProcessFilterWorkNode {
 			this.popName = popName;
 			this.pushName = pushName;
 			this.inputChannel = inputChannel;
-			this.outputChannel = outputChannel;
 			this.filterToThreadId = filterToThreadId;
 			this.dominators = dominators;
 			this.isDynamicPop = isDynamicPop;
@@ -100,7 +92,7 @@ public class ProcessFilterWorkNode {
 				if (isDynamicPop) {					
 					
 					InterSSGEdge edge = ((InterSSGChannel)inputChannel).getEdge();
-					OutputPort outputPort = edge.getSrc();
+					edge.getSrc();
 					InputPort inputPort = edge.getDest();
 					String threadId = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]).toString();					
 					
@@ -179,8 +171,6 @@ public class ProcessFilterWorkNode {
 			SMPBackEndFactory backEndBits, boolean isDynamicPop,
 			boolean isDynamicPush) {
 
-		// System.out.println("ProcessFilterWorkNode.getFilterCode");
-
 		CodeStoreHelper filterCode = CodeStoreHelper
 				.findHelperForSliceNode(filter);
 		if (filterCode == null) {
@@ -222,8 +212,6 @@ public class ProcessFilterWorkNode {
 		final String pushName;
 		final String popManyName;
 
-		// System.out.println("ProcessFilterWorkNode.makeFilterCode");
-
 		if (inputChannel != null) {
 			peekName = inputChannel.peekMethodName();
 			popName = inputChannel.popMethodName();
@@ -234,17 +222,11 @@ public class ProcessFilterWorkNode {
 			popManyName = "/* pop(N) from non-existent channel */";
 		}
 
-		//System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
-		//		+ filter + " popName=" + popName);
-
 		if (outputChannel != null) {
 			pushName = outputChannel.pushMethodName();
 		} else {
 			pushName = "/* push() to non-existent channel */";
 		}
-
-		//System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
-		//		+ filter + " popName=" + popName + " pushName=" + pushName);
 
 		CodeStoreHelper helper = backEndFactory.getCodeStoreHelper(filter);
 		JMethodDeclaration[] methods = helper.getMethods();
@@ -252,18 +234,6 @@ public class ProcessFilterWorkNode {
 		Map<Filter, Integer> filterToThreadId = backEndFactory
 				.getFilterToThreadId();
 		Map<String, String> dominators = backEndFactory.getDominators();
-
-		//System.out.println("ProcessFilterWorkNode.makeFilterCode filter="
-		//		+ filter + " ID=" + filterToThreadId.get(filter.getParent()));
-
-		//System.out.println("** ProcessFilterWorkNode.makeFilterCode filter="
-		//		+ filter + " dominates=" + dominators.get(filter.toString()));
-
-		// relies on fact that a JMethodDeclaration is not replaced so
-		// work, init, preWork are still identifiable after replacement.
-
-		
-		//Edge e = inputChannel.getEdge();		
 		
 		pushPopReplacingVisitor.init(filter, 
 				 inputChannel, outputChannel,
@@ -299,50 +269,7 @@ public class ProcessFilterWorkNode {
 	public ProcessFilterWorkNode() {
 		/* do nothing */
 	}
-
-	private void addTokenWrite(WorkNode filter, SchedulingPhase phase) {
-		Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);					
-		Set<InterFilterEdge> destEdges = filter.getParent()
-				.getOutputNode().getDestSet(phase);						
-		for (InterFilterEdge e : destEdges) {			
-			WorkNode dst = e.getDest().getParent().getWorkNode();	
-			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
-			if (!dstCore.equals(filterCore)) {								
-				String tokenName = filter + "_to_" + dst + "_token";	
-				SMPComputeCodeStore.addTokenName(tokenName);
-				SMPComputeCodeStore cs = filterCore.getComputeCode();				
-				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 1;"));
-				cs.setHasCode(); 								
-			} 
-		}
-	}
 		
-	private void addTokenWait(WorkNode filter, SchedulingPhase phase) {
-		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
-		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
-				.getSources(phase);		
-		Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
-		// remove duplicate edges if they exist
-		for (InterFilterEdge e : srcEdges) {			
-			edgeSet.add(e);
-		}				
-		for (InterFilterEdge e : edgeSet) {			
-			WorkNode src = e.getSrc().getParent().getWorkNode();			
-			// Need to special case for FileReaders, which won't be parallelized.
-			if (src.isFileInput()) {
-				continue;
-			} 						
-			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
-			if (!srcCore.equals(filterCore)) {	
-				String tokenName = src + "_to_" + filter + "_token";													
-				SMPComputeCodeStore cs = filterCore.getComputeCode();								
-				cs.addSteadyLoopStatement(Util.toStmt("while (" + tokenName + " == 0)"));
-				cs.addSteadyLoopStatement(Util.toStmt(tokenName + " = 0"));
-				cs.setHasCode(); 
-			}
-		}
-	}
-
 	/**
 	 * Create code for a FilterSliceNode. May request creation of channels, and
 	 * cause Process{Input/Filter/Output}SliceNode to be called for other slice
@@ -413,9 +340,6 @@ public class ProcessFilterWorkNode {
 					backEndFactory, hasDynamicInput, hasDynamicOutput);
 		}
 
-		// TODO: Check here if I should be printing the steady state
-		// or if I should start a thread.
-
 		switch (whichPhase) {
 		case PREINIT:
 			standardPreInitProcessing();
@@ -447,13 +371,12 @@ public class ProcessFilterWorkNode {
 
 	}
 
-
 	protected void postPrimePumpProcessing() {
-		addTokenWrite(filterNode, SchedulingPhase.PRIMEPUMP);
+
 	}
 
 	protected void postSteadyProcessing() {
-		addTokenWrite(filterNode, SchedulingPhase.STEADY);
+
 	}
 
 	protected void preInitProcessing() {
@@ -465,11 +388,11 @@ public class ProcessFilterWorkNode {
 	}
 	
 	protected void prePrimePumpProcessing() {
-		addTokenWait(filterNode, SchedulingPhase.PRIMEPUMP);
+
 	}
 
 	protected void preSteadyProcessing() {
-		addTokenWait(filterNode, SchedulingPhase.STEADY);
+
 	}
 
 	protected void standardInitProcessing() {
