@@ -31,6 +31,7 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 	/** Create a new Link */
 	public InterSSGEdge(OutputPort src, InputPort dst) {
 		super(src, dst);
+		System.out.println("InterSSGEdge(src,dst)");		
 	}
 
 	public String toString() {
@@ -38,7 +39,7 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 		Filter[] outputFilterGraph = dst.getSSG().getFilterGraph();
 		WorkNodeContent srcContent = inputFilterGraph[0].getWorkNodeContent();
 		WorkNodeContent dstContent = outputFilterGraph[outputFilterGraph.length - 1].getWorkNodeContent();		
-		return "InterSSGEdge " +  srcContent + " -> " + dstContent + "(type=" + getType() + ")";		
+		return "InterSSGEdge " +  srcContent + " -> " + dstContent + " (type=" + getType() + ")";		
 	}
 
 	public Rate getPushRate() {

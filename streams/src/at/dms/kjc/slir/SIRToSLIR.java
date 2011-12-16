@@ -50,12 +50,12 @@ public class SIRToSLIR {
 				inputPort, outputPort);
 		streamGraph.addSSG(src);
 
-		for (int i = 1; i < ssgs.size(); i++) {
+		for (int i = 1; i < ssgs.size()-1; i++) {
 			StaticSubGraph dst = new StaticSubGraph();
 			outputPort = new UnaryOutputPort(dst);
 			src.setOutputPort(outputPort);
 			inputPort = new UnaryInputPort(src);
-			str = ssgs.get(i);
+			str = ssgs.get(i);			
 			dst.init(streamGraph, str, inputPort, null);
 			InterSSGEdge link = new InterSSGEdge(outputPort, inputPort);
 			inputPort.addLink(link);

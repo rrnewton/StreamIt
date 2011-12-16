@@ -19,6 +19,7 @@ import at.dms.kjc.sir.SIRDummySink;
 import at.dms.kjc.sir.SIRDummySource;
 import at.dms.kjc.sir.SIRFeedbackLoop;
 import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRPhasedFilter;
 import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRSplitJoin;
@@ -165,30 +166,50 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		if (!isDynamicPush(filter) && !(isDynamicPop(filter)) 
 					&& !filter.isStateful()){					
 			pipelineChildren.add(filter);
+			if (isSink) {
+				endPipeline();
+			}
 		}
 							
 		else if (filter.isStateful()) {			
+			System.out.println("CASE 2: SegmentedSIRGraph.visitFilter() filter=" + filter.getName() + " isStateful=true");
+			
 			if (isSource) {
 				filter.setPush(new JIntLiteral(1));
 				pipelineChildren.add(filter);
+				System.out.println("SegmentedSIRGraph.visitFilter() isSource filter=" + filter.getName() + " type=" + filter.getOutputType());
 				pipelineChildren.add(createSink(filter, iter));
 				endPipeline();
 				startPipeline();
-			} else {
+			} else if (isSink) {
+				SIRFilter source = createSource(filter);
+				pipelineChildren.add(source);
+				filter.setPop(new JIntLiteral(1));
+				filter.setPeek(new JIntLiteral(1));
+				pipelineChildren.add(filter);
 				endPipeline();
-				startPipeline();
-				pipelineChildren.add(createSource(filter));
+			} else {
+				System.out.println("SegmentedSIRGraph.visitFilter() else filter=" + filter.getName() + " type=" + filter.getOutputType());
+				endPipeline();
+				startPipeline();		
+				SIRFilter source = createSource(filter);
+				System.out.println("-> SegmentedSIRGraph.visitFilter() else pipelineChildren.add(" + source.getName() + ")");
+				pipelineChildren.add(source);
 				filter.setPop(new JIntLiteral(1));
 				filter.setPeek(new JIntLiteral(1));
 				filter.setPush(new JIntLiteral(1));
+				System.out.println("-> SegmentedSIRGraph.visitFilter() else pipelineChildren.add(" + filter.getName() + ")");
 				pipelineChildren.add(filter);
-				pipelineChildren.add(createSink(self, iter));
+				SIRFilter sink = createSink(filter, iter);
+				System.out.println("-> SegmentedSIRGraph.visitFilter() else pipelineChildren.add(" + sink.getName() + ")");
+				pipelineChildren.add(sink);
 				endPipeline();
 				startPipeline();
 			}
 		}
 		
 		else if (isDynamicPush(filter) && !(isDynamicPop(filter))) {
+			System.out.println("CASE 3:");
 			System.out
 					.println("SegmentedSIRGraph.visitFilter adding the dynamic push only case ");
 			filter.setPush(new JIntLiteral(1));
@@ -199,6 +220,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		}
 
 		else if (!isDynamicPush(filter) && (isDynamicPop(filter))) {
+			System.out.println("CASE 4:");
 			endPipeline();
 			startPipeline();
 			pipelineChildren.add(createSource(filter));
@@ -208,6 +230,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		}
 
 		else { // if (isDynamicPush(filter) && (isDynamicPop(filter))) {
+			System.out.println("CASE 5:");
 			endPipeline();
 			startPipeline();
 			pipelineChildren.add(createSource(filter));
@@ -222,26 +245,34 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	}
 
 	private void endPipeline() {
+		System.out.println("SegmentedSIRGraph.endPipeline pipelineChildren.size()==" + pipelineChildren.size());
 		if (pipelineChildren.size() == 0) {
 			return;
 		}
 		// Create a new empty list of pipeline children
 		String name = uniquePipelineName();
 
-		System.out.println("SegmentedSIRGraph.visitFilter creating pipeline ");
-
+		System.out.print("**** SegmentedSIRGraph.endPipeline pipeline= ");
+		for (SIROperator child : pipelineChildren) {
+			System.out.print(child.getName() + "->");
+		}
+		System.out.println("");
+		
 		SIRPipeline pipeline = new SIRPipeline(null, name);
-
 		pipeline.setInit(SIRStream.makeEmptyInit());
-		this.setChildren(pipeline, pipelineChildren);
-
+		pipeline.setChildren(pipelineChildren);
+		
+		System.out.print("**** SegmentedSIRGraph.endPipeline pipeline= ");
+		for (SIROperator child : pipeline.getChildren()) {
+			System.out.print(child.getName() + "->");
+		}
+		System.out.println("");
+		
 		addToSegmentedGraph(pipeline);
 	}
 
 	private void startPipeline() {
-		// Create a new empty list of pipeline children
 		pipelineChildren = new LinkedList<SIRStream>();
-
 	}
 
 	@Override
@@ -251,6 +282,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	}
 
 	private SIRFilter createSink(SIRFilter pred, SIRFilterIter iter) {
+		System.out.println("SegmentedSIRGraph.createSink() pred=" + pred.getName() + " type=" + pred.getOutputType());
 		SIRFilter sink = new SIRDummySink(pred.getOutputType());
 		return sink;
 	}
@@ -260,9 +292,9 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		return source;
 	}
 
-	private void setChildren(SIRPipeline pipeline, List<SIRStream> children) {
-		pipeline.setChildren(pipelineChildren);
-	}
+	//private void setChildren(SIRPipeline pipeline, List<SIRStream> children) {
+//		pipeline.setChildren(pipelineChildren);
+	//}
 
 	private boolean isDynamicPop(SIRFilter self) {
 		return self.getPop().isDynamic();
