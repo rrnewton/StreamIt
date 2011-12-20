@@ -70,8 +70,12 @@ public class Fissioner {
     public static FissionGroup doit(Filter slice, StaticSubGraph slicer, int fissAmount) {
         System.out.println("Performing fission on: " + slice.getWorkNode() + ", fizzAmount: " + fissAmount);
         Fissioner fissioner = new Fissioner(slice, slicer, fissAmount);
-        if(canFizz(slice, false)) 
+        if(canFizz(slice, false)) {
+        	System.out.println("Fissioner.doit Can Fizz");
             return fissioner.fizz();
+        } else {
+        	System.out.println("Fissioner.doit Can't Fizz");
+        }
         return null;
     }
     

@@ -628,11 +628,6 @@ public class StaticSubGraph {
 		sirToContent = new HashMap<SIRFilter, WorkNodeContent>();
 		Map<OutputNode, HashMap<InputNode, InterFilterEdge>> edges = new HashMap<OutputNode, HashMap<InputNode, InterFilterEdge>>();
 
-		
-//		if (str instanceof SIRFilter) {
-//			System.out.println("StaticSubGraph.init() str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-//		}
-//		
 		GraphFlattener fg = new GraphFlattener(str);
 		SIRToFilterNodes filterNodes = new SIRToFilterNodes();
 		Map<SIROperator, int[]>[] executionCounts = SIRScheduler

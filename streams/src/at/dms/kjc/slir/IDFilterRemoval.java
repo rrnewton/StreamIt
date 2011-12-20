@@ -82,8 +82,8 @@ public class IDFilterRemoval {
     	}
     }
     
-    private void remove(SchedulingPhase phase) {
-        assert idInput.getSources(phase).length == idOutput.getDests(phase).length : idSlice + " " + phase + " " +
+    private void remove(SchedulingPhase phase) {    	
+    	assert idInput.getSources(phase).length == idOutput.getDests(phase).length : idSlice.getWorkNode() + " " + phase + " " +
             "input: " + idInput.getSources(phase).length + " output: " + idOutput.getDests(phase).length;
         InterFilterEdge[] idSources = idInput.getSources(phase);
         InterFilterEdge[][] idDests = idOutput.getDests(phase);

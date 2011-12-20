@@ -1,42 +1,17 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.CType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JAssignmentExpression;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmptyStatement;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JForStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JRelationalExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.sir.SIRPopExpression;
-
-
-
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.MutableStateExtractor;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.slir.fission.FissionGroup;
 import at.dms.kjc.slir.fission.Fissioner;
 
 public class StatelessFissioner {
-
-    /** unique id generator */
-    private static int uniqueID;
-    private int myID;
 
     /** the slice we are fissing */
     private Filter slice;
@@ -47,17 +22,7 @@ public class StatelessFissioner {
     /** the filter info of the filter of the slice we are fissing */
     private WorkNodeInfo fInfo;
 
-    /** the stats from the original filter, these don't change! */
-    private int slicePeek;
-    private int slicePop;
-    private int slicePush;
-    private int slicePrePeek;
-    private int slicePrePop;
-    private int slicePrePush;
-    private int sliceInitMult;
     private int sliceSteadyMult;
-    private int sliceCopyDown;
-
     /** the fission products of the slice */
     private Filter[] sliceClones;
 
@@ -122,17 +87,7 @@ public class StatelessFissioner {
         this.filter = slice.getWorkNode();
         this.fInfo = WorkNodeInfo.getFilterInfo(filter);
 
-        slicePeek = fInfo.peek;
-        slicePop = fInfo.pop;
-        slicePush = fInfo.push;
-        slicePrePeek = fInfo.prePeek;
-        slicePrePop = fInfo.prePop;
-        slicePrePush = fInfo.prePush;
-        sliceInitMult = fInfo.initMult;
         sliceSteadyMult = fInfo.steadyMult;
-        sliceCopyDown = fInfo.copyDown;
-
-        myID = uniqueID++;
     }
 
     private boolean checks() {
@@ -140,8 +95,7 @@ public class StatelessFissioner {
         if  (fInfo.pop > 0 && fInfo.copyDown >= fInfo.steadyMult * fInfo.pop / fizzAmount) { 
             System.out.println("Can't fizz: Slice does not meet copyDown constraint");
             return false;
-        }
-                   
+        }                   
         return true;
     }
    
