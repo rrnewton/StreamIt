@@ -440,6 +440,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     		return true;
     	
     	InterFilterEdge edge = edges.next();
+    	
     	int reps = 0;
     	if (getWeight(edge, phase) > 0)
     		reps = WorkNodeInfo.getFilterInfo(edge.getSrc().getPrevFilter()).totalItemsSent(phase) / getWeight(edge, phase);

@@ -664,7 +664,7 @@ public class StaticSubGraph {
 	/**
 	 * Return true if the slice is a top (source) slice in the forrest
 	 */
-	public boolean isTopSlice(Filter slice) {
+	public boolean isTopFilter(Filter slice) {
 		for (Filter cur : topFilters) {
 			if (cur == slice)
 				return true;

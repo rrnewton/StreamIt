@@ -118,6 +118,15 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         head = node;
         node.setParent(this);
     }
+    
+    /**
+     * return true if this filter is a dominator of its ssg.
+     * 
+     * @return true if this filter is a dominator of its ssg.
+     */
+    public boolean isTopFilter() {
+    	return parent.isTopFilter(this);
+    }
 
     /**
      * Set this filter's work node to <node>

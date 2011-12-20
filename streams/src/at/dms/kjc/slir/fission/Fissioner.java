@@ -124,7 +124,7 @@ public class Fissioner {
 
         //we need to know if this is a source slice, if so add the 
         //copies to the slicer's top slices, roots of the forrest
-        if (slicer.isTopSlice(s))
+        if (slicer.isTopFilter(s))
             isSourceSlice = true;
         else    
             isSourceSlice = false;

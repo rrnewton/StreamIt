@@ -54,7 +54,7 @@ public class IDFilterRemoval {
     	}
     	
     	//if this id was a root, remove it from the list of roots
-    	if (idSlice.getParent().isTopSlice(idSlice)) {
+    	if (idSlice.getParent().isTopFilter(idSlice)) {
     		idSlice.getParent().removeTopSlice(idSlice);
     	}
     }
