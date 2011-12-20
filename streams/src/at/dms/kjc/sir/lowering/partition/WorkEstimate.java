@@ -143,6 +143,19 @@ public class WorkEstimate {
         assert workMap.containsKey(obj): "Don't have work for " + obj;
         return ((WorkInfo)workMap.get(obj)).getTotalWork();
     }
+    
+    /**
+     * Returns a map of SIROperators to total work as calculated by the WorkList object.
+     */
+    public Map<SIROperator, Long> getTotalWorkMap() {
+    	HashMap<SIROperator, Long> map = new HashMap<SIROperator, Long>();
+    	
+    	for (SIROperator key : workMap.keySet()) {
+    		map.put(key, ((WorkInfo)workMap.get(key)).getTotalWork());
+    	}
+    	
+    	return map;
+    }
 
     /**
      * Returns estimate of instruction code for <pre>filter</pre>
