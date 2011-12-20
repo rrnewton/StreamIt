@@ -119,7 +119,7 @@ public class StatelessDuplicate {
 
         // check that it does not have mutable state
         if (hasMutableState(filter)) {
-            return false;
+        	return false;
         }
     
       //Hack to prevent fissing file writers

@@ -97,8 +97,8 @@ public class DuplicateBottleneck {
         //get the first work estimate
         WorkEstimate work = WorkEstimate.getWorkEstimate(str);
         //bin pack the shits
-        GreedyBinPacking binPacker = new GreedyBinPacking(str, numCores, work);
-        binPacker.pack();
+        GreedyBinPacking<SIROperator> binPacker = new GreedyBinPacking<SIROperator>(numCores);
+        binPacker.pack(work.getTotalWorkMap());
         //get the max bin weight for the packing
         long oldWork = binPacker.maxBinWeight();
         //the work of the new partitioning
@@ -150,8 +150,8 @@ public class DuplicateBottleneck {
             //get the new work estimate
             work = WorkEstimate.getWorkEstimate(str);
             //greedy bin pack the shits
-            binPacker = new GreedyBinPacking(str, numCores, work);
-            binPacker.pack();
+            binPacker = new GreedyBinPacking<SIROperator>(numCores);
+            binPacker.pack(work.getTotalWorkMap());
             newWork = binPacker.maxBinWeight();
             newOutputsPerSteady = outputsPerSteady(str, work.getExecutionCounts());
             

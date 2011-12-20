@@ -158,8 +158,7 @@ public class CellProcessInputSliceNode extends ProcessInputFilterNode {
         // write only once if multiple calls for steady state.
         if (!basicCodeWritten.containsKey(inputNode)) {
             //codeStore.addFields(joiner_code.getUsefulFields());
-            codeStore.addMethods(joiner_code.getMethods());
-            basicCodeWritten.put(inputNode,true);
+        	basicCodeWritten.put(inputNode,true);
         }
         codeStore.addSteadyLoopStatement(steadyBlock);
     }
@@ -238,7 +237,7 @@ public class CellProcessInputSliceNode extends ProcessInputFilterNode {
         return joiner_code;
     }
     
-    private static  void makeJoinerCode(InputNode joiner,
+    private static void makeJoinerCode(InputNode joiner,
             BackEndFactory backEndBits, CodeStoreHelper helper) {
         String joiner_name = "_joiner_" + ProcessFilterWorkNode.getUid();
         String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
