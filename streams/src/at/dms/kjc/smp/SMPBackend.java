@@ -145,12 +145,9 @@ public class SMPBackend {
 			SIRInterfaceTable[] interfaceTables, SIRStructure[] structs,
 			SIRHelper[] helpers, SIRGlobal global) {
 
-		//turn sw pipelining off for now.
+		//turn sw pipelining 
 		KjcOptions.noswpipe = true;
 		
-		checkArguments();
-		setScheduler();
-
 		if (KjcOptions.smp > 16) {
 			setupLargeConfig();
 		}
@@ -160,6 +157,9 @@ public class SMPBackend {
 		for (int x = 0; x < KjcOptions.smp; x++)
 			cores[x] = coreOrder[x];
 		chip = new SMPMachine(cores);
+		
+		checkArguments();
+		setScheduler();
 
 		// create a new structs.h file for typedefs etc.
 		structs_h = new Structs_h(structs);
@@ -177,6 +177,8 @@ public class SMPBackend {
 			isDynamic = true;
 		}
 
+
+		
 		InterSSGChannel.createBuffers(streamGraph);
 
 		Map<Filter, Integer> filterToThreadId = new HashMap<Filter, Integer>();

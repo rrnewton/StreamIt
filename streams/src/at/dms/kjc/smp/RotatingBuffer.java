@@ -147,6 +147,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 
 		for (Core ownerCore : SMPBackend.chip.getCores()) {
 			SMPComputeCodeStore cs = ownerCore.getComputeCode();
+									
 			for (WorkNode filter : cs.getFilters()) {
 				if (ssg.containsFilter(filter.getParent())) {
 					// System.out.println("RotatingBuffer.communicateAddresses filter="

@@ -34,9 +34,11 @@ public class TMD extends Scheduler {
      * have a layout where communicating slices are neighbors, boo
      */
     public boolean fallBackLayout;
+    private GreedyBinPacking<Filter> dominatorPacking;
     
     public TMD() {
         super();
+        dominatorPacking = new GreedyBinPacking<Filter>(SMPBackend.chip.size());
         fizzAmount = new HashMap<Filter, Integer>();
         DUP_THRESHOLD = ((double)KjcOptions.dupthresh) / 100.0;
     }
@@ -51,6 +53,24 @@ public class TMD extends Scheduler {
     }
     
     
+    /** 
+     * Layout the dominators of each ssg using a global bin packing to try to get 
+     * software pipeline parallelism between them.
+     * 
+     * @param ssg the current ssg
+     * @param filter the dominator to layout
+     */
+    protected void layoutDominator(Filter filter) {
+    	assert filter.isTopFilter();
+    	
+    	HashMap<Filter, Long> workMap = new HashMap<Filter, Long>();
+    	workMap.put(filter, FilterWorkEstimate.getWork(filter));
+    	
+    	dominatorPacking.pack(workMap);
+    	
+    	setComputeNode(filter.getWorkNode(), SMPBackend.chip.getNthComputeNode(dominatorPacking.getBin(filter)));
+    }
+    
     /** Set the Core for a Slice 
      * @param node         the {@link at.dms.kjc.slir.InternalFilterNode} to associate with ...
      * @param core   The tile to assign the node
@@ -59,7 +79,7 @@ public class TMD extends Scheduler {
         assert node != null && core != null;
         layoutMap.put(node, core);
         //remember what filters each tile has mapped to it
-        //System.out.println("Settting " + node + " to tile " + tile.getTileNumber());
+        //System.out.println("Setting " + node + " to core " + core);
         if (core.isComputeNode())
             core.getComputeCode().addFilter(node.getAsFilter());
     }

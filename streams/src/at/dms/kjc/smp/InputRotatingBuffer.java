@@ -1,6 +1,7 @@
 package at.dms.kjc.smp;
 
 import at.dms.classfile.Constants;
+import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.slir.*;
 import at.dms.kjc.slir.fission.*;
 import at.dms.util.Utils;
@@ -329,6 +330,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	@Override
 	public List<JStatement> beginSteadyRead() {
 		List<JStatement> list = new LinkedList<JStatement>();
+		//list.add(new SIRBeginMarker("beginSteadyRead"));
 		list.add(transferCommands.zeroOutTail(SchedulingPhase.STEADY));
 		list = addTokenWait(filterNode, SchedulingPhase.STEADY, list);
 		return list;

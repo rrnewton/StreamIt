@@ -41,6 +41,7 @@ public class TMDBinPackFissAll extends TMD {
     public void setComputeNode(InternalFilterNode node, Core core) {
         assert node != null && core != null;
         //remember what filters each tile has mapped to it
+        //System.out.println("Setting " + node + " to core " + core);
         layoutMap.put(node, core);
         if (core.isComputeNode())
             core.getComputeCode().addFilter(node.getAsFilter());
@@ -58,6 +59,7 @@ public class TMDBinPackFissAll extends TMD {
         LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
         HashSet<Filter> fizzedSlices = new HashSet<Filter>();
         HashSet<Filter> unfizzedSlices = new HashSet<Filter>();
+        HashSet<Filter> dominators = new HashSet<Filter>();
         	
         // Get work estimates for all slices
         HashMap<WorkNode, Long> workEsts = new HashMap<WorkNode, Long>();
@@ -66,11 +68,13 @@ public class TMDBinPackFissAll extends TMD {
         	workEsts.put(slice.getWorkNode(), workEst);
         }    
         
-        // Categorize slices into predefined, fizzed and unfizzed slices
+        // Categorize slices into predefined, dominators, fizzed and unfizzed slices
         // Predefined filters are automatically added to off-chip memory
         for(Filter slice : slices) {
         	if(slice.getWorkNode().isPredefined())
         		setComputeNode(slice.getWorkNode(), SMPBackend.chip.getOffChipMemory());
+        	else if (slice.getParent().isTopFilter(slice)) 
+        		dominators.add(slice);
         	else if(FissionGroupStore.isFizzed(slice))
         		fizzedSlices.add(slice);
         	else
@@ -79,6 +83,11 @@ public class TMDBinPackFissAll extends TMD {
         
         System.out.println("Number of fizzed slices: " + fizzedSlices.size());
         System.out.println("Number of unfizzed slices: " + unfizzedSlices.size());
+        
+        // use a global greedy bin packing across all ssgs and cores for the dominators of the ssgs
+        for (Filter filter : dominators) {
+        	layoutDominator(filter);
+        }
         
         // Sort unfizzed slices by estimated work, most work first
         LinkedList<Filter> sortedUnfizzedSlices = new LinkedList<Filter>();
