@@ -36,6 +36,12 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      */
     protected String ident;
 
+    /**
+     * Flag to indicate if a filter has a dynamic push or pop
+     * rate, or if a container holds such a filter.
+     */
+    protected boolean isDynamic;
+    
     /*
      * Don't set the init function upon instantation since the lowering
      * pass will have to create the init function
@@ -45,6 +51,7 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
                         JFieldDeclaration[] fields,
                         JMethodDeclaration[] methods) {
         super(parent);
+        this.isDynamic = false;
         this.ident = ident;
         this.fields = fields;
         this.methods = methods;
@@ -61,6 +68,24 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
         this.fields = f;
     }
 
+    /**
+     * Returns true if a filter has a dynamic push or pop
+     * rate, or if a container holds such a filter. 
+     * @return true if the SIRStream is dynamic.
+     */
+    public boolean getDynamic() {
+    	return isDynamic;
+    }
+
+    /**
+     * Sets the flag to indicate a dynamic filter or container
+     * @param isDynamic
+     */
+    public void setDynamic(boolean isDynamic) {
+    	this.isDynamic = isDynamic;
+    }
+
+    
     /**
      * Adds <f> to the fields of this. 
      * 

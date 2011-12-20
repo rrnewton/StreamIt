@@ -12,7 +12,6 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
-import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRCodeUnit;
 import at.dms.kjc.slir.Filter;
@@ -22,7 +21,7 @@ import at.dms.kjc.KjcOptions;
  * Emit c code for tiles
  * 
  * @author mgordon
- *
+ * 
  */
 public class EmitSMPCode extends EmitCode {
 
@@ -35,8 +34,8 @@ public class EmitSMPCode extends EmitCode {
 	Map<Integer, String> threadIdToType = null;
 
 	public EmitSMPCode(SMPBackEndFactory backEndFactory, boolean isDynamic,
-			Map<Filter, Integer> filterToThreadId, Set<String> dominated, Map<String, String> dominators,
-			Map<Integer, String> threadIdToType) {
+			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
+			Map<String, String> dominators, Map<Integer, String> threadIdToType) {
 		super(backEndFactory);
 		this.isDynamic = isDynamic;
 		this.filterToThreadId = filterToThreadId;
@@ -51,29 +50,32 @@ public class EmitSMPCode extends EmitCode {
 	}
 
 	public void doit() {
-		try {		
+		try {
 
-			// if load balancing, instrument steady-state loop before steady-state barrier
-			if(KjcOptions.loadbalance) {
+			// if load balancing, instrument steady-state loop before
+			// steady-state barrier
+			if (KjcOptions.loadbalance) {
 				LoadBalancer.instrumentSteadyStateLoopsBeforeBarrier();
 			}
 
 			// if profiling, add instrumentation before steady-state barrier
-			if(KjcOptions.profile) {
+			if (KjcOptions.profile) {
 				Profiler.instrumentBeforeBarrier();
 			}
 
-			// for all the cores, add a barrier at the end of the steady state, do it here 
+			// for all the cores, add a barrier at the end of the steady state,
+			// do it here
 			// because we are done with all code gen
 			SMPComputeCodeStore.addBarrierSteady();
 
-			// if load balancing, instrument steady-state loop after steady-state barrier
-			if(KjcOptions.loadbalance) {
+			// if load balancing, instrument steady-state loop after
+			// steady-state barrier
+			if (KjcOptions.loadbalance) {
 				LoadBalancer.instrumentSteadyStateLoopsAfterBarrier();
 			}
 
 			// if profiling, add instrumentation after steady-state barrier
-			if(KjcOptions.profile) {
+			if (KjcOptions.profile) {
 				Profiler.instrumentAfterBarrier();
 			}
 
@@ -83,7 +85,8 @@ public class EmitSMPCode extends EmitCode {
 					continue;
 
 				// core.getComputeCode().addSteadyLoopStatement(Util.toStmt("foo(NULL)"));
-				core.getComputeCode().addCleanupStatement(Util.toStmt("pthread_exit(NULL)"));
+				core.getComputeCode().addCleanupStatement(
+						Util.toStmt("pthread_exit(NULL)"));
 			}
 
 			// add call to buffer initialization and CPU affinity setting
@@ -91,23 +94,29 @@ public class EmitSMPCode extends EmitCode {
 				if (!core.getComputeCode().shouldGenerateCode())
 					continue;
 
-				core.getComputeCode().addFunctionCallFirst(core.getComputeCode().getBufferInitMethod(), new JExpression[0]);
+				core.getComputeCode().addFunctionCallFirst(
+						core.getComputeCode().getBufferInitMethod(),
+						new JExpression[0]);
 
-				if(!KjcOptions.nobind) {
+				if (!KjcOptions.nobind) {
 					JExpression[] setAffinityArgs = new JExpression[1];
 					setAffinityArgs[0] = new JIntLiteral(core.getCoreID());
-					core.getComputeCode().addFunctionCallFirst("setCPUAffinity", setAffinityArgs);
+					core.getComputeCode().addFunctionCallFirst(
+							"setCPUAffinity", setAffinityArgs);
 				}
 			}
 
 			// Standard final optimization of a code unit before code emission:
-			// unrolling and constant prop as allowed, DCE, array destruction into scalars.
+			// unrolling and constant prop as allowed, DCE, array destruction
+			// into scalars.
 			for (Core core : SMPBackend.chip.getCores()) {
 				if (!core.getComputeCode().shouldGenerateCode())
 					continue;
 
-				System.out.println("Optimizing core " + core.getCoreID() + "...");
-				(new at.dms.kjc.sir.lowering.FinalUnitOptimize()).optimize(core.getComputeCode());
+				System.out.println("Optimizing core " + core.getCoreID()
+						+ "...");
+				(new at.dms.kjc.sir.lowering.FinalUnitOptimize()).optimize(core
+						.getComputeCode());
 			}
 
 			// make sure that variables and methods are unique across cores
@@ -123,17 +132,20 @@ public class EmitSMPCode extends EmitCode {
 
 			// write out C code for tiles
 			for (Core core : SMPBackend.chip.getCores()) {
-				// if no code was written to this core's code store, then skip it
+				// if no code was written to this core's code store, then skip
+				// it
 				if (!core.getComputeCode().shouldGenerateCode())
 					continue;
 
 				String outputFileName = "core" + core.getCoreID() + ".c";
-				CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter(outputFileName, false)));
+				CodegenPrintWriter p = new CodegenPrintWriter(
+						new BufferedWriter(
+								new FileWriter(outputFileName, false)));
 
 				generateIncludes(p);
 
 				this.emitCodeForComputeNode(core, p);
-				
+
 				p.close();
 			}
 
@@ -153,7 +165,7 @@ public class EmitSMPCode extends EmitCode {
 			generateMakefile();
 
 			// generate load balancing code
-			if(KjcOptions.loadbalance)
+			if (KjcOptions.loadbalance)
 				LoadBalancer.generateLoadBalancerCode();
 
 		} catch (IOException e) {
@@ -162,47 +174,56 @@ public class EmitSMPCode extends EmitCode {
 	}
 
 	/**
-	 * Given a ComputeNode and a CodegenPrintWrite, print all code for the ComputeNode.
-	 * Channel information relevant to the ComputeNode is printed based on data in the
-	 * BackEndFactory passed when this class was instantiated.
+	 * Given a ComputeNode and a CodegenPrintWrite, print all code for the
+	 * ComputeNode. Channel information relevant to the ComputeNode is printed
+	 * based on data in the BackEndFactory passed when this class was
+	 * instantiated.
 	 * 
-	 * @param n The ComputeNode to emit code for.
-	 * @param p The CodegenPrintWriter (left open on return).
+	 * @param n
+	 *            The ComputeNode to emit code for.
+	 * @param p
+	 *            The CodegenPrintWriter (left open on return).
 	 */
-	public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
+	public void emitCodeForComputeStore(SIRCodeUnit fieldsAndMethods,
 			ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
 
 		p.println("// code for core " + n.getUniqueId());
-		p.println(((Core)n).getComputeCode().getGlobalText());
+		p.println(((Core) n).getComputeCode().getGlobalText());
 
-		
-		//System.out.println("EmitSMPCode.emitCodeForComputeStore, code for core=" + n.getUniqueId());	
-		
-		
-		
-		// generate function prototypes for methods so that they can call each other
+		// System.out.println("EmitSMPCode.emitCodeForComputeStore, code for core="
+		// + n.getUniqueId());
+
+		// generate function prototypes for methods so that they can call each
+		// other
 		// in C.
 		codegen.setDeclOnly(true);
 		for (JMethodDeclaration method : fieldsAndMethods.getMethods()) {
 			method.accept(codegen);
 		}
 		p.println("");
-		codegen.setDeclOnly(false);		
+		codegen.setDeclOnly(false);
 
-		// generate code for ends of channels that connect to code on this ComputeNode
-		Set <RotatingBuffer> outputBuffers = OutputRotatingBuffer.getOutputBuffersOnCore((Core)n);
-		Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnCore((Core)n);
+		// generate code for ends of channels that connect to code on this
+		// ComputeNode
+		Set<RotatingBuffer> outputBuffers = OutputRotatingBuffer
+				.getOutputBuffersOnCore((Core) n);
+		Set<InputRotatingBuffer> inputBuffers = InputRotatingBuffer
+				.getInputBuffersOnCore((Core) n);
 
 		// externs
 		for (RotatingBuffer c : outputBuffers) {
 			if (c.writeDeclsExtern() != null) {
-				for (JStatement d : c.writeDeclsExtern()) { d.accept(codegen); }
+				for (JStatement d : c.writeDeclsExtern()) {
+					d.accept(codegen);
+				}
 			}
 		}
 
 		for (RotatingBuffer c : inputBuffers) {
 			if (c.readDeclsExtern() != null) {
-				for (JStatement d : c.readDeclsExtern()) { d.accept(codegen); }
+				for (JStatement d : c.readDeclsExtern()) {
+					d.accept(codegen);
+				}
 			}
 		}
 
@@ -212,54 +233,82 @@ public class EmitSMPCode extends EmitCode {
 				// are in different files that eventually get concatenated.
 				p.println();
 				p.println("#ifndef " + c.getIdent() + "_CHANNEL_DATA");
-				for (JStatement d : c.dataDecls()) { d.accept(codegen); p.println();}
+				for (JStatement d : c.dataDecls()) {
+					d.accept(codegen);
+					p.println();
+				}
 				p.println("#define " + c.getIdent() + "_CHANNEL_DATA");
 				p.println("#endif");
 			}
 		}
 
 		for (RotatingBuffer c : inputBuffers) {
-			if (c.dataDecls() != null && ! outputBuffers.contains(c)) {
+			if (c.dataDecls() != null && !outputBuffers.contains(c)) {
 				p.println("#ifndef " + c.getIdent() + "_CHANNEL_DATA");
-				for (JStatement d : c.dataDecls()) { d.accept(codegen); p.println();}
+				for (JStatement d : c.dataDecls()) {
+					d.accept(codegen);
+					p.println();
+				}
 				p.println("#define " + c.getIdent() + "_CHANNEL_DATA");
 				p.println("#endif");
 			}
 		}
 
 		for (RotatingBuffer c : outputBuffers) {
-			p.println("/* output buffer " + "(" + c.getIdent() + " of " + c.getFilterNode() + ") */");
+			p.println("/* output buffer " + "(" + c.getIdent() + " of "
+					+ c.getFilterNode() + ") */");
 			if (c.writeDecls() != null) {
-				for (JStatement d : c.writeDecls()) { d.accept(codegen); p.println();}
+				for (JStatement d : c.writeDecls()) {
+					d.accept(codegen);
+					p.println();
+				}
 			}
-			if (c.pushMethod() != null) { c.pushMethod().accept(codegen); }
+			if (c.pushMethod() != null) {
+				c.pushMethod().accept(codegen);
+			}
 		}
 
 		for (RotatingBuffer c : inputBuffers) {
-			p.println("/* input buffer (" + c.getIdent() + " of " + c.getFilterNode() + ") */");
+			p.println("/* input buffer (" + c.getIdent() + " of "
+					+ c.getFilterNode() + ") */");
 			if (c.readDecls() != null) {
-				for (JStatement d : c.readDecls()) { d.accept(codegen); p.println();}
+				for (JStatement d : c.readDecls()) {
+					d.accept(codegen);
+					p.println();
+				}
 			}
-			if (c.peekMethod() != null) { c.peekMethod().accept(codegen); }
-			if (c.assignFromPeekMethod() != null) { c.assignFromPeekMethod().accept(codegen); }
-			if (c.popMethod() != null) { c.popMethod().accept(codegen); }
-			if (c.assignFromPopMethod() != null) { c.assignFromPopMethod().accept(codegen); }
-			if (c.popManyMethod() != null) { c.popManyMethod().accept(codegen); }
+			if (c.peekMethod() != null) {
+				c.peekMethod().accept(codegen);
+			}
+			if (c.assignFromPeekMethod() != null) {
+				c.assignFromPeekMethod().accept(codegen);
+			}
+			if (c.popMethod() != null) {
+				c.popMethod().accept(codegen);
+			}
+			if (c.assignFromPopMethod() != null) {
+				c.assignFromPopMethod().accept(codegen);
+			}
+			if (c.popManyMethod() != null) {
+				c.popManyMethod().accept(codegen);
+			}
 		}
-		p.println("");				
-		
+		p.println("");
+
 		p.println("");
 
 		// generate declarations for fields
 		for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
-//			System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: " + field.getVariable().getIdent());
+			// System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: "
+			// + field.getVariable().getIdent());
 			field.accept(codegen);
 		}
 		p.println("");
 
-		//handle the buffer initialization method separately because we do not want it
-		//optimized (it is not in the methods list of the code store
-		((Core)n).getComputeCode().getBufferInitMethod().accept(codegen);
+		// handle the buffer initialization method separately because we do not
+		// want it
+		// optimized (it is not in the methods list of the code store
+		((Core) n).getComputeCode().getBufferInitMethod().accept(codegen);
 
 		// generate functions for methods
 		codegen.setDeclOnly(false);
@@ -273,7 +322,8 @@ public class EmitSMPCode extends EmitCode {
 	private void generateBarrierCode() throws IOException {
 		CodegenPrintWriter p;
 
-		p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("barrier.h", false)));
+		p = new CodegenPrintWriter(new BufferedWriter(new FileWriter(
+				"barrier.h", false)));
 		p.println("#ifndef BARRIER_H");
 		p.println("#define BARRIER_H");
 		p.println();
@@ -290,7 +340,8 @@ public class EmitSMPCode extends EmitCode {
 		p.println("#endif");
 		p.close();
 
-		p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("barrier.c", false)));
+		p = new CodegenPrintWriter(new BufferedWriter(new FileWriter(
+				"barrier.c", false)));
 		p.println("#include \"barrier.h\"");
 		p.println();
 		p.println("int FetchAndDecr(volatile int *mem)");
@@ -325,14 +376,15 @@ public class EmitSMPCode extends EmitCode {
 	}
 
 	private void generateClockHeader() throws IOException {
-		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("rdtsc.h", false)));
+		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(
+				new FileWriter("rdtsc.h", false)));
 
 		p.println("#ifndef RDTSC_H");
 		p.println("#define RDTSC_H");
 		p.println("");
 		p.println("#include <stdint.h>");
 		p.println("");
-		p.println("/* Returns the number of clock cycles that have passed since the machine");        
+		p.println("/* Returns the number of clock cycles that have passed since the machine");
 		p.println(" * booted up. */");
 		p.println("static __inline__ uint64_t rdtsc(void)");
 		p.println("{");
@@ -346,7 +398,8 @@ public class EmitSMPCode extends EmitCode {
 	}
 
 	private void generateGlobalsHeader() throws IOException {
-		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("globals.h", false)));
+		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(
+				new FileWriter("globals.h", false)));
 
 		p.println("#ifndef GLOBALS_H");
 		p.println("#define GLOBALS_H");
@@ -361,14 +414,14 @@ public class EmitSMPCode extends EmitCode {
 		p.println("#include <stdint.h>");
 		p.println();
 
-		p.println("#define ITERATIONS " + KjcOptions.numbers);   
+		p.println("#define ITERATIONS " + KjcOptions.numbers);
 		p.println();
 
 		p.println("#define minf(a, b) ((a) < (b) ? (a) : (b))");
 		p.println("#define maxf(a, b) ((a) > (b) ? (a) : (b))");
 		p.println();
 
-		if(KjcOptions.iterations != -1) {
+		if (KjcOptions.iterations != -1) {
 			p.println("// Number of steady-state iterations");
 			p.println("extern int maxSteadyIter;");
 			p.println();
@@ -377,64 +430,72 @@ public class EmitSMPCode extends EmitCode {
 		p.println("// Global barrier");
 		p.println("extern barrier_t barrier;");
 		p.println();
-	
-		if (isDynamic) {															
-			int numDynamicReaders =  threadIdToType.keySet().size();	
+
+		if (isDynamic) {
+			int numDynamicReaders = threadIdToType.keySet().size();
 			p.println();
 			p.println("#define DYNAMIC_READERS  " + numDynamicReaders + 1);
 			p.println("#define ASLEEP          0");
 			p.println("#define AWAKE           1");
 			p.println("#define DYN_READER      0");
 			p.println("#define MASTER          1");
-			
+
 			for (Integer threadId : threadIdToType.keySet()) {
-				String type = threadIdToType.get(threadId);				
-//				System.out.println("EmitSMPCode.generateGlobalHeader " + "extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
-				p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
+				String type = threadIdToType.get(threadId);
+				// System.out.println("EmitSMPCode.generateGlobalHeader " +
+				// "extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId +
+				// ";");
+				p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_"
+						+ threadId + ";");
 			}
-							
-			p.println("extern pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");		
+
+			p.println("extern pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");
 			p.println("extern pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
 			p.println("extern int                   thread_to_sleep [DYNAMIC_READERS][2];");
 		}
 
 		p.println("// Shared buffers");
-		p.println(SMPBackend.chip.getOffChipMemory().getComputeCode().getGlobalText());
+		p.println(SMPBackend.chip.getOffChipMemory().getComputeCode()
+				.getGlobalText());
 
 		p.println("// CPU Affinity");
 		p.println("extern void setCPUAffinity(int core);");
 		p.println();
 
-		if(KjcOptions.profile)
+		if (KjcOptions.profile)
 			Profiler.emitProfilerExternGlobals(p);
 
-		if(KjcOptions.loadbalance)
+		if (KjcOptions.loadbalance)
 			LoadBalancer.emitLoadBalancerExternGlobals(p);
 
 		p.println("// Thread entry points");
-		for(Core core : SMPBackend.chip.getCores()) {
-			if(!core.getComputeCode().shouldGenerateCode())
+		for (Core core : SMPBackend.chip.getCores()) {
+			if (!core.getComputeCode().shouldGenerateCode())
 				continue;
-			p.println("extern void *" + core.getComputeCode().getMyMainName() + "(void * arg);");
+			p.println("extern void *" + core.getComputeCode().getMyMainName()
+					+ "(void * arg);");
 		}
 		p.println();
 
-		p.println("// Helper entry points");		
+		p.println("// Helper entry points");
 		for (Core core : SMPBackend.chip.getCores()) {
-			Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
+			Set<JMethodDeclaration> helperMethods = core.getComputeCode()
+					.getDynamicThreadHelperMethods();
 			for (JMethodDeclaration decl : helperMethods) {
-				p.println("extern void * " + decl.getName()  +  "(void * arg);");				
+				p.println("extern void * " + decl.getName() + "(void * arg);");
 			}
 		}
 		p.println();
 		for (Core core : SMPBackend.chip.getCores()) {
-			for (JFieldDeclaration fieldDecl : core.getComputeCode().getExternFields().values()) {
-				p.println("extern " + fieldDecl.getType() + " " + fieldDecl.getVariable().getIdent() + ";");
+			for (JFieldDeclaration fieldDecl : core.getComputeCode()
+					.getExternFields().values()) {
+				p.println("extern " + fieldDecl.getType() + " "
+						+ fieldDecl.getVariable().getIdent() + ";");
 			}
 		}
-		
+
 		p.println("extern int dummy_multiplier;");
-		
+
 		p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
@@ -450,8 +511,8 @@ public class EmitSMPCode extends EmitCode {
 		p.println("#define _GNU_SOURCE");
 		p.println("#endif");
 		p.println();
-		p.println("#include <stdio.h>");    // in case of FileReader / FileWriter
-		p.println("#include <math.h>");     // in case math functions
+		p.println("#include <stdio.h>"); // in case of FileReader / FileWriter
+		p.println("#include <math.h>"); // in case math functions
 		p.println("#include <stdlib.h>");
 		p.println("#include <unistd.h>");
 		p.println("#include <stdint.h>");
@@ -472,10 +533,10 @@ public class EmitSMPCode extends EmitCode {
 			p.println("#include \"dynamic_queue.h\"");
 		}
 
-		if(KjcOptions.loadbalance)
+		if (KjcOptions.loadbalance)
 			p.println("#include \"load_balancer.h\"");
 
-		if(KjcOptions.fixedpoint)
+		if (KjcOptions.fixedpoint)
 			p.println("#include \"fixed.h\"");
 
 		p.println();
@@ -490,28 +551,29 @@ public class EmitSMPCode extends EmitCode {
 	}
 
 	private void generateMainFile() throws IOException {
-		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter(MAIN_FILE, false)));
+		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(
+				new FileWriter(MAIN_FILE, false)));
 
 		generateIncludes(p);
 
-		if(KjcOptions.iterations != -1) {
+		if (KjcOptions.iterations != -1) {
 			p.println("// Number of steady-state iterations");
 			p.println("int maxSteadyIter = " + KjcOptions.iterations + ";");
 			p.println();
 		}
-	
+
 		if (isDynamic) {
-			int numDynamicReaders = threadIdToType.keySet().size();					
+			int numDynamicReaders = threadIdToType.keySet().size();
 			for (Integer threadId : threadIdToType.keySet()) {
-				String type = threadIdToType.get(threadId);				
-				p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");	
+				String type = threadIdToType.get(threadId);
+				p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");
 			}
-			
+
 			p.println();
 			p.println("#define DYNAMIC_READERS  " + numDynamicReaders + 1);
 			p.println("#define ASLEEP          0");
 			p.println("#define AWAKE           1");
-			p.println("pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");		
+			p.println("pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");
 			p.println("pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
 			p.println("int                   thread_to_sleep [DYNAMIC_READERS][2];");
 		}
@@ -519,35 +581,36 @@ public class EmitSMPCode extends EmitCode {
 		p.println();
 
 		for (Core core : SMPBackend.chip.getCores()) {
-			for (JFieldDeclaration fieldDecl : core.getComputeCode().getExternFields().values()) {
-				p.println(fieldDecl.getType() + " " + fieldDecl.getVariable().getIdent() + ";");
+			for (JFieldDeclaration fieldDecl : core.getComputeCode()
+					.getExternFields().values()) {
+				p.println(fieldDecl.getType() + " "
+						+ fieldDecl.getVariable().getIdent() + ";");
 			}
 		}
-		
+
 		p.println("int dummy_multiplier;");
-		
+
 		p.println();
-		
+
 		p.println("// Global barrier");
 		p.println("barrier_t barrier;");
 		p.println();
 
-		
 		p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
 			p.println("volatile int " + str + ";");
 		}
 		p.println();
-		
+
 		generateSetAffinity(p);
 
-		if(KjcOptions.profile) {
+		if (KjcOptions.profile) {
 			Profiler.emitProfilerGlobals(p);
 			Profiler.generateProfilerOutputCode(p);
 		}
 
-		if(KjcOptions.loadbalance) {
+		if (KjcOptions.loadbalance) {
 			LoadBalancer.emitLoadBalancerGlobals(p);
 			LoadBalancer.emitLoadBalancerInit(p);
 		}
@@ -558,158 +621,161 @@ public class EmitSMPCode extends EmitCode {
 
 		// figure out how many cores will participate in barrier
 		int barrier_count = 0;
-		for(Core core : SMPBackend.chip.getCores())
-			if(core.getComputeCode().shouldGenerateCode())
+		for (Core core : SMPBackend.chip.getCores())
+			if (core.getComputeCode().shouldGenerateCode())
 				barrier_count++;
 
-				p.println();
-				p.println("// Initialize barrier");
-				p.println("barrier_init(&barrier, " + barrier_count + ");");
-				
-				if (isDynamic) {
-					p.println();
-					p.println("// Initialize dynamic queues");
+		p.println();
+		p.println("// Initialize barrier");
+		p.println("barrier_init(&barrier, " + barrier_count + ");");
 
-											
-					for (Integer threadId : threadIdToType.keySet()) {
-						String type = threadIdToType.get(threadId);				
-						p.println("dyn_buf_" + threadId + " = " + type + "_queue_create();");	
-					}
-													
+		if (isDynamic) {
+			p.println();
+			p.println("// Initialize dynamic queues");
+
+			for (Integer threadId : threadIdToType.keySet()) {
+				String type = threadIdToType.get(threadId);
+				p.println("dyn_buf_" + threadId + " = " + type
+						+ "_queue_create();");
+			}
+
+			p.println();
+			p.println("// Initialize mutexes and condition variables");
+			p.println();
+			p.println("int i, j = 0;");
+			p.println("for (i = 0; i < DYNAMIC_READERS; i++) {");
+			p.indent();
+			p.println("for (j = 0; j < 2; j++) {");
+			p.indent();
+
+			p.println("pthread_cond_init(&thread_conds[i][j], NULL);");
+			p.println("pthread_mutex_init(&thread_mutexes[i][j], NULL);");
+			p.println("thread_to_sleep[i][j] = ASLEEP; /* 1 is asleep */");
+			p.outdent();
+			p.println("}");
+			p.outdent();
+			p.println("}");
+			p.println();
+		}
+
+		for (Core core : SMPBackend.chip.getCores()) {
+			for (JFieldDeclaration fieldDecl : core.getComputeCode()
+					.getExternFields().values()) {
+				String ident = fieldDecl.getVariable().getIdent();
+				if (dominated.contains(ident.substring(0, ident.length()
+						- "_multiplier".length()))) {
+					p.println(ident + " = 0;");
+				} else {
+					p.println(ident + " = 1;");
+				}
+			}
+		}
+		p.println("dummy_multiplier = 1;");
+
+		p.println();
+		p.println("// Intra-SSG synchronization tokens");
+		for (String str : SMPComputeCodeStore.getTokenNames()) {
+			p.println(str + " = 0;");
+		}
+		p.println();
+
+		if (KjcOptions.loadbalance) {
+			p.println();
+			p.println("// Initalize load balancer");
+			p.println(LoadBalancer.initLoadBalancerMethodName() + "();");
+		}
+
+		p.println();
+		p.println("// Spawn threads");
+		p.println("int rc;");
+		p.println("pthread_attr_t attr;");
+		p.println("void *status;");
+		p.println();
+		p.println("pthread_attr_init(&attr);");
+		p.println("pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);");
+
+		for (Core core : SMPBackend.chip.getCores()) {
+			if (!core.getComputeCode().shouldGenerateCode())
+				continue;
+
+			p.println();
+			p.println("pthread_t thread_n" + core.getCoreID() + ";");
+			p.println("if ((rc = pthread_create(&thread_n" + core.getCoreID()
+					+ ", NULL, "
+					+ core.getComputeCode().getMainFunction().getName()
+					+ ", (void *)NULL)) < 0)");
+			p.indent();
+			p.println("printf(\"Error creating thread for core "
+					+ core.getCoreID() + ": %d\\n\", rc);");
+			p.outdent();
+		}
+
+		if (isDynamic) {
+			for (Core core : SMPBackend.chip.getCores()) {
+				Set<JMethodDeclaration> helperMethods = core.getComputeCode()
+						.getDynamicThreadHelperMethods();
+
+				for (JMethodDeclaration decl : helperMethods) {
 					p.println();
-					p.println("// Initialize mutexes and condition variables");
-					p.println();
-					p.println("int i, j = 0;");
-					p.println("for (i = 0; i < DYNAMIC_READERS; i++) {");
+					String varName = "thread_" + decl.getName();
+					p.println("pthread_t " + varName + ";");
+					p.println("if ((rc = pthread_create(&" + varName + ", NULL, " + decl.getName() + ", (void *)NULL)) < 0)");
 					p.indent();
-					p.println("for (j = 0; j < 2; j++) {");
-					p.indent();
-
-					p.println("pthread_cond_init(&thread_conds[i][j], NULL);");
-					p.println("pthread_mutex_init(&thread_mutexes[i][j], NULL);");
-					p.println("thread_to_sleep[i][j] = ASLEEP; /* 1 is asleep */");
+					p.println("printf(\"Error creating helper "
+							+ ": %d\\n\", rc);");
 					p.outdent();
-					p.println("}");
-					p.outdent();
-					p.println("}");
-					p.println();           
+
 				}
-				
-				for (Core core : SMPBackend.chip.getCores()) {
-					for (JFieldDeclaration fieldDecl : core.getComputeCode().getExternFields().values()) {						
-						String ident = fieldDecl.getVariable().getIdent();
-						if (dominated.contains(ident.substring(0, ident.length() - "_multiplier".length()))) {
-							p.println(ident + " = 0;");
-						} else {
-							p.println(ident + " = 1;");
-						}
-					}
-				}
-				p.println("dummy_multiplier = 1;");
-				
-				p.println();
-				p.println("// Intra-SSG synchronization tokens");
-				for (String str : SMPComputeCodeStore.getTokenNames()) {
-					p.println(str + " = 0;");
-				}
-				p.println();
+			}
+		}
 
-				
+		p.println();
+		p.println("pthread_attr_destroy(&attr);");
 
-				if(KjcOptions.loadbalance) {
-					p.println();
-					p.println("// Initalize load balancer");
-					p.println(LoadBalancer.initLoadBalancerMethodName() + "();");
-				}
+		for (Core core : SMPBackend.chip.getCores()) {
+			if (!core.getComputeCode().shouldGenerateCode())
+				continue;
 
-				p.println();
-				p.println("// Spawn threads");
-				p.println("int rc;");
-				p.println("pthread_attr_t attr;");
-				p.println("void *status;");
-				p.println();
-				p.println("pthread_attr_init(&attr);");
-				p.println("pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);");
+			p.println();
+			p.println("if ((rc = pthread_join(thread_n" + core.getCoreID()
+					+ ", &status)) < 0) {");
+			p.indent();
+			p.println("printf(\"Error joining thread for core "
+					+ core.getCoreID() + ": %d\\n\", rc);");
+			p.println("exit(-1);");
+			p.outdent();
+			p.println("}");
+		}
 
-				for(Core core : SMPBackend.chip.getCores()) {
-					if(!core.getComputeCode().shouldGenerateCode())
-						continue;
-
-					p.println();
-					p.println("pthread_t thread_n" + core.getCoreID() + ";");
-					p.println("if ((rc = pthread_create(&thread_n" + core.getCoreID() + ", NULL, " +
-							core.getComputeCode().getMainFunction().getName() + ", (void *)NULL)) < 0)");
-					p.indent();
-					p.println("printf(\"Error creating thread for core " + core.getCoreID() + ": %d\\n\", rc);");
-					p.outdent();
-				}
-
-
-				if (isDynamic) {					
-					for (Core core : SMPBackend.chip.getCores()) {
-						Set<JMethodDeclaration> helperMethods = core.getComputeCode().getDynamicThreadHelperMethods();
-						int i = 0;
-
-						//System.out.println("EmitSMPCode.generateMainFile about to gnerate helper threads! helperMethods.size=" + helperMethods.size());
-						for (JMethodDeclaration decl : helperMethods) {
-
-							String varName = "helperThread" + i;
-							i++;
-							p.println();
-							p.println("pthread_t " + varName + ";");
-							p.println("if ((rc = pthread_create(&" + varName + ", NULL, " +
-									decl.getName() + ", (void *)NULL)) < 0)");
-							p.indent();
-							p.println("printf(\"Error creating helper " +  ": %d\\n\", rc);");
-							p.outdent();
-
-						}
-					}
-				}
-
-				p.println();
-				p.println("pthread_attr_destroy(&attr);");
-
-				for(Core core : SMPBackend.chip.getCores()) {
-					if(!core.getComputeCode().shouldGenerateCode())
-						continue;
-
-					p.println();
-					p.println("if ((rc = pthread_join(thread_n" + core.getCoreID() + ", &status)) < 0) {");
-					p.indent();
-					p.println("printf(\"Error joining thread for core " + core.getCoreID() + ": %d\\n\", rc);");
-					p.println("exit(-1);");
-					p.outdent();
-					p.println("}");
-				}
-
-				p.println();
-				p.println("// Exit");
-				p.println("pthread_exit(NULL);");
-				p.outdent();
-				p.println("}");
-				p.close();
+		p.println();
+		p.println("// Exit");
+		p.println("pthread_exit(NULL);");
+		p.outdent();
+		p.println("}");
+		p.close();
 	}
 
 	private void generateMakefile() throws IOException {
-		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(new FileWriter("Makefile", false)));
-		
-		//p.println("CC = icc");
-		//p.println("UNAME := $(shell uname)");
-		//p.println("ifeq ($(UNAME), Darwin)");
-		//p.println("# do something for OSX");
-		//p.println("endif");
+		CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(
+				new FileWriter("Makefile", false)));
+
+		// p.println("CC = icc");
+		// p.println("UNAME := $(shell uname)");
+		// p.println("ifeq ($(UNAME), Darwin)");
+		// p.println("# do something for OSX");
+		// p.println("endif");
 		p.println("CC = g++");
 		p.println("CFLAGS = -O2 -vec-report0");
 		p.println("INCLUDES = ");
 		p.println("LIBS = -pthread -lstdc++");
 		p.print("OBJS = main.o barrier.o ");
-		if (isDynamic) {       
+		if (isDynamic) {
 			p.print("dynamic_queue.o ");
-		} 
-		if(KjcOptions.loadbalance) p.print("load_balancer.o ");
-		for(Core core : SMPBackend.chip.getCores()) {
-			if(!core.getComputeCode().shouldGenerateCode())
+		}
+		if (KjcOptions.loadbalance)
+			p.print("load_balancer.o ");
+		for (Core core : SMPBackend.chip.getCores()) {
+			if (!core.getComputeCode().shouldGenerateCode())
 				continue;
 			p.print("core" + core.getCoreID() + ".o ");
 		}
@@ -717,12 +783,14 @@ public class EmitSMPCode extends EmitCode {
 		p.println();
 
 		p.println("all: $(OBJS)");
-		p.println("\t$(CC) $(CFLAGS) $(LIBS) $(OBJS) -o " + 
-				(KjcOptions.output == null ? "smp" + KjcOptions.smp : KjcOptions.output));
+		p.println("\t$(CC) $(CFLAGS) $(LIBS) $(OBJS) -o "
+				+ (KjcOptions.output == null ? "smp" + KjcOptions.smp
+						: KjcOptions.output));
 		p.println();
 		p.println("clean:");
-		p.println("\trm *.o " + 
-				(KjcOptions.output == null ? "smp" + KjcOptions.smp : KjcOptions.output));
+		p.println("\trm *.o "
+				+ (KjcOptions.output == null ? "smp" + KjcOptions.smp
+						: KjcOptions.output));
 		p.println();
 
 		p.println("main.o: main.c");
@@ -737,18 +805,19 @@ public class EmitSMPCode extends EmitCode {
 		p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c dynamic_queue.c");
 		p.println();
 
-
-		if(KjcOptions.loadbalance) {
+		if (KjcOptions.loadbalance) {
 			p.println("load_balancer.o: load_balancer.c");
 			p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c load_balancer.c");
 			p.println();
 		}
 
-		for(Core core : SMPBackend.chip.getCores()) {
-			if(!core.getComputeCode().shouldGenerateCode())
+		for (Core core : SMPBackend.chip.getCores()) {
+			if (!core.getComputeCode().shouldGenerateCode())
 				continue;
-			p.println("core" + core.getCoreID() + ".o: core" + core.getCoreID() + ".c");
-			p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c core" + core.getCoreID() + ".c");
+			p.println("core" + core.getCoreID() + ".o: core" + core.getCoreID()
+					+ ".c");
+			p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c core"
+					+ core.getCoreID() + ".c");
 			p.println();
 		}
 		p.close();

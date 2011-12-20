@@ -50,7 +50,7 @@ public class SIRToSLIR {
 				inputPort, outputPort);
 		streamGraph.addSSG(src);
 
-		for (int i = 1; i < ssgs.size()-1; i++) {
+		for (int i = 1; i < ssgs.size(); i++) {
 			StaticSubGraph dst = new StaticSubGraph();
 			outputPort = new UnaryOutputPort(dst);
 			src.setOutputPort(outputPort);

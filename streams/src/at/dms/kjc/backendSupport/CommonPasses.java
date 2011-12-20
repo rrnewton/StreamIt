@@ -99,36 +99,23 @@ public class CommonPasses {
 
 		//System.out
 		//		.println("CommonPasses.doStaticPassesSegmented enter");
-//
-//		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
-//
-//			if (str instanceof SIRPipeline) {
-//				System.out
-//						.println("CommonPasses.doStaticPasses str is a SIRPipeline");
-//				List<SIROperator> oldChildren = ((SIRPipeline) str)
-//						.getChildren();
-//
-//				for (SIROperator child : oldChildren) {
-//					System.out.println("CommonPasses.doStaticPasses child is "
-//							+ child.getIdent());
-//				}
-//			}
-//		}
-//
-//		System.out
-//				.println("CommonPasses.doStaticPasses segmentedGraph.getStaticSubGraphs().size()="
-//						+ segmentedGraph.getStaticSubGraphs().size());
+
+		System.out
+				.println("CommonPasses.doStaticPasses segmentedGraph.getStaticSubGraphs().size()="
+						+ segmentedGraph.getStaticSubGraphs().size());
 		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
 
+				
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
-
 			str = this.removeDummies(str);
-
 			str = doStaticPassSIRStream(str);
-
 			optimizedGraph.addToSegmentedGraph(str);
 		}
+
+		System.out
+				.println("CommonPasses.doStaticPasses optimizedGraph.getStaticSubGraphs().size()="
+						+ optimizedGraph.getStaticSubGraphs().size());
 		streamGraph = new SIRToSLIR().translate(optimizedGraph, numCores);
 
 		// System.out.println("CommonPasses.doStaticPassesSegmentedSIRGraph exit");
@@ -146,6 +133,9 @@ public class CommonPasses {
 	 */
 	private SIRStream doStaticPassSIRStream(SIRStream str) {
 
+		
+		// TODO: Add a unique id to the .dot file generation!
+		
 	
 //		if (str instanceof SIRFilter) {
 //    		System.out.println("CommonPasses.doStaticPassSIRStream before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
@@ -516,8 +506,16 @@ public class CommonPasses {
 		// ./sm LowerIterationExpression.doIt(str);
 
 		DynamismFinder.Result result = new DynamismFinder().find(str);
-		return doStaticPassesSegmentedSIRGraph(new SegmentedSIRGraph().init(
-				str, result.isDynamic()));
+		
+		SegmentedSIRGraph segmented = new SegmentedSIRGraph().init(str, result.isDynamic());
+		
+		int i = 0;
+		for (SIRStream sir : segmented.getStaticSubGraphs()) {
+			StreamItDot.printGraph(sir, "streamgraph-run-ssg" + i + ".dot");
+			++i;
+		}
+				
+		return doStaticPassesSegmentedSIRGraph(segmented);
 	}
 
 	/**

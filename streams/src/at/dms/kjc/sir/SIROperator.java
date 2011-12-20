@@ -303,7 +303,7 @@ public abstract class SIROperator implements Finalizable, Serializable, DeepClon
     protected void deepCloneInto(at.dms.kjc.sir.SIROperator other) {
         other.parent = this.parent;
         other.serializationHandle = this.serializationHandle;
-    }
+    }	
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

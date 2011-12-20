@@ -77,10 +77,14 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param streamGraph
 	 */
 	private static void createInputBuffers(StreamGraph streamGraph) {
+		System.out.println("InterSSGChannel.createInputBuffers streamGraph.getSSGs().size()=" + streamGraph.getSSGs().size());
+		
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
 			Filter top = ssg.getTopFilters()[0];
+			System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString());						
 			InputPort inputPort = ssg.getInputPort();
 			if (inputPort == null) {
+				System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString() + " inputPort==null");
 				continue;
 			}
 			InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);
