@@ -279,9 +279,12 @@ assert false : "This feature is unsupported for iteration count";
 
         //we are assigning an array to an array in C, we want to do 
         //element-wise copy!!
-        if ((left.getType() != null && left.getType().isArrayType() && ((CArrayType)left.getType()).getBaseType().isArrayType()) ||
-            (right.getType() != null && right.getType().isArrayType() && ((CArrayType)right.getType()).getBaseType().isArrayType())) {
-        	arrayCopy(left, right);
+    
+        //NOTE: This is broken for array's over tapes, but works for local or field arrays
+        
+        if ((left.getType() != null && left.getType().isArrayType()) ||
+            (right.getType() != null && right.getType().isArrayType())) {
+            arrayCopy(left, right);
             return;
         }
 
