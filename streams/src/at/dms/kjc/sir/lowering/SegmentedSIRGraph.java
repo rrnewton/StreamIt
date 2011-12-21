@@ -2,17 +2,13 @@ package at.dms.kjc.sir.lowering;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import at.dms.kjc.CStdType;
 import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFeedbackLoopIter;
 import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.iterator.SIRIterator;
 import at.dms.kjc.iterator.SIRPhasedFilterIter;
 import at.dms.kjc.iterator.SIRPipelineIter;
 import at.dms.kjc.iterator.SIRSplitJoinIter;
@@ -47,9 +43,6 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	/** An identifier to distinguish pipeline names */
 	private int pipelineId = 0;
 
-	/** These are the child nodes of the pipeline currently being created */
-	private List<SIRStream> pipelineChildren = null;
-
 	/** This is the list of all pipelines created */
 	private List<SIRStream> staticSubGraphs = null;
 
@@ -64,6 +57,19 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		connections = new HashMap<SIRStream, List<SIRStream>>();
 	}
 
+	/**
+	 * Add a connection between one ssg to another
+	 * @param connections the map of all connections
+	 * @param src the source of one connect
+	 * @param dst the destination of one connection
+	 */
+	private void addConnection(Map<SIRStream, List<SIRStream>> connections, SIRStream src, SIRStream dst) {
+		if (!connections.containsKey(src)) {
+			connections.put(src, new ArrayList<SIRStream>());
+		}
+		connections.get(src).add(dst);
+	}
+	
 	/**
 	 * Add a new static subsection to the graph. Each subsection must be a
 	 * pipeline with a source, some number of other filters, and a sink.
@@ -85,19 +91,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		SIRFilter source = new SIRDummySource(succ.getInputType());
 		return source;
 	}
-
-	private void endPipeline() {
-		if (pipelineChildren.size() == 0) {
-			return;
-		}
-		// Create a new empty list of pipeline children
-		String name = uniquePipelineName();		
-		SIRPipeline pipeline = new SIRPipeline(null, name);
-		pipeline.setInit(SIRStream.makeEmptyInit());
-		pipeline.setChildren(pipelineChildren);			
-		addToSegmentedGraph(pipeline);
-	}
-
+	
 	/**
 	 * Returns the connections between static subsections.
 	 * 
@@ -107,6 +101,14 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		return connections;
 	}
 
+	/**
+	 * Sets the connections between static subsections.
+	 * 	 
+	 */
+	public void setConnections(Map<SIRStream, List<SIRStream>> connections) {
+		this.connections = connections;
+	}
+	
 	/**
 	 * Returns the list of static subsections
 	 * 
@@ -222,6 +224,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 					currentPipeline = new SIRPipeline(null, uniquePipelineName());
 					SIRFilter next = (SIRFilter)allChildren.get(i+1);
 					SIRFilter source = createSource(next);
+					addConnection(connections, filter, next);
 					currentPipeline.add(source);				
 					next.setPop(new JIntLiteral(1));
 					next.setPeek(new JIntLiteral(1));										
@@ -252,10 +255,6 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	@Override
 	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
 		/* Do nothing yet */
-	}
-
-	private void startPipeline() {
-		pipelineChildren = new LinkedList<SIRStream>();
 	}
 
 	private String uniquePipelineName() {

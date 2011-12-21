@@ -113,6 +113,8 @@ public class CommonPasses {
 			optimizedGraph.addToSegmentedGraph(str);
 		}
 
+		optimizedGraph.setConnections(segmentedGraph.getConnections());
+		
 		System.out
 				.println("CommonPasses.doStaticPasses optimizedGraph.getStaticSubGraphs().size()="
 						+ optimizedGraph.getStaticSubGraphs().size());

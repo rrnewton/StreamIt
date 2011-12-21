@@ -4,6 +4,7 @@
 package at.dms.kjc.slir;
 
 import java.util.List;
+import java.util.Map;
 
 import at.dms.kjc.sir.SIRDummySink;
 import at.dms.kjc.sir.SIRDummySource;
@@ -39,6 +40,8 @@ public class SIRToSLIR {
 	public StreamGraph translate(SegmentedSIRGraph segmentedGraph, int numCores) {
 
 		List<SIRStream> ssgs = segmentedGraph.getStaticSubGraphs();
+		
+		Map<SIRStream, List<SIRStream>> connections = segmentedGraph.getConnections();
 
 		/* StreamGraph contains all of the StaticSubGraphs */
 		StreamGraph streamGraph = new StreamGraph();
