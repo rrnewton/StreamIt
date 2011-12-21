@@ -46,8 +46,8 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	protected static HashMap<WorkNode, InterSSGChannel> inputBuffers;
 	protected static HashMap<WorkNode, InterSSGChannel> outputBuffers;
 
-	protected static HashMap<String, String> bufferVariables;	
-	protected static HashMap<String, String> createMethods;	
+	protected static HashMap<String, String> bufferVariables;
+	protected static HashMap<String, String> createMethods;
 
 	static {
 		types = new HashSet<String>();
@@ -66,8 +66,8 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	/**
 	 * Create the implementation for queues of different types
 	 */
-	public static void createDynamicQueues() {		
-		for (String type : types) {			
+	public static void createDynamicQueues() {
+		for (String type : types) {
 			SMPBackend.dynamicQueueCodeGenerator.addQueueType(type);
 		}
 	}
@@ -77,50 +77,25 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param streamGraph
 	 */
 	private static void createInputBuffers(StreamGraph streamGraph) {
-		System.out.println("InterSSGChannel.createInputBuffers streamGraph.getSSGs().size()=" + streamGraph.getSSGs().size());
-		
-		
+		System.out
+				.println("InterSSGChannel.createInputBuffers streamGraph.getSSGs().size()="
+						+ streamGraph.getSSGs().size());
+
 		for (StaticSubGraph srcSSG : streamGraph.getSSGs()) {
 			OutputPort outputPort = srcSSG.getOutputPort();
 			if (outputPort == null) {
 				continue;
 			}
 			for (InterSSGEdge edge : outputPort.getLinks()) {
-				System.out.println("InterSSGChannel.createInputBuffers edge=" + edge.toString());
+				System.out.println("InterSSGChannel.createInputBuffers edge="
+						+ edge.toString());
 				InterSSGChannel channel = new InterSSGChannel(edge);
 				CType bufType = edge.getType();
-				types.add(bufType.toString());	
+				types.add(bufType.toString());
 				Filter top = edge.getDest().getSSG().getTopFilters()[0];
 				inputBuffers.put(top.getWorkNode(), channel);
 			}
 		}
-		
-		
-		
-		
-//		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-//			Filter top = ssg.getTopFilters()[0];
-//			System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString());						
-//			InputPort inputPort = ssg.getInputPort();
-//			if (inputPort == null) {
-//				System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString() + " inputPort==null");
-//				continue;
-//			}
-//			InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);
-//			
-//			System.out.println("InterSSGChannel.createInputBuffers edge=" + edge.toString());
-//
-//			InterSSGChannel channel = new InterSSGChannel(edge);			
-//			if (ssg.getTopFilters() != null) {
-//				top = ssg.getTopFilters()[0];
-//				CType bufType = top.getWorkNode().getFilter().getInputType();
-//				System.out.println("InterSSGChannel.createInputBuffers creating a dynamic buffer for type " + bufType.toString());
-//				types.add(bufType.toString());							
-//				inputBuffers.put(top.getWorkNode(), channel);
-//			} else {
-//				assert false : "InterSSGChannel::createInputBuffers() : ssg.getTopFilters() is null";
-//			}
-//		}
 	}
 
 	/**
@@ -128,49 +103,22 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param streamGraph
 	 */
 	private static void createOutputBuffers(StreamGraph streamGraph) {
-		
-		
-		
+
 		for (StaticSubGraph srcSSG : streamGraph.getSSGs()) {
 			InputPort inputPort = srcSSG.getInputPort();
 			if (inputPort == null) {
 				continue;
 			}
 			for (InterSSGEdge edge : inputPort.getLinks()) {
-				System.out.println("InterSSGChannel.createOutputBuffers edge=" + edge.toString());
+				System.out.println("InterSSGChannel.createOutputBuffers edge="
+						+ edge.toString());
 				InterSSGChannel channel = new InterSSGChannel(edge);
 				CType bufType = edge.getType();
-				types.add(bufType.toString());					
+				types.add(bufType.toString());
 				Filter top = srcSSG.getTopFilters()[0];
-				outputBuffers.put(top.getWorkNode(), channel);						
+				outputBuffers.put(top.getWorkNode(), channel);
 			}
 		}
-		
-		
-		
-		
-//		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-//			OutputPort outputPort = ssg.getOutputPort();
-//			if (outputPort == null) {
-//				continue;
-//			}
-//			List<InterSSGEdge> links = ssg.getOutputPort().getLinks();
-//			if (links.size() == 0) {
-//				continue;
-//			}
-//			InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
-//			
-//			System.out.println("InterSSGChannel.createOutputBuffers edge=" + edge.toString());
-//			
-//			InterSSGChannel channel = new InterSSGChannel(edge);
-//			if (ssg.getTopFilters() != null) {
-//				Filter top = ssg.getTopFilters()[0];
-//				outputBuffers.put(top.getWorkNode(), channel);
-//			} else {
-//				assert false : "InterSSGChannel::createOutputBuffers() : ssg.getTopFilters() is null";
-//			}
-//		}
-
 	}
 
 	public static Collection<InterSSGChannel> getInterSSGChannels() {
@@ -194,29 +142,33 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
-		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();		
+		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
 		for (InterSSGChannel b : inputBuffers.values()) {
 
 			InterSSGEdge edge = b.getEdge();
 			OutputPort iport = edge.getSrc();
-			StaticSubGraph ssg = iport.getSSG();			
+			StaticSubGraph ssg = iport.getSSG();
 
 			Filter top[] = ssg.getTopFilters();
 
 			for (Filter f : top) {
 
-				System.out.println("InterSSGChannel.getInputBuffersOnCore core=" + t.getCoreID() 
-						+ " filter=" + f.getWorkNode().toString());
+				System.out
+						.println("InterSSGChannel.getInputBuffersOnCore core="
+								+ t.getCoreID() + " filter="
+								+ f.getWorkNode().toString());
 
-				System.out.println("InterSSGChannel.getInputBuffersOnCore computeNode=" + 
-						SMPBackend.scheduler.getComputeNode(f.getWorkNode()).getCoreID());
+				System.out
+						.println("InterSSGChannel.getInputBuffersOnCore computeNode="
+								+ SMPBackend.scheduler.getComputeNode(
+										f.getWorkNode()).getCoreID());
 
 				if (SMPBackend.scheduler.getComputeNode(f.getWorkNode())
 						.equals(t)) {
-					System.out.println("InterSSGChannel.getInputBuffersOnCore adding b"); 							
+					System.out
+							.println("InterSSGChannel.getInputBuffersOnCore adding b");
 					set.add(b);
 				}
-
 
 			}
 		}
@@ -275,8 +227,6 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		return new LinkedList<JStatement>();
 	}
 
-	
-
 	/**
 	 * @return
 	 */
@@ -301,7 +251,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 
 	public String pushMethodName() {
 		String type = edge.getType().toString();
-		return  type + "_queue_push";
+		return type + "_queue_push";
 	}
 
 }

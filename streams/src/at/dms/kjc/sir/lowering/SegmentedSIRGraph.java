@@ -185,7 +185,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 			return;
 		}
 		
-		System.out.println("BIG TIME! SegmentedSIRGraph.postVisitPipeline called");		
+		System.out.println("SegmentedSIRGraph.postVisitPipeline called");		
 		List <SIROperator> allChildren = getAllChildren(pipeline);	
 		String name = uniquePipelineName();	
 		SIRPipeline currentPipeline = new SIRPipeline(null, name);
@@ -277,82 +277,6 @@ public class SegmentedSIRGraph implements StreamVisitor {
 		if (isDynamicPush(filter) || isDynamicPop(filter)) {
 			setDynamic(filter, true);
 		}
-
-//		SIRFilter filter = (SIRFilter) ObjectDeepCloner.deepCopy(self);
-//		boolean isSource = CStdType.Void == filter.getInputType();			
-//		boolean isSink = CStdType.Void == filter.getOutputType();			
-//				
-//		// If this is a completely static filter, then we
-//		// just add it to the current pipeline
-//		//if (!isDynamicPush(filter) && !(isDynamicPop(filter))) {
-//		if (!isDynamicPush(filter) && !(isDynamicPop(filter)) 
-//					&& !filter.isStateful()){					
-//			pipelineChildren.add(filter);
-//			if (isSink) {
-//				System.out.println("SegmentedSIRGraph.visitFilter filter =" + filter.getName() + "NotDynamicPush, NotDynamicPop");
-//				//endPipeline();
-//			}
-//		}
-//							
-//		else if (filter.isStateful()) {						
-//			if (isSource) {
-//				filter.setPush(new JIntLiteral(1));
-//				pipelineChildren.add(filter);
-//				pipelineChildren.add(createSink(filter, iter));
-//				endPipeline();
-//				startPipeline();
-//			} else if (isSink) {
-//				SIRFilter source = createSource(filter);
-//				pipelineChildren.add(source);
-//				filter.setPop(new JIntLiteral(1));
-//				filter.setPeek(new JIntLiteral(1));
-//				pipelineChildren.add(filter);
-//				//endPipeline();
-//			} else {
-//				endPipeline();
-//				startPipeline();		
-//				SIRFilter source = createSource(filter);
-//				pipelineChildren.add(source);
-//				filter.setPop(new JIntLiteral(1));
-//				filter.setPeek(new JIntLiteral(1));
-//				filter.setPush(new JIntLiteral(1));
-//				pipelineChildren.add(filter);
-//				SIRFilter sink = createSink(filter, iter);
-//				pipelineChildren.add(sink);
-//				endPipeline();
-//				startPipeline();
-//			}
-//		}
-//		
-//		else if (isDynamicPush(filter) && !(isDynamicPop(filter))) {
-//			filter.setPush(new JIntLiteral(1));
-//			pipelineChildren.add(filter);
-//			pipelineChildren.add(createSink(filter, iter));
-//			endPipeline();
-//			startPipeline();
-//		}
-//
-//		else if (!isDynamicPush(filter) && (isDynamicPop(filter))) {
-//			endPipeline();
-//			startPipeline();
-//			pipelineChildren.add(createSource(filter));
-//			filter.setPop(new JIntLiteral(1));
-//			filter.setPeek(new JIntLiteral(1));
-//			pipelineChildren.add(filter);
-//		}
-//
-//		else { // if (isDynamicPush(filter) && (isDynamicPop(filter))) {
-//			endPipeline();
-//			startPipeline();
-//			pipelineChildren.add(createSource(filter));
-//			filter.setPop(new JIntLiteral(1));
-//			filter.setPeek(new JIntLiteral(1));
-//			filter.setPush(new JIntLiteral(1));
-//			pipelineChildren.add(filter);
-//			pipelineChildren.add(createSink(filter, iter));
-//			endPipeline();
-//			startPipeline();
-//		}
 	}
 
 	@Override

@@ -75,39 +75,6 @@ public class SIRToSLIR {
 			}
 		}
 		System.out.println("\n\n");
-
-		
-		
-		
-//
-//		SIRStream str = ssgs.get(0);
-//		InputPort inputPort = null;
-//		OutputPort outputPort = null;
-//		
-//		StaticSubGraph src = new StaticSubGraph().init(streamGraph, str,
-//				inputPort, outputPort);
-//
-//		streamGraph.addSSG(src);
-//
-//		for (int i = 1; i < ssgs.size(); i++) {
-//			StaticSubGraph dst = new StaticSubGraph();
-//			outputPort = new UnaryOutputPort(dst);
-//			src.setOutputPort(outputPort);
-//			inputPort = new UnaryInputPort(src);
-//			str = ssgs.get(i);			
-//			dst.init(streamGraph, str, inputPort, null);
-//			
-//			
-//			InterSSGEdge edge = new InterSSGEdge(outputPort, inputPort);
-//
-//			System.out.println("StreamGraph.translate edge=" + edge);
-//			
-//			inputPort.addLink(edge);
-//			outputPort.addLink(edge);
-//			streamGraph.addSSG(dst);
-//			src = dst;
-//		}
-
 		return streamGraph;
 	}
 
