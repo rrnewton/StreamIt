@@ -509,6 +509,7 @@ public class CommonPasses {
 
 		DynamismFinder.Result result = new DynamismFinder().find(str);
 		
+		System.out.println("CommonPasses.run() creating segmentedSIRGraph");
 		SegmentedSIRGraph segmented = new SegmentedSIRGraph().init(str, result.isDynamic());
 		
 		int i = 0;

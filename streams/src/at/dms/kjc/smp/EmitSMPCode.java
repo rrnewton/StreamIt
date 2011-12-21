@@ -433,8 +433,10 @@ public class EmitSMPCode extends EmitCode {
 
 		if (isDynamic) {
 			int numDynamicReaders = threadIdToType.keySet().size();
+			System.out.println("EmitSMPCode.generateGlobalsHeader numDynamicReaders=" + numDynamicReaders);
+			
 			p.println();
-			p.println("#define DYNAMIC_READERS  " + numDynamicReaders + 1);
+			p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
 			p.println("#define ASLEEP          0");
 			p.println("#define AWAKE           1");
 			p.println("#define DYN_READER      0");
@@ -569,10 +571,7 @@ public class EmitSMPCode extends EmitCode {
 				p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");
 			}
 
-			p.println();
-			p.println("#define DYNAMIC_READERS  " + numDynamicReaders + 1);
-			p.println("#define ASLEEP          0");
-			p.println("#define AWAKE           1");
+			p.println();			
 			p.println("pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");
 			p.println("pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
 			p.println("int                   thread_to_sleep [DYNAMIC_READERS][2];");

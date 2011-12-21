@@ -14,7 +14,7 @@ public abstract class InputPort {
 	 * @param ssg 
 	 */
 	protected InputPort(StaticSubGraph ssg) {
-		this.setSSH(ssg);
+		this.setSSG(ssg);
 		links = new LinkedList<InterSSGEdge>();
 	}
 
@@ -45,7 +45,7 @@ public abstract class InputPort {
 		return ssg;
 	}
 
-	public void setSSH(StaticSubGraph ssg) {
+	public void setSSG(StaticSubGraph ssg) {
 		this.ssg = ssg;
 	}
 	

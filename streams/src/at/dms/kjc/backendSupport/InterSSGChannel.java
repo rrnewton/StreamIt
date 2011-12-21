@@ -79,29 +79,48 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	private static void createInputBuffers(StreamGraph streamGraph) {
 		System.out.println("InterSSGChannel.createInputBuffers streamGraph.getSSGs().size()=" + streamGraph.getSSGs().size());
 		
-		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			Filter top = ssg.getTopFilters()[0];
-			System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString());						
-			InputPort inputPort = ssg.getInputPort();
-			if (inputPort == null) {
-				System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString() + " inputPort==null");
+		
+		for (StaticSubGraph srcSSG : streamGraph.getSSGs()) {
+			OutputPort outputPort = srcSSG.getOutputPort();
+			if (outputPort == null) {
 				continue;
 			}
-			InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);
-			
-			System.out.println("InterSSGChannel.createInputBuffers edge=" + edge.toString());
-
-			InterSSGChannel channel = new InterSSGChannel(edge);			
-			if (ssg.getTopFilters() != null) {
-				top = ssg.getTopFilters()[0];
-				CType bufType = top.getWorkNode().getFilter().getInputType();
-				System.out.println("InterSSGChannel.createInputBuffers creating a dynamic buffer for type " + bufType.toString());
-				types.add(bufType.toString());							
+			for (InterSSGEdge edge : outputPort.getLinks()) {
+				System.out.println("InterSSGChannel.createInputBuffers edge=" + edge.toString());
+				InterSSGChannel channel = new InterSSGChannel(edge);
+				CType bufType = edge.getType();
+				types.add(bufType.toString());	
+				Filter top = edge.getDest().getSSG().getTopFilters()[0];
 				inputBuffers.put(top.getWorkNode(), channel);
-			} else {
-				assert false : "InterSSGChannel::createInputBuffers() : ssg.getTopFilters() is null";
 			}
 		}
+		
+		
+		
+		
+//		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
+//			Filter top = ssg.getTopFilters()[0];
+//			System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString());						
+//			InputPort inputPort = ssg.getInputPort();
+//			if (inputPort == null) {
+//				System.out.println("InterSSGChannel.createInputBuffers top=" + top.getWorkNode().toString() + " inputPort==null");
+//				continue;
+//			}
+//			InterSSGEdge edge = ssg.getInputPort().getLinks().get(0);
+//			
+//			System.out.println("InterSSGChannel.createInputBuffers edge=" + edge.toString());
+//
+//			InterSSGChannel channel = new InterSSGChannel(edge);			
+//			if (ssg.getTopFilters() != null) {
+//				top = ssg.getTopFilters()[0];
+//				CType bufType = top.getWorkNode().getFilter().getInputType();
+//				System.out.println("InterSSGChannel.createInputBuffers creating a dynamic buffer for type " + bufType.toString());
+//				types.add(bufType.toString());							
+//				inputBuffers.put(top.getWorkNode(), channel);
+//			} else {
+//				assert false : "InterSSGChannel::createInputBuffers() : ssg.getTopFilters() is null";
+//			}
+//		}
 	}
 
 	/**
@@ -109,27 +128,48 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @param streamGraph
 	 */
 	private static void createOutputBuffers(StreamGraph streamGraph) {
-		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			OutputPort outputPort = ssg.getOutputPort();
-			if (outputPort == null) {
+		
+		
+		
+		for (StaticSubGraph srcSSG : streamGraph.getSSGs()) {
+			InputPort inputPort = srcSSG.getInputPort();
+			if (inputPort == null) {
 				continue;
 			}
-			List<InterSSGEdge> links = ssg.getOutputPort().getLinks();
-			if (links.size() == 0) {
-				continue;
-			}
-			InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
-			
-			System.out.println("InterSSGChannel.createOutputBuffers edge=" + edge.toString());
-			
-			InterSSGChannel channel = new InterSSGChannel(edge);
-			if (ssg.getTopFilters() != null) {
-				Filter top = ssg.getTopFilters()[0];
-				outputBuffers.put(top.getWorkNode(), channel);
-			} else {
-				assert false : "InterSSGChannel::createOutputBuffers() : ssg.getTopFilters() is null";
+			for (InterSSGEdge edge : inputPort.getLinks()) {
+				System.out.println("InterSSGChannel.createOutputBuffers edge=" + edge.toString());
+				InterSSGChannel channel = new InterSSGChannel(edge);
+				CType bufType = edge.getType();
+				types.add(bufType.toString());					
+				Filter top = srcSSG.getTopFilters()[0];
+				outputBuffers.put(top.getWorkNode(), channel);						
 			}
 		}
+		
+		
+		
+		
+//		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
+//			OutputPort outputPort = ssg.getOutputPort();
+//			if (outputPort == null) {
+//				continue;
+//			}
+//			List<InterSSGEdge> links = ssg.getOutputPort().getLinks();
+//			if (links.size() == 0) {
+//				continue;
+//			}
+//			InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
+//			
+//			System.out.println("InterSSGChannel.createOutputBuffers edge=" + edge.toString());
+//			
+//			InterSSGChannel channel = new InterSSGChannel(edge);
+//			if (ssg.getTopFilters() != null) {
+//				Filter top = ssg.getTopFilters()[0];
+//				outputBuffers.put(top.getWorkNode(), channel);
+//			} else {
+//				assert false : "InterSSGChannel::createOutputBuffers() : ssg.getTopFilters() is null";
+//			}
+//		}
 
 	}
 
@@ -191,6 +231,9 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	public static Channel<InterSSGEdge> getOutputBuffer(WorkNode filterNode,
 			StaticSubGraph ssg) {
 		if (ssg.getOutputPort() == null) {
+			return null;
+		}
+		if (ssg.getOutputPort().getLinks().size() == 0) {
 			return null;
 		}
 		InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);

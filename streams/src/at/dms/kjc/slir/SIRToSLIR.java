@@ -3,6 +3,7 @@
  */
 package at.dms.kjc.slir;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,31 +42,71 @@ public class SIRToSLIR {
 
 		List<SIRStream> ssgs = segmentedGraph.getStaticSubGraphs();
 		
-		Map<SIRStream, List<SIRStream>> connections = segmentedGraph.getConnections();
+		
+		Map<SIRStream, StaticSubGraph> sirToSSG = new HashMap<SIRStream, StaticSubGraph>();
 
-		/* StreamGraph contains all of the StaticSubGraphs */
+		/* Create all the static subgraphs */
 		StreamGraph streamGraph = new StreamGraph();
-
-		SIRStream str = ssgs.get(0);
-		InputPort inputPort = null;
-		OutputPort outputPort = null;
-		StaticSubGraph src = new StaticSubGraph().init(streamGraph, str,
-				inputPort, outputPort);
-		streamGraph.addSSG(src);
-
-		for (int i = 1; i < ssgs.size(); i++) {
-			StaticSubGraph dst = new StaticSubGraph();
-			outputPort = new UnaryOutputPort(dst);
-			src.setOutputPort(outputPort);
-			inputPort = new UnaryInputPort(src);
-			str = ssgs.get(i);			
-			dst.init(streamGraph, str, inputPort, null);
-			InterSSGEdge link = new InterSSGEdge(outputPort, inputPort);
-			inputPort.addLink(link);
-			outputPort.addLink(link);
-			streamGraph.addSSG(dst);
-			src = dst;
+		for (SIRStream sir : ssgs) {
+			StaticSubGraph ssg = new StaticSubGraph().init(streamGraph, sir, new UnaryInputPort(), new UnaryOutputPort());
+			ssg.getInputPort().setSSG(ssg);
+			ssg.getOutputPort().setSSG(ssg);
+			streamGraph.addSSG(ssg);
+			sirToSSG.put(sir, ssg);
 		}
+		
+		/* Set up all the connections */
+		System.out.println("StreamGraph.translate\n\n");
+		Map<SIRStream, List<SIRStream>> connections = segmentedGraph.getConnections();		
+		for (SIRStream src : connections.keySet()) {
+			List<SIRStream> links = connections.get(src);
+			for (SIRStream dst : links) {
+				System.out.println(src + " --> " + dst);
+				StaticSubGraph ssgSrc = sirToSSG.get(src);
+				StaticSubGraph ssgDst = sirToSSG.get(dst);
+				assert (ssgSrc != null) : "Can't find ssg for src filter=" + src;
+				assert (ssgDst != null) : "Can't find ssg for dst filter=" + dst;
+				OutputPort outputPort = ssgSrc.getOutputPort();
+				InputPort inputPort = ssgDst.getInputPort();
+				InterSSGEdge edge = new InterSSGEdge(outputPort, inputPort);
+				System.out.println("StreamGraph.translate edge=" + edge);
+				inputPort.addLink(edge);
+				outputPort.addLink(edge);			
+			}
+		}
+		System.out.println("\n\n");
+
+		
+		
+		
+//
+//		SIRStream str = ssgs.get(0);
+//		InputPort inputPort = null;
+//		OutputPort outputPort = null;
+//		
+//		StaticSubGraph src = new StaticSubGraph().init(streamGraph, str,
+//				inputPort, outputPort);
+//
+//		streamGraph.addSSG(src);
+//
+//		for (int i = 1; i < ssgs.size(); i++) {
+//			StaticSubGraph dst = new StaticSubGraph();
+//			outputPort = new UnaryOutputPort(dst);
+//			src.setOutputPort(outputPort);
+//			inputPort = new UnaryInputPort(src);
+//			str = ssgs.get(i);			
+//			dst.init(streamGraph, str, inputPort, null);
+//			
+//			
+//			InterSSGEdge edge = new InterSSGEdge(outputPort, inputPort);
+//
+//			System.out.println("StreamGraph.translate edge=" + edge);
+//			
+//			inputPort.addLink(edge);
+//			outputPort.addLink(edge);
+//			streamGraph.addSSG(dst);
+//			src = dst;
+//		}
 
 		return streamGraph;
 	}

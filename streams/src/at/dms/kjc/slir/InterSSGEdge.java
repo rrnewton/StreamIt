@@ -13,12 +13,6 @@ import at.dms.kjc.CType;
 
 public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 
-	/** The destination port for this link */
-	private InputPort inputPort;
-
-	/** The source port for this link */
-	private OutputPort outputPort;
-
 	/** defined on the source OutputPort */
 	private Rate pushRate;
 
@@ -77,10 +71,10 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 
 		Filter[] inputFilterGraph = src.getSSG().getFilterGraph();
 		Filter[] outputFilterGraph = dst.getSSG().getFilterGraph();
-		WorkNodeContent srcContent = inputFilterGraph[0].getWorkNodeContent();
-		WorkNodeContent dstContent = outputFilterGraph[outputFilterGraph.length - 1].getWorkNodeContent();
-		CType srcType = srcContent.getInputType();
-		CType dstType = dstContent.getOutputType();
+		WorkNodeContent srcContent = inputFilterGraph[inputFilterGraph.length - 1].getWorkNodeContent();
+		WorkNodeContent dstContent = outputFilterGraph[0].getWorkNodeContent();
+		CType srcType = srcContent.getOutputType();
+		CType dstType = dstContent.getInputType();
 		type = srcType;
 		
 		System.out.println( "InterSSGEdge.getType() calculating type: " + 

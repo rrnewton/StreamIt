@@ -3,6 +3,7 @@ package at.dms.kjc.smp;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
@@ -47,6 +48,7 @@ public class ProcessFilterWorkNode {
 		String popName;
 		String pushName;
 		Channel inputChannel;
+		Channel outputChannel;
 		Map<Filter, Integer> filterToThreadId;
 		boolean isDynamicPop;
 		boolean isDynamicPush;
@@ -66,6 +68,7 @@ public class ProcessFilterWorkNode {
 			this.popName = popName;
 			this.pushName = pushName;
 			this.inputChannel = inputChannel;
+			this.outputChannel = outputChannel;
 			this.filterToThreadId = filterToThreadId;
 			this.dominators = dominators;
 			this.isDynamicPop = isDynamicPop;
@@ -126,8 +129,18 @@ public class ProcessFilterWorkNode {
 				CType tapeType, JExpression arg) {
 			JExpression newArg = (JExpression) arg.accept(this);
 			if (isDynamicPush) {
-				String threadId = filterToThreadId.get(filter.getParent())
-						.toString();
+				
+				
+				System.out.println("ProcessFilterWorkNode.PushPopReplacingVisitor.visitPushExpression filter=" + filter);
+				
+				InterSSGEdge edge = ((InterSSGChannel)outputChannel).getEdge();
+				InputPort inputPort = edge.getDest();
+				
+				System.out.println("ProcessFilterWorkNode.PushPopReplacingVisitor.visitPushExpression inputPort.getSSG().getTopFilters()[0]=" + inputPort.getSSG().getTopFilters()[0].getWorkNode());
+				
+				String threadId = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]).toString();	
+				
+				
 				String buffer = "dyn_buf_" + threadId;
 				JExpression dyn_queue = new JEmittedTextExpression(buffer);
 				return new JMethodCallExpression(pushName, new JExpression[] {
@@ -306,7 +319,8 @@ public class ProcessFilterWorkNode {
 
 		// A particular filter will only have dynamic input if it is
 		// the top node of an SSG, and if the SSG has dynamic input.
-		if (filterNode.equals(graph[0].getWorkNode())) {
+		if (filterNode.equals(graph[0].getWorkNode()) 
+				&& (filterNode.getParent().getInputNode().getType() != CStdType.Void)) {
 			hasDynamicInput = ssg.hasDynamicInput();
 		}
 
@@ -454,6 +468,9 @@ public class ProcessFilterWorkNode {
 		}
 
 		if (isDynamicPop) {
+			
+			System.out.println("ProcessFilterWorkNode.standardStreadyProcessing filter=" + filterNode.getFilter() + " isDynamicPop=");
+			
 			Map<Filter, Integer> filterToThreadId = backEndFactory
 					.getFilterToThreadId();							
 			String threadId = filterToThreadId.get(filterNode.getParent())

@@ -40,25 +40,23 @@ public class ThreadMapper {
 
 		boolean isStateful = f.getWorkNodeContent().isStateful();
 
-//		System.out.println("ThreadMapper.assignThreads filter = " + f.getWorkNode().toString() + " isStateful=" + isStateful);
-
 		/* Check if it has a dynamic pop rate */
 		if (isDynamicInput || isStateful) {
 			Filter[] topFilters = ssg.getTopFilters();
 
 			for (int i = 0; i < topFilters.length; i++) {
 				Filter dynamicReader = topFilters[i];
-//				System.out.println("ThreadMapper.assignThreads Filter "
-//						+ dynamicReader.getWorkNodeContent().getName()
-//						+ " is a dynamic reader");
-				
 
-				CType type = dynamicReader.getWorkNodeContent().getOutputType();				
+				if (CStdType.Void == dynamicReader.getInputNode().getType()) {
+						continue;					
+				}
+										
+				CType type = dynamicReader.getWorkNodeContent().getInputType();				
 
-//				System.out.println("ThreadMapper.assignThreads filter = " + dynamicReader.getWorkNode().toString()
-//						+ " has threadId=" + threadId
-//						+ " and type=" + type.toString()
-//						);
+				System.out.println("**** ThreadMapper.assignThreads filter = " + dynamicReader.getWorkNode().toString()
+						+ " has threadId=" + threadId
+						+ " and type=" + type.toString()
+						);
 
 				filterToThreadId.put(dynamicReader, threadId);
 
