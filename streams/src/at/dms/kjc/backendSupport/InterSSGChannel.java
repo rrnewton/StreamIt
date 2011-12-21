@@ -8,18 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import at.dms.kjc.CEmittedTextType;
-import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmittedTextExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
@@ -30,8 +21,6 @@ import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.smp.Core;
 import at.dms.kjc.smp.SMPBackend;
-import at.dms.kjc.smp.Util;
-import at.dms.util.Utils;
 
 /**
  * @author soule

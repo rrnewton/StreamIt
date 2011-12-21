@@ -101,7 +101,7 @@ public class DynamicQueueCodeGenerator {
 		cBuffer.append("  if ((q->size == 0)) {\n");
 		cBuffer.append("    *multiplier = 0;\n");
 		cBuffer.append("    pthread_mutex_lock(&thread_mutexes[threadIndex][MASTER]);\n");
-		cBuffer.append("    (thread_to_sleep[threadIndex][MASTER] = (AWAKE));\n");
+		cBuffer.append("    thread_to_sleep[threadIndex][MASTER] = AWAKE;\n");
 		cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[threadIndex][MASTER]);\n");
 		cBuffer.append("    pthread_cond_signal(&thread_conds[threadIndex][MASTER]);\n");
 		cBuffer.append("    pthread_mutex_lock(&thread_mutexes[threadIndex][DYN_READER]);\n");
