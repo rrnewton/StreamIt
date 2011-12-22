@@ -98,25 +98,41 @@ public class DynamicQueueCodeGenerator {
 		hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int * multiplier);\n");	
 		
 		cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int * multiplier) {\n");		
-		cBuffer.append("  if ((q->size == 0)) {\n");
-		cBuffer.append("    *multiplier = 0;\n");
-		cBuffer.append("    pthread_mutex_lock(&thread_mutexes[threadIndex][MASTER]);\n");
-		cBuffer.append("    thread_to_sleep[threadIndex][MASTER] = AWAKE;\n");
-		cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[threadIndex][MASTER]);\n");
-		cBuffer.append("    pthread_cond_signal(&thread_conds[threadIndex][MASTER]);\n");
-		cBuffer.append("    pthread_mutex_lock(&thread_mutexes[threadIndex][DYN_READER]);\n");
-		cBuffer.append("    while ((q->size == 0)) {\n");
-		cBuffer.append("      pthread_cond_wait(&thread_conds[threadIndex][DYN_READER], &thread_mutexes[threadIndex][DYN_READER]);\n");
-		cBuffer.append("    }\n");
-		cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[threadIndex][DYN_READER]);\n");
-		cBuffer.append("  }\n");
+
+//		cBuffer.append("  if ((q->size == 0)) {\n");
+//		cBuffer.append("    *multiplier = 0;\n");
+//		cBuffer.append("    pthread_mutex_lock(&thread_mutexes[threadIndex][MASTER]);\n");
+//		cBuffer.append("    thread_to_sleep[threadIndex][MASTER] = AWAKE;\n");
+//		cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[threadIndex][MASTER]);\n");
+//		cBuffer.append("    pthread_cond_signal(&thread_conds[threadIndex][MASTER]);\n");
+//		cBuffer.append("    pthread_mutex_lock(&thread_mutexes[threadIndex][DYN_READER]);\n");
+//		cBuffer.append("    while ((q->size == 0)) {\n");
+//		cBuffer.append("      pthread_cond_wait(&thread_conds[threadIndex][DYN_READER], &thread_mutexes[threadIndex][DYN_READER]);\n");
+//		cBuffer.append("    }\n");
+//		cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[threadIndex][DYN_READER]);\n");
+//		cBuffer.append("  }\n");
+
+
+		// start of new pop implementation
+		cBuffer.append("pthread_mutex_lock(&thread_mutexes[threadIndex][DYN_READER]);\n");
+		cBuffer.append("while ((q->size == 0)) {\n");
+		cBuffer.append("  *multiplier = 0;\n");
+		cBuffer.append("  pthread_mutex_lock(&thread_mutexes[threadIndex][MASTER]);\n");
+		cBuffer.append("  thread_to_sleep[threadIndex][MASTER] = AWAKE;\n");
+		cBuffer.append("  pthread_mutex_unlock(&thread_mutexes[threadIndex][MASTER]);\n");
+		cBuffer.append("  pthread_cond_signal(&thread_conds[threadIndex][MASTER]);\n");
+		cBuffer.append("  pthread_cond_wait(&thread_conds[threadIndex][DYN_READER], &thread_mutexes[threadIndex][DYN_READER]);\n");
+		cBuffer.append("}\n");
+		cBuffer.append("pthread_mutex_unlock(&thread_mutexes[threadIndex][DYN_READER]);\n");
+
+		// end of new pop implementation
 		cBuffer.append("  " + type + " elem = q->buffer[q->first];\n");
 		cBuffer.append("  q->size--;\n");
 		cBuffer.append("  q->first = (q->first + 1) & q->max;\n");
 		cBuffer.append("  *multiplier = 1;\n");
 		cBuffer.append("  return elem;\n");
 		cBuffer.append("}\n");
-		
+	
 	}
 
 	private void addCtx(String type) {
