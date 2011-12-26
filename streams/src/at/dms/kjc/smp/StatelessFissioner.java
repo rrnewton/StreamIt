@@ -43,35 +43,35 @@ public class StatelessFissioner {
      * Return true if <slice> can be fissed, meaning it is stateless.  The method 
      * does not check that the schedule allows for fission.
      */
-    public static boolean canFizz(Filter slice, boolean debug) {
+    public static boolean canFizz(Filter filter, boolean debug) {
 
         // Get information on Slice rates
         WorkNodeInfo.reset();
 
-        WorkNode filter = slice.getWorkNode();
+        WorkNode workNode = filter.getWorkNode();
         
         // Check to see if Slice has file reader/writer.  Don't fizz file
         // reader/writer
-        if(filter.isPredefined()) {
-            if(debug) System.out.println("Can't fizz: Slice contains file reader/writer: " + slice);
+        if(workNode.isPredefined()) {
+            if(debug) System.out.println("Can't fizz: Filter contains file reader/writer: " + filter);
             return false;
         }
 
         // Check to make sure that Slice is stateless
-        if(MutableStateExtractor.hasMutableState(slice.getWorkNode().getFilter())) {
-            if(debug) System.out.println("Can't fizz: Slice is not stateless: " + slice);
+        if(MutableStateExtractor.hasMutableState(filter.getWorkNode().getWorkNodeContent())) {
+            if(debug) System.out.println("Can't fizz: Filter is not stateless: " + filter);
             return false;
         }
 
         // Check to see if FilterSliceNode contains a linear filter.  At the
         // moment, we can't fizz linear filters
-        if(filter.getFilter().isLinear()) {
-            if(debug) System.out.println("Can't fizz: Slice contains linear filter, presently unsupported: " + slice);
+        if(workNode.getWorkNodeContent().isLinear()) {
+            if(debug) System.out.println("Can't fizz: Filter contains linear filter, presently unsupported: " + filter);
             return false;
         }
         
-        if (filter.hasIO() && KjcOptions.regtest) {        	 
-        	if(debug) System.out.println("Can't fizz: Filter contains print functions, presently unsupported: " + slice);
+        if (workNode.hasIO() && KjcOptions.regtest) {        	 
+        	if(debug) System.out.println("Can't fizz: Filter contains print functions, presently unsupported: " + filter);
         	 return false;
         }
         
@@ -118,12 +118,12 @@ public class StatelessFissioner {
             sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
         
         // Give each Slice clone a unique name
-        String origName = slice.getWorkNode().getFilter().getName();
+        String origName = slice.getWorkNode().getWorkNodeContent().getName();
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getWorkNode().getFilter().setName(origName + "_fizz" + fizzAmount + "_clone" + x);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount + "_clone" + x);
 
         // Modify name of original Slice
-        slice.getWorkNode().getFilter().setName(origName + "_fizz" + fizzAmount);
+        slice.getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount);
         
         // Calculate new steady-state multiplicity based upon fizzAmount.  
         // Because work is equally shared among all Slice clones, steady-state 
@@ -131,7 +131,7 @@ public class StatelessFissioner {
         int newSteadyMult = sliceSteadyMult / fizzAmount;
 
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getWorkNode().getFilter().setSteadyMult(newSteadyMult);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setSteadyMult(newSteadyMult);
     }
 
     private void setupInitPhase() {
@@ -149,8 +149,8 @@ public class StatelessFissioner {
         // disabling prework and seting initialization multiplicty to 0
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getWorkNode().getFilter().setPrework(null);
-            sliceClones[x].getWorkNode().getFilter().setInitMult(0);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setPrework(null);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setInitMult(0);
         }
 
         // Since only the first Slice clone executes, it will be the only Slice

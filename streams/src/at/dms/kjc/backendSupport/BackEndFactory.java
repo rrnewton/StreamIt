@@ -189,7 +189,7 @@ public abstract class BackEndFactory<
             return false;
         }
         if (sliceNeedsJoinerCode(filter.getParent()) && 
-                 Utils.hasPeeks(filter.getFilter())) {
+                 Utils.hasPeeks(filter.getWorkNodeContent())) {
             // if filter performs peeks and has joiner code upstream
             // then filter needs a peek buffer since it can not peek through a joiner.
             return true;

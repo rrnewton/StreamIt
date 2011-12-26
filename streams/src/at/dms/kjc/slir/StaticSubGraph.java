@@ -94,8 +94,8 @@ public class StaticSubGraph {
 	 */
 	public void createPredefinedContent() {
 		for (Filter s : getFilterGraph()) {
-			if (s.getWorkNode().getFilter() instanceof PredefinedContent) {
-				((PredefinedContent) s.getWorkNode().getFilter())
+			if (s.getWorkNode().getWorkNodeContent() instanceof PredefinedContent) {
+				((PredefinedContent) s.getWorkNode().getWorkNodeContent())
 						.createContent();
 			}
 		}
@@ -203,7 +203,7 @@ public class StaticSubGraph {
 		StringBuffer out = new StringBuffer();
 
 		// do something fancy for linear slices!!!
-		if (((WorkNode) node.getNext()).getFilter().getArray() != null)
+		if (((WorkNode) node.getNext()).getWorkNodeContent().getArray() != null)
 			out.append("color=cornflowerblue, style=filled, ");
 
 		out.append("label=\"" + node.getAsInput().debugString(true));// toString());
@@ -211,7 +211,7 @@ public class StaticSubGraph {
 		node = node.getNext();
 		while (node != null) {
 			if (node.isWorkNode()) {
-				WorkNodeContent f = node.getAsFilter().getFilter();
+				WorkNodeContent f = node.getAsFilter().getWorkNodeContent();
 				out.append("\\n" + node.toString() + "{" + getWorkEstimate(f)
 						+ "}");
 				if (f.isTwoStage())
@@ -377,13 +377,13 @@ public class StaticSubGraph {
 			// set up the work hashmaps
 			long workEst = 0;
 			if (filterNodes.generatedIds.contains(filterNode)) {
-				workEst = 3 * filterNode.getFilter().getSteadyMult();
+				workEst = 3 * filterNode.getWorkNodeContent().getSteadyMult();
 			} else {
 				assert node.isFilter();
 				workEst = work.getWork((SIRFilter) node.contents);
 			}
 
-			workEstimation.put(filterNode.getFilter(), workEst);
+			workEstimation.put(filterNode.getWorkNodeContent(), workEst);
 
 			filter.finish();
 
@@ -444,7 +444,7 @@ public class StaticSubGraph {
 	 *         steady-state mult of the filter.
 	 */
 	public long getFilterWork(WorkNode node) {
-		return workEstimation.get(node.getFilter()).longValue();
+		return workEstimation.get(node.getWorkNodeContent()).longValue();
 	}
 
 	/**
@@ -578,7 +578,7 @@ public class StaticSubGraph {
 	 * @return
 	 */
 	public long getWorkEstOneFiring(WorkNode node) {
-		return (getFilterWork(node) / (node.getFilter().getSteadyMult() / parent
+		return (getFilterWork(node) / (node.getWorkNodeContent().getSteadyMult() / parent
 				.getSteadyMult()));
 	}
 
@@ -732,9 +732,9 @@ public class StaticSubGraph {
 					// of items that passes through it (determined by the
 					// schedule mult).
 					workEstimation
-							.put(filter.getFilter(),
+							.put(filter.getWorkNodeContent(),
 									(long) (MultiLevelSplitsJoins.IDENTITY_WORK * filter
-											.getFilter().getSteadyMult()));
+											.getWorkNodeContent().getSteadyMult()));
 				}
 			}
 		}
@@ -756,7 +756,7 @@ public class StaticSubGraph {
 		StringBuffer out = new StringBuffer();
 
 		// do something fancy for linear slices!!!
-		if (((WorkNode) node.getNext()).getFilter().getArray() != null)
+		if (((WorkNode) node.getNext()).getWorkNodeContent().getArray() != null)
 			out.append("color=cornflowerblue, style=filled, ");
 
 		out.append("label=\"" + slice.hashCode() + "\\n");
@@ -770,7 +770,7 @@ public class StaticSubGraph {
 		node = node.getNext();
 		while (node != null) {
 			if (node.isWorkNode()) {
-				WorkNodeContent f = node.getAsFilter().getFilter();
+				WorkNodeContent f = node.getAsFilter().getWorkNodeContent();
 				out.append("\\n" + node.toString() + "{" + "}");
 				if (f.isTwoStage())
 					out.append("\\npre:(peek, pop, push): ("

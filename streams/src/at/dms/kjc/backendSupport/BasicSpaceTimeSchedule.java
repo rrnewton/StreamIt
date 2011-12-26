@@ -61,7 +61,7 @@ public class BasicSpaceTimeSchedule {
         for (int i = 0; i < fileWriters.size(); i++) {
             WorkNode node = (WorkNode)fileWriters.get(i).getInputNode().getNext();
             WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(node);
-            assert node.getFilter().getInputType().isNumeric() :
+            assert node.getWorkNodeContent().getInputType().isNumeric() :
                 "non-numeric type for input to filewriter";
         
             outputs += fi.totalItemsReceived(SchedulingPhase.STEADY);

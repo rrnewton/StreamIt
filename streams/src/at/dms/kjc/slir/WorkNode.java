@@ -48,7 +48,7 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
         return laidout;
     }
 
-    public WorkNodeContent getFilter() {
+    public WorkNodeContent getWorkNodeContent() {
         return filter;
     }
 

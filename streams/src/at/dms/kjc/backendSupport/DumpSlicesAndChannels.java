@@ -73,7 +73,7 @@ public class DumpSlicesAndChannels {
         StringBuffer out = new StringBuffer();
 
         //do something fancy for linear slices!!!
-        if (((WorkNode)node.getNext()).getFilter().getArray() != null)
+        if (((WorkNode)node.getNext()).getWorkNodeContent().getArray() != null)
             out.append("color=cornflowerblue, style=filled, ");
         
         out.append("label=\"" + node.getAsInput().debugString(true));//toString());
@@ -85,7 +85,7 @@ public class DumpSlicesAndChannels {
         node = node.getNext();
         while (node != null ) {
             if (node.isWorkNode()) {
-                WorkNodeContent f = node.getAsFilter().getFilter();
+                WorkNodeContent f = node.getAsFilter().getWorkNodeContent();
                 out.append("\\n" + node.toString() + "{"
                         + ssg.getFilterWork(node.getAsFilter())
                         + "}");

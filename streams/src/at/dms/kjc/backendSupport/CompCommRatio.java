@@ -104,7 +104,7 @@ public class CompCommRatio {
                 WorkNode filter = (WorkNode) sliceNode;
                 // comm += (filter.getFilter().getSteadyMult() *
                 // filter.getFilter().getPushInt());
-                comp += (filter.getFilter().getSteadyMult() * SSG
+                comp += (filter.getWorkNodeContent().getSteadyMult() * SSG
                          .getFilterWork(filter));
             } else if (sliceNode.isOutputSlice()) {
                 OutputNode output = (OutputNode) sliceNode;
@@ -112,8 +112,8 @@ public class CompCommRatio {
                 // FilterInfo filterInfo = FilterInfo.getFilterInfo(filter);
                 // calculate the number of items sent
 
-                int itemsReceived = filter.getFilter().getPushInt()
-                    * filter.getFilter().getSteadyMult();
+                int itemsReceived = filter.getWorkNodeContent().getPushInt()
+                    * filter.getWorkNodeContent().getSteadyMult();
                 int iterations = (output.totalWeights(SchedulingPhase.STEADY) != 0 ? itemsReceived
                                   / output.totalWeights(SchedulingPhase.STEADY) : 0);
 
@@ -132,8 +132,8 @@ public class CompCommRatio {
                 WorkNode filter = (WorkNode) input.getNext();
 
                 // calculate the number of items received
-                int itemsSent = filter.getFilter().getSteadyMult()
-                    * filter.getFilter().getPopInt();
+                int itemsSent = filter.getWorkNodeContent().getSteadyMult()
+                    * filter.getWorkNodeContent().getPopInt();
 
                 int iterations = (input.totalWeights(SchedulingPhase.STEADY) != 0 ? itemsSent
                                   / input.totalWeights(SchedulingPhase.STEADY) : 0);

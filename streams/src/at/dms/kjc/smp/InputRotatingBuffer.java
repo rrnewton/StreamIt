@@ -129,7 +129,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	private InputRotatingBuffer(WorkNode filterNode, Core parent) {
 		super(filterNode.getEdgeToPrev(), filterNode, parent);
 
-		bufType = filterNode.getFilter().getInputType();
+		bufType = filterNode.getWorkNodeContent().getInputType();
 		types.add(bufType.toString());
 		setInputBuffer(filterNode, this);
 

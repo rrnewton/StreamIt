@@ -82,14 +82,14 @@ public class EmitCellCode extends EmitCode {
     private void handleFilterSlice(CodegenPrintWriter p, WorkNode s, boolean init) {
         String str = "";
         if (init) str = "init_"; 
-        p.println("#define FILTER_NAME " + str + s.getFilter().getName());
+        p.println("#define FILTER_NAME " + str + s.getWorkNodeContent().getName());
         p.println("#include \"beginfilter.h\"");
     }
     
     private void handleInputSlice(CodegenPrintWriter p, InputNode s, boolean init) {
         String str = "";
         if (init) str = "init_"; 
-        p.println("#define FILTER_NAME " + str + "joiner_" + s.getNext().getAsFilter().getFilter().getName());
+        p.println("#define FILTER_NAME " + str + "joiner_" + s.getNext().getAsFilter().getWorkNodeContent().getName());
         if (s.isJoiner(SchedulingPhase.STEADY)) {
             p.println("#define NUM_INPUT_TAPES " + s.getWidth(SchedulingPhase.STEADY));
             p.print("#define JOINER_RATES {");
@@ -108,7 +108,7 @@ public class EmitCellCode extends EmitCode {
     private void handleOutputSlice(CodegenPrintWriter p, OutputNode s, boolean init) {
         String str = "";
         if (init) str = "init_";
-        p.println("#define FILTER_NAME " + str + "splitter_" + s.getPrevious().getAsFilter().getFilter().getName());
+        p.println("#define FILTER_NAME " + str + "splitter_" + s.getPrevious().getAsFilter().getWorkNodeContent().getName());
         if (s.isRRSplitter(SchedulingPhase.STEADY)) {
             p.println("#define NUM_OUTPUT_TAPES " + s.getWidth(SchedulingPhase.STEADY));
             p.print("#define SPLITTER_RATES {");
@@ -129,7 +129,7 @@ public class EmitCellCode extends EmitCode {
         p.println("#include <math.h>");
         p.println();
         String type;
-        if (s.getParent().getInputNode().getNextFilter().getFilter().getOutputType().isFloatingPoint())
+        if (s.getParent().getInputNode().getNextFilter().getWorkNodeContent().getOutputType().isFloatingPoint())
             type = "float";
         else type = "int";
         p.println("#define ITEM_TYPE " + type);

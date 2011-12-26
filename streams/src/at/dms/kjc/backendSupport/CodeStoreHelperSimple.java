@@ -36,7 +36,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
      * @param backEndBits   The back end factory as a source of data and back end specific functions.
      */
     public CodeStoreHelperSimple(WorkNode node, BackEndFactory backEndBits) {
-        super(node,node.getAsFilter().getFilter(),backEndBits);
+        super(node,node.getAsFilter().getWorkNodeContent(),backEndBits);
     }
 
     /**
@@ -53,7 +53,7 @@ public class CodeStoreHelperSimple extends CodeStoreHelper {
     public JMethodDeclaration getInitStageMethod() {
         JBlock statements = new JBlock();
         assert internalFilterNode instanceof WorkNode;
-        WorkNodeContent filter = ((WorkNode) internalFilterNode).getFilter();
+        WorkNodeContent filter = ((WorkNode) internalFilterNode).getWorkNodeContent();
 
         // channel code before work block
         if (backEndFactory.sliceHasUpstreamChannel(internalFilterNode.getParent())) {

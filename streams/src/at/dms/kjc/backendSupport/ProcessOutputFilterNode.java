@@ -201,7 +201,7 @@ public class ProcessOutputFilterNode {
         private static void makeSplitterCode(OutputNode splitter, 
                 BackEndFactory backEndBits, CodeStoreHelper helper) {
             String splitter_name = "_splitter_" + ProcessFilterWorkNode.getUid();
-            String splitter_method_name =  splitter_name + splitter.getPrevFilter().getFilter().getName();
+            String splitter_method_name =  splitter_name + splitter.getPrevFilter().getWorkNodeContent().getName();
 
             // size is number of edges with non-zero weight.
             int size = 0;

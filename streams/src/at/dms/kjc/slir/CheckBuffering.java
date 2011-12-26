@@ -76,7 +76,7 @@ public class CheckBuffering {
      */
     private void checkOutputNode(OutputNode output) {
         WorkNode filterNode = output.getPrevFilter();
-        WorkNodeContent filter = filterNode.getFilter();
+        WorkNodeContent filter = filterNode.getWorkNodeContent();
         
         //do nothing if nothing is pushed...
         if (filter.initItemsPushed() == 0) 
@@ -231,8 +231,8 @@ public class CheckBuffering {
         System.out.println("   with new output: " + newOutput);
         
         //set the mults of the new identity
-        filter.getFilter().setInitMult(itemsToPassInit);
-        WorkNodeContent prev = upSlice.getOutputNode().getPrevFilter().getFilter();
+        filter.getWorkNodeContent().setInitMult(itemsToPassInit);
+        WorkNodeContent prev = upSlice.getOutputNode().getPrevFilter().getWorkNodeContent();
         
         //calc the number of steady items
         int steadyItems = (int) 
@@ -242,7 +242,7 @@ public class CheckBuffering {
         System.out.println("   with initMult: " + itemsToPassInit + 
                 ", steadyMult: " + steadyItems);
         
-        filter.getFilter().setSteadyMult(steadyItems);
+        filter.getWorkNodeContent().setSteadyMult(steadyItems);
        
     }
     
@@ -331,7 +331,7 @@ public class CheckBuffering {
      * stage.
      */
     private double initItemsPushed(InterFilterEdge edge) {
-        return ((double)edge.getSrc().getPrevFilter().getFilter().initItemsPushed()) *
+        return ((double)edge.getSrc().getPrevFilter().getWorkNodeContent().initItemsPushed()) *
         edge.getSrc().ratio(edge, SchedulingPhase.INIT);
     }
 }

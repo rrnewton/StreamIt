@@ -53,29 +53,29 @@ public class GetOrMakeChannel  {
             System.err.print("(Channel ");
             System.err.print(c.getClass().getSimpleName());
             if (src instanceof WorkNode) {
-                System.err.print(" " + src.getAsFilter().getFilter().getName());
+                System.err.print(" " + src.getAsFilter().getWorkNodeContent().getName());
             } else if (src instanceof InputNode) {
                 System.err.print(" " + "joiner_"
-                        + src.getNext().getAsFilter().getFilter().getName());
+                        + src.getNext().getAsFilter().getWorkNodeContent().getName());
             } else {
                 assert src instanceof OutputNode;
                 System.err
                         .print(" "
                                 + "splitter_"
-                                + src.getPrevious().getAsFilter().getFilter()
+                                + src.getPrevious().getAsFilter().getWorkNodeContent()
                                         .getName());
             }
             if (dst instanceof WorkNode) {
-                System.err.print(" " + dst.getAsFilter().getFilter().getName());
+                System.err.print(" " + dst.getAsFilter().getWorkNodeContent().getName());
             } else if (dst instanceof InputNode) {
                 System.err.print(" " + "joiner_"
-                        + dst.getNext().getAsFilter().getFilter().getName());
+                        + dst.getNext().getAsFilter().getWorkNodeContent().getName());
             } else {
                 assert dst instanceof OutputNode;
                 System.err
                         .print(" "
                                 + "splitter_"
-                                + dst.getPrevious().getAsFilter().getFilter()
+                                + dst.getPrevious().getAsFilter().getWorkNodeContent()
                                         .getName());
             }
             System.err.print(" " + BufferSize.calculateSize(e));

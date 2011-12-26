@@ -87,7 +87,7 @@ public class WorkNodeInfo {
     }
 
     private WorkNodeInfo(WorkNode sliceNode) {
-        filter = sliceNode.getFilter();
+        filter = sliceNode.getWorkNodeContent();
         this.sliceNode = sliceNode;
         this.steadyMult = filter.getSteadyMult();
         this.initMult = filter.getInitMult();
@@ -153,7 +153,7 @@ public class WorkNodeInfo {
         int initItemsRec = 0;
         if (sliceNode.getPrevious().isWorkNode()) {
             WorkNodeContent filterC = ((WorkNode) sliceNode.getPrevious())
-                .getFilter();
+                .getWorkNodeContent();
             initItemsRec = filterC.getPushInt() * filterC.getInitMult();
             if (filterC.isTwoStage()) {
                 initItemsRec -= filterC.getPushInt();
@@ -166,7 +166,7 @@ public class WorkNodeInfo {
             for (int i = 0; i < in.getWeights(SchedulingPhase.INIT).length; i++) {
                 InterFilterEdge incoming = in.getSources(SchedulingPhase.INIT)[i];
                 WorkNodeContent filterC = ((WorkNode) incoming.getSrc()
-                                         .getPrevious()).getFilter();
+                                         .getPrevious()).getWorkNodeContent();
                 // calculate the init items sent by the upstream filter
                 int upstreamInitItems = 0;
                 upstreamInitItems = filterC.getPushInt()

@@ -138,7 +138,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     }
     
     public WorkNodeContent getWorkNodeContent() {
-    	return workNode.getFilter();
+    	return workNode.getWorkNodeContent();
     }
     
     /**

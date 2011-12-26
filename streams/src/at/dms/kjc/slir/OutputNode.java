@@ -383,7 +383,7 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
 
     /** type is output type of previous filter */
     public CType getType() {
-        return getPrevFilter().getFilter().getOutputType();
+        return getPrevFilter().getWorkNodeContent().getOutputType();
     }
 
     /**

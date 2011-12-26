@@ -85,7 +85,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
      */
     private InputRotatingBuffer(WorkNode filterNode, Tile parent) {
         super(filterNode.getEdgeToPrev(), filterNode, parent);
-        bufType = filterNode.getFilter().getInputType();
+        bufType = filterNode.getWorkNodeContent().getInputType();
         types.add(bufType);
         setInputBuffer(filterNode, this);
                 

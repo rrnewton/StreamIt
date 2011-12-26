@@ -17,7 +17,7 @@ public class IDFilterRemoval {
     private int[] usOutputIndices;
     
     public static void doit(Filter slice) {
-        assert slice.getWorkNode().getFilter() instanceof IDFilterContent : 
+        assert slice.getWorkNode().getWorkNodeContent() instanceof IDFilterContent : 
             "Trying to remove a non ID slice";
         
         IDFilterRemoval remover = new IDFilterRemoval(slice);
@@ -77,7 +77,7 @@ public class IDFilterRemoval {
     	if (fi.totalItemsReceived(phase) > fi.totalItemsSent(phase)) {
     		
     		//System.out.println("Needed to adjust ID multiplicity to remove it: " + idSlice + " " + phase + " " + max);
-    		idSlice.getWorkNode().getFilter().setMult(phase, fi.totalItemsReceived(phase));
+    		idSlice.getWorkNode().getWorkNodeContent().setMult(phase, fi.totalItemsReceived(phase));
     		WorkNodeInfo.reset();
     	}
     }

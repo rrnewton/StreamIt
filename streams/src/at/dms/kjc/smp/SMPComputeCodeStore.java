@@ -127,7 +127,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 			SMPComputeCodeStore codeStore = core.getComputeCode();
 
 			FileOutputContent fileOutput = (FileOutputContent) fileW
-					.getFilter();
+					.getWorkNodeContent();
 
 			codeStore.addPrintOutputCode(buf, firstInputFilter);
 			codeStore.appendTxtToGlobal("FILE *output;\n");
@@ -264,10 +264,10 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		 * SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult( //
 		 * edge.getSrc().getParent()); }
 		 */
-		int outputs = fileW.getFilter().getSteadyMult();
-		String type = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "%d"
+		int outputs = fileW.getWorkNodeContent().getSteadyMult();
+		String type = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
 				: "%f";
-		String cast = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "(int)"
+		String cast = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
 				: "(float)";
 		String bufferName = buf.getAddressRotation(filter).currentWriteBufName;
 		// create the loop

@@ -50,7 +50,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
      * @param backEndBits   The back end factory as a source of data and back end specific functions.
      */
     public FilterCodeGeneration(WorkNode node, TileraBackEndFactory backEndBits) {
-        super(node,node.getAsFilter().getFilter(),backEndBits);
+        super(node,node.getAsFilter().getWorkNodeContent(),backEndBits);
         filterNode = node;
         filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
         //assume that every filter is a two-stage and prework is called
@@ -74,7 +74,7 @@ public class FilterCodeGeneration extends CodeStoreHelper {
     public JMethodDeclaration getInitStageMethod() {
         JBlock statements = new JBlock();
         assert internalFilterNode instanceof WorkNode;
-        WorkNodeContent filter = ((WorkNode) internalFilterNode).getFilter();
+        WorkNodeContent filter = ((WorkNode) internalFilterNode).getWorkNodeContent();
 
         // channel code before work block
         //slice has input, so we 
@@ -122,8 +122,8 @@ public class FilterCodeGeneration extends CodeStoreHelper {
             
             InputRotatingBuffer buf = InputRotatingBuffer.getInputBuffer(fileW);
             int outputs = filterInfo.totalItemsSent(SchedulingPhase.INIT);
-            String type = ((FileOutputContent)fileW.getFilter()).getType() == CStdType.Integer ? "%d" : "%f";
-            String cast = ((FileOutputContent)fileW.getFilter()).getType() == CStdType.Integer ? "(int)" : "(float)";
+            String type = ((FileOutputContent)fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d" : "%f";
+            String cast = ((FileOutputContent)fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)" : "(float)";
             String bufferName = buf.getAddressRotation(TileraBackend.backEndBits.getLayout().getComputeNode(filterNode)).currentWriteBufName;
             //create the loop
             statements.addStatement(Util.toStmt(

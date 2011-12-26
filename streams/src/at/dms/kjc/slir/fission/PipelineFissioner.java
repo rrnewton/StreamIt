@@ -169,14 +169,14 @@ public class PipelineFissioner {
         }
 
         // Check to make sure that Slice is stateless
-        if(MutableStateExtractor.hasMutableState(slice.getWorkNode().getFilter())) {
+        if(MutableStateExtractor.hasMutableState(slice.getWorkNode().getWorkNodeContent())) {
             if(debug) System.out.println("Can't fizz: Slice is not stateless!!");
             return false;
         }
 
         // Check to see if FilterSliceNode contains a linear filter.  At the
         // moment, we can't fizz linear filters
-        if(filter.getFilter().isLinear()) {
+        if(filter.getWorkNodeContent().isLinear()) {
             if(debug) System.out.println("Can't fizz: Slice contains linear filter, presently unsupported");
             return false;
         }
@@ -370,9 +370,9 @@ public class PipelineFissioner {
             sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
 
         // Give each Slice clone a unique name
-        String origName = sliceClones[0].getWorkNode().getFilter().getName();
+        String origName = sliceClones[0].getWorkNode().getWorkNodeContent().getName();
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getWorkNode().getFilter().setName(origName + "_fizz" + x);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + x);
 
         /**********************************************************************
          *                   Setup initialization schedule                    *
@@ -395,15 +395,15 @@ public class PipelineFissioner {
 
         if(sliceInitMult > 0) {
             JBlock firstWorkBody =
-                sliceClones[0].getWorkNode().getFilter().getWork().getBody();
+                sliceClones[0].getWorkNode().getWorkNodeContent().getWork().getBody();
 	    
             JBlock newPreworkBody = new JBlock();
 	    
-            if(sliceClones[0].getWorkNode().getFilter().getPrework() != null &&
-               sliceClones[0].getWorkNode().getFilter().getPrework().length > 0 &&
-               sliceClones[0].getWorkNode().getFilter().getPrework()[0] != null &&
-               sliceClones[0].getWorkNode().getFilter().getPrework()[0].getBody() != null) {
-                newPreworkBody.addStatement(sliceClones[0].getWorkNode().getFilter().getPrework()[0].getBody());
+            if(sliceClones[0].getWorkNode().getWorkNodeContent().getPrework() != null &&
+               sliceClones[0].getWorkNode().getWorkNodeContent().getPrework().length > 0 &&
+               sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0] != null &&
+               sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0].getBody() != null) {
+                newPreworkBody.addStatement(sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0].getBody());
             }
 
             JVariableDefinition initMultLoopVar =
@@ -432,9 +432,9 @@ public class PipelineFissioner {
                                   (JBlock)ObjectDeepCloner.deepCopy(firstWorkBody));
             newPreworkBody.addStatement(initMultLoop);
 	    
-            if(sliceClones[0].getWorkNode().getFilter().getPrework() == null ||
-               sliceClones[0].getWorkNode().getFilter().getPrework().length == 0 ||
-               sliceClones[0].getWorkNode().getFilter().getPrework()[0] == null) {
+            if(sliceClones[0].getWorkNode().getWorkNodeContent().getPrework() == null ||
+               sliceClones[0].getWorkNode().getWorkNodeContent().getPrework().length == 0 ||
+               sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0] == null) {
                 JMethodDeclaration newPreworkMethod =
                     new JMethodDeclaration(null,
                                            at.dms.kjc.Constants.ACC_PUBLIC,
@@ -446,14 +446,14 @@ public class PipelineFissioner {
                                            null,
                                            null);
 
-                sliceClones[0].getWorkNode().getFilter().setPrework(newPreworkMethod);
+                sliceClones[0].getWorkNode().getWorkNodeContent().setPrework(newPreworkMethod);
 
                 slicePrePeek = 0;
                 slicePrePush = 0;
                 slicePrePop = 0;
             }
             else {
-                sliceClones[0].getWorkNode().getFilter().getPrework()[0].setBody(newPreworkBody);
+                sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0].setBody(newPreworkBody);
             }
 	    
             // For the first Slice clone, adjust prework rates to reflect that 
@@ -464,22 +464,22 @@ public class PipelineFissioner {
             slicePrePop = slicePrePop + sliceInitMult * slicePop;
             slicePrePush = slicePrePush + sliceInitMult * slicePush;
 	    
-            sliceClones[0].getWorkNode().getFilter().getPrework()[0].setPeek(slicePrePeek);
-            sliceClones[0].getWorkNode().getFilter().getPrework()[0].setPop(slicePrePop);
-            sliceClones[0].getWorkNode().getFilter().getPrework()[0].setPush(slicePrePush);
+            sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0].setPeek(slicePrePeek);
+            sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0].setPop(slicePrePop);
+            sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0].setPush(slicePrePush);
 	    
             // Since the initialization work has been moved into prework, set
             // the initialization multiplicity of the first Slice clone to 0
 	    
-            sliceClones[0].getWorkNode().getFilter().setInitMult(1);
+            sliceClones[0].getWorkNode().getWorkNodeContent().setInitMult(1);
         }
 
         // Disable all other Slice clones in initialization.  This involves
         // disabling prework and seting initialization multiplicty to 0
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getWorkNode().getFilter().setPrework(null);
-            sliceClones[x].getWorkNode().getFilter().setInitMult(0);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setPrework(null);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setInitMult(0);
         }
 
         sliceInitMult = 0;
@@ -557,17 +557,17 @@ public class PipelineFissioner {
         // remove these unneeded elements.
 
         if(Math.max(0, (slicePeek - slicePop) - sliceCopyDown) > 0) {
-            if(!sliceClones[fizzAmount - 1].getWorkNode().getFilter().isTwoStage()) {
+            if(!sliceClones[fizzAmount - 1].getWorkNode().getWorkNodeContent().isTwoStage()) {
                 JMethodDeclaration prework = 
                     new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
                                            CStdType.Void, "emptyPrework",
                                            JFormalParameter.EMPTY, CClassType.EMPTY,
                                            new JBlock(), null, null);
                 
-                sliceClones[fizzAmount - 1].getWorkNode().getFilter().setPrework(prework);
+                sliceClones[fizzAmount - 1].getWorkNode().getWorkNodeContent().setPrework(prework);
             }
             
-            sliceClones[fizzAmount - 1].getWorkNode().getFilter().getPrework()[0]
+            sliceClones[fizzAmount - 1].getWorkNode().getWorkNodeContent().getPrework()[0]
                 .setPop(Math.max(0, (slicePeek - slicePop) - sliceCopyDown));
         }
 
@@ -582,7 +582,7 @@ public class PipelineFissioner {
         sliceSteadyMult /= fizzAmount;
 
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getWorkNode().getFilter().setSteadyMult(sliceSteadyMult);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setSteadyMult(sliceSteadyMult);
 
         // Construct splitter-joiner schedule between source Slices and Slice 
         // clones
@@ -1011,7 +1011,7 @@ public class PipelineFissioner {
 
         for(int x = 0 ; x < fizzAmount ; x++)
             origWorkBodies[x] =
-                sliceClones[x].getWorkNode().getFilter().getWork().getBody();
+                sliceClones[x].getWorkNode().getWorkNodeContent().getWork().getBody();
 
         // Roll the steady-state multiplicity into a loop around the work
         // body of each Slice.
@@ -1049,7 +1049,7 @@ public class PipelineFissioner {
             newWorkBody.addStatement(steadyMultLoop);
 
             // Set new work body
-            sliceClones[x].getWorkNode().getFilter().getWork().setBody(newWorkBody);
+            sliceClones[x].getWorkNode().getWorkNodeContent().getWork().setBody(newWorkBody);
         }
 
         // Now that steady-state multiplicity has been rolled around the work
@@ -1061,10 +1061,10 @@ public class PipelineFissioner {
         slicePush = slicePush * sliceSteadyMult;
 
         for(int x = 0 ; x < fizzAmount ; x++) {
-            sliceClones[x].getWorkNode().getFilter().setSteadyMult(1);
-            sliceClones[x].getWorkNode().getFilter().getWork().setPeek(slicePeek);
-            sliceClones[x].getWorkNode().getFilter().getWork().setPop(slicePop);
-            sliceClones[x].getWorkNode().getFilter().getWork().setPush(slicePush);
+            sliceClones[x].getWorkNode().getWorkNodeContent().setSteadyMult(1);
+            sliceClones[x].getWorkNode().getWorkNodeContent().getWork().setPeek(slicePeek);
+            sliceClones[x].getWorkNode().getWorkNodeContent().getWork().setPop(slicePop);
+            sliceClones[x].getWorkNode().getWorkNodeContent().getWork().setPush(slicePush);
         }
         
         /**********************************************************************
@@ -1084,14 +1084,14 @@ public class PipelineFissioner {
             // Add pop statement to end of each work body
             for(int x = 0 ; x < fizzAmount ; x++) {
                 CType inputType = 
-                    sliceClones[x].getWorkNode().getFilter().getInputType();
+                    sliceClones[x].getWorkNode().getWorkNodeContent().getInputType();
                 
                 SIRPopExpression popExpr =
                     new SIRPopExpression(inputType, slicePeek - slicePop);
                 JExpressionStatement popStmnt =
                     new JExpressionStatement(popExpr);
                 
-                sliceClones[x].getWorkNode().getFilter().getWork().getBody()
+                sliceClones[x].getWorkNode().getWorkNodeContent().getWork().getBody()
                     .addStatement(popStmnt);
             }
 
@@ -1099,7 +1099,7 @@ public class PipelineFissioner {
             slicePop += (slicePeek - slicePop);
 
             for(int x = 0 ; x < fizzAmount ; x++)
-                sliceClones[x].getWorkNode().getFilter().getWork().setPop(slicePop);
+                sliceClones[x].getWorkNode().getWorkNodeContent().getWork().setPop(slicePop);
         }
 
         // This is a hack to maintain the meaning of the peek rate.  Normally,
@@ -1113,10 +1113,10 @@ public class PipelineFissioner {
 
         if(sliceCopyDown > 0) {
             int newPeek = 
-                sliceClones[0].getWorkNode().getFilter().getWork().getPeekInt() +
+                sliceClones[0].getWorkNode().getWorkNodeContent().getWork().getPeekInt() +
                 sliceCopyDown;
 
-            sliceClones[0].getWorkNode().getFilter().getWork().setPeek(newPeek);
+            sliceClones[0].getWorkNode().getWorkNodeContent().getWork().setPeek(newPeek);
         }
 
         /**********************************************************************

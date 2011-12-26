@@ -81,7 +81,7 @@ public class ProcessFilterSliceNode {
         if (filterCode == null) {
             if (debug) {
               System.err.println(
-                    "filter " + filterNode.getFilter() +
+                    "filter " + filterNode.getWorkNodeContent() +
                     ", make_joiner " + backEndBits.sliceNeedsJoinerCode(filterNode.getParent()) + 
                     ", make_peek_buffer " + backEndBits.sliceNeedsPeekBuffer(filterNode.getParent()) +
                     ", has_upstream_channel " + backEndBits.sliceHasUpstreamChannel(filterNode.getParent()) +
@@ -226,8 +226,8 @@ public class ProcessFilterSliceNode {
         if (!basicCodeWritten.containsKey(filterNode)) {
             codeStore.addFields(filterCode.getFields());
             codeStore.addMethods(filterCode.getUsefulMethods());
-            if (filterNode.getFilter() instanceof FileOutputContent) {
-                codeStore.addCleanupStatement(((FileOutputContent)filterNode.getFilter()).closeFile());
+            if (filterNode.getWorkNodeContent() instanceof FileOutputContent) {
+                codeStore.addCleanupStatement(((FileOutputContent)filterNode.getWorkNodeContent()).closeFile());
             }
             basicCodeWritten.put(filterNode,true);
         }
@@ -235,7 +235,7 @@ public class ProcessFilterSliceNode {
         
         if (debug) {
             // debug info only: expected splitter and joiner firings.
-            System.err.print("(Filter" + filterNode.getFilter().getName());
+            System.err.print("(Filter" + filterNode.getWorkNodeContent().getName());
             System.err.print(" "
                     + WorkNodeInfo.getFilterInfo(filterNode).getMult(
                             SchedulingPhase.INIT));
@@ -244,7 +244,7 @@ public class ProcessFilterSliceNode {
                             SchedulingPhase.STEADY));
             System.err.println(")");
             System.err.print("(Joiner joiner_"
-                    + filterNode.getFilter().getName());
+                    + filterNode.getWorkNodeContent().getName());
             System.err.print(" "
                     + WorkNodeInfo.getFilterInfo(filterNode)
                             .totalItemsReceived(SchedulingPhase.INIT));
@@ -253,7 +253,7 @@ public class ProcessFilterSliceNode {
                             .totalItemsReceived(SchedulingPhase.STEADY));
             System.err.println(")");
             System.err.print("(Splitter splitter_"
-                    + filterNode.getFilter().getName());
+                    + filterNode.getWorkNodeContent().getName());
             System.err.print(" "
                     + WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(
                             SchedulingPhase.INIT));
@@ -341,7 +341,7 @@ public class ProcessFilterSliceNode {
                 }
             });
             // Add markers to code for debugging of emitted code:
-            String methodName = "filter " + filter.getFilter().getName() + "." + method.getName();
+            String methodName = "filter " + filter.getWorkNodeContent().getName() + "." + method.getName();
             method.addStatementFirst(new SIRBeginMarker(methodName));
             method.addStatement(new SIREndMarker(methodName));
         }

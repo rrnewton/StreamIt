@@ -265,7 +265,7 @@ public class MultiLevelSplitsJoins {
             InterFilterEdge downEdge = traces[i].getOutputNode().getSingleEdge(SchedulingPhase.STEADY);
             
             //the downstream filter
-            WorkNodeContent next = downEdge.getDest().getNextFilter().getFilter();
+            WorkNodeContent next = downEdge.getDest().getNextFilter().getWorkNodeContent();
             //System.out.println(next + " receives " + next.getSteadyMult() * next.getPopInt());
             
             //set the steady items based on the number of items the down stream 
@@ -276,7 +276,7 @@ public class MultiLevelSplitsJoins {
                     
             //System.out.println("Setting steady items " + steadyItems + " " + 
             //        traces[i].getHead().getNextFilter().getFilter());
-            traces[i].getInputNode().getNextFilter().getFilter().setSteadyMult(steadyItems);
+            traces[i].getInputNode().getNextFilter().getWorkNodeContent().setSteadyMult(steadyItems);
             
             int initItems = 0;
             int steadyItemsOther = 0;
@@ -285,13 +285,13 @@ public class MultiLevelSplitsJoins {
             InputNode input = traces[i].getInputNode();
             for (int s = 0; s < input.getSources(SchedulingPhase.STEADY).length; s++) {
                 InterFilterEdge upEdge = input.getSources(SchedulingPhase.STEADY)[s];
-               WorkNodeContent prev = upEdge.getSrc().getPrevFilter().getFilter();
+               WorkNodeContent prev = upEdge.getSrc().getPrevFilter().getWorkNodeContent();
                initItems += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
                        ((double)prev.initItemsPushed()));
                steadyItemsOther += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
                        ((double)(prev.getPushInt() * prev.getSteadyMult())));
             }
-            traces[i].getInputNode().getNextFilter().getFilter().setInitMult(initItems);
+            traces[i].getInputNode().getNextFilter().getWorkNodeContent().setInitMult(initItems);
             
             //this has to be greater than the requirement for the downstream filter
             //on this edge
@@ -464,7 +464,7 @@ public class MultiLevelSplitsJoins {
      
             //the last filter of the prev (original) trace 
             WorkNodeContent prev = 
-               edge.getSrc().getPrevFilter().getFilter();
+               edge.getSrc().getPrevFilter().getWorkNodeContent();
             //System.out.println("Source Total Items Steady: " + 
             //        prev.getSteadyMult() * prev.getPushInt() + " " + prev);
             
@@ -472,7 +472,7 @@ public class MultiLevelSplitsJoins {
             //trace in the init stage
             int initItems = 
                 (int) (((double) prev.initItemsPushed()) * edge.getSrc().ratio(edge, SchedulingPhase.STEADY));
-            slices[i].getInputNode().getNextFilter().getFilter().setInitMult(initItems);
+            slices[i].getInputNode().getNextFilter().getWorkNodeContent().setInitMult(initItems);
             
             //calc the number of steady items
             int steadyItems = (int) ((((double)prev.getSteadyMult()) * ((double)prev.getPushInt())) * 
@@ -480,7 +480,7 @@ public class MultiLevelSplitsJoins {
             
             //System.out.println("Setting Steady Items: " + steadyItems + " " + 
             //        traces[i].getHead().getNextFilter().getFilter());
-            slices[i].getInputNode().getNextFilter().getFilter().setSteadyMult(steadyItems);
+            slices[i].getInputNode().getNextFilter().getWorkNodeContent().setSteadyMult(steadyItems);
         }
         
     }

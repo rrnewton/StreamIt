@@ -116,7 +116,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	protected OutputRotatingBuffer(WorkNode filterNode, Core parent) {
 		super(filterNode.getEdgeToNext(), filterNode, parent);
 
-		bufType = filterNode.getFilter().getOutputType();
+		bufType = filterNode.getWorkNodeContent().getOutputType();
 
 		checkDirectWrite();
 		// if(directWrite)

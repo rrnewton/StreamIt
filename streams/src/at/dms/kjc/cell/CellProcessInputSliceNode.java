@@ -78,7 +78,7 @@ public class CellProcessInputSliceNode extends ProcessInputFilterNode {
             ppuCS.setupFilter(inputNode);
             // setup EXT_PSP_EX_PARAMS/LAYOUT
             ppuCS.setupPSP(inputNode);
-            System.out.println("new joiner " + filterId + " " + inputNode.getIdent() + " " + inputNode.getWidth(SchedulingPhase.STEADY) + " " + inputNode.getNextFilter().getFilter().getName());
+            System.out.println("new joiner " + filterId + " " + inputNode.getIdent() + " " + inputNode.getWidth(SchedulingPhase.STEADY) + " " + inputNode.getNextFilter().getWorkNodeContent().getName());
         }
         
         // Ids of channels that are inputs to this filter
@@ -240,7 +240,7 @@ public class CellProcessInputSliceNode extends ProcessInputFilterNode {
     private static void makeJoinerCode(InputNode joiner,
             BackEndFactory backEndBits, CodeStoreHelper helper) {
         String joiner_name = "_joiner_" + ProcessFilterWorkNode.getUid();
-        String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
+        String joiner_method_name =  joiner_name + joiner.getNextFilter().getWorkNodeContent().getName();
 
         // size is number of edges with non-zero weight.
         int size = 0;
@@ -348,7 +348,7 @@ public class CellProcessInputSliceNode extends ProcessInputFilterNode {
         }
         joinerWork = new JMethodDeclaration(
                 CStdType.Void,
-                "_joinerWork_" + joiner.getNextFilter().getFilter().getName(),
+                "_joinerWork_" + joiner.getNextFilter().getWorkNodeContent().getName(),
                 JFormalParameter.EMPTY,
                 body);
         joiner_code.setWorkMethod(joinerWork);

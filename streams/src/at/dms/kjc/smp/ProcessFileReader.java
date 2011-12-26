@@ -38,7 +38,7 @@ public class ProcessFileReader {
     
     public ProcessFileReader (WorkNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
         this.filterNode = filter;
-        this.fileInput = (FileInputContent)filter.getFilter();
+        this.fileInput = (FileInputContent)filter.getWorkNodeContent();
         this.phase = phase;
         this.factory = factory;
         this.allocatingCore = nextAllocatingCore();

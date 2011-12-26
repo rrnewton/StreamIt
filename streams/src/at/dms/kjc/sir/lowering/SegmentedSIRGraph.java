@@ -38,7 +38,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	 * Maps source to sinks to indicate connections between static subgraphs.
 	 * Divergent operators will have multiple connections.
 	 */
-	private Map<SIRStream, List<SIRStream>> connections = null;
+	private Map<Integer, List<Integer>> connections = null;
 
 	/** An identifier to distinguish pipeline names */
 	private int pipelineId = 0;
@@ -54,7 +54,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	 */
 	public SegmentedSIRGraph() {
 		staticSubGraphs = new ArrayList<SIRStream>();
-		connections = new HashMap<SIRStream, List<SIRStream>>();
+		connections = new HashMap<Integer, List<Integer>>();
 	}
 
 	/**
@@ -63,10 +63,10 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	 * @param src the source of one connect
 	 * @param dst the destination of one connection
 	 */
-	private void addConnection(Map<SIRStream, List<SIRStream>> connections, SIRStream src, SIRStream dst) {
-		System.out.println("SegmentedSIRGraph.addConnection src=" + src + "--> dst=" + dst);
+	private void addConnection(Map<Integer, List<Integer>> connections, int src, int dst) {
+		System.out.println("SegmentedSIRGraph.addConnection ssg src=" + src + "--> ssg dst=" + dst);
 		if (!connections.containsKey(src)) {
-			connections.put(src, new ArrayList<SIRStream>());
+			connections.put(src, new ArrayList<Integer>());
 		}
 		connections.get(src).add(dst);
 	}
@@ -98,7 +98,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	 * 
 	 * @return the connections between static subsections.
 	 */
-	public Map<SIRStream, List<SIRStream>> getConnections() {
+	public Map<Integer, List<Integer>> getConnections() {
 		return connections;
 	}
 
@@ -106,7 +106,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	 * Sets the connections between static subsections.
 	 * 	 
 	 */
-	public void setConnections(Map<SIRStream, List<SIRStream>> connections) {
+	public void setConnections(Map<Integer, List<Integer>> connections) {
 		this.connections = connections;
 	}
 	
@@ -125,9 +125,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 			this.addToSegmentedGraph(str);
 			return this;
 		}
-		//startPipeline();
 		IterFactory.createFactory().createIter(str).accept(this);
-		//endPipeline();
 		System.out.println("SegmentedSIRGraph.init() isDynamic=true, number of partitions=" + staticSubGraphs.size());
 		return this;
 	}
@@ -221,11 +219,13 @@ public class SegmentedSIRGraph implements StreamVisitor {
 					filter.setPush(new JIntLiteral(1));
 					SIRFilter sink = createSink(filter);					
 					currentPipeline.add(sink);
-					addToSegmentedGraph(currentPipeline);					
+					addToSegmentedGraph(currentPipeline);
+					int ssgSrcNum = staticSubGraphs.size() - 1;
+					int ssgDstNum = staticSubGraphs.size();					
 					currentPipeline = new SIRPipeline(null, uniquePipelineName());
 					SIRFilter next = (SIRFilter)allChildren.get(i+1);
-					SIRFilter source = createSource(next);
-					addConnection(connections, filter, next);
+					SIRFilter source = createSource(next);										
+					addConnection(connections, ssgSrcNum, ssgDstNum);
 					currentPipeline.add(source);				
 					next.setPop(new JIntLiteral(1));
 					next.setPeek(new JIntLiteral(1));										

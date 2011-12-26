@@ -269,7 +269,7 @@ public class ProcessFilterWorkNode {
 			method.accept(pushPopReplacingVisitor);
 
 			// Add markers to code for debugging of emitted code:
-			String methodName = "filter " + filter.getFilter().getName() + "."
+			String methodName = "filter " + filter.getWorkNodeContent().getName() + "."
 					+ method.getName();
 
 			method.addStatementFirst(new SIRBeginMarker(methodName));
@@ -469,9 +469,9 @@ public class ProcessFilterWorkNode {
 		if (!basicCodeWritten.containsKey(filterNode)) {
 			codeStore.addFields(filterCode.getFields());
 			codeStore.addMethods(filterCode.getUsefulMethods());
-			if (filterNode.getFilter() instanceof FileOutputContent) {
+			if (filterNode.getWorkNodeContent() instanceof FileOutputContent) {
 				codeStore.addCleanupStatement(((FileOutputContent) filterNode
-						.getFilter()).closeFile());
+						.getWorkNodeContent()).closeFile());
 			}
 			basicCodeWritten.put(filterNode, true);
 		}
@@ -480,7 +480,7 @@ public class ProcessFilterWorkNode {
 
 			System.out
 					.println("ProcessFilterWorkNode.standardStreadyProcessing filter="
-							+ filterNode.getFilter() + " isDynamicPop=");
+							+ filterNode.getWorkNodeContent() + " isDynamicPop=");
 
 			Map<Filter, Integer> filterToThreadId = backEndFactory
 					.getFilterToThreadId();
@@ -489,7 +489,7 @@ public class ProcessFilterWorkNode {
 
 			System.out
 					.println("ProcessFilterWorkNode.standardStreadyProcessing filter="
-							+ filterNode.getFilter() + " thread=" + threadId);
+							+ filterNode.getWorkNodeContent() + " thread=" + threadId);
 
 			int threadIndex = Integer.parseInt(threadId);
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
@@ -500,7 +500,7 @@ public class ProcessFilterWorkNode {
 		}
 		if (debug) {
 			// debug info only: expected splitter and joiner firings.
-			System.err.print("(Filter" + filterNode.getFilter().getName());
+			System.err.print("(Filter" + filterNode.getWorkNodeContent().getName());
 			System.err.print(" "
 					+ WorkNodeInfo.getFilterInfo(filterNode).getMult(
 							SchedulingPhase.INIT));
@@ -509,7 +509,7 @@ public class ProcessFilterWorkNode {
 							SchedulingPhase.STEADY));
 			System.err.println(")");
 			System.err.print("(Joiner joiner_"
-					+ filterNode.getFilter().getName());
+					+ filterNode.getWorkNodeContent().getName());
 			System.err.print(" "
 					+ WorkNodeInfo.getFilterInfo(filterNode)
 							.totalItemsReceived(SchedulingPhase.INIT));
@@ -518,7 +518,7 @@ public class ProcessFilterWorkNode {
 							.totalItemsReceived(SchedulingPhase.STEADY));
 			System.err.println(")");
 			System.err.print("(Splitter splitter_"
-					+ filterNode.getFilter().getName());
+					+ filterNode.getWorkNodeContent().getName());
 			System.err.print(" "
 					+ WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(
 							SchedulingPhase.INIT));

@@ -52,7 +52,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputFilterNode {
             LinkedList<Integer> outputIds = CellBackend.outputChannelMap.get(outputNode);
             ppuCS.attachOutputChannelArray(filterId, outputIds);
 
-            System.out.println("new splitter " + filterId + " " + outputNode.getIdent() + " " + outputNode.getWidth(SchedulingPhase.STEADY) + " " + outputNode.getPrevFilter().getFilter().getName());
+            System.out.println("new splitter " + filterId + " " + outputNode.getIdent() + " " + outputNode.getWidth(SchedulingPhase.STEADY) + " " + outputNode.getPrevFilter().getWorkNodeContent().getName());
         }
         
         if (!KjcOptions.celldyn) addToScheduleLayout();
@@ -155,7 +155,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputFilterNode {
     private static void makeSplitterCode(OutputNode splitter, 
             BackEndFactory backEndBits, CodeStoreHelper helper) {
         String splitter_name = "_splitter_" + ProcessFilterWorkNode.getUid();
-        String splitter_method_name =  splitter_name + splitter.getPrevFilter().getFilter().getName();
+        String splitter_method_name =  splitter_name + splitter.getPrevFilter().getWorkNodeContent().getName();
 
         // size is number of edges with non-zero weight.
         int size = 0;

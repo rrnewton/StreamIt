@@ -181,7 +181,7 @@ public class TMDBinPackFissAll extends TMD {
 		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
 
 		    for (Filter slice : slices) {
-		    	WorkNodeContent filter = slice.getWorkNode().getFilter();
+		    	WorkNodeContent filter = slice.getWorkNode().getWorkNodeContent();
 		    	filter.multSteadyMult(KjcOptions.steadymult);
 		    }
 
@@ -201,7 +201,7 @@ public class TMDBinPackFissAll extends TMD {
         LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
 
         for (Filter slice : slices) {
-            WorkNodeContent filter = slice.getWorkNode().getFilter();
+            WorkNodeContent filter = slice.getWorkNode().getWorkNodeContent();
             filter.multSteadyMult(factor * KjcOptions.steadymult);
          }
         
@@ -251,7 +251,7 @@ public class TMDBinPackFissAll extends TMD {
     	// Look for fizzable filters
     	for(Filter slice : slices) {
     		WorkNode fsn = slice.getWorkNode();
-    		WorkNodeContent fc = fsn.getFilter();
+    		WorkNodeContent fc = fsn.getWorkNodeContent();
     		
     		long workEst = FilterWorkEstimate.getWork(slice);
     		int commRate = (fc.getPushInt() + fc.getPopInt() * fc.getMult(SchedulingPhase.STEADY));

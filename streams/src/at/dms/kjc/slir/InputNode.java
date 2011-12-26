@@ -424,7 +424,7 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
     
     public CType getType() {
-        return getNextFilter().getFilter().getInputType();
+        return getNextFilter().getWorkNodeContent().getInputType();
     }
     
     /**

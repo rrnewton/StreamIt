@@ -376,9 +376,9 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
         for (InterFilterEdge edge : fileW.getParent().getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
             assert TileraBackend.scheduler.getGraphSchedule().getPrimePumpMult(edge.getSrc().getParent()) == 1;
         }
-        int outputs = fileW.getFilter().getSteadyMult();
-        String type = ((FileOutputContent)fileW.getFilter()).getType() == CStdType.Integer ? "%d" : "%f";
-        String cast = ((FileOutputContent)fileW.getFilter()).getType() == CStdType.Integer ? "(int)" : "(float)";
+        int outputs = fileW.getWorkNodeContent().getSteadyMult();
+        String type = ((FileOutputContent)fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d" : "%f";
+        String cast = ((FileOutputContent)fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)" : "(float)";
         String bufferName = buf.getAddressRotation(this.parent).currentWriteBufName;
         //create the loop
         addSteadyLoopStatement(Util.toStmt(

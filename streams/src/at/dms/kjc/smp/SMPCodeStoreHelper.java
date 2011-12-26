@@ -61,7 +61,7 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	 */
 	public SMPCodeStoreHelper(WorkNode node,
 			SMPBackEndFactory backEndFactory, SMPComputeCodeStore codeStore) {
-		super(node, node.getAsFilter().getFilter(), backEndFactory);
+		super(node, node.getAsFilter().getWorkNodeContent(), backEndFactory);
 		filterNode = node;
 		filterInfo = WorkNodeInfo.getFilterInfo(filterNode);
 		this.codeStore = codeStore;
@@ -129,7 +129,7 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	public JMethodDeclaration getInitStageMethod() {
 		JBlock statements = new JBlock();
 		assert internalFilterNode instanceof WorkNode;
-		WorkNodeContent filter = ((WorkNode) internalFilterNode).getFilter();
+		WorkNodeContent filter = ((WorkNode) internalFilterNode).getWorkNodeContent();
 
 		// channel code before work block
 		// slice has input, so we
@@ -187,9 +187,9 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 
 			InputRotatingBuffer buf = RotatingBuffer.getInputBuffer(fileW);
 			int outputs = filterInfo.totalItemsSent(SchedulingPhase.INIT);
-			String type = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "%d"
+			String type = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
 					: "%f";
-			String cast = ((FileOutputContent) fileW.getFilter()).getType() == CStdType.Integer ? "(int)"
+			String cast = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
 					: "(float)";
 			String bufferName = buf.getAddressRotation(filterNode).currentWriteBufName;
 			// create the loop

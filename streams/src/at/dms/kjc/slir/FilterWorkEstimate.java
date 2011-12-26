@@ -82,12 +82,12 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
         // if no work function (e.g., identity filters?) return 0
         if (slice.getWorkNode().isPredefined()) {
             return 0;
-        } else if (slice.getWorkNode().getFilter().getWork()==null) {
+        } else if (slice.getWorkNode().getWorkNodeContent().getWork()==null) {
             //System.err.println("this filter has null work function: " + filter);
             return 0;
         } else {
-                long work = getWork(slice, slice.getWorkNode().getFilter().getWork()) *                
-                slice.getWorkNode().getFilter().getSteadyMult();
+                long work = getWork(slice, slice.getWorkNode().getWorkNodeContent().getWork()) *                
+                slice.getWorkNode().getWorkNodeContent().getSteadyMult();
                 return work;
         }
         
@@ -114,7 +114,7 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     
     private JMethodDeclaration findMethod(String name) 
     {
-        JMethodDeclaration[] methods = slice.getWorkNode().getFilter().getMethods();
+        JMethodDeclaration[] methods = slice.getWorkNode().getWorkNodeContent().getMethods();
         for (int i = 0; i < methods.length; i++)
             {
                 JMethodDeclaration method = methods[i];

@@ -115,18 +115,18 @@ public class CellBackendScaffold extends BackEndScaffold {
         if (sliceNode.isInputSlice()) {
             int mult;
             if (whichPhase == SchedulingPhase.INIT) 
-                mult = sliceNode.getNext().getAsFilter().getFilter().getInitMult();
-            else mult = sliceNode.getNext().getAsFilter().getFilter().getSteadyMult() * CellBackend.ITERS_PER_BATCH;
-            int peeks = sliceNode.getNext().getAsFilter().getFilter().getPeekInt();
-            int pops = sliceNode.getNext().getAsFilter().getFilter().getPopInt();
+                mult = sliceNode.getNext().getAsFilter().getWorkNodeContent().getInitMult();
+            else mult = sliceNode.getNext().getAsFilter().getWorkNodeContent().getSteadyMult() * CellBackend.ITERS_PER_BATCH;
+            int peeks = sliceNode.getNext().getAsFilter().getWorkNodeContent().getPeekInt();
+            int pops = sliceNode.getNext().getAsFilter().getWorkNodeContent().getPopInt();
             int items = Math.max(peeks, pops) + (mult-1)*pops;
             iters = items / sliceNode.getAsInput().totalWeights(whichPhase);
         } else if (sliceNode.isOutputSlice()) {
             int mult;
             if (whichPhase == SchedulingPhase.INIT)
-                mult = sliceNode.getPrevious().getAsFilter().getFilter().getInitMult();
-            else mult = sliceNode.getPrevious().getAsFilter().getFilter().getSteadyMult() * CellBackend.ITERS_PER_BATCH;
-            int pushes = sliceNode.getPrevious().getAsFilter().getFilter().getPushInt();
+                mult = sliceNode.getPrevious().getAsFilter().getWorkNodeContent().getInitMult();
+            else mult = sliceNode.getPrevious().getAsFilter().getWorkNodeContent().getSteadyMult() * CellBackend.ITERS_PER_BATCH;
+            int pushes = sliceNode.getPrevious().getAsFilter().getWorkNodeContent().getPushInt();
             int items = mult * pushes;
             iters = items/ sliceNode.getAsOutput().totalWeights(whichPhase);
         } else {

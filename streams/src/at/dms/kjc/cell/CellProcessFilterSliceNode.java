@@ -95,7 +95,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterWorkNode {
         
         LinkedList<Integer> inputIds = CellBackend.inputChannelMap.get(inputNode);
         
-        System.out.println("new filter " + filterId + " " + filterNode.getFilter().getName());
+        System.out.println("new filter " + filterId + " " + filterNode.getWorkNodeContent().getName());
         
         // Finish handling inputs
         if (!inputNode.isJoiner(SchedulingPhase.STEADY)) {
@@ -236,7 +236,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterWorkNode {
         
         if (debug) {
             // debug info only: expected splitter and joiner firings.
-            System.err.print("(Filter" + filterNode.getFilter().getName());
+            System.err.print("(Filter" + filterNode.getWorkNodeContent().getName());
             System.err.print(" "
                     + WorkNodeInfo.getFilterInfo(filterNode).getMult(
                             SchedulingPhase.INIT));
@@ -245,7 +245,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterWorkNode {
                             SchedulingPhase.STEADY));
             System.err.println(")");
             System.err.print("(Joiner joiner_"
-                    + filterNode.getFilter().getName());
+                    + filterNode.getWorkNodeContent().getName());
             System.err.print(" "
                     + WorkNodeInfo.getFilterInfo(filterNode)
                             .totalItemsReceived(SchedulingPhase.INIT));
@@ -254,7 +254,7 @@ public class CellProcessFilterSliceNode extends ProcessFilterWorkNode {
                             .totalItemsReceived(SchedulingPhase.STEADY));
             System.err.println(")");
             System.err.print("(Splitter splitter_"
-                    + filterNode.getFilter().getName());
+                    + filterNode.getWorkNodeContent().getName());
             System.err.print(" "
                     + WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(
                             SchedulingPhase.INIT));

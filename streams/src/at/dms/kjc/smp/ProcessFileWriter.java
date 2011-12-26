@@ -24,7 +24,7 @@ public class ProcessFileWriter {
     
     public ProcessFileWriter (WorkNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
         this.filterNode = filter;
-        this.fileOutput = (FileOutputContent)filter.getFilter();
+        this.fileOutput = (FileOutputContent)filter.getWorkNodeContent();
         this.phase = phase;
         this.factory = factory;
     }
@@ -60,7 +60,7 @@ public class ProcessFileWriter {
     public void processFileWriter() {
         //do nothing if faking io
         if (phase == SchedulingPhase.INIT) {
-            int outputs = filterNode.getFilter().getSteadyMult();
+            int outputs = filterNode.getWorkNodeContent().getSteadyMult();
             System.out.println("Outputs for " + filterNode + ": " + outputs);
             totalOutputs += outputs;
             assert allocatingCores.containsKey(filterNode);

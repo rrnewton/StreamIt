@@ -262,7 +262,7 @@ public class ProcessInputFilterNode {
         private static  void makeJoinerCode(InputNode joiner,
                 BackEndFactory backEndBits, CodeStoreHelper helper) {
             String joiner_name = "_joiner_" + ProcessFilterWorkNode.getUid();
-            String joiner_method_name =  joiner_name + joiner.getNextFilter().getFilter().getName();
+            String joiner_method_name =  joiner_name + joiner.getNextFilter().getWorkNodeContent().getName();
             
             // size is number of edges with non-zero weight.
             int size = 0;
@@ -459,7 +459,7 @@ public class ProcessInputFilterNode {
             }
             joinerWork = new JMethodDeclaration(
                     CStdType.Void,
-                    "_joinerWork_" + joiner.getNextFilter().getFilter().getName(),
+                    "_joinerWork_" + joiner.getNextFilter().getWorkNodeContent().getName(),
                     JFormalParameter.EMPTY,
                     body);
             joiner_code.setWorkMethod(joinerWork);

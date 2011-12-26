@@ -96,7 +96,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     protected OutputRotatingBuffer(WorkNode filterNode, Tile parent) {
         super(filterNode.getEdgeToNext(), filterNode, parent);
         outputNode = filterNode.getParent().getOutputNode();
-        bufType = filterNode.getFilter().getOutputType();
+        bufType = filterNode.getWorkNodeContent().getOutputType();
         setOutputBuffer(filterNode, this);
        
         transRotName = this.getIdent() + "_rot_trans";

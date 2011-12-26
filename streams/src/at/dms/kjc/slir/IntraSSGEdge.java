@@ -50,8 +50,8 @@ public class IntraSSGEdge<S extends InternalFilterNode,T extends InternalFilterN
             WorkNodeContent dstContent;
             CType srcType;
             CType dstType;
-            srcContent = ((OutputNode)src).getPrevFilter().getFilter();
-            dstContent = ((InputNode)dst).getNextFilter().getFilter();
+            srcContent = ((OutputNode)src).getPrevFilter().getWorkNodeContent();
+            dstContent = ((InputNode)dst).getNextFilter().getWorkNodeContent();
             srcType = srcContent.getOutputType();
             dstType = dstContent.getInputType();
             type = dstType;
@@ -62,20 +62,20 @@ public class IntraSSGEdge<S extends InternalFilterNode,T extends InternalFilterN
         
         // intra-slice edges:
         if (src instanceof InputNode && dst instanceof WorkNode) {
-            type = ((WorkNode)dst).getFilter().getInputType();
+            type = ((WorkNode)dst).getWorkNodeContent().getInputType();
             return type;
         }
         if (src instanceof WorkNode && dst instanceof OutputNode) {
-            type = ((WorkNode)src).getFilter().getOutputType();
+            type = ((WorkNode)src).getWorkNodeContent().getOutputType();
             return type;
         }
         // only for general slices...
         if (src instanceof WorkNode
                 && dst instanceof WorkNode) {
-            type = ((WorkNode)src).getFilter().getOutputType();
-            assert type == ((WorkNode)dst).getFilter().getInputType() 
+            type = ((WorkNode)src).getWorkNodeContent().getOutputType();
+            assert type == ((WorkNode)dst).getWorkNodeContent().getInputType() 
             : "Error calculating type: " + 
-            ((WorkNode)src).getFilter() + " -> " + ((WorkNode)dst).getFilter();
+            ((WorkNode)src).getWorkNodeContent() + " -> " + ((WorkNode)dst).getWorkNodeContent();
             return type;
         }
         throw new AssertionError ("Unexpected SliceNode connection " + src + " -> " + dst);
