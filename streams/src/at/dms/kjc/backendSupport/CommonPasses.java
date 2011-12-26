@@ -97,23 +97,35 @@ public class CommonPasses {
 	private StreamGraph doStaticPassesSegmentedSIRGraph(
 			SegmentedSIRGraph segmentedGraph) {
 
-		//System.out
-		//		.println("CommonPasses.doStaticPassesSegmented enter");
 
 		System.out
 				.println("CommonPasses.doStaticPasses segmentedGraph.getStaticSubGraphs().size()="
 						+ segmentedGraph.getStaticSubGraphs().size());
-		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
-
-				
+		int i = 0;	
+		SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();		
 		for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
 			SemanticChecker.doCheck(str);
 			str = this.removeDummies(str);
-			str = doStaticPassSIRStream(str);
+			str = doStaticPassSIRStream(str, i);
 			optimizedGraph.addToSegmentedGraph(str);
+			i++;
+		}
+		optimizedGraph.setConnections(segmentedGraph.getConnections());
+
+		// Print the optimized graph for debugging
+		i = 0;
+		for (SIRStream str : optimizedGraph.getStaticSubGraphs()) {
+			StreamItDot.printGraph(str, "optimized-ssg" + i + ".dot");
+			i++;	
 		}
 
-		optimizedGraph.setConnections(segmentedGraph.getConnections());
+		
+		
+		
+		
+		
+		
+		
 		
 		System.out
 				.println("CommonPasses.doStaticPasses optimizedGraph.getStaticSubGraphs().size()="
@@ -133,15 +145,7 @@ public class CommonPasses {
 	 *            the SIRStream on which to do the single pass
 	 * @return The modified SIRStream
 	 */
-	private SIRStream doStaticPassSIRStream(SIRStream str) {
-
-		
-		// TODO: Add a unique id to the .dot file generation!
-		
-	
-//		if (str instanceof SIRFilter) {
-//    		System.out.println("CommonPasses.doStaticPassSIRStream before str=" + str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-//    	}
+	private SIRStream doStaticPassSIRStream(SIRStream str, int ssgNum) {
 		
 		// Checks that all filters with mutable states are labeled with
 		// stateful keyword
@@ -153,11 +157,11 @@ public class CommonPasses {
 			// fused sections, and vectorization should map pipelines of
 			// stateless filters to pipelines of stateless filters.
 
-			StreamItDot.printGraph(str, "before-vectorize.dot");
+			StreamItDot.printGraph(str, "before-vectorize-ssg" + ssgNum + ".dot");
 			SimplifyPopPeekPush.simplify(str);
 			VectorizeEnable.vectorizeEnable(str, null);
 			vectorizedEarly = true;
-			StreamItDot.printGraph(str, "after-vectorize.dot");
+			StreamItDot.printGraph(str, "after-vectorize-ssg" + ssgNum + ".dot");
 		}
 
 		// fuse entire str to one filter if possible
@@ -165,7 +169,7 @@ public class CommonPasses {
 			str = FuseAll.fuse(str, false);
 
 		WorkEstimate work = WorkEstimate.getWorkEstimate(str);
-		work.printGraph(str, "work_estimate.dot");
+		work.printGraph(str, "work_estimate-ssg" + ssgNum + ".dot");
 
 		if (KjcOptions.tilera != -1) {
 			// running the tilera backend
@@ -178,7 +182,7 @@ public class CommonPasses {
 			DuplicateBottleneck dup = new DuplicateBottleneck();
 			dup.percentStateless(str);
 			str = FusePipelines.fusePipelinesOfStatelessStreams(str);
-			StreamItDot.printGraph(str, "after-fuse-stateless.dot");
+			StreamItDot.printGraph(str, "after-fuse-stateless-ssg" + ssgNum + ".dot");
 
 			if (!at.dms.kjc.tilera.TMD.allLevelsFit(str, KjcOptions.tilera
 					* KjcOptions.tilera)) {
@@ -202,9 +206,9 @@ public class CommonPasses {
 			DuplicateBottleneck dup = new DuplicateBottleneck();
 			dup.percentStateless(str);
 			str = FusePipelines.fusePipelinesOfStatelessStreams(str);
-			StreamItDot.printGraph(str, "after-fuse-stateless.dot");
+			StreamItDot.printGraph(str, "after-fuse-stateless-ssg" + ssgNum + ".dot");
 			
-			SIRPrinter printer1 = new SIRPrinter("after-fuse-stateless.out");
+			SIRPrinter printer1 = new SIRPrinter("after-fuse-stateless-ssg" + ssgNum + ".out");
 	        IterFactory.createFactory().createIter(str).accept(printer1);
 	        printer1.close();
 
@@ -228,7 +232,7 @@ public class CommonPasses {
 				DuplicateBottleneck dup = new DuplicateBottleneck();
 				dup.percentStateless(str);
 				str = FusePipelines.fusePipelinesOfStatelessStreams(str);
-				StreamItDot.printGraph(str, "after-fuse-stateless.dot");
+				StreamItDot.printGraph(str, "after-fuse-stateless-ssg" + ssgNum + ".dot");
 				dup.smarterDuplicate(str, numCores);
 			} else if (KjcOptions.dup == numCores) {
 				// if we want to use fine-grained parallelization
@@ -249,7 +253,7 @@ public class CommonPasses {
 		//	str = FusePipelines.fusePipelinesOfFilters(str);
 
 		// Print stream graph after fissing and fusing.
-		StreamItDot.printGraph(str, "canonical-graph.dot");
+		StreamItDot.printGraph(str, "canonical-graph-ssg" + ssgNum + ".dot");
 
 		// this must run before vertical fission
 		str = Flattener.doLinearAnalysis(str);
@@ -280,7 +284,7 @@ public class CommonPasses {
 			SJToPipe.doit(str);
 		}
 
-		StreamItDot.printGraph(str, "before-partition.dot");
+		StreamItDot.printGraph(str, "before-partition-ssg" + ssgNum + ".dot");
 
 		// VarDecl Raise to move array assignments up
 		new VarDeclRaiser().raiseVars(str);
@@ -324,7 +328,7 @@ public class CommonPasses {
 			VectorizeEnable.vectorizeEnable(str, null);
 		}
 
-		StreamItDot.printGraph(str, "after-partition.dot");
+		StreamItDot.printGraph(str, "after-partition-ssg" + ssgNum + ".dot");
 
 		// convert locals to fields if desired (can avoid stack overflow for
 		// huge programs)
@@ -514,7 +518,7 @@ public class CommonPasses {
 		
 		int i = 0;
 		for (SIRStream sir : segmented.getStaticSubGraphs()) {
-			StreamItDot.printGraph(sir, "streamgraph-run-ssg" + i + ".dot");
+			StreamItDot.printGraph(sir, "commonpasses-run-ssg" + i + ".dot");
 			++i;
 		}
 				

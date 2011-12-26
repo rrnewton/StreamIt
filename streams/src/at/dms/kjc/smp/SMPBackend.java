@@ -191,8 +191,10 @@ public class SMPBackend {
 					dominated, dominators, threadIdToType);
 		}
 
+		int i = 0;
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			runSSG(ssg, filterToThreadId, dominated, dominators, threadIdToType);
+			runSSG(ssg, i, filterToThreadId, dominated, dominators, threadIdToType);
+			i++;
 		}
 
 		RotatingBuffer.rotTypeDefs();
@@ -204,11 +206,11 @@ public class SMPBackend {
 		emitCode(filterToThreadId, dominated, dominators, threadIdToType);
 
 	}
-
-	private static void runSSG(StaticSubGraph ssg,
+	
+	private static void runSSG(StaticSubGraph ssg, int ssgNum,
 			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
 			Map<String, String> dominators, Map<Integer, String> threadIdToType) {
-
+				
 		// dump slice graph to dot file
 		ssg.dumpGraph("traces.dot", null);
 
@@ -225,7 +227,7 @@ public class SMPBackend {
 		scheduler.runLayout();
 		// dump final slice graph to dot file
 		graphSchedule.getSSG()
-				.dumpGraph("after_slice_partition.dot", scheduler);
+				.dumpGraph("after_slice_partition_ssg"+ ssgNum + ".dot", scheduler);
 		graphSchedule.getSSG().dumpGraph("slice_graph.dot", scheduler, false);
 		// if load balancing, find candidiate fission groups to load balance
 		if (KjcOptions.loadbalance) {

@@ -64,7 +64,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	 * @param dst the destination of one connection
 	 */
 	private void addConnection(Map<SIRStream, List<SIRStream>> connections, SIRStream src, SIRStream dst) {
-		System.out.println("SegmentedSIRGraph.addConnection src=" + src + " dst=" + dst);
+		System.out.println("SegmentedSIRGraph.addConnection src=" + src + "--> dst=" + dst);
 		if (!connections.containsKey(src)) {
 			connections.put(src, new ArrayList<SIRStream>());
 		}
