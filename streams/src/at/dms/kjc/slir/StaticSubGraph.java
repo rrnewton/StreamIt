@@ -63,7 +63,7 @@ public class StaticSubGraph {
 	 * 
 	 */
 	public StaticSubGraph() {
-
+		/* Do Nothing */
 	}
 
 	/**
@@ -271,22 +271,22 @@ public class StaticSubGraph {
 	
 			InputNode input = filterNodes.inputNodes.get(node.contents);
 			OutputNode output = filterNodes.outputNodes.get(node.contents);
-			WorkNode filterNode = filterNodes.filterNodes.get(node.contents);
+			WorkNode workNode = filterNodes.filterNodes.get(node.contents);
 
-			assert input != null && output != null && filterNode != null;
+			assert input != null && output != null && workNode != null;
 
 			// set up the slice
 			Filter filter = new Filter(this);
-			input.setNext(filterNode);
-			filterNode.setPrevious(input);
-			filterNode.setNext(output);
-			output.setPrevious(filterNode);
+			input.setNext(workNode);
+			workNode.setPrevious(input);
+			workNode.setNext(output);
+			output.setPrevious(workNode);
 			input.setParent(filter);
 			output.setParent(filter);
-			filterNode.setParent(filter);
+			workNode.setParent(filter);
 			filter.setInputNode(input);
 			filter.setOutputNode(output);
-			filter.setWorkNode(filterNode);
+			filter.setWorkNode(workNode);
 
 			if (node.ways != 0) {
 				assert node.ways == node.getEdges().length
@@ -376,14 +376,14 @@ public class StaticSubGraph {
 
 			// set up the work hashmaps
 			long workEst = 0;
-			if (filterNodes.generatedIds.contains(filterNode)) {
-				workEst = 3 * filterNode.getWorkNodeContent().getSteadyMult();
+			if (filterNodes.generatedIds.contains(workNode)) {
+				workEst = 3 * workNode.getWorkNodeContent().getSteadyMult();
 			} else {
 				assert node.isFilter();
 				workEst = work.getWork((SIRFilter) node.contents);
 			}
 
-			workEstimation.put(filterNode.getWorkNodeContent(), workEst);
+			workEstimation.put(workNode.getWorkNodeContent(), workEst);
 
 			filter.finish();
 

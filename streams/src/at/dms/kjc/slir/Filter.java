@@ -15,6 +15,11 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     protected WorkNode workNode;
     protected StaticSubGraph parent;
     
+    /* Flag to indicate if the Filter has a dynamic rate input */
+    protected boolean hasDynamicInput;
+    /* Flag to indicate if the Filter has a dynamic rate output */
+    protected boolean hasDynamicOutput;
+    
     /*
      * public Slice (Slice[] edges, Slice[] depends, InputSliceNode head) { if
      * (edges == null) this.edges = new Slice[0]; else this.edges = edges;
@@ -25,7 +30,27 @@ public class Filter implements at.dms.kjc.DeepCloneable {
      * depends; len=-1; }
      */
 
-    /**
+    public boolean hasDynamicInput() {
+		return hasDynamicInput;
+	}
+
+
+	public void setHasDynamicInput(boolean hasDynamicInput) {
+		this.hasDynamicInput = hasDynamicInput;
+	}
+
+
+	public boolean hasDynamicOutput() {
+		return hasDynamicOutput;
+	}
+
+
+	public void setHasDynamicOutput(boolean hasDynamicOutput) {
+		this.hasDynamicOutput = hasDynamicOutput;
+	}
+
+
+	/**
      * Create filter with no internal nodes.
      */
     public Filter(StaticSubGraph parent) {
@@ -33,7 +58,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     }
 
     
-    public StaticSubGraph getParent() {
+    public StaticSubGraph getStaticSubGraph() {
     	return parent;
     }
     
@@ -166,7 +191,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     public OutputNode getOutputNode() {
         return tail;
     }
-
+    
     /**
      * Return a brief string description of this slice.
      * 

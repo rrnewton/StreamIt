@@ -1,6 +1,7 @@
 package at.dms.kjc.slir;
 
 //import at.dms.kjc.sir.*;
+import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
 
 import java.util.*;
@@ -9,7 +10,7 @@ import java.util.*;
  **/
 public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepCloneable
 {
-    private WorkNodeContent filter;
+    private WorkNodeContent workNodeContent;
    
     private boolean predefined;
     private boolean laidout;
@@ -27,11 +28,11 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
         super();
     }
 
-    public WorkNode(WorkNodeContent filter) {
-        predefined = (filter instanceof PredefinedContent);
-        this.filter = filter;
+    public WorkNode(WorkNodeContent content) {
+        predefined = (content instanceof PredefinedContent);
+        this.workNodeContent = content;
         laidout = false;
-        contentToNode.put(filter, this);
+        contentToNode.put(content, this);
     }
     
     public static WorkNode getFilterNode(WorkNodeContent f) {
@@ -49,33 +50,33 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
     }
 
     public WorkNodeContent getWorkNodeContent() {
-        return filter;
+        return workNodeContent;
     }
 
     public String toString() {
-        return filter.toString();   
+        return workNodeContent.toString();   
     }
     
-    public String toString(Layout layout) 
+    public <T extends ComputeNode<?>> String toString(Layout<T> layout) 
     {
-        return filter.toString() + " " + 
+        return workNodeContent.toString() + " " + 
         (layout != null ? layout.getComputeNode(this) : "");   
     }
     
     
     public boolean isFileInput()
     {
-        return (filter instanceof FileInputContent);
+        return (workNodeContent instanceof FileInputContent);
     }
     
     public boolean isFileOutput() 
     {
-        return (filter instanceof FileOutputContent);
+        return (workNodeContent instanceof FileOutputContent);
     }
     
     public boolean hasIO() {
     	
-    	return filter.hasIO();    	
+    	return workNodeContent.hasIO();    	
 	}
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
@@ -91,7 +92,7 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.slir.WorkNode other) {
         super.deepCloneInto(other);
-        other.filter = (at.dms.kjc.slir.WorkNodeContent)at.dms.kjc.AutoCloner.cloneToplevel(this.filter);
+        other.workNodeContent = (at.dms.kjc.slir.WorkNodeContent)at.dms.kjc.AutoCloner.cloneToplevel(this.workNodeContent);
         other.predefined = this.predefined;
         other.laidout = this.laidout;
     }

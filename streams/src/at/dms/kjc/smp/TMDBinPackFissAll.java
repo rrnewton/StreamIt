@@ -73,7 +73,7 @@ public class TMDBinPackFissAll extends TMD {
         for(Filter slice : slices) {
         	if(slice.getWorkNode().isPredefined())
         		setComputeNode(slice.getWorkNode(), SMPBackend.chip.getOffChipMemory());
-        	else if (slice.getParent().isTopFilter(slice)) 
+        	else if (slice.getStaticSubGraph().isTopFilter(slice)) 
         		dominators.add(slice);
         	else if(FissionGroupStore.isFizzed(slice))
         		fizzedSlices.add(slice);

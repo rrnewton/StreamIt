@@ -50,12 +50,12 @@ public class IDFilterRemoval {
     	// and the downstream filters become new roots
     	
     	for (InterFilterEdge edge : idSlice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
-    		idSlice.getParent().addTopSlice(edge.getDest().getParent());
+    		idSlice.getStaticSubGraph().addTopSlice(edge.getDest().getParent());
     	}
     	
     	//if this id was a root, remove it from the list of roots
-    	if (idSlice.getParent().isTopFilter(idSlice)) {
-    		idSlice.getParent().removeTopSlice(idSlice);
+    	if (idSlice.getStaticSubGraph().isTopFilter(idSlice)) {
+    		idSlice.getStaticSubGraph().removeTopSlice(idSlice);
     	}
     }
     
