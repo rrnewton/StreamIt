@@ -220,14 +220,18 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 * @return
 	 */
 	public String peekMethodName() {
-		return "dynamic_buffer_peek";
+		//return "dynamic_buffer_peek";
+		String type = edge.getType().toString();
+		return type + "_queue_peek";
 	}
 
 	/**
 	 * @return
 	 */
 	public String popManyMethodName() {
-		return "dynamic_buffer_pop_many";
+		//return "dynamic_buffer_pop_many";
+		String type = edge.getType().toString();
+		return type + "_queue_pop_many";
 	}
 
 	/**

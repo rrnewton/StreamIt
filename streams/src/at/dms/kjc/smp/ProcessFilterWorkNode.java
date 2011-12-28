@@ -34,14 +34,15 @@ import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
  * Process a FilterSliceNode creating code in the code store.
- *  
+ * 
  */
 public class ProcessFilterWorkNode {
 
 	/**
 	 * Private class for setting up dynamic push and pop calls
+	 * 
 	 * @author soule
-	 *
+	 * 
 	 */
 	private static class PushPopReplacingVisitor extends SLIRReplacingVisitor {
 
@@ -58,6 +59,47 @@ public class ProcessFilterWorkNode {
 		boolean isDynamicPush;
 		WorkNode filter;
 		Map<String, String> dominators;
+
+		private JExpression staticPop(SIRPopExpression self, CType tapeType) {			
+			if (self.getNumPop() > 1) {
+				return new JMethodCallExpression(popManyName,
+						new JExpression[] { new JIntLiteral(self.getNumPop()) });
+			} else {
+				JExpression methodCall = new JMethodCallExpression(popName,
+						new JExpression[0]);
+				methodCall.setType(tapeType);
+				return methodCall;
+			}
+		}
+		
+		private JExpression dynamicPop(SIRPopExpression self, CType tapeType) {
+			InputPort inputPort = ((InterSSGChannel) inputChannel).getEdge()
+					.getDest();
+			String threadId = filterToThreadId.get(
+					inputPort.getSSG().getTopFilters()[0]).toString();
+
+			String buffer = "dyn_buf_" + threadId;
+			JExpression dyn_queue = new JEmittedTextExpression(buffer);
+			JExpression index = new JEmittedTextExpression(threadId);
+			String multiplier;
+			if (dominators.get(filter.toString()) == null) {
+				multiplier = "dummy_multiplier";
+			} else {
+				multiplier = dominators.get(filter.toString()) + "_multiplier";
+			}
+			JExpression dominated = new JEmittedTextExpression("&" + multiplier);
+
+			if (self.getNumPop() > 1) {
+				return new JMethodCallExpression(popManyName,
+						new JExpression[] { dyn_queue, index, dominated,
+								new JIntLiteral(self.getNumPop()) });
+			} else {
+				JExpression methodCall = new JMethodCallExpression(popName,
+						new JExpression[] { dyn_queue, index, dominated });
+				methodCall.setType(tapeType);
+				return methodCall;
+			}
+		}
 
 		@SuppressWarnings("rawtypes")
 		public void init(WorkNode filter, Channel inputChannel,
@@ -82,52 +124,36 @@ public class ProcessFilterWorkNode {
 		@Override
 		public Object visitPeekExpression(SIRPeekExpression self,
 				CType tapeType, JExpression arg) {
-			JExpression newArg = (JExpression) arg.accept(this);
-			JExpression methodCall = new JMethodCallExpression(peekName,
-					new JExpression[] { newArg });
-			methodCall.setType(tapeType);
-			return methodCall;
+			if (isDynamicPop) {
+				InputPort inputPort = ((InterSSGChannel) inputChannel)
+						.getEdge().getDest();
+				String threadId = filterToThreadId.get(
+						inputPort.getSSG().getTopFilters()[0]).toString();
+
+				String buffer = "dyn_buf_" + threadId;
+				JExpression dyn_queue = new JEmittedTextExpression(buffer);
+				JExpression index = new JEmittedTextExpression(threadId);
+				JExpression newArg = (JExpression) arg.accept(this);
+				JExpression methodCall = new JMethodCallExpression(peekName,
+						new JExpression[] { dyn_queue, index, newArg });
+				methodCall.setType(tapeType);
+				return methodCall;
+
+			} else {
+				JExpression newArg = (JExpression) arg.accept(this);
+				JExpression methodCall = new JMethodCallExpression(peekName,
+						new JExpression[] { newArg });
+				methodCall.setType(tapeType);
+				return methodCall;
+			}
 		}
 
 		@Override
 		public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
-
-			if (self.getNumPop() > 1) {
-				return new JMethodCallExpression(popManyName,
-						new JExpression[] { new JIntLiteral(self.getNumPop()) });
+			if (isDynamicPop) {
+				return dynamicPop(self, tapeType);
 			} else {
-				if (isDynamicPop) {
-
-					InterSSGEdge edge = ((InterSSGChannel) inputChannel)
-							.getEdge();
-					edge.getSrc();
-					InputPort inputPort = edge.getDest();
-					String threadId = filterToThreadId.get(
-							inputPort.getSSG().getTopFilters()[0]).toString();
-
-					String buffer = "dyn_buf_" + threadId;
-					JExpression dyn_queue = new JEmittedTextExpression(buffer);
-					JExpression index = new JEmittedTextExpression(threadId);
-					String multiplier;
-					if (dominators.get(filter.toString()) == null) {
-						multiplier = "dummy_multiplier";
-					} else {
-						multiplier = dominators.get(filter.toString())
-								+ "_multiplier";
-					}
-					JExpression dominated = new JEmittedTextExpression("&"
-							+ multiplier);
-
-					JExpression methodCall = new JMethodCallExpression(popName,
-							new JExpression[] { dyn_queue, index, dominated });
-					methodCall.setType(tapeType);
-					return methodCall;
-				} else {
-					JExpression methodCall = new JMethodCallExpression(popName,
-							new JExpression[0]);
-					methodCall.setType(tapeType);
-					return methodCall;
-				}
+				return staticPop(self, tapeType);
 			}
 		}
 
@@ -228,7 +254,8 @@ public class ProcessFilterWorkNode {
 	 *         methods.
 	 */
 	private static CodeStoreHelper makeFilterCode(WorkNode filter,
-			@SuppressWarnings("rawtypes") Channel inputChannel, @SuppressWarnings("rawtypes") Channel outputChannel,
+			@SuppressWarnings("rawtypes") Channel inputChannel,
+			@SuppressWarnings("rawtypes") Channel outputChannel,
 			SMPBackEndFactory backEndFactory, final boolean isDynamicPop,
 			final boolean isDynamicPush) {
 
@@ -265,13 +292,11 @@ public class ProcessFilterWorkNode {
 				dominators, isDynamicPop, isDynamicPush);
 
 		for (JMethodDeclaration method : methods) {
-
 			method.accept(pushPopReplacingVisitor);
-
 			// Add markers to code for debugging of emitted code:
-			String methodName = "filter " + filter.getWorkNodeContent().getName() + "."
+			String methodName = "filter "
+					+ filter.getWorkNodeContent().getName() + "."
 					+ method.getName();
-
 			method.addStatementFirst(new SIRBeginMarker(methodName));
 			method.addStatement(new SIREndMarker(methodName));
 		}
@@ -282,13 +307,14 @@ public class ProcessFilterWorkNode {
 	protected CodeStoreHelper filterCode;
 	protected SMPComputeCodeStore codeStore;
 	protected WorkNode filterNode;
-
 	protected SchedulingPhase whichPhase;
-
 	protected SMPBackEndFactory backEndFactory;
-
 	protected Core location;
 
+
+	/**
+	 * Create a new instance of a ProcessFilterWorkNode
+	 */
 	public ProcessFilterWorkNode() {
 		/* do nothing */
 	}
@@ -328,7 +354,7 @@ public class ProcessFilterWorkNode {
 		int last = graph.length - 1;
 
 		// A particular filter will only have dynamic input if it is
-		// the top node of an SSG, and if the SSG has dynamic input.
+		// the top node of an SSG, and if the SSG has dynamic input.s		
 		if (filterNode.equals(graph[0].getWorkNode())
 				&& (filterNode.getParent().getInputNode().getType() != CStdType.Void)) {
 			hasDynamicInput = ssg.hasDynamicInput();
@@ -365,59 +391,20 @@ public class ProcessFilterWorkNode {
 
 		switch (whichPhase) {
 		case PREINIT:
-			standardPreInitProcessing();
-			postPreInitProcessing();
+			standardPreInitProcessing();			
 			break;
 		case INIT:
 			standardInitProcessing();
-			postInitProcessing();
 			break;
 		case PRIMEPUMP:
-			preSteadyProcessing();
 			standardPrimePumpProcessing(hasDynamicInput);
-			postPrimePumpProcessing();
 			break;
 		case STEADY:
-			preSteadyProcessing();
 			standardSteadyProcessing(hasDynamicInput);
-			postSteadyProcessing();
 			break;
 		}
-
 	}
-
-	protected void postInitProcessing() {
-
-	}
-
-	protected void postPreInitProcessing() {
-
-	}
-
-	protected void postPrimePumpProcessing() {
-
-	}
-
-	protected void postSteadyProcessing() {
-
-	}
-
-	protected void preInitProcessing() {
-
-	}
-
-	protected void prePreInitProcessing() {
-
-	}
-
-	protected void prePrimePumpProcessing() {
-
-	}
-
-	protected void preSteadyProcessing() {
-
-	}
-
+	
 	protected void standardInitProcessing() {
 		// Have the main function for the CodeStore call out init.
 		codeStore.addInitFunctionCall(filterCode.getInitMethod());
@@ -480,7 +467,8 @@ public class ProcessFilterWorkNode {
 
 			System.out
 					.println("ProcessFilterWorkNode.standardStreadyProcessing filter="
-							+ filterNode.getWorkNodeContent() + " isDynamicPop=");
+							+ filterNode.getWorkNodeContent()
+							+ " isDynamicPop=");
 
 			Map<Filter, Integer> filterToThreadId = backEndFactory
 					.getFilterToThreadId();
@@ -489,7 +477,9 @@ public class ProcessFilterWorkNode {
 
 			System.out
 					.println("ProcessFilterWorkNode.standardStreadyProcessing filter="
-							+ filterNode.getWorkNodeContent() + " thread=" + threadId);
+							+ filterNode.getWorkNodeContent()
+							+ " thread="
+							+ threadId);
 
 			int threadIndex = Integer.parseInt(threadId);
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
@@ -500,7 +490,8 @@ public class ProcessFilterWorkNode {
 		}
 		if (debug) {
 			// debug info only: expected splitter and joiner firings.
-			System.err.print("(Filter" + filterNode.getWorkNodeContent().getName());
+			System.err.print("(Filter"
+					+ filterNode.getWorkNodeContent().getName());
 			System.err.print(" "
 					+ WorkNodeInfo.getFilterInfo(filterNode).getMult(
 							SchedulingPhase.INIT));

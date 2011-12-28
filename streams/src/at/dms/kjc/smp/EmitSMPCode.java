@@ -408,6 +408,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println("#include \"barrier.h\"");
 		p.println("#include \"structs.h\"");
 		p.println("#include \"pthread.h\"");
+		p.println("#include <unistd.h>");
 		if (isDynamic) {
 			p.println("#include \"dynamic_queue.h\"");
 		}
@@ -792,6 +793,13 @@ public class EmitSMPCode extends EmitCode {
 						: KjcOptions.output));
 		p.println();
 
+		p.println();
+		p.println("realclean:");
+		p.println("\trm *.o *.dot *.c *.h *.java "
+				+ (KjcOptions.output == null ? "smp" + KjcOptions.smp
+						: KjcOptions.output));
+		p.println();
+		
 		p.println("main.o: main.c");
 		p.println("\t$(CC) $(CFLAGS) $(INCLUDES) -c main.c");
 		p.println();

@@ -207,11 +207,7 @@ public class CommonPasses {
 			dup.percentStateless(str);
 			str = FusePipelines.fusePipelinesOfStatelessStreams(str);
 			StreamItDot.printGraph(str, "after-fuse-stateless-ssg" + ssgNum + ".dot");
-			
-			SIRPrinter printer1 = new SIRPrinter("after-fuse-stateless-ssg" + ssgNum + ".out");
-	        IterFactory.createFactory().createIter(str).accept(printer1);
-	        printer1.close();
-
+					
 			// if we have a user defined partition, the user wants control
 			// otherwise, if any level is too big for the chip, then fuse
 			if (KjcOptions.optfile == null)
