@@ -749,7 +749,7 @@ public class EmitSMPCode extends EmitCode {
 
 		p.println();
 		p.println("// Exit");
-		p.println("pthread_exit(NULL);");
+		p.println("exit(0);");
 		p.outdent();
 		p.println("}");
 		p.close();
