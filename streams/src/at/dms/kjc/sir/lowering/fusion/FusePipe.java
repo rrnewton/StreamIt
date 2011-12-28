@@ -294,6 +294,7 @@ public class FusePipe {
 		}		
 
 		
+		
 		// special case: identity filters are fusable (even though
 		// they fail some of the later tests, like having a work function)
 		if (filter instanceof SIRIdentity) {

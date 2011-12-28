@@ -74,6 +74,12 @@ public class StatelessFissioner {
         	if(debug) System.out.println("Can't fizz: Filter contains print functions, presently unsupported: " + filter);
         	 return false;
         }
+
+        // Dominators can't be fizzed 
+        if (filter.isTopFilter()) {
+        	System.out.println("Can't fizz: Filter is a dominator: " + filter);
+        	return false;
+        }
         
         //TODO: make sure the rates match between the slice and its inputs and the slices 
         //and its outputs
