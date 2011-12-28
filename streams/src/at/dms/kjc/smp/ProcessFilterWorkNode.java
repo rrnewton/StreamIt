@@ -134,8 +134,15 @@ public class ProcessFilterWorkNode {
 				JExpression dyn_queue = new JEmittedTextExpression(buffer);
 				JExpression index = new JEmittedTextExpression(threadId);
 				JExpression newArg = (JExpression) arg.accept(this);
+				String multiplier;
+				if (dominators.get(filter.toString()) == null) {
+					multiplier = "dummy_multiplier";
+				} else {
+					multiplier = dominators.get(filter.toString()) + "_multiplier";
+				}
+				JExpression dominated = new JEmittedTextExpression("&" + multiplier);
 				JExpression methodCall = new JMethodCallExpression(peekName,
-						new JExpression[] { dyn_queue, index, newArg });
+						new JExpression[] { dyn_queue, index, dominated, newArg});
 				methodCall.setType(tapeType);
 				return methodCall;
 
