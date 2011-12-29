@@ -1,7 +1,5 @@
 package at.dms.kjc.slir.fission;
 
-import java.util.LinkedList;
-
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -28,8 +26,6 @@ public class Fissioner {
     private Filter slice;
     /** the amount we are fizzing slice by */
     private int fizzAmount;
-    /** the filter of the slice we are fissing */
-    private WorkNode filter;
     /** the filter info of the filter of the slice we are fissing */
     private WorkNodeInfo fInfo;
     /** the identity slice inserted downstream fo the fizzed slices */
@@ -109,8 +105,7 @@ public class Fissioner {
             if(debug) System.out.println("Can't fizz: Slice contains linear filter, presently unsupported");
             return false;
         }
-        
-        
+             
         //TODO: make sure the rates match between the slice and its inputs and the slices 
         //and its outputs
 
@@ -133,8 +128,7 @@ public class Fissioner {
         
         this.slice = s;
         this.fizzAmount = d;
-        this.fInfo = WorkNodeInfo.getFilterInfo(s.getWorkNode());
-        this.filter = slice.getWorkNode();
+        this.fInfo = WorkNodeInfo.getFilterInfo(s.getWorkNode());       
         slicePeek = fInfo.peek;
         slicePop = fInfo.pop;
         slicePush = fInfo.push;
@@ -558,7 +552,8 @@ public class Fissioner {
         return edge;
     }
     
-    private void debug() {
+    @SuppressWarnings("unused")
+	private void debug() {
         System.out.println("--- INIT ---");
         System.out.println("--- Inputs ---");
         for (int i = 0; i < inputsInit.length; i++) {

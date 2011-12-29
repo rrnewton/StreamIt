@@ -1,16 +1,16 @@
 package at.dms.kjc.sir;
 
 import at.dms.kjc.sir.lowering.Propagator;
-import at.dms.kjc.lir.LIRStreamType;
-import at.dms.kjc.sir.lowering.LoweringConstants;
 import at.dms.kjc.*;
-import at.dms.util.*;
 
 /**
  * This represents a StreaMIT filter that writes a file to a data source.
  */
 public class SIRFileWriter extends SIRPredefinedFilter implements Cloneable {
-    /**
+
+	private static final long serialVersionUID = 1L;
+
+	/**
      * The filename of the data source.
      */
     private JExpression fileName;
