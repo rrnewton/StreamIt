@@ -1,6 +1,17 @@
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.*;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JBinaryExpression;
+import at.dms.kjc.JBitwiseExpression;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JEqualityExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JShiftExpression;
+import at.dms.kjc.JUnaryExpression;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CodegenPrintWriter;
 
 /**

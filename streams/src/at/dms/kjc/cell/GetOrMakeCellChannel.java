@@ -1,9 +1,9 @@
 package at.dms.kjc.cell;
 
-import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.GetOrMakeChannel;
-import at.dms.kjc.slir.IntraSSGEdge;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.IntraSSGEdge;
 
 public class GetOrMakeCellChannel extends GetOrMakeChannel {
 

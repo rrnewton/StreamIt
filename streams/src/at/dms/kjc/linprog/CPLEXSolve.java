@@ -1,11 +1,14 @@
 package at.dms.kjc.linprog;
 
-import ilog.concert.*;
-import ilog.cplex.*;
+import ilog.concert.IloException;
+import ilog.concert.IloNumVar;
+import ilog.concert.IloNumVarType;
+import ilog.cplex.IloCplex;
 
-import at.dms.util.*;
+import java.io.IOException;
+import java.io.Serializable;
 
-import java.io.*;
+import at.dms.util.Utils;
 
 /**
  * Solver that uses CPLEX.  Current limitations:

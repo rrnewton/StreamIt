@@ -3,10 +3,13 @@
  */
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.*;
-import java.util.*;
-import at.dms.kjc.sir.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFileWriter;
 
 /**
 * This class stores statistics needed to generate automatic performance 

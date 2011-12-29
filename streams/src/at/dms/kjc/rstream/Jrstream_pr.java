@@ -1,9 +1,9 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.*;
 import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JStatement;
 
 /**
  * This class represents a rstream_pr block in the parse tree of 

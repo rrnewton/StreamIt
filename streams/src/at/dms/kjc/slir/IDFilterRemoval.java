@@ -1,10 +1,8 @@
 package at.dms.kjc.slir;
 
-import java.util.LinkedList;
-import java.util.HashMap;
 import java.util.Arrays;
-
-import at.dms.kjc.slir.fission.*;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class IDFilterRemoval {
     private Filter idSlice;

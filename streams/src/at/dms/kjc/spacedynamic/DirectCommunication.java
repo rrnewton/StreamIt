@@ -1,22 +1,44 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-import java.util.Hashtable;
-import java.math.BigInteger;
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.common.*;
+
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JBooleanLiteral;
+import at.dms.kjc.JCastExpression;
+import at.dms.kjc.JDoStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JStringLiteral;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.JWhileStatement;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.common.PeekPopPushInHelper;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPrintStatement;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.util.Utils;
 
 //if 
 //not 2 stage

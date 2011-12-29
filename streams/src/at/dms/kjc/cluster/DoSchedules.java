@@ -1,9 +1,15 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
 import java.util.Iterator;
+
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Looks like printing some debugging info about SDEP schedules.

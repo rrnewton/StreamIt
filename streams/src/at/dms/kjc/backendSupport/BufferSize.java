@@ -1,9 +1,9 @@
 package at.dms.kjc.backendSupport;
 
+import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.WorkNode;
-import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.WorkNodeInfo;
 
 /**

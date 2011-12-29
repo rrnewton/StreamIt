@@ -1,9 +1,8 @@
 package at.dms.kjc.raw;
 
-import at.dms.kjc.flatgraph.FlatNode;
 import java.util.Vector;
-import at.dms.util.Utils;
-import at.dms.kjc.*;
+
+import at.dms.kjc.flatgraph.FlatNode;
 
 
 /**

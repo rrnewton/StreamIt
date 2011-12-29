@@ -1,12 +1,12 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
 
 /**
  * This represents a symbolic transformation on a stream graph.

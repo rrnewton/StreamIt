@@ -1,8 +1,7 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import java.util.LinkedList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Vector;
 
 /**

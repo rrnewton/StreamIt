@@ -1,10 +1,5 @@
 package at.dms.kjc.sir.statespace;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.statespace.*;
-import at.dms.kjc.iterator.*;
 
 
 /**

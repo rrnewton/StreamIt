@@ -21,8 +21,6 @@
 
 package at.dms.kjc;
 
-import java.util.Hashtable;
-
 import at.dms.compiler.UnpositionedError;
 
 /**

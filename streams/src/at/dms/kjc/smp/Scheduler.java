@@ -1,11 +1,11 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.backendSupport.*;
 import java.util.HashMap;
 
-import at.dms.kjc.slir.*;
-import at.dms.kjc.KjcOptions;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.Layout;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.slir.InternalFilterNode;
 
 /**
  * This class is the super class of all partitioners that act on the SIR graph to

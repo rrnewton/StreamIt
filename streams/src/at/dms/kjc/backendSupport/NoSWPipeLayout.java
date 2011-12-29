@@ -3,10 +3,23 @@
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
-import at.dms.kjc.common.*;
-import at.dms.kjc.slir.*;
+import at.dms.kjc.common.SimulatedAnnealing;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * @author mgordon

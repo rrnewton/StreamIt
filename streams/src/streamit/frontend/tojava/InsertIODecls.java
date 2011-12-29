@@ -16,12 +16,14 @@
 
 package streamit.frontend.tojava;
 
-import streamit.frontend.nodes.*;
-
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import java.util.ArrayList;
+import streamit.frontend.nodes.FuncWork;
+import streamit.frontend.nodes.Function;
+import streamit.frontend.nodes.StreamSpec;
+import streamit.frontend.nodes.StreamType;
 
 /**
  * Insert I/O rate declarations into filters' init functions.  For

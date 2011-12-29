@@ -3,7 +3,8 @@
  */
 package at.dms.kjc.spacedynamic;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * This class encodes a repetition of objects (values) for our generalized 

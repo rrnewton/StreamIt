@@ -1,8 +1,11 @@
 package at.dms.kjc.cell;
 
-import at.dms.kjc.backendSupport.*;
-//import java.util.*;
-import at.dms.kjc.slir.*;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.NoSWPipeLayout;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputContent;
+import at.dms.kjc.slir.OutputContent;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * Subclass of NoSWPipeLayout that keeps all I/O filters on PPU and all non-I/O filtrers on SPUs

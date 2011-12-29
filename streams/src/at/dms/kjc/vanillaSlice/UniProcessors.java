@@ -1,9 +1,9 @@
 package at.dms.kjc.vanillaSlice;
 
+import java.util.Vector;
+
 import at.dms.kjc.backendSupport.ComputeNode;
-import at.dms.kjc.backendSupport.ComputeNodesI; 
-import java.util.*;
-import at.dms.kjc.backendSupport.ComputeNodes;
+import at.dms.kjc.backendSupport.ComputeNodesI;
 
 /**
  * Implementation of {@link at.backendSupport.ComputeNodesI} to provide a collection of {@link UniProcessor}s.

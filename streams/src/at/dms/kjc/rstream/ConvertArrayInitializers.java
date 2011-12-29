@@ -1,12 +1,31 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
 import java.util.HashSet;
-import java.util.HashMap;
 import java.util.Vector;
+
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JArrayInitializer;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRFilter;
 import at.dms.util.Utils;
 
 /**

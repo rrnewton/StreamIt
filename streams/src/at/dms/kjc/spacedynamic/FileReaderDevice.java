@@ -1,9 +1,10 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.util.Utils;
-import at.dms.kjc.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.StaticStreamGraph;
+import at.dms.kjc.flatgraph.StreamGraph;
 import at.dms.kjc.sir.SIRFileReader;
-import at.dms.kjc.flatgraph.*;
 
 /** This class represents a file reader in the backend.  It store various information
  * for the file reader in easy-to-access form.  It extends IODevice so it is connected 

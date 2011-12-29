@@ -24,9 +24,9 @@ import java.util.Vector;
 
 import at.dms.classfile.SwitchInstruction;
 import at.dms.compiler.CWarning;
+import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-import at.dms.compiler.JavaStyleComment;
 
 /**
  * JLS 14.10: Switch Statement

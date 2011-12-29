@@ -20,10 +20,17 @@
 
 package at.dms.kjc.rstream;
 
-import at.dms.compiler.PositionedError;
-import at.dms.compiler.TokenReference;
-import at.dms.compiler.JavaStyleComment;
-import at.dms.kjc.*;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JStatement;
 
 
 /**

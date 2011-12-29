@@ -4,8 +4,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import at.dms.kjc.*;
-import at.dms.kjc.slir.*;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.slir.IntraSSGEdge;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * This class models the rotating structure that is needed when a core uses double buffered communication

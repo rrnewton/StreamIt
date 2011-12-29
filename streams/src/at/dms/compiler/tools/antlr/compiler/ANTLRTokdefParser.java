@@ -2,7 +2,14 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.BitSet;
+import at.dms.compiler.tools.antlr.runtime.NoViableAltException;
+import at.dms.compiler.tools.antlr.runtime.ParserSharedInputState;
+import at.dms.compiler.tools.antlr.runtime.RecognitionException;
+import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.TokenBuffer;
+import at.dms.compiler.tools.antlr.runtime.TokenStream;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
 
 /** Simple lexer/parser for reading token definition files
     in support of the import/export vocab option for grammars.

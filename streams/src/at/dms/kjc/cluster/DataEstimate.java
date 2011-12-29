@@ -1,11 +1,26 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.flatgraph.*;
 import java.util.HashMap;
+
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CClass;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CField;
+import at.dms.kjc.CNullType;
+import at.dms.kjc.CType;
+import at.dms.kjc.CVectorType;
+import at.dms.kjc.CVectorTypeLow;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * Estimates the data working set of an operator. Currently

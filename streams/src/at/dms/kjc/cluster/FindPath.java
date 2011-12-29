@@ -1,10 +1,15 @@
 
 package at.dms.kjc.cluster;
 
-import java.lang.*;
-import java.util.*;
-import at.dms.kjc.sir.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
+
 import at.dms.kjc.KjcOptions;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * Attempts to find a path between two stream nodes. Uses information 

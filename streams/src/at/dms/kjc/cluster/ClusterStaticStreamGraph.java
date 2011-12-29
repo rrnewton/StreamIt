@@ -1,9 +1,15 @@
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.flatgraph.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import at.dms.kjc.CType;
-import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatGraphToSIR;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.ScheduledStaticStreamGraph;
+import at.dms.kjc.flatgraph.StreamGraph;
 
 public class ClusterStaticStreamGraph extends ScheduledStaticStreamGraph {
     /**

@@ -1,9 +1,16 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.sir.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
-import java.util.*;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * A greedy implementation of a constrained scheduler.

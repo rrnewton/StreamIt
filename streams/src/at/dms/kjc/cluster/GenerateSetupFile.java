@@ -1,6 +1,7 @@
 package at.dms.kjc.cluster;
 
 import java.io.FileWriter;
+
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CodegenPrintWriter;
 

@@ -4,7 +4,6 @@
 package at.dms.kjc.backendSupport;
 
 import at.dms.kjc.slir.Edge;
-import at.dms.kjc.slir.InterSSGEdge;
 
 /**
  * @author soule

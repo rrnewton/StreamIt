@@ -1,22 +1,13 @@
 package at.dms.kjc.raw;
 
+import at.dms.kjc.Constants;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-import java.util.Hashtable;
-import java.math.BigInteger;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.FieldProp;
 
 /**
  * This class will unroll and propagate for all sinks in the stream

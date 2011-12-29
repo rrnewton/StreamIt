@@ -1,7 +1,26 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JStringLiteral;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPopExpression;
 
 /**
  * A file writer class that implements a file writer as a normal

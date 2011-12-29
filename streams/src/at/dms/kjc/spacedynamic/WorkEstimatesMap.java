@@ -1,11 +1,12 @@
 package at.dms.kjc.spacedynamic;
 
+import java.util.HashMap;
+
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import java.util.HashMap;
-import at.dms.util.Utils;
+import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.sir.*;
+import at.dms.util.Utils;
 
 public class WorkEstimatesMap implements FlatVisitor 
 {

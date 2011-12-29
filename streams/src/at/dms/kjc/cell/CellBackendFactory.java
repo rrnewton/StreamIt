@@ -3,20 +3,19 @@ package at.dms.kjc.cell;
 import java.util.LinkedList;
 
 import at.dms.kjc.backendSupport.BackEndFactory;
-import at.dms.kjc.backendSupport.BackEndScaffold;
-import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.CodeStoreHelperJoiner;
 import at.dms.kjc.backendSupport.CodeStoreHelperSimple;
 import at.dms.kjc.backendSupport.CodeStoreHelperSplitter;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.Layout;
-import at.dms.kjc.slir.IntraSSGEdge;
-import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.WorkNode;
 
 public class CellBackendFactory 
     extends BackEndFactory<CellChip, CellPU, CellComputeCodeStore, Integer> {

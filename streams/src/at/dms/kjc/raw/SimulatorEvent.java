@@ -1,7 +1,8 @@
 package at.dms.kjc.raw;
 
-import at.dms.kjc.flatgraph.FlatNode;
 import java.util.List;
+
+import at.dms.kjc.flatgraph.FlatNode;
 
 
 //This class represents an event in the work bases simulator which is 

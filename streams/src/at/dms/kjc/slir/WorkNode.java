@@ -1,10 +1,10 @@
 package at.dms.kjc.slir;
 
 //import at.dms.kjc.sir.*;
+import java.util.HashMap;
+
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.Layout;
-
-import java.util.*;
 /** 
  * A {@link InternalFilterNode} that references a {@link WorkNodeContent}.
  **/

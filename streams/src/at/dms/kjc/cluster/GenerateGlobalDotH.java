@@ -4,10 +4,7 @@ package at.dms.kjc.cluster;
 import java.io.FileWriter;
 
 import at.dms.kjc.CType;
-import at.dms.kjc.JExpression;
 import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JFloatLiteral;
-import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.sir.SIRGlobal;

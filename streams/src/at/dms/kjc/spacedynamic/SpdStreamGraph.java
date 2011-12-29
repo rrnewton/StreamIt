@@ -1,13 +1,13 @@
 package at.dms.kjc.spacedynamic;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.StreamItDot;
 import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.spacedynamic.SpdStaticStreamGraph;
-//import at.dms.util.IRPrinter;
-//import at.dms.util.SIRPrinter;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.*;
-import java.io.*;
+import at.dms.kjc.sir.SIRFilter;
 
 /**
  * This class represents the entire stream graph of the application we are

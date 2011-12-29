@@ -1,17 +1,23 @@
 package at.dms.kjc.sir.lowering.fusion;
 
 //import at.dms.util.Utils;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.sir.lowering.fission.*;
-
-//import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
+
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.sir.ReplacingStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.lowering.Vectorizable;
+import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
+import at.dms.kjc.sir.lowering.partition.PartitionGroup;
 
 /**
  * This class fuses sub-segments of pipelines with various

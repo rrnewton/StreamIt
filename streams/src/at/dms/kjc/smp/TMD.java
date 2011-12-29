@@ -1,22 +1,34 @@
 package at.dms.kjc.smp;
 
 import java.util.HashMap;
-
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.*;
+import java.util.HashSet;
 import java.util.LinkedList;
-import at.dms.kjc.backendSupport.*;
+import java.util.Set;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.StreamItDot;
+import at.dms.kjc.backendSupport.GreedyBinPacking;
 import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.iterator.SIRFilterIter;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.slir.fission.*;
-
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashSet;
-import java.util.List;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.sir.lowering.partition.WorkList;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.FilterWorkEstimate;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.LevelizeSSG;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
+import at.dms.kjc.slir.WorkNodeInfo;
+import at.dms.kjc.slir.fission.Fissioner;
 
 /**
  * 

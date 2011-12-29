@@ -1,19 +1,16 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.util.IRPrinter;
-import at.dms.util.SIRPrinter;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.lir.*;
-import java.util.*;
-import java.io.*;
-import at.dms.util.Utils;
-import at.dms.kjc.flatgraph.*;
+import java.io.FileWriter;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Vector;
+
+import at.dms.kjc.CClass;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.StaticStreamGraph;
+import at.dms.kjc.flatgraph.StreamGraph;
+import at.dms.kjc.sir.SIRStructure;
 
 /*******************************************************************************
  * This class will create any necessary c type definitions that represent the

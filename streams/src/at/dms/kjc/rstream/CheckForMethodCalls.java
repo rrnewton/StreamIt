@@ -1,10 +1,9 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
-import java.util.HashSet;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.SLIREmptyVisitor;
 
 /**
  * Given an entry point for a visitor on the java IR, check

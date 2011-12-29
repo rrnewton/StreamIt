@@ -1,19 +1,57 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-
-import java.util.Vector;
-import at.dms.kjc.common.CodegenPrintWriter;
-
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.io.*;
+import java.util.Vector;
+
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JContinueStatement;
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JEqualityExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIfStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JReturnStatement;
+import at.dms.kjc.JShiftExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.JWhileStatement;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * This class generates and emits code for each filter, splitter, and joiner

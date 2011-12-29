@@ -1,11 +1,17 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.flatgraph.FlatNode;
-//import at.dms.util.IRPrinter;
-//import at.dms.util.SIRPrinter;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import at.dms.kjc.StreamItDot;
+import at.dms.kjc.sir.SIRDynamicRateManager;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * A representation of a FlatGraph as a collection of StaticStreamGraph. 

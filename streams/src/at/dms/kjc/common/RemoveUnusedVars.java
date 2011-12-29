@@ -1,14 +1,26 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-
 import java.io.Serializable;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
 import java.util.HashSet;
 import java.util.Vector;
-import at.dms.util.Utils;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBinaryExpression;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.sir.SIRFilter;
 
 /**
  * Class to remove unused variables from the IR. Unused variables are defined

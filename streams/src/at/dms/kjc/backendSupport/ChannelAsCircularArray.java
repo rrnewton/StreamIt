@@ -1,10 +1,27 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-import at.dms.kjc.slir.*;
-import at.dms.kjc.*;
-import at.dms.kjc.common.*;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JAddExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBitwiseExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JReturnStatement;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.common.ALocalVariable;
+import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.slir.IntraSSGEdge;
 
 /**
  * Implement a channel as a circular array.

@@ -6,12 +6,15 @@ package at.dms.kjc.spacedynamic;
 import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Iterator;
-import at.dms.kjc.flatgraph.*;
+
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
-import at.dms.kjc.sir.*;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.RawSimulatorPrint;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.StaticStreamGraph;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.util.Utils;
 
 /**

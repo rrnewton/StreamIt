@@ -1,18 +1,24 @@
 package at.dms.kjc.raw;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Vector;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 import at.dms.util.Utils;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Vector;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Iterator;
 
 
 /**

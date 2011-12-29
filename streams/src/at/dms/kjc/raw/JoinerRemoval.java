@@ -1,11 +1,12 @@
 package at.dms.kjc.raw;
 
+import java.util.HashSet;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import java.util.HashSet;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
 
 public class JoinerRemoval implements FlatVisitor 
 {

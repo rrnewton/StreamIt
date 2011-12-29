@@ -1,6 +1,9 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.*;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.KjcOptions;
 
 public class JoinerScheduleNode {
     public static final int FIRE = 0;

@@ -1,8 +1,6 @@
 package at.dms.kjc.slir;
 
-import at.dms.kjc.backendSupport.*;
 import java.util.Arrays;
-import java.util.ArrayList;
 
 /**
  * This class will unroll the splitting and joining distribution of the slice (or slices)

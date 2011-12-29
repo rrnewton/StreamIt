@@ -5,9 +5,8 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Comparator;
 
-import at.dms.kjc.slir.StaticSubGraph;
-import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.StaticSubGraph;
 
 /**
  * A Comparator for the work estimation of slices that compares slices

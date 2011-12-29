@@ -1,7 +1,7 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.SIRFilter;
 
 /**
  * Represents a pairwise constraint due to a latency constrained message

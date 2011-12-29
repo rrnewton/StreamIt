@@ -5,8 +5,8 @@ import java.util.List;
 import at.dms.kjc.CType;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.IntraSSGEdge;
 
 /**
  * A Channel that delegates all useful work to another channel.

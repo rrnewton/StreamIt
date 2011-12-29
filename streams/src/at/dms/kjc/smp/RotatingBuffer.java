@@ -1,19 +1,23 @@
 package at.dms.kjc.smp;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import at.dms.kjc.CType;
 import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JFieldAccessExpression;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slir.*;
-
-import java.util.LinkedList;
-import at.dms.kjc.*;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.HashMap;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
+import at.dms.kjc.slir.IntraSSGEdge;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
  * A rotating buffer represents a block of memory that a filter reads from or

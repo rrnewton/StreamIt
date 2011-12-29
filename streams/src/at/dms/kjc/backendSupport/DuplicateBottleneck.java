@@ -3,13 +3,17 @@
  */
 package at.dms.kjc.backendSupport;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Vector;
 
-import at.dms.kjc.sir.SIRFeedbackLoop;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPredefinedFilter;
@@ -18,8 +22,6 @@ import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.sir.lowering.partition.WorkList;
-import java.util.*;
-import at.dms.kjc.*;
 
 /**
  * This class holds various methods for extracting data parallelism

@@ -4,7 +4,6 @@
 package at.dms.kjc.cluster;
 
 import at.dms.kjc.CType;
-import at.dms.kjc.common.CodegenPrintWriter;
 
 /**
  * Common elements for all kinds of tapes.

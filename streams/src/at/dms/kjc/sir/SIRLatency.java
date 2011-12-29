@@ -1,7 +1,12 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
 import java.io.Serializable;
+
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.DeepCloneable;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /** 
  * This represents a latency for message delivery.  A latency can be:

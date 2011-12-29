@@ -1,23 +1,22 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.common.*;
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashSet;
 import java.util.HashMap;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-import java.util.Hashtable;
-import at.dms.util.SIRPrinter;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JBreakStatement;
+import at.dms.kjc.JContinueStatement;
+import at.dms.kjc.JDoStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIfStatement;
+import at.dms.kjc.JLabeledStatement;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JWhileStatement;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
 
 
 /**

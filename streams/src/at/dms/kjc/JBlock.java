@@ -20,13 +20,13 @@
 
 package at.dms.kjc;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
-
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.List;
 
 /**
  * JLS 14.2: Block

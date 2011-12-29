@@ -4,11 +4,9 @@
 package at.dms.kjc.cluster;
 
 import at.dms.kjc.CType;
-//import at.dms.kjc.common.CodegenPrintWriter;
-import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.KjcOptions;
+import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.sir.*;
 
 /**
  * @author dimock

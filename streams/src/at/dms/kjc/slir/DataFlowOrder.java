@@ -1,11 +1,7 @@
 package at.dms.kjc.slir;
 
-import java.util.LinkedList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Vector;
-
-import at.dms.util.Utils;
+import java.util.LinkedList;
 
 /**
  * This class generates a data flow schedule of the slice graph (but does not handle feedbackloops).

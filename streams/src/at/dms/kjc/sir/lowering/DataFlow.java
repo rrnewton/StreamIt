@@ -1,13 +1,15 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
-import at.dms.compiler.JavaStyleComment;
-import at.dms.compiler.JavadocComment;
-import java.lang.Math;
+import java.util.HashMap;
+
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIfStatement;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JSwitchGroup;
+import at.dms.kjc.JSwitchStatement;
+import at.dms.kjc.JWhileStatement;
+import at.dms.kjc.SLIRReplacingVisitor;
 
 /**
  * Basic dataflow framework. Extend and fill in transfer functions and merge function

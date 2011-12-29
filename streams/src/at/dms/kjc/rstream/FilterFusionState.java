@@ -1,11 +1,18 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import java.util.HashMap;
 import java.util.Vector;
-import at.dms.kjc.*;
-import at.dms.util.Utils;
-import at.dms.kjc.sir.*;
+
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 
 /**
  * This class represents a filter flatnode's fusion state that is 

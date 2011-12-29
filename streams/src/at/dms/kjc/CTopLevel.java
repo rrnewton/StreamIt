@@ -21,7 +21,7 @@
 package at.dms.kjc;
 
 import java.util.Hashtable;
-import java.util.Enumeration;
+
 import at.dms.classfile.ClassInfo;
 import at.dms.classfile.ClassPath;
 import at.dms.compiler.Compiler;

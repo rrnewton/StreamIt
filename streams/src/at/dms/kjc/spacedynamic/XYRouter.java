@@ -1,7 +1,6 @@
 package at.dms.kjc.spacedynamic;
 
 import java.util.LinkedList;
-import at.dms.util.Utils;
 
 /*******************************************************************************
  * Generate a route from <pre>src</pre> to <pre>dst</pre> routing X then Y, just as the dynamic

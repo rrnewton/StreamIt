@@ -1,18 +1,30 @@
 package at.dms.kjc.smp;
 
-import at.dms.compiler.*;
-import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.ComputeCodeStore;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
-import at.dms.util.*;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
+
+import at.dms.compiler.JavaStyleComment;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JNameExpression;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIRReplacingVisitor;
 
 /**
  * This visitor renames every variable, method, and field to a globally unique

@@ -1,14 +1,12 @@
 package at.dms.kjc.smp;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.slir.fission.FissionGroup;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 public class FissionGroupStore {
 

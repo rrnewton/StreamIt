@@ -1,12 +1,9 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
-
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fusion.*;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.util.Utils;
 
 /**
  * Vertical cut transform on a stream graph.

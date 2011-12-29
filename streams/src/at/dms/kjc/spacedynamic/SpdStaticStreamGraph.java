@@ -1,17 +1,15 @@
 package at.dms.kjc.spacedynamic;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.StaticStreamGraph;
-//import at.dms.kjc.flatgraph.GraphFlattener;
-//import at.dms.kjc.flatgraph.SSGEdge;
-import at.dms.kjc.flatgraph.*;
-//import at.dms.util.IRPrinter;
-//import at.dms.util.SIRPrinter;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-//import at.dms.kjc.sir.lowering.*;
-//import at.dms.kjc.sir.lowering.partition.*;
-import java.util.*;
+import at.dms.kjc.flatgraph.StreamGraph;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * A StaticStreamGraph represents a subgraph of the application's StreamGraph

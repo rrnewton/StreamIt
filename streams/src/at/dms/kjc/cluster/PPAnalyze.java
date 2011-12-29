@@ -1,12 +1,30 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
-import at.dms.compiler.*;
-import java.lang.*;
-import java.util.*;
+import java.util.Stack;
+
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JDoStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionListStatement;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIfStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JWhileStatement;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
 
 public class PPAnalyze extends SLIREmptyVisitor {
 

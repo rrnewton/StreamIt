@@ -20,12 +20,11 @@
 
 package at.dms.optimize;
 
-import at.dms.classfile.JumpInstruction;
 import at.dms.classfile.Instruction;
-import at.dms.classfile.NoArgInstruction;
+import at.dms.classfile.JumpInstruction;
 import at.dms.classfile.LocalVarInstruction;
+import at.dms.classfile.NoArgInstruction;
 import at.dms.classfile.PushLiteralInstruction;
-
 import at.dms.util.InconsistencyException;
 
 /**

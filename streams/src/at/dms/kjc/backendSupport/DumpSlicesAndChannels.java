@@ -1,10 +1,15 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.io.FileWriter;
 
-import at.dms.kjc.slir.*;
-
-import java.io.*;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.IntraSSGEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /** Dump a graph with info about slices and channels. */
 public class DumpSlicesAndChannels {

@@ -1,10 +1,15 @@
 // $Id: BackEndScaffold.java,v 1.11 2008-09-06 18:45:32 mgordon Exp $
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
-import at.dms.kjc.slir.*;
-import at.dms.kjc.KjcOptions;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
 
 
 /**

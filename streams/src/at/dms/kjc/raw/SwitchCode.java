@@ -1,16 +1,13 @@
 package at.dms.kjc.raw;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.Utils;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.FileWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import java.io.*;
+
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.util.Utils;
 
 /**
  * This class generates the switch code for each tile and writes it to a file

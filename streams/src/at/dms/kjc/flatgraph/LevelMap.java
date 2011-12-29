@@ -1,9 +1,10 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.flatgraph.*;
 import java.util.HashMap;
 import java.util.Random;
-import at.dms.kjc.sir.*;
+
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
 
 public class LevelMap {
     

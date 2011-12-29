@@ -1,5 +1,6 @@
 package at.dms.kjc.flatgraph;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * Need ability to itereate over FlatGraph edges that correspond with 

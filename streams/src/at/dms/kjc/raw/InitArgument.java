@@ -1,18 +1,11 @@
 package at.dms.kjc.raw;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.util.Utils;
-import at.dms.util.*;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
+
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.sir.SIRFilter;
 
 
 /* This class finds the init statement call for a given filter and

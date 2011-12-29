@@ -1,11 +1,17 @@
 package at.dms.kjc.flatgraph;
 
-import java.util.*;
-//import at.dms.kjc.flatgraph.*;
-import at.dms.util.Utils;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.SIRScheduler;
-import at.dms.kjc.sir.lowering.partition.PartitionDot;
-import at.dms.kjc.sir.*;
+import at.dms.util.Utils;
 /**
  * A StaticStreamGraph represents a subgraph of the application's StreamGraph
  * where communication within the SSG is over static rate channels. The

@@ -1,23 +1,32 @@
 package at.dms.kjc.spacedynamic;
 
+import java.util.HashMap;
+
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionListStatement;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-import java.util.Hashtable;
-import java.math.BigInteger;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.lowering.RemoveMultiPops;
 
 /**
  * This pass creates the SIR necessary for each filter of the StreamGraph to

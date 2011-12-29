@@ -1,19 +1,18 @@
 package at.dms.kjc.cluster;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-//mport at.dms.kjc.*;
-//import at.dms.kjc.cluster.*;
-import at.dms.kjc.sir.*;
-//import at.dms.util.Utils;
-//import java.util.Vector;
-//import java.util.List;
-//import at.dms.compiler.TabbedPrintWriter;
-//import at.dms.kjc.raw.Util;
-//import at.dms.kjc.sir.lowering.*;
-import java.util.*;
-//import java.io.*;
-//import java.lang.*;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * the class finds splitters / joiners that need to be fused with filters.

@@ -16,8 +16,9 @@
 
 package streamit.library;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 import streamit.misc.DestroyedClass;
 

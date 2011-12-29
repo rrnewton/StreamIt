@@ -1,10 +1,24 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import java.io.FileWriter;
+import java.util.HashMap;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.cluster.CodeEstimate;
-import java.io.*;
-import java.util.*;
+import at.dms.kjc.raw.RawBackend;
+import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 

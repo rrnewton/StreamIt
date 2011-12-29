@@ -16,10 +16,9 @@
 
 package streamit.scheduler2.minlatency;
 
-import streamit.scheduler2.iriter./*persistent.*/
-    FilterIter;
 import streamit.scheduler2.Schedule;
 import streamit.scheduler2.hierarchical.PhasingSchedule;
+import streamit.scheduler2.iriter.FilterIter;
 
 /**
  * This class implements a minimum-latency algorithm for creating

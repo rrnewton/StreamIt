@@ -1,21 +1,20 @@
 package at.dms.kjc.spacedynamic;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.util.Random;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.flatgraph.FlatNode;
-//import at.dms.util.IRPrinter;
-//import at.dms.util.SIRPrinter;
-import at.dms.kjc.*;
-//import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-//import at.dms.kjc.sir.lowering.partition.*;
-//import at.dms.kjc.sir.lowering.fusion.*;
-//import at.dms.kjc.sir.lowering.fission.*;
-//import at.dms.kjc.lir.*;
-import java.util.*;
-import at.dms.util.Utils;
-import java.io.*;
-//import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.lowering.VarDeclRaiser;
+import at.dms.util.Utils;
 
 public class IMEMEstimation implements FlatVisitor
 {

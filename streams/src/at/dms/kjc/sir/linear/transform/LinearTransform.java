@@ -1,7 +1,6 @@
 package at.dms.kjc.sir.linear.transform;
 
-import at.dms.kjc.sir.linear.*;
-import java.util.*;
+import at.dms.kjc.sir.linear.LinearFilterRepresentation;
 
 /**
  * A LinearTransform communicates information

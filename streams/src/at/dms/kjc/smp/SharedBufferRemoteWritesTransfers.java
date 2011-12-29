@@ -1,16 +1,44 @@
 package at.dms.kjc.smp;
 
-import at.dms.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.slir.fission.*;
-import at.dms.kjc.smp.arrayassignment.*;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAddExpression;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JMultExpression;
+import at.dms.kjc.JNameExpression;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JReturnStatement;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeInfo;
+import at.dms.kjc.slir.fission.FissionGroup;
+import at.dms.kjc.smp.arrayassignment.ArrayAssignmentStatements;
 
 public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
 

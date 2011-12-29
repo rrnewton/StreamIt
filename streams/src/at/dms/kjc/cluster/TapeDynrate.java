@@ -3,13 +3,19 @@ package at.dms.kjc.cluster;
 
 //TODO in upstream init function, init the tape as per top of dataDeclaratoinUpstream.
 
-import at.dms.kjc.CType;
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.KjcOptions;
-//import at.dms.kjc.JExpression;
 import at.dms.kjc.CArrayType;
+import at.dms.kjc.CType;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.StaticStreamGraph;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 
 /**
  * Dynamic-rate tapes linking nodes.

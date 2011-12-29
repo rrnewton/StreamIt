@@ -1,6 +1,5 @@
 package at.dms.kjc.slir;
 
-import java.util.*;
 
 /**
  * This class represents the edge that connects two slice nodes in the same 

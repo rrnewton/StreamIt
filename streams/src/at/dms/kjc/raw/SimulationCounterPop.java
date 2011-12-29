@@ -1,10 +1,9 @@
 package at.dms.kjc.raw;
 
-import at.dms.kjc.flatgraph.FlatNode;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.Iterator;
-import java.util.Collection;
+
+import at.dms.kjc.flatgraph.FlatNode;
 
 /** 
  * This class keeps the counters for weights of the splitter/joiners

@@ -1,11 +1,10 @@
 package at.dms.kjc.raw;
 
 import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.Utils;
-import java.util.HashSet;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitter;
 
 /**
  * This class generates a push schedule for the switch code by simulating pushes from 

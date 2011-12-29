@@ -1,10 +1,15 @@
 // $Header
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.sir.*;
 import at.dms.kjc.CType;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
 
 class ClusterUtils {
 

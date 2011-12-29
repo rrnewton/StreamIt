@@ -1,7 +1,7 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slir.ProcElement;
 import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.ProcElement;
 
 /**
  * This abstract class represents a device that can perform computation.

@@ -1,29 +1,27 @@
 package at.dms.kjc.common;
  
 //import at.dms.kjc.CIntType;
-import at.dms.kjc.CStdType;
-//import at.dms.kjc.Constants;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.CType;
-import at.dms.kjc.CClassType;
-import at.dms.kjc.CBitType;
 import at.dms.kjc.CArrayType;
+import at.dms.kjc.CBitType;
+import at.dms.kjc.CClassType;
 import at.dms.kjc.CEmittedTextType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
 import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JClassExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.sir.SIRStructure;
+import at.dms.kjc.JExpression;
 import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRJoiner;
 import at.dms.kjc.sir.SIRSplitter;
-import java.util.*;
+import at.dms.kjc.sir.SIRStructure;
 /**
  * Some public static utility functions pulled out of other routines.
  */

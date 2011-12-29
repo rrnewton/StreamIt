@@ -18,7 +18,15 @@ import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.sir.SIRPopExpression;
-import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.IDFilterContent;
+import at.dms.kjc.slir.IDFilterRemoval;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.MutableStateExtractor;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 public class Fissioner {
     private static int uniqueID;

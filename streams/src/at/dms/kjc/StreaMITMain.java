@@ -1,7 +1,10 @@
 package at.dms.kjc;
 
-import at.dms.kjc.sir.*;
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SemanticChecker;
 
 /**
  * This provides the toplevel interface for StreaMIT.

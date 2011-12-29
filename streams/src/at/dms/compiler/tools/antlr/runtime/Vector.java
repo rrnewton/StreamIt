@@ -21,7 +21,6 @@
 package at.dms.compiler.tools.antlr.runtime;
 
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
 
 public class Vector implements Cloneable {
     protected Object[] data;

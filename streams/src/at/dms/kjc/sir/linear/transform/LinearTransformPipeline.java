@@ -1,9 +1,13 @@
 package at.dms.kjc.sir.linear.transform;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Iterator;
-import at.dms.kjc.sir.linear.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.sir.linear.FilterMatrix;
+import at.dms.kjc.sir.linear.FilterVector;
+import at.dms.kjc.sir.linear.LinearFilterRepresentation;
+import at.dms.kjc.sir.linear.LinearPrinter;
 
 /**
  * Represents a pipeline combination transform. Combines two filter that

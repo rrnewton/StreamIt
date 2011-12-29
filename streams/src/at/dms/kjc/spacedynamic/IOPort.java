@@ -1,7 +1,5 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.util.Utils;
-import at.dms.kjc.*;
 
 /*******************************************************************************
  * This class represents an IOPort on the chip in which devices can be connected

@@ -20,8 +20,6 @@
 
 package at.dms.compiler.tools.common;
 
-import at.dms.compiler.tools.common.Message;
-import at.dms.compiler.tools.common.MessageDescription;
 
 /**
  * This class is the root class for all compiler errors without a reference

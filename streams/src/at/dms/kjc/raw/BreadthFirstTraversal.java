@@ -1,9 +1,10 @@
 package at.dms.kjc.raw;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import java.util.LinkedList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Vector;
+
+import at.dms.kjc.flatgraph.FlatNode;
 
 public class BreadthFirstTraversal 
 {

@@ -37,19 +37,19 @@ import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.slir.FileInputContent;
 import at.dms.kjc.slir.FileOutputContent;
-import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.WorkNode;
 
 public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     

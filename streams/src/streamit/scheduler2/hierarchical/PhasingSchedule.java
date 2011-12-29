@@ -17,8 +17,9 @@
 package streamit.scheduler2.hierarchical;
 
 import java.util.Vector;
-import streamit.scheduler2.Schedule;
+
 import streamit.misc.DestroyedClass;
+import streamit.scheduler2.Schedule;
 
 /**
  * This class stores all information about PhasingSchedules.

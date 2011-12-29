@@ -1,17 +1,27 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.LevelMap;
-import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-//import at.dms.kjc.sir.lowering.*;
-//import at.dms.util.Utils;
-import at.dms.kjc.common.CommonUtils;
-import java.io.*;
-//import java.util.List;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.Set;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.cluster.DataEstimate;
+import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.flatgraph.LevelMap;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
 
 /**
  * The Layout class generates mapping of filters to raw tiles. It operates on

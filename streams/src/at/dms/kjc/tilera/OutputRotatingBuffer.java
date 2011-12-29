@@ -1,40 +1,30 @@
 package at.dms.kjc.tilera;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
-import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JBooleanLiteral;
 import at.dms.kjc.JEmittedTextExpression;
-import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFormalParameter;
 import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JLogicalComplementExpression;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JPostfixExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.slir.WorkNode;
-import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeInfo;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 public class OutputRotatingBuffer extends RotatingBuffer {
     /** the output slice node for this output buffer */

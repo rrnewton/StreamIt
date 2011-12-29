@@ -1,7 +1,12 @@
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.flatgraph.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.ScheduledStreamGraph;
+import at.dms.kjc.flatgraph.StaticStreamGraph;
+import at.dms.kjc.flatgraph.StreamGraph;
 
 public class ClusterStreamGraph extends ScheduledStreamGraph {
 

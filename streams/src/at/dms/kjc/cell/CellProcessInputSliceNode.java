@@ -2,48 +2,28 @@ package at.dms.kjc.cell;
 
 import java.util.LinkedList;
 
-import at.dms.kjc.CArrayType;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
-import at.dms.kjc.JArrayInitializer;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmptyStatement;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIfStatement;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JModuloExpression;
-import at.dms.kjc.JPrefixExpression;
-import at.dms.kjc.JRelationalExpression;
 import at.dms.kjc.JReturnStatement;
 import at.dms.kjc.JStatement;
-import at.dms.kjc.JSwitchGroup;
-import at.dms.kjc.JSwitchLabel;
-import at.dms.kjc.JSwitchStatement;
 import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
-import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
-import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.ProcessFilterWorkNode;
 import at.dms.kjc.backendSupport.ProcessInputFilterNode;
 import at.dms.kjc.common.ALocalVariable;
-import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.InternalFilterNode;
 
 public class CellProcessInputSliceNode extends ProcessInputFilterNode {
 

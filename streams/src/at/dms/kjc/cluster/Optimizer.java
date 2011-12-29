@@ -4,16 +4,27 @@ package at.dms.kjc.cluster;
 //import at.dms.kjc.common.*;
 //import at.dms.kjc.flatgraph.FlatNode;
 //import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-//import at.dms.util.Utils;
-//import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-//import at.dms.util.SIRPrinter;
+import java.util.Hashtable;
 
-import java.util.*;
-//import java.io.*;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRPhasedFilterIter;
+import at.dms.kjc.iterator.SIRPipelineIter;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPhasedFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.StreamVisitor;
+import at.dms.kjc.sir.lowering.BlockFlattener;
+import at.dms.kjc.sir.lowering.DeadCodeElimination;
+import at.dms.kjc.sir.lowering.Propagator;
+import at.dms.kjc.sir.lowering.Unroller;
+import at.dms.kjc.sir.lowering.VarDeclRaiser;
 
 /**
  * A StreamVisitor that perfoms a sequence of optimizations.

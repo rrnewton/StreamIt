@@ -20,7 +20,7 @@
 
 package at.dms.compiler;
 
-import java.io.*;
+import java.io.Serializable;
 
 /**
  * A simple character constant

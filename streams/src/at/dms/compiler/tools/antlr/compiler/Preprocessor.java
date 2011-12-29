@@ -2,9 +2,15 @@
 
 package at.dms.compiler.tools.antlr.compiler;
 
-import at.dms.compiler.tools.antlr.runtime.*;
-
-import java.util.Hashtable;
+import at.dms.compiler.tools.antlr.runtime.BitSet;
+import at.dms.compiler.tools.antlr.runtime.NoViableAltException;
+import at.dms.compiler.tools.antlr.runtime.ParserSharedInputState;
+import at.dms.compiler.tools.antlr.runtime.RecognitionException;
+import at.dms.compiler.tools.antlr.runtime.SemanticException;
+import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.TokenBuffer;
+import at.dms.compiler.tools.antlr.runtime.TokenStream;
+import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
 
 public class Preprocessor extends at.dms.compiler.tools.antlr.runtime.LLkParser
     implements PreprocessorTokenTypes

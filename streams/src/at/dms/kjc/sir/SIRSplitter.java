@@ -1,8 +1,14 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.sir.lowering.LoweringConstants;
+import at.dms.util.Utils;
 
 /**
  * This represents a stream construct with a single input and multiple

@@ -1,13 +1,9 @@
 package at.dms.kjc.flatgraph;
 
 import java.io.FileWriter;
-import java.util.HashMap;
-import java.util.Set;
 import java.util.Iterator;
 
 import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRJoiner;
-import at.dms.kjc.sir.SIRTwoStageFilter;
 
 public class LevelDotGraph implements FlatVisitor {
     /** The dotty code as we create it */

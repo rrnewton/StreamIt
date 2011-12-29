@@ -1,10 +1,24 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Vector;
+
 import streamit.misc.AssertedClass;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRLatency;
+import at.dms.kjc.sir.SIRLatencyMax;
+import at.dms.kjc.sir.SIRLatencyRange;
+import at.dms.kjc.sir.SIRLatencySet;
+import at.dms.kjc.sir.SIRNavigationUtils;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRPortalSender;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * A class that detects and stores pairwise latency constraints 

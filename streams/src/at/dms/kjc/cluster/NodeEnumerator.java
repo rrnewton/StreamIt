@@ -1,11 +1,19 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
-//import java.lang.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Create a mapping from SIROperators and FlatNodes to unique numbers [0..n] used for thread ids.

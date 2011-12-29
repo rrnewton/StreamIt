@@ -1,14 +1,14 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.common.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
 import java.util.HashSet;
-import java.util.Vector;
-import java.util.HashMap;
 import java.util.Iterator;
+
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.common.VariablesDefUse;
+import at.dms.kjc.common.VarsAssigned;
 
 
 /**

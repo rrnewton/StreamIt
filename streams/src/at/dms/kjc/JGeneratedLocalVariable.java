@@ -22,7 +22,6 @@ package at.dms.kjc;
 
 import at.dms.compiler.TokenReference;
 import at.dms.util.InconsistencyException;
-import java.io.*;
 
 
 /**

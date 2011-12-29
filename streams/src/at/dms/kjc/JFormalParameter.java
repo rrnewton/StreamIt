@@ -23,7 +23,6 @@ package at.dms.kjc;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
 import at.dms.compiler.UnpositionedError;
-import java.io.*;
 
 /**
  * This class represents a parameter declaration in the syntax tree

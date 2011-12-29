@@ -1,12 +1,12 @@
 package at.dms.kjc.smp;
 
 import java.util.HashMap;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import at.dms.kjc.JBlock;
-import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.slir.*;
+
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 public class ProcessFileWriter {
     private static int totalOutputs = 0;

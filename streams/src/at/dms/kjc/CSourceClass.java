@@ -28,12 +28,9 @@ import java.util.Hashtable;
 import at.dms.classfile.ClassConstant;
 import at.dms.classfile.ClassFileFormatException;
 import at.dms.classfile.ClassInfo;
-import at.dms.classfile.CodeInfo;
 import at.dms.classfile.FieldInfo;
-import at.dms.classfile.FieldRefInstruction;
 import at.dms.classfile.InnerClassInfo;
 import at.dms.classfile.MethodInfo;
-import at.dms.compiler.Compiler;
 import at.dms.compiler.TokenReference;
 import at.dms.util.Utils;
 

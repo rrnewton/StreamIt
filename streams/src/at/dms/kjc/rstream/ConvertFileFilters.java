@@ -1,10 +1,22 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class visits the stream graph and converts all 

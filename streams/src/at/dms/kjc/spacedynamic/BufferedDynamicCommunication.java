@@ -6,33 +6,29 @@ package at.dms.kjc.spacedynamic;
 import java.util.List;
 import java.util.ListIterator;
 
-import at.dms.kjc.*;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
-import at.dms.kjc.JAddExpression;
-import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JBlock;
+import at.dms.kjc.JBooleanLiteral;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JParenthesedExpression;
-import at.dms.kjc.JPrefixExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JStringLiteral;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.spacedynamic.BufferedStaticCommunication.ConvertCommunication;
-import at.dms.kjc.spacedynamic.BufferedStaticCommunication.ConvertCommunicationSimple;
-import at.dms.kjc.spacedynamic.BufferedStaticCommunication.LocalVariables;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPrintStatement;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 
 /**
  * @author mgordon

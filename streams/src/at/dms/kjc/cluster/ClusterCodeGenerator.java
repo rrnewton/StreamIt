@@ -1,15 +1,34 @@
 // $Header: /afs/csail.mit.edu/group/commit/reps/projects/streamit/cvsroot/streams/src/at/dms/kjc/cluster/ClusterCodeGenerator.java,v 1.69 2009-05-22 19:15:44 ctan Exp $
 package at.dms.kjc.cluster;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
-//import sun.security.krb5.internal.o;
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRNavigationUtils;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRPortalSender;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 /**
  * A class that generates part of the threadX.cpp files that is shared
  * among splitters, joiners and filters.

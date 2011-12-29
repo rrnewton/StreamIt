@@ -1,8 +1,10 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import java.util.List;
+import at.dms.kjc.iterator.SIRFeedbackLoopIter;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRPhasedFilterIter;
+import at.dms.kjc.iterator.SIRPipelineIter;
+import at.dms.kjc.iterator.SIRSplitJoinIter;
 
 /**
  * This visitor is for visiting stream structures in the SIR.  It does

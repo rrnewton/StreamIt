@@ -1,10 +1,10 @@
 package at.dms.kjc.spacedynamic;
 
-import java.util.LinkedList;
-import java.util.List;
-import at.dms.kjc.flatgraph.FlatNode;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import at.dms.kjc.flatgraph.FlatNode;
 
 /**
  * The class represents the heap of scheduled events for the work

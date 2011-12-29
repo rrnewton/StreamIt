@@ -1,11 +1,46 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.common.*;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.CVectorType;
+import at.dms.kjc.CVectorTypeLow;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JArrayInitializer;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JNewArrayExpression;
+import at.dms.kjc.JQualifiedAnonymousCreation;
+import at.dms.kjc.JQualifiedInstanceCreation;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JUnqualifiedAnonymousCreation;
+import at.dms.kjc.JUnqualifiedInstanceCreation;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.common.CodeGenerator;
+import at.dms.kjc.common.CodegenPrintWriter;
+import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.common.MacroConversion;
+import at.dms.kjc.common.ToC;
+import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.sir.SIRIterationExpression;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.slir.InternalFilterNode;
 
     /**
     * Takes a ComputeNode collection, a collection of Channel's, 

@@ -1,9 +1,31 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Random;
+import java.util.Set;
+import java.util.Stack;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRFilter;
 
 // Given a filter and a set of variables created by ArrayDestroyer rename
 // and reduce number of the variables by analyzing live ranges.

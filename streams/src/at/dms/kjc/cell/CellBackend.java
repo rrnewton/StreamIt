@@ -10,18 +10,25 @@ import java.util.LinkedList;
 
 import at.dms.kjc.JInterfaceDeclaration;
 import at.dms.kjc.KjcOptions;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.CommonPasses;
 import at.dms.kjc.backendSupport.DumpSlicesAndChannels;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.MultiLevelSplitsJoins;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRGlobal;
 import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.sir.SIRInterfaceTable;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRStructure;
-import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.StreamGraph;
+import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.vanillaSlice.EmitStandaloneCode;
 
 public class CellBackend {

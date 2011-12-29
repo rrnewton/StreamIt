@@ -1,15 +1,12 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Vector;
 import java.util.Iterator;
-import java.util.Collection;
 import java.util.LinkedList;
+
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFilter;
 import at.dms.util.Utils;
 
 /** 

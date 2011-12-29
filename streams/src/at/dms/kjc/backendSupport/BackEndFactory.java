@@ -1,10 +1,16 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slir.*;
-import at.dms.util.Utils;
-
 import java.util.Collection;
-import java.util.Map;
+
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.IntraSSGEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeInfo;
+import at.dms.util.Utils;
 
 /**
  * Factor out parts of back end that need matching types.

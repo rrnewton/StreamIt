@@ -1,15 +1,16 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
 import java.util.ListIterator;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
 
 /**
  * This class check to see whether a filter contains push

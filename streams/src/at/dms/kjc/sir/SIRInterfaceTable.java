@@ -1,7 +1,19 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.compiler.*;
+import at.dms.compiler.TokenReference;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CExpressionContext;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.CodeSequence;
+import at.dms.kjc.ExpressionVisitor;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * This represents an interface table.  This encapsulates the

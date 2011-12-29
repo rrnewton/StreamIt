@@ -1,13 +1,19 @@
 package at.dms.kjc.cluster;
 
+import java.util.List;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.common.CommonUtils;
-import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.CType;
+import at.dms.kjc.sir.SIRDummySink;
+import at.dms.kjc.sir.SIRDummySource;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRPredefinedFilter;
 import at.dms.util.Utils;
-import java.util.*;
-//import at.dms.kjc.JMethodDeclaration;
 
 class BuiltinsCodeGen {
 

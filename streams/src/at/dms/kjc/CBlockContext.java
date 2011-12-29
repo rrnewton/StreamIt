@@ -20,8 +20,8 @@
 
 package at.dms.kjc;
 
-import java.util.Vector;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import at.dms.compiler.CWarning;
 import at.dms.compiler.TokenReference;

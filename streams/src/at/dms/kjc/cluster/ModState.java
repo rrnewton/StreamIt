@@ -1,6 +1,14 @@
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.*;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.SLIREmptyVisitor;
 
 /**
  * Determines if a method modifies the state of a stream node!

@@ -3,22 +3,22 @@
  */
 package at.dms.kjc.smp;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
-import at.dms.kjc.backendSupport.IntraSSGChannel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
-import at.dms.kjc.slir.IntraSSGEdge;
-import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.backendSupport.IntraSSGChannel;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.LevelizeSSG;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.InternalFilterNode;
-
-import java.util.HashMap;
-import java.util.Map;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * @author mgordon

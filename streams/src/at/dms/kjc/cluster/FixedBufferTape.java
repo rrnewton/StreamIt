@@ -1,9 +1,13 @@
 package at.dms.kjc.cluster;
 
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.sir.*;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 
 /**
  * Calculate buffer sizes for an edge (a tape) that uses a fixed-length buffer.

@@ -1,11 +1,27 @@
 package at.dms.kjc.vanillaSlice;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slir.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import at.dms.kjc.JInterfaceDeclaration;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.backendSupport.BackEndFactory;
+import at.dms.kjc.backendSupport.BackEndScaffold;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.CommonPasses;
+import at.dms.kjc.backendSupport.ComputeNode;
+import at.dms.kjc.backendSupport.DumpSlicesAndChannels;
+import at.dms.kjc.backendSupport.Layout;
+import at.dms.kjc.backendSupport.NoSWPipeLayout;
 import at.dms.kjc.common.CodegenPrintWriter;
-import java.io.*;
+import at.dms.kjc.sir.SIRGlobal;
+import at.dms.kjc.sir.SIRHelper;
+import at.dms.kjc.sir.SIRInterfaceTable;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRStructure;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.StreamGraph;
 /**
  * The entry to the back end for a uniprocesor or cluster.
  */

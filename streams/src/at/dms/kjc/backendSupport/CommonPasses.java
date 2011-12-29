@@ -15,7 +15,6 @@ import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
 import at.dms.kjc.common.ConvertLocalsToFields;
-import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRDummySink;
 import at.dms.kjc.sir.SIRDummySource;
@@ -56,7 +55,6 @@ import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
-import at.dms.util.SIRPrinter;
 
 /**
  * Common passes, useful in new back ends.

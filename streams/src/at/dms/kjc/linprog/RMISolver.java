@@ -1,6 +1,7 @@
 package at.dms.kjc.linprog;
 
-import java.rmi.*;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 public interface RMISolver extends Remote {
     // solves a problem

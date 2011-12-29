@@ -1,6 +1,14 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.IntraSSGEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
  * Create channels of appropriate type for a back end.

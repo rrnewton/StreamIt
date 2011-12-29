@@ -13,12 +13,16 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.backendSupport.*;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
+import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.util.Utils;
-import at.dms.kjc.KjcOptions;
 
 public class FilterCodeGeneration extends CodeStoreHelper {
  

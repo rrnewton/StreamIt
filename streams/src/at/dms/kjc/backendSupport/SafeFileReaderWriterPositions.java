@@ -1,11 +1,40 @@
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.flatgraph.GraphFlattener;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.RenameAll;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.flatgraph.*;
 
 // need to get parameters for file readers / file writers
 // remove parameters from add pipeline, put them into new subpipeline

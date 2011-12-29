@@ -2,8 +2,8 @@ package at.dms.kjc.cell;
 
 import java.util.HashMap;
 
-import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InternalFilterNode;
 

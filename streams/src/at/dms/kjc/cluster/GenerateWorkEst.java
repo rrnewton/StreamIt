@@ -1,15 +1,16 @@
 package at.dms.kjc.cluster;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.FileWriter;
 
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import at.dms.kjc.sir.lowering.partition.WorkList;
 
 /**
  * Generates work-estimate.txt file that contains work estimates for

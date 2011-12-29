@@ -1,14 +1,28 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.GraphFlattener;
-//import at.dms.util.IRPrinter;
-//import at.dms.util.SIRPrinter;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import java.util.*;
-import at.dms.kjc.common.CommonUtils;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRDummySink;
+import at.dms.kjc.sir.SIRDummySource;
+import at.dms.kjc.sir.SIRDynamicRateManager;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 
 
 /**

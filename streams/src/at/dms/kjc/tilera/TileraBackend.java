@@ -1,10 +1,19 @@
 package at.dms.kjc.tilera;
 
-import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.backendSupport.BasicGenerateSteadyStateSchedule;
+import at.dms.kjc.JInterfaceDeclaration;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.backendSupport.CommonPasses;
+import at.dms.kjc.backendSupport.GeneratePrimePump;
+import at.dms.kjc.sir.SIRGlobal;
+import at.dms.kjc.sir.SIRHelper;
+import at.dms.kjc.sir.SIRInterfaceTable;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRStructure;
+import at.dms.kjc.slir.DataFlowOrder;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.StreamGraph;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 public class TileraBackend {
 	public static final boolean FAKE_IO = true;

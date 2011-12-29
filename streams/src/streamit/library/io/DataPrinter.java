@@ -16,8 +16,8 @@
 
 package streamit.library.io;
 
-import streamit.library.Filter;
 import streamit.library.Channel;
+import streamit.library.Filter;
 
 public class DataPrinter extends Filter
 {

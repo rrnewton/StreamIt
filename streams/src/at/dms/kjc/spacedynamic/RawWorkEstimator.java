@@ -1,20 +1,22 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.util.IRPrinter;
-import at.dms.util.SIRPrinter;
-import at.dms.kjc.*;
-import at.dms.kjc.iterator.*;
+import java.io.File;
+import java.io.FileReader;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
 import at.dms.kjc.raw.RawBackend;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.lir.*;
-import java.util.*;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRStructure;
+import at.dms.kjc.sir.lowering.VarDeclRaiser;
 import at.dms.util.Utils;
-import java.io.*;
 
 
 public class RawWorkEstimator extends EmptyStreamVisitor

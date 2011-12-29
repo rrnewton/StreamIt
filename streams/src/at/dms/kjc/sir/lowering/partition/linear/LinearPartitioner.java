@@ -1,17 +1,27 @@
 package at.dms.kjc.sir.lowering.partition.linear;
 
-import java.util.*;
-import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.iterator.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.fusion.*;
-import at.dms.kjc.sir.lowering.fission.*;
-import at.dms.kjc.sir.lowering.partition.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.sir.EmptyAttributeStreamVisitor;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.linear.LinearAnalyzer;
+import at.dms.kjc.sir.lowering.SIRScheduler;
+import at.dms.kjc.sir.lowering.fusion.Lifter;
+import at.dms.kjc.sir.lowering.partition.PartitionDot;
+import at.dms.kjc.sir.lowering.partition.RefactorSplitJoin;
+import at.dms.kjc.sir.lowering.partition.StreamTransform;
 
 public class LinearPartitioner {
     /**

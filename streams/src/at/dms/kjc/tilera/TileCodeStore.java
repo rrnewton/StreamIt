@@ -1,13 +1,23 @@
 package at.dms.kjc.tilera;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.common.ALocalVariable;
-import at.dms.kjc.*;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
-
-import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNode;
 
 public class TileCodeStore extends ComputeCodeStore<Tile> {
     /** True if this tile code store has code appended to it */

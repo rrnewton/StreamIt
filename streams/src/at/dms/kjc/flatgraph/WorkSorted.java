@@ -3,9 +3,10 @@
  */
 package at.dms.kjc.flatgraph;
 
-import java.util.*;
-import at.dms.kjc.sir.lowering.partition.*;
-import at.dms.kjc.sir.*;
+import java.util.LinkedList;
+
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 
 /**
  * @author mgordon

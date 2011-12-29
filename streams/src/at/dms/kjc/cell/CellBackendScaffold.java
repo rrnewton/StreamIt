@@ -11,12 +11,12 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.backendSupport.ComputeNodesI;
-import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InternalFilterNode;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
+import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.util.Utils;
 
 public class CellBackendScaffold extends BackEndScaffold {

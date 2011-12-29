@@ -1,20 +1,55 @@
 package at.dms.kjc.sir.lowering.fusion;
 
 //import at.dms.util.IRPrinter;
-import at.dms.util.Utils;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-//import at.dms.kjc.sir.lowering.partition.*;
-//import at.dms.kjc.lir.*;
-
-//import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAddExpression;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionListStatement;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.lowering.InlinePhases;
+import at.dms.kjc.sir.lowering.RenameAll;
+import at.dms.kjc.sir.lowering.SIRScheduler;
+import at.dms.util.Utils;
 
 class ShiftPipelineFusion {
 

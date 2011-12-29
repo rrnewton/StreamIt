@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.StaticSubGraph;
-import at.dms.kjc.slir.StreamGraph;
-import at.dms.kjc.KjcOptions;
 
 /**
  * @author mgordon / dimock

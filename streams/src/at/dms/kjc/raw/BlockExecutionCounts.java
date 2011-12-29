@@ -1,13 +1,14 @@
 package at.dms.kjc.raw;
 
+import java.util.HashMap;
+
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 import at.dms.util.Utils;
-import java.util.HashSet; 
-import java.util.HashMap;
 
 public class BlockExecutionCounts implements FlatVisitor 
 {

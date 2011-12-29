@@ -1,7 +1,15 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.compiler.*;
+import at.dms.compiler.PositionedError;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.CBodyContext;
+import at.dms.kjc.CodeSequence;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRVisitor;
 
 /**
  * Register Receiver Statement.

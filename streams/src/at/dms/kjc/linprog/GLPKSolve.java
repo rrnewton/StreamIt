@@ -1,11 +1,10 @@
 package at.dms.kjc.linprog;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
-import at.dms.util.*;
-import lpsolve.lprec;
-import lpsolve.constant;
-import lpsolve.solve;
+import at.dms.util.Utils;
 
 /**
  * This is an integer linear program solver based on GLPK.

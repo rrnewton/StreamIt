@@ -1,8 +1,12 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.sir.*;
-import java.io.*;
-import java.util.*;
+import java.io.FileWriter;
+import java.util.HashMap;
+
+import at.dms.kjc.raw.RawBackend;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 
 /**
  * Dump a representation of the flat graph to a dot file to be 

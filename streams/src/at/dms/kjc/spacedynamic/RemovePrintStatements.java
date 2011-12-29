@@ -1,22 +1,12 @@
 package at.dms.kjc.spacedynamic;
 
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-import java.util.Hashtable;
-import java.math.BigInteger;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPrintStatement;
 
 //remove all print statements in code
 public class RemovePrintStatements implements FlatVisitor {

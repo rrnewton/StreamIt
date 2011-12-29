@@ -1,8 +1,11 @@
 package at.dms.kjc.slir.fission;
 
-import java.util.*;
-import at.dms.kjc.*;
-import at.dms.kjc.slir.*;
+import java.util.HashMap;
+
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
 
 public class FissionEdgeMemoizer {
     private static HashMap<EdgeDescriptor, InterFilterEdge> edges =

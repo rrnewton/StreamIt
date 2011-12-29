@@ -3,13 +3,8 @@ package at.dms.kjc.slir;
 import at.dms.kjc.CType;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
-import java.util.*;
-import at.dms.kjc.sir.linear.*;
-import at.dms.kjc.sir.lowering.RenameAll;
-import at.dms.kjc.backendSupport.SafeFileReaderWriterPositions;
-import at.dms.kjc.tilera.CFixedPointType;
+import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.sir.SIRPhasedFilter;
 
 /**
  * Intended to reflect all the content of a filter needed by a

@@ -22,7 +22,6 @@ import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeInfo;
-import at.dms.kjc.smp.Util;
 
 /**
  * Process a FilterSliceNode creating code in the code store and buffers for

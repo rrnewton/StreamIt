@@ -2,15 +2,24 @@ package at.dms.kjc.backendSupport;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedList;
-//import at.dms.kjc.slicegraph.InterSliceEdge;
+import java.util.List;
+
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.Util;
-//import at.dms.kjc.spacetime.InterSliceBuffer;
-import at.dms.kjc.*;
 import at.dms.util.Utils;
 
 /**

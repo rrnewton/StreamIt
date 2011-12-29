@@ -21,14 +21,13 @@
 package at.dms.kjc;
 
 import java.util.Hashtable;
-import at.dms.compiler.Compiler;
+
 import at.dms.compiler.CWarning;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
 import at.dms.compiler.PositionedError;
 import at.dms.compiler.TokenReference;
 import at.dms.compiler.UnpositionedError;
-import at.dms.util.Utils;
 
 /**
  * This class represents a Java class or interface declaration

@@ -1,11 +1,11 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.slir.IntraSSGEdge;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.util.*;
-
-import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
+import at.dms.kjc.slir.IntraSSGEdge;
 /**
  * A Channel with the single purpose of holding the name of a push() routine.
  * Such a channel is used to connect a filter to a splitter

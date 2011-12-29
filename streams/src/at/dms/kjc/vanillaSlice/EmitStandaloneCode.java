@@ -3,10 +3,11 @@ package at.dms.kjc.vanillaSlice;
 
 //import java.util.*;
 //import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.backendSupport.*;
-//import at.dms.kjc.slicegraph.*;
-import at.dms.kjc.common.*;
+import at.dms.kjc.backendSupport.BackEndFactory;
+import at.dms.kjc.backendSupport.EmitCode;
+import at.dms.kjc.backendSupport.EmitTypedefs;
+import at.dms.kjc.common.CodegenPrintWriter;
+import at.dms.kjc.sir.SIRStructure;
 
 /**
  * Takes a ComputeNode collection, a collection of Channel's, 

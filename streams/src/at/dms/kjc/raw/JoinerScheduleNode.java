@@ -1,6 +1,9 @@
 package at.dms.kjc.raw;
 
-import at.dms.kjc.*;
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.RawUtil;
 
 public class JoinerScheduleNode 

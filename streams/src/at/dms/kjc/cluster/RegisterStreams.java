@@ -2,12 +2,21 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.flatgraph.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.CType;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
 import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
 import at.dms.kjc.common.CommonUtils;
-import java.util.*;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * Constructs a list of input and output tapes for each stream operator.

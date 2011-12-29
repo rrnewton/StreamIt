@@ -1,14 +1,36 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.common.*;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
-import java.util.HashSet;
-import java.util.Vector;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Vector;
+
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAddExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBinaryExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionListStatement;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.FlatVisitor;
+import at.dms.kjc.sir.SIRFilter;
 
 /**
  * This pass identifies java-style for loops that can be converted to 

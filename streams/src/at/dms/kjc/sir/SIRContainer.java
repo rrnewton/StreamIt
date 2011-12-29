@@ -1,9 +1,12 @@
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import java.util.*;
-import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.util.ConstList;
+import at.dms.util.MutableList;
 
 /**
  * This represents a 1-to-1 stream that can contain other streams as a

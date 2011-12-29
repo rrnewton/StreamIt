@@ -3,13 +3,22 @@
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 
+import at.dms.kjc.CType;
+import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRIdentity;
-import at.dms.kjc.*; 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.slir.*;
+import at.dms.kjc.sir.lowering.RenameAll;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 
 /**
  * This pass will break up splits or joins (OutputSliceNodes and InputSliceNodes)

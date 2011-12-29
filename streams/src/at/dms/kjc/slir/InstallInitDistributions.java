@@ -1,6 +1,5 @@
 package at.dms.kjc.slir;
 
-import at.dms.kjc.backendSupport.*;
 
 /**
  * Go through all the slices and create and install the schedule of distribution for the

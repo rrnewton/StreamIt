@@ -1,9 +1,14 @@
 package at.dms.kjc.sir.statespace.transform;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Iterator;
-import at.dms.kjc.sir.statespace.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.sir.statespace.ComplexNumber;
+import at.dms.kjc.sir.statespace.FilterMatrix;
+import at.dms.kjc.sir.statespace.FilterVector;
+import at.dms.kjc.sir.statespace.LinearFilterRepresentation;
+import at.dms.kjc.sir.statespace.LinearPrinter;
 
 /**
  * Represents a pipeline combination transform. Combines two filters that

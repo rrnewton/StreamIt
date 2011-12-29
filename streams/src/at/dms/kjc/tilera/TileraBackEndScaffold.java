@@ -3,20 +3,14 @@
  */
 package at.dms.kjc.tilera;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
+import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.ComputeNodesI;
+import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.Filter;
-import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 
 /**
  * @author mgordon

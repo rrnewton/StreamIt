@@ -1,16 +1,11 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.common.RawSimulatorPrint;
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.Utils;
+import java.io.FileWriter;
 import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.io.*;
+
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.flatgraph.FlatNode;
 
 public class MakefileGenerator {
     public static final String MAKEFILE_NAME = "Makefile.streamit";

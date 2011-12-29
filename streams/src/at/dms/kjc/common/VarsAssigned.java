@@ -1,13 +1,19 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-
 import java.io.Serializable;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
 import java.util.HashSet;
+
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.util.Utils;
 
 /**
  * Find all the vars that are possible assigned given a tree in the

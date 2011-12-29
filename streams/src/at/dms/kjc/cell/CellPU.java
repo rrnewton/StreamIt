@@ -1,7 +1,6 @@
 package at.dms.kjc.cell;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 import at.dms.kjc.backendSupport.ComputeNode;

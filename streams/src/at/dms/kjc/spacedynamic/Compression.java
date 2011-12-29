@@ -3,8 +3,6 @@
  */
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import java.util.*;
 
 /**
  * @author mgordon

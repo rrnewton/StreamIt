@@ -1,8 +1,6 @@
 package at.dms.kjc.iterator; 
 
-import at.dms.kjc.sir.*;
-import at.dms.util.*;
-import streamit.scheduler2.iriter.*;
+import at.dms.kjc.sir.SIRSplitJoin;
 
 /**
  * FineGrainedIterFactory uses this for SIRSplitJoiner

@@ -1,6 +1,5 @@
 package at.dms.kjc.sir.statespace.transform;
 
-import at.dms.kjc.sir.statespace.*;
 
 /**
  * Exception that is thrown when we can't compute a transform for some reason.

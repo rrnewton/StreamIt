@@ -1,14 +1,15 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-
-import java.io.Serializable;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JLocalVariable;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.SLIREmptyVisitor;
 
 /**
  * This class will return a HashMap from local vars->hashset.  The hashset

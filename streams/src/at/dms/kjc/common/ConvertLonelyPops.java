@@ -4,7 +4,9 @@
 package at.dms.kjc.common;
 
 import java.util.Iterator;
-import java.util.HashSet;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
@@ -12,14 +14,16 @@ import at.dms.kjc.JFloatLiteral;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JLiteral;
 import at.dms.kjc.JLocalVariableExpression;
-import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.spacedynamic.RawExecutionCode;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.*;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class will convert each pop expression that is not nested

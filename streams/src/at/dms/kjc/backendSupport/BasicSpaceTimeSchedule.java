@@ -5,14 +5,15 @@
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Vector;
 
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeInfo;
-import at.dms.kjc.common.CommonUtils;
 
 /**
  * Collects initialization schedule, prime-pump schedule

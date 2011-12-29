@@ -3,13 +3,14 @@
  */
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.CType;
-//import at.dms.kjc.CStdType;
 import at.dms.kjc.CArrayType;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.CType;
 import at.dms.kjc.common.CommonUtils;
-//import java.util.*;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 
 /**
  * Janis' code for cluster edges pulled out

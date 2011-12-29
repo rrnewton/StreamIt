@@ -1,9 +1,25 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.sir.EmptyStreamVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class converts certain (large) local variables into fields so

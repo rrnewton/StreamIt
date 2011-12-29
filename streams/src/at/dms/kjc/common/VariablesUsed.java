@@ -1,13 +1,20 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.sir.*;
-
 import java.io.Serializable;
-import java.util.ListIterator;
-import at.dms.kjc.flatgraph.*;
 import java.util.HashSet;
+
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JPhylum;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.util.Utils;
 
 /**
  * This class will return a HashSet containing all the

@@ -1,13 +1,12 @@
 package at.dms.kjc.raw;
 
+import java.util.HashSet;
+import java.util.Iterator;
+
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.Utils;
-import java.io.*;
-import java.util.*;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
 
 
 public class FileVisitor implements FlatVisitor {

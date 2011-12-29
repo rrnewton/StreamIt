@@ -1,19 +1,19 @@
 package at.dms.kjc.spacedynamic;
 
+import java.io.FileWriter;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
 import at.dms.util.Utils;
-import at.dms.kjc.common.CommonUtils;
-//import java.util.List;
-//import at.dms.kjc.sir.lowering.*;
-//import java.util.ListIterator;
-import java.util.Iterator;
-//import java.util.LinkedList;
-//import java.util.TreeSet;
-import java.util.HashSet;
-import java.io.*;
 
 /**
  * This class dumps the tile code for each filter into a file based on the tile

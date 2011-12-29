@@ -3,11 +3,10 @@ package at.dms.kjc.rstream;
 //import at.dms.util.IRPrinter;
 //import at.dms.util.SIRPrinter;
 //import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-//import java.util.*;
-import java.io.*;
-//import at.dms.util.Utils;
+import java.io.FileWriter;
+
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.sir.SIRStructure;
 
 
 /**

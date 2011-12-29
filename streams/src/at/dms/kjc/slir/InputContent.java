@@ -1,10 +1,7 @@
 package at.dms.kjc.slir;
 
 //import at.dms.kjc.CType;
-import at.dms.kjc.sir.*;
-//import at.dms.kjc.*;
-//import java.util.*;
-//import at.dms.kjc.sir.linear.*;
+import at.dms.kjc.sir.SIRPredefinedFilter;
 
 /**
  * Predefined FilterContent for input. Could be restructured to be

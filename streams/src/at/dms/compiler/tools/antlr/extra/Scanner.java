@@ -23,15 +23,15 @@ package at.dms.compiler.tools.antlr.extra;
 import java.io.IOException;
 import java.util.Vector;
 
+import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.TokenStream;
 import at.dms.compiler.tools.common.Compiler;
 import at.dms.compiler.tools.common.CompilerMessages;
 import at.dms.compiler.tools.common.JavaStyleComment;
 import at.dms.compiler.tools.common.JavadocComment;
+import at.dms.compiler.tools.common.MessageDescription;
 import at.dms.compiler.tools.common.PositionedError;
 import at.dms.compiler.tools.common.TokenReference;
-import at.dms.compiler.tools.antlr.runtime.Token;
-import at.dms.compiler.tools.antlr.runtime.TokenStream;
-import at.dms.compiler.tools.common.MessageDescription;
 import at.dms.compiler.tools.common.Utils;
 
 /**

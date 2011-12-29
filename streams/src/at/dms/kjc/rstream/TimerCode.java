@@ -1,6 +1,25 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.*;
+import at.dms.kjc.CDoubleType;
+import at.dms.kjc.CEmittedTextType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JCastExpression;
+import at.dms.kjc.JClassExpression;
+import at.dms.kjc.JDivideExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMinusExpression;
+import at.dms.kjc.JNameExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JStringLiteral;
+import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
 
 /**
  * Process timers (dumping user and system ticks) in SIR.

@@ -1,6 +1,5 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.*;
 
 /** A node on a raw chip that can compute, right now either a
     raw tile or an IOPort **/

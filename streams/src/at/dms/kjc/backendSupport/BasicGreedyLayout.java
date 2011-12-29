@@ -3,9 +3,18 @@
  */
 package at.dms.kjc.backendSupport;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-import at.dms.kjc.slir.*;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
 
 
 /**

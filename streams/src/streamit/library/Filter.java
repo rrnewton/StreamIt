@@ -17,9 +17,10 @@
 package streamit.library;
 
 import java.lang.reflect.Method;
-import streamit.scheduler2.Scheduler;
-import java.util.Vector;
 import java.util.HashMap;
+import java.util.Vector;
+
+import streamit.scheduler2.Scheduler;
 
 // a filter is the lowest-level block of streams
 public abstract class Filter extends Stream

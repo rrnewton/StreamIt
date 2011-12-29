@@ -3,21 +3,21 @@ package at.dms.kjc.backendSupport;
 import java.util.Iterator;
 import java.util.Map;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.sir.lowering.partition.*; 
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.OutputNode;
-import at.dms.kjc.slir.StaticSubGraph;
-import at.dms.kjc.slir.StreamGraph;
-import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.InternalFilterNode;
-import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.OutputNode;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.Util;
-import java.lang.*;
-
-import java.util.*;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * Calculate the computation to communication ratio.  Poorly named class,

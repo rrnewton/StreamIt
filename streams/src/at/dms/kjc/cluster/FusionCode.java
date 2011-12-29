@@ -1,15 +1,25 @@
 package at.dms.kjc.cluster;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.sir.*;
-//import at.dms.kjc.CType;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.cluster.ClusterUtils;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRTwoStageFilter;
 
 /**
  * A class that generates code for the --cluster --standalone, where

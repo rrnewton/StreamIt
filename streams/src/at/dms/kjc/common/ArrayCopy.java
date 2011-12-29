@@ -1,8 +1,17 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.*;
+import java.util.Hashtable;
+import java.util.LinkedList;
 
-import java.util.*;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
 
 public class ArrayCopy {
     //Only handles rectangle multi dim arrays now

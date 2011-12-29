@@ -5,8 +5,8 @@ import java.io.FileWriter;
 
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CodegenPrintWriter;
-import at.dms.kjc.sir.SIRHelper;
 import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRHelper;
 
 
 

@@ -1,14 +1,27 @@
 package at.dms.kjc.raw;
 
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
+import java.util.Set;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
 import at.dms.util.Utils;
-import java.io.*;
-import java.util.*;
 
 
 /**

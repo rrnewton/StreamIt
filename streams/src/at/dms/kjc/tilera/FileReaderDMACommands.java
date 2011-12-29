@@ -1,12 +1,8 @@
 package at.dms.kjc.tilera;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import at.dms.kjc.JStatement;
-import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InterFilterEdge;
-import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNodeInfo;
 

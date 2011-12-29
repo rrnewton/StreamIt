@@ -20,9 +20,9 @@
 
 package at.dms.backend;
 
+import at.dms.classfile.Constants;
 import at.dms.classfile.LocalVarInstruction;
 import at.dms.classfile.NoArgInstruction;
-import at.dms.classfile.Constants;
 import at.dms.util.InconsistencyException;
 
 /**

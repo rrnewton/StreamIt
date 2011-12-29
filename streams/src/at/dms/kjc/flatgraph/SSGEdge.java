@@ -1,6 +1,5 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.flatgraph.FlatNode;
 import java.util.Map;
 import java.util.WeakHashMap;
 /**

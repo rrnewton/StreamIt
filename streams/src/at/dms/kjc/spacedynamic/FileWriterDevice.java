@@ -1,8 +1,8 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.flatgraph.*;
-import at.dms.util.Utils;
-import at.dms.kjc.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.StreamGraph;
 import at.dms.kjc.sir.SIRFileWriter;
 
 public class FileWriterDevice extends IODevice {

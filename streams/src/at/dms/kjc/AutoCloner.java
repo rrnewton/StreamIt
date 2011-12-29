@@ -1,15 +1,26 @@
 package at.dms.kjc;
 
-import at.dms.kjc.sir.*;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.*;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+import java.util.Vector;
+
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.TokenReference;
-
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.Array;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRJoinType;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.slir.Filter;
+import at.dms.util.ConstList;
+import at.dms.util.Utils;
 
 public class AutoCloner {
     /**

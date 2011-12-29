@@ -1,10 +1,13 @@
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.common.CodegenPrintWriter;
-
 import java.util.HashMap;
+
+import at.dms.kjc.Constants;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.common.CodegenPrintWriter;
+import at.dms.kjc.sir.SIRBeginMarker;
+import at.dms.kjc.sir.SIREndMarker;
+import at.dms.kjc.sir.SIRMarker;
 
 /**
  * If KjcOptions.profiling is enabled, this class inserts timers

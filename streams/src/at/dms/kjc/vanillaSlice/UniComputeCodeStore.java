@@ -1,10 +1,8 @@
 package at.dms.kjc.vanillaSlice;
 
+import at.dms.kjc.CStdType;
+import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.common.ALocalVariable;
-import java.util.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.*;
 
 /**
  * Modest extension to {@link at.dms.kjc.backendSupport.ComputeCodeStore}. 

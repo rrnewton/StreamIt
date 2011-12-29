@@ -1,6 +1,5 @@
 package at.dms.kjc.smp;
 
-import at.dms.kjc.sir.*;
 import at.dms.kjc.slir.InternalFilterNode;
 
 public class SMD extends Scheduler {

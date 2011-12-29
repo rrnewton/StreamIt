@@ -1,9 +1,15 @@
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.*;
-import at.dms.kjc.slir.*;
-import at.dms.kjc.backendSupport.*;
-import at.dms.util.Utils;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.JBlock;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.slir.InputNode;
+import at.dms.kjc.slir.InterFilterEdge;
+import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.WorkNodeInfo;
 
 public class CodeStoreHelperJoiner extends CodeStoreHelper {
 

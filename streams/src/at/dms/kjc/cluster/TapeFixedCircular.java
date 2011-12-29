@@ -3,8 +3,8 @@
  */
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.CType;
 import at.dms.kjc.CArrayType;
+import at.dms.kjc.CType;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JIntLiteral;
 

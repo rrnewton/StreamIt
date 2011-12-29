@@ -3,12 +3,15 @@
  */
 package at.dms.kjc.slir;
 
-import java.util.*;
-import at.dms.kjc.slir.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRIdentity;
 import at.dms.kjc.sir.lowering.RenameAll;
-import at.dms.kjc.*;
 
 /**
  * <p>After synch removal and conversion from the stream graph to the slice

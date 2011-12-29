@@ -1,8 +1,9 @@
 package at.dms.kjc.raw;
 
+import java.util.LinkedList;
+
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import java.util.LinkedList;
 
 public class DFTraversal implements FlatVisitor 
 {

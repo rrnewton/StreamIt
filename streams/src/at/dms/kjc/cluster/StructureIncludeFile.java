@@ -1,16 +1,27 @@
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import java.util.*;
-import java.io.*;
+import java.io.FileWriter;
+import java.util.HashSet;
+import java.util.Set;
 
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CType;
+import at.dms.kjc.CVectorType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.common.CommonConstants;
 import at.dms.kjc.common.CommonUtils;
 import at.dms.kjc.common.RawUtil;
-import at.dms.kjc.flatgraph.*;
-//import at.dms.util.IRPrinter;
-//import at.dms.util.SIRPrinter;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.flatgraph.StaticStreamGraph;
+import at.dms.kjc.flatgraph.StreamGraph;
+import at.dms.kjc.flatgraph.StreamGraphVisitor;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRStructure;
 
 /**
  * Create structs.h and its contents.

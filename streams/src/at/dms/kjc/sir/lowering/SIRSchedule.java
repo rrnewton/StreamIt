@@ -1,12 +1,12 @@
 package at.dms.kjc.sir.lowering;
 
 import streamit.scheduler2.Scheduler;
-
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.lir.*;
-import at.dms.util.Utils;
-import at.dms.kjc.iterator.*;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This provides an SIR wrapper for the underlying schedule (from the

@@ -1,6 +1,10 @@
 package at.dms.kjc.common;
 
-import at.dms.kjc.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
 
 /**
  * Package up declaration statement and use expression for a local variable. 

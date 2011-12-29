@@ -1,14 +1,13 @@
 package at.dms.kjc.slir;
 
-import at.dms.kjc.*;
-import at.dms.kjc.backendSupport.*;
-import java.util.Arrays;
-import java.util.Set;
 import java.util.HashSet;
-import java.util.Vector;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
+import at.dms.kjc.CType;
 
 /**
  * Each slice is terminated by an OutputSliceNode that has single input (the last filter) 

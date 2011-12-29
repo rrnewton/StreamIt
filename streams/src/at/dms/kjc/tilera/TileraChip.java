@@ -2,9 +2,10 @@ package at.dms.kjc.tilera;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.util.Utils;
-import at.dms.kjc.KjcOptions;
 
 public class TileraChip implements ComputeNodesI<TileCodeStore> {
     protected int gXSize;

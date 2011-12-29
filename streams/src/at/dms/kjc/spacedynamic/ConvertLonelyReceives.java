@@ -1,23 +1,20 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.common.*;
+import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFloatLiteral;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JVariableDeclarationStatement;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-import java.util.Hashtable;
-import at.dms.util.SIRPrinter;
+import at.dms.kjc.sir.SIRFilter;
 
 /**
  * This class converts network receives that are not assigned to a

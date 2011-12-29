@@ -1,9 +1,5 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.Utils;
 
 /**
  * Visitor interface to a graph of FlatNodes.

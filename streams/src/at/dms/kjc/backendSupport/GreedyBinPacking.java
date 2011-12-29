@@ -3,12 +3,13 @@
  */
 package at.dms.kjc.backendSupport;
 
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.GraphFlattener;
-import at.dms.kjc.flatgraph.WorkSorted;
-import at.dms.kjc.sir.*;
-import java.util.*;
-import at.dms.kjc.sir.lowering.partition.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author mgordon

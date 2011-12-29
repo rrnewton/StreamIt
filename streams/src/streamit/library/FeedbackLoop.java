@@ -16,9 +16,10 @@
 
 package streamit.library;
 
-import streamit.scheduler2.Scheduler;
-import streamit.library.iriter.Iterator;
 import java.util.List;
+
+import streamit.library.iriter.Iterator;
+import streamit.scheduler2.Scheduler;
 
 // the feedback loop
 public class FeedbackLoop extends Stream

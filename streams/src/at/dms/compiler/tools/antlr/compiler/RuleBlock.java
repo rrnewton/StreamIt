@@ -22,7 +22,8 @@ package at.dms.compiler.tools.antlr.compiler;
 
 import java.util.Hashtable;
 
-import at.dms.compiler.tools.antlr.runtime.*;
+import at.dms.compiler.tools.antlr.runtime.Token;
+import at.dms.compiler.tools.antlr.runtime.Vector;
 
 /**
  * A list of alternatives and info contained in

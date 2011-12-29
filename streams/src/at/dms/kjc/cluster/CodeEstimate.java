@@ -1,11 +1,33 @@
 
 package at.dms.kjc.cluster;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-
 import java.util.HashMap;
-import at.dms.kjc.common.RawUtil;
+
+import at.dms.kjc.CArrayType;
+import at.dms.kjc.CClassNameType;
+import at.dms.kjc.CNullType;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.JArrayAccessExpression;
+import at.dms.kjc.JBinaryExpression;
+import at.dms.kjc.JConditionalExpression;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JForStatement;
+import at.dms.kjc.JMethodCallExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.JStatement;
+import at.dms.kjc.JUnaryExpression;
+import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.sir.SIRDynamicRateManager;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRPrintStatement;
+import at.dms.kjc.sir.SIRPushExpression;
 
 
 /**

@@ -1,13 +1,17 @@
 package at.dms.kjc.spacedynamic;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.sir.lowering.*;
-import at.dms.util.Utils;
-import java.io.*;
-import java.util.*;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
 
 /** 
  * Set up in the backend the various file readers or writers by creating the necessary 

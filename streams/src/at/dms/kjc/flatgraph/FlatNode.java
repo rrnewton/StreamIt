@@ -1,9 +1,15 @@
 package at.dms.kjc.flatgraph;
 
-import at.dms.kjc.sir.*;
-import at.dms.util.Utils;
-import java.util.HashSet; 
+import java.util.HashSet;
 import java.util.Set;
+
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIROperator;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.util.Utils;
 
 /**
  * This class represents a node in the flattened graph.  It has incoming edges

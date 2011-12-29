@@ -1,21 +1,24 @@
 package at.dms.kjc.spacedynamic;
 
-import at.dms.kjc.flatgraph.FlatNode;
-//import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-//import at.dms.kjc.sir.lowering.*;
-import at.dms.kjc.common.CommonUtils;
-import at.dms.util.Utils;
-import java.util.HashSet;
-//import java.math.BigInteger;
 import java.util.HashMap;
-//import java.util.Vector;
-import java.util.List;
-import java.util.LinkedList;
-//import java.util.ListIterator;
+import java.util.HashSet;
 import java.util.Iterator;
-//import at.dms.kjc.sir.lowering.partition.WorkEstimate;
+import java.util.LinkedList;
+import java.util.List;
+
+import at.dms.kjc.CType;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.common.CommonUtils;
+import at.dms.kjc.flatgraph.FlatNode;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRFileReader;
+import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRFilter;
+import at.dms.kjc.sir.SIRIdentity;
+import at.dms.kjc.sir.SIRJoiner;
+import at.dms.kjc.sir.SIRSplitType;
+import at.dms.kjc.sir.SIRSplitter;
+import at.dms.util.Utils;
 
 /**
  * This class generates a schedule for the switch code by simulating the 

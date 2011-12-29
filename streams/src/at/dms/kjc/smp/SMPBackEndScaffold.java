@@ -11,11 +11,7 @@ import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.ComputeNodesI;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
-import at.dms.kjc.slir.InputPort;
-import at.dms.kjc.slir.InterSSGEdge;
-import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
-import at.dms.kjc.slir.StaticSubGraph;
 
 /**
  * @author mgordon

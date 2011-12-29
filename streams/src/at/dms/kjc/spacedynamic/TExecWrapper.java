@@ -1,6 +1,7 @@
 package at.dms.kjc.spacedynamic;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class TExecWrapper 
 {

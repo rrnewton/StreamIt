@@ -1,23 +1,6 @@
 package at.dms.kjc.rstream;
 
-import at.dms.kjc.common.*;
-import at.dms.kjc.flatgraph.FlatNode;
-import at.dms.kjc.flatgraph.FlatVisitor;
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
-import at.dms.kjc.iterator.*;
-import at.dms.util.Utils;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.io.*;
-import at.dms.compiler.*;
-import at.dms.kjc.sir.lowering.*;
-import java.util.Hashtable;
-import at.dms.util.SIRPrinter;
+import at.dms.kjc.JLocalVariable;
 
 /**
  * This class will try to convert the communication expressions of a filter

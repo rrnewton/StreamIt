@@ -1,8 +1,11 @@
 package at.dms.kjc.sir.lowering.partition;
 
-import java.util.*;
-import java.io.*;
-import at.dms.util.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.LinkedList;
+
+import at.dms.util.Utils;
 
 public class PartitionUtil {
 

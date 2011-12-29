@@ -1,16 +1,25 @@
 
 package at.dms.kjc.sir;
 
-import at.dms.kjc.*;
-import at.dms.util.*;
-import at.dms.kjc.iterator.*;
-import at.dms.compiler.PositionedError;
-import at.dms.kjc.sir.lowering.Propagator;
-import at.dms.kjc.sir.lowering.LoweringConstants;
-import at.dms.compiler.TokenReference;
-import at.dms.util.InconsistencyException;
+import java.util.LinkedList;
 
-import java.util.*;
+import at.dms.compiler.PositionedError;
+import at.dms.kjc.AttributeVisitor;
+import at.dms.kjc.CExpressionContext;
+import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
+import at.dms.kjc.CodeSequence;
+import at.dms.kjc.ExpressionVisitor;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.KjcVisitor;
+import at.dms.kjc.SLIRAttributeVisitor;
+import at.dms.kjc.SLIRReplacingVisitor;
+import at.dms.kjc.SLIRVisitor;
+import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.util.InconsistencyException;
 
 /**
  * This represents a stream portal used for messaging

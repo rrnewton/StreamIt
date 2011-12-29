@@ -1,10 +1,30 @@
 package at.dms.kjc.sir.lowering;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 
-import at.dms.kjc.*;
-import at.dms.kjc.sir.*;
+import at.dms.kjc.CClassType;
+import at.dms.kjc.JExpression;
+import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JLiteral;
+import at.dms.kjc.JLocalVariableExpression;
+import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.KjcOptions;
+import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.common.ArrayCopy;
+import at.dms.kjc.sir.SIRContainer;
+import at.dms.kjc.sir.SIRFeedbackLoop;
+import at.dms.kjc.sir.SIRGlobal;
+import at.dms.kjc.sir.SIRInitStatement;
+import at.dms.kjc.sir.SIRPhasedFilter;
+import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPortal;
+import at.dms.kjc.sir.SIRPredefinedFilter;
+import at.dms.kjc.sir.SIRRecursiveStub;
+import at.dms.kjc.sir.SIRSplitJoin;
+import at.dms.kjc.sir.SIRStream;
 
 /**
  * This class propagates constants and unrolls loops.  Currently only
