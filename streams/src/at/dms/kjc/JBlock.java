@@ -170,15 +170,16 @@ public class JBlock extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         CBlockContext   self = new CBlockContext(context);
 
         for (int i = 0; i < body.size(); i++) {
             if (! self.isReachable()) {
-                throw new CLineError(((JStatement)body.get(i)).getTokenReference(), KjcMessages.STATEMENT_UNREACHABLE);
+                throw new CLineError(body.get(i).getTokenReference(), KjcMessages.STATEMENT_UNREACHABLE);
             }
             try {
-                ((JStatement)body.get(i)).analyse(self);
+                body.get(i).analyse(self);
             } catch (CLineError e) {
                 self.reportTrouble(e);
             }
@@ -195,7 +196,8 @@ public class JBlock extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitBlockStatement(this, getComments());
     }
 
@@ -203,7 +205,8 @@ public class JBlock extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitBlockStatement(this, getComments());
     }
 
@@ -211,11 +214,12 @@ public class JBlock extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         for (int i = 0; i < body.size(); i++) {
-            ((JStatement)body.get(i)).genCode(code);
+            body.get(i).genCode(code);
         }
     }
 
@@ -234,14 +238,14 @@ public class JBlock extends JStatement {
      * Returns i'th statement.
      */
     public JStatement getStatement(int i) {
-        return (JStatement)body.get(i);
+        return body.get(i);
     }
 
     /**
      * Returns array of statements in this.  
      */
     public JStatement[] getStatementArray() {
-        return (JStatement[])body.toArray(new JStatement[0]);
+        return body.toArray(new JStatement[0]);
     }
 
     /**
@@ -269,7 +273,8 @@ public class JBlock extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JBlock other = new at.dms.kjc.JBlock();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

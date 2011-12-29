@@ -30,7 +30,8 @@ public class SingleAAStmt implements AAStatement, Comparable<SingleAAStmt>{
     /**
      * Convert to a JStatement of a JEmitedTxtExpression
      */
-    public JStatement toJStmt() {
+    @Override
+	public JStatement toJStmt() {
         String dstOffset = dstOffsetName.equals("") ? "" : dstOffsetName + " + ";
         String srcOffset = srcOffsetName.equals("") ? "" : srcOffsetName + " + ";
 
@@ -38,7 +39,8 @@ public class SingleAAStmt implements AAStatement, Comparable<SingleAAStmt>{
                 srcBufName + "[" + srcOffset + srcIndex + "]"); 
     }
     
-    public int compareTo(SingleAAStmt other) {
+    @Override
+	public int compareTo(SingleAAStmt other) {
         if (!dstBufName.equals(other.dstBufName)) 
             return dstBufName.compareTo(other.dstBufName);
         else if (!dstOffsetName.equals(other.dstOffsetName))

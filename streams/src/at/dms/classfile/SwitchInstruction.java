@@ -98,14 +98,16 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
      * Returns true iff control flow can reach the next instruction
      * in textual order.
      */
-    public boolean canComplete() {
+    @Override
+	public boolean canComplete() {
         return false;
     }
 
     /**
      * Transforms targets (deferences to actual instructions).
      */
-    public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
+    @Override
+	public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
         this.deflab = this.deflab.transform(transformer, this);
         for (int i = 0; i < targets.length; i++) {
             this.targets[i] = this.targets[i].transform(transformer, this);
@@ -250,7 +252,8 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
     /**
      * Returns the number of bytes used by the the instruction in the code array.
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return computeSize(getAddress());
     }
 
@@ -261,7 +264,8 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
     /**
      * Returns the type pushed on the stack
      */
-    public byte getReturnType() {
+    @Override
+	public byte getReturnType() {
         return TYP_REFERENCE;
     }
 
@@ -276,7 +280,8 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
      *      and it can complete normally
      * @exception   ClassFileFormatException    a problem was detected
      */
-    /*package*/ void check(CodeEnv env, int curStack)
+    @Override
+	/*package*/ void check(CodeEnv env, int curStack)
         throws ClassFileFormatException
     {
         env.checkExecutionPath((InstructionHandle)deflab, curStack);
@@ -293,7 +298,8 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
      *              is changed to the minimum and maximum
      *              address of the end of this instruction.
      */
-    /*package*/ void computeEndAddress(CodePosition position) {
+    @Override
+	/*package*/ void computeEndAddress(CodePosition position) {
         int     size = computeSize(position.max);
         position.min += size;
         position.max += size;
@@ -302,14 +308,16 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
     /**
      * Returns the size of data pushed on the stack by this instruction
      */
-    public int getPushedOnStack() {
+    @Override
+	public int getPushedOnStack() {
         return 0;
     }
 
     /**
      * Return the amount of stack (positive or negative) used by this instruction
      */
-    public int getStack() {
+    @Override
+	public int getStack() {
         return -1;
     }
 
@@ -322,7 +330,8 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {}
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {}
 
     /**
      * Write this instruction into a file
@@ -332,7 +341,8 @@ public class SwitchInstruction extends Instruction implements AccessorContainer 
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte((byte)getOpcode());
 
         // pad to next 4-byte boundary

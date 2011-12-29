@@ -7,6 +7,7 @@ import java.util.Set;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
 import at.dms.kjc.JAddExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
@@ -439,7 +440,7 @@ public class PipelineFissioner {
             newPreworkBody.addStatementFirst(initMultLoopVarDecl);
 	    
             JRelationalExpression initMultLoopCond =
-                new JRelationalExpression(JRelationalExpression.OPE_LT,
+                new JRelationalExpression(Constants.OPE_LT,
                                           new JLocalVariableExpression(initMultLoopVar),
                                           new JIntLiteral(sliceInitMult));
 	    
@@ -460,7 +461,7 @@ public class PipelineFissioner {
                sliceClones[0].getWorkNode().getWorkNodeContent().getPrework()[0] == null) {
                 JMethodDeclaration newPreworkMethod =
                     new JMethodDeclaration(null,
-                                           at.dms.kjc.Constants.ACC_PUBLIC,
+                                           at.dms.classfile.Constants.ACC_PUBLIC,
                                            CStdType.Void,
                                            "fissionPrework",
                                            JFormalParameter.EMPTY,
@@ -582,7 +583,7 @@ public class PipelineFissioner {
         if(Math.max(0, (slicePeek - slicePop) - sliceCopyDown) > 0) {
             if(!sliceClones[fizzAmount - 1].getWorkNode().getWorkNodeContent().isTwoStage()) {
                 JMethodDeclaration prework = 
-                    new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+                    new JMethodDeclaration(null, at.dms.classfile.Constants.ACC_PUBLIC,
                                            CStdType.Void, "emptyPrework",
                                            JFormalParameter.EMPTY, CClassType.EMPTY,
                                            new JBlock(), null, null);
@@ -1055,7 +1056,7 @@ public class PipelineFissioner {
 
             // Add for-loop that wraps around existing work body
             JRelationalExpression steadyMultLoopCond =
-                new JRelationalExpression(JRelationalExpression.OPE_LT,
+                new JRelationalExpression(Constants.OPE_LT,
                                           new JLocalVariableExpression(steadyMultLoopVar),
                                           new JIntLiteral(sliceSteadyMult));
 

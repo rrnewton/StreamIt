@@ -90,7 +90,8 @@ public class CBinaryMethod extends CMethod {
      * search if two methods have same signature
      * @param   other       the other method
      */
-    public boolean equals(CMethod other) {
+    @Override
+	public boolean equals(CMethod other) {
         CClass owner = getOwner();
 
         if (!isConstructor() 
@@ -126,7 +127,8 @@ public class CBinaryMethod extends CMethod {
      * @param   ident       method invocation name
      * @param   actuals     method invocation arguments
      */
-    public boolean isApplicableTo(String ident, CType[] actuals) {
+    @Override
+	public boolean isApplicableTo(String ident, CType[] actuals) {
         CClass owner = getOwner();
 
         if (!isConstructor() 
@@ -158,7 +160,8 @@ public class CBinaryMethod extends CMethod {
      * Is this method more specific than the one given as argument (JLS 15.12.2.2) ?
      * @param   other       the method to compare to
      */
-    public boolean isMoreSpecificThan(CMethod other) {
+    @Override
+	public boolean isMoreSpecificThan(CMethod other) {
         CClass owner = getOwner();
 
         if (!isConstructor() 
@@ -193,7 +196,8 @@ public class CBinaryMethod extends CMethod {
      * NOTE: return type not considered
      * @param   other       the method to compare to
      */
-    public boolean hasSameSignature(CMethod other) {
+    @Override
+	public boolean hasSameSignature(CMethod other) {
         CClass owner = getOwner();
 
         if (!isConstructor() 
@@ -222,7 +226,8 @@ public class CBinaryMethod extends CMethod {
     /**
      * Returns a string representation of this method.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         CClass owner = getOwner();
 
         if (!isConstructor() 
@@ -254,7 +259,8 @@ public class CBinaryMethod extends CMethod {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CBinaryMethod other = new at.dms.kjc.CBinaryMethod();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

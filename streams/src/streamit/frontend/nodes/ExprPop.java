@@ -37,12 +37,14 @@ public class ExprPop extends Expression
     }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprPop(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         // No state; any two pop expressions are equal.
         if (other instanceof ExprPop)
@@ -50,13 +52,15 @@ public class ExprPop extends Expression
         return false;
     }
 
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         // No state, so...
         return 17;
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return "pop()";
     }

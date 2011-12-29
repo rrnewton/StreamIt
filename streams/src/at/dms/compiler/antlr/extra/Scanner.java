@@ -60,7 +60,8 @@ public abstract class Scanner implements TokenStream {
     /**
      * Returns the next token in the input.
      */
-    public final Token nextToken() {
+    @Override
+	public final Token nextToken() {
         while (true) {
             try {
                 return nextTokenImpl();

@@ -739,7 +739,8 @@ public class ClusterBackend {
     
     private static void mapToPartitionZero(SIRStream str, final Map<SIROperator,Integer> partitionMap) {
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     partitionMap.put(self, new Integer(0));
                     if (self instanceof SIRSplitJoin) {

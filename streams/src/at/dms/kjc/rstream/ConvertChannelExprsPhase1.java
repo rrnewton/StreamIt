@@ -137,7 +137,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * visit a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -260,7 +261,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * peek expression
      */
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         //don't want this is a header to for!!
@@ -282,7 +284,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * Visits a pop expression.
      */
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType) {
         //don't want this is a header to for!!
         if (doHeader > 0)
@@ -304,7 +307,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * Visits a push expression.
      */
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         //can't see a channel expr inside non-doloop control flow
@@ -330,7 +334,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      ** visit an if statement, the rate on each branch must be equal
      */
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause) {
@@ -380,7 +385,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * visit a while statement, remember that we are in unanalyzable control flow
      */
-    public void visitWhileStatement(JWhileStatement self,
+    @Override
+	public void visitWhileStatement(JWhileStatement self,
                                     JExpression cond,
                                     JStatement body) {
         insideControlFlow++;
@@ -393,7 +399,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * visit a label statement, remember that we are in unanalyzable control flow
      */
-    public void visitLabeledStatement(JLabeledStatement self,
+    @Override
+	public void visitLabeledStatement(JLabeledStatement self,
                                       String label,
                                       JStatement stmt) {
         insideControlFlow++;
@@ -405,7 +412,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * visit a label statement, remember that we are in unanalyzable control flow
      */
-    public void visitDoStatement(JDoStatement self,
+    @Override
+	public void visitDoStatement(JDoStatement self,
                                  JExpression cond,
                                  JStatement body) {
         insideControlFlow++;
@@ -417,7 +425,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * visit a continue statement, we shouldn't see any breaks inside a do loop
      */
-    public void visitContinueStatement(JContinueStatement self,
+    @Override
+	public void visitContinueStatement(JContinueStatement self,
                                        String label) {
         //can't see this inside a doloop
         if (doLoopLevel > 0)
@@ -427,7 +436,8 @@ class ConvertChannelExprsPhase1 extends SLIREmptyVisitor
     /**
      * we should see any breaks inside of do loops
      */
-    public void visitBreakStatement(JBreakStatement self,
+    @Override
+	public void visitBreakStatement(JBreakStatement self,
                                     String label) {
         //can't see this inside a doloop
         if (doLoopLevel > 0)

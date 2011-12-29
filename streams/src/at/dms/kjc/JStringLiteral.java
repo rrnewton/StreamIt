@@ -97,14 +97,16 @@ public class JStringLiteral extends JLiteral {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.String;
     }
 
     /**
      * Returns the constant value of the expression.
      */
-    public String stringValue() {
+    @Override
+	public String stringValue() {
         return value;
     }
 
@@ -112,14 +114,16 @@ public class JStringLiteral extends JLiteral {
      * Returns true iff the value of this literal is the
      * default value for this type (JLS 4.5.5).
      */
-    public boolean isDefault() {
+    @Override
+	public boolean isDefault() {
         return false;
     }
 
     /**
      * Returns a string representation of this literal.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JStringLiteral[");
@@ -128,7 +132,8 @@ public class JStringLiteral extends JLiteral {
         return buffer.toString();
     }
 
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         return value;
     }
 
@@ -142,7 +147,8 @@ public class JStringLiteral extends JLiteral {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) {
+    @Override
+	public JExpression analyse(CExpressionContext context) {
         return this;
     }
 
@@ -154,7 +160,8 @@ public class JStringLiteral extends JLiteral {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         /*
           StringBuffer s = new StringBuffer();
           for (int i = 0; i < value.length(); i++) {
@@ -180,7 +187,8 @@ public class JStringLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         /*
           StringBuffer s = new StringBuffer();
           for (int i = 0; i < value.length(); i++) {
@@ -223,7 +231,8 @@ public class JStringLiteral extends JLiteral {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantInstruction(new PushLiteralInstruction(value));
@@ -234,7 +243,8 @@ public class JStringLiteral extends JLiteral {
      * Returns whether or <pre>o</pre> this represents a literal with the same
      * value as this.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o!=null && 
                 (o instanceof JStringLiteral) &&
                 ((JStringLiteral)o).value.equals(this.value));
@@ -246,7 +256,8 @@ public class JStringLiteral extends JLiteral {
 
     private String      value;
     
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         if(dest.getTypeID()!=TID_CLASS)
             throw new InconsistencyException("cannot convert StringType");
         return this;
@@ -255,7 +266,8 @@ public class JStringLiteral extends JLiteral {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JStringLiteral other = new at.dms.kjc.JStringLiteral();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

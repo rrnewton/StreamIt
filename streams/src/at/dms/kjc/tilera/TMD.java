@@ -49,14 +49,15 @@ public class TMD extends Scheduler {
     public TMD() {
         super();
         fizzAmount = new HashMap<Filter, Integer>();
-        DUP_THRESHOLD = ((double)KjcOptions.dupthresh) / 100.0;
+        DUP_THRESHOLD = KjcOptions.dupthresh / 100.0;
     }
     
     /** Get the tile for a Slice 
      * @param node the {@link at.dms.kjc.slir.InternalFilterNode} to look up. 
      * @return the tile that should execute the {@link at.dms.kjc.slir.InternalFilterNode}. 
      */
-    public Tile getComputeNode(InternalFilterNode node) {
+    @Override
+	public Tile getComputeNode(InternalFilterNode node) {
         assert layoutMap.keySet().contains(node);
         return layoutMap.get(node);
     }
@@ -66,7 +67,8 @@ public class TMD extends Scheduler {
      * @param node         the {@link at.dms.kjc.slir.InternalFilterNode} to associate with ...
      * @param tile   The tile to assign the node
      */
-    public void setComputeNode(InternalFilterNode node, Tile tile) {
+    @Override
+	public void setComputeNode(InternalFilterNode node, Tile tile) {
         assert node != null && tile != null;
         layoutMap.put(node, tile);
         //remember what filters each tile has mapped to it
@@ -79,7 +81,8 @@ public class TMD extends Scheduler {
      * Assign the filternodes of the slice graph to tiles on the chip based on the levels
      * of the graph. 
      */
-    public void runLayout() {
+    @Override
+	public void runLayout() {
         assert graphSchedule != null : 
             "Must set the graph schedule (multiplicities) before running layout";
         
@@ -352,7 +355,8 @@ public class TMD extends Scheduler {
      * Run the Time-Multiplexing Data-parallel scheduler.  Right now, it assumes 
      * a pipeline of stateless filters
      */
-    public void run(int tiles) {
+    @Override
+	public void run(int tiles) {
         //if we are using the SIR data parallelism pass, then don't run TMD
         if (KjcOptions.dup == 1)
             return;
@@ -496,7 +500,7 @@ public class TMD extends Scheduler {
                 //System.out.println("Calculating fizz amount for: " + fsn + "(" + availTiles + " avail tiles)");
                 
                 double faFloat = 
-                    (((double)workEsts.get(fsn)) / ((double)slTotal)) * ((double)availTiles);
+                    (((double)workEsts.get(fsn)) / ((double)slTotal)) * availTiles;
                 int fa = 0;
                 if (faFloat < 1.0) 
                     fa = 1;
@@ -518,7 +522,7 @@ public class TMD extends Scheduler {
                 if (thisWork > maxLevelWork)
                     maxLevelWork = thisWork;
              
-                fizzAmount.put(fsn.getParent(), (int)fa);
+                fizzAmount.put(fsn.getParent(), fa);
                 assert fa > 0 : fsn;
                 tilesUsed += fa;
             }
@@ -573,10 +577,10 @@ public class TMD extends Scheduler {
                 
                 //check that we have reached the threshold for duplicated items
                 int threshFactor = (int)Math.ceil((((double)(fi.peek - fi.pop)) * fizzAmount.get(slice)) / 
-                        ((double)(DUP_THRESHOLD * (((double)fi.pop) * ((double)fi.steadyMult)))));
+                        (DUP_THRESHOLD * (((double)fi.pop) * ((double)fi.steadyMult))));
 
                 //this factor makes sure that copydown is less than pop*mult*factor
-                int cdFactor = (int)Math.ceil(((double)fi.copyDown) / ((double)(fi.pop * fi.steadyMult) / (double)(fizzAmount.get(slice))));
+                int cdFactor = (int)Math.ceil(fi.copyDown / ((double)(fi.pop * fi.steadyMult) / (double)(fizzAmount.get(slice))));
 
                 int myFactor = Math.max(cdFactor, threshFactor);
 
@@ -632,7 +636,8 @@ public class TMD extends Scheduler {
         //Don't count identity filters
         final int[] count = { 0 };
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     if (self.getPeekInt() > self.getPopInt())
                         count[0]++;
@@ -647,7 +652,8 @@ public class TMD extends Scheduler {
         //Don't count identity filters
         final int[] count = { 0 };
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     if (!(self instanceof SIRIdentity))
                         count[0]++;

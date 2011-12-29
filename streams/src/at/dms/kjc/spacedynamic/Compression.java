@@ -222,7 +222,8 @@ public class Compression {
         return buf.toString();
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         return compressed.toString();
     }
 }

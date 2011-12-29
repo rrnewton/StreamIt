@@ -57,7 +57,8 @@ public class DoCompositeProp extends SymbolTableVisitor
     }
 
 
-    public Object visitStmtAssign(StmtAssign stmt)
+    @Override
+	public Object visitStmtAssign(StmtAssign stmt)
     {
         Expression lhs = stmt.getLHS();
         Expression rhs = stmt.getRHS();
@@ -72,7 +73,8 @@ public class DoCompositeProp extends SymbolTableVisitor
     }
 
 
-    public Object visitExprUnary(ExprUnary unary) {
+    @Override
+	public Object visitExprUnary(ExprUnary unary) {
 
         Expression expr = (Expression)unary.getExpr().accept(this);
         FEContext ctx = unary.getContext();
@@ -99,7 +101,8 @@ public class DoCompositeProp extends SymbolTableVisitor
     }
 
 
-    public Object visitExprBinary(ExprBinary exp) {
+    @Override
+	public Object visitExprBinary(ExprBinary exp) {
 
         Expression left = (Expression)exp.getLeft().accept(this);
         Expression right = (Expression)exp.getRight().accept(this);
@@ -212,7 +215,8 @@ public class DoCompositeProp extends SymbolTableVisitor
         return new ExprBinary(ctx, exp.getOp(), left, right); 
     }
 
-    public Object visitExprFunCall(ExprFunCall exp)
+    @Override
+	public Object visitExprFunCall(ExprFunCall exp)
     {
         FEContext ctx = exp.getContext();
 

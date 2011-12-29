@@ -135,7 +135,8 @@ public class DetectImmutable extends SymbolTableVisitor
     // The following methods overridden from SymbolTableVisitor:
     //
 
-    public Object visitStmtAssign(StmtAssign stmt)
+    @Override
+	public Object visitStmtAssign(StmtAssign stmt)
     {
         Expression lhs = stmt.getLHS();
         Expression rhs = stmt.getRHS();
@@ -163,7 +164,8 @@ public class DetectImmutable extends SymbolTableVisitor
         return super.visitStmtAssign(stmt);
     }
 
-    public Object visitExprFunCall(ExprFunCall exp) 
+    @Override
+	public Object visitExprFunCall(ExprFunCall exp) 
     {
         // Note - if a function callout (i.e. to the math library)
         // tries to use a streamit array as a parameter, this will
@@ -187,7 +189,8 @@ public class DetectImmutable extends SymbolTableVisitor
         return super.visitExprFunCall(exp);
     }
 
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         // Set the active stream name so when we visit an array we know which
         // stream with which to associate it.
@@ -237,7 +240,8 @@ public class DetectImmutable extends SymbolTableVisitor
         return returnVal;
     }    
 
-    public Object visitFunction(Function func) {
+    @Override
+	public Object visitFunction(Function func) {
         activeFunctionName = func.getName();
         return super.visitFunction(func);
     }

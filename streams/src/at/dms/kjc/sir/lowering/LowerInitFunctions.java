@@ -360,7 +360,8 @@ public class LowerInitFunctions implements StreamVisitor {
     /**
      * visit a filter 
      */
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
         // only worry about actual SIRFilter's, not special cases like
         // FileReader's and FileWriter's
@@ -396,7 +397,8 @@ public class LowerInitFunctions implements StreamVisitor {
           getWorkName(self))));*/
     }
 
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         JMethodDeclaration init = self.getInit();
         // set stream type to filter
@@ -480,7 +482,8 @@ public class LowerInitFunctions implements StreamVisitor {
     }
     
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self,
+    @Override
+	public void preVisitPipeline(SIRPipeline self,
                                  SIRPipelineIter iter) {
         // do standard container stuff
         visitContainer(self, self.getInit());
@@ -489,7 +492,8 @@ public class LowerInitFunctions implements StreamVisitor {
     }
 
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter) {
         // do standard container stuff
         visitContainer(self, self.getInit());
@@ -498,7 +502,8 @@ public class LowerInitFunctions implements StreamVisitor {
     }
 
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
         // do standard container stuff
         visitContainer(self, self.getInit());
@@ -509,19 +514,22 @@ public class LowerInitFunctions implements StreamVisitor {
     }
 
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self,
+    @Override
+	public void postVisitPipeline(SIRPipeline self,
                                   SIRPipelineIter iter) {
         // do nothing -- all work is in preVisit
     }
 
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
         // do nothing -- all work is in preVisit
     }
 
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
         // do nothing -- all work is in preVisit
     }

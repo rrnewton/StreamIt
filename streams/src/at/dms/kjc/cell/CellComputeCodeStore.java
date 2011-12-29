@@ -990,7 +990,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
         
         JVariableDefinition numspus = new JVariableDefinition(CStdType.Integer, "numspus");
         addField(new JFieldDeclaration(numspus));
-        addInitStatement(new JExpressionStatement(new JAssignmentExpression(new JFieldAccessExpression("numspus"), new JIntLiteral(this.numspus))));
+        addInitStatement(new JExpressionStatement(new JAssignmentExpression(new JFieldAccessExpression("numspus"), new JIntLiteral(CellComputeCodeStore.numspus))));
         
         newline();
     }

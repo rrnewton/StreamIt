@@ -115,7 +115,8 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
 
     // When processing a JBlock, we can simplify it to something else
     // so restore JBlock if needed before reconstructing the method declaration.
-    public Object visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public Object visitMethodDeclaration(JMethodDeclaration self,
             int modifiers, CType returnType, String ident,
             JFormalParameter[] parameters, CClassType[] exceptions,
             JBlock body) {
@@ -135,7 +136,8 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
 
     // assume that a CompoundStatement is the equivalent of a Block
     // as its documentation states, and mung it to be processed as a Block
-    public Object visitCompoundStatement(JCompoundStatement self,
+    @Override
+	public Object visitCompoundStatement(JCompoundStatement self,
             JStatement[] body) {
         // assumes that Compound statement really is just block without parentheses
         JBlock b = new JBlock(body);
@@ -158,7 +160,8 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
     // recurr to process any sub-blocks, then walk the block 
     // combining adjacent pop statements and for loops consisting
     // only of a pop statement.
-    public Object visitBlockStatement(JBlock oldBlock,
+    @Override
+	public Object visitBlockStatement(JBlock oldBlock,
             JavaStyleComment[] comments) {
         //SIRPopExpression oldPrevPop = prevPop;
         // non-null when combining a sequence of pop statements.
@@ -263,7 +266,8 @@ public class IntroduceMultiPops extends SLIRReplacingVisitor {
     // Since all real work is done at the block level, make
     // sure the for statement body is a block before processing
     // the for statement.
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
             JStatement init,
             JExpression cond,
             JStatement incr,

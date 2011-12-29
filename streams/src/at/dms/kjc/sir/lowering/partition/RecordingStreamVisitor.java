@@ -44,13 +44,14 @@ public class RecordingStreamVisitor extends EmptyStreamVisitor {
      * This is called before all visits to a stream structure (Filter,
      * Pipeline, SplitJoin, FeedbackLoop)
      */
-    public void preVisitStream(SIRStream self,
+    @Override
+	public void preVisitStream(SIRStream self,
                                SIRIterator iter) {
         // add the stream
         if (self instanceof SIRContainer) {
             // containers
             if (!curPartition.contains(self)) {
-                curPartition.add((SIRContainer)self, getWork(self));
+                curPartition.add(self, getWork(self));
             }
         } else {
             // filters

@@ -70,7 +70,8 @@ public class SeparateFieldInitializers extends streamit.frontend.tojava.InitMung
         this.libraryFormat = libraryFormat;
     }
 
-    public Object visitStreamSpec(StreamSpec spec) {
+    @Override
+	public Object visitStreamSpec(StreamSpec spec) {
         // maintain a separate list of field inits per stream
         ArrayList<Statement> oldFieldInits = fieldInits;
         fieldInits = new ArrayList<Statement>();       
@@ -96,7 +97,8 @@ public class SeparateFieldInitializers extends streamit.frontend.tojava.InitMung
         return spec;
     }
 
-    public Object visitFieldDecl(FieldDecl field)
+    @Override
+	public Object visitFieldDecl(FieldDecl field)
     {
         field = (FieldDecl)super.visitFieldDecl(field);
 

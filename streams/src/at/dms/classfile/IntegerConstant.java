@@ -47,7 +47,8 @@ public class IntegerConstant extends PooledConstant {
     /**
      * Returns the associated literal
      */
-    /*package*/ Object getLiteral() {
+    @Override
+	/*package*/ Object getLiteral() {
         return new Integer(value);
     }
 
@@ -60,7 +61,8 @@ public class IntegerConstant extends PooledConstant {
      * CONVENTION: return XXXXXXXXXXXX &lt;&lt; 4 + Y
      * with Y = ident of the type of the pooled constant
      */
-    public final int hashCode() {
+    @Override
+	public final int hashCode() {
         return (value << 4) + POO_INTEGER_CONSTANT;
     }
 
@@ -68,7 +70,8 @@ public class IntegerConstant extends PooledConstant {
      * equals (an exact comparison)
      * ASSERT: this.hashCode == o.hashCode ===&gt; cast
      */
-    public final boolean equals(Object o) {
+    @Override
+	public final boolean equals(Object o) {
         return (o instanceof IntegerConstant) &&
             ((IntegerConstant)o).value == value;
     }
@@ -83,7 +86,8 @@ public class IntegerConstant extends PooledConstant {
      * @param   pc      the already in pooled constant
      * ASSERT pc.getClass() == this.getClass()
      */
-    /*package*/ final void resolveConstants(PooledConstant pc) {
+    /*package*/ @Override
+	final void resolveConstants(PooledConstant pc) {
         setIndex(pc.getIndex());
     }
 
@@ -92,7 +96,8 @@ public class IntegerConstant extends PooledConstant {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {
         return;
     }
 
@@ -105,7 +110,8 @@ public class IntegerConstant extends PooledConstant {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte(CST_INTEGER);
         out.writeInt(value);
     }

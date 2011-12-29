@@ -30,14 +30,16 @@ public class NoSimulator extends Simulator {
         /**
          * don't do anything
          */
-    public void simulate() {
+    @Override
+	public void simulate() {
        
     }
     
     /* (non-Javadoc)
      * @see at.dms.kjc.spacedynamic.Simulator#canFire(at.dms.kjc.flatgraph.FlatNode, java.util.HashMap, at.dms.kjc.spacedynamic.SimulationCounter)
      */
-    public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts,
+    @Override
+	public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts,
             SimulationCounter counters) {
         // TODO Auto-generated method stub
         return false;
@@ -46,7 +48,8 @@ public class NoSimulator extends Simulator {
     /* (non-Javadoc)
      * @see at.dms.kjc.spacedynamic.Simulator#fireJoiner(at.dms.kjc.flatgraph.FlatNode, at.dms.kjc.spacedynamic.SimulationCounter, java.util.HashMap)
      */
-    protected int fireJoiner(FlatNode fire, SimulationCounter counters,
+    @Override
+	protected int fireJoiner(FlatNode fire, SimulationCounter counters,
             HashMap<FlatNode, Integer> executionCounts) {
         // TODO Auto-generated method stub
         return 0;

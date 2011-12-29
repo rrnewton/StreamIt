@@ -363,14 +363,16 @@ public class AutoCloner {
         /**
          * Hashcode of <pre>obj</pre>.
          */
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             return obj.hashCode();
         }
     
         /**
          * Only .equal if the objects have reference equality.
          */
-        public boolean equals(Object other) {
+        @Override
+		public boolean equals(Object other) {
             return (other instanceof RegistryWrapper && ((RegistryWrapper)other).obj==obj);
         }
     }

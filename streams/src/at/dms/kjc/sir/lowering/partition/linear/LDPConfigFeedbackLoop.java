@@ -9,7 +9,8 @@ class LDPConfigFeedbackLoop extends LDPConfigContainer {
         super(cont, partitioner, WIDTH, 2);
     }
 
-    protected LDPConfig childConfig(int x, int y) {
+    @Override
+	protected LDPConfig childConfig(int x, int y) {
         assert x==0;
         return partitioner.getConfig(cont.get(y));
     }

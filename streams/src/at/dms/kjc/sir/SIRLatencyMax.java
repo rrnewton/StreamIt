@@ -59,7 +59,8 @@ public class SIRLatencyMax extends SIRLatency implements Comparable {
      * Compares the max time of this to that of <x>, returning the
      * difference.
      */
-    public int compareTo(Object o) {
+    @Override
+	public int compareTo(Object o) {
         return getMax() - ((SIRLatencyMax)o).getMax();
     }
 
@@ -67,7 +68,8 @@ public class SIRLatencyMax extends SIRLatency implements Comparable {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitLatencyMax(this);
         } else {
@@ -78,7 +80,8 @@ public class SIRLatencyMax extends SIRLatency implements Comparable {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitLatencyMax(this);
         } else {
@@ -89,7 +92,8 @@ public class SIRLatencyMax extends SIRLatency implements Comparable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRLatencyMax other = new at.dms.kjc.sir.SIRLatencyMax();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

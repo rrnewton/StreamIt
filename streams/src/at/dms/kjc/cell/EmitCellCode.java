@@ -232,7 +232,8 @@ public class EmitCellCode extends EmitCode {
         /**
          * prints a field declaration
          */
-        public void visitFieldDeclaration(JFieldDeclaration self,
+        @Override
+		public void visitFieldDeclaration(JFieldDeclaration self,
                                           int modifiers,
                                           CType type,
                                           String ident,

@@ -91,7 +91,7 @@ public class LinearCost {
     public long getDirectCost() {
         // add the push count now to estimate copying overhead, even
         // if you're not adding/multiplying.
-        return SCALE_FACTOR * (185l + 2l*cols + (3l*(long)multiplyCount) + ((long)addCount));
+        return SCALE_FACTOR * (185l + 2l*cols + (3l*multiplyCount) + addCount);
     }
 
     /**
@@ -108,11 +108,11 @@ public class LinearCost {
         // distort the partitioning), then multiply by popcount since
         // the node has to be repeated, redundantly, if some of its
         // outputs are useless.
-        double nodeCost = (((double)SCALE_FACTOR) *
+        double nodeCost = (SCALE_FACTOR *
                            (getFrequencyComputationCost() +
                             185.0 +
-                            ((float)(2*cols))) *
-                           ((double)Math.max(popCount,1)));
+                            (2*cols)) *
+                           Math.max(popCount,1));
         // just count the pushing since popping is almost free, all at
         // once.  count it twice since you have to read it and write
         // it.
@@ -140,8 +140,8 @@ public class LinearCost {
      * The offset 0.65 was obtained experimentally.
      */
     public double getFrequencyComputationCost() {
-        return (((double)cols) *
-                Math.log(1.0 + ((float)(4*rows)) /
-                         (1.0 + ((float)LEETFrequencyReplacer.calculateN(rows))/50.0)));
+        return (cols *
+                Math.log(1.0 + (4*rows) /
+                         (1.0 + LEETFrequencyReplacer.calculateN(rows)/50.0)));
     }
 }

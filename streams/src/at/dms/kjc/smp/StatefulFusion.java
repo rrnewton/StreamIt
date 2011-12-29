@@ -58,7 +58,8 @@ public class StatefulFusion {
 
         //Setup pairs (of nodes) ordered by work
         pairs=new TreeMap(new Comparator() {
-                public int compare(Object o1,Object o2) {
+                @Override
+				public int compare(Object o1,Object o2) {
                     if(o1==o2)
                         return 0;
                     long work1=((Pair)o1).work;
@@ -79,7 +80,8 @@ public class StatefulFusion {
 
         //Setup full list of nodes ordered by work
         nodes=new TreeMap<Node,Object>(new Comparator() {
-                public int compare(Object o1,Object o2) {
+                @Override
+				public int compare(Object o1,Object o2) {
                     if(o1==o2)
                         return 0;
                     long work1=((Node)o1).work;
@@ -114,7 +116,8 @@ public class StatefulFusion {
                 Node prevNode;
                 SIRContainer prevParent;
                 
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     if (FusePipe.isFusable(self) && StatelessDuplicate.hasMutableState(self)) {
                         Node node=new Node(self,work.getWork(self));
@@ -305,7 +308,8 @@ public class StatefulFusion {
         // them.
         final int[] count = { 0 };
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     if(StatelessDuplicate.hasMutableState(self))
                         count[0]++;
@@ -357,7 +361,8 @@ public class StatefulFusion {
 	/**
 	 * String representation. Returns filter's name.
 	 */
-        public String toString() {
+        @Override
+		public String toString() {
             return filter.getName();
         }
     }
@@ -406,7 +411,8 @@ public class StatefulFusion {
 	/**
 	 * String representation.
 	 */
-        public String toString() {
+        @Override
+		public String toString() {
             return "Pair(" + n1 + ", " + n2  + ")";
         }
     }

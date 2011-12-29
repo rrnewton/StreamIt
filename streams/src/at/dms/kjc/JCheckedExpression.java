@@ -51,14 +51,16 @@ public final class JCheckedExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return checked.getType();
     }
     
     /**
      * Delegates to checked expression.
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         checked.setType(type);
     }
 
@@ -68,7 +70,8 @@ public final class JCheckedExpression extends JExpression {
      *
      * @return  true iff this expression is constant
      */
-    public boolean isConstant() {
+    @Override
+	public boolean isConstant() {
         throw new InconsistencyException("CHECK ME BEFORE AND YOU WONT SEE ME ANYMORE");
     }
 
@@ -82,7 +85,8 @@ public final class JCheckedExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) {
+    @Override
+	public JExpression analyse(CExpressionContext context) {
         return checked; // already checked
     }
 
@@ -94,7 +98,8 @@ public final class JCheckedExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         throw new InconsistencyException("CHECK ME BEFORE AND YOU WONT SEE ME ANYMORE");
     }
 
@@ -102,7 +107,8 @@ public final class JCheckedExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         throw new InconsistencyException("CHECK ME BEFORE AND YOU WONT SEE ME ANYMORE");
     }
 
@@ -124,7 +130,8 @@ public final class JCheckedExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         throw new InconsistencyException("CHECK ME BEFORE AND YOU WONT SEE ME ANYMORE");
     }
 
@@ -137,7 +144,8 @@ public final class JCheckedExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JCheckedExpression other = new at.dms.kjc.JCheckedExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

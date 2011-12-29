@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CArrayType;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
@@ -351,7 +352,7 @@ public class FuseSimpleSplit {
         Iterator<SIRStream> iter = children.iterator();
         while (iter.hasNext()) {
             SIRFilter filter = (SIRFilter)iter.next();
-            RenameAll.renameFilterContents((SIRFilter)filter);
+            RenameAll.renameFilterContents(filter);
         }
     }
 
@@ -404,7 +405,7 @@ public class FuseSimpleSplit {
 
         // make work function
         JMethodDeclaration work = new JMethodDeclaration(null,
-                                                         at.dms.kjc.Constants.ACC_PUBLIC,
+                                                         Constants.ACC_PUBLIC,
                                                          CStdType.Void,
                                                          "work",
                                                          JFormalParameter.EMPTY,
@@ -918,7 +919,7 @@ public class FuseSimpleSplit {
         // Now make a new work function based on this.
         JMethodDeclaration newWork =
             new JMethodDeclaration(null,
-                                   at.dms.kjc.Constants.ACC_PUBLIC,
+                                   Constants.ACC_PUBLIC,
                                    CStdType.Void,
                                    "work",
                                    JFormalParameter.EMPTY,
@@ -963,7 +964,8 @@ public class FuseSimpleSplit {
             
                 private boolean inExpressionStatement = false;
                
-                public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
+                @Override
+				public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
                     boolean oldInExpressionStatement = inExpressionStatement;
                     if (expr instanceof SIRPopExpression) {inExpressionStatement = true;}
                     Object result = super.visitExpressionStatement(self,expr);
@@ -971,7 +973,8 @@ public class FuseSimpleSplit {
                     return result;
                 }
 
-                public Object visitPopExpression(SIRPopExpression oldSelf,
+                @Override
+				public Object visitPopExpression(SIRPopExpression oldSelf,
                                                  CType oldTapeType) {
                     // Recurse into children.
                     SIRPopExpression self = (SIRPopExpression) super
@@ -999,7 +1002,8 @@ public class FuseSimpleSplit {
                                                  oldTapeType);
                 }
             
-                public Object visitPeekExpression(SIRPeekExpression oldSelf,
+                @Override
+				public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                                   CType oldTapeType,
                                                   JExpression arg) {
                     // Recurse into children.
@@ -1150,7 +1154,7 @@ public class FuseSimpleSplit {
             Map<SIROperator, int[]>[] execCount = SIRScheduler.getExecutionCounts(sj);
             for (int i=0; i<sj.size(); i++) {
                 // get the steady-state count
-                int[] count = (int[])execCount[1].get(sj.get(i));
+                int[] count = execCount[1].get(sj.get(i));
                 if (count==null) {
                     this.child[i] = 0;
                 } else {

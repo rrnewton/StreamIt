@@ -70,7 +70,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * Is this block of alternatives LL(k)?  Fill in alternative cache for this block.
      * @return true if the block is deterministic
      */
-    public boolean deterministic(AlternativeBlock blk) {
+    @Override
+	public boolean deterministic(AlternativeBlock blk) {
         /**
          * The lookahead depth for this decision
          */
@@ -258,7 +259,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * Is (...)+ block LL(1)?  Fill in alternative cache for this block.
      * @return true if the block is deterministic
      */
-    public boolean deterministic(OneOrMoreBlock blk) {
+    @Override
+	public boolean deterministic(OneOrMoreBlock blk) {
         if ( DEBUG_ANALYZER ) {
             System.out.println("deterministic(...)+("+blk+")");
         }
@@ -276,7 +278,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * Is (...)* block LL(1)?  Fill in alternative cache for this block.
      * @return true if the block is deterministic
      */
-    public boolean deterministic(ZeroOrMoreBlock blk) {
+    @Override
+	public boolean deterministic(ZeroOrMoreBlock blk) {
         if ( DEBUG_ANALYZER ) {
             System.out.println("deterministic(...)*("+blk+")");
         }
@@ -418,7 +421,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * Compute the lookahead set of whatever follows references to
      * the rule associated witht the FOLLOW block.
      */
-    public Lookahead FOLLOW(int k, RuleEndElement end) {
+    @Override
+	public Lookahead FOLLOW(int k, RuleEndElement end) {
         // what rule are we trying to compute FOLLOW of?
         RuleBlock rb = (RuleBlock)end.block;
         // rule name is different in lexer
@@ -544,7 +548,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
     /**
      * Actions are ignored
      */
-    public Lookahead look(int k, ActionElement action) {
+    @Override
+	public Lookahead look(int k, ActionElement action) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookAction("+k+","+action+")");
         }
@@ -554,7 +559,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
     /**
      * Combine the lookahead computed for each alternative
      */
-    public Lookahead look(int k, AlternativeBlock blk) {
+    @Override
+	public Lookahead look(int k, AlternativeBlock blk) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookAltBlk(" + k + "," + blk + ")");
         }
@@ -607,7 +613,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * during a FOLLOW operation and the FIRST of this
      * block must be included in that lookahead computation.
      */
-    public Lookahead look(int k, BlockEndElement end) {
+    @Override
+	public Lookahead look(int k, BlockEndElement end) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookBlockEnd("+k+", "+end.block+"); lock is "+end.lock[k]);
         }
@@ -674,7 +681,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * ( 'a' | ~'a' )* 'b'
      * should exit upon seeing a 'b' during the loop.
      */
-    public Lookahead look(int k, CharLiteralElement atom) {
+    @Override
+	public Lookahead look(int k, CharLiteralElement atom) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookCharLiteral("+k+","+atom+")");
         }
@@ -707,7 +715,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
         }
     }
 
-    public Lookahead look(int k, CharRangeElement r) {
+    @Override
+	public Lookahead look(int k, CharRangeElement r) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookCharRange("+k+","+r+")");
         }
@@ -722,7 +731,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
         return new Lookahead(p);
     }
 
-    public Lookahead look(int k, GrammarAtom atom) {
+    @Override
+	public Lookahead look(int k, GrammarAtom atom) {
         if (DEBUG_ANALYZER) {
             System.out.println("look("+k+","+atom+"["+atom.getType()+"])");
         }
@@ -751,7 +761,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * all alternatives and, if an empty path is found, the lookahead
      * of what follows the block.
      */
-    public Lookahead look(int k, OneOrMoreBlock blk) {
+    @Override
+	public Lookahead look(int k, OneOrMoreBlock blk) {
         if (DEBUG_ANALYZER) {
             System.out.println("look+"+k+","+blk+")");
         }
@@ -765,7 +776,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * on itself--infinite loop.  This also implies infinite left-recursion
      * in the grammar (or an error in this algorithm ;)).
      */
-    public Lookahead look(int k, RuleBlock blk) {
+    @Override
+	public Lookahead look(int k, RuleBlock blk) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookRuleBlk("+k+","+blk+")");
         }
@@ -800,7 +812,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * end block is locked, FOLLOW will return an empty set
      * with a cycle to the rule associated with this end block.
      */
-    public Lookahead look(int k, RuleEndElement end) {
+    @Override
+	public Lookahead look(int k, RuleEndElement end) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookRuleBlockEnd("+k+"); noFOLLOW="+
                                end.noFOLLOW+"; lock is "+end.lock[k]);
@@ -832,7 +845,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * orthogonal to the <tt>lock</tt> variable that prevents
      * infinite recursion.  noFOLLOW does not care about what k is.
      */
-    public Lookahead look(int k, RuleRefElement rr) {
+    @Override
+	public Lookahead look(int k, RuleRefElement rr) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookRuleRef("+k+","+rr+")");
         }
@@ -885,7 +899,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
         return p;
     }
 
-    public Lookahead look(int k, StringLiteralElement atom) {
+    @Override
+	public Lookahead look(int k, StringLiteralElement atom) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookStringLiteral("+k+","+atom+")");
         }
@@ -919,14 +934,16 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * out at run-time).  The LOOK of (a)=&gt;A B is A for LL(1)
      * ### is this even called?
      */
-    public Lookahead look(int k, SynPredBlock blk) {
+    @Override
+	public Lookahead look(int k, SynPredBlock blk) {
         if (DEBUG_ANALYZER) {
             System.out.println("look=>("+k+","+blk+")");
         }
         return blk.next.look(k);
     }
 
-    public Lookahead look(int k, TokenRangeElement r) {
+    @Override
+	public Lookahead look(int k, TokenRangeElement r) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookTokenRange("+k+","+r+")");
         }
@@ -941,7 +958,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
         return new Lookahead(p);
     }
 
-    public Lookahead look(int k, WildcardElement wc) {
+    @Override
+	public Lookahead look(int k, WildcardElement wc) {
         if (DEBUG_ANALYZER) {
             System.out.println("look(" + k + "," + wc + ")");
         }
@@ -975,7 +993,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * The (...)* element is the combined lookahead of the alternatives and what can
      *  follow the loop.
      */
-    public Lookahead look(int k, ZeroOrMoreBlock blk) {
+    @Override
+	public Lookahead look(int k, ZeroOrMoreBlock blk) {
         if (DEBUG_ANALYZER) {
             System.out.println("look*("+k+","+blk+")");
         }
@@ -995,7 +1014,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
      * Currently only look(RuleRef) calls this.  There is no need
      * for the code generator to call this.
      */
-    public Lookahead look(int k, String rule) {
+    @Override
+	public Lookahead look(int k, String rule) {
         if (DEBUG_ANALYZER) {
             System.out.println("lookRuleName("+k+","+rule+")");
         }
@@ -1019,7 +1039,7 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
         }
 
         rb.lock[k] = true;
-        Lookahead p = look(k, (RuleBlock)rb);
+        Lookahead p = look(k, rb);
         rb.lock[k] = false;
 
         // cache results
@@ -1098,7 +1118,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
     /**
      * Set the grammar for the analyzer
      */
-    public void setGrammar(Grammar g) {
+    @Override
+	public void setGrammar(Grammar g) {
         if (grammar != null) {
             reset();
         }
@@ -1109,7 +1130,8 @@ public class LLkAnalyzer implements LLkGrammarAnalyzer {
         DEBUG_ANALYZER = grammar.analyzerDebug;
     }
 
-    public boolean subruleCanBeInverted(AlternativeBlock blk, boolean forLexer) {
+    @Override
+	public boolean subruleCanBeInverted(AlternativeBlock blk, boolean forLexer) {
         if (
             blk instanceof ZeroOrMoreBlock ||
             blk instanceof OneOrMoreBlock ||

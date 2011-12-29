@@ -170,12 +170,14 @@ public class StmtVarDecl extends Statement
     }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtVarDecl(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof StmtVarDecl))
             return false;
@@ -197,13 +199,15 @@ public class StmtVarDecl extends Statement
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         // just use the first type and name.
         return types.get(0).hashCode() ^ names.get(0).hashCode();
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < types.size(); i++)

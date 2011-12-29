@@ -204,7 +204,8 @@ public class LinearAnalyzer extends EmptyStreamVisitor {
     /////////////////////////////////////
     
     /** More or less get a callback for each stream. -- see EmptyStreamVisitor. **/
-    public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+    @Override
+	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
         // short-circuit the case where we've already seen this stream
         // (for dynamic programming partitioner)
         if (streamsToLinearRepresentation.containsKey(self) || nonLinearStreams.contains(self)) {
@@ -296,7 +297,8 @@ public class LinearAnalyzer extends EmptyStreamVisitor {
             checkRep();
     }
     
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {
         // short-circuit the case where we've already seen this stream
         // (for dynamic programming partitioner)
         if (streamsToLinearRepresentation.containsKey(self) || nonLinearStreams.contains(self)) {
@@ -390,7 +392,8 @@ public class LinearAnalyzer extends EmptyStreamVisitor {
      * We combine any adjacent linear children into their own wrapper
      * pipeline and also determine a linear form for them.
      **/
-    public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
+    @Override
+	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
         // short-circuit the case where we've already seen this stream
         // (for dynamic programming partitioner)
         if (streamsToLinearRepresentation.containsKey(self) || nonLinearStreams.contains(self)) {
@@ -558,7 +561,8 @@ public class LinearAnalyzer extends EmptyStreamVisitor {
      * linear representations for all the children, then we can  combine
      * the entire split join construct into a single linear representation.
      **/
-    public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
         // short-circuit the case where we've already seen this stream
         // (for dynamic programming partitioner)
         if (streamsToLinearRepresentation.containsKey(self) || nonLinearStreams.contains(self)) {

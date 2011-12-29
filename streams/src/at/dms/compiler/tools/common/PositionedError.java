@@ -104,7 +104,8 @@ public class PositionedError extends FormattedException {
     /**
      * Returns the string explaining the error.
      */
-    public String getMessage() {
+    @Override
+	public String getMessage() {
         return where.getFile() + ":" + where.getLine() + ": " + super.getMessage();
     }
 

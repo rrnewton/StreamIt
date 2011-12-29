@@ -33,7 +33,8 @@ abstract public class Splitter extends Operator
     public Channel inputChannel = null;
     public Channel outputChannel[] = null;
 
-    public void init()
+    @Override
+	public void init()
     {}
 
     SplitJoinIter sjIter;
@@ -78,11 +79,13 @@ abstract public class Splitter extends Operator
         return totalData;
     }
     
-    public boolean canFire() {
+    @Override
+	public boolean canFire() {
         return inputChannel.myqueue.size() >= inputsNeededToFire();
     }
 
-    public void prepareToWork() {
+    @Override
+	public void prepareToWork() {
         if (!Stream.scheduledRun) {
             inputChannel.ensureData(inputsNeededToFire());
         }
@@ -90,7 +93,8 @@ abstract public class Splitter extends Operator
     }
 
     int nWork = 0;
-    public void work()
+    @Override
+	public void work()
     {
         int throughput[] =
             (sjIter != null
@@ -126,7 +130,8 @@ abstract public class Splitter extends Operator
         return true;
     }
 
-    public void connectGraph()
+    @Override
+	public void connectGraph()
     {
         // do I even have anything to do?
         if (dest.isEmpty())
@@ -185,7 +190,8 @@ abstract public class Splitter extends Operator
         addSplitter();
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return "splitter";
     }

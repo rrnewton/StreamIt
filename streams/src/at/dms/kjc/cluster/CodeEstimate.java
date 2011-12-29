@@ -214,7 +214,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
      * visits a variable definition, this increase size of locals
      */
 
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -253,7 +254,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
      * visits a method call expression
      */
 
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -276,7 +278,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
      * visits a for statement
      */
 
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -305,7 +308,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
      * visits a peek expression.
      */
 
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         super.visitPeekExpression(self, tapeType, arg);
@@ -316,7 +320,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a pop expression.
      */
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType) {
         //assert self.getNumPops() == 1: "Need support here for multiple pop"; only if have MULTIPOP_EXPR
         super.visitPopExpression(self, tapeType);
@@ -327,7 +332,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a print statement.
      */
-    public void visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression arg) {
         super.visitPrintStatement(self, arg);
         code_size += PRINT_EXPR;
@@ -337,7 +343,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a push expression.
      */
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         super.visitPushExpression(self, tapeType, arg);
@@ -369,7 +376,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits an unary plus expression
      */
-    public void visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryPlusExpression(JUnaryExpression self,
                                          JExpression expr) {
         super.visitUnaryPlusExpression(self, expr);
         code_size += UNARY_EXPR;
@@ -379,7 +387,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits an unary minus expression
      */
-    public void visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryMinusExpression(JUnaryExpression self,
                                           JExpression expr) {
         super.visitUnaryMinusExpression(self, expr);
         code_size += UNARY_EXPR;
@@ -390,7 +399,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a bitwise complement expression
      */
-    public void visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         super.visitBitwiseComplementExpression(self, expr);
@@ -402,7 +412,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a logical complement expression
      */
-    public void visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitLogicalComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         super.visitLogicalComplementExpression(self, expr);
@@ -414,7 +425,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a prefix expression
      */
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         super.visitPrefixExpression(self, oper, expr);
@@ -426,7 +438,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a postfix expression
      */
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         super.visitPostfixExpression(self, oper, expr);
@@ -438,7 +451,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a binary expression
      */
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right) {
@@ -449,7 +463,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a conditional expression
      */
-    public void visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public void visitConditionalExpression(JConditionalExpression self,
                                            JExpression cond,
                                            JExpression left,
                                            JExpression right) {
@@ -463,7 +478,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident) {
         super.visitFieldExpression(self, left, ident);
@@ -475,7 +491,8 @@ public class CodeEstimate extends SLIREmptyVisitor {
     /**
      * visits an array access expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor) {
         super.visitArrayAccessExpression(self, prefix, accessor);

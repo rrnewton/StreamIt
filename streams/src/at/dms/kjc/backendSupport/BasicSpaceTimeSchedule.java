@@ -89,7 +89,7 @@ public class BasicSpaceTimeSchedule {
      * @param is The initSchedule to set.
      */
     final public void setInitSchedule(LinkedList<Filter> is) {
-        this.initSchedule = (Filter[])is.toArray(new Filter[0]);
+        this.initSchedule = is.toArray(new Filter[0]);
     }
 
     /**

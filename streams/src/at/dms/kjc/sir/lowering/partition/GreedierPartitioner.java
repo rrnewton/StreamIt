@@ -64,7 +64,8 @@ public class GreedierPartitioner {
         this.joinersNeedTiles=joinersNeedTiles;
         //Setup pairs (of nodes) ordered by work
         pairs=new TreeMap(new Comparator() {
-                public int compare(Object o1,Object o2) {
+                @Override
+				public int compare(Object o1,Object o2) {
                     if(o1==o2)
                         return 0;
                     long work1=((Pair)o1).work;
@@ -104,7 +105,8 @@ public class GreedierPartitioner {
             });
         //Setup full list of nodes ordered by work
         nodes=new TreeMap<Node,Object>(new Comparator() {
-                public int compare(Object o1,Object o2) {
+                @Override
+				public int compare(Object o1,Object o2) {
                     if(o1==o2)
                         return 0;
                     long work1=((Node)o1).work;
@@ -138,7 +140,8 @@ public class GreedierPartitioner {
                 Node prevNode;
                 SIRContainer prevParent;
         
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     if (FusePipe.isFusable(self)) {
                         System.out.println("visitFilter, isFusable: " + self);
@@ -469,7 +472,8 @@ public class GreedierPartitioner {
 	/**
 	 * String representation. Returns filter's name.
 	 */
-        public String toString() {
+        @Override
+		public String toString() {
             return filter.getName();
         }
     }
@@ -518,7 +522,8 @@ public class GreedierPartitioner {
 	/**
 	 * String representation.
 	 */
-        public String toString() {
+        @Override
+		public String toString() {
             return "Pair(" + n1 + ", " + n2  + ")";
         }
     }

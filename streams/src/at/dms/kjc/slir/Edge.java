@@ -52,8 +52,8 @@ public abstract class Edge<S,T> {
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.slir.Edge other) {
-        other.src = (java.lang.Object)at.dms.kjc.AutoCloner.cloneToplevel(this.src);
-        other.dst = (java.lang.Object)at.dms.kjc.AutoCloner.cloneToplevel(this.dst);
+        other.src = at.dms.kjc.AutoCloner.cloneToplevel(this.src);
+        other.dst = at.dms.kjc.AutoCloner.cloneToplevel(this.dst);
     }
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

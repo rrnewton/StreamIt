@@ -42,7 +42,8 @@ public class Vector implements Cloneable {
     public int capacity() {
         return data.length;
     }
-    public Object clone() {
+    @Override
+	public Object clone() {
         Vector v=null;
         try {
             v = (Vector)super.clone();

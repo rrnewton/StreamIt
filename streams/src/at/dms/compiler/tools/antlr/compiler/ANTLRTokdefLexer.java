@@ -40,7 +40,8 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
         setCaseSensitive(true);
     }
 
-    public Token nextToken() throws TokenStreamException {
+    @Override
+	public Token nextToken() throws TokenStreamException {
         Token theRetToken=null;
         tryAgain:
         for (;;) {
@@ -117,7 +118,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                         }
                         else {
                             if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-                            else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                            else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                         }
                     }
                     if ( _returnToken==null ) { continue tryAgain; } // found SKIP token
@@ -179,7 +180,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -233,7 +234,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -483,7 +484,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                                 else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                                 }
                                 else {
-                                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                                 }
                 
                             }
@@ -491,7 +492,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -509,7 +510,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -526,7 +527,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -577,7 +578,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
             }
         default:
             {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         }
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -631,7 +632,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -700,7 +701,7 @@ public class ANTLRTokdefLexer extends at.dms.compiler.tools.antlr.runtime.CharSc
                     mDIGIT(false);
                 }
                 else {
-                    if ( _cnt40>=1 ) { break _loop40; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                    if ( _cnt40>=1 ) { break _loop40; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                 }
             
                 _cnt40++;

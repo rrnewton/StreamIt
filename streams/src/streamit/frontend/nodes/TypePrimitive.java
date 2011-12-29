@@ -95,18 +95,21 @@ public class TypePrimitive extends Type
         return type;
     }
 
-    public boolean isComplex()
+    @Override
+	public boolean isComplex()
     {
         return type == TYPE_COMPLEX;
     }
 
-    public boolean isComposite() {
+    @Override
+	public boolean isComposite() {
         return type == TYPE_FLOAT2 ||
             type == TYPE_FLOAT3 ||
             type == TYPE_FLOAT4;
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         switch (type)
             {
@@ -142,7 +145,8 @@ public class TypePrimitive extends Type
      * @param that  other type to check promotion to
      * @return      true if this can be promoted to that
      */
-    public boolean promotesTo(Type that)
+    @Override
+	public boolean promotesTo(Type that)
     {
         if (super.promotesTo(that))
             return true;
@@ -186,7 +190,8 @@ public class TypePrimitive extends Type
             }
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         // Two cases.  One, this is complex, and so is that:
         if (other instanceof Type)
@@ -204,7 +209,8 @@ public class TypePrimitive extends Type
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return new Integer(type).hashCode();
     }

@@ -56,7 +56,8 @@ public class ExprConstBoolean extends Expression
     public boolean getVal() { return val; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprConstBoolean(this);
     }

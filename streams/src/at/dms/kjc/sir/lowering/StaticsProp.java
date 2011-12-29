@@ -186,7 +186,8 @@ public class StaticsProp {
         public String getTheStatic() { return theStatic; }
         
         /** overridden equals  @see #hashCode() */
-        public boolean equals(Object o) {
+        @Override
+		public boolean equals(Object o) {
             if (o != null && o.getClass().equals(this.getClass())) {
                 StaticAndField s = (StaticAndField)o;
                 return theStatic.equals(s.theStatic) 
@@ -195,12 +196,14 @@ public class StaticsProp {
         }
         
         /** overridden hashcode  @see #equals(Object)*/
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             return theStatic.hashCode() ^ theField.hashCode();
         }
         
         /** used in debugging only. There is no commitment to this format! */
-        public String toString() { return theStatic + "." + theField; }
+        @Override
+		public String toString() { return theStatic + "." + theField; }
     }
 
 
@@ -298,7 +301,8 @@ public class StaticsProp {
             for (int j = 0; j < fs.length; j++) {
                 JFieldDeclaration f = fs[j];
                 fs[j] = (JFieldDeclaration)f.accept(new SLIRReplacingVisitor() {
-                    public Object visitFieldExpression(JFieldAccessExpression self,
+                    @Override
+					public Object visitFieldExpression(JFieldAccessExpression self,
                             JExpression left, String fieldIdent) {
                         JFieldAccessExpression f1 = 
                             (JFieldAccessExpression)super.visitFieldExpression(self,left,fieldIdent);
@@ -309,7 +313,8 @@ public class StaticsProp {
                         }
                         return f1;
                     }
-                    public Object visitNameExpression(JNameExpression self, JExpression left, String ident) {
+                    @Override
+					public Object visitNameExpression(JNameExpression self, JExpression left, String ident) {
                         JNameExpression f1 = (JNameExpression)super.visitNameExpression(self,left, ident);
                         if (left == null || left instanceof JThisExpression) {
                             JFieldAccessExpression f2 = 
@@ -364,7 +369,8 @@ public class StaticsProp {
     /** Specialize stream walker to maintain this.currentStreamIdent
      * so that the FindStaticsInStr visitor can record stream names */
     private class MyIter extends IterOverAllFieldsAndMethods {
-        protected boolean preVisit(SIRStream str) {
+        @Override
+		protected boolean preVisit(SIRStream str) {
             // an ugly way to make the stream ident available to
             // private class FindStaticsInStr, via field in common
             // outer class.
@@ -380,7 +386,8 @@ public class StaticsProp {
     private class FindStaticsInStr extends SLIREmptyAttributeVisitor {
         // All other visits just walk the SIR abstract syntax tree,
         // We need to look at JFieldAccessExpression content.
-        public Object visitFieldExpression(JFieldAccessExpression self,
+        @Override
+		public Object visitFieldExpression(JFieldAccessExpression self,
                                          JExpression left, String fieldIdent) {
             super.visitFieldExpression(self,left,fieldIdent);
             if (left instanceof JTypeNameExpression) {
@@ -462,7 +469,8 @@ public class StaticsProp {
         
         methods[0].accept(new KjcEmptyVisitor() {
 
-            public void visitExpressionStatement(JExpressionStatement self,
+            @Override
+			public void visitExpressionStatement(JExpressionStatement self,
                                                  JExpression expr) {
                 isUsefulAssignment[0] = false;
                 super.visitExpressionStatement(self,expr);
@@ -470,7 +478,8 @@ public class StaticsProp {
                     fsAssignments.addLast(self);
                 }
             }
-            public void visitAssignmentExpression(JAssignmentExpression self,
+            @Override
+			public void visitAssignmentExpression(JAssignmentExpression self,
                                                   JExpression left, 
                                                   JExpression right) {
                 super.visitAssignmentExpression(self, left, right);
@@ -519,7 +528,8 @@ public class StaticsProp {
     private void propagateIntoStreams(SIRStream str) {
         IterFactory.createFactory().createIter(str).accept(
             new EmptyStreamVisitor() {
-                public void postVisitStream(SIRStream self,
+                @Override
+				public void postVisitStream(SIRStream self,
                         SIRIterator iter) {
                     String streamIdent = self.getIdent();
                     Set<StaticAndField> toPropagate = 
@@ -545,7 +555,7 @@ public class StaticsProp {
                             JFieldDeclaration newDecl = 
                                 (JFieldDeclaration) ObjectDeepCloner
                                 .deepCopy(
-                                        (JFieldDeclaration)staticNameToFields.get(sf));
+                                        staticNameToFields.get(sf));
                             LinkedList<JStatement> newAssignments = 
                                 new LinkedList<JStatement>();
                             List<JStatement> oldAssignments = 
@@ -668,7 +678,8 @@ public class StaticsProp {
 
         for (Iterator it = theCode.iterator(); it.hasNext();) {
             ((JStatement)it.next()).accept(new KjcEmptyVisitor() {
-                public void visitFieldExpression(JFieldAccessExpression self,
+                @Override
+				public void visitFieldExpression(JFieldAccessExpression self,
                                                  JExpression left, 
                                                  String ident) {
                     super.visitFieldExpression(self,left,ident);
@@ -685,7 +696,8 @@ public class StaticsProp {
         
         // change to newFieldName in field declaration.
         theDecl.accept(new KjcEmptyVisitor() {
-                public void visitFieldDeclaration(JFieldDeclaration self, 
+                @Override
+				public void visitFieldDeclaration(JFieldDeclaration self, 
                                                   int modifiers, 
                                                   CType type, 
                                                   String ident, 
@@ -752,7 +764,8 @@ public class StaticsProp {
             final Map<StaticAndField,String>namesInStream) {
         ReplacingVisitor visitor = new SLIRReplacingVisitor() {
             // need to change JFieldAccessExpression
-            public Object visitFieldExpression(JFieldAccessExpression self,
+            @Override
+			public Object visitFieldExpression(JFieldAccessExpression self,
                     JExpression left, 
                     String ident) {
                 if (left instanceof JTypeNameExpression) {
@@ -859,7 +872,8 @@ public class StaticsProp {
             IterFactory.createFactory().createIter(str).
                 accept(new EmptyStreamVisitor() {
 
-                    public void preVisitStream(SIRStream self,
+                    @Override
+					public void preVisitStream(SIRStream self,
                             SIRIterator iter) {
                         if (preVisit(self)) {
                             iterOverFieldsAndMethods(self,_doFields,
@@ -1114,7 +1128,8 @@ public class StaticsProp {
 //                }
 
                 // make all field acesses reference the base name.
-                public void visitFieldExpression(JFieldAccessExpression self,
+                @Override
+				public void visitFieldExpression(JFieldAccessExpression self,
                         JExpression left,
                         String ident) {
                     super.visitFieldExpression(self,left,ident);

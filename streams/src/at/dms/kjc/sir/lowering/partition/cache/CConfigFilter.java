@@ -38,20 +38,24 @@ class CConfigFilter extends CConfig {
         fusion_info = new FusionInfo(work_estimate+penalty, work_estimate, code_size, data_size, filter.getPopInt(), filter.getPeekInt(), filter.getPushInt(), input, output);  
     }
 
-    public boolean getPeek() {
+    @Override
+	public boolean getPeek() {
         return filter.getPeekInt() > filter.getPopInt();
     }
 
 
-    public int numberOfTiles() {
+    @Override
+	public int numberOfTiles() {
         return 1;
     }
 
-    public FusionInfo getFusionInfo() {
+    @Override
+	public FusionInfo getFusionInfo() {
         return fusion_info;
     }
 
-    public CCost get(int tileLimit) {
+    @Override
+	public CCost get(int tileLimit) {
         return getFusionInfo().getCost();
     }
 
@@ -69,8 +73,8 @@ class CConfigFilter extends CConfig {
         // fuse with anyone else.  We don't want all containers of
         // this filter to have a high cost just because this guy
         // exceeded the icode limit.
-        if (iCodeSize>partitioner.getCodeCacheSize()) {
-            iCodeSize = partitioner.getCodeCacheSize();
+        if (iCodeSize>CachePartitioner.getCodeCacheSize()) {
+            iCodeSize = CachePartitioner.getCodeCacheSize();
         }
         return iCodeSize;
     }
@@ -83,12 +87,14 @@ class CConfigFilter extends CConfig {
     /**
      * Add this to the map and return.
      */
-    public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, SIRStream str) {
+    @Override
+	public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, SIRStream str) {
         curPartition.add(filter, partitioner.getWorkEstimate().getWork(filter));
         return filter;
     }
 
-    public void printArray(int numTiles) {
+    @Override
+	public void printArray(int numTiles) {
         System.err.println("Filter cost");
     }
 

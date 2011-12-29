@@ -213,7 +213,7 @@ class BasicBlock extends AbstractInstructionAccessor implements AccessorContaine
         QNode   last = getLastNode();
 
         if (last != null && last.isJump()) {
-            BasicBlock  target = (BasicBlock)last.getJump().getTarget();
+            BasicBlock  target = last.getJump().getTarget();
 
             seq.plantBasicBlock(target, last.getInstruction().getJump(), getTransition(target));
         } else if (last != null && last.isSwitch()) {
@@ -231,7 +231,7 @@ class BasicBlock extends AbstractInstructionAccessor implements AccessorContaine
         InstructionHandle   last = insns[insns.length - 1];
 
         if (last.isJump()) {
-            InstructionHandle   target = (InstructionHandle)last.getTarget();
+            InstructionHandle   target = last.getTarget();
             BasicBlock  block = ControlFlow.findBasicBlock(target);
 
             last.getJump().setTarget(block);
@@ -270,7 +270,8 @@ class BasicBlock extends AbstractInstructionAccessor implements AccessorContaine
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "BasicBlock " + pos;
     }
 
@@ -324,7 +325,7 @@ class BasicBlock extends AbstractInstructionAccessor implements AccessorContaine
             successors[--count] = next;
         }
         if (last != null && last.isJump()) {
-            successors[--count] = (BasicBlock)last.getJump().getTarget();
+            successors[--count] = last.getJump().getTarget();
         } else if (last != null && last.isSwitch()) {
             SwitchInstruction   insn = (SwitchInstruction)last.getInstruction().getInstruction();
 
@@ -353,7 +354,8 @@ class BasicBlock extends AbstractInstructionAccessor implements AccessorContaine
      * Transforms the accessors contained in this class.
      * @param   transformer     the transformer used to transform accessors
      */
-    public void transformAccessors(AccessorTransformer transformer)
+    @Override
+	public void transformAccessors(AccessorTransformer transformer)
         throws BadAccessorException
     {
     }

@@ -151,21 +151,24 @@ public abstract class TapeBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#getSource()
      */
-    public int getSource() {
+    @Override
+	public int getSource() {
         return src;
     }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#getDest()
      */
-    public int getDest() {
+    @Override
+	public int getDest() {
         return dst;
     }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#getType()
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return type;
     }
 
@@ -173,7 +176,8 @@ public abstract class TapeBase implements Tape {
      * get name of push(val) routine for upstream end of tape.
      * @return
      */
-    public String getPushName() {
+    @Override
+	public String getPushName() {
         return push_name;
     }
     
@@ -181,7 +185,8 @@ public abstract class TapeBase implements Tape {
      * get name of pop() routine for downstream end of tape.
      * @return
      */
-     public String getPopName() {
+     @Override
+	public String getPopName() {
         return pop_name;
     }
 
@@ -189,71 +194,84 @@ public abstract class TapeBase implements Tape {
       * get name of peek(int) routine for downstream end of tape.
       * @return
       */
-    public String getPeekName() {
+    @Override
+	public String getPeekName() {
         return peek_name;
     }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#dataDeclarationH(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String dataDeclarationH();
+    @Override
+	public abstract String dataDeclarationH();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#dataDeclaration(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String dataDeclaration();
+    @Override
+	public abstract String dataDeclaration();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#downstreamDeclarationExtern(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String downstreamDeclarationExtern();
+    @Override
+	public abstract String downstreamDeclarationExtern();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#downstreamDeclaration(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String downstreamDeclaration();
+    @Override
+	public abstract String downstreamDeclaration();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#upstreamDeclarationExtern(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String upstreamDeclarationExtern();
+    @Override
+	public abstract String upstreamDeclarationExtern();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#upstreamDeclaration(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String upstreamDeclaration();
+    @Override
+	public abstract String upstreamDeclaration();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#topOfWorkIteration(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String topOfWorkIteration();
+    @Override
+	public abstract String topOfWorkIteration();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#upstreamCleanup()
      */
-    public abstract String upstreamCleanup();
+    @Override
+	public abstract String upstreamCleanup();
     
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#downstreamCleanup()
      */
-    public abstract String downstreamCleanup();
+    @Override
+	public abstract String downstreamCleanup();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushPrefix(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String pushPrefix();
+    @Override
+	public abstract String pushPrefix();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushSuffix(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String pushSuffix();
+    @Override
+	public abstract String pushSuffix();
 
 
     /* Override if can actually push many items at once.
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushManyItems(java.lang.String, int, int)
      */
-    public String pushManyItems(String sourceBuffer, int sourceOffset, int numItems) {
+    @Override
+	public String pushManyItems(String sourceBuffer, int sourceOffset, int numItems) {
         StringBuffer s = new StringBuffer();
         for (int y = 0; y < numItems; y++) {
             s.append(pushPrefix() + sourceBuffer + "[" + (sourceOffset+y) + "]" + pushSuffix() + ";");
@@ -265,7 +283,8 @@ public abstract class TapeBase implements Tape {
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#popManyItems(java.lang.String, int, int)
      */
-    public String popManyItems(String destBuffer, int destOffset, int numItems) {
+    @Override
+	public String popManyItems(String destBuffer, int destOffset, int numItems) {
         StringBuffer s = new StringBuffer();
         for (int y = 0; y < numItems; y++) {
             s.append("    "+ destBuffer + "[" + (destOffset+y) + "] = " + popExpr() + ";\n");
@@ -274,50 +293,62 @@ public abstract class TapeBase implements Tape {
     }
 
 
-    public abstract String assignPopToVar(String varName);
+    @Override
+	public abstract String assignPopToVar(String varName);
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#popExpr(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String popExpr();
+    @Override
+	public abstract String popExpr();
 
-    public abstract String popExprNoCleanup();
+    @Override
+	public abstract String popExprNoCleanup();
     
-    public abstract String popExprCleanup();
+    @Override
+	public abstract String popExprCleanup();
     
    /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#popNPrefix(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String popNStmt(int N);
+    @Override
+	public abstract String popNStmt(int N);
 
-    public abstract String assignPeekToVar(String varName, String offset);
+    @Override
+	public abstract String assignPeekToVar(String varName, String offset);
    /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#peekPrefix(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String peekPrefix();
+    @Override
+	public abstract String peekPrefix();
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#peekSuffix(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public abstract String peekSuffix(); 
+    @Override
+	public abstract String peekSuffix(); 
     /*
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushbackInit(int)
      */
-    public abstract String pushbackInit(int NumberToPush);
+    @Override
+	public abstract String pushbackInit(int NumberToPush);
     /*
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushbackPrefix()
      */
-    public abstract String pushbackPrefix();
+    @Override
+	public abstract String pushbackPrefix();
     /*
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushbackSuffix()
      */
-    public abstract String pushbackSuffix();
+    @Override
+	public abstract String pushbackSuffix();
     /*
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushbackCleanup()
      */
-    public abstract String pushbackCleanup();
+    @Override
+	public abstract String pushbackCleanup();
 
 }

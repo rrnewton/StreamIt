@@ -36,7 +36,8 @@ public class OptgenOptions extends at.dms.util.Options {
   }
   public static String release = null;
 
-  public boolean processOption(int code, Getopt g) {
+  @Override
+public boolean processOption(int code, Getopt g) {
     switch (code) {
     case 'r':
       release = getString(g, ""); return true;
@@ -45,7 +46,8 @@ public class OptgenOptions extends at.dms.util.Options {
     }
   }
 
-  public String[] getOptions() {
+  @Override
+public String[] getOptions() {
     String[]   parent = super.getOptions();
     String[]   total = new String[parent.length + 1];
     System.arraycopy(parent, 0, total, 0, parent.length);
@@ -55,22 +57,26 @@ public class OptgenOptions extends at.dms.util.Options {
   }
 
 
-  public String getShortOptions() {
+  @Override
+public String getShortOptions() {
     return "r:" + super.getShortOptions();
   }
 
 
-  public void version() {
+  @Override
+public void version() {
     System.out.println();
   }
 
 
-  public void usage() {
+  @Override
+public void usage() {
     System.err.println("usage: at.dms.optgen.Main [option]* [--help] <file>+");
   }
 
 
-  public void help() {
+  @Override
+public void help() {
     System.err.println("usage: at.dms.optgen.Main [option]* [--help] <file>+");
     printOptions();
     System.err.println();
@@ -80,7 +86,8 @@ public class OptgenOptions extends at.dms.util.Options {
     System.err.println("For more info, please see: http://www.dms.at/kopi");
   }
 
-  public LongOpt[] getLongOptions() {
+  @Override
+public LongOpt[] getLongOptions() {
     LongOpt[]  parent = super.getLongOptions();
     LongOpt[]  total = new LongOpt[parent.length + LONGOPTS.length];
     

@@ -70,7 +70,8 @@ public class GrammarFile {
     }
     public void addHeaderAction(String a) {headerAction+=a+System.getProperty("line.separator");}
     public void setOptions(IndexedVector o) {options=o;}
-    public String toString() {
+    @Override
+	public String toString() {
         String h = headerAction==null ? "" : headerAction;
         String o = options==null ? "" : Hierarchy.optionsToString(options);
 

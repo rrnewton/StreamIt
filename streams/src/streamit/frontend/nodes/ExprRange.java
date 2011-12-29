@@ -71,12 +71,14 @@ public class ExprRange extends Expression
     }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprRange(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprRange))
             return false;
@@ -90,14 +92,16 @@ public class ExprRange extends Expression
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         // following the pattern in the integer constants -- constants
         // of the same value have the same hashcode
         return min.hashCode() * ave.hashCode() * max.hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return "[" + min + "," + ave + "," + max + "]";
     }

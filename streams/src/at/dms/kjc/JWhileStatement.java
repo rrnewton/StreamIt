@@ -64,7 +64,8 @@ public class JWhileStatement extends JLoopStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         try {
             CLoopContext    condContext = new CLoopContext(context, this);
             cond = cond.analyse(new CExpressionContext(condContext));
@@ -116,7 +117,8 @@ public class JWhileStatement extends JLoopStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitWhileStatement(this, cond, body);
     }
@@ -125,7 +127,8 @@ public class JWhileStatement extends JLoopStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitWhileStatement(this, cond, body);
     }
 
@@ -134,7 +137,8 @@ public class JWhileStatement extends JLoopStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         code.pushContext(this);
@@ -188,7 +192,8 @@ public class JWhileStatement extends JLoopStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JWhileStatement other = new at.dms.kjc.JWhileStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

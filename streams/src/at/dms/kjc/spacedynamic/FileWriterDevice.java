@@ -49,7 +49,8 @@ public class FileWriterDevice extends IODevice {
             return fileWriter.getInputType();
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "File Writer (" + getFileName() + ")";
     }
 

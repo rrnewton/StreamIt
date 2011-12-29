@@ -741,7 +741,8 @@ public class LinearFilterRepresentation {
         return true;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
 
         String retString = new String( "\n Matrix A:\n" + A + 
                                        "\n Matrix B:\n" + B + 

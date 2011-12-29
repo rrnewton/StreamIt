@@ -55,7 +55,8 @@ public class LowerWorkFunctions implements StreamVisitor
                             (LoweringConstants.getStreamContext()));
         // prepend exit nodes before any return statements, too
         method.accept(new SLIRReplacingVisitor() {
-                public Object visitReturnStatement(JReturnStatement self,
+                @Override
+				public Object visitReturnStatement(JReturnStatement self,
                                                    JExpression expr)
                 {
                     JStatement[] stmts = new JStatement[2];
@@ -70,7 +71,8 @@ public class LowerWorkFunctions implements StreamVisitor
     private void removeStructureNew(JMethodDeclaration method)
     {
         method.accept(new SLIRReplacingVisitor() {
-                public Object visitExpressionStatement(JExpressionStatement self,
+                @Override
+				public Object visitExpressionStatement(JExpressionStatement self,
                                                        JExpression expr)
                 {
                     if (!(expr instanceof JAssignmentExpression))
@@ -90,13 +92,15 @@ public class LowerWorkFunctions implements StreamVisitor
      */
     
     /* visit a filter */
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
         doGeneralFilter(self);
     }
 
     /* visit a phased filter */
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         doGeneralFilter(self);
     }
@@ -116,7 +120,7 @@ public class LowerWorkFunctions implements StreamVisitor
         // current limitation: DeadCode only works for plain
         // SIRFilters, not SIRPhasedFilters
         if (self instanceof SIRFilter) {
-            DeadCodeElimination.doit((SIRFilter)self);
+            DeadCodeElimination.doit(self);
         }
 
         addEntryExits(self);
@@ -135,13 +139,16 @@ public class LowerWorkFunctions implements StreamVisitor
             JMethodDeclaration method = self.getMethods()[i];
             final boolean[] IO = { false };
             method.accept(new SLIREmptyVisitor() {
-                    public void visitPopExpression(SIRPopExpression self, CType tapeType) {
+                    @Override
+					public void visitPopExpression(SIRPopExpression self, CType tapeType) {
                         IO[0] = true;
                     }
-                    public void visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
+                    @Override
+					public void visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
                         IO[0] = true;
                     }
-                    public void visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
+                    @Override
+					public void visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
                         IO[0] = true;
                     }
                 });
@@ -160,19 +167,22 @@ public class LowerWorkFunctions implements StreamVisitor
      */
         
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self,
+    @Override
+	public void preVisitPipeline(SIRPipeline self,
                                  SIRPipelineIter iter) {
         removeStructureNew(self.getInit());
     }
   
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter) {
         removeStructureNew(self.getInit());
     }
   
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
         removeStructureNew(self.getInit());
     }
@@ -182,17 +192,20 @@ public class LowerWorkFunctions implements StreamVisitor
      */
 
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self,
+    @Override
+	public void postVisitPipeline(SIRPipeline self,
                                   SIRPipelineIter iter) { 
     }
   
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
     }
   
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
     }
 }

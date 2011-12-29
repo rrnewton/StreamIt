@@ -1,5 +1,6 @@
 package at.dms.kjc.sir.lowering;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JExpression;
@@ -116,9 +117,9 @@ public class LoweringConstants {
         getInterfaceTableVariable(JExpression initializer) {
         return new JVariableDefinition(/* tokref */ null,
                                        /* modifiers - emulate a constant */
-                                       at.dms.kjc.Constants.ACC_PUBLIC |
-                                       at.dms.kjc.Constants.ACC_STATIC | 
-                                       at.dms.kjc.Constants.ACC_FINAL,
+                                       Constants.ACC_PUBLIC |
+                                       Constants.ACC_STATIC | 
+                                       Constants.ACC_FINAL,
                                        /* type--doesn't matter, so try void */ 
                                        CStdType.Void,
                                        /* ident - number them */
@@ -185,8 +186,7 @@ public class LoweringConstants {
         // define a variable
         JVariableDefinition var = 
             new JVariableDefinition(/* tokenref */ null, 
-                                    /* modifiers */ at.dms.kjc.
-                                    Constants.ACC_PUBLIC,
+                                    /* modifiers */ Constants.ACC_PUBLIC,
                                     /* type */ CClassType.lookup(
                                                                  CONTEXT_TYPE_NAME),
                                     /* identifier  */ CONTEXT_VAR_NAME,
@@ -219,8 +219,7 @@ public class LoweringConstants {
         // define a variable
         JVariableDefinition var = 
             new JVariableDefinition(/* tokenref */ null, 
-                                    /* modifiers */ at.dms.kjc.
-                                    Constants.ACC_PUBLIC,
+                                    /* modifiers */ Constants.ACC_PUBLIC,
                                     /* type */ CClassType.lookup(
                                                                  TAPE_TYPE_NAME),
                                     /* identifier  */ name,

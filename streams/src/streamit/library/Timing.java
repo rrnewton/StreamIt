@@ -105,7 +105,8 @@ public class Timing {
         // sort the entries by decreasing amount of work done
         List entryList = new ArrayList(typeToElapsed.entrySet());
         Collections.sort(entryList, new Comparator() {
-                public int compare(Object o1, Object o2) {
+                @Override
+				public int compare(Object o1, Object o2) {
                     Map.Entry e1 = (Map.Entry) o1;
                     Map.Entry e2 = (Map.Entry) o2;
                     Comparable c1 = (Comparable)e1.getValue();
@@ -126,11 +127,11 @@ public class Timing {
 
                 // format nicely -- e.g., "Saturation: 25.05%"
                 String shortName = type.substring(type.lastIndexOf(" ")+1);
-                double percentTime = 100.0* (double)value / (double)totalElapsedTime;
+                double percentTime = 100.0* (double)value / totalElapsedTime;
                 // make sure "percentTime" includes a decimal point
                 percentTime += 0.00000001;
                 String longTime = "" + percentTime;
-                String shortTime = longTime.substring(0, (int)Math.min(longTime.indexOf(".")+3,
+                String shortTime = longTime.substring(0, Math.min(longTime.indexOf(".")+3,
                                                                        longTime.length()-1));
                 
                 out.println(shortName + ": " + shortTime + "%");

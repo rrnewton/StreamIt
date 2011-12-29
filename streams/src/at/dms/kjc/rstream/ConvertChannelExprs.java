@@ -59,7 +59,8 @@ public class ConvertChannelExprs extends SLIRReplacingVisitor {
     /** 
      * visit a pop expression, converting the expression to a buffer access 
      **/
-    public Object visitPopExpression(SIRPopExpression self,
+    @Override
+	public Object visitPopExpression(SIRPopExpression self,
                                      CType tapeType) {
     
         // build ref to pop array
@@ -79,7 +80,8 @@ public class ConvertChannelExprs extends SLIRReplacingVisitor {
     /** 
      * visit a pop expression, converting the expression to a buffer access 
      **/
-    public Object visitPeekExpression(SIRPeekExpression oldSelf,
+    @Override
+	public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                       CType oldTapeType,
                                       JExpression oldArg) {
 
@@ -109,7 +111,8 @@ public class ConvertChannelExprs extends SLIRReplacingVisitor {
     /** 
      * visit a push expression, converting the expression to a buffer write
      **/
-    public Object visitPushExpression(SIRPushExpression oldSelf,
+    @Override
+	public Object visitPushExpression(SIRPushExpression oldSelf,
                                       CType oldTapeType,
                                       JExpression oldArg) {
         // do the super

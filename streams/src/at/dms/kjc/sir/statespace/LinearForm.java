@@ -262,7 +262,8 @@ public class LinearForm {
     
 
     /** Returns true if this object is equal in value to this linear form. **/
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (o == null) {return false;}
         if (!(o instanceof LinearForm)) {return false;}
         LinearForm other = (LinearForm)o;
@@ -272,12 +273,14 @@ public class LinearForm {
     }
 
     /** Preserve equals() semantics. **/
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return 1;
     }
 
     /** Pretty print this linear form. **/
-    public String toString() {
+    @Override
+	public String toString() {
         return ("Linear Form: (" +
                 this.v.toString() +
                 " + " + this.w.toString() + ")");

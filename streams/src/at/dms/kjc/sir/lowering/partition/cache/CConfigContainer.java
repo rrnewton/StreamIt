@@ -49,7 +49,8 @@ abstract class CConfigContainer extends CConfig {
      * Return the bottleneck work if this config is fit on <pre>tileLimit</pre>
      * tiles.
      */
-    protected CCost get(int tileLimit) {
+    @Override
+	protected CCost get(int tileLimit) {
         // make sure our array is big enough
         expandCostArray(tileLimit);
 
@@ -105,7 +106,8 @@ abstract class CConfigContainer extends CConfig {
     /**
      * Traceback function.
      */
-    public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, SIRStream str) {
+    @Override
+	public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, SIRStream str) {
         SIRStream result = traceback(partitions, curPartition, 0, cont.size()-1, tileLimit, str);
         // if the whole container is assigned to one tile, record it
         // as such.
@@ -281,7 +283,8 @@ abstract class CConfigContainer extends CConfig {
      */
     protected abstract CCost fusionOverhead();
 
-    public void printArray(int numTiles) {
+    @Override
+	public void printArray(int numTiles) {
         for (int i=0; i<cont.size(); i++) {
             for (int j=0; j<cont.size(); j++) {
                 for (int k=0; k<numTiles; k++) {

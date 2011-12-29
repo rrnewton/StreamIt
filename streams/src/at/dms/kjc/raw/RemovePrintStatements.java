@@ -15,7 +15,8 @@ public class RemovePrintStatements implements FlatVisitor {
         top.accept(new RemovePrintStatements(), null, true);
     }
     
-    public void visitNode(FlatNode node) {
+    @Override
+	public void visitNode(FlatNode node) {
         if (node.isFilter()) {
             SIRFilter filter = (SIRFilter)node.contents;
             for (int i = 0; i < filter.getMethods().length; i++)
@@ -26,7 +27,8 @@ public class RemovePrintStatements implements FlatVisitor {
     static class RemovePrintStatementsHelper extends SLIRReplacingVisitor {
 
 
-        public Object visitPrintStatement(SIRPrintStatement oldself,
+        @Override
+		public Object visitPrintStatement(SIRPrintStatement oldself,
                                           JExpression exp) {
 
             SIRPrintStatement self = (SIRPrintStatement)

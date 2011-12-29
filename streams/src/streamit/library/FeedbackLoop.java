@@ -397,7 +397,8 @@ public class FeedbackLoop extends Stream
     public Joiner getJoiner () { return joiner; }
 
 
-    public Stream getChild(int nChild)
+    @Override
+	public Stream getChild(int nChild)
     {
         if (nChild == 0) return getBody ();
         if (nChild == 0) return getLoop ();
@@ -475,13 +476,15 @@ public class FeedbackLoop extends Stream
     }
 
     // not used here!
-    public void add(Stream s)
+    @Override
+	public void add(Stream s)
     {
         throw new UnsupportedOperationException();
     }
 
     // connect all the elements of this FeedbackLoop
-    public void connectGraph ()
+    @Override
+	public void connectGraph ()
     {
         // make sure that I have the minimal elements to construct this loop
         assert joiner != null;
@@ -795,7 +798,8 @@ public class FeedbackLoop extends Stream
     // This code constructs an independent graph for the scheduler
     // ----------------------------------------------------------------
 
-    void setupBufferLengths (Scheduler buffers)
+    @Override
+	void setupBufferLengths (Scheduler buffers)
     {
         // some of these asserts are restrictions on functionality
         // of this function and not on what a correct streamit structure would
@@ -816,24 +820,24 @@ public class FeedbackLoop extends Stream
 
         // between joiner and body
         s = buffers.getBufferSizeBetween (new Iterator(this), new Iterator(body));
-        StreamIt.totalBuffer += s;
+        Stream.totalBuffer += s;
         joiner.getIOField("outputChannel", 0).makePassThrough ();
         body.getInputChannel ().setChannelSize (s);
 
         // between body and splitter
         s = buffers.getBufferSizeBetween (new Iterator(body), new Iterator(this));
-        StreamIt.totalBuffer += s;
+        Stream.totalBuffer += s;
         splitter.getIOField("inputChannel", 0).setChannelSize (s);
         body.getOutputChannel ().makePassThrough ();
 
         // between splitter and loop
         s = buffers.getBufferSizeBetween (new Iterator(this), new Iterator(loop));
-        StreamIt.totalBuffer += s;
+        Stream.totalBuffer += s;
         loop.getInputChannel ().setChannelSize (s);
 
         // between loop and joiner
         s = buffers.getBufferSizeBetween (new Iterator(loop), new Iterator(this));
-        StreamIt.totalBuffer += s;
+        Stream.totalBuffer += s;
         loop.getOutputChannel ().setChannelSize (s);
 
         // make sure that the input/output channels push data through right away:

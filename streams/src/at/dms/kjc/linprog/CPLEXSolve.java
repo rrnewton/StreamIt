@@ -119,7 +119,8 @@ public class CPLEXSolve extends SimpleLinearProgram implements LinearProgramSolv
      * Solve the program and return the value of the the variables
      * (indices 0...numVars-1) in the optimum.
      */
-    public double[] solve() throws LPSolverFailedException {
+    @Override
+	public double[] solve() throws LPSolverFailedException {
         // setup model
         ModelAndVars mv = null;
         try {
@@ -222,7 +223,8 @@ public class CPLEXSolve extends SimpleLinearProgram implements LinearProgramSolv
             this.obj = -1;
         }
 
-        protected void main() {
+        @Override
+		protected void main() {
             // if we haven't found a solution, keep looking
             if (!hasIncumbent()) {
                 return;

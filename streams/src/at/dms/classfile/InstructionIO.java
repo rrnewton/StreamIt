@@ -504,7 +504,8 @@ public class InstructionIO implements Constants {
      */
     private void resolveReferences() throws ClassFileFormatException {
         AccessorTransformer transformer = new AccessorTransformer() {
-                public InstructionAccessor transform(InstructionAccessor accessor,
+                @Override
+				public InstructionAccessor transform(InstructionAccessor accessor,
                                                      AccessorContainer container)
                     throws BadAccessorException
                 {

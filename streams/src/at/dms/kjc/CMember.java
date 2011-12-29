@@ -231,7 +231,8 @@ public class CMember extends at.dms.util.Utils implements Constants {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CMember other = new at.dms.kjc.CMember();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

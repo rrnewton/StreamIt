@@ -66,7 +66,8 @@ public class StructureIncludeFile {
             // horrible mess for getting typedefs for all vector types in program into vectorTypeDefs
             final Set<String> vectorTypeDefs = new HashSet<String>();
             sg.getTopLevel().accept(new StreamGraphVisitor(){
-                public void visitStaticStreamGraph(StaticStreamGraph ssg) {
+                @Override
+				public void visitStaticStreamGraph(StaticStreamGraph ssg) {
                     for (FlatNode fn : ssg.getFlatNodes()) {
                         if (fn.isFilter()) {
                             SIRFilter filter = (SIRFilter)fn.contents;

@@ -40,7 +40,8 @@ public class ConvertLocalsToFields {
      */
     public static void doit(SIRStream str) {
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     convertFilter(self);
                 }
@@ -62,7 +63,8 @@ public class ConvertLocalsToFields {
             filter.getMethods()[i].accept(new SLIRReplacingVisitor() {
 
                     // variable definitions get replaced by initializations
-                    public Object visitVariableDefinition(JVariableDefinition self,
+                    @Override
+					public Object visitVariableDefinition(JVariableDefinition self,
                                                           int modifiers,
                                                           CType type,
                                                           String ident,
@@ -85,7 +87,8 @@ public class ConvertLocalsToFields {
                     }
 
                     // variable references get replaced by field references
-                    public Object visitLocalVariableExpression(JLocalVariableExpression self,
+                    @Override
+					public Object visitLocalVariableExpression(JLocalVariableExpression self,
                                                                String ident) {
                         if (locals.contains(self.getVariable())) {
                             JFieldAccessExpression field = new JFieldAccessExpression(self.getIdent());

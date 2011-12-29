@@ -30,7 +30,8 @@ public class StreamFactory
     extends DestroyedClass
     implements streamit.scheduler2.base.StreamFactory
 {
-    public StreamInterface newFrom(Iterator streamIter, Iterator parent)
+    @Override
+	public StreamInterface newFrom(Iterator streamIter, Iterator parent)
     {
         if (streamIter.isFilter() != null)
             {
@@ -56,5 +57,6 @@ public class StreamFactory
         return null;
     }
 
-    public boolean needsSchedule() { return true; }
+    @Override
+	public boolean needsSchedule() { return true; }
 }

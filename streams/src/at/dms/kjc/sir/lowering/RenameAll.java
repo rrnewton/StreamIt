@@ -113,7 +113,8 @@ public class RenameAll extends SLIRReplacingVisitor
      */
     public static void expandFunctionNames(SIRStream str) {
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     // name to append to methods
                     String filterName = self.getName();
@@ -165,7 +166,8 @@ public class RenameAll extends SLIRReplacingVisitor
         // name the stream structure
         IterFactory.createFactory().createIter(toplevel).accept(new EmptyStreamVisitor() {
                 /* visit a filter */
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     //RenameAll.renameFilterContents(self);
                     SIRFilter f2 = RenameAll.globalRenamer.renameFilter(self);
@@ -186,7 +188,8 @@ public class RenameAll extends SLIRReplacingVisitor
         // name the stream structure
         IterFactory.createFactory().createIter(toplevel).accept(new EmptyStreamVisitor() {
                 /* visit a filter */
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     RenameAll.renameFilterContents(self);
                 }
@@ -310,7 +313,8 @@ public class RenameAll extends SLIRReplacingVisitor
             }
     }
 
-    public Object visitBlockStatement(JBlock self, JavaStyleComment[] comments)
+    @Override
+	public Object visitBlockStatement(JBlock self, JavaStyleComment[] comments)
     {
         RASymbolTable ost = symtab;
         symtab = new RASymbolTable(ost);
@@ -324,7 +328,8 @@ public class RenameAll extends SLIRReplacingVisitor
         return new JBlock(self.getTokenReference(), newstmts, comments);
     }
 
-    public Object visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public Object visitFieldDeclaration(JFieldDeclaration self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -338,7 +343,8 @@ public class RenameAll extends SLIRReplacingVisitor
                                      null);
     }
 
-    public Object visitFormalParameters(JFormalParameter self,
+    @Override
+	public Object visitFormalParameters(JFormalParameter self,
                                         boolean isFinal,
                                         CType type,
                                         String ident)
@@ -367,7 +373,8 @@ public class RenameAll extends SLIRReplacingVisitor
       return self;
       }*/
     
-    public Object visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public Object visitVariableDefinition(JVariableDefinition self,
                                           int modifiers,
                                           CType type,
                                           java.lang.String ident,
@@ -393,7 +400,8 @@ public class RenameAll extends SLIRReplacingVisitor
         return self;
     }
 
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -411,7 +419,8 @@ public class RenameAll extends SLIRReplacingVisitor
 
     // Hmm.  Are there anonymous creations at this point?  Ignore for now.
 
-    public Object visitNameExpression(JNameExpression self,
+    @Override
+	public Object visitNameExpression(JNameExpression self,
                                       JExpression prefix,
                                       String ident)
     {
@@ -420,7 +429,8 @@ public class RenameAll extends SLIRReplacingVisitor
                                    symtab.nameFor(ident));
     }
 
-    public Object visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public Object visitMethodCallExpression(JMethodCallExpression self,
                                             JExpression prefix,
                                             String ident,
                                             JExpression[] args)
@@ -445,7 +455,8 @@ public class RenameAll extends SLIRReplacingVisitor
         return retval;
     }
 
-    public Object visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public Object visitMethodDeclaration(JMethodDeclaration self,
                                          int modifiers,
                                          CType returnType,
                                          String ident,
@@ -480,7 +491,8 @@ public class RenameAll extends SLIRReplacingVisitor
     }        
 
     
-    public Object visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public Object visitFieldExpression(JFieldAccessExpression self,
                                        JExpression left,
                                        String ident)
     {

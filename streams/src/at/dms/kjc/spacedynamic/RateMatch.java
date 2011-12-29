@@ -71,7 +71,8 @@ public class RateMatch implements FlatVisitor
     /**
      * Visit each flatnode in the static stream graph and find the joiners.
      */
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         //if we have already failed then just return
         if (fail)

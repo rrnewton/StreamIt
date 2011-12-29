@@ -74,7 +74,8 @@ public class DeadCodeElimination {
          * If something is assigned but never referenced,
          * it's still dead.
          */
-        public Object visitAssignmentExpression(JAssignmentExpression self,
+        @Override
+		public Object visitAssignmentExpression(JAssignmentExpression self,
                                               JExpression left,
                                               JExpression right) {
             // if not a local variable must descend into left
@@ -85,7 +86,8 @@ public class DeadCodeElimination {
             return null;
         }
 
-        public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+        @Override
+		public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                       int oper,
                                                       JExpression left,
                                                       JExpression right) {
@@ -100,7 +102,8 @@ public class DeadCodeElimination {
 
         // If we get here, we have a variable reference that is used as a r-value.
         // add it to set of used variables.
-        public Object visitLocalVariableExpression(JLocalVariableExpression self,
+        @Override
+		public Object visitLocalVariableExpression(JLocalVariableExpression self,
                                                  String ident) {
             super.visitLocalVariableExpression(self, ident);
             varsUsed.add(self.getVariable());
@@ -148,7 +151,8 @@ public class DeadCodeElimination {
                             final boolean assigningToLiveVar[] = new boolean[1];
                             final LinkedList<JLocalVariable> dead = new LinkedList<JLocalVariable>();
                             left.accept(new SLIREmptyVisitor() {
-                                    public void visitLocalVariableExpression(JLocalVariableExpression self,
+                                    @Override
+									public void visitLocalVariableExpression(JLocalVariableExpression self,
                                                                              String ident) {
                                         if (!(varsUsed.contains(self.getVariable()) ||
                                                 self.getVariable().isVolatile())) {
@@ -176,7 +180,8 @@ public class DeadCodeElimination {
                             return false;
                         }
 
-                        public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+                        @Override
+						public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                                         int oper,
                                                                         JExpression left,
                                                                         JExpression right) {
@@ -192,7 +197,8 @@ public class DeadCodeElimination {
                         }
 
 
-                        public Object visitAssignmentExpression(JAssignmentExpression self,
+                        @Override
+						public Object visitAssignmentExpression(JAssignmentExpression self,
                                                                 JExpression left,
                                                                 JExpression right) {   
                             if (eliminateAssignment(left, right)) { 
@@ -212,7 +218,8 @@ public class DeadCodeElimination {
         for (int i=0; i<methods.length; i++) {
             // take a deleting pass, removing declarations that were not used
             methods[i].accept(new SLIRReplacingVisitor() {
-                    public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+                    @Override
+					public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                                     JVariableDefinition[] vars) {
                         ArrayList<JVariableDefinition> newVars = new ArrayList<JVariableDefinition>();
                         // see if vars used
@@ -258,7 +265,8 @@ public class DeadCodeElimination {
         JMethodDeclaration[] methods = unit.getMethods();
         for (int i=0; i<methods.length; i++) {
             methods[i].accept(new SLIREmptyVisitor() {
-                    public void visitFieldExpression(JFieldAccessExpression self,
+                    @Override
+					public void visitFieldExpression(JFieldAccessExpression self,
                                                      JExpression left,
                                                      String ident) {
                         super.visitFieldExpression(self, left, ident);
@@ -272,7 +280,7 @@ public class DeadCodeElimination {
         ArrayList<JFieldDeclaration> fieldsToKeep = new ArrayList<JFieldDeclaration>();
         int removed = 0;
         for (int i=0; i<fields.length; i++) {
-            JFieldDeclaration decl = (JFieldDeclaration)fields[i];
+            JFieldDeclaration decl = fields[i];
             if (fieldsUsed.contains(decl.getVariable().getIdent())) {
                 fieldsToKeep.add(decl);
             } else {
@@ -295,7 +303,8 @@ public class DeadCodeElimination {
         JMethodDeclaration[] methods = unit.getMethods();
         for (int i=0; i<methods.length; i++) {
             JBlock newBody = (JBlock)methods[i].getBody().accept(new SLIRReplacingVisitor() {
-                    public Object visitBlockStatement(JBlock self,
+                    @Override
+					public Object visitBlockStatement(JBlock self,
                                                       JavaStyleComment[] comments) {
                         ArrayList<Object> newStatements = new ArrayList<Object>();
                         for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
@@ -305,17 +314,20 @@ public class DeadCodeElimination {
                         }
                         return new JBlock(null,newStatements.toArray(new JStatement[0]),null);
                     }
-                    public Object visitEmptyStatement(JEmptyStatement self) {
+                    @Override
+					public Object visitEmptyStatement(JEmptyStatement self) {
                         return null;
                     }
-                    public Object visitExpressionStatement(JExpressionStatement self,
+                    @Override
+					public Object visitExpressionStatement(JExpressionStatement self,
                                                            JExpression expr) {
                         if (expr instanceof JLiteral) { return null; }
                         if (expr instanceof JLocalVariableExpression) { return null; }
                         if (expr instanceof JFieldAccessExpression) { return null; }
                         return self;
                     }
-                    public Object visitExpressionListStatement(JExpressionListStatement self,
+                    @Override
+					public Object visitExpressionListStatement(JExpressionListStatement self,
                                                                JExpression[] expr) {
                         ArrayList<Object> newList = new ArrayList<Object>();
                         for (int i = 0; i < expr.length; i++) {
@@ -330,7 +342,8 @@ public class DeadCodeElimination {
                         if (newList.size() == 0) return null;
                         return new JExpressionListStatement(null, newList.toArray(new JExpression[0]), null);
                     }
-                    public Object visitCompoundStatement(JCompoundStatement self,
+                    @Override
+					public Object visitCompoundStatement(JCompoundStatement self,
                                                          JStatement[] body) {
 
                         ArrayList<Object> newList = new ArrayList<Object>();
@@ -343,7 +356,8 @@ public class DeadCodeElimination {
                         if (newList.size() == 0) return null;
                         return new JCompoundStatement(null, newList.toArray(new JStatement[0]));
                     }
-                    public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+                    @Override
+					public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                                     JVariableDefinition[] vars) {
                         if (vars.length == 0) return null; else return self;
                     }

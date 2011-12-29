@@ -42,8 +42,8 @@ public class TileCode extends at.dms.util.Utils implements FlatVisitor {
         tiles = new HashSet<Object>();
         //for decoupled execution the scheduler does not run
         if (!(KjcOptions.decoupled || IMEMEstimation.TESTING_IMEM)) {
-            tiles.addAll(RawBackend.simulator.initSchedules.keySet());
-            tiles.addAll(RawBackend.simulator.steadySchedules.keySet());
+            tiles.addAll(Simulator.initSchedules.keySet());
+            tiles.addAll(Simulator.steadySchedules.keySet());
         }
         Iterator<Object> tileIterator = tiles.iterator();
         while(tileIterator.hasNext()) {
@@ -207,10 +207,10 @@ public class TileCode extends at.dms.util.Utils implements FlatVisitor {
             ret.append(";\n");
         }
 
-        printSchedule(joiner, RawBackend.simulator.initJoinerCode.get(joiner), ret);
+        printSchedule(joiner, Simulator.initJoinerCode.get(joiner), ret);
         ret.append(SwitchCode.SW_SS_TRIPS + "();\n");
         ret.append("while(1) {\n");
-        printSchedule(joiner, RawBackend.simulator.steadyJoinerCode.get(joiner), ret);
+        printSchedule(joiner, Simulator.steadyJoinerCode.get(joiner), ret);
         ret.append("}}\n");
 
         return ret.toString();
@@ -374,7 +374,8 @@ public class TileCode extends at.dms.util.Utils implements FlatVisitor {
         
     //generate the code for the tiles containing filters and joiners
     //remember which tiles we have generated code for
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         //this is a mapped joiner, we do not want to generate code for
         //joiners in the decoupled case

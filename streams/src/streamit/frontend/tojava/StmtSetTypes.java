@@ -77,7 +77,8 @@ public class StmtSetTypes extends Statement
         return outType;
     }
     
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitOther(this);
     }

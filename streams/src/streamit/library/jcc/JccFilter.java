@@ -49,10 +49,12 @@ public class JccFilter extends JccStream {
 		runPrework = hasPrework;
 	}
 
+	@Override
 	Stream getStreamIt() {
 		return filter;
 	}
 
+	@Override
 	void setInChannel(JccChannel channel) {
 		inChannel = channel;
 		super.setInChannel(inChannel);
@@ -60,6 +62,7 @@ public class JccFilter extends JccStream {
 		filter.inputChannel = inChannel;
 	}
 
+	@Override
 	void setOutChannel(JccChannel channel) {
 		outChannel = channel;
 		super.setOutChannel(outChannel);
@@ -67,6 +70,7 @@ public class JccFilter extends JccStream {
 		filter.outputChannel = outChannel;
 	}
 
+	@Override
 	public void init() {
 		// If not a source, start the JCC model. If a source, do nothing.
 		if (inChannel != null) {
@@ -79,6 +83,7 @@ public class JccFilter extends JccStream {
 	 * input stream. It pops the item into a private queue and runs the actual
 	 * work function if the peek rate can be satisfied.
 	 */
+	@Override
 	public void work() {
 		if (peekRate == 0) {
 			// Filter is source, run actual work/prework function once
@@ -130,6 +135,7 @@ public class JccFilter extends JccStream {
 		}
 	}
 
+	@Override
 	boolean isSource() {
 		return (peekRate == 0);
 	}

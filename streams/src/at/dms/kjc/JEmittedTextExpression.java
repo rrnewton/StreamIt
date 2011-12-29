@@ -24,10 +24,12 @@ public class JEmittedTextExpression extends JExpression {
     
     private Object[] parts;
     private CType type;
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         this.type = type;
     }
-    public CType getType() {
+    @Override
+	public CType getType() {
         return type;
     }
     public Object[] getParts() {
@@ -79,7 +81,8 @@ public class JEmittedTextExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JEmittedTextExpression other = new at.dms.kjc.JEmittedTextExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

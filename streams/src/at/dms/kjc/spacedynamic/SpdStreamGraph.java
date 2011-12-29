@@ -78,7 +78,7 @@ public class SpdStreamGraph extends at.dms.kjc.flatgraph.StreamGraph {
      */
     @Override protected SpdStaticStreamGraph new_StaticStreamGraph(at.dms.kjc.flatgraph.StreamGraph sg, FlatNode realTop) {
         assert sg instanceof SpdStreamGraph;
-        return new SpdStaticStreamGraph((SpdStreamGraph)sg,realTop);
+        return new SpdStaticStreamGraph(sg,realTop);
     }
 
     
@@ -206,7 +206,8 @@ public class SpdStreamGraph extends at.dms.kjc.flatgraph.StreamGraph {
     public void layoutGraph() {
         // set up the parent map for other passes
         ((SpdStaticStreamGraph)getTopLevel()).accept(new StreamGraphVisitor() {
-                public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
+                @Override
+				public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
                     parentMap.putAll(ssg.getParentMap());
                 }
 

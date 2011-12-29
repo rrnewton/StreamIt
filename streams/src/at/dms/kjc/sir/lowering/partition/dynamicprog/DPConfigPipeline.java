@@ -15,7 +15,8 @@ class DPConfigPipeline extends DPConfigContainer {
         super(cont, partitioner, getWidths(cont), cont.size());
     }
 
-    protected DPCost get(int tileLimit, int nextToJoiner) {
+    @Override
+	protected DPCost get(int tileLimit, int nextToJoiner) {
         // if this pipeline ends in a splitjoin that has a null
         // joiner, then don't need to allocate a tile for the joiner,
         // so count us as already being next to a joiner.
@@ -26,7 +27,8 @@ class DPConfigPipeline extends DPConfigContainer {
         return super.get(tileLimit, nextToJoiner);
     }
     
-    public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, int nextToJoiner, SIRStream str) {
+    @Override
+	public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, int nextToJoiner, SIRStream str) {
         // if we have null joiner, then don't need to allocate a tile
         // for the joiner, so count us as already being next to a
         // joiner.
@@ -37,7 +39,8 @@ class DPConfigPipeline extends DPConfigContainer {
         return super.traceback(partitions, curPartition, tileLimit, nextToJoiner, str);
     }
 
-    protected DPConfig childConfig(int x, int y) {
+    @Override
+	protected DPConfig childConfig(int x, int y) {
         SIRStream c1 = cont.get(y), c2;
         // if we're just accessing a hierarchical unit, return it
         if (x==0 && !(c1 instanceof SIRSplitJoin || c1 instanceof SIRFeedbackLoop)) {
@@ -58,7 +61,7 @@ class DPConfigPipeline extends DPConfigContainer {
     private boolean endsInNullJoiner() {
         if (cont.size()>0 && cont.get(cont.size()-1) instanceof SIRSplitJoin) {
             SIRSplitJoin sj = (SIRSplitJoin)cont.get(cont.size()-1);
-            SIRJoiner joiner = ((SIRSplitJoin)sj).getJoiner();
+            SIRJoiner joiner = sj.getJoiner();
             if (joiner.getType().isNull() || joiner.getSumOfWeights()==0) {
                 return true;
             }

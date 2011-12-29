@@ -117,7 +117,8 @@ public class CMethodContext extends CContext {
      *
      * @return true iff the context is static
      */
-    public boolean isStaticContext() {
+    @Override
+	public boolean isStaticContext() {
         if (self.isStatic()) {
             return true;
         } else {
@@ -129,7 +130,8 @@ public class CMethodContext extends CContext {
      * getClassContext
      * @return  the near parent of type CClassContext
      */
-    public CClassContext getClassContext() {
+    @Override
+	public CClassContext getClassContext() {
         return getParentContext().getClassContext();
     }
 
@@ -145,7 +147,8 @@ public class CMethodContext extends CContext {
      * getMethod
      * @return  the near parent of type CMethodContext
      */
-    public CMethodContext getMethodContext() {
+    @Override
+	public CMethodContext getMethodContext() {
         return this;
     }
 
@@ -182,7 +185,8 @@ public class CMethodContext extends CContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CMethodContext other = new at.dms.kjc.CMethodContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

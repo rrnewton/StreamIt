@@ -71,7 +71,8 @@ public abstract class CMethod extends CMember {
     /**
      * @return  the interface
      */
-    public CMethod getMethod() {
+    @Override
+	public CMethod getMethod() {
         return this;
     }
 
@@ -328,7 +329,8 @@ public abstract class CMethod extends CMember {
     /**
      * Returns a string representation of this method.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append(returnType);
@@ -399,7 +401,8 @@ public abstract class CMethod extends CMember {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CMethod other) {

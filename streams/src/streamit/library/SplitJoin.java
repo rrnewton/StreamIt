@@ -681,7 +681,8 @@ public class SplitJoin extends Stream
     }
 
     // add a stream to the parallel section between the splitter and the joiner
-    public void add(Stream s)
+    @Override
+	public void add(Stream s)
     {
         assert joiner == null;
 
@@ -700,7 +701,8 @@ public class SplitJoin extends Stream
         s.setParent(this);
     }
 
-    public void connectGraph()
+    @Override
+	public void connectGraph()
     {
         // setup all children of this splitjoin
         {
@@ -737,7 +739,8 @@ public class SplitJoin extends Stream
     {
         return childrenStreams.get(n);
     }
-    public Stream getChild(int nChild)
+    @Override
+	public Stream getChild(int nChild)
     {
         return getChildN (nChild);
     }
@@ -751,7 +754,8 @@ public class SplitJoin extends Stream
         return joiner;
     }
 
-    void setupBufferLengths(Scheduler buffers)
+    @Override
+	void setupBufferLengths(Scheduler buffers)
     {
         ListIterator<Stream> iter;
         iter = childrenStreams.listIterator();
@@ -771,7 +775,7 @@ public class SplitJoin extends Stream
                                                      new Iterator(this),
                                                      new Iterator(child));
 
-                    StreamIt.totalBuffer += splitBufferSize;
+                    Stream.totalBuffer += splitBufferSize;
                 
                     // if the size of the buffer is zero, there is no corresponding
                     // channel, so don't try to set it.
@@ -786,7 +790,7 @@ public class SplitJoin extends Stream
                                                      new Iterator(child),
                                                      new Iterator(this));
 
-                    StreamIt.totalBuffer += joinBufferSize;
+                    Stream.totalBuffer += joinBufferSize;
                 
                     // if the size of the buffer is zero, there is no corresponding
                     // channel, so don't try to set it.

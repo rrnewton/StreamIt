@@ -71,7 +71,8 @@ public abstract class AnyTypeLattice implements Lattice
         return value;
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof AnyTypeLattice))
             return false;

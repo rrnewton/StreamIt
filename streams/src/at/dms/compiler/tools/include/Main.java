@@ -29,6 +29,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import at.dms.compiler.tools.common.CompilerMessages;
+
 //import at.dms.compiler.tools.common.CompilerMessages;
 
 /**
@@ -52,7 +54,7 @@ public class Main {
 
         if (infiles.length == 0) {
             options.usage();
-            System.err.println(IncludeMessages.NO_INPUT_FILE.getFormat());
+            System.err.println(CompilerMessages.NO_INPUT_FILE.getFormat());
             System.exit(1);
         } else if (infiles.length > 1) {
             options.usage();
@@ -86,7 +88,7 @@ public class Main {
         try {
             reader = new BufferedReader(new FileReader(options.nonOptions[0]));
         } catch (FileNotFoundException e) {
-            throw new IncludeError(IncludeMessages.FILE_NOT_FOUND, options.nonOptions[0]);
+            throw new IncludeError(CompilerMessages.FILE_NOT_FOUND, options.nonOptions[0]);
         }
 
         /* open output file */
@@ -111,14 +113,14 @@ public class Main {
                 }
             }
         } catch (IOException e) {
-            throw new IncludeError(IncludeMessages.IO_EXCEPTION, options.nonOptions[0], e.getMessage());
+            throw new IncludeError(CompilerMessages.IO_EXCEPTION, options.nonOptions[0], e.getMessage());
         }
 
         /* close input file */
         try {
             reader.close();
         } catch (IOException e) {
-            throw new IncludeError(IncludeMessages.IO_EXCEPTION, options.nonOptions[0], e.getMessage());
+            throw new IncludeError(CompilerMessages.IO_EXCEPTION, options.nonOptions[0], e.getMessage());
         }
         /* close output file */
         writer.flush();
@@ -139,7 +141,7 @@ public class Main {
         try {
             reader = new BufferedReader(new FileReader(new File(directory, name)));
         } catch (FileNotFoundException e) {
-            throw new IncludeError(IncludeMessages.FILE_NOT_FOUND, name);
+            throw new IncludeError(CompilerMessages.FILE_NOT_FOUND, name);
         }
 
         try {
@@ -150,7 +152,7 @@ public class Main {
             }
             reader.close();
         } catch (IOException e) {
-            throw new IncludeError(IncludeMessages.IO_EXCEPTION, name, e.getMessage());
+            throw new IncludeError(CompilerMessages.IO_EXCEPTION, name, e.getMessage());
         }
     }
 

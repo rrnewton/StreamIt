@@ -27,20 +27,23 @@ public class SIRCreatePortal extends JExpression {
     /**
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Void;
     }
     
     /**
      * must be CStdType.Void
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         assert type == CStdType.Void;
     }
 
 
     
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         at.dms.util.Utils.fail("Codegen of SIR nodes not supported yet.");
     }
 
@@ -48,7 +51,8 @@ public class SIRCreatePortal extends JExpression {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitCreatePortalExpression(this);
         } else {
@@ -56,7 +60,8 @@ public class SIRCreatePortal extends JExpression {
         }
     }
 
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitCreatePortalExpression(this);
         } else {
@@ -78,7 +83,8 @@ public class SIRCreatePortal extends JExpression {
     }
 
 
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         at.dms.util.Utils.fail("Analysis of SIR nodes not supported yet.");
         return this;
     }
@@ -87,7 +93,8 @@ public class SIRCreatePortal extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRCreatePortal other = new at.dms.kjc.sir.SIRCreatePortal();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

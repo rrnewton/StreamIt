@@ -44,7 +44,8 @@ public class CSimpleBodyContext extends CBodyContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CSimpleBodyContext other = new at.dms.kjc.CSimpleBodyContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

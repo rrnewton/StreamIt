@@ -36,7 +36,8 @@ public class ModState extends SLIREmptyVisitor {
 
     
 
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
 
@@ -48,7 +49,8 @@ public class ModState extends SLIREmptyVisitor {
         }
     }
 
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
 
@@ -60,7 +62,8 @@ public class ModState extends SLIREmptyVisitor {
     }
 
 
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
 
@@ -84,7 +87,8 @@ public class ModState extends SLIREmptyVisitor {
     }
 
 
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {

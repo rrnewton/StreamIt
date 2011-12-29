@@ -53,7 +53,8 @@ public class ConvertFileFilters extends EmptyAttributeStreamVisitor
      * @return The new pipeline.
      * 
      */
-    public Object visitPipeline(SIRPipeline self,
+    @Override
+	public Object visitPipeline(SIRPipeline self,
                                 JFieldDeclaration[] fields,
                                 JMethodDeclaration[] methods,
                                 JMethodDeclaration init) {
@@ -72,7 +73,8 @@ public class ConvertFileFilters extends EmptyAttributeStreamVisitor
      * Visit a splitjoin and reset the parallel children to be
      * the children returned by the attribute visitor.
      */
-    public Object visitSplitJoin(SIRSplitJoin self,
+    @Override
+	public Object visitSplitJoin(SIRSplitJoin self,
                                  JFieldDeclaration[] fields,
                                  JMethodDeclaration[] methods,
                                  JMethodDeclaration init,
@@ -102,7 +104,8 @@ public class ConvertFileFilters extends EmptyAttributeStreamVisitor
      * Visit a feedbackloop and reset the loop and body to be the
      * loop and body as returned by the attribute stream visitor
      */
-    public Object visitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init,
@@ -118,7 +121,8 @@ public class ConvertFileFilters extends EmptyAttributeStreamVisitor
      * Visit a filter, if the filter is an SIRFile Reader or Writer
      * replace it with a FileReader or FileWriter, respectively.
      */
-    public Object visitFilter(SIRFilter self,
+    @Override
+	public Object visitFilter(SIRFilter self,
                               JFieldDeclaration[] fields,
                               JMethodDeclaration[] methods,
                               JMethodDeclaration init,

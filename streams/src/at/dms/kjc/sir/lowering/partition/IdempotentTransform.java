@@ -12,7 +12,8 @@ public abstract class IdempotentTransform extends StreamTransform {
     /**
      * This is idempotent if preds and succs are idempotent.
      */
-    protected boolean isIdempotent() {
+    @Override
+	protected boolean isIdempotent() {
         boolean ok = true;
         // test preds
         for (int i=0; i<getPredSize(); i++) {

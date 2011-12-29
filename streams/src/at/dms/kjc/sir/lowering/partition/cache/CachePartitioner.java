@@ -200,7 +200,8 @@ public class CachePartitioner extends ListPartitioner {
     private int countFilters(SIRStream str) {
         final int[] count = new int[1];
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     count[0]++;
                 }
@@ -243,7 +244,8 @@ public class CachePartitioner extends ListPartitioner {
 
     class ConfigBuilder extends EmptyAttributeStreamVisitor {
 
-        public Object visitSplitJoin(SIRSplitJoin self,
+        @Override
+		public Object visitSplitJoin(SIRSplitJoin self,
                                      JFieldDeclaration[] fields,
                                      JMethodDeclaration[] methods,
                                      JMethodDeclaration init,
@@ -256,7 +258,8 @@ public class CachePartitioner extends ListPartitioner {
             return makeConfig(self);
         }
 
-        public Object visitPipeline(SIRPipeline self,
+        @Override
+		public Object visitPipeline(SIRPipeline self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init) {
@@ -265,7 +268,8 @@ public class CachePartitioner extends ListPartitioner {
         }
 
         /* pre-visit a feedbackloop */
-        public Object visitFeedbackLoop(SIRFeedbackLoop self,
+        @Override
+		public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                         JFieldDeclaration[] fields,
                                         JMethodDeclaration[] methods,
                                         JMethodDeclaration init,
@@ -274,7 +278,8 @@ public class CachePartitioner extends ListPartitioner {
             return makeConfig(self);
         }
 
-        public Object visitFilter(SIRFilter self,
+        @Override
+		public Object visitFilter(SIRFilter self,
                                   JFieldDeclaration[] fields,
                                   JMethodDeclaration[] methods,
                                   JMethodDeclaration init,

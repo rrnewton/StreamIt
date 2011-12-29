@@ -58,7 +58,8 @@ public class JGeneratedLocalVariable extends JLocalVariable {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         throw new InconsistencyException();
     }
 
@@ -66,7 +67,8 @@ public class JGeneratedLocalVariable extends JLocalVariable {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         throw new InconsistencyException();
     }
 
@@ -75,7 +77,8 @@ public class JGeneratedLocalVariable extends JLocalVariable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JGeneratedLocalVariable other = new at.dms.kjc.JGeneratedLocalVariable();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

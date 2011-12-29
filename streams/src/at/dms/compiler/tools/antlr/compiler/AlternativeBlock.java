@@ -72,7 +72,8 @@ class AlternativeBlock extends AlternativeElement {
     public void addAlternative(Alternative alt) {
         alternatives.appendElement(alt);
     }
-    public void generate(JavaCodeGenerator generator) {
+    @Override
+	public void generate(JavaCodeGenerator generator) {
         generator.gen(this);
     }
     public Alternative getAlternativeAt(int i) {
@@ -87,10 +88,12 @@ class AlternativeBlock extends AlternativeElement {
     public String getInitAction() {
         return initAction;
     }
-    public String getLabel() {
+    @Override
+	public String getLabel() {
         return label;
     }
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
     public void prepareForAnalysis() {
@@ -135,7 +138,8 @@ class AlternativeBlock extends AlternativeElement {
     public void setInitAction(String initAction_) {
         initAction = initAction_;
     }
-    public void setLabel(String label_) {
+    @Override
+	public void setLabel(String label_) {
         label = label_;
     }
 
@@ -171,7 +175,8 @@ class AlternativeBlock extends AlternativeElement {
         }
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         String s=" (";
         if ( initAction!=null ) {
             s += initAction;

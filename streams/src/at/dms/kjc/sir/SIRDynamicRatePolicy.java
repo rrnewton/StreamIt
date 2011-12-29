@@ -14,7 +14,8 @@ public abstract class SIRDynamicRatePolicy {
      */
     private static SIRDynamicRatePolicy identity =  
         new SIRDynamicRatePolicy() {
-            public JExpression interpretRate(JExpression rate) {
+            @Override
+			public JExpression interpretRate(JExpression rate) {
                 return rate;
             }
         };
@@ -33,7 +34,8 @@ public abstract class SIRDynamicRatePolicy {
      */
     static SIRDynamicRatePolicy constantPolicy(final int constant) {
         return new SIRDynamicRatePolicy() {
-                public JExpression interpretRate(JExpression rate) {
+                @Override
+				public JExpression interpretRate(JExpression rate) {
                     if (rate.isDynamic()) {
                         // for dynamic rates, return the constant
                         return new JIntLiteral(constant);
@@ -61,7 +63,8 @@ public abstract class SIRDynamicRatePolicy {
      */
     static SIRDynamicRatePolicy estimatePolicy() {
         return new SIRDynamicRatePolicy() {
-                public JExpression interpretRate(JExpression rate) {
+                @Override
+				public JExpression interpretRate(JExpression rate) {
                     if (rate.isDynamic()) {
                         SIRRangeExpression r = (SIRRangeExpression)rate;
                         if (r.getAve() instanceof JIntLiteral) {

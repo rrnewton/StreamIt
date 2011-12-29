@@ -78,30 +78,35 @@ public class JccChannel extends Channel {
 				+ type.getName());
 	}
 
+	@Override
 	public int peekInt(int index) {
 		assert type == Integer.TYPE;
 		ensurePeek(index);
 		return wgqueue_int.elem(index);
 	}
 
+	@Override
 	public float peekFloat(int index) {
 		assert type == Float.TYPE;
 		ensurePeek(index);
 		return wgqueue_float.elem(index);
 	}
 
+	@Override
 	public int popInt() {
 		assert type == Integer.TYPE;
 		ensurePeek(0);
 		return wgqueue_int.dequeue();
 	}
 
+	@Override
 	public float popFloat() {
 		assert type == Float.TYPE;
 		ensurePeek(0);
 		return wgqueue_float.dequeue();
 	}
 
+	@Override
 	public void pushInt(int i) {
 		assert type == Integer.TYPE;
 
@@ -118,6 +123,7 @@ public class JccChannel extends Channel {
 		}
 	}
 
+	@Override
 	public void pushFloat(float d) {
 		assert type == Float.TYPE;
 

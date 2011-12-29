@@ -24,7 +24,8 @@ import at.dms.util.Utils;
  */
 public class FineGrainSimulator extends Simulator {
         
-    public void simulate() {
+    @Override
+	public void simulate() {
         System.out.println("FineGrainSimulator Running...");
         
         initJoinerCode = new HashMap<FlatNode, JoinerScheduleNode>();
@@ -250,7 +251,8 @@ public class FineGrainSimulator extends Simulator {
      * sourceSendSchedule.add(destsRawTile); }
      */
 
-    protected int fireJoiner(FlatNode fire, SimulationCounter counters,
+    @Override
+	protected int fireJoiner(FlatNode fire, SimulationCounter counters,
                              HashMap<FlatNode, Integer> executionCounts) {
         // System.out.println("Firing " + fire.contents.getName());
         // The joiner is passing a data item, record this as an execution
@@ -428,7 +430,8 @@ public class FineGrainSimulator extends Simulator {
         return mostDownStream;
     }
 
-    public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts,
+    @Override
+	public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts,
                            SimulationCounter counters) {
         if (node == null)
             return false;

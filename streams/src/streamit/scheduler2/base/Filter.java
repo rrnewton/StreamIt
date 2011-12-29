@@ -95,7 +95,9 @@ abstract public class Filter extends Stream
         // End Debugging
     }
     
-    public int getNumNodes () { return 1; }
+    @Override
+	public int getNumNodes () { return 1; }
     
-    public int getNumNodeFirings() { return 1; }
+    @Override
+	public int getNumNodeFirings() { return 1; }
 }

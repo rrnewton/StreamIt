@@ -69,7 +69,8 @@ public class RenameGlobals extends SymbolTableVisitor
         global = false;
     }
 
-    public Object visitStreamSpec(StreamSpec ss) {
+    @Override
+	public Object visitStreamSpec(StreamSpec ss) {
         if (ss.getType() == StreamSpec.STREAM_GLOBAL) {
             global = true;
         }
@@ -78,7 +79,8 @@ public class RenameGlobals extends SymbolTableVisitor
         return result;
     }
     
-    public Object visitExprVar(ExprVar var) {
+    @Override
+	public Object visitExprVar(ExprVar var) {
 
         int kind = symtab.lookupKind(var.getName());
         if (!global && kind == SymbolTable.KIND_GLOBAL) {

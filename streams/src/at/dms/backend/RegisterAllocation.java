@@ -126,7 +126,8 @@ public class RegisterAllocation extends TreeWalker {
     // PRIVATE METHODS
     // --------------------------------------------------------------------
 
-    protected void processNode(QNode node) {
+    @Override
+	protected void processNode(QNode node) {
         QTemporary[]    liveins = node.getLivein();
 
         for (int i = 0; i < liveins.length; i++) {

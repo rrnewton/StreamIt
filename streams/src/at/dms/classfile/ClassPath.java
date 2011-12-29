@@ -242,7 +242,8 @@ public class ClassPath {
          * @return  the class info for the specified class,
          *      or null if the class cannot be found in this directory
          */
-        public ClassInfo loadClass(String name, boolean interfaceOnly) {
+        @Override
+		public ClassInfo loadClass(String name, boolean interfaceOnly) {
             File        file;
 
             file = new File(dir.getPath(),
@@ -293,7 +294,8 @@ public class ClassPath {
          * @return  the class info for the specified class,
          *      or null if the class cannot be found in this directory
          */
-        public ClassInfo loadClass(String name, boolean interfaceOnly) {
+        @Override
+		public ClassInfo loadClass(String name, boolean interfaceOnly) {
             ZipEntry        entry;
 
             entry = zip.getEntry(name + ".class");

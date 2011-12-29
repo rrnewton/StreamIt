@@ -53,7 +53,8 @@ public class SplitJoin
             }
     }
 
-    public void initiateConstrained()
+    @Override
+	public void initiateConstrained()
     {
         splitterLatencyEdges = new LatencyEdge[getNumChildren()];
 
@@ -114,46 +115,54 @@ public class SplitJoin
         return (StreamInterface)child;
     }
 
-    public StreamInterface getTopConstrainedStream()
+    @Override
+	public StreamInterface getTopConstrainedStream()
     {
         return this;
     }
 
-    public StreamInterface getBottomConstrainedStream()
+    @Override
+	public StreamInterface getBottomConstrainedStream()
     {
         return this;
     }
 
-    public LatencyNode getBottomLatencyNode()
+    @Override
+	public LatencyNode getBottomLatencyNode()
     {
         return latencyJoiner;
     }
 
-    public LatencyNode getTopLatencyNode()
+    @Override
+	public LatencyNode getTopLatencyNode()
     {
         return latencySplitter;
     }
 
     // override getSplitPhase so I can ask for any phase > 0
-    public PhasingSchedule getSplitPhase(int nPhase)
+    @Override
+	public PhasingSchedule getSplitPhase(int nPhase)
     {
         return super.getSplitPhase (nPhase % getNumSplitPhases ());
     }
 
     // override getJoingPhase so I can ask for any phase > 0
-    public PhasingSchedule getJoinPhase(int nPhase)
+    @Override
+	public PhasingSchedule getJoinPhase(int nPhase)
     {
         return super.getJoinPhase (nPhase % getNumJoinPhases ());
     }
 
 
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         ERROR("Not implemented yet.");
     }
 
-    public void registerConstraint(P2PPortal portal)
+    @Override
+	public void registerConstraint(P2PPortal portal)
     {
         ERROR ("You cannot have SplitJoin as the lowest common parent!");
     }
@@ -165,7 +174,8 @@ public class SplitJoin
     final DLList steadyStateRestrictedChildren = new DLList();
     int numSteadyStateRestrictions = 2;
 
-    public void createSteadyStateRestrictions(int streamNumExecs)
+    @Override
+	public void createSteadyStateRestrictions(int streamNumExecs)
     {
         // create restrictions for my children
         for (int nChild = 0; nChild < getNumChildren(); nChild++)
@@ -194,19 +204,22 @@ public class SplitJoin
         numSteadyStateRestrictions = 2;
     }
 
-    public void doneSteadyState(LatencyNode node)
+    @Override
+	public void doneSteadyState(LatencyNode node)
     {
         assert node == latencySplitter || node == latencyJoiner;
         numSteadyStateRestrictions--;
         assert numSteadyStateRestrictions >= 0;
     }
 
-    public void initRestrictionsCompleted(P2PPortal portal)
+    @Override
+	public void initRestrictionsCompleted(P2PPortal portal)
     {
         numInitialRestrictions--;
     }
 
-    public void initializeRestrictions(Restrictions _restrictions)
+    @Override
+	public void initializeRestrictions(Restrictions _restrictions)
     {
         restrictions = _restrictions;
         // SplitJoin cannot be a parent of any external restrictions,
@@ -255,7 +268,8 @@ public class SplitJoin
         }
     }
 
-    public boolean isDoneInitializing()
+    @Override
+	public boolean isDoneInitializing()
     {
         if (numInitialRestrictions > 0)
             return false;
@@ -281,7 +295,8 @@ public class SplitJoin
 
     int nSplitterPhase = 0, nJoinerPhase = 0;
 
-    public PhasingSchedule getNextPhase(
+    @Override
+	public PhasingSchedule getNextPhase(
                                         Restrictions restrs,
                                         int nDataAvailable)
     {
@@ -390,12 +405,14 @@ public class SplitJoin
         return phase;
     }
 
-    public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
+    @Override
+	public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
     {
         ERROR("not implemented");
     }
 
-    public boolean isDoneSteadyState()
+    @Override
+	public boolean isDoneSteadyState()
     {
         return numSteadyStateRestrictions == 0;
     }

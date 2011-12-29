@@ -93,7 +93,8 @@ public class ConvertArrayInitializers extends SLIRReplacingVisitor
         meth.getBody().addStatement(i, currentBlock);
     }
 
-    public Object visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public Object visitMethodDeclaration(JMethodDeclaration self,
                                          int modifiers,
                                          CType returnType,
                                          String ident,
@@ -119,7 +120,8 @@ public class ConvertArrayInitializers extends SLIRReplacingVisitor
     /**
      * Visit a local var def and remove and convert the array initializer.
      */
-    public Object visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public Object visitVariableDefinition(JVariableDefinition self,
                                           int modifiers,
                                           CType type,
                                           String ident,
@@ -142,7 +144,8 @@ public class ConvertArrayInitializers extends SLIRReplacingVisitor
     /**
      * visit a field decl, remove and convert the array initializer
      */
-    public Object visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public Object visitFieldDeclaration(JFieldDeclaration self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -281,7 +284,8 @@ public class ConvertArrayInitializers extends SLIRReplacingVisitor
     
     /**
      */
-    public Object visitArrayInitializer(JArrayInitializer self,
+    @Override
+	public Object visitArrayInitializer(JArrayInitializer self,
                                         JExpression[] elems)
     {
         assert false : "Visitor should not see JArrayInitializer";

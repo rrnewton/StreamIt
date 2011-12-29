@@ -44,7 +44,8 @@ public class EnqueueToFunction extends FEReplacer
     // Type that enqueue statements should accept
     private Type enqType;
     
-    public Object visitStreamSpec(StreamSpec ss)
+    @Override
+	public Object visitStreamSpec(StreamSpec ss)
     {
         Type lastEnqType = enqType;
         // NB: feedback loops should always have stream types,
@@ -60,7 +61,8 @@ public class EnqueueToFunction extends FEReplacer
         return result;
     }
     
-    public Object visitStmtEnqueue(StmtEnqueue stmt)
+    @Override
+	public Object visitStmtEnqueue(StmtEnqueue stmt)
     {
         // The goal here is to generate a StmtExpr containing an
         // ExprFunCall.  Find the name of the function:

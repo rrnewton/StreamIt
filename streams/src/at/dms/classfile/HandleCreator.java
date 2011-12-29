@@ -48,7 +48,8 @@ class HandleCreator implements AccessorTransformer {
      * @param   accessor        the accessor to transform
      * @return  the transformed accessor
      */
-    public InstructionAccessor transform(InstructionAccessor accessor,
+    @Override
+	public InstructionAccessor transform(InstructionAccessor accessor,
                                          AccessorContainer container)
         throws BadAccessorException
     {

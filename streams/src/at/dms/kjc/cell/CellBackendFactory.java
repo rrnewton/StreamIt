@@ -55,11 +55,13 @@ public class CellBackendFactory
         return scaffolding;
     }
     
-    public void setLayout(Layout<CellPU> layout) {
+    @Override
+	public void setLayout(Layout<CellPU> layout) {
         this.layout = layout;
     }
     
-    public Layout<CellPU> getLayout() {
+    @Override
+	public Layout<CellPU> getLayout() {
         return this.layout;
     }
 

@@ -28,7 +28,8 @@ public class RoundToFloor extends EmptyStreamVisitor {
         IterFactory.createFactory().createIter(str).accept(new RoundToFloor());
     }
 
-    public void preVisitStream(SIRStream self,
+    @Override
+	public void preVisitStream(SIRStream self,
                                SIRIterator iter) {
         // visit methods
         JMethodDeclaration[] methods = self.getMethods();
@@ -47,7 +48,8 @@ public class RoundToFloor extends EmptyStreamVisitor {
      * Round-To-Floor).
      */
     KjcVisitor rtf = new SLIREmptyVisitor() {
-            public void visitMethodCallExpression(JMethodCallExpression self,
+            @Override
+			public void visitMethodCallExpression(JMethodCallExpression self,
                                                   JExpression prefix,
                                                   String ident,
                                                   JExpression[] args) {

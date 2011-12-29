@@ -69,14 +69,16 @@ public class JConstructorCall extends JExpression {
     /**
      * XXX: returns null.
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return null;
     }
 
     /**
      * no-op for now.
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         //
     }
 
@@ -90,7 +92,8 @@ public class JConstructorCall extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         ((CConstructorContext)context.getMethodContext()).setSuperConstructorCalled(false);
 
         // !!! check in constructor !!!
@@ -181,7 +184,8 @@ public class JConstructorCall extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitConstructorCall(this, functorIsThis, arguments);
     }
 
@@ -189,7 +193,8 @@ public class JConstructorCall extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitConstructorCall(this, functorIsThis, arguments);
     }
 
@@ -211,7 +216,8 @@ public class JConstructorCall extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
         code.plantLoadThis();
 
@@ -243,7 +249,8 @@ public class JConstructorCall extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JConstructorCall other = new at.dms.kjc.JConstructorCall();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

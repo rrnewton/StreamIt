@@ -48,24 +48,28 @@ public class StmtExpr extends Statement
         return expr;
     }
     
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtExpr(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof StmtExpr))
             return false;
         return expr.equals(((StmtExpr)other).getExpression());
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return expr.hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return expr.toString();
     }

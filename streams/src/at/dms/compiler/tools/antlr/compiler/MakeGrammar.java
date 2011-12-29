@@ -43,7 +43,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
     /**
      * Abort the processing of a grammar (due to syntax errors)
      */
-    public void abortGrammar() {
+    @Override
+	public void abortGrammar() {
         String s = "unknown grammar";
         if ( grammar!=null ) {
             s = grammar.getClassName();
@@ -55,20 +56,23 @@ public class MakeGrammar extends DefineGrammarSymbols {
         e.enclosingRuleName = ruleBlock.ruleName;
         context().addAlternativeElement(e);
     }
-    public void beginAlt(boolean doAutoGen_) {
+    @Override
+	public void beginAlt(boolean doAutoGen_) {
         super.beginAlt(doAutoGen_);
         Alternative alt = new Alternative();
         alt.setAutoGen(doAutoGen_);
         context().block.addAlternative(alt);
     }
-    public void beginChildList() {
+    @Override
+	public void beginChildList() {
         super.beginChildList();
         context().block.addAlternative(new Alternative());
     }
     /**
      * Add an exception group to a rule (currently a no-op)
      */
-    public void beginExceptionGroup() {
+    @Override
+	public void beginExceptionGroup() {
         super.beginExceptionGroup();
         if (!(context().block instanceof RuleBlock)) {
             Utils.panic("beginExceptionGroup called outside of rule block");
@@ -77,7 +81,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
     /**
      * Add an exception spec to an exception group or rule block
      */
-    public void beginExceptionSpec(Token label) {
+    @Override
+	public void beginExceptionSpec(Token label) {
         // Hack the label string a bit to remove leading/trailing space.
         if (label != null) {
             label.setText( Utils.stripFront( Utils.stripBack(label.getText(), " \n\r\t"), " \n\r\t") );
@@ -87,7 +92,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         // may leave it set to something.
         currentExceptionSpec = new ExceptionSpec(label);
     }
-    public void beginSubRule(Token label, int line, boolean not) {
+    @Override
+	public void beginSubRule(Token label, int line, boolean not) {
         super.beginSubRule(label,line, not);
         // we don't know what kind of subrule it is yet.
         // push a dummy one that will allow us to collect the
@@ -198,7 +204,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         return blk;
     }
 
-    public void defineRuleName(Token r, String access, String docComment)
+    @Override
+	public void defineRuleName(Token r, String access, String docComment)
         throws SemanticException
     {
         //      if ( Character.isUpperCase(r.getText().charAt(0)) ) {
@@ -238,7 +245,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         rb.setEndElement(ruleEnd);
         nested = 0;
     }
-    public void endAlt() {
+    @Override
+	public void endAlt() {
         super.endAlt();
         if ( nested==0 ) {  // all rule-level alts link to ruleEnd node
             addElementToCurrentAlt(ruleEnd);
@@ -247,7 +255,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         }
         context().altNum++;
     }
-    public void endChildList() {
+    @Override
+	public void endChildList() {
         super.endChildList();
         // create a final node to which the last elememt of the single
         // alternative will point.  Done for compatibility with analyzer.
@@ -257,10 +266,12 @@ public class MakeGrammar extends DefineGrammarSymbols {
         be.block = context().block;
         addElementToCurrentAlt(be);
     }
-    public void endExceptionGroup() {
+    @Override
+	public void endExceptionGroup() {
         super.endExceptionGroup();
     }
-    public void endExceptionSpec() {
+    @Override
+	public void endExceptionSpec() {
         super.endExceptionSpec();
         if (currentExceptionSpec == null) {
             Utils.panic("exception processing internal error -- no active exception spec");
@@ -281,14 +292,16 @@ public class MakeGrammar extends DefineGrammarSymbols {
     /**
      * Called at the end of processing a grammar
      */
-    public void endGrammar() {
+    @Override
+	public void endGrammar() {
         if (grammarError) {
             abortGrammar();
         } else {
             super.endGrammar();
         }
     }
-    public void endRule(String rule) {
+    @Override
+	public void endRule(String rule) {
         super.endRule(rule);
         BlockContext ctx = (BlockContext) blocks.pop(); // remove scope
         // record the start of this block in the ending node
@@ -296,7 +309,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         ruleEnd.block.prepareForAnalysis();
         //System.out.println(ctx.block);
     }
-    public void endSubRule() {
+    @Override
+	public void endSubRule() {
         super.endSubRule();
         nested--;
         // remove subrule context from scope stack
@@ -342,7 +356,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
     /**
      * Remember that a major error occured in the grammar
      */
-    public void hasError() {
+    @Override
+	public void hasError() {
         grammarError = true;
     }
     private void labelElement(AlternativeElement el, Token label) {
@@ -361,7 +376,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
             ruleBlock.labeledElements.appendElement(el);
         }
     }
-    public void oneOrMoreSubRule() {
+    @Override
+	public void oneOrMoreSubRule() {
         if (context().block.not) {
             tool.error("'~' cannot be applied to (...)* subrule", grammar.getFilename(), context().block.getLine());
         }
@@ -376,7 +392,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         context().blockEnd = old.blockEnd;
         context().blockEnd.block = b;
     }
-    public void optionalSubRule() {
+    @Override
+	public void optionalSubRule() {
         if (context().block.not) {
             tool.error("'~' cannot be applied to (...)? subrule", grammar.getFilename(), context().block.getLine());
         }
@@ -385,21 +402,25 @@ public class MakeGrammar extends DefineGrammarSymbols {
         beginAlt(false);
         endAlt();
     }
-    public void refAction(Token action) {
+    @Override
+	public void refAction(Token action) {
         super.refAction(action);
         context().block.hasAnAction = true;
         addElementToCurrentAlt(new ActionElement(grammar,action));
     }
 
-    public void setUserExceptions(String thr) {
+    @Override
+	public void setUserExceptions(String thr) {
         ((RuleBlock)context().block).throwsSpec = thr;
     }
 
     // Only called for rule blocks
-    public void refArgAction(Token action) {
+    @Override
+	public void refArgAction(Token action) {
         ((RuleBlock)context().block).argAction = action.getText();
     }
-    public void refCharLiteral(Token lit, Token label, boolean inverted, boolean lastInRule) {
+    @Override
+	public void refCharLiteral(Token lit, Token label, boolean inverted, boolean lastInRule) {
         if (!(grammar instanceof LexerGrammar)) {
             tool.error("Character literal only valid in lexer", grammar.getFilename(), lit.getLine());
             return;
@@ -424,7 +445,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
             addElementToCurrentAlt(createOptionalRuleRef(ignore, lit.getLine()));
         }
     }
-    public void refCharRange(Token t1, Token t2, Token label, boolean lastInRule) {
+    @Override
+	public void refCharRange(Token t1, Token t2, Token label, boolean lastInRule) {
         if (!(grammar instanceof LexerGrammar)) {
             tool.error("Character range only valid in lexer", grammar.getFilename(), t1.getLine());
             return;
@@ -458,13 +480,13 @@ public class MakeGrammar extends DefineGrammarSymbols {
         }
     }
 
-    public void refTokensSpecElementOption(Token tok, Token option, Token value) {
+    @Override
+	public void refTokensSpecElementOption(Token tok, Token option, Token value) {
         /*
           System.out.println("setting tokens spec option for "+tok.getText());
           System.out.println(option.getText()+","+value.getText());
         */
-        TokenSymbol ts = (TokenSymbol)
-            grammar.tokenManager.getTokenSymbol(tok.getText());
+        TokenSymbol ts = grammar.tokenManager.getTokenSymbol(tok.getText());
         if ( ts==null ) {
             Utils.panic("cannot find "+tok.getText()+"in tokens {...}");
         }
@@ -474,7 +496,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
                            option.getLine());
     }
 
-    public void refElementOption(Token option, Token value) {
+    @Override
+	public void refElementOption(Token option, Token value) {
         /*
           System.out.println("setting option for "+context().currentElement());
           System.out.println(option.getText()+","+value.getText());
@@ -495,7 +518,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
     /**
      * Add an exception handler to an exception spec
      */
-    public void refExceptionHandler(Token exTypeAndName, Token action) {
+    @Override
+	public void refExceptionHandler(Token exTypeAndName, Token action) {
         super.refExceptionHandler(exTypeAndName, action);
         if (currentExceptionSpec == null) {
             Utils.panic("exception handler processing internal error");
@@ -503,21 +527,25 @@ public class MakeGrammar extends DefineGrammarSymbols {
         currentExceptionSpec.addHandler(new ExceptionHandler(exTypeAndName, action));
     }
 
-    public void refInitAction(Token action) {
+    @Override
+	public void refInitAction(Token action) {
         super.refAction(action);
         context().block.setInitAction(action.getText());
     }
 
-    public void refMemberAction(Token act) {
+    @Override
+	public void refMemberAction(Token act) {
         grammar.classMemberAction = act;
     }
 
-    public void refPreambleAction(Token act) {
+    @Override
+	public void refPreambleAction(Token act) {
         super.refPreambleAction(act);
     }
 
     // Only called for rule blocks
-    public void refReturnAction(Token returnAction) {
+    @Override
+	public void refReturnAction(Token returnAction) {
         if (grammar instanceof LexerGrammar) {
             String name = JavaCodeGenerator.lexerRuleName(((RuleBlock)context().block).getRuleName());
             RuleSymbol rs = (RuleSymbol)grammar.getSymbol(name);
@@ -529,7 +557,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         ((RuleBlock)context().block).returnAction = returnAction.getText();
     }
 
-    public void refRule(Token idAssign, Token r, Token label, Token args) {
+    @Override
+	public void refRule(Token idAssign, Token r, Token label, Token args) {
         // Disallow parser rule references in the lexer
         if (grammar instanceof LexerGrammar) {
             //          if (!Character.isUpperCase(r.getText().charAt(0))) {
@@ -560,7 +589,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         labelElement(lastRuleRef, label);
     }
 
-    public void refSemPred(Token pred) {
+    @Override
+	public void refSemPred(Token pred) {
         //System.out.println("refSemPred "+pred.getText());
         super.refSemPred(pred);
         //System.out.println("context().block: "+context().block);
@@ -574,7 +604,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         //System.out.println("DONE refSemPred "+pred.getText());
     }
 
-    public void refStringLiteral(Token lit, Token label, boolean lastInRule) {
+    @Override
+	public void refStringLiteral(Token lit, Token label, boolean lastInRule) {
         super.refStringLiteral(lit, label, lastInRule);
         StringLiteralElement sl = new StringLiteralElement(grammar, lit);
 
@@ -599,7 +630,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         }
     }
 
-    public void refToken(Token idAssign, Token t, Token label, Token args,
+    @Override
+	public void refToken(Token idAssign, Token t, Token label, Token args,
                          boolean inverted, boolean lastInRule) {
         if (grammar instanceof LexerGrammar) {
             // In lexer, token references are really rule references
@@ -628,7 +660,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         }
     }
 
-    public void refTokenRange(Token t1, Token t2, Token label, boolean lastInRule) {
+    @Override
+	public void refTokenRange(Token t1, Token t2, Token label, boolean lastInRule) {
         if (grammar instanceof LexerGrammar) {
             tool.error("Token range not allowed in lexer", grammar.getFilename(), t1.getLine());
             return;
@@ -642,7 +675,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         addElementToCurrentAlt(tr);
         labelElement(tr, label);
     }
-    public void refWildcard(Token t, Token label) {
+    @Override
+	public void refWildcard(Token t, Token label) {
         super.refWildcard(t, label);
         WildcardElement wc = new WildcardElement(grammar, t);
         addElementToCurrentAlt(wc);
@@ -651,7 +685,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
     /**
      * Get ready to process a new grammar
      */
-    public void reset() {
+    @Override
+	public void reset() {
         super.reset();
         blocks = new LList();
         lastRuleRef = null;
@@ -661,7 +696,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         currentExceptionSpec = null;
         grammarError = false;
     }
-    public void setArgOfRuleRef(Token argAction) {
+    @Override
+	public void setArgOfRuleRef(Token argAction) {
         super.setArgOfRuleRef(argAction);
         lastRuleRef.setArgs(argAction.getText());
     }
@@ -678,14 +714,17 @@ public class MakeGrammar extends DefineGrammarSymbols {
         b.greedy = src.greedy;
         b.greedySet = src.greedySet;
     }
-    public void setRuleOption(Token key, Token value) {
+    @Override
+	public void setRuleOption(Token key, Token value) {
         //((RuleBlock)context().block).setOption(key, value);
         ruleBlock.setOption(key, value);
     }
-    public void setSubruleOption(Token key, Token value) {
-        ((AlternativeBlock)context().block).setOption(key, value);
+    @Override
+	public void setSubruleOption(Token key, Token value) {
+        context().block.setOption(key, value);
     }
-    public void synPred() {
+    @Override
+	public void synPred() {
         if (context().block.not) {
             tool.error("'~' cannot be applied to syntactic predicate", grammar.getFilename(), context().block.getLine());
         }
@@ -700,7 +739,8 @@ public class MakeGrammar extends DefineGrammarSymbols {
         context().blockEnd = old.blockEnd;
         context().blockEnd.block = b;
     }
-    public void zeroOrMoreSubRule() {
+    @Override
+	public void zeroOrMoreSubRule() {
         if (context().block.not) {
             tool.error("'~' cannot be applied to (...)+ subrule", grammar.getFilename(), context().block.getLine());
         }

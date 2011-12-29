@@ -175,21 +175,24 @@ public class PushLiteralInstruction extends Instruction {
      * Returns true iff control flow can reach the next instruction
      * in textual order.
      */
-    public boolean canComplete() {
+    @Override
+	public boolean canComplete() {
         return true;
     }
 
     /**
      * Return true if this instruction is a literal
      */
-    public boolean isLiteral() {
+    @Override
+	public boolean isLiteral() {
         return true;
     }
 
     /**
      * Returns the number of bytes used by the the instruction in the code array.
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return 1 + (operand == null ? 0 : operand.getSize());
     }
 
@@ -207,14 +210,16 @@ public class PushLiteralInstruction extends Instruction {
     /**
      * Returns the size of data pushed on the stack by this instruction
      */
-    public int getPushedOnStack() {
+    @Override
+	public int getPushedOnStack() {
         return getStack();
     }
 
     /**
      * Returns the type pushed on the stack
      */
-    public byte getReturnType() {
+    @Override
+	public byte getReturnType() {
         switch (getOpcode()) {
         case opc_iconst_m1:
         case opc_iconst_0:
@@ -248,7 +253,8 @@ public class PushLiteralInstruction extends Instruction {
     /**
      * Return the amount of stack (positive or negative) used by this instruction
      */
-    public int getStack() {
+    @Override
+	public int getStack() {
         switch (getOpcode()) {
         case opc_iconst_m1:
         case opc_iconst_0:
@@ -287,7 +293,8 @@ public class PushLiteralInstruction extends Instruction {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {
         if (operand != null) {
             operand.resolveConstants(cp);
         }
@@ -301,7 +308,8 @@ public class PushLiteralInstruction extends Instruction {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte((byte)getOpcode());
 
         if (operand != null) {
@@ -347,13 +355,16 @@ public class PushLiteralInstruction extends Instruction {
             this.value = value;
         }
 
-        public void resolveConstants(ConstantPool cp) {}
+        @Override
+		public void resolveConstants(ConstantPool cp) {}
 
-        public int getSize() {
+        @Override
+		public int getSize() {
             return 1;
         }
 
-        public void write(ConstantPool cp, DataOutput out) throws IOException {
+        @Override
+		public void write(ConstantPool cp, DataOutput out) throws IOException {
             out.writeByte(value);
         }
 
@@ -367,13 +378,16 @@ public class PushLiteralInstruction extends Instruction {
             this.value = value;
         }
 
-        public void resolveConstants(ConstantPool cp) {}
+        @Override
+		public void resolveConstants(ConstantPool cp) {}
 
-        public int getSize() {
+        @Override
+		public int getSize() {
             return 2;
         }
 
-        public void write(ConstantPool cp, DataOutput out) throws IOException {
+        @Override
+		public void write(ConstantPool cp, DataOutput out) throws IOException {
             out.writeShort(value);
         }
 
@@ -388,11 +402,13 @@ public class PushLiteralInstruction extends Instruction {
             this.wide = wide;
         }
 
-        public void resolveConstants(ConstantPool cp) {
+        @Override
+		public void resolveConstants(ConstantPool cp) {
             cp.addItem(value);
         }
 
-        public int getSize() {
+        @Override
+		public int getSize() {
             wide = value.getIndex() > 255;
 
             if (getOpcode() != opc_ldc2_w) {
@@ -406,7 +422,8 @@ public class PushLiteralInstruction extends Instruction {
             return (getOpcode() == opc_ldc2_w) || wide ? 2 : 1;
         }
 
-        public void write(ConstantPool cp, DataOutput out) throws IOException {
+        @Override
+		public void write(ConstantPool cp, DataOutput out) throws IOException {
             int idx = value.getIndex();
 
             if (wide || getOpcode() == opc_ldc2_w) {

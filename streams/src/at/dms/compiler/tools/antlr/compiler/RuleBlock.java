@@ -94,7 +94,8 @@ public class RuleBlock extends AlternativeBlock {
     public ExceptionSpec findExceptionSpec(String label) {
         return exceptionSpecs.get(label==null ? "" : label);
     }
-    public void generate(JavaCodeGenerator generator) {
+    @Override
+	public void generate(JavaCodeGenerator generator) {
         generator.gen(this);
     }
     public boolean getDefaultErrorHandler() {
@@ -115,10 +116,12 @@ public class RuleBlock extends AlternativeBlock {
     public boolean isLexerAutoGenRule() {
         return ruleName.equals("nextToken");
     }
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
-    public void prepareForAnalysis() {
+    @Override
+	public void prepareForAnalysis() {
         super.prepareForAnalysis();
         lock = new boolean[grammar.maxk+1];
     }
@@ -129,7 +132,8 @@ public class RuleBlock extends AlternativeBlock {
     public void setEndElement(RuleEndElement re) {
         endNode = re;
     }
-    public void setOption(Token key, Token value) {
+    @Override
+	public void setOption(Token key, Token value) {
         if (key.getText().equals("defaultErrorHandler")) {
             if (value.getText().equals("true")) {
                 defaultErrorHandler = true;
@@ -179,7 +183,8 @@ public class RuleBlock extends AlternativeBlock {
             grammar.tool.error("Invalid rule option: " + key.getText(), grammar.getFilename(), key.getLine());
         }
     }
-    public String toString() {
+    @Override
+	public String toString() {
         String s = " FOLLOW={";
         Lookahead[] cache = endNode.cache;
         int k = grammar.maxk;

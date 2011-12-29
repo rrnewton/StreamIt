@@ -197,7 +197,8 @@ public class FusePipelines {
             }
         }
 
-        public Object visitPipeline(SIRPipeline self,
+        @Override
+		public Object visitPipeline(SIRPipeline self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init) {
@@ -274,7 +275,7 @@ public class FusePipelines {
                 for (int i=0; i<partitionArr.length; i++) {
                     // if we fused something here
                     if (partitionArr[i]>1) {
-                        checkState((SIRFilter)self.get(i));
+                        checkState(self.get(i));
                     }
                 }
                 return self;
@@ -664,7 +665,7 @@ public class FusePipelines {
             boolean result;
             if (str instanceof SIRFilter) {
                 // base case: test filters for fusable
-                result = FusePipe.isFusable((SIRFilter)str);
+                result = FusePipe.isFusable(str);
             } else if (str instanceof SIRPipeline || str instanceof SIRSplitJoin) {
                 // otherwise, container is fusable iff all of children
                 // are fusable

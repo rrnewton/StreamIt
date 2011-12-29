@@ -81,10 +81,11 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits an init statement.
      */
-    public Object visitInitStatement(SIRInitStatement self,
+    @Override
+	public Object visitInitStatement(SIRInitStatement self,
                                      SIRStream target) {
         for (int i=0; i<self.getArgs().size(); i++) {
-            ((JExpression)self.getArgs().get(i)).accept(this);
+            self.getArgs().get(i).accept(this);
         }
         return self;
     }
@@ -92,46 +93,53 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits an interface table.
      */
-    public Object visitInterfaceTable(SIRInterfaceTable self) { 
+    @Override
+	public Object visitInterfaceTable(SIRInterfaceTable self) { 
         return self;
     }
 
     /**
      * Visits a latency.
      */
-    public Object visitLatency(SIRLatency self) {
+    @Override
+	public Object visitLatency(SIRLatency self) {
         return self;
     }
 
     /**
      * Visits a max latency.
      */
-    public Object visitLatencyMax(SIRLatencyMax self) {
+    @Override
+	public Object visitLatencyMax(SIRLatencyMax self) {
         return self;
     }
 
     /**
      * Visits a latency range.
      */
-    public Object visitLatencyRange(SIRLatencyRange self) {
+    @Override
+	public Object visitLatencyRange(SIRLatencyRange self) {
         return self;
     }
 
     /**
      * Visits a latency set.
      */
-    public Object visitLatencySet(SIRLatencySet self) {
+    @Override
+	public Object visitLatencySet(SIRLatencySet self) {
         return self;
     }
 
-    public Object visitCreatePortalExpression(SIRCreatePortal self) {
+    @Override
+	public Object visitCreatePortalExpression(SIRCreatePortal self) {
         return self;
     }
 
     /**
      * Visits a message statement.
      */
-    public Object visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public Object visitMessageStatement(SIRMessageStatement self,
                                         JExpression portal,
                                         String iname,
                                         String ident,
@@ -148,7 +156,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a range expression.
      */
-    public Object visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public Object visitRangeExpression(SIRRangeExpression self) {
         self.getMin().accept(this);
         self.getAve().accept(this);
         self.getMax().accept(this);
@@ -158,14 +167,16 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a dynamic token.
      */
-    public Object visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public Object visitDynamicToken(SIRDynamicToken self) {
         return self;
     }
 
     /**
      * Visits a peek expression.
      */
-    public Object visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public Object visitPeekExpression(SIRPeekExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         arg.accept(this);
@@ -175,7 +186,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a file reader.
      */
-    public Object visitFileReader(LIRFileReader self) {
+    @Override
+	public Object visitFileReader(LIRFileReader self) {
         self.getStreamContext().accept(this);
         return self;
     }
@@ -183,7 +195,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a file writer.
      */
-    public Object visitFileWriter(LIRFileWriter self) {
+    @Override
+	public Object visitFileWriter(LIRFileWriter self) {
         self.getStreamContext().accept(this);
         return self;
     }
@@ -192,6 +205,7 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits an iteration expression.
      */
+	@Override
 	public Object visitIterationExpression(SIRIterationExpression self) {
 		return self;
 	}
@@ -199,7 +213,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a pop expression.
      */
-    public Object visitPopExpression(SIRPopExpression self,
+    @Override
+	public Object visitPopExpression(SIRPopExpression self,
                                      CType tapeType) {
         return self;
     }
@@ -207,7 +222,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a message-receiving portal.
      */
-    public Object visitPortal(SIRPortal self)
+    @Override
+	public Object visitPortal(SIRPortal self)
     {
         return self;
     }
@@ -215,7 +231,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a print statement.
      */
-    public Object visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public Object visitPrintStatement(SIRPrintStatement self,
                                       JExpression arg) {
         arg.accept(this);
         return self;
@@ -224,7 +241,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a push expression.
      */
-    public Object visitPushExpression(SIRPushExpression self,
+    @Override
+	public Object visitPushExpression(SIRPushExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         arg.accept(this);
@@ -234,7 +252,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a register-receiver statement.
      */
-    public Object visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public Object visitRegReceiverStatement(SIRRegReceiverStatement self,
                                             JExpression portal,
                                             SIRStream receiver,
                                             JMethodDeclaration[] methods) {
@@ -246,7 +265,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a vector literal
      */
-    public Object visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
+    @Override
+	public Object visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
         scalar.accept(this);
         return self;
     }
@@ -254,7 +274,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a register-sender statement.
      */
-    public Object visitRegSenderStatement(SIRRegSenderStatement self,
+    @Override
+	public Object visitRegSenderStatement(SIRRegSenderStatement self,
                                           String portal,
                                           SIRLatency latency) {
         latency.accept(this);
@@ -264,7 +285,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visit SIRMarker.
      */
-    public Object visitMarker(SIRMarker self) {
+    @Override
+	public Object visitMarker(SIRMarker self) {
         return self;
     }
 
@@ -275,7 +297,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a function pointer.
      */
-    public Object visitFunctionPointer(LIRFunctionPointer self,
+    @Override
+	public Object visitFunctionPointer(LIRFunctionPointer self,
                                        String name) {
         return self;
     }
@@ -283,14 +306,16 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits an LIR node.
      */
-    public Object visitNode(LIRNode self) {
+    @Override
+	public Object visitNode(LIRNode self) {
         return self;
     }
 
     /**
      * Visits a child registration node.
      */
-    public Object visitSetChild(LIRSetChild self,
+    @Override
+	public Object visitSetChild(LIRSetChild self,
                                 JExpression streamContext,
                                 String childType,
                                 String childName) {
@@ -301,7 +326,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a decoder registration node.
      */
-    public Object visitSetDecode(LIRSetDecode self,
+    @Override
+	public Object visitSetDecode(LIRSetDecode self,
                                  JExpression streamContext,
                                  LIRFunctionPointer fp) {
         streamContext.accept(this);
@@ -312,7 +338,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a feedback loop delay node.
      */
-    public Object visitSetDelay(LIRSetDelay self,
+    @Override
+	public Object visitSetDelay(LIRSetDelay self,
                                 JExpression data,
                                 JExpression streamContext,
                                 int delay,
@@ -327,7 +354,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits an encoder registration node.
      */
-    public Object visitSetEncode(LIRSetEncode self,
+    @Override
+	public Object visitSetEncode(LIRSetEncode self,
                                  JExpression streamContext,
                                  LIRFunctionPointer fp) {
         streamContext.accept(this);
@@ -338,7 +366,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a joiner-setting node.
      */
-    public Object visitSetJoiner(LIRSetJoiner self,
+    @Override
+	public Object visitSetJoiner(LIRSetJoiner self,
                                  JExpression streamContext,
                                  SIRJoinType type,
                                  int ways,
@@ -350,7 +379,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a peek-rate-setting node.
      */
-    public Object visitSetPeek(LIRSetPeek self,
+    @Override
+	public Object visitSetPeek(LIRSetPeek self,
                                JExpression streamContext,
                                int peek) {
         streamContext.accept(this);
@@ -360,7 +390,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a pop-rate-setting node.
      */
-    public Object visitSetPop(LIRSetPop self,
+    @Override
+	public Object visitSetPop(LIRSetPop self,
                               JExpression streamContext,
                               int pop) {
         streamContext.accept(this);
@@ -370,7 +401,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a push-rate-setting node.
      */
-    public Object visitSetPush(LIRSetPush self,
+    @Override
+	public Object visitSetPush(LIRSetPush self,
                                JExpression streamContext,
                                int push) {
         streamContext.accept(this);
@@ -380,7 +412,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a splitter-setting node.
      */
-    public Object visitSetSplitter(LIRSetSplitter self,
+    @Override
+	public Object visitSetSplitter(LIRSetSplitter self,
                                    JExpression streamContext,
                                    SIRSplitType type,
                                    int ways,
@@ -392,7 +425,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a stream-type-setting node.
      */
-    public Object visitSetStreamType(LIRSetStreamType self,
+    @Override
+	public Object visitSetStreamType(LIRSetStreamType self,
                                      JExpression streamContext,
                                      LIRStreamType streamType) {
         streamContext.accept(this);
@@ -402,7 +436,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a work-function-setting node.
      */
-    public Object visitSetWork(LIRSetWork self,
+    @Override
+	public Object visitSetWork(LIRSetWork self,
                                JExpression streamContext,
                                LIRFunctionPointer fn) {
         streamContext.accept(this);
@@ -413,7 +448,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a tape registerer.
      */
-    public Object visitSetTape(LIRSetTape self,
+    @Override
+	public Object visitSetTape(LIRSetTape self,
                                JExpression streamContext,
                                JExpression srcStruct,
                                JExpression dstStruct,
@@ -428,7 +464,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a main function contents.
      */
-    public Object visitMainFunction(LIRMainFunction self,
+    @Override
+	public Object visitMainFunction(LIRMainFunction self,
                                     String typeName,
                                     LIRFunctionPointer init,
                                     List<JStatement> initStatements) {
@@ -443,7 +480,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a set body of feedback loop.
      */
-    public Object visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
+    @Override
+	public Object visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
                                          JExpression streamContext,
                                          JExpression childContext,
                                          CType inputType,
@@ -459,7 +497,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a set loop of feedback loop.
      */
-    public Object visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
+    @Override
+	public Object visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
                                          JExpression streamContext,
                                          JExpression childContext,
                                          CType inputType,
@@ -474,7 +513,8 @@ public class SLIREmptyAttributeVisitor extends EmptyAttributeVisitor
     /**
      * Visits a set a parallel stream.
      */
-    public Object visitSetParallelStream(LIRSetParallelStream self,
+    @Override
+	public Object visitSetParallelStream(LIRSetParallelStream self,
                                          JExpression streamContext,
                                          JExpression childContext,
                                          int position,

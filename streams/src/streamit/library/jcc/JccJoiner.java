@@ -65,6 +65,7 @@ class JccJoiner extends JccOperator {
 		}
 	}
 
+	@Override
 	public void init() {
 		assert inChannelList.size() == weightList.size();
 
@@ -113,10 +114,12 @@ class JccJoiner extends JccOperator {
 	 * Overrides standard run() method to hang on the input stream of the
 	 * current input channel.
 	 */
+	@Override
 	public void run() {
 		inputStream.runWhenReady(this);
 	}
 
+	@Override
 	public void work() {
 		// Increment run count in case this is a source
 		runCount++;
@@ -141,10 +144,12 @@ class JccJoiner extends JccOperator {
 		}
 	}
 
+	@Override
 	public boolean closed() {
 		return inputStream.closed();
 	}
 
+	@Override
 	boolean isSource() {
 		if (noInput) {
 			return false;
@@ -157,10 +162,12 @@ class JccJoiner extends JccOperator {
 		}
 	}
 
+	@Override
 	public final void setInStream(InStream in) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public final void setOutStream(OutStream out) {
 		throw new UnsupportedOperationException();
 	}

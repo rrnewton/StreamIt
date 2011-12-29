@@ -18,6 +18,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import at.dms.classfile.Constants;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
 import at.dms.kjc.sir.SIRContainer;
@@ -659,6 +660,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 
 	// private int spaces=0;
 
+	@Override
 	public Object visitClassDeclaration(JClassDeclaration self, int modifiers,
 			String ident, String superName, CClassType[] interfaces,
 			JPhylum[] body, JFieldDeclaration[] fields,
@@ -740,6 +742,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 		return current;
 	}
 
+	@Override
 	public Object visitCompilationUnit(JCompilationUnit self,
 			JPackageName packageName, JPackageImport[] importedPackages,
 			JClassImport[] importedClasses, JTypeDeclaration[] typeDeclarations) {
@@ -820,6 +823,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 		return topLevel;
 	}
 
+	@Override
 	public Object visitClassBody(JTypeDeclaration[] decls,
 			JFieldDeclaration[] fields, JMethodDeclaration[] methods,
 			JPhylum[] body) {
@@ -847,6 +851,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a class declaration
 	 */
+	@Override
 	public Object visitInnerClassDeclaration(JClassDeclaration self,
 			int modifiers, String ident, String superName,
 			CClassType[] interfaces, JTypeDeclaration[] decls, JPhylum[] body,
@@ -890,6 +895,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a field declaration
 	 */
+	@Override
 	public Object visitFieldDeclaration(JFieldDeclaration self, int modifiers,
 			CType type, String ident, JExpression expr) {
 		printMe("FieldDeclaration " + ident);
@@ -900,8 +906,8 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 		 * if the field is static and not final, it could be used for message
 		 * passing, so we flag an error
 		 */
-		if (CModifier.contains(CModifier.ACC_STATIC, modifiers)
-				&& !CModifier.contains(CModifier.ACC_FINAL, modifiers)
+		if (CModifier.contains(Constants.ACC_STATIC, modifiers)
+				&& !CModifier.contains(Constants.ACC_FINAL, modifiers)
 				&& !(parentStream instanceof SIRGlobal))
 			at.dms.util.Utils.fail(printLine(self) + "Cannot declare field "
 					+ ident + " static (only final static).");
@@ -947,14 +953,15 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a method declaration
 	 */
+	@Override
 	public Object visitMethodDeclaration(JMethodDeclaration self,
 			int modifiers, CType returnType, String ident,
 			JFormalParameter[] parameters, CClassType[] exceptions, JBlock body) {
 		blockStart("MethodDeclaration: " + ident, self);
 		// ignore main method
 		if (ident.equals("main")
-				&& CModifier.contains(CModifier.ACC_STATIC, modifiers)
-				&& CModifier.contains(CModifier.ACC_PUBLIC, modifiers)) {
+				&& CModifier.contains(Constants.ACC_STATIC, modifiers)
+				&& CModifier.contains(Constants.ACC_PUBLIC, modifiers)) {
 			printMe("Main ignored");
 			return self;
 		}
@@ -1009,7 +1016,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 
 		/* Install init function for filter */
 		else if (ident.equals("init") && (parentStream instanceof SIRStream)) {
-			((SIRStream) parentStream).setInit(new JMethodDeclaration(null,
+			parentStream.setInit(new JMethodDeclaration(null,
 					modifiers, returnType, ident, parameters, exceptions, body,
 					null, null));
 		} else if (ident.startsWith("initPath")) {
@@ -1022,7 +1029,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 							null, null));
 		} else if (!ignoreMethodDeclaration(ident)
 				&& (parentStream instanceof SIRStream))
-			((SIRStream) parentStream).addMethod(new JMethodDeclaration(null,
+			parentStream.addMethod(new JMethodDeclaration(null,
 					modifiers, returnType, ident, parameters, exceptions, body,
 					null, null));
 
@@ -1035,6 +1042,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a method declaration
 	 */
+	@Override
 	public Object visitConstructorDeclaration(JConstructorDeclaration self,
 			int modifiers, String ident, JFormalParameter[] parameters,
 			CClassType[] exceptions, JConstructorBlock body) {
@@ -1056,6 +1064,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a while statement
 	 */
+	@Override
 	public Object visitWhileStatement(JWhileStatement self, JExpression cond,
 			JStatement body) {
 		blockStart("WhileStatement", self);
@@ -1072,6 +1081,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a variable declaration statement
 	 */
+	@Override
 	public Object visitVariableDeclarationStatement(
 			JVariableDeclarationStatement self, JVariableDefinition[] vars) {
 		blockStart("VariableDeclarationStatement", self);
@@ -1091,6 +1101,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	 * the local variable references that have been resolved to this variable
 	 * def. will still hold.
 	 */
+	@Override
 	public Object visitVariableDefinition(JVariableDefinition self,
 			int modifiers, CType type, String ident, JExpression expr) {
 		blockStart("VariableDefinition: " + self.getIdent(), self);
@@ -1169,6 +1180,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a switch statement
 	 */
+	@Override
 	public Object visitSwitchStatement(JSwitchStatement self, JExpression expr,
 			JSwitchGroup[] body) {
 		blockStart("SwitchStatement", self);
@@ -1183,6 +1195,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a return statement
 	 */
+	@Override
 	public Object visitReturnStatement(JReturnStatement self, JExpression expr) {
 		blockStart("Return", self);
 		if (expr != null)
@@ -1194,6 +1207,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a labeled statement
 	 */
+	@Override
 	public Object visitLabeledStatement(JLabeledStatement self, String label,
 			JStatement stmt) {
 		blockStart("LabeledStatement", self);
@@ -1206,6 +1220,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a if statement
 	 */
+	@Override
 	public Object visitIfStatement(JIfStatement self, JExpression cond,
 			JStatement thenClause, JStatement elseClause) {
 		blockStart("IfStatement", self);
@@ -1222,6 +1237,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a for statement
 	 */
+	@Override
 	public Object visitForStatement(JForStatement self, JStatement init,
 			JExpression cond, JStatement incr, JStatement body) {
 		blockStart("ForStatement", self);
@@ -1246,6 +1262,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a compound statement
 	 */
+	@Override
 	public Object visitCompoundStatement(JCompoundStatement self,
 			JStatement[] body) {
 		blockStart("CompoundStatement", self);
@@ -1257,6 +1274,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an expression statement
 	 */
+	@Override
 	public Object visitExpressionStatement(JExpressionStatement self,
 			JExpression expr) {
 		blockStart("ExpressionStatement", self);
@@ -1277,6 +1295,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an expression list statement
 	 */
+	@Override
 	public Object visitExpressionListStatement(JExpressionListStatement self,
 			JExpression[] expr) {
 		blockStart("ExpressionListStatement", self);
@@ -1289,6 +1308,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a empty statement
 	 */
+	@Override
 	public Object visitEmptyStatement(JEmptyStatement self) {
 		blockStart("EmptyStatement", self);
 		return self;
@@ -1297,6 +1317,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a do statement
 	 */
+	@Override
 	public Object visitDoStatement(JDoStatement self, JExpression cond,
 			JStatement body) {
 		blockStart("DoStatement", self);
@@ -1311,6 +1332,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a continue statement
 	 */
+	@Override
 	public Object visitContinueStatement(JContinueStatement self, String label) {
 		blockStart("ContinueStatement", self);
 		return self;
@@ -1319,6 +1341,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a break statement
 	 */
+	@Override
 	public Object visitBreakStatement(JBreakStatement self, String label) {
 		blockStart("BreakStatement", self);
 		return self;
@@ -1327,6 +1350,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an expression statement
 	 */
+	@Override
 	public Object visitBlockStatement(JBlock self, JavaStyleComment[] comments) {
 		JStatement[] body = self.getStatementArray();
 		JTryCatchStatement removeFlag = new JTryCatchStatement(null, null,
@@ -1360,6 +1384,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a type declaration statement
 	 */
+	@Override
 	public Object visitTypeDeclarationStatement(JTypeDeclarationStatement self,
 			JTypeDeclaration decl) {
 		blockStart("TypeDeclarationStatement", self);
@@ -1375,6 +1400,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an unary plus expression
 	 */
+	@Override
 	public Object visitUnaryPlusExpression(JUnaryExpression self,
 			JExpression expr) {
 		blockStart("UnaryPlusExpression", self);
@@ -1386,6 +1412,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an unary minus expression
 	 */
+	@Override
 	public Object visitUnaryMinusExpression(JUnaryExpression self,
 			JExpression expr) {
 		blockStart("UnaryMinusExpression", self);
@@ -1397,6 +1424,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a bitwise complement expression
 	 */
+	@Override
 	public Object visitBitwiseComplementExpression(JUnaryExpression self,
 			JExpression expr) {
 		blockStart("BitwiseComplementExpression", self);
@@ -1408,6 +1436,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a logical complement expression
 	 */
+	@Override
 	public Object visitLogicalComplementExpression(JUnaryExpression self,
 			JExpression expr) {
 		blockStart("LogicalComplementExpression", self);
@@ -1419,6 +1448,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a type name expression
 	 */
+	@Override
 	public Object visitTypeNameExpression(JTypeNameExpression self, CType type) {
 		blockStart("TypeNameExpression", self);
 		return self;
@@ -1427,6 +1457,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a this expression
 	 */
+	@Override
 	public Object visitThisExpression(JThisExpression self, JExpression prefix) {
 		blockStart("ThisExpression", self);
 		// never need to visit a this expression
@@ -1440,6 +1471,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a super expression
 	 */
+	@Override
 	public Object visitSuperExpression(JSuperExpression self) {
 		blockStart("SuperExpression", self);
 		return self;
@@ -1448,6 +1480,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a shift expression
 	 */
+	@Override
 	public Object visitShiftExpression(JShiftExpression self, int oper,
 			JExpression left, JExpression right) {
 		blockStart("ShiftExpression", self);
@@ -1461,6 +1494,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a shift expressiona
 	 */
+	@Override
 	public Object visitRelationalExpression(JRelationalExpression self,
 			int oper, JExpression left, JExpression right) {
 		blockStart("RelationalExpression", self);
@@ -1474,6 +1508,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a prefix expression
 	 */
+	@Override
 	public Object visitPrefixExpression(JPrefixExpression self, int oper,
 			JExpression expr) {
 		blockStart("PrefixExpression", self);
@@ -1485,6 +1520,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a postfix expression
 	 */
+	@Override
 	public Object visitPostfixExpression(JPostfixExpression self, int oper,
 			JExpression expr) {
 		blockStart("PostfixExpression", self);
@@ -1496,6 +1532,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a parenthesed expression
 	 */
+	@Override
 	public Object visitParenthesedExpression(JParenthesedExpression self,
 			JExpression expr) {
 		// Not parenthesized?
@@ -1507,6 +1544,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * Visits an unqualified anonymous class instance creation expression.
 	 */
+	@Override
 	public Object visitQualifiedAnonymousCreation(
 			JQualifiedAnonymousCreation self, JExpression prefix, String ident,
 			JExpression[] params, JClassDeclaration decl) {
@@ -1525,6 +1563,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * Visits an unqualified instance creation expression.
 	 */
+	@Override
 	public Object visitQualifiedInstanceCreation(
 			JQualifiedInstanceCreation self, JExpression prefix, String ident,
 			JExpression[] params) {
@@ -1540,6 +1579,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * Visits an unqualified anonymous class instance creation expression.
 	 */
+	@Override
 	public Object visitUnqualifiedAnonymousCreation(
 			JUnqualifiedAnonymousCreation self, CClassType type,
 			JExpression[] params, JClassDeclaration decl) {
@@ -1569,6 +1609,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * Visits an unqualified instance creation expression.
 	 */
+	@Override
 	public Object visitUnqualifiedInstanceCreation(
 			JUnqualifiedInstanceCreation self, CClassType type,
 			JExpression[] params) {
@@ -1611,6 +1652,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array allocator expression.
 	 */
+	@Override
 	public Object visitNewArrayExpression(JNewArrayExpression self, CType type,
 			JExpression[] dims, JArrayInitializer init) {
 		blockStart("NewArrayExpression", self);
@@ -1627,6 +1669,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a name expression
 	 */
+	@Override
 	public Object visitNameExpression(JNameExpression self, JExpression prefix,
 			String ident) {
 		blockStart("NameExpression", self);
@@ -1638,6 +1681,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array allocator expression
 	 */
+	@Override
 	public Object visitBinaryExpression(JBinaryExpression self, String oper,
 			JExpression left, JExpression right) {
 		blockStart("BinaryExpression", self);
@@ -1733,7 +1777,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 		// Keep track of the list of methods for this interface with a
 		// interface table, to be passed on with a callback to Kopi2SIR
 		SIRInterfaceTable itable = new SIRInterfaceTable(null, interfaces[0],
-				(JMethodDeclaration[]) matchedMethods.clone());
+				matchedMethods.clone());
 		interfaceTableList.add(itable);
 		return new SIRRegReceiverStatement(prefix, st, itable);
 	}
@@ -1761,7 +1805,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 			// now we must set the parent and do any other steps that are
 			// necessary
 			// when registering
-			newST = (SIRStream) ((SIRInitStatement) SIROp).getTarget();
+			newST = ((SIRInitStatement) SIROp).getTarget();
 			newST.setParent((SIRContainer) parentStream);
 		}
 
@@ -1833,6 +1877,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a method call expression
 	 */
+	@Override
 	public Object visitMethodCallExpression(JMethodCallExpression self,
 			JExpression prefix, String ident, JExpression[] args) {
 	
@@ -2206,6 +2251,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a local variable expression
 	 */
+	@Override
 	public Object visitLocalVariableExpression(JLocalVariableExpression self,
 			String ident) {
 		blockStart("LocalVariableExpression", self);
@@ -2221,6 +2267,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an equality expression
 	 */
+	@Override
 	public Object visitEqualityExpression(JEqualityExpression self,
 			boolean equal, JExpression left, JExpression right) {
 		blockStart("EqualityExpression", self);
@@ -2234,6 +2281,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a conditional expression
 	 */
+	@Override
 	public Object visitConditionalExpression(JConditionalExpression self,
 			JExpression cond, JExpression left, JExpression right) {
 		blockStart("ConditionalExpression", self);
@@ -2249,6 +2297,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a compound expression
 	 */
+	@Override
 	public Object visitCompoundAssignmentExpression(
 			JCompoundAssignmentExpression self, int oper, JExpression left,
 			JExpression right) {
@@ -2263,6 +2312,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a field expression
 	 */
+	@Override
 	public Object visitFieldExpression(JFieldAccessExpression self,
 			JExpression left, String ident) {
 		blockStart("FieldExpression", self);
@@ -2292,6 +2342,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a class expression
 	 */
+	@Override
 	public Object visitClassExpression(JClassExpression self, CType type) {
 		blockStart("ClassExpression", self);
 		return self;
@@ -2300,6 +2351,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a cast expression
 	 */
+	@Override
 	public Object visitCastExpression(JCastExpression self, JExpression expr,
 			CType type) {
 		blockStart("CastExpression", self);
@@ -2311,6 +2363,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a cast expression
 	 */
+	@Override
 	public Object visitUnaryPromoteExpression(JUnaryPromote self,
 			JExpression expr, CType type) {
 		blockStart("UnaryPromoteExpression", self);
@@ -2322,6 +2375,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a compound assignment expression
 	 */
+	@Override
 	public Object visitBitwiseExpression(JBitwiseExpression self, int oper,
 			JExpression left, JExpression right) {
 		blockStart("BitwiseExpression", self);
@@ -2335,6 +2389,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an assignment expression
 	 */
+	@Override
 	public Object visitAssignmentExpression(JAssignmentExpression self,
 			JExpression left, JExpression right) {
 		blockStart("AssignmentExpression", self);
@@ -2424,6 +2479,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitArrayLengthExpression(JArrayLengthExpression self,
 			JExpression prefix) {
 		blockStart("ArrayLengthExpression", self);
@@ -2435,6 +2491,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitArrayAccessExpression(JArrayAccessExpression self,
 			JExpression prefix, JExpression accessor) {
 		blockStart("ArrayAccessExpression", self);
@@ -2452,6 +2509,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitSwitchLabel(JSwitchLabel self, JExpression expr) {
 		blockStart("SwitchLabel", self);
 		if (expr != null)
@@ -2462,6 +2520,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitSwitchGroup(JSwitchGroup self, JSwitchLabel[] labels,
 			JStatement[] stmts) {
 		blockStart("SwitchGroup", self);
@@ -2475,6 +2534,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitFormalParameters(JFormalParameter self, boolean isFinal,
 			CType type, String ident) {
 		blockStart("FormalParameter", self);
@@ -2493,6 +2553,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitConstructorCall(JConstructorCall self,
 			boolean functorIsThis, JExpression[] params) {
 		blockStart("ConstructorCall", self);
@@ -2507,6 +2568,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array initializer expression
 	 */
+	@Override
 	public Object visitArrayInitializer(JArrayInitializer self,
 			JExpression[] elems) {
 		blockStart("ArrayInitializer", self);
@@ -2518,6 +2580,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a boolean literal
 	 */
+	@Override
 	public Object visitBooleanLiteral(JBooleanLiteral self, boolean value) {
 		blockStart("BooleanLiteral", self);
 		return new JBooleanLiteral(self.getTokenReference(), value);
@@ -2526,6 +2589,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a byte literal
 	 */
+	@Override
 	public Object visitByteLiteral(JByteLiteral self, byte value) {
 		blockStart("ByteLiteral", self);
 		return new JByteLiteral(self.getTokenReference(), value);
@@ -2534,6 +2598,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a character literal
 	 */
+	@Override
 	public Object visitCharLiteral(JCharLiteral self, char value) {
 		blockStart("CharLiteral", self);
 		return new JCharLiteral(self.getTokenReference(), value);
@@ -2542,6 +2607,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a double literal
 	 */
+	@Override
 	public Object visitDoubleLiteral(JDoubleLiteral self, double value) {
 		blockStart("DoubleLiteral", self);
 		if (KjcOptions.tilera > 0)
@@ -2552,6 +2618,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a float literal
 	 */
+	@Override
 	public Object visitFloatLiteral(JFloatLiteral self, float value) {
 		blockStart("FloatLiteral", self);
 		return new JFloatLiteral(self.getTokenReference(), value);
@@ -2560,6 +2627,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a int literal
 	 */
+	@Override
 	public Object visitIntLiteral(JIntLiteral self, int value) {
 		blockStart("IntLiteral", self);
 		return new JIntLiteral(self.getTokenReference(), value);
@@ -2568,6 +2636,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a long literal
 	 */
+	@Override
 	public Object visitLongLiteral(JLongLiteral self, long value) {
 		blockStart("LongLiteral", self);
 		return new JLongLiteral(self.getTokenReference(), value);
@@ -2576,6 +2645,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a short literal
 	 */
+	@Override
 	public Object visitShortLiteral(JShortLiteral self, short value) {
 		blockStart("ShortLiteral", self);
 		return new JShortLiteral(self.getTokenReference(), value);
@@ -2584,6 +2654,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a string literal
 	 */
+	@Override
 	public Object visitStringLiteral(JStringLiteral self, String value) {
 		blockStart("StringLiteral", self);
 		return new JStringLiteral(self.getTokenReference(), value);
@@ -2592,6 +2663,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a null literal
 	 */
+	@Override
 	public Object visitNullLiteral(JNullLiteral self) {
 		blockStart("NullLiteral", self);
 		return new JNullLiteral(self.getTokenReference());
@@ -2604,6 +2676,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a package name declaration
 	 */
+	@Override
 	public Object visitPackageName(String name) {
 		blockStart("PackageName");
 		return null;
@@ -2612,6 +2685,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a package import declaration
 	 */
+	@Override
 	public Object visitPackageImport(String name) {
 		blockStart("PackageImport");
 		return null;
@@ -2620,6 +2694,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a class import declaration
 	 */
+	@Override
 	public Object visitClassImport(String name) {
 		blockStart("ClassImport");
 		return null;
@@ -2671,6 +2746,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an interface declaration
 	 */
+	@Override
 	public Object visitInterfaceDeclaration(JInterfaceDeclaration self,
 			int modifiers, String ident, CClassType[] interfaces,
 			JPhylum[] body, JMethodDeclaration[] methods) {
@@ -2683,6 +2759,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a try-catch statement
 	 */
+	@Override
 	public Object visitTryCatchStatement(JTryCatchStatement self,
 			JBlock tryClause, JCatchClause[] catchClauses) {
 		blockStart("TryCatchStatement", self);
@@ -2696,6 +2773,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a try-finally statement
 	 */
+	@Override
 	public Object visitTryFinallyStatement(JTryFinallyStatement self,
 			JBlock tryClause, JBlock finallyClause) {
 		blockStart("TryFinallyStatement", self);
@@ -2708,6 +2786,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a throw statement
 	 */
+	@Override
 	public Object visitThrowStatement(JThrowStatement self, JExpression expr) {
 		blockStart("ThrowStatement", self);
 		/* expr.accept(this); */
@@ -2717,6 +2796,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits a synchronized statement
 	 */
+	@Override
 	public Object visitSynchronizedStatement(JSynchronizedStatement self,
 			JExpression cond, JStatement body) {
 		blockStart("SynchronizedStatement", self);
@@ -2729,6 +2809,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an instanceof expression
 	 */
+	@Override
 	public Object visitInstanceofExpression(JInstanceofExpression self,
 			JExpression expr, CType dest) {
 		blockStart("InstanceOfExpression", self);
@@ -2736,6 +2817,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 		return self;
 	}
 
+	@Override
 	public Object visitEmittedTextExpression(JEmittedTextExpression self,
 			Object[] parts) {
 		throw new AssertionError("Didn's expect JEmittedTextExpression");
@@ -2744,6 +2826,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitComments(JavaStyleComment[] comments) {
 		blockStart("Comments");
 		return comments;
@@ -2752,6 +2835,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitComment(JavaStyleComment comment) {
 		blockStart("Comment");
 		return comment;
@@ -2760,6 +2844,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitJavadoc(JavadocComment comment) {
 		blockStart("Javadoc");
 		return null;
@@ -2768,6 +2853,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
 	 * visits an array length expression
 	 */
+	@Override
 	public Object visitCatchClause(JCatchClause self,
 			JFormalParameter exception, JBlock body) {
 		blockStart("CatchClause", self);
@@ -2779,6 +2865,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
 	/** Returns a deep clone of this object. */
+	@Override
 	public Object deepClone() {
 		at.dms.kjc.Kopi2SIR other = new at.dms.kjc.Kopi2SIR();
 		at.dms.kjc.AutoCloner.register(this, other);

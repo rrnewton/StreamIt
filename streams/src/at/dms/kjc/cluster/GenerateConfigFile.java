@@ -122,7 +122,7 @@ public class GenerateConfigFile {
                     list.add(line);
                 }
                 reader.close();
-                return (String[])list.toArray(new String[0]);
+                return list.toArray(new String[0]);
             } catch (IOException e) {
                 return new String[0];
             }

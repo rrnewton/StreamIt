@@ -279,7 +279,8 @@ public class GenerateCopies extends SymbolTableVisitor
         final boolean[] result = { false };
 
         expr.accept(new FEReplacer() {
-                public Object visitExprFunCall(ExprFunCall expr)
+                @Override
+				public Object visitExprFunCall(ExprFunCall expr)
                 {
                     result[0] = true;
                     // don't need to visit any further; we found what
@@ -291,7 +292,8 @@ public class GenerateCopies extends SymbolTableVisitor
         return result[0];
     }
 
-    public Object visitExprPeek(ExprPeek expr)
+    @Override
+	public Object visitExprPeek(ExprPeek expr)
     {
         Expression result = (Expression)super.visitExprPeek(expr);
         if (needsCopy(result))
@@ -299,7 +301,8 @@ public class GenerateCopies extends SymbolTableVisitor
         return result;
     }
     
-    public Object visitExprPop(ExprPop expr)
+    @Override
+	public Object visitExprPop(ExprPop expr)
     {
         Expression result = (Expression)super.visitExprPop(expr);
         if (needsCopy(result))
@@ -307,7 +310,8 @@ public class GenerateCopies extends SymbolTableVisitor
         return result;
     }
 
-    public Object visitExprHelperCall(ExprHelperCall expr)
+    @Override
+	public Object visitExprHelperCall(ExprHelperCall expr)
     {
         boolean hasChanged = false;
         Expression result = expr;
@@ -333,7 +337,8 @@ public class GenerateCopies extends SymbolTableVisitor
         return result;
     }
 
-    public Object visitStmtAssign(StmtAssign stmt)
+    @Override
+	public Object visitStmtAssign(StmtAssign stmt)
     {
 
         //System.out.println("GenCopies::visitStmtAssign"+
@@ -406,7 +411,8 @@ public class GenerateCopies extends SymbolTableVisitor
         return result;
     }
 
-    public Object visitStmtPush(StmtPush expr)
+    @Override
+	public Object visitStmtPush(StmtPush expr)
     {
         Expression value = (Expression)expr.getValue().accept(this);
         if (needsCopy(value))
@@ -414,7 +420,8 @@ public class GenerateCopies extends SymbolTableVisitor
         return new StmtPush(expr.getContext(), value);
     }
 
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         // Set the active stream name so when we visit an array we know which
         // stream with which to associate it.

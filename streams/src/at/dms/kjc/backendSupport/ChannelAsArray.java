@@ -3,6 +3,7 @@ package at.dms.kjc.backendSupport;
 import java.util.LinkedList;
 import java.util.List;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -112,10 +113,10 @@ public class ChannelAsArray extends IntraSSGChannel {
         bufSize = BufferSize.calculateSize(edge);
         bufDefn = CommonUtils.makeArrayVariableDefn(bufSize,edge.getType(),bufName);
         headDefn = new JVariableDefinition(null,
-                at.dms.kjc.Constants.ACC_STATIC,
+                Constants.ACC_STATIC,
                 CStdType.Integer, headName, null);
         tailDefn = new JVariableDefinition(null,
-                at.dms.kjc.Constants.ACC_STATIC,
+                Constants.ACC_STATIC,
                 CStdType.Integer, tailName, null);
         bufPrefix = new JFieldAccessExpression(bufName);
         bufPrefix.setType(edge.getType());
@@ -126,11 +127,12 @@ public class ChannelAsArray extends IntraSSGChannel {
     }
     
     /** input_type pop(). */
-    public JMethodDeclaration popMethod() {
+    @Override
+	public JMethodDeclaration popMethod() {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 edge.getType(),
                 popMethodName(),
                 new JFormalParameter[0],
@@ -143,7 +145,8 @@ public class ChannelAsArray extends IntraSSGChannel {
     }
 
     /** void pop(int N). */
-    public JMethodDeclaration popManyMethod() {
+    @Override
+	public JMethodDeclaration popManyMethod() {
         String parameterName = "__n";
         JFormalParameter n = new JFormalParameter(
                 CStdType.Integer,
@@ -152,7 +155,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 popManyMethodName(),
                 new JFormalParameter[]{n},
@@ -166,7 +169,8 @@ public class ChannelAsArray extends IntraSSGChannel {
     }
     
     /** void pop(input_type val)  generally assign if val is not an array, else memcpy */
-    public JMethodDeclaration assignFromPopMethod() {
+    @Override
+	public JMethodDeclaration assignFromPopMethod() {
         String parameterName = "__val";
         JFormalParameter val = new JFormalParameter(
                 CStdType.Integer,
@@ -175,7 +179,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 assignFromPopMethodName(),
                 new JFormalParameter[]{val},
@@ -189,7 +193,8 @@ public class ChannelAsArray extends IntraSSGChannel {
     }
     
     /** input_type peek(int offset) */
-    public JMethodDeclaration peekMethod() {
+    @Override
+	public JMethodDeclaration peekMethod() {
         String parameterName = "__offset";
         JFormalParameter offset = new JFormalParameter(
                 CStdType.Integer,
@@ -198,7 +203,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 edge.getType(),
                 peekMethodName(),
                 new JFormalParameter[]{offset},
@@ -211,7 +216,8 @@ public class ChannelAsArray extends IntraSSGChannel {
     }
 
     /** void peek(input_type val, int offset)  generally assign if val is not an array, else memcpy */
-    public JMethodDeclaration assignFromPeekMethod() {
+    @Override
+	public JMethodDeclaration assignFromPeekMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
                 CStdType.Integer,
@@ -223,7 +229,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 assignFromPeekMethodName(),
                 new JFormalParameter[]{val,offset},
@@ -237,7 +243,8 @@ public class ChannelAsArray extends IntraSSGChannel {
     }
 
    /** void push(output_type val) */
-    public JMethodDeclaration pushMethod() {
+    @Override
+	public JMethodDeclaration pushMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
                 edge.getType(),
@@ -246,7 +253,7 @@ public class ChannelAsArray extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 pushMethodName(),
                 new JFormalParameter[]{val},
@@ -261,72 +268,84 @@ public class ChannelAsArray extends IntraSSGChannel {
      }
     
     /** Statements for beginning of init() on read (downstream) end of buffer */
-    public List<JStatement> beginInitRead() {
+    @Override
+	public List<JStatement> beginInitRead() {
         List<JStatement> retval = new LinkedList<JStatement>();
         retval.add(zeroOutTail());
         return retval; 
     }
 
     /** Statements for end of init() on read (downstream) end of buffer */
-    public List<JStatement> endInitRead() {
+    @Override
+	public List<JStatement> endInitRead() {
         return new LinkedList<JStatement>(); 
     }
 
     /** Statements for beginning of init() on write (upstream) end of buffer */
-    public List<JStatement> beginInitWrite() {
+    @Override
+	public List<JStatement> beginInitWrite() {
         List<JStatement> retval = new LinkedList<JStatement>();
         retval.add(zeroOutHead());
         return retval; 
     }
 
     /** Statements for end of init() on write (upstream) end of buffer */
-    public List<JStatement> endInitWrite() {
+    @Override
+	public List<JStatement> endInitWrite() {
         return new LinkedList<JStatement>(); 
     }
     
     /** Statements for beginning of steady state iteration on read (downstream) end of buffer */
-    public List<JStatement> beginSteadyRead() {
+    @Override
+	public List<JStatement> beginSteadyRead() {
         List<JStatement> retval = new LinkedList<JStatement>();
         retval.add(zeroOutTail());
         return retval; 
     }
 
     /** Statements for end of steady state iteration on read (downstream) end of buffer */
-    public List<JStatement> endSteadyRead() {
+    @Override
+	public List<JStatement> endSteadyRead() {
         return new LinkedList<JStatement>(); 
     }
 
     /** Statements for beginning of steady state iteration on write (upstream) end of buffer */
-    public List<JStatement> beginSteadyWrite() {
+    @Override
+	public List<JStatement> beginSteadyWrite() {
         List<JStatement> retval = new LinkedList<JStatement>();
         retval.add(zeroOutHead());
         return retval; 
     }
 
     /** Statements for end of steady state iteration on write (upstream) end of buffer */
-    public List<JStatement> endSteadyWrite() {
+    @Override
+	public List<JStatement> endSteadyWrite() {
         return new LinkedList<JStatement>(); 
     }
     
     /** Statements for beginning of work function.
      * May be more convenient than at top of steady state if work function iterated. */
-    public List<JStatement> topOfWorkSteadyRead() {
+    @Override
+	public List<JStatement> topOfWorkSteadyRead() {
         return new LinkedList<JStatement>(); 
     }
     
     /** Statements for beginning of work function.
      * May be more convenient than at top of steady state if work function iterated. */
-    public List<JStatement> topOfWorkSteadyWrite() {
+    @Override
+	public List<JStatement> topOfWorkSteadyWrite() {
         return new LinkedList<JStatement>(); 
     }
  
     /** Statements for data declaration in .h file */
-    public List<JStatement> dataDeclsH() {
+    @Override
+	public List<JStatement> dataDeclsH() {
         return new LinkedList<JStatement>();
     }
     
     /** Statements for data declaration at top of .c / .cpp file */
-    public List<JStatement> dataDecls() {
+    @Override
+	public List<JStatement> dataDecls() {
         JStatement arrayDecl = new JVariableDeclarationStatement(bufDefn); 
         List<JStatement> retval = new LinkedList<JStatement>();
         retval.add(arrayDecl);
@@ -335,13 +354,15 @@ public class ChannelAsArray extends IntraSSGChannel {
     
     /** Statements for extern declarations needed for read 
      * in steady state but at global scope in .c / .cpp */
-    public List<JStatement> readDeclsExtern() {
+    @Override
+	public List<JStatement> readDeclsExtern() {
         return new LinkedList<JStatement>();
     }   
     
     /** Statements for other declarations needed for read  
      * in steady state but at file scope in .c / .cpp */
-    public List<JStatement> readDecls() {
+    @Override
+	public List<JStatement> readDecls() {
         JStatement headDecl = new JVariableDeclarationStatement(tailDefn);
         List<JStatement> retval = new LinkedList<JStatement>();
         retval.add(headDecl);
@@ -351,13 +372,15 @@ public class ChannelAsArray extends IntraSSGChannel {
     
     /** Statements for extern declarations needed for write 
      * in steady state but at global scope in .c / .cpp */
-    public List<JStatement> writeDeclsExtern() {
+    @Override
+	public List<JStatement> writeDeclsExtern() {
         return new LinkedList<JStatement>();
     }   
     
     /** Statements for other declarations needed for write
      * in steady state but at file scope in .c / .cpp */
-    public List<JStatement> writeDecls() {
+    @Override
+	public List<JStatement> writeDecls() {
         JStatement tailDecl = new JVariableDeclarationStatement(headDefn);
         List<JStatement> retval = new LinkedList<JStatement>();
         retval.add(tailDecl);

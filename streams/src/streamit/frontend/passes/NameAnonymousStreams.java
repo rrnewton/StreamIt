@@ -71,7 +71,8 @@ public class NameAnonymousStreams extends SymbolTableVisitor
         return newStreams;
     }
 
-    public Object visitProgram(Program prog)
+    @Override
+	public Object visitProgram(Program prog)
     {
         prog = (Program)super.visitProgram(prog);
         // Combine prog's stream list and newStreams.
@@ -81,7 +82,8 @@ public class NameAnonymousStreams extends SymbolTableVisitor
         return new Program(prog.getContext(), streams, prog.getStructs(), prog.getHelpers());
     }
 
-    public Object visitSCAnon(SCAnon creator)
+    @Override
+	public Object visitSCAnon(SCAnon creator)
     {
         // First, replace things in children.
         StreamSpec newSpec = (StreamSpec)creator.getSpec().accept(this);
@@ -90,7 +92,8 @@ public class NameAnonymousStreams extends SymbolTableVisitor
         // variables.
         final Set<String> freeVars = new java.util.TreeSet<String>();
         newSpec.accept(new SymbolTableVisitor(null) {
-                public Object visitExprVar(ExprVar expr)
+                @Override
+				public Object visitExprVar(ExprVar expr)
                 {
                     Object result = super.visitExprVar(expr);
                     if (!(symtab.hasVar(expr.getName())))

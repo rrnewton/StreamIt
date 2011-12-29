@@ -63,7 +63,8 @@ public class TokenCache {
             return store;
         }
 
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             int h = 0;
             int index1 = start;
             char[]  val = data;
@@ -75,7 +76,8 @@ public class TokenCache {
             return h * 37 + type;
         }
 
-        public boolean equals(Object o) {
+        @Override
+		public boolean equals(Object o) {
             if (!(o instanceof LookupToken)) {
                 return false;
             }

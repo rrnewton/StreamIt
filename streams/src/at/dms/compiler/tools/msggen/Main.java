@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 
+import at.dms.compiler.tools.common.CompilerMessages;
+
 //import gnu.getopt.Getopt;
 //import gnu.getopt.LongOpt;
 
@@ -93,7 +95,7 @@ public class Main {
             return false;
         }
         if (options.nonOptions.length == 0) {
-            System.err.println(MsggenMessages.NO_INPUT_FILE.getFormat());
+            System.err.println(CompilerMessages.NO_INPUT_FILE.getFormat());
             return false;
         } else if (options.nonOptions.length > 1) {
             options.usage();

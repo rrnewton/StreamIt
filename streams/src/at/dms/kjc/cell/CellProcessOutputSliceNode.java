@@ -2,6 +2,7 @@ package at.dms.kjc.cell;
 
 import java.util.LinkedList;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JBlock;
@@ -265,7 +266,7 @@ public class CellProcessOutputSliceNode extends ProcessOutputFilterNode {
 
         JMethodDeclaration splitter_method = new JMethodDeclaration(
                 null, 
-                at.dms.kjc.Constants.ACC_STATIC | at.dms.kjc.Constants.ACC_INLINE,
+                Constants.ACC_STATIC | Constants.ACC_INLINE,
                 CStdType.Void,
                 splitter_method_name,
                 new JFormalParameter[]{arg},

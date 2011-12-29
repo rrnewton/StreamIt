@@ -40,7 +40,8 @@ public class TypeStructRef extends Type
         return name;
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (other instanceof TypeStruct)
             {
@@ -60,12 +61,14 @@ public class TypeStructRef extends Type
         return false;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return name.hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return name;
     }

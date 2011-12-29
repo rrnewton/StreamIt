@@ -61,7 +61,8 @@ public class LIRSetJoiner extends LIRNode
                 weights[i] = this.weights[i];
     }
     
-    public void accept(SLIRVisitor v) 
+    @Override
+	public void accept(SLIRVisitor v) 
     {
         int[] weights = null;
         if (this.weights != null)

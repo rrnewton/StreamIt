@@ -34,7 +34,8 @@ abstract public class Joiner extends Operator
     public Channel inputChannel[] = null;
     public Channel outputChannel = null;
 
-    public void init()
+    @Override
+	public void init()
     {}
 
     void add(Stream s)
@@ -47,7 +48,8 @@ abstract public class Joiner extends Operator
         return true;
     }
 
-    public void connectGraph()
+    @Override
+	public void connectGraph()
     {
         // do I even have anything to do?
         if (srcs.isEmpty())
@@ -103,7 +105,8 @@ abstract public class Joiner extends Operator
         addJoiner();
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return "joiner";
     }
@@ -121,7 +124,8 @@ abstract public class Joiner extends Operator
         flIter = fl;
     }
 
-    public boolean canFire() {
+    @Override
+	public boolean canFire() {
         // for the day when joiners can ever receive messages,
         // make sure that all inputs are ready before starting
         // execution, so that messages can be delivered in time
@@ -140,7 +144,8 @@ abstract public class Joiner extends Operator
         return true;
     }
 
-    public void prepareToWork() {
+    @Override
+	public void prepareToWork() {
         if (!Stream.scheduledRun) {
             // for the day when joiners can ever receive messages,
             // make sure that all inputs are ready before starting
@@ -161,7 +166,8 @@ abstract public class Joiner extends Operator
     }
 
     int nWork = 0;
-    public void work()
+    @Override
+	public void work()
     {
         int throughput[] =
             (sjIter != null

@@ -33,24 +33,29 @@ public class UniProcessors  implements ComputeNodesI<UniComputeCodeStore>{
     /**
      * Assume that it is easy to add more nodes...
      */
-    public boolean canAllocateNewComputeNode() {
+    @Override
+	public boolean canAllocateNewComputeNode() {
         return true;
     }
 
-    public UniProcessor getNthComputeNode(int n) {
+    @Override
+	public UniProcessor getNthComputeNode(int n) {
         return nodes.elementAt(n);
     }
 
-    public boolean isValidComputeNodeNumber(int nodeNumber) {
+    @Override
+	public boolean isValidComputeNodeNumber(int nodeNumber) {
         return 0 <= nodeNumber && nodeNumber < nodes.size();
     }
 
-    public int newComputeNode() {
+    @Override
+	public int newComputeNode() {
         nodes.add(new UniProcessor(nodes.size()));
         return nodes.size() - 1;
     }
 
-    public int size() {
+    @Override
+	public int size() {
         return nodes.size();
     }
 

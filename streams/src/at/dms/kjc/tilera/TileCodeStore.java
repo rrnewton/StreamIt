@@ -241,7 +241,7 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
     }
     
     public Tile getParent() {
-        return (Tile)parent;
+        return parent;
     }
     
     /**

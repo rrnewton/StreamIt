@@ -18,7 +18,8 @@ public class Restrictions extends streamit.misc.Misc
     class RestrictionExecutionsComperator
         implements streamit.misc.Comperator
     {
-        public boolean isLess(Object leftObj, Object rightObj)
+        @Override
+		public boolean isLess(Object leftObj, Object rightObj)
         {
             assert leftObj != null && rightObj != null;
             assert leftObj instanceof Restriction
@@ -39,7 +40,8 @@ public class Restrictions extends streamit.misc.Misc
 
     class RestrictionPrtlFltrComperator implements streamit.misc.Comperator
     {
-        public boolean isLess(Object leftObj, Object rightObj)
+        @Override
+		public boolean isLess(Object leftObj, Object rightObj)
         {
             assert leftObj != null && rightObj != null;
             assert leftObj instanceof Restriction

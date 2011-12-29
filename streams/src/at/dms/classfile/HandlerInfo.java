@@ -87,7 +87,8 @@ public class HandlerInfo implements AccessorContainer {
     /**
      * Transforms targets (deferences to actual instructions).
      */
-    public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
+    @Override
+	public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
         this.start = this.start.transform(transformer, this);
         this.end = this.end.transform(transformer, this);
         this.handler = this.handler.transform(transformer, this);
@@ -172,7 +173,7 @@ public class HandlerInfo implements AccessorContainer {
         out.writeShort((short)((Instruction)start).getAddress());
         out.writeShort((short)(((Instruction)end).getAddress() + ((Instruction)end).getSize()));
         out.writeShort((short)((Instruction)handler).getAddress());
-        out.writeShort((short)(thrown == null ? 0 : thrown.getIndex()));
+        out.writeShort((thrown == null ? 0 : thrown.getIndex()));
     }
 
     // --------------------------------------------------------------------

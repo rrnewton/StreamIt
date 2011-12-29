@@ -32,7 +32,8 @@ public class LIRIdentity extends LIRNode
         return childName;
     }
     
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitIdentity(this);
     }

@@ -105,7 +105,8 @@ public class FileReaderDMACommands extends FileReaderCode{
      * 
      * @return the dma commands
      */
-    public List<JStatement> getCode(SchedulingPhase which) {
+    @Override
+	public List<JStatement> getCode(SchedulingPhase which) {
         if (which == SchedulingPhase.INIT)
             return commandsInit;
         
@@ -116,7 +117,8 @@ public class FileReaderDMACommands extends FileReaderCode{
      * Return declarations of variables needed by the dma commands 
      * @return declarations of variables needed by the dma commands 
      */
-    public List<JStatement> decls() {
+    @Override
+	public List<JStatement> decls() {
         return decls;
     }
     
@@ -125,7 +127,8 @@ public class FileReaderDMACommands extends FileReaderCode{
      * 
      * @return the wait statements
      */
-    public List<JStatement> waitCallsSteady() {
+    @Override
+	public List<JStatement> waitCallsSteady() {
         return waitCallsSteady;    
     }
 }

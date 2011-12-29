@@ -6,6 +6,7 @@ package at.dms.kjc.spacedynamic;
 import java.util.List;
 import java.util.ListIterator;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -95,7 +96,7 @@ public class BufferedDynamicCommunication {
 
         // create the method and add it to the filter
         JMethodDeclaration rawMainFunct = new JMethodDeclaration(null,
-                                                                 at.dms.kjc.Constants.ACC_PUBLIC, CStdType.Void,
+                                                                 Constants.ACC_PUBLIC, CStdType.Void,
                                                                  RawExecutionCode.rawMain, JFormalParameter.EMPTY,
                                                                  CClassType.EMPTY, block, null, null);
         filter.addMethod(rawMainFunct);
@@ -185,7 +186,8 @@ public class BufferedDynamicCommunication {
          * var = buf[oldest]; size--; oldest = (oldest + 1) % bufferSize; } else {
          * var = dynamic_receive(); }
          */
-        public Object visitPopExpression(SIRPopExpression oldSelf,
+        @Override
+		public Object visitPopExpression(SIRPopExpression oldSelf,
                                          CType oldTapeType) {
             // do the super
             SIRPopExpression self = (SIRPopExpression) super
@@ -202,7 +204,8 @@ public class BufferedDynamicCommunication {
         // convert peek exps into:
         // (recvBuffer[(recvBufferIndex + (arg) + 1) mod recvBufferSize]) ??
         // WHAT IS IT NOW????
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType, JExpression oldArg) {
             // do the super
             SIRPeekExpression self = (SIRPeekExpression) super

@@ -181,7 +181,7 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
 
         // create the method and add it to the filter
         JMethodDeclaration rawMainFunct = new JMethodDeclaration(null,
-                                                                 at.dms.kjc.Constants.ACC_PUBLIC, CStdType.Void,
+                                                                 at.dms.classfile.Constants.ACC_PUBLIC, CStdType.Void,
                                                                  RawExecutionCode.rawMain, JFormalParameter.EMPTY,
                                                                  CClassType.EMPTY, block, null, null);
         filter.addMethod(rawMainFunct);
@@ -296,7 +296,7 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
                 : 1;
 
             JVariableDefinition recvBufVar = new JVariableDefinition(null,
-                                                                     at.dms.kjc.Constants.ACC_FINAL, // ?????????
+                                                                     at.dms.classfile.Constants.ACC_FINAL, // ?????????
                                                                      new CArrayType(CommonUtils.getBaseType(filter.getInputType()), dim /* dimension */,
                                                                                     bufferDims(filter, filter.getInputType(),
                                                                                                buffersize)), RawExecutionCode.recvBuffer,
@@ -304,13 +304,13 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
 
             // the size of the buffer
             JVariableDefinition recvBufferSizeVar = new JVariableDefinition(
-                                                                            null, at.dms.kjc.Constants.ACC_FINAL, // ?????????
+                                                                            null, at.dms.classfile.Constants.ACC_FINAL, // ?????????
                                                                             CStdType.Integer, RawExecutionCode.recvBufferSize,
                                                                             new JIntLiteral(buffersize));
 
             // the size of the buffer
             JVariableDefinition recvBufferBitsVar = new JVariableDefinition(
-                                                                            null, at.dms.kjc.Constants.ACC_FINAL, // ?????????
+                                                                            null, at.dms.classfile.Constants.ACC_FINAL, // ?????????
                                                                             CStdType.Integer, RawExecutionCode.recvBufferBits,
                                                                             new JIntLiteral(buffersize - 1));
 
@@ -358,7 +358,7 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
                                       * Util.getTypeSize(filter.getOutputType()));
 
             JVariableDefinition sendBufVar = new JVariableDefinition(null,
-                                                                     at.dms.kjc.Constants.ACC_FINAL, // ?????????
+                                                                     at.dms.classfile.Constants.ACC_FINAL, // ?????????
                                                                      new CArrayType(filter.getOutputType(), 1 /* dimension */,
                                                                                     dims), RawExecutionCode.sendBuffer, null);
             localVariables.sendBuffer = sendBufVar;
@@ -894,7 +894,8 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
 
         // for pop expressions convert to the form
         // (recvBuffer[++recvBufferIndex % recvBufferSize])
-        public Object visitPopExpression(SIRPopExpression oldSelf,
+        @Override
+		public Object visitPopExpression(SIRPopExpression oldSelf,
                                          CType oldTapeType) {
 
             // do the super
@@ -918,7 +919,8 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
 
         // convert peek exps into:
         // (recvBuffer[(recvBufferIndex + (arg) + 1) mod recvBufferSize])
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType, JExpression oldArg) {
             // do the super
             SIRPeekExpression self = (SIRPeekExpression) super
@@ -970,7 +972,8 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
 
         // for pop expressions convert to the form
         // (recvBuffer[++recvBufferIndex % recvBufferSize])
-        public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
+        @Override
+		public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
 
             // create the increment of the index var
             JPrefixExpression bufferIncrement = new JPrefixExpression(null,
@@ -999,7 +1002,8 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
 
         // convert peek exps into:
         // (recvBuffer[(recvBufferIndex + (arg) + 1) mod recvBufferSize])
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType, JExpression oldArg) {
             // do the super
             SIRPeekExpression self = (SIRPeekExpression) super
@@ -1048,7 +1052,8 @@ public class BufferedStaticCommunication extends at.dms.util.Utils implements
         /**
          * Visits a push expression.
          */
-        public Object visitPushExpression(SIRPushExpression self,
+        @Override
+		public Object visitPushExpression(SIRPushExpression self,
                                           CType tapeType, JExpression arg) {
             JExpression newExp = (JExpression) arg.accept(this);
             return new JAssignmentExpression(null, new JArrayAccessExpression(

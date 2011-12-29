@@ -29,19 +29,24 @@ class WildcardElement extends GrammarAtom {
         super(g, t);
         line = t.getLine();
     }
-    public void generate(JavaCodeGenerator generator) {
+    @Override
+	public void generate(JavaCodeGenerator generator) {
         generator.gen(this);
     }
-    public String getLabel() {
+    @Override
+	public String getLabel() {
         return label;
     }
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
-    public void setLabel(String label_) {
+    @Override
+	public void setLabel(String label_) {
         label = label_;
     }
-    public String toString() {
+    @Override
+	public String toString() {
         String s = " ";
         if (label!=null) {
             s += label+":";

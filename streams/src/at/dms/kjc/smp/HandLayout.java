@@ -30,7 +30,8 @@ public class HandLayout implements Layout {
         assignment = new HashMap<InternalFilterNode, Core>();
     }
 
-    public ComputeNode getComputeNode(InternalFilterNode node) {
+    @Override
+	public ComputeNode getComputeNode(InternalFilterNode node) {
         return assignment.get(node);
     }
 
@@ -71,7 +72,8 @@ public class HandLayout implements Layout {
         }
     }
     
-    public void runLayout() {
+    @Override
+	public void runLayout() {
         Iterator<Filter> slices = scheduleOrder.iterator();
                 
         System.out.println("Enter desired tile for each filter: ");
@@ -87,7 +89,8 @@ public class HandLayout implements Layout {
         }
     }
 
-    public void setComputeNode(InternalFilterNode node, ComputeNode tile) {
+    @Override
+	public void setComputeNode(InternalFilterNode node, ComputeNode tile) {
         assignment.put(node, (Core)tile);
     }
 

@@ -77,7 +77,8 @@ public class CCompilationUnitContext extends CContext {
     /**
      * Returns the field definition state.
      */
-    public CVariableInfo getFieldInfo() {
+    @Override
+	public CVariableInfo getFieldInfo() {
         return null;
     }
 
@@ -98,7 +99,8 @@ public class CCompilationUnitContext extends CContext {
      * @return  a class according to imports or null if error occur
      * @exception UnpositionedError this error will be positioned soon
      */
-    public CClassType lookupClass(CClass caller, String name) throws UnpositionedError {
+    @Override
+	public CClassType lookupClass(CClass caller, String name) throws UnpositionedError {
         return cunit.lookupClass(caller, name);
     }
 
@@ -110,7 +112,8 @@ public class CCompilationUnitContext extends CContext {
      * getParentContext
      * @return  the parent
      */
-    public CContext getParentContext() {
+    @Override
+	public CContext getParentContext() {
         throw new InconsistencyException();
     }
 
@@ -118,7 +121,8 @@ public class CCompilationUnitContext extends CContext {
      * getClass
      * @return  the near parent of type CClassContext
      */
-    public CClassContext getClassContext() {
+    @Override
+	public CClassContext getClassContext() {
         return null;
     }
 
@@ -126,18 +130,21 @@ public class CCompilationUnitContext extends CContext {
      * getMethod
      * @return  the near parent of type CMethodContext
      */
-    public CMethodContext getMethodContext() {
+    @Override
+	public CMethodContext getMethodContext() {
         return null;
     }
 
     /**
      * @return  the compilation unit
      */
-    public CCompilationUnitContext getCompilationUnitContext() {
+    @Override
+	public CCompilationUnitContext getCompilationUnitContext() {
         return this;
     }
 
-    public CBlockContext getBlockContext() {
+    @Override
+	public CBlockContext getBlockContext() {
         return null;
     }
 
@@ -150,7 +157,8 @@ public class CCompilationUnitContext extends CContext {
      *
      * @param   trouble     the error to report
      */
-    public void reportTrouble(PositionedError trouble) {
+    @Override
+	public void reportTrouble(PositionedError trouble) {
         compiler.reportTrouble(trouble);
     }
 
@@ -161,7 +169,8 @@ public class CCompilationUnitContext extends CContext {
     /**
      * Adds a class to generate
      */
-    public void addSourceClass(CSourceClass clazz) {
+    @Override
+	public void addSourceClass(CSourceClass clazz) {
         classes.addElement(clazz);
     }
 
@@ -176,7 +185,8 @@ public class CCompilationUnitContext extends CContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CCompilationUnitContext other = new at.dms.kjc.CCompilationUnitContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -83,7 +83,8 @@ public class InputBuffer extends java.io.Reader {
     /**
      * Closes the input buffer.
      */
-    public void close() throws IOException {
+    @Override
+	public void close() throws IOException {
         if (reader != null) {
             reader.close();
         }
@@ -105,7 +106,8 @@ public class InputBuffer extends java.io.Reader {
      * @return  The number of characters read, or -1 if the end of the stream has been reached
      * @exception   IOException - If an I/O error occurs
      */
-    public int read(char[] cbuf, int off, int len) throws IOException {
+    @Override
+	public int read(char[] cbuf, int off, int len) throws IOException {
         int         read;
 
         read = reader.read(cbuf, off, len);

@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JClassDeclaration;
@@ -120,8 +121,7 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
                 // define the dummy variable 
                 JVariableDefinition dummyvar = 
                     new JVariableDefinition(/* tokenref */ null, 
-                                            /* modifiers */ at.dms.kjc.
-                                            Constants.ACC_PUBLIC,
+                                            /* modifiers */ Constants.ACC_PUBLIC,
                                             /* type - any type would do */ CStdType.Integer,
                                             /* identifier */ "__dummy__",
                                             /* initializer */ null);
@@ -137,7 +137,7 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
         return new JClassDeclaration(/* TokenReference where */
                                      null,
                                      /* int modifiers */
-                                     at.dms.kjc.Constants.ACC_PUBLIC,
+                                     Constants.ACC_PUBLIC,
                                      /* java.lang.String ident */
                                      "Main",
                                      /* CClassType superClass */
@@ -201,8 +201,7 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
             // define a variable of the structure
             JVariableDefinition var = 
                 new JVariableDefinition(/* tokenref */ null, 
-                                        /* modifiers */ at.dms.kjc.
-                                        Constants.ACC_PUBLIC,
+                                        /* modifiers */ Constants.ACC_PUBLIC,
                                         /* type */ CClassType.lookup(typeName),
                                         /* identifier  */ varName,
                                         /* initializer */ null);
@@ -220,7 +219,7 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
             new JClassDeclaration(/* TokenReference where */
                                   null,
                                   /* int modifiers, */
-                                  at.dms.kjc.Constants.ACC_PUBLIC,
+                                  Constants.ACC_PUBLIC,
                                   /* String ident,  */
                                   name,
                                   /* CClassType superClass, */
@@ -266,7 +265,8 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
         // data structure as the first argument
         for (int i=0; i<methods.length; i++) {
             methods[i].accept(new SLIREmptyVisitor() {
-                    public void visitMethodCallExpression(JMethodCallExpression
+                    @Override
+					public void visitMethodCallExpression(JMethodCallExpression
                                                           self,
                                                           JExpression prefix,
                                                           String ident,
@@ -360,8 +360,8 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
             new JClassDeclaration(/* TokenReference where */
                                   null,
                                   /* int modifiers, */
-                                  at.dms.kjc.Constants.ACC_PUBLIC |
-                                  at.dms.kjc.Constants.ACC_STATIC,
+                                  Constants.ACC_PUBLIC |
+                                  Constants.ACC_STATIC,
                                   /* String ident,  */
                                   self.getIdent(),
                                   /* CClassType superClass, */
@@ -387,7 +387,8 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
     }
      
     /* visit a filter */
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
         // only worry about actual SIRFilter's, not special cases like
         // FileReader's and FileWriter's
@@ -403,7 +404,8 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
     }
 
     /* visit a phased filter */
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         // create struct type
         createStruct(self.getTypeNameInC(), self.getFields(), EMPTY_LIST);
@@ -418,19 +420,22 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
      */
         
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self,
+    @Override
+	public void preVisitPipeline(SIRPipeline self,
                                  SIRPipelineIter iter) {
         // don't do anything--visit on the way up
     }
   
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter) {
         // don't do anything--visit on the way up
     }
   
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
         // don't do anything--visit on the way up
     }
@@ -455,19 +460,22 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
     }
         
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self,
+    @Override
+	public void postVisitPipeline(SIRPipeline self,
                                   SIRPipelineIter iter) {
         postVisit(self.getTypeNameInC(), self.getFields(), self.getMethods(), self.getSequentialStreams());
     }
   
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
         postVisit(self.getTypeNameInC(), self.getFields(), self.getMethods(), self.getParallelStreams());
     }
   
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
         // make a list of body and loop
         List<SIRStream> children = new LinkedList<SIRStream>();
@@ -488,7 +496,8 @@ public class Structurer extends at.dms.util.Utils implements StreamVisitor {
         /**
          * visits a field expression
          */
-        public void visitFieldExpression(JFieldAccessExpression self,
+        @Override
+		public void visitFieldExpression(JFieldAccessExpression self,
                                          JExpression left,
                                          String ident) {
             // for <this> expressions, replace the LHS with a refernce to

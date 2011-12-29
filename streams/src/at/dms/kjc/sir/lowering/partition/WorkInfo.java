@@ -74,7 +74,8 @@ class WorkInfo {
     /**
      * Returns the amount of work.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "" + (reps*workExact);
     }
 
@@ -116,7 +117,8 @@ class WorkInfo {
      * Make them hash to the same node if they started from the same
      * filter and have the same work *estimate*
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return (int)workEstimate;
     }
 
@@ -124,7 +126,8 @@ class WorkInfo {
      * Count as equal if started from same filter and have same work
      * estimate.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o instanceof WorkInfo &&
                 ((WorkInfo)o).workEstimate==this.workEstimate);
     }

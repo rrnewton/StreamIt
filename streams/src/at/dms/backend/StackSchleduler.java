@@ -60,7 +60,8 @@ public class StackSchleduler extends TreeWalker {
      *
      * @param   node        the node to be processed
      */
-    protected void processNode(QNode node) {
+    @Override
+	protected void processNode(QNode node) {
         QOrigin[]   origins = node.getOrigins();
         int     pos = 0;
 
@@ -114,7 +115,8 @@ public class StackSchleduler extends TreeWalker {
      /**
      * Called when a branch is reached
      */
-    protected void kill() {
+    @Override
+	protected void kill() {
         stack.setSize(0);
     }
 

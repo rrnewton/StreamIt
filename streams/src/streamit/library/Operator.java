@@ -2016,7 +2016,8 @@ public class Operator extends DestroyedClass
      * This is what shows up on nodes in the dot graph output of the
      * library.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getClass().getName();
     }
 

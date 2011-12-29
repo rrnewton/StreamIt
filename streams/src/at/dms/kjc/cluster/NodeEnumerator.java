@@ -56,7 +56,8 @@ public class NodeEnumerator {
         /**
          * Needs to have root FlatNode of graph accept a NodeEnumerator to set up numbers to nodes associations.
          */
-        public void visitNode(FlatNode node) {
+        @Override
+		public void visitNode(FlatNode node) {
 
             Integer _int = new Integer(counter); 
 
@@ -114,7 +115,8 @@ public class NodeEnumerator {
             JMethodDeclaration[] methods = str.getMethods();
             for (int i=0; i<methods.length; i++) {
                 methods[i].accept(new SLIREmptyVisitor() {
-                        public void visitFormalParameters(JFormalParameter self,
+                        @Override
+						public void visitFormalParameters(JFormalParameter self,
                                                           boolean isFinal,
                                                           CType type,
                                                           String ident) {
@@ -122,7 +124,8 @@ public class NodeEnumerator {
                             result[0] += type.getSizeInC();
                         }
             
-                        public void visitVariableDefinition(JVariableDefinition self,
+                        @Override
+						public void visitVariableDefinition(JVariableDefinition self,
                                                             int modifiers,
                                                             CType type,
                                                             String ident,

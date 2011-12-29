@@ -74,44 +74,52 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits an init statement.
      */
-    public void visitInitStatement(SIRInitStatement self,
+    @Override
+	public void visitInitStatement(SIRInitStatement self,
                                    SIRStream target) {
         for (int i=0; i<self.getArgs().size(); i++) {
-            ((JExpression)self.getArgs().get(i)).accept(this);
+            self.getArgs().get(i).accept(this);
         }
     }
 
     /**
      * Visits an interface table.
      */
-    public void visitInterfaceTable(SIRInterfaceTable self) {}
+    @Override
+	public void visitInterfaceTable(SIRInterfaceTable self) {}
 
     /**
      * Visits a latency.
      */
-    public void visitLatency(SIRLatency self) {}
+    @Override
+	public void visitLatency(SIRLatency self) {}
 
     /**
      * Visits a max latency.
      */
-    public void visitLatencyMax(SIRLatencyMax self) {}
+    @Override
+	public void visitLatencyMax(SIRLatencyMax self) {}
 
     /**
      * Visits a latency range.
      */
-    public void visitLatencyRange(SIRLatencyRange self) {}
+    @Override
+	public void visitLatencyRange(SIRLatencyRange self) {}
 
     /**
      * Visits a latency set.
      */
-    public void visitLatencySet(SIRLatencySet self) {}
+    @Override
+	public void visitLatencySet(SIRLatencySet self) {}
 
-    public void visitCreatePortalExpression(SIRCreatePortal self) {}
+    @Override
+	public void visitCreatePortalExpression(SIRCreatePortal self) {}
 
     /**
      * Visits a message statement.
      */
-    public void visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public void visitMessageStatement(SIRMessageStatement self,
                                       JExpression portal,
                                       String iname,
                                       String ident,
@@ -127,7 +135,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a range expression.
      */
-    public void visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public void visitRangeExpression(SIRRangeExpression self) {
         self.getMin().accept(this);
         self.getAve().accept(this);
         self.getMax().accept(this);
@@ -136,12 +145,14 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a dynamic token.
      */
-    public void visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public void visitDynamicToken(SIRDynamicToken self) {
     }
     
     /**
      * Visits an iteration count expression.
      */
+	@Override
 	public void visitIterationExpression(
 			SIRIterationExpression sirIterationExpression) {
 	}
@@ -149,7 +160,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a peek expression.
      */
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         arg.accept(this);
@@ -158,20 +170,23 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a pop expression.
      */
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType) {
     }
 
     /**
      * Visits a message-receiving portal.
      */
-    public void visitPortal(SIRPortal self) {
+    @Override
+	public void visitPortal(SIRPortal self) {
     }
 
     /**
      * Visits a print statement.
      */
-    public void visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression arg) {
         arg.accept(this);
     }
@@ -179,7 +194,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a push expression.
      */
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         arg.accept(this);
@@ -188,7 +204,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a register-receiver statement.
      */
-    public void visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public void visitRegReceiverStatement(SIRRegReceiverStatement self,
                                           JExpression portal,
                                           SIRStream receiver,
                                           JMethodDeclaration[] methods) {
@@ -198,7 +215,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a register-sender statement.
      */
-    public void visitRegSenderStatement(SIRRegSenderStatement self,
+    @Override
+	public void visitRegSenderStatement(SIRRegSenderStatement self,
                                         String portal,
                                         SIRLatency latency) {
         latency.accept(this);
@@ -208,7 +226,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visit SIRMarker.
      */
-    public void visitMarker(SIRMarker self) {
+    @Override
+	public void visitMarker(SIRMarker self) {
     }
 
     /**
@@ -218,19 +237,22 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a function pointer.
      */
-    public void visitFunctionPointer(LIRFunctionPointer self,
+    @Override
+	public void visitFunctionPointer(LIRFunctionPointer self,
                                      String name) {
     }
     
     /**
      * Visits an LIR node.
      */
-    public void visitNode(LIRNode self) {}
+    @Override
+	public void visitNode(LIRNode self) {}
 
     /**
      * Visits an LIR register-receiver statement.
      */
-    public void visitRegisterReceiver(LIRRegisterReceiver self,
+    @Override
+	public void visitRegisterReceiver(LIRRegisterReceiver self,
                                       JExpression streamContext,
                                       SIRPortal portal,
                                       String childName,
@@ -243,7 +265,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a child registration node.
      */
-    public void visitSetChild(LIRSetChild self,
+    @Override
+	public void visitSetChild(LIRSetChild self,
                               JExpression streamContext,
                               String childType,
                               String childName) {
@@ -253,7 +276,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a decoder registration node.
      */
-    public void visitSetDecode(LIRSetDecode self,
+    @Override
+	public void visitSetDecode(LIRSetDecode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp) {
         streamContext.accept(this);
@@ -263,7 +287,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a feedback loop delay node.
      */
-    public void visitSetDelay(LIRSetDelay self,
+    @Override
+	public void visitSetDelay(LIRSetDelay self,
                               JExpression data,
                               JExpression streamContext,
                               int delay,
@@ -277,28 +302,32 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a file reader.
      */
-    public void visitFileReader(LIRFileReader self) {
+    @Override
+	public void visitFileReader(LIRFileReader self) {
         self.getStreamContext().accept(this);
     }
     
     /**
      * Visits a file writer.
      */
-    public void visitFileWriter(LIRFileWriter self) {
+    @Override
+	public void visitFileWriter(LIRFileWriter self) {
         self.getStreamContext().accept(this);
     }
 
     /**
      * Visits an identity creator.
      */
-    public void visitIdentity(LIRIdentity self) {
+    @Override
+	public void visitIdentity(LIRIdentity self) {
         self.getStreamContext().accept(this);
     }
     
     /**
      * Visits an encoder registration node.
      */
-    public void visitSetEncode(LIRSetEncode self,
+    @Override
+	public void visitSetEncode(LIRSetEncode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp) {
         streamContext.accept(this);
@@ -308,7 +337,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a joiner-setting node.
      */
-    public void visitSetJoiner(LIRSetJoiner self,
+    @Override
+	public void visitSetJoiner(LIRSetJoiner self,
                                JExpression streamContext,
                                SIRJoinType type,
                                int ways,
@@ -319,7 +349,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a peek-rate-setting node.
      */
-    public void visitSetPeek(LIRSetPeek self,
+    @Override
+	public void visitSetPeek(LIRSetPeek self,
                              JExpression streamContext,
                              int peek) {
         streamContext.accept(this);
@@ -328,7 +359,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a pop-rate-setting node.
      */
-    public void visitSetPop(LIRSetPop self,
+    @Override
+	public void visitSetPop(LIRSetPop self,
                             JExpression streamContext,
                             int pop) {
         streamContext.accept(this);
@@ -337,7 +369,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a push-rate-setting node.
      */
-    public void visitSetPush(LIRSetPush self,
+    @Override
+	public void visitSetPush(LIRSetPush self,
                              JExpression streamContext,
                              int push) {
         streamContext.accept(this);
@@ -346,7 +379,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a splitter-setting node.
      */
-    public void visitSetSplitter(LIRSetSplitter self,
+    @Override
+	public void visitSetSplitter(LIRSetSplitter self,
                                  JExpression streamContext,
                                  SIRSplitType type,
                                  int ways,
@@ -357,7 +391,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a stream-type-setting node.
      */
-    public void visitSetStreamType(LIRSetStreamType self,
+    @Override
+	public void visitSetStreamType(LIRSetStreamType self,
                                    JExpression streamContext,
                                    LIRStreamType streamType) {
         streamContext.accept(this);
@@ -366,7 +401,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a work-function-setting node.
      */
-    public void visitSetWork(LIRSetWork self,
+    @Override
+	public void visitSetWork(LIRSetWork self,
                              JExpression streamContext,
                              LIRFunctionPointer fn) {
         streamContext.accept(this);
@@ -376,7 +412,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a tape registerer.
      */
-    public void visitSetTape(LIRSetTape self,
+    @Override
+	public void visitSetTape(LIRSetTape self,
                              JExpression streamContext,
                              JExpression srcStruct,
                              JExpression dstStruct,
@@ -390,7 +427,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a main function contents.
      */
-    public void visitMainFunction(LIRMainFunction self,
+    @Override
+	public void visitMainFunction(LIRMainFunction self,
                                   String typeName,
                                   LIRFunctionPointer init,
                                   List<JStatement> initStatements) {
@@ -404,7 +442,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a set body of feedback loop.
      */
-    public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
+    @Override
+	public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -419,7 +458,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a set loop of feedback loop.
      */
-    public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
+    @Override
+	public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -433,7 +473,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a set a parallel stream.
      */
-    public void visitSetParallelStream(LIRSetParallelStream self,
+    @Override
+	public void visitSetParallelStream(LIRSetParallelStream self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        int position,
@@ -448,7 +489,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a work function entry.
      */
-    public void visitWorkEntry(LIRWorkEntry self)
+    @Override
+	public void visitWorkEntry(LIRWorkEntry self)
     {
         self.getStreamContext().accept(this);
     }
@@ -456,7 +498,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a work function exit.
      */
-    public void visitWorkExit(LIRWorkExit self)
+    @Override
+	public void visitWorkExit(LIRWorkExit self)
     {
         self.getStreamContext().accept(this);
     }
@@ -469,7 +512,8 @@ public class SLIREmptyVisitor extends KjcEmptyVisitor
     /**
      * Visits a vector literal
      */
-    public void visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
+    @Override
+	public void visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
         scalar.accept(this);
     }
 

@@ -60,7 +60,8 @@ public class LIRSetLoopOfFeedback extends LIRNode {
         this.outputSize = outputSize;
     }
 
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitSetLoopOfFeedback(this,
                                  this.getStreamContext(), 

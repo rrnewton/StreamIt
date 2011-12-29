@@ -46,7 +46,8 @@ public class SIRFileWriter extends SIRPredefinedFilter implements Cloneable {
         return ((JStringLiteral)fileName).stringValue();
     }
 
-    public void propagatePredefinedFields(Propagator propagator) {
+    @Override
+	public void propagatePredefinedFields(Propagator propagator) {
         JExpression newFilename = (JExpression)fileName.accept(propagator);
         if (newFilename!=null && newFilename!=fileName) {
             fileName = newFilename;
@@ -56,7 +57,8 @@ public class SIRFileWriter extends SIRPredefinedFilter implements Cloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRFileWriter other = new at.dms.kjc.sir.SIRFileWriter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

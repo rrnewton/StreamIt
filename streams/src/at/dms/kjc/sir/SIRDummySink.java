@@ -63,8 +63,7 @@ public class SIRDummySink extends SIRPredefinedFilter implements Cloneable, Cons
                                        /* comments */ null);    
     
         JMethodDeclaration workfn =  new JMethodDeclaration( /* tokref     */ null,
-                                                             /* modifiers  */ at.dms.kjc.
-                                                             Constants.ACC_PUBLIC,
+                                                             /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                                              /* returntype */ CStdType.Void,
                                                              /* identifier */ "work",
                                                              /* parameters */ JFormalParameter.EMPTY,

@@ -49,7 +49,8 @@ public class PopToPeek extends EmptyStreamVisitor implements Constants {
     }
     
     /** visit a filter and do the transformation on it. **/
-    public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+    @Override
+	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
         // if the work function is null, our work here is done.
         if (self.getWork() != null) {
             doIt(self, self.getWork().getBody(), self.getPopInt());
@@ -110,7 +111,8 @@ public class PopToPeek extends EmptyStreamVisitor implements Constants {
         }
 
         /** visit a pop expression and convert it into a peek expression. **/
-        public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
+        @Override
+		public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
             // the basic scheme -- add a peek at the current index var
             // and then add a indexvar increment. 
 
@@ -123,7 +125,8 @@ public class PopToPeek extends EmptyStreamVisitor implements Constants {
         }
 
         /** Visit a peek expression and change the index to be the current value+index. **/
-        public Object visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
             // push ourselves through the current peek expression's argument
             JExpression visitedExpr = (JExpression)arg.accept(this);
                 

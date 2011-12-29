@@ -11,13 +11,15 @@ import at.dms.kjc.JMethodDeclaration;
  */
 public class ReplacingStreamVisitor implements AttributeStreamVisitor {
     /* visit a structure */
-    public Object visitStructure(SIRStructure self,
+    @Override
+	public Object visitStructure(SIRStructure self,
                                  JFieldDeclaration[] fields) {
         return self;
     }
 
     /* visit a filter */
-    public Object visitFilter(SIRFilter self,
+    @Override
+	public Object visitFilter(SIRFilter self,
                               JFieldDeclaration[] fields,
                               JMethodDeclaration[] methods,
                               JMethodDeclaration init,
@@ -27,7 +29,8 @@ public class ReplacingStreamVisitor implements AttributeStreamVisitor {
     }
   
     /* visit a phased filter */
-    public Object visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public Object visitPhasedFilter(SIRPhasedFilter self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init,
@@ -40,21 +43,24 @@ public class ReplacingStreamVisitor implements AttributeStreamVisitor {
     }
   
     /* visit a splitter */
-    public Object visitSplitter(SIRSplitter self,
+    @Override
+	public Object visitSplitter(SIRSplitter self,
                                 SIRSplitType type,
                                 JExpression[] weights) {
         return self;
     }
     
     /* visit a joiner */
-    public Object visitJoiner(SIRJoiner self,
+    @Override
+	public Object visitJoiner(SIRJoiner self,
                               SIRJoinType type,
                               JExpression[] weights) {
         return self;
     }
 
     /* pre-visit a pipeline */
-    public Object visitPipeline(SIRPipeline self,
+    @Override
+	public Object visitPipeline(SIRPipeline self,
                                 JFieldDeclaration[] fields,
                                 JMethodDeclaration[] methods,
                                 JMethodDeclaration init) {
@@ -67,7 +73,8 @@ public class ReplacingStreamVisitor implements AttributeStreamVisitor {
     }
 
     /* pre-visit a splitjoin */
-    public Object visitSplitJoin(SIRSplitJoin self,
+    @Override
+	public Object visitSplitJoin(SIRSplitJoin self,
                                  JFieldDeclaration[] fields,
                                  JMethodDeclaration[] methods,
                                  JMethodDeclaration init,
@@ -86,7 +93,8 @@ public class ReplacingStreamVisitor implements AttributeStreamVisitor {
     }
 
     /* pre-visit a feedbackloop */
-    public Object visitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init,

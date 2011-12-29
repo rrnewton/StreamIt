@@ -47,19 +47,23 @@ public abstract class LinearReplacer extends EmptyStreamVisitor implements Const
     // order of and-expression), and only clear the children if we
     // make a replacement (to prevent the visitor from descending into
     // disconnected stream components).
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
         if (!KjcOptions.nolinearcollapse && makeReplacement(self)) { self.clear(); }
     }
-    public void preVisitPipeline(    SIRPipeline self,
+    @Override
+	public void preVisitPipeline(    SIRPipeline self,
                                      SIRPipelineIter iter){
         if (!KjcOptions.nolinearcollapse && makeReplacement(self)) { self.clear(); }
     }
-    public void preVisitSplitJoin(   SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(   SIRSplitJoin self,
                                      SIRSplitJoinIter iter){
         if (!KjcOptions.nolinearcollapse && makeReplacement(self)) { self.clear(); }
     }
-    public void visitFilter(         SIRFilter self,
+    @Override
+	public void visitFilter(         SIRFilter self,
                                      SIRFilterIter iter){
         makeReplacement(self);
     }
@@ -86,10 +90,14 @@ public abstract class LinearReplacer extends EmptyStreamVisitor implements Const
     class LinearChildCounter extends EmptyStreamVisitor {
         HashSet<SIRStream> kids = new HashSet<SIRStream>();
         public HashSet<SIRStream> getKids() {return this.kids;}
-        public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {kids.add(self);}
-        public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter){kids.add(self);}
-        public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter){kids.add(self);}
-        public void visitFilter(SIRFilter self, SIRFilterIter iter){kids.add(self);}
+        @Override
+		public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {kids.add(self);}
+        @Override
+		public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter){kids.add(self);}
+        @Override
+		public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter){kids.add(self);}
+        @Override
+		public void visitFilter(SIRFilter self, SIRFilterIter iter){kids.add(self);}
     }
 
     /**

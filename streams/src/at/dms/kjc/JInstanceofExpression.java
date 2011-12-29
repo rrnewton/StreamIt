@@ -59,7 +59,8 @@ public class JInstanceofExpression extends JExpression {
      *
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Boolean;
     }
     
@@ -67,7 +68,8 @@ public class JInstanceofExpression extends JExpression {
      * Manifest type CStdType.Boolean; do not set to anything else.
      */
     
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         assert type == getType();
     }
 
@@ -81,7 +83,8 @@ public class JInstanceofExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         expr = expr.analyse(context);
         try {
             dest.checkType(context);
@@ -109,7 +112,8 @@ public class JInstanceofExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitInstanceofExpression(this, expr, dest);
     }
 
@@ -117,7 +121,8 @@ public class JInstanceofExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitInstanceofExpression(this, expr, dest);
     }
 
@@ -139,7 +144,8 @@ public class JInstanceofExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         expr.genCode(code, false);
@@ -160,7 +166,8 @@ public class JInstanceofExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JInstanceofExpression other = new at.dms.kjc.JInstanceofExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

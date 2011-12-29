@@ -1,5 +1,6 @@
 package at.dms.kjc.rstream;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JAssignmentExpression;
@@ -84,7 +85,7 @@ public class File_Writer extends SIRFilter
         initBlock.addStatement(new JExpressionStatement(null, fass, null));
         //set this as the init function...
         this.setInit(new JMethodDeclaration(null,
-                                            at.dms.kjc.Constants.ACC_PUBLIC,
+                                            Constants.ACC_PUBLIC,
                                             CStdType.Void,
                                             "init_filewrite" + uniqueID ,
                                             JFormalParameter.EMPTY,
@@ -167,7 +168,7 @@ public class File_Writer extends SIRFilter
 
         workBlock.addStatement(new JExpressionStatement(null, fileio, null));
         this.setWork(new JMethodDeclaration(null,
-                                            at.dms.kjc.Constants.ACC_PUBLIC,
+                                            Constants.ACC_PUBLIC,
                                             CStdType.Void,
                                             "work_filewrite" + uniqueID ,
                                             JFormalParameter.EMPTY,

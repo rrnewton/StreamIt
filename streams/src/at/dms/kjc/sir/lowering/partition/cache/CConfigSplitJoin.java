@@ -24,7 +24,8 @@ class CConfigSplitJoin extends CConfigContainer {
         num_tiles = 0;
     }
 
-    public boolean getPeek() {
+    @Override
+	public boolean getPeek() {
         boolean duplicate = split_join.getSplitter().getType().isDuplicate();
 
         if (!duplicate) return false; // round robin splitter
@@ -50,7 +51,8 @@ class CConfigSplitJoin extends CConfigContainer {
         return x;
     }
 
-    public int numberOfTiles() {
+    @Override
+	public int numberOfTiles() {
         if (num_tiles > 0) return num_tiles; // check if we have precomputed
  
         FusionInfo fi = getFusionInfo();
@@ -86,7 +88,8 @@ class CConfigSplitJoin extends CConfigContainer {
     }
 
 
-    public FusionInfo getFusionInfo() {
+    @Override
+	public FusionInfo getFusionInfo() {
 
         if (fusion_info != null) return fusion_info; // check if we have precomputed
 
@@ -396,7 +399,8 @@ class CConfigSplitJoin extends CConfigContainer {
         return fusion_info;
     }
     
-    protected SIRStream doCut(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition,
+    @Override
+	protected SIRStream doCut(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition,
                               int x1, int x2, int xPivot, int tileLimit, int tPivot, SIRStream str) {
         // there's a division at this <xPivot>.  We'll
         // return result of a vertical cut
@@ -423,7 +427,8 @@ class CConfigSplitJoin extends CConfigContainer {
      * Mark that horizontal fusion in splitjoin costs something.
      */
     private static final CCost fusionOverhead = new CCost(1);
-    protected CCost fusionOverhead() {
+    @Override
+	protected CCost fusionOverhead() {
         return fusionOverhead;
     }
 }

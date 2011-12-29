@@ -66,7 +66,8 @@ public class ANTLRStringBuffer {
             }
         }
     }
-    public final String toString() {
+    @Override
+	public final String toString() {
         return new String(buffer, 0, length);
     }
 }

@@ -78,7 +78,8 @@ public class MarkFilterBoundaries extends EmptyStreamVisitor {
     }
 
     /* visit a filter */
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
         JMethodDeclaration work = self.getWork();
         work.addStatementFirst(makeBeginMarker(self));

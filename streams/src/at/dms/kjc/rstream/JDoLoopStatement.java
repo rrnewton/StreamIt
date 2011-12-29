@@ -31,6 +31,7 @@ import at.dms.kjc.JLocalVariable;
 import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JRelationalExpression;
 import at.dms.kjc.JStatement;
+import at.dms.util.Utils;
 
 
 /**
@@ -96,8 +97,8 @@ public class JDoLoopStatement extends JForStatement
         this.incrValue = incrVal;
         this.condValue = condVal;
         this.countUp = countUp;
-        this.zeroInit =  (Util.passThruParens(initVal) instanceof JIntLiteral &&
-                          ((JIntLiteral)Util.passThruParens(initVal)).intValue() == 0);
+        this.zeroInit =  (Utils.passThruParens(initVal) instanceof JIntLiteral &&
+                          ((JIntLiteral)Utils.passThruParens(initVal)).intValue() == 0);
     
     }
     
@@ -181,17 +182,17 @@ public class JDoLoopStatement extends JForStatement
     /** return true if the init, cond, and incr values are int literals at compile time **/
     public boolean staticBounds() 
     {
-        return (Util.passThruParens(initValue) instanceof JIntLiteral &&
-                Util.passThruParens(condValue) instanceof JIntLiteral &&
-                Util.passThruParens(incrValue) instanceof JIntLiteral); 
+        return (Utils.passThruParens(initValue) instanceof JIntLiteral &&
+                Utils.passThruParens(condValue) instanceof JIntLiteral &&
+                Utils.passThruParens(incrValue) instanceof JIntLiteral); 
     }
 
     /** return the integer value of the increment value, if not a int literal, fail **/
     public int getIncrInt() 
     {
-        assert Util.passThruParens(incrValue) instanceof JIntLiteral;
+        assert Utils.passThruParens(incrValue) instanceof JIntLiteral;
     
-        return ((JIntLiteral)Util.passThruParens(incrValue)).intValue();
+        return ((JIntLiteral)Utils.passThruParens(incrValue)).intValue();
     }
     
     /** return the trip count of the loop, for this function to pass, the loop
@@ -202,9 +203,9 @@ public class JDoLoopStatement extends JForStatement
     
         int init, cond, incr;
     
-        init = ((JIntLiteral)Util.passThruParens(initValue)).intValue();
-        cond = ((JIntLiteral)Util.passThruParens(condValue)).intValue();
-        incr = ((JIntLiteral)Util.passThruParens(incrValue)).intValue();
+        init = ((JIntLiteral)Utils.passThruParens(initValue)).intValue();
+        cond = ((JIntLiteral)Utils.passThruParens(condValue)).intValue();
+        incr = ((JIntLiteral)Utils.passThruParens(incrValue)).intValue();
     
         int tripCount = (int)java.lang.Math.round((((double)(cond  - init) / (double)incr)));
     
@@ -225,7 +226,8 @@ public class JDoLoopStatement extends JForStatement
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.rstream.JDoLoopStatement other = new at.dms.kjc.rstream.JDoLoopStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

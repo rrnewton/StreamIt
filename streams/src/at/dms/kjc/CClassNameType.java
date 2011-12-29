@@ -58,7 +58,8 @@ public class CClassNameType extends CClassType {
      * For any class type except string, get back the java class type.
      * For string, get back "char*"
      */
-    public String toString() {
+    @Override
+	public String toString() {
         if (qualifiedName == null) {
             return super.toString();
         } else {
@@ -74,7 +75,8 @@ public class CClassNameType extends CClassType {
     /**
      *
      */
-    public String getQualifiedName() {
+    @Override
+	public String getQualifiedName() {
         return qualifiedName == null ? super.getQualifiedName() : qualifiedName;
     }
 
@@ -86,7 +88,8 @@ public class CClassNameType extends CClassType {
      *
      * @return the class object associated with this type
      */
-    public CClass getCClass() {
+    @Override
+	public CClass getCClass() {
         if (qualifiedName != null) {
             try {
                 checkType(null);
@@ -110,7 +113,8 @@ public class CClassNameType extends CClassType {
      * @param   context     the context (may be be null)
      * @exception UnpositionedError this error will be positioned soon
      */
-    public void checkType(CContext context) throws UnpositionedError {
+    @Override
+	public void checkType(CContext context) throws UnpositionedError {
         if (qualifiedName != null) {
             String            clazzName  = null;
 
@@ -201,7 +205,8 @@ public class CClassNameType extends CClassType {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CClassNameType other = new at.dms.kjc.CClassNameType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

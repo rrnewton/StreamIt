@@ -15,7 +15,8 @@ public class SIRPortalSender {
         this.latency = latency;
     }
 
-    public boolean equals(Object obj) {   
+    @Override
+	public boolean equals(Object obj) {   
         if (obj instanceof SIRPortalSender) {
             SIRPortalSender ps = (SIRPortalSender)obj;
             return stream.equals(ps.stream)&&latency.equals(ps.latency);

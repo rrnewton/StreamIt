@@ -340,7 +340,7 @@ public class JavaCodeGenerator {
                 } else {
                     print(s);
                     // check for a paraphrase
-                    TokenSymbol ts = (TokenSymbol)tm.getTokenSymbol(s);
+                    TokenSymbol ts = tm.getTokenSymbol(s);
                     if ( ts==null ) {
                         Utils.warning("undefined token symbol: "+s);
                     } else {
@@ -937,7 +937,7 @@ public class JavaCodeGenerator {
                 generateNonGreedyExitPath = true;
                 nonGreedyExitDepth = blk.exitLookaheadDepth;
             } else if ( !blk.greedy &&
-                        blk.exitLookaheadDepth==LLkGrammarAnalyzer.NONDETERMINISTIC )
+                        blk.exitLookaheadDepth==GrammarAnalyzer.NONDETERMINISTIC )
                 {
                     generateNonGreedyExitPath = true;
                 }
@@ -1271,7 +1271,7 @@ public class JavaCodeGenerator {
                 generateNonGreedyExitPath = true;
                 nonGreedyExitDepth = blk.exitLookaheadDepth;
             } else if ( !blk.greedy &&
-                        blk.exitLookaheadDepth==LLkGrammarAnalyzer.NONDETERMINISTIC )
+                        blk.exitLookaheadDepth==GrammarAnalyzer.NONDETERMINISTIC )
                 {
                     generateNonGreedyExitPath = true;
                 }
@@ -1823,7 +1823,7 @@ public class JavaCodeGenerator {
      * Generate a header that is common to all Java files
      */
     private void genHeader() {
-        println("// $ANTLR "+tool.version+": "+
+        println("// $ANTLR "+Main.version+": "+
                 "\""+Utils.fileMinusPath(tool.grammarFile)+"\""+
                 " -> "+
                 "\""+grammar.getClassName()+".java\"$");
@@ -2362,7 +2362,7 @@ public class JavaCodeGenerator {
         syntacticPredLevel++;
         println("try {");
         tabs++;
-        gen((AlternativeBlock)blk);     // gen code to test predicate
+        gen(blk);     // gen code to test predicate
         tabs--;
         //println("System.out.println(\"pred "+blk+" succeeded\");");
         println("}");
@@ -2412,7 +2412,7 @@ public class JavaCodeGenerator {
                 s = "<"+String.valueOf(i)+">";
             }
             if ( !s.startsWith("\"") && !s.startsWith("<") ) {
-                TokenSymbol ts = (TokenSymbol)grammar.tokenManager.getTokenSymbol(s);
+                TokenSymbol ts = grammar.tokenManager.getTokenSymbol(s);
                 if ( ts!=null && ts.getParaphrase()!=null ) {
                     s = Utils.stripFrontBack(ts.getParaphrase(), "\"", "\"");
                 }
@@ -2695,7 +2695,7 @@ public class JavaCodeGenerator {
      * @return A string representing the mangled literal, or null if not possible.
      */
     private String mangleLiteral(String s) {
-        String mangled = tool.literalsPrefix;
+        String mangled = Main.literalsPrefix;
         for (int i = 1; i < s.length()-1; i++) {
             if (!Character.isLetter(s.charAt(i)) &&
                 s.charAt(i) != '_') {
@@ -2703,7 +2703,7 @@ public class JavaCodeGenerator {
             }
             mangled += s.charAt(i);
         }
-        if (tool.upperCaseMangledLiterals ) {
+        if (Main.upperCaseMangledLiterals ) {
             mangled = mangled.toUpperCase();
         }
         return mangled;

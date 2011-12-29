@@ -271,7 +271,8 @@ public class SemanticChecker
     public void checkStreamCreators(Program prog, final Map<String, FEContext> streamNames)
     {
         prog.accept(new FEReplacer() {
-                public Object visitSCSimple(SCSimple creator)
+                @Override
+				public Object visitSCSimple(SCSimple creator)
                 {
                     String name = creator.getName();
                     if (!streamNames.containsKey(creator.getName()))
@@ -295,7 +296,8 @@ public class SemanticChecker
 
         // Check for duplicate top-level streams.
         prog.accept(new FEReplacer() {
-                public Object visitStreamSpec(StreamSpec ss)
+                @Override
+				public Object visitStreamSpec(StreamSpec ss)
                 {
                     StreamType st = ss.getStreamType();
                     if (ss.getType() != StreamSpec.STREAM_GLOBAL && 
@@ -389,7 +391,8 @@ public class SemanticChecker
                 private StreamSpec spec = null;
                 private Function func = null;
                 
-                public Object visitStreamSpec(StreamSpec ss)
+                @Override
+				public Object visitStreamSpec(StreamSpec ss)
                 {
                     StreamSpec oldSpec = spec;
                     spec = ss;
@@ -398,7 +401,8 @@ public class SemanticChecker
                     return result;
                 }
 
-                public Object visitFunction(Function func2)
+                @Override
+				public Object visitFunction(Function func2)
                 {
                     Function oldFunc = func;
                     func = func2;
@@ -407,7 +411,8 @@ public class SemanticChecker
                     return result;
                 }
 
-                public Object visitFuncWork(FuncWork func2)
+                @Override
+				public Object visitFuncWork(FuncWork func2)
                 {
                     Function oldFunc = func;
                     func = func2;
@@ -419,7 +424,8 @@ public class SemanticChecker
                 // So the remainder of this just needs to check
                 // spec.getType() and func.getCls() and that they're
                 // correct vs. the type of statement.
-                public Object visitStmtAdd(StmtAdd stmt)
+                @Override
+				public Object visitStmtAdd(StmtAdd stmt)
                 {
                     if ((func.getCls() != Function.FUNC_INIT) ||
                         (spec.getType() != StreamSpec.STREAM_PIPELINE &&
@@ -430,7 +436,8 @@ public class SemanticChecker
                     return super.visitStmtAdd(stmt);
                 }
 
-                public Object visitStmtBody(StmtBody stmt)
+                @Override
+				public Object visitStmtBody(StmtBody stmt)
                 {
                     if (func.getCls() != Function.FUNC_INIT ||
                         spec.getType() != StreamSpec.STREAM_FEEDBACKLOOP)
@@ -440,7 +447,8 @@ public class SemanticChecker
                     return super.visitStmtBody(stmt);
                 }
 
-                public Object visitStmtEnqueue(StmtEnqueue stmt)
+                @Override
+				public Object visitStmtEnqueue(StmtEnqueue stmt)
                 {
                     if (func.getCls() != Function.FUNC_INIT ||
                         spec.getType() != StreamSpec.STREAM_FEEDBACKLOOP)
@@ -450,7 +458,8 @@ public class SemanticChecker
                     return super.visitStmtEnqueue(stmt);
                 }
 
-                public Object visitStmtJoin(StmtJoin stmt)
+                @Override
+				public Object visitStmtJoin(StmtJoin stmt)
                 {
                     if ((func.getCls() != Function.FUNC_INIT) ||
                         (spec.getType() != StreamSpec.STREAM_FEEDBACKLOOP &&
@@ -461,7 +470,8 @@ public class SemanticChecker
                     return super.visitStmtJoin(stmt);
                 }
 
-                public Object visitStmtLoop(StmtLoop stmt)
+                @Override
+				public Object visitStmtLoop(StmtLoop stmt)
                 {
                     if (func.getCls() != Function.FUNC_INIT ||
                         spec.getType() != StreamSpec.STREAM_FEEDBACKLOOP)
@@ -471,7 +481,8 @@ public class SemanticChecker
                     return super.visitStmtLoop(stmt);
                 }
 
-                public Object visitExprPeek(ExprPeek expr)
+                @Override
+				public Object visitExprPeek(ExprPeek expr)
                 {
                     if ((func.getCls() != Function.FUNC_HELPER &&
                          func.getCls() != Function.FUNC_PREWORK &&
@@ -483,7 +494,8 @@ public class SemanticChecker
                     return super.visitExprPeek(expr);
                 }
 
-                public Object visitExprPop(ExprPop expr)
+                @Override
+				public Object visitExprPop(ExprPop expr)
                 {
                     if ((func.getCls() != Function.FUNC_HELPER &&
                          func.getCls() != Function.FUNC_PREWORK &&
@@ -495,7 +507,8 @@ public class SemanticChecker
                     return super.visitExprPop(expr);
                 }
 
-                public Object visitStmtPush(StmtPush stmt)
+                @Override
+				public Object visitStmtPush(StmtPush stmt)
                 {
                     if ((func.getCls() != Function.FUNC_HELPER &&
                          func.getCls() != Function.FUNC_PREWORK &&
@@ -507,7 +520,8 @@ public class SemanticChecker
                     return super.visitStmtPush(stmt);
                 }
 
-                public Object visitStmtSplit(StmtSplit stmt)
+                @Override
+				public Object visitStmtSplit(StmtSplit stmt)
                 {
                     if ((func.getCls() != Function.FUNC_INIT) ||
                         (spec.getType() != StreamSpec.STREAM_FEEDBACKLOOP &&
@@ -556,7 +570,8 @@ public class SemanticChecker
                 // an error exactly when GET returns null,
                 // so we can ignore nulls (assume that they type
                 // check).
-                public Object visitExprUnary(ExprUnary expr)
+                @Override
+				public Object visitExprUnary(ExprUnary expr)
                 {
                     Type ot = getType(expr.getExpr());
                     if (ot != null)
@@ -612,7 +627,8 @@ public class SemanticChecker
                     return super.visitExprUnary(expr);
                 }
 
-                public Object visitExprBinary(ExprBinary expr)
+                @Override
+				public Object visitExprBinary(ExprBinary expr)
                 {
                     Type lt = getType(expr.getLeft());
                     Type rt = getType(expr.getRight());
@@ -729,7 +745,8 @@ public class SemanticChecker
                     return super.visitExprBinary(expr);
                 }
 
-                public Object visitExprTernary(ExprTernary expr)
+                @Override
+				public Object visitExprTernary(ExprTernary expr)
                 {
                     Type at = getType(expr.getA());
                     Type bt = getType(expr.getB());
@@ -756,7 +773,8 @@ public class SemanticChecker
                     return super.visitExprTernary(expr);
                 }
 
-                public Object visitExprField(ExprField expr)
+                @Override
+				public Object visitExprField(ExprField expr)
                 {
                     Type lt = getType(expr.getLeft());
 
@@ -827,7 +845,8 @@ public class SemanticChecker
                     return super.visitExprField(expr);
                 }
 
-                public Object visitExprArray(ExprArray expr)
+                @Override
+				public Object visitExprArray(ExprArray expr)
                 {
                     Type bt = getType(expr.getBase());
                     Type ot = getType(expr.getOffset());
@@ -848,7 +867,8 @@ public class SemanticChecker
                     return super.visitExprArray(expr);
                 }
 
-                public Object visitExprArrayInit(ExprArrayInit expr)
+                @Override
+				public Object visitExprArrayInit(ExprArrayInit expr)
                 {
                     // check for uniform length and dimensions among all children.
                     List elems = expr.getElements();
@@ -890,7 +910,8 @@ public class SemanticChecker
                     return super.visitExprArrayInit(expr);
                 }
 
-                public Object visitExprPeek(ExprPeek expr)
+                @Override
+				public Object visitExprPeek(ExprPeek expr)
                 {
                     Type it = getType(expr.getExpr());
                     
@@ -904,7 +925,8 @@ public class SemanticChecker
                     return super.visitExprPeek(expr);                    
                 }
 
-                public Object visitFieldDecl(FieldDecl field) {
+                @Override
+				public Object visitFieldDecl(FieldDecl field) {
                     // check that array sizes match
                     for (int i=0; i<field.getNumFields(); i++) {
                         // the types are backwards from the initializers
@@ -916,7 +938,8 @@ public class SemanticChecker
                     return super.visitFieldDecl(field);
                 }
 
-                public Object visitStmtPush(StmtPush stmt)
+                @Override
+				public Object visitStmtPush(StmtPush stmt)
                 {
                     Type xt = getType(stmt.getValue());
                     
@@ -929,7 +952,8 @@ public class SemanticChecker
                     return super.visitStmtPush(stmt);
                 }
 
-                public Object visitStmtEnqueue(StmtEnqueue stmt)
+                @Override
+				public Object visitStmtEnqueue(StmtEnqueue stmt)
                 {
                     Type xt = getType(stmt.getValue());
                     
@@ -950,7 +974,8 @@ public class SemanticChecker
                     return super.visitStmtEnqueue(stmt);
                 }
 
-                public Object visitStmtAssign(StmtAssign stmt)
+                @Override
+				public Object visitStmtAssign(StmtAssign stmt)
                 {
                     Type lt = getType(stmt.getLHS());
                     Type rt = getType(stmt.getRHS());
@@ -988,7 +1013,8 @@ public class SemanticChecker
         
         // Look for init functions in composite streams:
         prog.accept(new FEReplacer() {
-                public Object visitStreamSpec(StreamSpec ss)
+                @Override
+				public Object visitStreamSpec(StreamSpec ss)
                 {
                     if (ss.getType() == StreamSpec.STREAM_SPLITJOIN)
                         checkSplitJoinConnectionTyping(ss, streams);
@@ -1011,7 +1037,8 @@ public class SemanticChecker
 
         // Use data flow to check the stream types.
         Map inTypes = new DataFlow() {
-                public Lattice getInit()
+                @Override
+				public Lattice getInit()
                 {
                     if (st == null)
                         return new StrictTypeLattice(true); // top
@@ -1019,7 +1046,8 @@ public class SemanticChecker
                         return new StrictTypeLattice(st.getIn());
                 }
                 
-                public Lattice flowFunction(CFGNode node, Lattice in)
+                @Override
+				public Lattice flowFunction(CFGNode node, Lattice in)
                 {
                     if (!node.isStmt())
                         return in;
@@ -1111,7 +1139,8 @@ public class SemanticChecker
         assert init != null;
         CFG cfg = CFGBuilder.buildCFG(init);
         Map typeMap = new DataFlow() {
-                public Lattice getInit()
+                @Override
+				public Lattice getInit()
                 {
                     StreamType st = ss.getStreamType();
                     if (st == null)
@@ -1127,7 +1156,8 @@ public class SemanticChecker
                     return new StrictTypeLattice(theType);
                 }
 
-                public Lattice flowFunction(CFGNode node, Lattice in)
+                @Override
+				public Lattice flowFunction(CFGNode node, Lattice in)
                 {
                     if (!node.isStmt())
                         return in;
@@ -1243,7 +1273,8 @@ public class SemanticChecker
     {
         // Look for init functions in split-joins and feedback loops:
         prog.accept(new FEReplacer() {
-                public Object visitStreamSpec(StreamSpec ss)
+                @Override
+				public Object visitStreamSpec(StreamSpec ss)
                 {
                     if (ss.getType() == StreamSpec.STREAM_SPLITJOIN ||
                         ss.getType() == StreamSpec.STREAM_FEEDBACKLOOP)
@@ -1251,14 +1282,16 @@ public class SemanticChecker
                             exactlyOneStatement
                                 (ss, "split",
                                  new StatementCounter() {
-                                     public boolean
+                                     @Override
+									public boolean
                                          statementQualifies(Statement stmt)
                                      { return stmt instanceof StmtSplit; }
                                  });
                             exactlyOneStatement
                                 (ss, "join",
                                  new StatementCounter() {
-                                     public boolean
+                                     @Override
+									public boolean
                                          statementQualifies(Statement stmt)
                                      { return stmt instanceof StmtJoin; }
                                  });
@@ -1269,14 +1302,16 @@ public class SemanticChecker
                             exactlyOneStatement
                                 (ss, "body",
                                  new StatementCounter() {
-                                     public boolean
+                                     @Override
+									public boolean
                                          statementQualifies(Statement stmt)
                                      { return stmt instanceof StmtBody; }
                                  });
                             exactlyOneStatement
                                 (ss, "loop",
                                  new StatementCounter() {
-                                     public boolean
+                                     @Override
+									public boolean
                                          statementQualifies(Statement stmt)
                                      { return stmt instanceof StmtLoop; }
                                  });
@@ -1331,7 +1366,8 @@ public class SemanticChecker
                 // the function we are currently visiting, if any
                 private Function func;
                 
-                public Object visitStreamSpec(StreamSpec ss)
+                @Override
+				public Object visitStreamSpec(StreamSpec ss)
                 {
                     // We want to save the spec so we can look at its
                     // stream type.  But we only care within the
@@ -1347,14 +1383,16 @@ public class SemanticChecker
                     return super.visitStreamSpec(ss);
                 }
 
-                public Object visitFuncWork(FuncWork func)
+                @Override
+				public Object visitFuncWork(FuncWork func)
                 {
                     this.func = func;
                     checkFunction(func);
                     return super.visitFuncWork(func);
                 }
 
-                public Object visitFunction(Function func)
+                @Override
+				public Object visitFunction(Function func)
                 {
                     this.func = func;
                     // only need to check I/O properties for functions that do I/O
@@ -1427,11 +1465,12 @@ public class SemanticChecker
                 {
                     if (!(type instanceof TypePrimitive)) return false;
                     TypePrimitive tp = (TypePrimitive)type;
-                    if (tp.getType() == tp.TYPE_VOID) return true;
+                    if (tp.getType() == TypePrimitive.TYPE_VOID) return true;
                     return false;
                 }
 
-                public Object visitExprPeek(ExprPeek expr)
+                @Override
+				public Object visitExprPeek(ExprPeek expr)
                 {
                     if (!canPop &&
                         // do allow peeking without popping from prework functions
@@ -1442,7 +1481,8 @@ public class SemanticChecker
                     return super.visitExprPeek(expr);
                 }
 
-                public Object visitExprPop(ExprPop expr)
+                @Override
+				public Object visitExprPop(ExprPop expr)
                 {
                     if (!canPop)
                         report(expr,
@@ -1451,7 +1491,8 @@ public class SemanticChecker
                     return super.visitExprPop(expr);
                 }
 
-                public Object visitStmtPush(StmtPush stmt)
+                @Override
+				public Object visitStmtPush(StmtPush stmt)
                 {
                     if (!canPush)
                         report(stmt,
@@ -1475,7 +1516,8 @@ public class SemanticChecker
     public void checkVariableUsage(Program prog)
     {
         prog.accept(new SymbolTableVisitor(null) {
-                public Object visitExprVar(ExprVar var)
+                @Override
+				public Object visitExprVar(ExprVar var)
                 {
                     // Check: the variable is declared somewhere.
                     try
@@ -1505,7 +1547,8 @@ public class SemanticChecker
                     return false;
                 }
 
-                public Object visitStmtVarDecl(StmtVarDecl stmt)
+                @Override
+				public Object visitStmtVarDecl(StmtVarDecl stmt)
                 {
                     // Check: none of the locals shadow stream parameters.
                     for (int i = 0; i < stmt.getNumVars(); i++)
@@ -1525,7 +1568,8 @@ public class SemanticChecker
                     return super.visitStmtVarDecl(stmt);
                 }
 
-                public Object visitStmtAssign(StmtAssign stmt)
+                @Override
+				public Object visitStmtAssign(StmtAssign stmt)
                 {
                     // Check: LHS isn't a stream parameter.
                     Expression lhs = stmt.getLHS();
@@ -1539,7 +1583,8 @@ public class SemanticChecker
                     return super.visitStmtAssign(stmt);
                 }
 
-                public Object visitExprUnary(ExprUnary expr)
+                @Override
+				public Object visitExprUnary(ExprUnary expr)
                 {
                     int op = expr.getOp();
                     Expression child = expr.getExpr();

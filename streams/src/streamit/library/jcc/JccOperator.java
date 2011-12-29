@@ -19,6 +19,7 @@ abstract class JccOperator extends x10.stream.Filter {
 		return false;
 	}
 
+	@Override
 	public final void test(Promise[] p) {
 		throw new UnsupportedOperationException();
 	}

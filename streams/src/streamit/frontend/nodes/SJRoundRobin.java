@@ -49,7 +49,8 @@ public class SJRoundRobin extends SplitterJoiner
     }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitSJRoundRobin(this);
     }

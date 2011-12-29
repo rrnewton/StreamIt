@@ -112,13 +112,13 @@ public class ProcessFilterSliceNode {
             RotatingBuffer inputBuffer = null;
             
             if (backEndBits.sliceHasUpstreamChannel(filterNode.getParent())) {
-                inputBuffer = InputRotatingBuffer.getInputBuffer(filterNode);
+                inputBuffer = RotatingBuffer.getInputBuffer(filterNode);
             }
             
             RotatingBuffer outputBuffer = null;
             
             if (backEndBits.sliceHasDownstreamChannel(filterNode.getParent())) {
-                outputBuffer = OutputRotatingBuffer.getOutputBuffer(filterNode);
+                outputBuffer = RotatingBuffer.getOutputBuffer(filterNode);
             }
 
             filterCode = getFilterCode(filterNode,inputBuffer,outputBuffer,backEndBits);

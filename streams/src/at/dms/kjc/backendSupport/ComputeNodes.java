@@ -31,26 +31,31 @@ public class ComputeNodes<CodeStoreType extends ComputeCodeStore<?>>  implements
     /**
      * Assume that it is easy to add more nodes...
      */
-    public boolean canAllocateNewComputeNode() {
+    @Override
+	public boolean canAllocateNewComputeNode() {
         return true;
     }
 
-    public ComputeNode<CodeStoreType> getNthComputeNode(int n) {
+    @Override
+	public ComputeNode<CodeStoreType> getNthComputeNode(int n) {
         return nodes.elementAt(n);
     }
 
-    public boolean isValidComputeNodeNumber(int nodeNumber) {
+    @Override
+	public boolean isValidComputeNodeNumber(int nodeNumber) {
         return 0 <= nodeNumber && nodeNumber < nodes.size();
     }
 
-    public int newComputeNode() {
+    @Override
+	public int newComputeNode() {
         ComputeNode<CodeStoreType> node = new ComputeNode<CodeStoreType>();
         node.setUniqueId(high_unique_id);
         nodes.add(node);
         return high_unique_id++;
     }
 
-    public int size() {
+    @Override
+	public int size() {
         return nodes.size();
     }
     

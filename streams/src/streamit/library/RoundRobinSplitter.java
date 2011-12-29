@@ -45,7 +45,8 @@ public class RoundRobinSplitter extends Splitter
     }
     */
 
-    public int [] getWeights ()
+    @Override
+	public int [] getWeights ()
     {
         int numChildren = dest.size ();
         int [] weights = new int [numChildren];
@@ -62,7 +63,8 @@ public class RoundRobinSplitter extends Splitter
         return weights;
     }
 
-    public int getConsumption ()
+    @Override
+	public int getConsumption ()
     {
         int numChildren = dest.size ();
         int inputTotal = 0;
@@ -79,7 +81,8 @@ public class RoundRobinSplitter extends Splitter
         return inputTotal;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "roundrobin";
     }
 }

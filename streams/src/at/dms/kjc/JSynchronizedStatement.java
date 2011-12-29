@@ -64,7 +64,8 @@ public class JSynchronizedStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         localVar = new JGeneratedLocalVariable(null,
                                                0,
                                                CStdType.Integer,
@@ -88,7 +89,8 @@ public class JSynchronizedStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitSynchronizedStatement(this, cond, body);
     }
@@ -97,7 +99,8 @@ public class JSynchronizedStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitSynchronizedStatement(this, cond, body);
     }
 
@@ -116,7 +119,8 @@ public class JSynchronizedStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         CodeLabel       nextLabel = new CodeLabel();
@@ -155,7 +159,8 @@ public class JSynchronizedStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JSynchronizedStatement other = new at.dms.kjc.JSynchronizedStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

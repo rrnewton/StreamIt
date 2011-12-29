@@ -53,10 +53,12 @@ public class DeadcodeElimination extends TreeWalker {
     // PRIVATE METHODS
     // --------------------------------------------------------------------
 
-    protected void processNode(QNode node) {
+    @Override
+	protected void processNode(QNode node) {
     }
 
-    protected void kill() {
+    @Override
+	protected void kill() {
         last = null;
     }
 

@@ -103,7 +103,8 @@ public class WrappableGrowableQueue_obj implements WrappableGrowableQueue {
      * Returns the number of elements currently stored in the queue.
      * @return The number of elements in the queue.
      */
-    public int size() {
+    @Override
+	public int size() {
         return sizeof_queue;
     }
 
@@ -141,7 +142,8 @@ public class WrappableGrowableQueue_obj implements WrappableGrowableQueue {
      * @throws IllegalArgumentException If one tries to set the buffer size to a value 
      *                                  smaller than the current number of elements in the queue.
      */
-    public void setBufferSize(int size) {
+    @Override
+	public void setBufferSize(int size) {
         if (sizeof_queue > size) {
             throw new IllegalArgumentException("sizeof_queue " + sizeof_queue + " size " + size);
         }

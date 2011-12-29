@@ -100,7 +100,8 @@ public class SafeFileReaderWriterPositions {
     }
 
     private class CheckGraph implements FlatVisitor {
-        public void visitNode(FlatNode node) {
+        @Override
+		public void visitNode(FlatNode node) {
             if (node.contents instanceof SIRFileReader) {
                 FlatNode[] outgoing = node.getEdges();
                 if (outgoing.length == 1
@@ -134,7 +135,8 @@ public class SafeFileReaderWriterPositions {
          * a filter should be replaced by a pipeline consisting of the original
          * filter preceeded or followed by an identity filter.</p>
          */
-        public void visitFilter(SIRFilter self,
+        @Override
+		public void visitFilter(SIRFilter self,
                 SIRFilterIter iter) {
             if (self instanceof SIRFileReader
                 && readerBeforeSplitter.contains(self)) {

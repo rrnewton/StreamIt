@@ -91,7 +91,7 @@ public class LinearCost {
     public long getDirectCost() {
         // add the push count now to estimate copying overhead, even
         // if you're not adding/multiplying.
-        return SCALE_FACTOR * (185l + 2l*cols + (3l*(long)multiplyCount) + ((long)addCount));
+        return SCALE_FACTOR * (185l + 2l*cols + (3l*multiplyCount) + addCount);
     }
 
 }

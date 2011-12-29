@@ -35,18 +35,21 @@ class ParserGrammar extends Grammar {
     /**
      * Top-level call to generate the code for this grammar
      */
-    public void generate(JavaCodeGenerator generator) throws IOException {
+    @Override
+	public void generate(JavaCodeGenerator generator) throws IOException {
         generator.gen(this);
     }
     // Get name of class from which generated parser/lexer inherits
-    protected String getSuperClass() {
+    @Override
+	protected String getSuperClass() {
         return "LLkParser";
     }
 
     /**
      * Set parser options -- performs action on the following options:
      */
-    public boolean setOption(String key, Token value) {
+    @Override
+	public boolean setOption(String key, Token value) {
         String s = value.getText();
 
         if (key.equals("interactive")) {

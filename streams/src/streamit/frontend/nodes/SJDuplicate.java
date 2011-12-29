@@ -31,7 +31,8 @@ public class SJDuplicate extends SplitterJoiner
     }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitSJDuplicate(this);
     }

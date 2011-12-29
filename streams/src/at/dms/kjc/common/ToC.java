@@ -89,7 +89,7 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
                     break;
                 }
                 // assume rectangular arrays
-                JExpression next = (JExpression)init.getElems()[0];
+                JExpression next = init.getElems()[0];
                 if (next instanceof JArrayInitializer) {
                     init = (JArrayInitializer)next;
                 } else {
@@ -106,7 +106,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a field declaration
      */
-    public void visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public void visitFieldDeclaration(JFieldDeclaration self,
                                       int modifiers,
                                       CType type,
                                       String ident,
@@ -192,7 +193,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a if statement
      */
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause) {
@@ -271,7 +273,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a this expression
      */
-    public void visitThisExpression(JThisExpression self,
+    @Override
+	public void visitThisExpression(JThisExpression self,
                                     JExpression prefix) {
         //Utils.fail("This Expression encountered");
     }
@@ -279,7 +282,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a super expression
      */
-    public void visitSuperExpression(JSuperExpression self) {
+    @Override
+	public void visitSuperExpression(JSuperExpression self) {
         Utils.fail("Super Expression Encountered");
     }
 
@@ -290,7 +294,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a relational expression
      */
-    public void visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public void visitRelationalExpression(JRelationalExpression self,
                                           int oper,
                                           JExpression left,
                                           JExpression right) {
@@ -339,7 +344,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
      *     to print 'prefix->string'
      *     TODO:  It seems that they should have used a BinaryExpression
      */
-    public void visitNameExpression(JNameExpression self, JExpression prefix,
+    @Override
+	public void visitNameExpression(JNameExpression self, JExpression prefix,
             String ident) {
 
         p.print("(");
@@ -354,7 +360,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints an binary expression
      */
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right) {
@@ -371,7 +378,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident)
     {
@@ -397,7 +405,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a bitwise expression
      */
-    public void visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public void visitBitwiseExpression(JBitwiseExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {
@@ -423,7 +432,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints an array length expression
      */
-    public void visitArrayLengthExpression(JArrayLengthExpression self,
+    @Override
+	public void visitArrayLengthExpression(JArrayLengthExpression self,
                                            JExpression prefix) {
         Utils.fail("Array length expression not supported in streamit");
     
@@ -434,7 +444,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints an array access expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor) {
         printLParen();
@@ -449,17 +460,20 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     // STREAMIT IR HANDLERS
     // ----------------------------------------------------------------------
 
-    public void visitCreatePortalExpression(SIRCreatePortal self) {
+    @Override
+	public void visitCreatePortalExpression(SIRCreatePortal self) {
         p.print("create_portal()");
     }
 
-    public void visitInitStatement(SIRInitStatement self,
+    @Override
+	public void visitInitStatement(SIRInitStatement self,
                                    SIRStream stream)
     {
         p.print("/* InitStatement */");
     }
 
-    public void visitInterfaceTable(SIRInterfaceTable self)
+    @Override
+	public void visitInterfaceTable(SIRInterfaceTable self)
     {
         String iname = self.getIface().getIdent();
         JMethodDeclaration[] methods = self.getMethods();
@@ -475,27 +489,32 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
         p.print("}");
     }
     
-    public void visitLatency(SIRLatency self)
+    @Override
+	public void visitLatency(SIRLatency self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencyMax(SIRLatencyMax self)
+    @Override
+	public void visitLatencyMax(SIRLatencyMax self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencyRange(SIRLatencyRange self)
+    @Override
+	public void visitLatencyRange(SIRLatencyRange self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencySet(SIRLatencySet self)
+    @Override
+	public void visitLatencySet(SIRLatencySet self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
 
-    public void visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public void visitMessageStatement(SIRMessageStatement self,
                                       JExpression portal,
                                       String iname,
                                       String ident,
@@ -528,7 +547,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints an array length expression
      */
-    public void visitSwitchLabel(JSwitchLabel self,
+    @Override
+	public void visitSwitchLabel(JSwitchLabel self,
                                  JExpression expr) {
         p.newLine();
         if (expr != null) {
@@ -543,7 +563,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints an array length expression
      */
-    public void visitSwitchGroup(JSwitchGroup self,
+    @Override
+	public void visitSwitchGroup(JSwitchGroup self,
                                  JSwitchLabel[] labels,
                                  JStatement[] stmts) {
         for (int i = 0; i < labels.length; i++) {
@@ -560,7 +581,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a boolean literal
      */
-    public void visitBooleanLiteral(boolean value) {
+    @Override
+	public void visitBooleanLiteral(boolean value) {
         if (value)
             p.print(this.hasBoolType ? "true" :  "1");
         else
@@ -570,14 +592,16 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a byte literal
      */
-    public void visitByteLiteral(byte value) {
+    @Override
+	public void visitByteLiteral(byte value) {
         p.print("((byte)" + value + ")");
     }
 
     /**
      * prints a character literal
      */
-    public void visitCharLiteral(char value) {
+    @Override
+	public void visitCharLiteral(char value) {
         switch (value) {
         case '\b':
             p.print("'\\b'");
@@ -611,7 +635,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a double literal
      */
-    public void visitDoubleLiteral(double value) {
+    @Override
+	public void visitDoubleLiteral(double value) {
         assert !KjcOptions.fixedpoint;
         p.print("((float)" + value + ")");
     }
@@ -619,7 +644,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a float literal
      */
-    public void visitFloatLiteral(float value) {
+    @Override
+	public void visitFloatLiteral(float value) {
         if (KjcOptions.fixedpoint && value == 0.0f) {
             p.print("(0)");
         } else 
@@ -629,42 +655,48 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints a int literal
      */
-    public void visitIntLiteral(int value) {
+    @Override
+	public void visitIntLiteral(int value) {
         p.print(value);
     }
 
     /**
      * prints a long literal
      */
-    public void visitLongLiteral(long value) {
+    @Override
+	public void visitLongLiteral(long value) {
         p.print("(" + value + "L)");
     }
 
     /**
      * prints a short literal
      */
-    public void visitShortLiteral(short value) {
+    @Override
+	public void visitShortLiteral(short value) {
         p.print("((short)" + value + ")");
     }
 
     /**
      * prints a string literal
      */
-    public void visitStringLiteral(String value) {
+    @Override
+	public void visitStringLiteral(String value) {
         p.print('"' + value + '"');
     }
 
     /**
      * prints a null literal
      */
-    public void visitNullLiteral() {
+    @Override
+	public void visitNullLiteral() {
         p.print("null");
     }
 
     /**
      * prints an array length expression
      */
-    public void visitFormalParameters(JFormalParameter self,
+    @Override
+	public void visitFormalParameters(JFormalParameter self,
                                       boolean isFinal,
                                       CType type,
                                       String ident) {
@@ -695,7 +727,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints an array length expression
      */
-    public void visitConstructorCall(JConstructorCall self,
+    @Override
+	public void visitConstructorCall(JConstructorCall self,
                                      boolean functorIsThis,
                                      JExpression[] params)
     {
@@ -709,7 +742,8 @@ public class ToC extends ToCCommon implements SLIRVisitor,CodeGenerator
     /**
      * prints an array initializer expression
      */
-    public void visitArrayInitializer(JArrayInitializer self,
+    @Override
+	public void visitArrayInitializer(JArrayInitializer self,
                                       JExpression[] elems)
     {
         // RMR { do not insert a new line before array initialization

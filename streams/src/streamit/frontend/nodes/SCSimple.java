@@ -83,7 +83,8 @@ public class SCSimple extends StreamCreator
     }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitSCSimple(this);
     }

@@ -7,11 +7,13 @@ public class PPU extends CellPU {
         super(uniqueId);
     }
     
-    public boolean isPPU() {
+    @Override
+	public boolean isPPU() {
         return true;
     }
     
-    public boolean isSPU() {
+    @Override
+	public boolean isSPU() {
         return false;
     }
 }

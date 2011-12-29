@@ -94,7 +94,8 @@ public class JForStatement extends JLoopStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         try {
             CBlockContext bodyContext = new CBlockContext(context,
                                                           init instanceof JVariableDeclarationStatement ?
@@ -163,7 +164,8 @@ public class JForStatement extends JLoopStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitForStatement(this, init, cond, incr, body);
     }
 
@@ -171,7 +173,8 @@ public class JForStatement extends JLoopStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitForStatement(this, init, cond, incr, body);
     }
 
@@ -179,7 +182,8 @@ public class JForStatement extends JLoopStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         CodeLabel       startLabel = new CodeLabel();
@@ -258,7 +262,8 @@ public class JForStatement extends JLoopStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JForStatement other = new at.dms.kjc.JForStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

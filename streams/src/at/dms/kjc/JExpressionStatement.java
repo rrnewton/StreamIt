@@ -70,7 +70,8 @@ public class JExpressionStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         // the result of the expression will be discarded
         expr = expr.analyse(new CExpressionContext(context, false, true));
         check(context, expr.isStatementExpression(), KjcMessages.INVALID_EXPRESSION_STATEMENT);
@@ -84,7 +85,8 @@ public class JExpressionStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitExpressionStatement(this, expr);
     }
@@ -93,7 +95,8 @@ public class JExpressionStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitExpressionStatement(this, expr);
     }
   
@@ -102,14 +105,16 @@ public class JExpressionStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         // ignore the result
         expr.genCode(code, true);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JExpressionStatement[");
@@ -127,7 +132,8 @@ public class JExpressionStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JExpressionStatement other = new at.dms.kjc.JExpressionStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

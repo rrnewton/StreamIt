@@ -122,10 +122,12 @@ public class Unroller extends SLIRReplacingVisitor {
     public static void unrollFilter(SIRFilter filter, int unrollFactor) {
         // set all loops to be unrolled again
         IterFactory.createFactory().createIter(filter).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream filter, SIRIterator iter) {
+                @Override
+				public void preVisitStream(SIRStream filter, SIRIterator iter) {
                     for (int i=0; i<filter.getMethods().length; i++) {
                         filter.getMethods()[i].accept(new SLIREmptyVisitor() {
-                                public void visitForStatement(JForStatement self, JStatement init, JExpression cond,
+                                @Override
+								public void visitForStatement(JForStatement self, JStatement init, JExpression cond,
                                                               JStatement incr, JStatement body) {
                                     self.setUnrolled(false);
                                 }
@@ -214,7 +216,8 @@ public class Unroller extends SLIRReplacingVisitor {
     /**
      * checks prefix
      */
-    public Object visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public Object visitPrefixExpression(JPrefixExpression self,
                                         int oper,
                                         JExpression expr) {
         if(expr instanceof JLocalVariableExpression) {
@@ -227,7 +230,8 @@ public class Unroller extends SLIRReplacingVisitor {
     /**
      * checks postfix
      */
-    public Object visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public Object visitPostfixExpression(JPostfixExpression self,
                                          int oper,
                                          JExpression expr) {
         if(expr instanceof JLocalVariableExpression){
@@ -240,7 +244,8 @@ public class Unroller extends SLIRReplacingVisitor {
     /**
      * checks var def
      */
-    public Object visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public Object visitVariableDefinition(JVariableDefinition self,
                                           int modifiers,
                                           CType type,
                                           String ident,
@@ -255,7 +260,8 @@ public class Unroller extends SLIRReplacingVisitor {
     /**
      * checks assignment
      */
-    public Object visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public Object visitAssignmentExpression(JAssignmentExpression self,
                                             JExpression left,
                                             JExpression right) {
         if(left instanceof JLocalVariableExpression) {
@@ -270,7 +276,8 @@ public class Unroller extends SLIRReplacingVisitor {
     /**
      * Overload the for-statement visit.
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -386,7 +393,8 @@ public class Unroller extends SLIRReplacingVisitor {
         if(KjcOptions.numbers>0) {
             final boolean[] hasPrint = { false };
             body.accept(new SLIREmptyVisitor() {
-                    public void visitPrintStatement(SIRPrintStatement self,
+                    @Override
+					public void visitPrintStatement(SIRPrintStatement self,
                                                     JExpression arg) {
                         hasPrint[0]=true;
                         super.visitPrintStatement(self,arg);
@@ -507,7 +515,8 @@ public class Unroller extends SLIRReplacingVisitor {
                 //JStatement cloneIncr=(JStatement)ObjectDeepCloner.deepCopy(makeIncr(info,info.incrVal));
                 final int incremented=i;
                 cloneBody.accept(new SLIRReplacingVisitor() {
-                        public Object visitLocalVariableExpression(JLocalVariableExpression self2,
+                        @Override
+						public Object visitLocalVariableExpression(JLocalVariableExpression self2,
                                                                    String ident) {
                             if(inductVar.equals(self2.getVariable())) {
                                 return LoopIterInfo.makeIncreased(info,incremented*incrVal);

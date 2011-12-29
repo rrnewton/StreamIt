@@ -181,7 +181,8 @@ final class CodeEnv {
         // replace instruction handles by actual instructions
         try {
             AccessorTransformer transformer = new AccessorTransformer() {
-                    public InstructionAccessor transform(InstructionAccessor accessor,
+                    @Override
+					public InstructionAccessor transform(InstructionAccessor accessor,
                                                          AccessorContainer container)
                     {
                         // the only accessors to resolve are instruction handles

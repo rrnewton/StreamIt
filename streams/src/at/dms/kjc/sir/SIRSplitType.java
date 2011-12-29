@@ -49,13 +49,13 @@ public class SIRSplitType implements Serializable, DeepCloneable {
 
     private Object readResolve() throws Exception {
         if (this.name.equals("DUPLICATE"))
-            return this.DUPLICATE;
+            return SIRSplitType.DUPLICATE;
         if (this.name.equals("ROUND_ROBIN"))
-            return this.ROUND_ROBIN;
+            return SIRSplitType.ROUND_ROBIN;
         if (this.name.equals("WEIGHTED_ROUND_ROBIN"))
-            return this.WEIGHTED_RR;
+            return SIRSplitType.WEIGHTED_RR;
         if (this.name.equals("NULL_SJ"))
-            return this.NULL;
+            return SIRSplitType.NULL;
         else 
             throw new Exception();
     }
@@ -76,14 +76,16 @@ public class SIRSplitType implements Serializable, DeepCloneable {
         return false;
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         return name;
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRSplitType other = new at.dms.kjc.sir.SIRSplitType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

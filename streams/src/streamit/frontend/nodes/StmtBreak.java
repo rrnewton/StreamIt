@@ -32,12 +32,14 @@ public class StmtBreak extends Statement
     }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtBreak(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         // No state; any two break statements are equal.
         if (other instanceof StmtBreak)
@@ -45,13 +47,15 @@ public class StmtBreak extends Statement
         return false;
     }
 
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         // No state, so...
         return 17;
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return "break";
     }

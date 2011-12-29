@@ -235,7 +235,8 @@ public class StaticStreamGraph {
         // check that we have cuts in the correct places
         // remove edges that connect to flatnodes not in this ssg
         topLevel.accept(new FlatVisitor() {
-            public void visitNode(FlatNode node) {
+            @Override
+			public void visitNode(FlatNode node) {
                 if (!flatNodes.contains(node))
                     return;
 
@@ -264,7 +265,8 @@ public class StaticStreamGraph {
         // make sure all nodes have correct number of connections...
         // seems to be all checks -- except for fixing number of joiner ways.
         topLevel.accept(new FlatVisitor() {
-                public void visitNode(FlatNode node) {
+                @Override
+				public void visitNode(FlatNode node) {
                     if (node.isFilter()) {
                         // checks removed... 
                 } else if (node.isJoiner()) {
@@ -307,7 +309,8 @@ public class StaticStreamGraph {
         splitterBalance = 0;
 
         topLevel.accept(new FlatVisitor() {
-                public void visitNode(FlatNode node) {
+                @Override
+				public void visitNode(FlatNode node) {
                     if (node.isJoiner()) {
                         splitterBalance--;
                     } else if (node.isSplitter()) {
@@ -651,7 +654,8 @@ public class StaticStreamGraph {
         // and update the global parent map
         final StaticStreamGraph thiz = this;
         topLevel.accept(new FlatVisitor() {
-                public void visitNode(FlatNode node) {
+                @Override
+				public void visitNode(FlatNode node) {
                     flatNodes.add(node);
                     streamGraph.parentMap.put(node,thiz);
                 }
@@ -706,7 +710,8 @@ public class StaticStreamGraph {
         bottomLevel = null;
 
         topLevel.accept(new FlatVisitor() {
-                public void visitNode(FlatNode node) {
+                @Override
+				public void visitNode(FlatNode node) {
                     // if the node has no edges, it is a bottom level...
                     if (node.getEdges().length == 0) {
                         assert bottomLevel == null : node;
@@ -850,7 +855,8 @@ public class StaticStreamGraph {
         return topLevelSIR;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         if (topLevelSIR != null) {
             return "StaticStreamGraph_with_SIR_" + topLevelSIR.getName();
         } else {
@@ -926,7 +932,8 @@ public class StaticStreamGraph {
 
         IterFactory.createFactory().createIter(getTopLevelSIR()).accept(
                 new EmptyStreamVisitor() {
-                    public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+                    @Override
+					public void visitFilter(SIRFilter self, SIRFilterIter iter) {
                         if (!(self instanceof SIRDummySource || self instanceof SIRDummySink)) {
                             filters[0]++;
                         }

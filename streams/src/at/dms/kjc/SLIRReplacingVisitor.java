@@ -82,7 +82,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits an init statement.
      */
-    public Object visitInitStatement(SIRInitStatement self,
+    @Override
+	public Object visitInitStatement(SIRInitStatement self,
                                      SIRStream target) {
         List args = self.getArgs();
         for (int i=0; i<args.size(); i++) {
@@ -97,46 +98,53 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits an interface table.
      */
-    public Object visitInterfaceTable(SIRInterfaceTable self) {
+    @Override
+	public Object visitInterfaceTable(SIRInterfaceTable self) {
         return self;
     }
 
     /**
      * Visits a latency.
      */
-    public Object visitLatency(SIRLatency self) {
+    @Override
+	public Object visitLatency(SIRLatency self) {
         return self;
     }
 
     /**
      * Visits a max latency.
      */
-    public Object visitLatencyMax(SIRLatencyMax self) {
+    @Override
+	public Object visitLatencyMax(SIRLatencyMax self) {
         return self;
     }
 
     /**
      * Visits a latency range.
      */
-    public Object visitLatencyRange(SIRLatencyRange self) {
+    @Override
+	public Object visitLatencyRange(SIRLatencyRange self) {
         return self;
     }
 
     /**
      * Visits a latency set.
      */
-    public Object visitLatencySet(SIRLatencySet self) {
+    @Override
+	public Object visitLatencySet(SIRLatencySet self) {
         return self;
     }
 
-    public Object visitCreatePortalExpression(SIRCreatePortal self) {
+    @Override
+	public Object visitCreatePortalExpression(SIRCreatePortal self) {
         return self;
     }
 
     /**
      * Visits a message statement.
      */
-    public Object visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public Object visitMessageStatement(SIRMessageStatement self,
                                         JExpression portal,
                                         String iname,
                                         String ident,
@@ -155,7 +163,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a range expression.
      */
-    public Object visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public Object visitRangeExpression(SIRRangeExpression self) {
         JExpression newMin = (JExpression)self.getMin().accept(this);
         if (newMin!=null && newMin!=self.getMin()) {
             self.setMin(newMin);
@@ -177,13 +186,15 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a dynamic token.
      */
-    public Object visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public Object visitDynamicToken(SIRDynamicToken self) {
         return self;
     }
 
     /**
      * Visits an iteration expression.
      */
+	@Override
 	public Object visitIterationExpression(SIRIterationExpression self) {
 		return self;
 	}
@@ -191,7 +202,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a peek expression.
      */
-    public Object visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public Object visitPeekExpression(SIRPeekExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
@@ -205,7 +217,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a pop expression.
      */
-    public Object visitPopExpression(SIRPopExpression self,
+    @Override
+	public Object visitPopExpression(SIRPopExpression self,
                                      CType tapeType) {
         return self;
     }
@@ -213,14 +226,16 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a message-receiving portal.
      */
-    public Object visitPortal(SIRPortal self) {
+    @Override
+	public Object visitPortal(SIRPortal self) {
         return self;
     }
 
     /**
      * Visits a print statement.
      */
-    public Object visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public Object visitPrintStatement(SIRPrintStatement self,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
         if (newExp!=null && newExp!=arg) {
@@ -233,7 +248,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a push expression.
      */
-    public Object visitPushExpression(SIRPushExpression self,
+    @Override
+	public Object visitPushExpression(SIRPushExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
@@ -247,7 +263,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a vector literal expression.
      */
-    public Object visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
+    @Override
+	public Object visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
         JLiteral newExp = (JLiteral)scalar.accept(this);
         if (newExp!=null && newExp!=scalar) {
             self.setScalar(newExp);
@@ -258,7 +275,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a register-receiver statement.
      */
-    public Object visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public Object visitRegReceiverStatement(SIRRegReceiverStatement self,
                                             JExpression portal,
                                             SIRStream receiver,
                                             JMethodDeclaration[] methods) {
@@ -273,7 +291,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a register-sender statement.
      */
-    public Object visitRegSenderStatement(SIRRegSenderStatement self,
+    @Override
+	public Object visitRegSenderStatement(SIRRegSenderStatement self,
                                           String portal,
                                           SIRLatency latency) {
         latency.accept(this);
@@ -283,7 +302,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visit SIRMarker.
      */
-    public Object visitMarker(SIRMarker self) {
+    @Override
+	public Object visitMarker(SIRMarker self) {
         return self;
     }
 
@@ -294,7 +314,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a function pointer.
      */
-    public Object visitFunctionPointer(LIRFunctionPointer self,
+    @Override
+	public Object visitFunctionPointer(LIRFunctionPointer self,
                                        String name) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
         return self;
@@ -303,7 +324,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits an LIR node.
      */
-    public Object visitNode(LIRNode self) {
+    @Override
+	public Object visitNode(LIRNode self) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
         return self;
     }
@@ -311,7 +333,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a child registration node.
      */
-    public Object visitSetChild(LIRSetChild self,
+    @Override
+	public Object visitSetChild(LIRSetChild self,
                                 JExpression streamContext,
                                 String childType,
                                 String childName) {
@@ -324,7 +347,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a file reader.
      */
-    public Object visitFileReader(LIRFileReader self) {
+    @Override
+	public Object visitFileReader(LIRFileReader self) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
         self.getStreamContext().accept(this);
         return self;
@@ -333,7 +357,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a file writer.
      */
-    public Object visitFileWriter(LIRFileWriter self) {
+    @Override
+	public Object visitFileWriter(LIRFileWriter self) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
         self.getStreamContext().accept(this);
         return self;
@@ -342,7 +367,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a decoder registration node.
      */
-    public Object visitSetDecode(LIRSetDecode self,
+    @Override
+	public Object visitSetDecode(LIRSetDecode self,
                                  JExpression streamContext,
                                  LIRFunctionPointer fp) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
@@ -354,7 +380,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a feedback loop delay node.
      */
-    public Object visitSetDelay(LIRSetDelay self,
+    @Override
+	public Object visitSetDelay(LIRSetDelay self,
                                 JExpression data,
                                 JExpression streamContext,
                                 int delay,
@@ -370,7 +397,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits an encoder registration node.
      */
-    public Object visitSetEncode(LIRSetEncode self,
+    @Override
+	public Object visitSetEncode(LIRSetEncode self,
                                  JExpression streamContext,
                                  LIRFunctionPointer fp) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
@@ -382,7 +410,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a joiner-setting node.
      */
-    public Object visitSetJoiner(LIRSetJoiner self,
+    @Override
+	public Object visitSetJoiner(LIRSetJoiner self,
                                  JExpression streamContext,
                                  SIRJoinType type,
                                  int ways,
@@ -395,7 +424,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a peek-rate-setting node.
      */
-    public Object visitSetPeek(LIRSetPeek self,
+    @Override
+	public Object visitSetPeek(LIRSetPeek self,
                                JExpression streamContext,
                                int peek) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
@@ -406,7 +436,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a pop-rate-setting node.
      */
-    public Object visitSetPop(LIRSetPop self,
+    @Override
+	public Object visitSetPop(LIRSetPop self,
                               JExpression streamContext,
                               int pop) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
@@ -417,7 +448,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a push-rate-setting node.
      */
-    public Object visitSetPush(LIRSetPush self,
+    @Override
+	public Object visitSetPush(LIRSetPush self,
                                JExpression streamContext,
                                int push) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
@@ -428,7 +460,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a splitter-setting node.
      */
-    public Object visitSetSplitter(LIRSetSplitter self,
+    @Override
+	public Object visitSetSplitter(LIRSetSplitter self,
                                    JExpression streamContext,
                                    SIRSplitType type,
                                    int ways,
@@ -441,7 +474,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a stream-type-setting node.
      */
-    public Object visitSetStreamType(LIRSetStreamType self,
+    @Override
+	public Object visitSetStreamType(LIRSetStreamType self,
                                      JExpression streamContext,
                                      LIRStreamType streamType) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
@@ -452,7 +486,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a work-function-setting node.
      */
-    public Object visitSetWork(LIRSetWork self,
+    @Override
+	public Object visitSetWork(LIRSetWork self,
                                JExpression streamContext,
                                LIRFunctionPointer fn) {
         Utils.fail("Replacing visitor doesn't deal with LIR nodes yet");
@@ -464,7 +499,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a tape registerer.
      */
-    public Object visitSetTape(LIRSetTape self,
+    @Override
+	public Object visitSetTape(LIRSetTape self,
                                JExpression streamContext,
                                JExpression srcStruct,
                                JExpression dstStruct,
@@ -481,7 +517,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
      * Visits a main function contents.
      */
 
-    public Object visitMainFunction(LIRMainFunction self,
+    @Override
+	public Object visitMainFunction(LIRMainFunction self,
                                     String typeName,
                                     LIRFunctionPointer init,
                                     List<JStatement> initStatements) {
@@ -501,7 +538,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a set body of feedback loop.
      */
-    public Object visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
+    @Override
+	public Object visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
                                          JExpression streamContext,
                                          JExpression childContext,
                                          CType inputType,
@@ -518,7 +556,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a set loop of feedback loop.
      */
-    public Object visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
+    @Override
+	public Object visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
                                          JExpression streamContext,
                                          JExpression childContext,
                                          CType inputType,
@@ -534,7 +573,8 @@ public class SLIRReplacingVisitor extends ReplacingVisitor
     /**
      * Visits a set a parallel stream.
      */
-    public Object visitSetParallelStream(LIRSetParallelStream self,
+    @Override
+	public Object visitSetParallelStream(LIRSetParallelStream self,
                                          JExpression streamContext,
                                          JExpression childContext,
                                          int position,

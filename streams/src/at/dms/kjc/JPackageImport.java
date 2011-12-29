@@ -129,7 +129,8 @@ public class JPackageImport extends JPhylum {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (comments != null) {
             p.visitComments(comments);
         }
@@ -140,7 +141,8 @@ public class JPackageImport extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (comments != null) {
             return p.visitComments(comments);
         }
@@ -159,7 +161,8 @@ public class JPackageImport extends JPhylum {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JPackageImport other = new at.dms.kjc.JPackageImport();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

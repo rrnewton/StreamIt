@@ -267,7 +267,8 @@ public abstract class Grammar {
     /**
      * Print out the grammar without actions
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer buf = new StringBuffer(20000);
         Enumeration ids = rules.elements();
         while ( ids.hasMoreElements() ) {

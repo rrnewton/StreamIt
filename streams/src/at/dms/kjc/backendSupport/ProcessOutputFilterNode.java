@@ -3,6 +3,7 @@ package at.dms.kjc.backendSupport;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CArrayType;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
@@ -251,7 +252,7 @@ public class ProcessOutputFilterNode {
             JExpression argExpr = new JLocalVariableExpression(arg);
             
             JVariableDefinition edgeVar = new JVariableDefinition(
-                    at.dms.kjc.Constants.ACC_STATIC,
+                    Constants.ACC_STATIC,
                     CStdType.Integer,
                     edge_name,
                     new JIntLiteral(size - 1));
@@ -260,7 +261,7 @@ public class ProcessOutputFilterNode {
             JFieldAccessExpression edgeExpr = new JFieldAccessExpression(edge_name);
             
             JVariableDefinition weightVar = new JVariableDefinition(
-                    at.dms.kjc.Constants.ACC_STATIC,
+                    Constants.ACC_STATIC,
                     CStdType.Integer,
                     weight_name,
                     new JIntLiteral(0));
@@ -279,7 +280,7 @@ public class ProcessOutputFilterNode {
             }
             
             JVariableDefinition weightsArray = new JVariableDefinition(
-                    at.dms.kjc.Constants.ACC_STATIC | at.dms.kjc.Constants.ACC_FINAL,  // static const in C
+                    Constants.ACC_STATIC | Constants.ACC_FINAL,  // static const in C
                     new CArrayType(CStdType.Integer,
                             1, new JExpression[]{new JIntLiteral(size)}),
                     "weights",
@@ -340,7 +341,7 @@ public class ProcessOutputFilterNode {
     
             JMethodDeclaration splitter_method = new JMethodDeclaration(
                     null, 
-                    at.dms.kjc.Constants.ACC_STATIC | at.dms.kjc.Constants.ACC_INLINE,
+                    Constants.ACC_STATIC | Constants.ACC_INLINE,
                     CStdType.Void,
                     splitter_method_name,
                     new JFormalParameter[]{arg},

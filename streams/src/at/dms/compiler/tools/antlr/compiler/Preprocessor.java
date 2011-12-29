@@ -205,7 +205,7 @@ public class Preprocessor extends at.dms.compiler.tools.antlr.runtime.LLkParser
             match(ID);
             match(SEMI);
             
-            gr = (GrammarDefinition)hier.getGrammar(sub.getText());
+            gr = hier.getGrammar(sub.getText());
             if ( gr!=null ) {
                 //              Utils.toolError("redefinition of grammar "+gr.getName()+" ignored");
                 gr=null;

@@ -55,7 +55,8 @@ public class JClassFieldDeclarator extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         decl.analyse(context);
 
         if (decl.hasInitializer()) {
@@ -67,7 +68,8 @@ public class JClassFieldDeclarator extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         // utility class for classfile
     }
 
@@ -75,7 +77,8 @@ public class JClassFieldDeclarator extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    null;   // utility class for classfile
     }
 
@@ -84,7 +87,8 @@ public class JClassFieldDeclarator extends JStatement {
      *
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         if (decl.getField().getConstantValue() == null) {
             decl.genCode(code);
         }
@@ -99,7 +103,8 @@ public class JClassFieldDeclarator extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JClassFieldDeclarator other = new at.dms.kjc.JClassFieldDeclarator();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

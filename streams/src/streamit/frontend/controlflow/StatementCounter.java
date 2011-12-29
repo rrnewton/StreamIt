@@ -34,7 +34,8 @@ public abstract class StatementCounter extends DataFlow
      *
      * @return lattice value at the entry node of the CFG
      */
-    public Lattice getInit()
+    @Override
+	public Lattice getInit()
     {
         return new CountLattice(0);
     }
@@ -52,7 +53,8 @@ public abstract class StatementCounter extends DataFlow
      * @param in    lattice value at entry to the node
      * @return      lattice value at exit from the node
      */
-    public Lattice flowFunction(CFGNode node, Lattice in)
+    @Override
+	public Lattice flowFunction(CFGNode node, Lattice in)
     {
         // Ignore nodes that aren't statement nodes.
         if (!node.isStmt())

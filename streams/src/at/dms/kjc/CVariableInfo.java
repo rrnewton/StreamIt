@@ -33,8 +33,9 @@ public final class CVariableInfo implements DeepCloneable {
         this.infos = infos;
     }
 
-    public Object clone() {
-        return new CVariableInfo((int[])infos.clone());
+    @Override
+	public Object clone() {
+        return new CVariableInfo(infos.clone());
     }
 
     // ----------------------------------------------------------------------
@@ -125,7 +126,8 @@ public final class CVariableInfo implements DeepCloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CVariableInfo other = new at.dms.kjc.CVariableInfo();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

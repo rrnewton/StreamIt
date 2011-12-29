@@ -1,5 +1,6 @@
 package at.dms.kjc.cell;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JBlock;
@@ -37,7 +38,7 @@ public class InterSPUChannel extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 edge.getType(),
                 popMethodName(),
                 new JFormalParameter[0],
@@ -65,7 +66,7 @@ public class InterSPUChannel extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                at.dms.kjc.Constants.ACC_INLINE,
+                Constants.ACC_INLINE,
                 CStdType.Void,
                 pushMethodName(),
                 new JFormalParameter[]{val},
@@ -93,7 +94,7 @@ public class InterSPUChannel extends IntraSSGChannel {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                at.dms.kjc.Constants.ACC_INLINE,
+                Constants.ACC_INLINE,
                 edge.getType(),
                 pushMethodName(),
                 new JFormalParameter[]{offset},

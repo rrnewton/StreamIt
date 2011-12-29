@@ -20,7 +20,8 @@ public class Coordinate {
         return row;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "(" + row + ", " + column + ")";
     }
 }

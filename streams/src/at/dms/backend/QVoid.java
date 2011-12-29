@@ -38,7 +38,8 @@ class QVoid extends QNode {
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "V " +  origin;
     }
 
@@ -52,7 +53,8 @@ class QVoid extends QNode {
     /**
      * Returns the primitive instruction
      */
-    public InstructionHandle getInstruction() {
+    @Override
+	public InstructionHandle getInstruction() {
         return origin.getInstruction();
     }
 
@@ -63,28 +65,32 @@ class QVoid extends QNode {
     /**
      * Returns the defined temporary.
      */
-    public QTemporary getDef() {
+    @Override
+	public QTemporary getDef() {
         return null;
     }
 
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         return origin.getUses();
     }
 
     /**
      * returns the parameters of this instruction
      */
-    public QOrigin[] getOrigins() {
+    @Override
+	public QOrigin[] getOrigins() {
         return origin.getOrigins();
     }
 
     /**
      * Sets the parameters of this instruction
      */
-    public void setOrigin(QOrigin origin, int i) {
+    @Override
+	public void setOrigin(QOrigin origin, int i) {
         if (this.origin instanceof QOperator) {
             this.origin.setOrigin(origin, i);
         } else if (i == 0) {
@@ -102,7 +108,8 @@ class QVoid extends QNode {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
         origin.generate(seq);
     }
 

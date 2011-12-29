@@ -80,7 +80,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
 
@@ -113,7 +114,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints a field declaration
      */
-    public void visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public void visitFieldDeclaration(JFieldDeclaration self,
                                       int modifiers,
                                       CType type,
                                       String ident,
@@ -193,7 +195,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -295,7 +298,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints an expression statement
      */
-    public void visitBlockStatement(JBlock self,
+    @Override
+	public void visitBlockStatement(JBlock self,
                                     JavaStyleComment[] comments) {
         if (self instanceof Jrstream_pr) {
             // RMR { did the rstream C language extensions change?
@@ -322,7 +326,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints a method declaration
      */
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -439,7 +444,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -497,7 +503,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints an array access expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor) {
         if (KjcOptions.absarray) {
@@ -548,7 +555,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -585,7 +593,8 @@ public class FlatIRToRS extends ToC
         p.print(")");
     }
 
-    public JExpression passParentheses(JExpression exp) 
+    @Override
+	public JExpression passParentheses(JExpression exp) 
     {
         while (exp instanceof JParenthesedExpression)
             exp = ((JParenthesedExpression)exp).getExpr();
@@ -594,14 +603,16 @@ public class FlatIRToRS extends ToC
     }
     
 
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression num)
     {
         assert false : "RStream code generation should not see a pop statement";
     }
     
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType)
     {
         assert false : "RStream code generation should not see a pop statement";
@@ -609,7 +620,8 @@ public class FlatIRToRS extends ToC
     
     // visitPrintStatement innerited from ToCCommon
     
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression val)
     {
@@ -706,7 +718,8 @@ public class FlatIRToRS extends ToC
     /**
     
     */
-    public void visitComments(JavaStyleComment[] comments) {
+    @Override
+	public void visitComments(JavaStyleComment[] comments) {
         for (int i = 0; i < comments.length; i++)
             visitComment(comments[i]);
     }
@@ -714,7 +727,8 @@ public class FlatIRToRS extends ToC
     /**
     
     */
-    public void visitComment(JavaStyleComment comment) {
+    @Override
+	public void visitComment(JavaStyleComment comment) {
         //don't print random comments, only sir comments
         if (!comment.getText().startsWith("SIR"))
             return;
@@ -735,7 +749,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints a cast expression
      */
-    public void visitCastExpression(JCastExpression self,
+    @Override
+	public void visitCastExpression(JCastExpression self,
                                     JExpression expr,
                                     CType type)
     {
@@ -818,7 +833,8 @@ public class FlatIRToRS extends ToC
     /**
      * prints a empty statement
      */
-    public void visitEmptyStatement(JEmptyStatement self) {
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self) {
         //if we are inside a for loop header, we need to print 
         //the ; of an empty statement
         if (forLoopHeader > 0) {

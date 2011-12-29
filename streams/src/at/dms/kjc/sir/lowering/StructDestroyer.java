@@ -77,7 +77,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      * @param left Left hand side JExpression.
      * @param ident Identifier of field access.
      */
-    public Object visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public Object visitFieldExpression(JFieldAccessExpression self,
                                        JExpression left,
                                        String ident) {
         JExpression newLeft=(JExpression)left.accept(this);
@@ -106,7 +107,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      * @param self Visiting this JLocalVariableExpression.
      * @param ident Identifier of variable access.
      */
-    public Object visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public Object visitLocalVariableExpression(JLocalVariableExpression self,
                                                String ident) {
         JExpression out=(JExpression)super.visitLocalVariableExpression(self,ident);
         if(out.getType() instanceof CClassNameType) //unsafe access
@@ -124,7 +126,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      * @param left Left hand side JExpression.
      * @param right Right hand side JExpression.
      */
-    public Object visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public Object visitAssignmentExpression(JAssignmentExpression self,
                                             JExpression left,
                                             JExpression right) {
         JExpression savedUnsafeRhs=unsafeRhs;
@@ -165,7 +168,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      * @param expr Expression being cast.
      * @param type Type being cast to.
      */
-    public Object visitCastExpression(JCastExpression self,
+    @Override
+	public Object visitCastExpression(JCastExpression self,
                                       JExpression expr,
                                       CType type) {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -191,7 +195,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      * @param self Visiting this JBlock.
      * @param comments Comments attached to this block.
      */
-    public Object visitBlockStatement(JBlock self,
+    @Override
+	public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
         List statements=self.getStatements();
         for(int i=0;i<statements.size();i++) {
@@ -291,7 +296,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      * @param self The SIRInitStatement being visited.
      * @param target The expanded SIRStream init statement refers to.
      */
-    public Object visitInitStatement(SIRInitStatement self,
+    @Override
+	public Object visitInitStatement(SIRInitStatement self,
                                      SIRStream target) {
         List args=self.getArgs();
         if(target instanceof SIRRecursiveStub) {
@@ -411,7 +417,8 @@ public class StructDestroyer extends SLIRReplacingVisitor {
      * sure to add declarations for the temporary variables created by
      * calling getVar(String name,CType type).
      */
-    public Object visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public Object visitMethodDeclaration(JMethodDeclaration self,
                                          int modifiers,
                                          CType returnType,
                                          String ident,

@@ -43,7 +43,7 @@ public class CompCommRatio {
         mults = executionCounts;
         walkSTR(str);
         
-        return ((double)comp)/((double)comm); 
+        return comp/comm; 
     }
 
     // The following structure appears all over the place.  It needs to be abstracted somehow.

@@ -81,7 +81,8 @@ public class JInitializerDeclaration extends JMethodDeclaration {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void checkBody1(CClassContext context) {
+    @Override
+	public void checkBody1(CClassContext context) {
         // I've made it !
         // nothing to check.
     }
@@ -119,7 +120,8 @@ public class JInitializerDeclaration extends JMethodDeclaration {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         // Don t print initializers
     }
 
@@ -127,7 +129,8 @@ public class JInitializerDeclaration extends JMethodDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return null;    // Don t print initializers
     }
 
@@ -140,7 +143,8 @@ public class JInitializerDeclaration extends JMethodDeclaration {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JInitializerDeclaration other = new at.dms.kjc.JInitializerDeclaration();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

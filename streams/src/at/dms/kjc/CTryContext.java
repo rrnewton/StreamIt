@@ -55,7 +55,8 @@ public class CTryContext extends CBodyContext {
         clearThrowables();
     }
 
-    public void close(TokenReference ref) {
+    @Override
+	public void close(TokenReference ref) {
     }
 
     // ----------------------------------------------------------------------
@@ -69,7 +70,8 @@ public class CTryContext extends CBodyContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CTryContext other = new at.dms.kjc.CTryContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

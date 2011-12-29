@@ -39,7 +39,8 @@ public class SIRBeginMarker extends SIRMarker {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRBeginMarker other = new at.dms.kjc.sir.SIRBeginMarker();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

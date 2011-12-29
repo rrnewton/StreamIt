@@ -112,14 +112,16 @@ public class CSwitchBodyContext extends CBodyContext {
      * Returns the innermost statement which can be target of a break
      * statement without label.
      */
-    public JStatement getNearestBreakableStatement() {
+    @Override
+	public JStatement getNearestBreakableStatement() {
         return stmt;
     }
 
     /**
      *
      */
-    protected void addBreak(JStatement target,
+    @Override
+	protected void addBreak(JStatement target,
                             CBodyContext context)
     {
         if (stmt == target) {
@@ -140,7 +142,8 @@ public class CSwitchBodyContext extends CBodyContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CSwitchBodyContext other = new at.dms.kjc.CSwitchBodyContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

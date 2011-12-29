@@ -45,34 +45,41 @@ public class FeedbackLoopIter
     FeedbackLoop feedback;
     IterFactory factory;
     
-    public Object getObject ()
+    @Override
+	public Object getObject ()
     {
         return feedback;
     }
     
-    public streamit.scheduler2.iriter.Iterator getUnspecializedIter()
+    @Override
+	public streamit.scheduler2.iriter.Iterator getUnspecializedIter()
     {
         return new Iterator(feedback, factory);
     }
     
-    public int getDelaySize()
+    @Override
+	public int getDelaySize()
     {
         return feedback.getDelay();
     }
     
-    public streamit.scheduler2.iriter.Iterator getBodyChild ()
+    @Override
+	public streamit.scheduler2.iriter.Iterator getBodyChild ()
     {
         return new Iterator (feedback.getBody (), factory);
     }
 
-    public streamit.scheduler2.iriter.Iterator getLoopChild ()
+    @Override
+	public streamit.scheduler2.iriter.Iterator getLoopChild ()
     {
         return new Iterator (feedback.getLoop (), factory);
     }
 
-    public int getFanOut () { return 2; }
+    @Override
+	public int getFanOut () { return 2; }
 
-    public int getSplitterNumWork ()
+    @Override
+	public int getSplitterNumWork ()
     {
         if (feedback.getSplitter() instanceof NullSplitter)
             {
@@ -82,13 +89,15 @@ public class FeedbackLoopIter
             }
     }
     
-    public Object getSplitterWork(int nWork)
+    @Override
+	public Object getSplitterWork(int nWork)
     {
         assert nWork >= 0 && nWork < getSplitterNumWork ();
         return  feedback.getSplitter();
     }
     
-    public int getJoinerNumWork ()
+    @Override
+	public int getJoinerNumWork ()
     {
         if (feedback.getJoiner() instanceof NullJoiner)
             {
@@ -98,42 +107,50 @@ public class FeedbackLoopIter
             }
     }
     
-    public Object getJoinerWork(int nWork)
+    @Override
+	public Object getJoinerWork(int nWork)
     {
         assert nWork >= 0 && nWork < getJoinerNumWork ();
         return  feedback.getJoiner();
     }
     
-    public int[] getSplitPushWeights (int nWork)
+    @Override
+	public int[] getSplitPushWeights (int nWork)
     {
         return feedback.getSplitter ().getWeights ();
     }
     
-    public int getFanIn () { return 2; }
+    @Override
+	public int getFanIn () { return 2; }
 
-    public int[] getJoinPopWeights (int nWork)
+    @Override
+	public int[] getJoinPopWeights (int nWork)
     {
         return feedback.getJoiner ().getWeights ();
     }
     
-    public int getSplitPop (int nWork)
+    @Override
+	public int getSplitPop (int nWork)
     {
         return feedback.getSplitter ().getConsumption ();
     }
     
-    public int getJoinPush (int nWork)
+    @Override
+	public int getJoinPush (int nWork)
     {
         return feedback.getJoiner ().getProduction ();
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof FeedbackLoopIter)) return false;
         FeedbackLoopIter otherLoop = (FeedbackLoopIter) other;
         return otherLoop.getObject() == this.getObject();
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return feedback.hashCode();
     }

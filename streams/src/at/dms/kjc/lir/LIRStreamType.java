@@ -21,7 +21,8 @@ public class LIRStreamType {
         this.name = name;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return name;
     }
 }

@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+import at.dms.compiler.tools.common.CompilerMessages;
+
 /**
  * This class is the entry point for the Message generator.
  */
@@ -83,7 +85,7 @@ public class Main {
             return false;
         }
         if (options.nonOptions.length == 0) {
-            System.err.println(OptgenMessages.NO_INPUT_FILE.getFormat());
+            System.err.println(CompilerMessages.NO_INPUT_FILE.getFormat());
             options.usage();
             return false;
         }
@@ -94,8 +96,8 @@ public class Main {
         if (! parseSource(sourceFile)) {
             return false;
         }
-        if (options.release != null) {
-            definition.setVersion(options.release);
+        if (OptgenOptions.release != null) {
+            definition.setVersion(OptgenOptions.release);
         }
         if (! checkIdentifiers()) {
             return false;

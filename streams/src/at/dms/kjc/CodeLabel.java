@@ -75,7 +75,8 @@ class CodeLabel extends AbstractInstructionAccessor implements Serializable, Dee
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CodeLabel other = new at.dms.kjc.CodeLabel();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

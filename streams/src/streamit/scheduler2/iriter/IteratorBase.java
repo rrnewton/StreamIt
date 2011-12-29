@@ -50,7 +50,8 @@ public interface IteratorBase
      * 
      * @return true if this iterator is the same as the other iterator
      */
-    public boolean equals(Object other);
+    @Override
+	public boolean equals(Object other);
     
     /**
      * Returns a hash code of an iterator.  If two iterators are equivalent,
@@ -62,5 +63,6 @@ public interface IteratorBase
      * 
      * @return hash code for this iterator
      */
-    public int hashCode();
+    @Override
+	public int hashCode();
 }

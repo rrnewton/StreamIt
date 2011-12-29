@@ -97,7 +97,8 @@ class Rule {
     public void setReturnValue(String ret) { returnValue=ret; }
     public void setThrowsSpec(String t) { throwsSpec=t; }
     public void setVisibility(String v) { visibility=v; }
-    public String toString() {
+    @Override
+	public String toString() {
         String s="";
         String retString = returnValue==null ? "" : "returns "+returnValue;
         String argString = args==null ? "" : args;
@@ -109,7 +110,7 @@ class Rule {
                 "options {"+
                 System.getProperty("line.separator");
             for (Enumeration e = options.elements() ; e.hasMoreElements() ;) {
-                s += (Option)e.nextElement()+System.getProperty("line.separator");
+                s += e.nextElement()+System.getProperty("line.separator");
             }
             s += "}"+System.getProperty("line.separator");
         }

@@ -84,22 +84,26 @@ public class Pipeline extends streamit.scheduler2.hierarchical.Pipeline
             pipeline = _pipeline;
         }
 
-        public void addSchedulePhase(PhasingSchedule phase)
+        @Override
+		public void addSchedulePhase(PhasingSchedule phase)
         {
             pipeline.addInitScheduleStage(phase);
         }
 
-        public void advanceChildSchedule(StreamInterface child)
+        @Override
+		public void advanceChildSchedule(StreamInterface child)
         {
             pipeline.advanceChildInitSchedule(child);
         }
 
-        public PhasingSchedule getChildNextPhase(StreamInterface child)
+        @Override
+		public PhasingSchedule getChildNextPhase(StreamInterface child)
         {
             return pipeline.getChildNextInitStage(child);
         }
 
-        public PhasingSchedule getChildPhase(
+        @Override
+		public PhasingSchedule getChildPhase(
                                              StreamInterface child,
                                              int stage)
         {
@@ -116,22 +120,26 @@ public class Pipeline extends streamit.scheduler2.hierarchical.Pipeline
             pipeline = _pipeline;
         }
 
-        public void addSchedulePhase(PhasingSchedule phase)
+        @Override
+		public void addSchedulePhase(PhasingSchedule phase)
         {
             pipeline.addSteadySchedulePhase(phase);
         }
 
-        public void advanceChildSchedule(StreamInterface child)
+        @Override
+		public void advanceChildSchedule(StreamInterface child)
         {
             pipeline.advanceChildSteadySchedule(child);
         }
 
-        public PhasingSchedule getChildNextPhase(StreamInterface child)
+        @Override
+		public PhasingSchedule getChildNextPhase(StreamInterface child)
         {
             return pipeline.getChildNextSteadyPhase(child);
         }
 
-        public PhasingSchedule getChildPhase(
+        @Override
+		public PhasingSchedule getChildPhase(
                                              StreamInterface child,
                                              int stage)
         {
@@ -182,7 +190,7 @@ public class Pipeline extends streamit.scheduler2.hierarchical.Pipeline
         int firstStreamMaxExecPerPhase =
             (int) ((float)childrenExecs[0]
                    * (float)lastStreamMaxExecPerPhase
-                   / (float)childrenExecs[getNumChildren()
+                   / childrenExecs[getNumChildren()
                                           - 1]);
         assert firstStreamMaxExecPerPhase <= childrenExecs[0];
 
@@ -342,7 +350,8 @@ public class Pipeline extends streamit.scheduler2.hierarchical.Pipeline
         return extraChildrenExecs;
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         int steadyChildPhases[] = new int[getNumChildren()];
 
@@ -441,8 +450,8 @@ public class Pipeline extends streamit.scheduler2.hierarchical.Pipeline
                         if (numPipelinePhases != 0)
                             lastChildNumExecPerPhase =
                                 (int)Math.ceil(
-                                               ((double)numChildPhases[getNumChildren()
-                                                                       - 1])
+                                               numChildPhases[getNumChildren()
+                                                                       - 1]
                                                / numPipelinePhases);
                         else
                             lastChildNumExecPerPhase =

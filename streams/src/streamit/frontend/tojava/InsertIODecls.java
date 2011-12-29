@@ -69,7 +69,8 @@ public class InsertIODecls extends InitMunger
         return work;
     }
 
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         spec = (StreamSpec)super.visitStreamSpec(spec);
 

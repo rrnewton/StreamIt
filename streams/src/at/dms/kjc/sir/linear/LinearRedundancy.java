@@ -104,7 +104,8 @@ public class LinearRedundancy {
     }
 
     /** Make a nice human readable string for this LinearRedundancy. **/
-    public String toString() {
+    @Override
+	public String toString() {
         return this.calculateRedundancyString();
     }
     
@@ -201,7 +202,7 @@ public class LinearRedundancy {
         returnString +=       "reused tuples:" + stats.reusedTuples + "\n";
         returnString +=       "reused tuples in subsequent firings:" + stats.crossFiringReusedTuples+ "\n";
         returnString +=       "overall redundancy: "; 
-        returnString +=       100 * ((float)stats.reusedTuples)/((float)stats.totalOriginalTuples);
+        returnString +=       100 * ((float)stats.reusedTuples)/stats.totalOriginalTuples;
         returnString +=       "%\n";
         returnString +=       "subsequent redundancy: "; 
         returnString +=       100 * (((float)stats.crossFiringReusedTuples)/

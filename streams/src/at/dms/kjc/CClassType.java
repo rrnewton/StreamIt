@@ -95,7 +95,8 @@ public class CClassType extends CType {
     /**
      * equals
      */
-    public boolean equals(CType other) {
+    @Override
+	public boolean equals(CType other) {
         return (!other.isClassType() || other.isArrayType()) ?
             false :
             ((CClassType)other).getCClass() == getCClass();
@@ -104,7 +105,8 @@ public class CClassType extends CType {
     /**
      * Transforms this type to a string
      */
-    public String toString() {
+    @Override
+	public String toString() {
         if (clazz.isNested()) {
             return clazz.getIdent();
         } else {
@@ -115,7 +117,8 @@ public class CClassType extends CType {
     /**
      * Appends the VM signature of this type to the specified buffer.
      */
-    protected void appendSignature(SimpleStringBuffer buffer) {
+    @Override
+	protected void appendSignature(SimpleStringBuffer buffer) {
         buffer.append('L');
         buffer.append(getQualifiedName());
         buffer.append(';');
@@ -140,7 +143,8 @@ public class CClassType extends CType {
      * of bytes needed in C on 32-bit machine) used by a value of this
      * type.
      */
-    public int getSizeInC() {
+    @Override
+	public int getSizeInC() {
         // TODO: recurse into elements of this structure and add up
         // their sizes.  For now, conservatively assume a structure
         // has ~100 elements (this includes array elements), each of
@@ -151,7 +155,8 @@ public class CClassType extends CType {
     /**
      * Returns the stack size used by a value of this type.
      */
-    public int getSize() {
+    @Override
+	public int getSize() {
         return 1;
     }
 
@@ -159,7 +164,8 @@ public class CClassType extends CType {
      * Check if a type is a reference
      * @return  is it a type that accept null value
      */
-    public boolean isReference() {
+    @Override
+	public boolean isReference() {
         return true;
     }
 
@@ -167,7 +173,8 @@ public class CClassType extends CType {
      * Check if a type is a class type
      * @return  is it a subtype of ClassType ?
      */
-    public boolean isClassType() {
+    @Override
+	public boolean isClassType() {
         return true;
     }
 
@@ -179,7 +186,8 @@ public class CClassType extends CType {
      *
      * @return the class object associated with this type
      */
-    public CClass getCClass() {
+    @Override
+	public CClass getCClass() {
         // !!! graf 000213
         // !!! should have been checked (see JFieldAccessExpression)
         assert clazz != BAC_CLASS;
@@ -204,7 +212,8 @@ public class CClassType extends CType {
      * @param   context     the context (may be be null)
      * @exception UnpositionedError this error will be positioned soon
      */
-    public void checkType(CContext context) throws UnpositionedError {
+    @Override
+	public void checkType(CContext context) throws UnpositionedError {
     }
 
     // ----------------------------------------------------------------------
@@ -216,7 +225,8 @@ public class CClassType extends CType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isAssignableTo(CType dest) {
+    @Override
+	public boolean isAssignableTo(CType dest) {
         return dest.isClassType() && !dest.isArrayType() &&
             getCClass().descendsFrom(dest.getCClass());
     }
@@ -226,7 +236,8 @@ public class CClassType extends CType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isCastableTo(CType dest) {
+    @Override
+	public boolean isCastableTo(CType dest) {
         // test for array first because array types are classes
 
         if (getCClass().isInterface()) {
@@ -265,7 +276,8 @@ public class CClassType extends CType {
     /**
      *
      */
-    public boolean isCheckedException() {
+    @Override
+	public boolean isCheckedException() {
         return !isAssignableTo(CStdType.RuntimeException) &&
             !isAssignableTo(CStdType.Error);
     }
@@ -293,7 +305,8 @@ public class CClassType extends CType {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CClassType other = new at.dms.kjc.CClassType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

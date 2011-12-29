@@ -255,7 +255,8 @@ public class Fraction        // encapsulates a fraction
     }
 
     /******************************************************************************/
-    public String toString()
+    @Override
+	public String toString()
         /******************************************************************************/
     {
         if(num.equals (BigInteger.ZERO))

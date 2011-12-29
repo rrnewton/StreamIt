@@ -127,7 +127,8 @@ public class BitSet implements Cloneable {
         bits[n] &= ~bitMask(el);
     }
 
-    public Object clone() {
+    @Override
+	public Object clone() {
         BitSet s;
         try {
             s = (BitSet)super.clone();
@@ -157,7 +158,8 @@ public class BitSet implements Cloneable {
     /**
      * code "inherited" from java.util.BitSet
      */
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof BitSet)) {
             BitSet set = (BitSet)obj;
 
@@ -333,7 +335,8 @@ public class BitSet implements Cloneable {
         return elems;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return toString(",");
     }
 

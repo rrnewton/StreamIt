@@ -82,7 +82,8 @@ public class ClusterCode {
         /**
          * visitor doing all the work for {@link generateCode(FlatNode)}.
          */
-        public void visitNode(FlatNode node) 
+        @Override
+		public void visitNode(FlatNode node) 
         {
 
             if (node.contents instanceof SIRFilter) {
@@ -770,7 +771,8 @@ public class ClusterCode {
                     work.getBody().accept(new SLIRReplacingVisitor(){
                         private int popCount = -1;
                         
-                        public Object visitPopExpression(SIRPopExpression self,
+                        @Override
+						public Object visitPopExpression(SIRPopExpression self,
                                                          CType tapeType) {
                             ++popCount;
                             return new JArrayAccessExpression(
@@ -778,7 +780,8 @@ public class ClusterCode {
                                     new JIntLiteral(popCount / 2));
                         }
 
-                        public Object visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
+                        @Override
+						public Object visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
                             return new JMethodCallExpression(push, new JExpression[]{arg});
                         }
                     });

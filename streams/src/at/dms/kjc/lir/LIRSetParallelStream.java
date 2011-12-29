@@ -70,7 +70,8 @@ public class LIRSetParallelStream extends LIRNode {
         this.outputSize = outputSize;
     }
 
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitSetParallelStream(this,
                                  this.getStreamContext(), 

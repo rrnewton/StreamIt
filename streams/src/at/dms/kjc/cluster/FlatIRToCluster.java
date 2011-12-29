@@ -195,7 +195,8 @@ public class FlatIRToCluster extends InsertTimers implements
                                + filter.getName() + "...");
         
         (new FinalUnitOptimize(){
-            protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
+            @Override
+			protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
                 return !(unit instanceof SIRTwoStageFilter 
                         && method == ((SIRTwoStageFilter)unit).getInitWork());
             }
@@ -218,7 +219,8 @@ public class FlatIRToCluster extends InsertTimers implements
                                + filter.getName() + "...");
         
         (new FinalUnitOptimize(){
-            protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
+            @Override
+			protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
                 return !(unit instanceof SIRTwoStageFilter 
                         && method == ((SIRTwoStageFilter)unit).getInitWork());
             }
@@ -264,7 +266,8 @@ public class FlatIRToCluster extends InsertTimers implements
 //                new SIRGlobal[0]);
 
         (new FinalUnitOptimize(){
-            protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
+            @Override
+			protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
                 return !(unit instanceof SIRTwoStageFilter 
                         && method == ((SIRTwoStageFilter)unit).getInitWork());
             }
@@ -330,7 +333,8 @@ public class FlatIRToCluster extends InsertTimers implements
 
     private int selfID = -1;
 
-    public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+    @Override
+	public void visitFilter(SIRFilter self, SIRFilterIter iter) {
         // create code for this filter to include in 
         // ClusterCodegenerator.generateRunFunction
         cleanupCode = new Vector<String>();
@@ -714,7 +718,7 @@ public class FlatIRToCluster extends InsertTimers implements
             JFormalParameter params[] = new JFormalParameter[1];
             params[0] = param;
             JMethodDeclaration work_n = new JMethodDeclaration(null,
-                                                               at.dms.kjc.Constants.ACC_PUBLIC, CStdType.Void, work
+                                                               at.dms.classfile.Constants.ACC_PUBLIC, CStdType.Void, work
                                                                .getName(), params, CClassType.EMPTY, 
                                                                (KjcOptions.mencoder && steady_counts == 1) ? work.getBody() : block, 
                                                                null, null);
@@ -1087,7 +1091,8 @@ public class FlatIRToCluster extends InsertTimers implements
     }
 
 
-    public void visitPhasedFilter(SIRPhasedFilter self, SIRPhasedFilterIter iter) {
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self, SIRPhasedFilterIter iter) {
         // This is a stub; it'll get filled in once we figure out how phased
         // filters should actually work.
     }
@@ -1095,7 +1100,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints a method declaration
      */
-    public void visitMethodDeclaration(JMethodDeclaration self, int modifiers,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self, int modifiers,
                                        CType returnType, String ident, JFormalParameter[] parameters,
                                        CClassType[] exceptions, JBlock body) {
         declsAreLocal = true;
@@ -1230,7 +1236,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers, CType type, String ident, JExpression expr) {
 
         if ((modifiers & ACC_STATIC) != 0) {
@@ -1297,7 +1304,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints a for statement
      */
-    public void visitForStatement(JForStatement self, JStatement init,
+    @Override
+	public void visitForStatement(JForStatement self, JStatement init,
                                   JExpression cond, JStatement incr, JStatement body) {
         if (printCodegenComments) {
             JavaStyleComment[] comments = self.getComments();
@@ -1356,7 +1364,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints a compound statement
      */
-    public void visitCompoundStatement(JStatement[] body) {
+    @Override
+	public void visitCompoundStatement(JStatement[] body) {
         for (int i = 0; i < body.length; i++) {
             if (body[i] instanceof JIfStatement && i < body.length - 1
                 && !(body[i + 1] instanceof JReturnStatement)) {
@@ -1388,7 +1397,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /*
      * prints a empty statement
      */
-    public void visitEmptyStatement(JEmptyStatement self) {
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self) {
         // if we are inside a for loop header, we need to print
         // the ; of an empty statement
         if (forLoopHeader > 0) {
@@ -1479,7 +1489,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix, String ident, JExpression[] args) {
 
         //        if (PRINT_MSG_PARAM > -1) {
@@ -1573,7 +1584,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left, String ident) {
         if (ident.equals(JAV_OUTER_THIS)) {// don't generate generated fields
             p.print(left.getType().getCClass().getOwner().getType() + "->this");
@@ -1625,7 +1637,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left, JExpression right) {
 
         if (left.getType() != null
@@ -1824,7 +1837,8 @@ public class FlatIRToCluster extends InsertTimers implements
      * in ToC
      */
 
-    public void visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public void visitMessageStatement(SIRMessageStatement self,
                                       JExpression portal, String iname, String __ident,
                                       JExpression[] params, SIRLatency latency) {
         /*
@@ -2060,20 +2074,24 @@ public class FlatIRToCluster extends InsertTimers implements
         }
     }
 
-    public void visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public void visitDynamicToken(SIRDynamicToken self) {
         Utils.fail("Dynamic rates not yet supported in cluster backend.");
     }
 
-    public void visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public void visitRangeExpression(SIRRangeExpression self) {
         Utils.fail("Dynamic rates not yet supported in cluster backend.");
     }
     
+	@Override
 	public void visitIterationExpression(
 			SIRIterationExpression sirIterationExpression) {
             assert false : "This feature is unsupported for iteration count";
 	}
 
-    public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
                                     JExpression num) {
 
         //Tape in = RegisterStreams.getFilterInStream(filter);
@@ -2094,7 +2112,8 @@ public class FlatIRToCluster extends InsertTimers implements
         //Utils.fail("FlatIRToCluster should see no peek expressions");
     }
 
-    public void visitPopExpression(SIRPopExpression self, CType tapeType) {
+    @Override
+	public void visitPopExpression(SIRPopExpression self, CType tapeType) {
 
         //Tape in = RegisterStreams.getFilterInStream(filter);
         if (self.getNumPop() == 1)  {
@@ -2203,7 +2222,8 @@ public class FlatIRToCluster extends InsertTimers implements
         }
     }
 
-    public void visitPushExpression(SIRPushExpression self, CType tapeType,
+    @Override
+	public void visitPushExpression(SIRPushExpression self, CType tapeType,
                                     JExpression val) {
         if (tapeType.isArrayType())
             pushArray(self, tapeType, val);
@@ -2213,7 +2233,8 @@ public class FlatIRToCluster extends InsertTimers implements
             pushScalar(self, tapeType, val);
     }
 
-    public void visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public void visitRegReceiverStatement(SIRRegReceiverStatement self,
                                           JExpression portal, SIRStream receiver, JMethodDeclaration[] methods) {
         p.print("register_receiver(");
         portal.accept(this);
@@ -2223,7 +2244,8 @@ public class FlatIRToCluster extends InsertTimers implements
         // (But shouldn't there be a latency field in here?)
     }
 
-    public void visitRegSenderStatement(SIRRegSenderStatement self, String fn,
+    @Override
+	public void visitRegSenderStatement(SIRRegSenderStatement self, String fn,
                                         SIRLatency latency) {
         p.print("register_sender(this->context, ");
         p.print(fn);
@@ -2239,7 +2261,8 @@ public class FlatIRToCluster extends InsertTimers implements
     /**
      * prints an array length expression
      */
-    public void visitFormalParameters(JFormalParameter self, boolean isFinal,
+    @Override
+	public void visitFormalParameters(JFormalParameter self, boolean isFinal,
                                       CType type, String ident) {
         String type_string = type.toString();
         if (type_string.equals("java.lang.String")) {
@@ -2262,15 +2285,18 @@ public class FlatIRToCluster extends InsertTimers implements
     // ----------------------------------------------------------------------
 
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
+    @Override
+	public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
     }
 
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
     }
 
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
     }
 
@@ -2279,15 +2305,18 @@ public class FlatIRToCluster extends InsertTimers implements
      */
 
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
+    @Override
+	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
     }
 
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
     }
 
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
     }
 

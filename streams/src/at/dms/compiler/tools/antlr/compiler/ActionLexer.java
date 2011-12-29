@@ -57,7 +57,8 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
     }
 
     // Override of error-reporting for syntax
-    public void reportError(RecognitionException e) {
+    @Override
+	public void reportError(RecognitionException e) {
         System.err.print("Syntax error in action: ");
         super.reportError(e);
     }
@@ -77,7 +78,8 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
         setCaseSensitive(true);
     }
 
-    public Token nextToken() throws TokenStreamException {
+    @Override
+	public Token nextToken() throws TokenStreamException {
         Token theRetToken=null;
         tryAgain:
         for (;;) {
@@ -92,7 +94,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                     }
                     else {
                         if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-                        else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                        else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                     }
                 
                     if ( _returnToken==null ) { continue tryAgain; } // found SKIP token
@@ -167,7 +169,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                     }
                 default:
                     {
-                        if ( _cnt3>=1 ) { break _loop3; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                        if ( _cnt3>=1 ) { break _loop3; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                     }
                 }
                 _cnt3++;
@@ -257,7 +259,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 newline();
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         }
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -321,7 +323,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                             
                 }
                 else {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             
             }
@@ -333,7 +335,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                     
         }
         else {
-            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
         }
         
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -355,7 +357,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
             mML_COMMENT(false);
         }
         else {
-            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
         }
         
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -480,7 +482,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -526,7 +528,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -543,13 +545,13 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                         else if ((_tokenSet_5.member(LA(1))) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
                 
                     }
                 }
                 else {
-                    if ( _cnt13>=1 ) { break _loop13; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                    if ( _cnt13>=1 ) { break _loop13; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                 }
             
                 _cnt13++;
@@ -591,7 +593,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                     newline();
                 }
                 else {
-                    if ( _cnt73>=1 ) { break _loop73; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                    if ( _cnt73>=1 ) { break _loop73; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                 }
             
                 _cnt73++;
@@ -657,7 +659,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
             }
         default:
             {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         }
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -682,7 +684,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
             else if ((_tokenSet_7.member(LA(1))) && (true)) {
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -698,7 +700,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                         else if ((_tokenSet_8.member(LA(1))) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -740,7 +742,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                             }
                         default:
                             {
-                                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                             }
                         }
                     }
@@ -762,7 +764,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                                     else if ((_tokenSet_9.member(LA(1))) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
                                     }
                                     else {
-                                        throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                        throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                                     }
                     
                                 }
@@ -780,14 +782,14 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                                         }
                                     default:
                                         {
-                                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                                         }
                                     }
                                 }
                                 match(']');
                             }
                             else {
-                                if ( _cnt27>=1 ) { break _loop27; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                                if ( _cnt27>=1 ) { break _loop27; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                             }
                 
                             _cnt27++;
@@ -825,7 +827,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -849,7 +851,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                     mDIGIT(false);
                 }
                 else {
-                    if ( _cnt67>=1 ) { break _loop67; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                    if ( _cnt67>=1 ) { break _loop67; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                 }
             
                 _cnt67++;
@@ -880,7 +882,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
             else if ((_tokenSet_11.member(LA(1))) && (true)) {
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -927,7 +929,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -973,7 +975,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                             }
                         default:
                             {
-                                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                             }
                         }
                     }
@@ -1017,7 +1019,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -1038,7 +1040,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                             }
                         default:
                             {
-                                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                             }
                         }
                     }
@@ -1066,7 +1068,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                             }
                         default:
                             {
-                                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                             }
                         }
                     }
@@ -1085,7 +1087,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                             }
                         default:
                             {
-                                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                             }
                         }
                     }
@@ -1150,7 +1152,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 match('\r');
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -1266,7 +1268,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                                 else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                                 }
                                 else {
-                                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                                 }
                 
                             }
@@ -1274,7 +1276,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -1292,7 +1294,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -1300,7 +1302,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -1337,7 +1339,7 @@ public class ActionLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                     mDIGIT(false);
                 }
                 else {
-                    if ( _cnt64>=1 ) { break _loop64; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                    if ( _cnt64>=1 ) { break _loop64; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                 }
             
                 _cnt64++;

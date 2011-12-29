@@ -167,7 +167,8 @@ public class SymbolTableVisitor extends FEReplacer
         return type;
     }
 
-    public Object visitFieldDecl(FieldDecl field)
+    @Override
+	public Object visitFieldDecl(FieldDecl field)
     {
         for (int i = 0; i < field.getNumFields(); i++)
             symtab.registerVar(field.getName(i),
@@ -177,7 +178,8 @@ public class SymbolTableVisitor extends FEReplacer
         return super.visitFieldDecl(field);
     }
 
-    public Object visitFunction(Function func)
+    @Override
+	public Object visitFunction(Function func)
     {
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
@@ -194,7 +196,8 @@ public class SymbolTableVisitor extends FEReplacer
         return result;
     }
     
-    public Object visitFuncWork(FuncWork func)
+    @Override
+	public Object visitFuncWork(FuncWork func)
     {
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
@@ -210,7 +213,8 @@ public class SymbolTableVisitor extends FEReplacer
      * helpersByName will map helper function names to TypeHelper's
      * symtab will be initialized for all fields for static's
      */
-    public Object visitProgram(Program prog) {
+    @Override
+	public Object visitProgram(Program prog) {
         // Examine and register structure members, then recurse normally.
         for (Iterator<TypeStruct> iter = prog.getStructs().iterator(); iter.hasNext();) {
             TypeStruct struct = iter.next();
@@ -236,7 +240,8 @@ public class SymbolTableVisitor extends FEReplacer
         return super.visitProgram(prog);
     }
     
-    public Object visitStmtBlock(StmtBlock block)
+    @Override
+	public Object visitStmtBlock(StmtBlock block)
     {
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
@@ -245,7 +250,8 @@ public class SymbolTableVisitor extends FEReplacer
         return result;
     }
 
-    public Object visitStmtVarDecl(StmtVarDecl stmt)
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt)
     {
         for (int i = 0; i < stmt.getNumVars(); i++)
             symtab.registerVar(stmt.getName(i),
@@ -255,7 +261,8 @@ public class SymbolTableVisitor extends FEReplacer
         return super.visitStmtVarDecl(stmt);
     }
 
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         StreamType oldStreamType = streamType;
         SymbolTable oldSymTab = symtab;

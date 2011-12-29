@@ -387,7 +387,7 @@ public class RawBackend {
             for (Iterator it = executionCounts[i].keySet().iterator();
                  it.hasNext(); ){
                 SIROperator obj = (SIROperator)it.next();
-                int val = ((int[])executionCounts[i].get(obj))[0];
+                int val = executionCounts[i].get(obj)[0];
                 //System.err.println("execution count for " + obj + ": " + val);
                 /* This bug doesn't show up in the new version of
                  * FM Radio - but leaving the comment here in case
@@ -417,14 +417,14 @@ public class RawBackend {
                 if(initExecutionCounts.get(node.incoming[0])!=null)
                     initCount=initExecutionCounts.get(node.incoming[0]).intValue();
                 if((initCount==-1)&&(executionCounts[0].get(node.incoming[0].contents)!=null))
-                    initCount=((int[])executionCounts[0].get(node.incoming[0].contents))[0];
+                    initCount=executionCounts[0].get(node.incoming[0].contents)[0];
             }
             int steadyCount=-1;
             if(node.incoming.length>0) {
                 if(steadyExecutionCounts.get(node.incoming[0])!=null)
                     steadyCount=steadyExecutionCounts.get(node.incoming[0]).intValue();
                 if((steadyCount==-1)&&(executionCounts[1].get(node.incoming[0].contents)!=null))
-                    steadyCount=((int[])executionCounts[1].get(node.incoming[0].contents))[0];
+                    steadyCount=executionCounts[1].get(node.incoming[0].contents)[0];
             }
             if(node.contents instanceof SIRIdentity) {
                 if(initCount>=0)
@@ -451,9 +451,9 @@ public class RawBackend {
             } else if(node.contents instanceof SIRJoiner) {
                 FlatNode oldNode=graphFlattener.getFlatNode(node.contents);
                 if(executionCounts[0].get(node.oldContents)!=null)
-                    result[0].put(node,new Integer(((int[])executionCounts[0].get(node.oldContents))[0]));
+                    result[0].put(node,new Integer(executionCounts[0].get(node.oldContents)[0]));
                 if(executionCounts[1].get(node.oldContents)!=null)
-                    result[1].put(node,new Integer(((int[])executionCounts[1].get(node.oldContents))[0]));
+                    result[1].put(node,new Integer(executionCounts[1].get(node.oldContents)[0]));
             }
         }
     
@@ -542,7 +542,7 @@ public class RawBackend {
 	    for (Iterator it = localExecutionCounts[i].keySet().iterator();
 		 it.hasNext(); ){
 		SIROperator obj = (SIROperator)it.next();
-		int val = ((int[])localExecutionCounts[i].get(obj))[0];
+		int val = localExecutionCounts[i].get(obj)[0];
 		//System.err.println("execution count for " + obj + ": " + val);
 		/** This bug doesn't show up in the new version of
 		 * FM Radio - but leaving the comment here in case
@@ -572,14 +572,14 @@ public class RawBackend {
 		if(initExecutionCounts.get(node.incoming[0])!=null)
 		    initCount=initExecutionCounts.get(node.incoming[0]).intValue();
 		if((initCount==-1)&&(localExecutionCounts[0].get(node.incoming[0].contents)!=null))
-		    initCount=((int[])localExecutionCounts[0].get(node.incoming[0].contents))[0];
+		    initCount=localExecutionCounts[0].get(node.incoming[0].contents)[0];
 	    }
 	    int steadyCount=-1;
 	    if(node.incoming.length>0) {
 		if(steadyExecutionCounts.get(node.incoming[0])!=null)
 		    steadyCount=steadyExecutionCounts.get(node.incoming[0]).intValue();
 		if((steadyCount==-1)&&(localExecutionCounts[1].get(node.incoming[0].contents)!=null))
-		    steadyCount=((int[])localExecutionCounts[1].get(node.incoming[0].contents))[0];
+		    steadyCount=localExecutionCounts[1].get(node.incoming[0].contents)[0];
 	    }
 	    if(node.contents instanceof SIRIdentity) {
 		if(initCount>=0)
@@ -606,9 +606,9 @@ public class RawBackend {
 	    } else if(node.contents instanceof SIRJoiner) {
 		FlatNode oldNode=graphFlattener.getFlatNode(node.contents);
 		if(localExecutionCounts[0].get(node.oldContents)!=null)
-		    result[0].put(node,new Integer(((int[])localExecutionCounts[0].get(node.oldContents))[0]));
+		    result[0].put(node,new Integer(localExecutionCounts[0].get(node.oldContents)[0]));
 		if(localExecutionCounts[1].get(node.oldContents)!=null)
-		    result[1].put(node,new Integer(((int[])localExecutionCounts[1].get(node.oldContents))[0]));
+		    result[1].put(node,new Integer(localExecutionCounts[1].get(node.oldContents)[0]));
 	    }
 	}
 	
@@ -650,7 +650,7 @@ public class RawBackend {
     public static int getMult(FlatNode node, boolean init)
     {
         Integer val = 
-            ((Integer)(init ? initExecutionCounts.get(node) : steadyExecutionCounts.get(node)));
+            (init ? initExecutionCounts.get(node) : steadyExecutionCounts.get(node));
         if (val == null)
             return 0;
         else 

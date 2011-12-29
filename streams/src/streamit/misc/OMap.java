@@ -38,7 +38,8 @@ public class OMap
             comparator = customComperator;
         }
 
-        public boolean isLess(Object left, Object right)
+        @Override
+		public boolean isLess(Object left, Object right)
         {
             assert left instanceof Pair;
             assert right instanceof Pair;

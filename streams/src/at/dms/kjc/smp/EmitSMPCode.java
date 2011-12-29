@@ -187,6 +187,7 @@ public class EmitSMPCode extends EmitCode {
 	 * @param p
 	 *            The CodegenPrintWriter (left open on return).
 	 */
+	@Override
 	public void emitCodeForComputeStore(SIRCodeUnit fieldsAndMethods,
 			ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
 
@@ -208,9 +209,9 @@ public class EmitSMPCode extends EmitCode {
 
 		// generate code for ends of channels that connect to code on this
 		// ComputeNode
-		Set<RotatingBuffer> outputBuffers = OutputRotatingBuffer
+		Set<RotatingBuffer> outputBuffers = RotatingBuffer
 				.getOutputBuffersOnCore((Core) n);
-		Set<InputRotatingBuffer> inputBuffers = InputRotatingBuffer
+		Set<InputRotatingBuffer> inputBuffers = RotatingBuffer
 				.getInputBuffersOnCore((Core) n);
 
 		// externs

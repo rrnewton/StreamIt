@@ -62,12 +62,14 @@ public class SplitJoin extends streamit.scheduler2.hierarchical.SplitJoin
     // and splitter - single appearance schedules only need one
     // phase for the splitter and joiner schedules respectively
 
-    public int getNumSplitPhases()
+    @Override
+	public int getNumSplitPhases()
     {
         return 1;
     }
 
-    public PhasingSchedule getSplitPhase(int nPhase)
+    @Override
+	public PhasingSchedule getSplitPhase(int nPhase)
     {
         // single appearance schedule has only one split phase
         assert nPhase == 0;
@@ -82,12 +84,14 @@ public class SplitJoin extends streamit.scheduler2.hierarchical.SplitJoin
         return splitSched;
     }
 
-    public int getNumJoinPhases()
+    @Override
+	public int getNumJoinPhases()
     {
         return 1;
     }
 
-    public PhasingSchedule getJoinPhase(int nPhase)
+    @Override
+	public PhasingSchedule getJoinPhase(int nPhase)
     {
         // single appearance schedule has only one join phase
         assert nPhase == 0;
@@ -103,7 +107,8 @@ public class SplitJoin extends streamit.scheduler2.hierarchical.SplitJoin
     }
 
     // this function is basically copied from scheduler v1
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         // compute the children's schedules and figure out
         // how many times the split needs to be executed to feed

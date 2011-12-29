@@ -56,7 +56,8 @@ public class JLocalVariableExpression extends JExpression {
     /**
      * Returns true if this field accept assignment
      */
-    public boolean isLValue(CExpressionContext context) {
+    @Override
+	public boolean isLValue(CExpressionContext context) {
         return !variable.isFinal() || !myBeInitialized(context);
     }
 
@@ -65,14 +66,16 @@ public class JLocalVariableExpression extends JExpression {
      *
      * @return true if the variable is final.
      */
-    public boolean isFinal() {
+    @Override
+	public boolean isFinal() {
         return variable.isFinal();
     }
  
     /**
      * Returns true if this field is already initialized
      */
-    public boolean isInitialized(CExpressionContext context) {
+    @Override
+	public boolean isInitialized(CExpressionContext context) {
         return CVariableInfo.isInitialized(context.getBodyContext().getVariableInfo(variable.getIndex()));
     }
 
@@ -87,7 +90,8 @@ public class JLocalVariableExpression extends JExpression {
      * Declares this variable to be initialized.
      *
      */
-    public void setInitialized(CExpressionContext context) {
+    @Override
+	public void setInitialized(CExpressionContext context) {
         context.getBodyContext().setVariableInfo(variable.getIndex(), CVariableInfo.INITIALIZED);
     }
 
@@ -102,19 +106,22 @@ public class JLocalVariableExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return variable.getType();
     }
 
     /**
      * Delegates to internal JLocalVariable
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         variable.setType(type);
     }
 
     
-    public String getIdent() {
+    @Override
+	public String getIdent() {
         return variable.getIdent();
     }
 
@@ -123,14 +130,16 @@ public class JLocalVariableExpression extends JExpression {
      *
      * @return  true iff this expression is constant
      */
-    public boolean isConstant() {
+    @Override
+	public boolean isConstant() {
         return variable.isConstant();
     }
 
     /**
      * Returns the literal value of this field
      */
-    public JLiteral getLiteral() {
+    @Override
+	public JLiteral getLiteral() {
         return (JLiteral)variable.getValue();
     }
 
@@ -148,7 +157,8 @@ public class JLocalVariableExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         if (!context.isLeftSide() || !context.discardValue()) {
             variable.setUsed();
         }
@@ -178,7 +188,8 @@ public class JLocalVariableExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitLocalVariableExpression(this, variable.getIdent());
     }
 
@@ -186,7 +197,8 @@ public class JLocalVariableExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitLocalVariableExpression(this, variable.getIdent());
     }
 
@@ -202,7 +214,8 @@ public class JLocalVariableExpression extends JExpression {
     }
 
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o instanceof JLocalVariableExpression) &&
             variable.equals(((JLocalVariableExpression)o).variable);
     }
@@ -213,7 +226,8 @@ public class JLocalVariableExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             variable.genLoad(code);
@@ -231,7 +245,8 @@ public class JLocalVariableExpression extends JExpression {
      *
      * @param   code        the code list
      */
-    public void genStartStoreCode(CodeSequence code) {
+    @Override
+	public void genStartStoreCode(CodeSequence code) {
         // nothing to do here
     }
 
@@ -247,7 +262,8 @@ public class JLocalVariableExpression extends JExpression {
      * @param   code        the code list
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genEndStoreCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genEndStoreCode(CodeSequence code, boolean discardValue) {
         if (!discardValue) {
             int opcode;
 
@@ -261,7 +277,8 @@ public class JLocalVariableExpression extends JExpression {
         variable.genStore(code);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "VarExp: " + variable.getIdent();
     }
 
@@ -274,7 +291,8 @@ public class JLocalVariableExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JLocalVariableExpression other = new at.dms.kjc.JLocalVariableExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

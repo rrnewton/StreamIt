@@ -47,7 +47,8 @@ public class StatelessDot extends StreamItDot {
     }
 
     /* visit a filter */
-    public Object visitFilter(SIRFilter self,
+    @Override
+	public Object visitFilter(SIRFilter self,
                               JFieldDeclaration[] fields,
                               JMethodDeclaration[] methods,
                               JMethodDeclaration init,
@@ -58,7 +59,8 @@ public class StatelessDot extends StreamItDot {
     }
 
     /* visit a splitter */
-    public Object visitSplitter(SIRSplitter self,
+    @Override
+	public Object visitSplitter(SIRSplitter self,
                                 SIRSplitType type,
                                 JExpression[] expWeights)
     {
@@ -80,7 +82,8 @@ public class StatelessDot extends StreamItDot {
     }
     
     /* visit a joiner */
-    public Object visitJoiner(SIRJoiner self,
+    @Override
+	public Object visitJoiner(SIRJoiner self,
                               SIRJoinType type,
                               JExpression[] expWeights)
     {

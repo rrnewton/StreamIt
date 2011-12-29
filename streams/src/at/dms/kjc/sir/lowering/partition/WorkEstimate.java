@@ -117,7 +117,8 @@ public class WorkEstimate {
     private WorkList buildWorkList(final HashMap<SIROperator, Object> map) {
         // first make a treemap to do the sorting for us
         TreeMap<SIROperator, Object> treeMap = new TreeMap<SIROperator, Object>(new Comparator<Object>() {
-                public int compare(Object o1, Object o2) {
+                @Override
+				public int compare(Object o1, Object o2) {
                     // assume these are map.entry's
                     long work1 = ((WorkInfo)map.get(o1)).getTotalWork();
                     long work2 = ((WorkInfo)map.get(o2)).getTotalWork();
@@ -259,7 +260,7 @@ public class WorkEstimate {
             for (int j=length; j<35; j++) {
                 System.err.print(" ");
             }
-            float percentageWork = 100.0f * ((float)sorted.getWork(i))/((float)totalWork);
+            float percentageWork = 100.0f * sorted.getWork(i)/totalWork;
             System.err.println("\t" + sorted.getWork(i) + "\t" + "(" + ((int)percentageWork) + "%)");
         }
     }
@@ -283,7 +284,7 @@ public class WorkEstimate {
              it.hasNext(); ){
             SIROperator obj = (SIROperator)it.next();
             if (obj instanceof SIRFilter) {
-                int reps = ((int[])executionCounts.get(obj))[0];
+                int reps = executionCounts.get(obj)[0];
                 //long work = RawWorkEstimator.estimateWork((SIRFilter)obj);
                 long workEstimate;
                 
@@ -389,7 +390,8 @@ public class WorkEstimate {
         /**
          * Visits a peek expression.
          */
-        public void visitPeekExpression(SIRPeekExpression self,
+        @Override
+		public void visitPeekExpression(SIRPeekExpression self,
                                         CType tapeType,
                                         JExpression arg) {
             super.visitPeekExpression(self, tapeType, arg);
@@ -399,7 +401,8 @@ public class WorkEstimate {
         /**
          * Visits a pop expression.
          */
-        public void visitPopExpression(SIRPopExpression self,
+        @Override
+		public void visitPopExpression(SIRPopExpression self,
                                        CType tapeType) {
             super.visitPopExpression(self, tapeType);
             work += POP;
@@ -408,7 +411,8 @@ public class WorkEstimate {
         /**
          * Visits a print statement.
          */
-        public void visitPrintStatement(SIRPrintStatement self,
+        @Override
+		public void visitPrintStatement(SIRPrintStatement self,
                                         JExpression arg) {
             super.visitPrintStatement(self, arg);
             work += PRINT;
@@ -417,7 +421,8 @@ public class WorkEstimate {
         /**
          * Visits a push expression.
          */
-        public void visitPushExpression(SIRPushExpression self,
+        @Override
+		public void visitPushExpression(SIRPushExpression self,
                                         CType tapeType,
                                         JExpression arg) {
             super.visitPushExpression(self, tapeType, arg);
@@ -433,7 +438,8 @@ public class WorkEstimate {
         /**
          * prints a while statement
          */
-        public void visitWhileStatement(JWhileStatement self,
+        @Override
+		public void visitWhileStatement(JWhileStatement self,
                                         JExpression cond,
                                         JStatement body) {
             System.err.println("WARNING:  Estimating work in while loop, assume N=" + LOOP_COUNT + " (in " + theFilter.getIdent() + ")");
@@ -446,7 +452,8 @@ public class WorkEstimate {
         /**
          * prints a switch statement
          */
-        public void visitSwitchStatement(JSwitchStatement self,
+        @Override
+		public void visitSwitchStatement(JSwitchStatement self,
                                          JExpression expr,
                                          JSwitchGroup[] body) {
             super.visitSwitchStatement(self, expr, body);
@@ -456,7 +463,8 @@ public class WorkEstimate {
         /**
          * prints a return statement
          */
-        public void visitReturnStatement(JReturnStatement self,
+        @Override
+		public void visitReturnStatement(JReturnStatement self,
                                          JExpression expr) {
             super.visitReturnStatement(self, expr);
             // overhead of returns is folded into method call overhead
@@ -465,7 +473,8 @@ public class WorkEstimate {
         /**
          * prints a if statement
          */
-        public void visitIfStatement(JIfStatement self,
+        @Override
+		public void visitIfStatement(JIfStatement self,
                                      JExpression cond,
                                      JStatement thenClause,
                                      JStatement elseClause) {
@@ -489,7 +498,8 @@ public class WorkEstimate {
         /**
          * prints a for statement
          */
-        public void visitForStatement(JForStatement self,
+        @Override
+		public void visitForStatement(JForStatement self,
                                       JStatement init,
                                       JExpression cond,
                                       JStatement incr,
@@ -518,7 +528,8 @@ public class WorkEstimate {
         /**
          * prints a do statement
          */
-        public void visitDoStatement(JDoStatement self,
+        @Override
+		public void visitDoStatement(JDoStatement self,
                                      JExpression cond,
                                      JStatement body) {
             System.err.println("WARNING:  Estimating work in do loop, assume N=" + LOOP_COUNT + " (in filter " + theFilter.getIdent() + ")");
@@ -531,7 +542,8 @@ public class WorkEstimate {
         /**
          * prints a continue statement
          */
-        public void visitContinueStatement(JContinueStatement self,
+        @Override
+		public void visitContinueStatement(JContinueStatement self,
                                            String label) {
             super.visitContinueStatement(self, label);
             work += CONTINUE;
@@ -540,7 +552,8 @@ public class WorkEstimate {
         /**
          * prints a break statement
          */
-        public void visitBreakStatement(JBreakStatement self,
+        @Override
+		public void visitBreakStatement(JBreakStatement self,
                                         String label) {
             super.visitBreakStatement(self, label);
             work += BREAK;
@@ -570,7 +583,8 @@ public class WorkEstimate {
         /**
          * prints an unary plus expression
          */
-        public void visitUnaryPlusExpression(JUnaryExpression self,
+        @Override
+		public void visitUnaryPlusExpression(JUnaryExpression self,
                                              JExpression expr) {
             super.visitUnaryPlusExpression(self, expr);
             countArithOp(self);
@@ -579,7 +593,8 @@ public class WorkEstimate {
         /**
          * prints an unary minus expression
          */
-        public void visitUnaryMinusExpression(JUnaryExpression self,
+        @Override
+		public void visitUnaryMinusExpression(JUnaryExpression self,
                                               JExpression expr) {
             super.visitUnaryMinusExpression(self, expr);
             countArithOp(self);
@@ -588,7 +603,8 @@ public class WorkEstimate {
         /**
          * prints a bitwise complement expression
          */
-        public void visitBitwiseComplementExpression(JUnaryExpression self,
+        @Override
+		public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                      JExpression expr)
         {
             super.visitBitwiseComplementExpression(self, expr);
@@ -598,7 +614,8 @@ public class WorkEstimate {
         /**
          * prints a logical complement expression
          */
-        public void visitLogicalComplementExpression(JUnaryExpression self,
+        @Override
+		public void visitLogicalComplementExpression(JUnaryExpression self,
                                                      JExpression expr)
         {
             super.visitLogicalComplementExpression(self, expr);
@@ -608,7 +625,8 @@ public class WorkEstimate {
         /**
          * prints a shift expression
          */
-        public void visitShiftExpression(JShiftExpression self,
+        @Override
+		public void visitShiftExpression(JShiftExpression self,
                                          int oper,
                                          JExpression left,
                                          JExpression right) {
@@ -619,7 +637,8 @@ public class WorkEstimate {
         /**
          * prints a shift expressiona
          */
-        public void visitRelationalExpression(JRelationalExpression self,
+        @Override
+		public void visitRelationalExpression(JRelationalExpression self,
                                               int oper,
                                               JExpression left,
                                               JExpression right) {
@@ -630,7 +649,8 @@ public class WorkEstimate {
         /**
          * prints a prefix expression
          */
-        public void visitPrefixExpression(JPrefixExpression self,
+        @Override
+		public void visitPrefixExpression(JPrefixExpression self,
                                           int oper,
                                           JExpression expr) {
             super.visitPrefixExpression(self, oper, expr);
@@ -640,7 +660,8 @@ public class WorkEstimate {
         /**
          * prints a postfix expression
          */
-        public void visitPostfixExpression(JPostfixExpression self,
+        @Override
+		public void visitPostfixExpression(JPostfixExpression self,
                                            int oper,
                                            JExpression expr) {
             super.visitPostfixExpression(self, oper, expr);
@@ -650,7 +671,8 @@ public class WorkEstimate {
         /**
          * prints a name expression
          */
-        public void visitNameExpression(JNameExpression self,
+        @Override
+		public void visitNameExpression(JNameExpression self,
                                         JExpression prefix,
                                         String ident) {
             super.visitNameExpression(self, prefix, ident);
@@ -660,7 +682,8 @@ public class WorkEstimate {
         /**
          * prints an array allocator expression
          */
-        public void visitBinaryExpression(JBinaryExpression self,
+        @Override
+		public void visitBinaryExpression(JBinaryExpression self,
                                           String oper,
                                           JExpression left,
                                           JExpression right) {
@@ -671,7 +694,8 @@ public class WorkEstimate {
         /**
          * prints a method call expression
          */
-        public void visitMethodCallExpression(JMethodCallExpression self,
+        @Override
+		public void visitMethodCallExpression(JMethodCallExpression self,
                                               JExpression prefix,
                                               String ident,
                                               JExpression[] args) {
@@ -747,7 +771,8 @@ public class WorkEstimate {
         /**
          * prints an equality expression
          */
-        public void visitEqualityExpression(JEqualityExpression self,
+        @Override
+		public void visitEqualityExpression(JEqualityExpression self,
                                             boolean equal,
                                             JExpression left,
                                             JExpression right) {
@@ -758,7 +783,8 @@ public class WorkEstimate {
         /**
          * prints a conditional expression
          */
-        public void visitConditionalExpression(JConditionalExpression self,
+        @Override
+		public void visitConditionalExpression(JConditionalExpression self,
                                                JExpression cond,
                                                JExpression left,
                                                JExpression right) {
@@ -769,7 +795,8 @@ public class WorkEstimate {
         /**
          * prints a compound expression
          */
-        public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+        @Override
+		public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                       int oper,
                                                       JExpression left,
                                                       JExpression right) {
@@ -781,7 +808,8 @@ public class WorkEstimate {
         /**
          * prints a field expression
          */
-        public void visitFieldExpression(JFieldAccessExpression self,
+        @Override
+		public void visitFieldExpression(JFieldAccessExpression self,
                                          JExpression left,
                                          String ident) {
             super.visitFieldExpression(self, left, ident);
@@ -791,7 +819,8 @@ public class WorkEstimate {
         /**
          * prints a compound assignment expression
          */
-        public void visitBitwiseExpression(JBitwiseExpression self,
+        @Override
+		public void visitBitwiseExpression(JBitwiseExpression self,
                                            int oper,
                                            JExpression left,
                                            JExpression right) {
@@ -802,7 +831,8 @@ public class WorkEstimate {
         /**
          * prints an assignment expression
          */
-        public void visitAssignmentExpression(JAssignmentExpression self,
+        @Override
+		public void visitAssignmentExpression(JAssignmentExpression self,
                                               JExpression left,
                                               JExpression right) {
             // try to leave out const prop remnants
@@ -817,7 +847,8 @@ public class WorkEstimate {
         /**
          * prints an array length expression
          */
-        public void visitArrayAccessExpression(JArrayAccessExpression self,
+        @Override
+		public void visitArrayAccessExpression(JArrayAccessExpression self,
                                                JExpression prefix,
                                                JExpression accessor) {
             super.visitArrayAccessExpression(self, prefix, accessor);

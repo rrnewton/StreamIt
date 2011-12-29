@@ -98,7 +98,8 @@ public class JDoubleLiteral extends JLiteral {
         this.value = value;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Double["+value+"]";
     }
 
@@ -109,14 +110,16 @@ public class JDoubleLiteral extends JLiteral {
     /**
      * Returns the type of this expression.
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Double;
     }
 
     /**
      * Returns the constant value of the expression.
      */
-    public double doubleValue() {
+    @Override
+	public double doubleValue() {
         return value;
     }
 
@@ -124,11 +127,13 @@ public class JDoubleLiteral extends JLiteral {
      * Returns true iff the value of this literal is the
      * default value for this type (JLS 4.5.5).
      */
-    public boolean isDefault() {
+    @Override
+	public boolean isDefault() {
         return Double.doubleToLongBits(value) == ZERO_BITS;
     }
 
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         return ""+value;
     }
 
@@ -141,7 +146,8 @@ public class JDoubleLiteral extends JLiteral {
      * changes the type of this expression to an other
      * @param  dest the destination type
      */
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         switch (dest.getTypeID()) {
         case TID_BYTE:
             return new JByteLiteral(getTokenReference(), (byte)value);
@@ -175,7 +181,8 @@ public class JDoubleLiteral extends JLiteral {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitDoubleLiteral(value);
     }
 
@@ -183,7 +190,8 @@ public class JDoubleLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitDoubleLiteral(this, value);
     }
 
@@ -205,7 +213,8 @@ public class JDoubleLiteral extends JLiteral {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantInstruction(new PushLiteralInstruction(value));
@@ -216,7 +225,8 @@ public class JDoubleLiteral extends JLiteral {
      * Returns whether or <pre>o</pre> this represents a literal with the same
      * value as this.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o!=null && 
                 (o instanceof JDoubleLiteral) &&
                 ((JDoubleLiteral)o).value==this.value);
@@ -232,7 +242,8 @@ public class JDoubleLiteral extends JLiteral {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JDoubleLiteral other = new at.dms.kjc.JDoubleLiteral();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -72,7 +72,8 @@ public class JThisExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         // not sure why <self> is null, but it was causing problems with
         // FMRadio and this seems to fix it
         if (self==null) {
@@ -82,7 +83,8 @@ public class JThisExpression extends JExpression {
         }
     }
     
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         if (self == null) {
             assert type == null;
         } else {
@@ -93,7 +95,8 @@ public class JThisExpression extends JExpression {
     /**
      * @return is this expression a lvalue ?
      */
-    public boolean isLValue(CExpressionContext context) {
+    @Override
+	public boolean isLValue(CExpressionContext context) {
         return false;
     }
 
@@ -107,7 +110,8 @@ public class JThisExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(final CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(final CExpressionContext context) throws PositionedError {
         if (prefix != null) {
             prefix = prefix.analyse(context);
             check(context, prefix.getType().isClassType(), KjcMessages.THIS_BADACCESS);
@@ -135,13 +139,15 @@ public class JThisExpression extends JExpression {
                                 /**
                                  * @return the local index in context variable table
                                  */
-                                public int getPosition() {
+                                @Override
+								public int getPosition() {
                                     return context.getMethodContext().getCMethod().getParameters().length + 1 /*this*/;
                                 }
                             };
 
                         return new JLocalVariableExpression(getTokenReference(), local) {
-                                public JExpression analyse(CExpressionContext ctxt) {
+                                @Override
+								public JExpression analyse(CExpressionContext ctxt) {
                                     // already checked
                                     return this;
                                 }
@@ -172,7 +178,8 @@ public class JThisExpression extends JExpression {
         return this;
     }
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return o instanceof JThisExpression &&
             self.equals(((JThisExpression)o).self);
     }
@@ -185,7 +192,8 @@ public class JThisExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitThisExpression(this, prefix);
     }
 
@@ -193,7 +201,8 @@ public class JThisExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitThisExpression(this, prefix);
     }
 
@@ -215,7 +224,8 @@ public class JThisExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantLoadThis();
@@ -239,7 +249,8 @@ public class JThisExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JThisExpression other = new at.dms.kjc.JThisExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

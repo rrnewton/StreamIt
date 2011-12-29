@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 
 import at.dms.compiler.tools.antlr.runtime.ParserException;
+import at.dms.compiler.tools.common.CompilerMessages;
 import at.dms.compiler.tools.common.PositionedError;
 import at.dms.compiler.tools.common.TokenReference;
 
@@ -75,13 +76,13 @@ class DefinitionFile {
 
             return defs;
         } catch (FileNotFoundException e) {
-            throw new OptgenError(OptgenMessages.FILE_NOT_FOUND, sourceFile);
+            throw new OptgenError(CompilerMessages.FILE_NOT_FOUND, sourceFile);
         } catch (IOException e) {
-            throw new OptgenError(OptgenMessages.IO_EXCEPTION, sourceFile, e.getMessage());
+            throw new OptgenError(CompilerMessages.IO_EXCEPTION, sourceFile, e.getMessage());
         } catch (ParserException e) {
-            throw new OptgenError(OptgenMessages.FORMATTED_ERROR,
+            throw new OptgenError(CompilerMessages.FORMATTED_ERROR,
                                   new PositionedError(new TokenReference(sourceFile, e.getLine()),
-                                                      OptgenMessages.SYNTAX_ERROR,
+                                                      CompilerMessages.SYNTAX_ERROR,
                                                       e.getMessage()));
         }
     }

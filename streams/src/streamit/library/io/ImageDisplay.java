@@ -86,7 +86,8 @@ public class ImageDisplay extends Filter {
         BorderLayout borderlay = new BorderLayout();
         displayWindow.setContentPane(new JPanel(borderlay)
             {
-                public void paint(Graphics g) {
+                @Override
+				public void paint(Graphics g) {
                     if (imageList.size() == 0) {
                         g.drawImage(firstImage, 0, 0, this);
                         info.setText("Waiting for first image");
@@ -106,7 +107,8 @@ public class ImageDisplay extends Filter {
         info.setPreferredSize(new Dimension(130, 20));
 
         timer = new Timer(50, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                @Override
+				public void actionPerformed(ActionEvent e) {
                     currentImage += 1;
                     if (currentImage > imageList.size())
                         currentImage = 1;
@@ -116,7 +118,8 @@ public class ImageDisplay extends Filter {
 
         JButton buttonFrameBck = new JButton("<");
         buttonFrameBck.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                @Override
+				public void actionPerformed(ActionEvent e) {
                     timer.stop();
                     currentImage -= 1;
                     if (currentImage <= 0) {
@@ -127,7 +130,8 @@ public class ImageDisplay extends Filter {
             });
         JButton buttonFrameFwd = new JButton(">");
         buttonFrameFwd.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                @Override
+				public void actionPerformed(ActionEvent e) {
                     timer.stop();
                     currentImage += 1;
                     if (currentImage > imageList.size()) {
@@ -139,13 +143,15 @@ public class ImageDisplay extends Filter {
 
         JButton buttonPlay = new JButton("Play");
         buttonPlay.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                @Override
+				public void actionPerformed(ActionEvent e) {
                     timer.start();
                 }
             });
         JButton buttonStop = new JButton("Stop");
         buttonStop.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                @Override
+				public void actionPerformed(ActionEvent e) {
                     timer.stop();
                 }
             });
@@ -197,11 +203,13 @@ public class ImageDisplay extends Filter {
 
     }
 
-    public void init() {
+    @Override
+	public void init() {
         inputChannel = new Channel (Integer.TYPE, width*height*3);
     }
  
-    public void work() {
+    @Override
+	public void work() {
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         int[] pixel = new int[3];    
         for (int y = 0; y < height; y++) {
@@ -217,7 +225,8 @@ public class ImageDisplay extends Filter {
         displayWindow.repaint();
     }
 
-    public void DELETE() {
+    @Override
+	public void DELETE() {
         displayWindow.dispose();
     }
 
@@ -232,13 +241,15 @@ class WindowDragger extends MouseInputAdapter {
         this.window = window;
     }
 
-    public void mousePressed(MouseEvent e) {
+    @Override
+	public void mousePressed(MouseEvent e) {
         // Remember offset into window for dragging
         origin.x = e.getX();
         origin.y = e.getY();
     }
 
-    public void mouseDragged(MouseEvent e) {
+    @Override
+	public void mouseDragged(MouseEvent e) {
         // Move window relative to drag start
         Point p = window.getLocation();
         window.setLocation(

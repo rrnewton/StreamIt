@@ -173,7 +173,8 @@ public class ClassInfo extends Member {
     /**
      * Returns the name of the this class (fully qualified)
      */
-    public String getName() {
+    @Override
+	public String getName() {
         return thisClass.getName();
     }
 
@@ -187,7 +188,8 @@ public class ClassInfo extends Member {
     /**
      * Returns the type of the this field
      */
-    public String getSignature() {
+    @Override
+	public String getSignature() {
         return thisClass.getName();
     }
 

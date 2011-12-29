@@ -31,7 +31,8 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
     /**
      * Visits a while statement
      */
-    public Object visitWhileStatement(JWhileStatement self,
+    @Override
+	public Object visitWhileStatement(JWhileStatement self,
                                       JExpression cond,
                                       JStatement body) {
         cond.accept(this);
@@ -48,7 +49,8 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
     /**
      * Visits a if statement
      */
-    public Object visitIfStatement(JIfStatement self,
+    @Override
+	public Object visitIfStatement(JIfStatement self,
                                    JExpression cond,
                                    JStatement thenClause,
                                    JStatement elseClause) {
@@ -65,7 +67,8 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
     /**
      * Visits a for statement
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -87,7 +90,8 @@ public abstract class DataFlow extends SLIRReplacingVisitor {
     /**
      * Visits a switch statement
      */
-    public Object visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public Object visitSwitchStatement(JSwitchStatement self,
                                        JExpression expr,
                                        JSwitchGroup[] body) {
         expr.accept(this);

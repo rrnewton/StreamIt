@@ -92,7 +92,8 @@ public class Vectorizable {
         final Set<SIRFilter> vectorizableFilters = new HashSet<SIRFilter>();
         IterFactory.createFactory().createIter(str).accept(
             new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+                @Override
+				public void visitFilter(SIRFilter self, SIRFilterIter iter) {
                     if (at.dms.kjc.sir.lowering.Vectorizable.vectorizable(self)) {
                         vectorizableFilters.add(self);
                     }
@@ -198,11 +199,13 @@ public class Vectorizable {
         List<JMethodDeclaration> methods = GetSteadyMethods.getSteadyMethods(f);
         for (JMethodDeclaration method : methods)
             method.accept(new SLIREmptyVisitor() {
-                public void visitPrintStatement(SIRPrintStatement self,
+                @Override
+				public void visitPrintStatement(SIRPrintStatement self,
                         JExpression exp) { 
                     tf[0] = true;
                 }
-                public void visitMessageStatement(SIRMessageStatement self,
+                @Override
+				public void visitMessageStatement(SIRMessageStatement self,
                         JExpression portal,
                         String iname,
                         String ident,
@@ -667,7 +670,8 @@ public class Vectorizable {
                     private Set<String> arrayAccessIn(JExpression e) {
                         final Set<String> s = new HashSet<String>();
                         e.accept(new SLIREmptyVisitor() {
-                            public void visitArrayAccessExpression(
+                            @Override
+							public void visitArrayAccessExpression(
                                     JArrayAccessExpression self, JExpression prefix,
                                     JExpression accessor) {
                                 s.add(CommonUtils.lhsBaseExpr(prefix).getIdent());

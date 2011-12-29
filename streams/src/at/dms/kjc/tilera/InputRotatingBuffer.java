@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -131,7 +132,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         
         tailName = this.getIdent() + "tail";
         tailDefn = new JVariableDefinition(null,
-                at.dms.kjc.Constants.ACC_STATIC,
+                Constants.ACC_STATIC,
                 CStdType.Integer, tailName, null);
         tail = new JFieldAccessExpression(tailName);
         tail.setType(CStdType.Integer);
@@ -235,7 +236,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
             
             firstExeName = "__first__" + this.getIdent();        
             firstExe = new JVariableDefinition(null,
-                    at.dms.kjc.Constants.ACC_STATIC,
+                    Constants.ACC_STATIC,
                     CStdType.Boolean, firstExeName, new JBooleanLiteral(true));
         }
     }
@@ -260,7 +261,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
            if (tile == parent && hasLocalSrcFilter())
                continue;
            
-           SourceAddressRotation rot = new SourceAddressRotation(tile, this, filterNode, (IntraSSGEdge) edge);
+           SourceAddressRotation rot = new SourceAddressRotation(tile, this, filterNode, edge);
            addressBufs[i] = rot;
            addrBufMap.put(tile, rot);
            i++;
@@ -272,7 +273,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * create the commands that the upstream filter will use to transfer items to 
      * its destinations.  
      */
-    public void createTransferCommands() {
+    @Override
+	public void createTransferCommands() {
         if (!hasLocalSrcFilter())
             return;
         
@@ -288,7 +290,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * Thus it needs the address buffers of any destination for the upstream filter that
      * uses the input buffer as an output buffer.
      */
-    public void createAddressBuffers() {
+    @Override
+	public void createAddressBuffers() {
         //do nothing for input buffers that don't act as output buffers
         if (!hasLocalSrcFilter())
             return;
@@ -302,7 +305,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
             if (edge.getDest() == this.filterNode.getParent().getInputNode())
                 continue;
             
-            InputRotatingBuffer input = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
+            InputRotatingBuffer input = RotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
             addressBuffers.put(input, input.getAddressRotation(parent));               
         }
     }
@@ -339,7 +342,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * Generate the code to setup the structure of the rotating buffer 
      * as a circular linked list.
      */
-    protected void setupRotation() {
+    @Override
+	protected void setupRotation() {
         String temp = "__temp__";
         TileCodeStore cs; 
         //this is the typedef we will use for this buffer rotation structure
@@ -482,7 +486,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * Set the buffer size of this input buffer based on the max
      * number of items it receives.
      */
-    protected void setBufferSize() {
+    @Override
+	protected void setBufferSize() {
        
         bufSize = Math.max(filterInfo.totalItemsReceived(SchedulingPhase.INIT),
                 (filterInfo.totalItemsReceived(SchedulingPhase.STEADY) + filterInfo.copyDown));
@@ -502,18 +507,20 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popMethodName()
      */
-    public String popMethodName() {
+    @Override
+	public String popMethodName() {
         return "__pop_" + unique_id;
     }
     
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popMethod()
      */
-    public JMethodDeclaration popMethod() {
+    @Override
+	public JMethodDeclaration popMethod() {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 edge.getType(),
                 popMethodName(),
                 new JFormalParameter[0],
@@ -526,7 +533,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     }
     
     /** Create an array reference given an offset */   
-    public JFieldAccessExpression writeBufRef() {
+    @Override
+	public JFieldAccessExpression writeBufRef() {
         assert hasLocalSrcFilter();
         return new JFieldAccessExpression(new JThisExpression(), currentWriteBufName);
     }
@@ -541,7 +549,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popManyMethodName()
      */
-    public String popManyMethodName() {
+    @Override
+	public String popManyMethodName() {
         return "__popN_" + unique_id;
     }
  
@@ -551,7 +560,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
      * Pop many items at once ignoring them.
      * Default method generated here to call popMethod() repeatedly.
      */
-    public JMethodDeclaration popManyMethod() {
+    @Override
+	public JMethodDeclaration popManyMethod() {
         if (popManyCode != null) {
             return popManyCode;
         }
@@ -583,13 +593,15 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPopMethodName()
      */
-    public String assignFromPopMethodName() {
+    @Override
+	public String assignFromPopMethodName() {
         return "__popv_" + unique_id;
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPopMethod()
      */
-    public JMethodDeclaration assignFromPopMethod() {
+    @Override
+	public JMethodDeclaration assignFromPopMethod() {
         String parameterName = "__val";
         JFormalParameter val = new JFormalParameter(
                 CStdType.Integer,
@@ -598,7 +610,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 assignFromPopMethodName(),
                 new JFormalParameter[]{val},
@@ -614,13 +626,15 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#peekMethodName()
      */
-    public String peekMethodName() {
+    @Override
+	public String peekMethodName() {
         return "__peek_" + unique_id;
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#peekMethod()
      */
-    public JMethodDeclaration peekMethod() {
+    @Override
+	public JMethodDeclaration peekMethod() {
         String parameterName = "__offset";
         JFormalParameter offset = new JFormalParameter(
                 CStdType.Integer,
@@ -629,7 +643,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 edge.getType(),
                 peekMethodName(),
                 new JFormalParameter[]{offset},
@@ -644,13 +658,15 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPeekMethodName()
      */
-    public String assignFromPeekMethodName() {
+    @Override
+	public String assignFromPeekMethodName() {
         return "__peekv_" + unique_id;
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPeekMethod()
      */
-    public JMethodDeclaration assignFromPeekMethod() {
+    @Override
+	public JMethodDeclaration assignFromPeekMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
                 CStdType.Integer,
@@ -664,7 +680,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 assignFromPeekMethodName(),
                 new JFormalParameter[]{val,offset},
@@ -681,7 +697,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#beginInitRead()
      */
-    public List<JStatement> beginInitRead() {
+    @Override
+	public List<JStatement> beginInitRead() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         list.add(zeroOutTail());
         return list;
@@ -690,31 +707,36 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#beginInitRead()
      */
-    public List<JStatement> postPreworkInitRead() {
+    @Override
+	public List<JStatement> postPreworkInitRead() {
         return new LinkedList<JStatement>(); 
     }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#endInitRead()
      */
-    public List<JStatement> endInitRead() {
+    @Override
+	public List<JStatement> endInitRead() {
         LinkedList<JStatement> list = new LinkedList<JStatement>(); 
         list.addAll(copyDownStatements(SchedulingPhase.INIT));
         return list;
     }
 
-    public List<JStatement> beginPrimePumpRead() {
+    @Override
+	public List<JStatement> beginPrimePumpRead() {
         return beginSteadyRead();
     }
     
-    public List<JStatement> endPrimePumpRead() {
+    @Override
+	public List<JStatement> endPrimePumpRead() {
         return endSteadyRead();
     }
     
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#beginSteadyRead()
      */
-    public List<JStatement> beginSteadyRead() {
+    @Override
+	public List<JStatement> beginSteadyRead() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         list.add(zeroOutTail());
         return list;
@@ -724,7 +746,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#endSteadyRead()
      */
-    public List<JStatement> endSteadyRead() {
+    @Override
+	public List<JStatement> endSteadyRead() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         //copy the copyDown items to the next rotation buffer
         list.addAll(copyDownStatements(SchedulingPhase.STEADY));
@@ -736,21 +759,24 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#topOfWorkSteadyRead()
      */
-    public List<JStatement> topOfWorkSteadyRead() {
+    @Override
+	public List<JStatement> topOfWorkSteadyRead() {
         return new LinkedList<JStatement>(); 
     }
     
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#dataDeclsH()
      */
-    public List<JStatement> dataDeclsH() {
+    @Override
+	public List<JStatement> dataDeclsH() {
         return new LinkedList<JStatement>();
     }
     
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#dataDecls()
      */
-    public List<JStatement> dataDecls() {
+    @Override
+	public List<JStatement> dataDecls() {
         //declare the buffer array
         List<JStatement> retval = new LinkedList<JStatement>();
         return retval;
@@ -759,14 +785,16 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#readDeclsExtern()
      */
-    public List<JStatement> readDeclsExtern() {
+    @Override
+	public List<JStatement> readDeclsExtern() {
         return new LinkedList<JStatement>();
     }   
     
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#readDecls()
      */
-    public List<JStatement> readDecls() {
+    @Override
+	public List<JStatement> readDecls() {
         //declare the tail    
         JStatement tailDecl = new JVariableDeclarationStatement(tailDefn);
         List<JStatement> retval = new LinkedList<JStatement>();
@@ -819,7 +847,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#endInitWrite()
      */
-    public List<JStatement> endInitWrite() {
+    @Override
+	public List<JStatement> endInitWrite() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         
         LinkedList<JStatement> list = new LinkedList<JStatement>();
@@ -834,7 +863,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
      *  
      *       
      */
-    public List<JStatement> beginPrimePumpWrite() {
+    @Override
+	public List<JStatement> beginPrimePumpWrite() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         
         LinkedList<JStatement> list = new LinkedList<JStatement>();
@@ -860,7 +890,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
         return list;
     }
     
-    public List<JStatement> endPrimePumpWrite() {
+    @Override
+	public List<JStatement> endPrimePumpWrite() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         
         LinkedList<JStatement> list = new LinkedList<JStatement>();
@@ -915,7 +946,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#beginSteadyWrite()
      */
-    public List<JStatement> beginSteadyWrite() {
+    @Override
+	public List<JStatement> beginSteadyWrite() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         
         LinkedList<JStatement> list = new LinkedList<JStatement>();
@@ -929,7 +961,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#endSteadyWrite()
      */
-    public List<JStatement> endSteadyWrite() {
+    @Override
+	public List<JStatement> endSteadyWrite() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         
         LinkedList<JStatement> list = new LinkedList<JStatement>();
@@ -955,7 +988,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#writeDecls()
      */
-    public List<JStatement> writeDecls() {
+    @Override
+	public List<JStatement> writeDecls() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         List<JStatement> retval = new LinkedList<JStatement>();
         
@@ -972,14 +1006,16 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#pushMethodName()
      */
-    public String pushMethodName() {
+    @Override
+	public String pushMethodName() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         return "__push_" + unique_id;
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#pushMethod()
      */
-    public JMethodDeclaration pushMethod() {
+    @Override
+	public JMethodDeclaration pushMethod() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         return transferCommands.pushMethod();
     }
@@ -987,7 +1023,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#beginInitWrite()
      */
-    public List<JStatement> beginInitWrite() {
+    @Override
+	public List<JStatement> beginInitWrite() {
         assert hasLocalSrcFilter() : "Calling write method for input buffer that does not act as output buffer.";
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         if (WorkNodeInfo.getFilterInfo(localSrcFilter).totalItemsSent(SchedulingPhase.INIT) > 0)

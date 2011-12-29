@@ -29,7 +29,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a labeled statement
      */
-    public Object visitLabeledStatement(JLabeledStatement self,
+    @Override
+	public Object visitLabeledStatement(JLabeledStatement self,
                                         String label,
                                         JStatement stmt) {
         JStatement newStmt = (JStatement)stmt.accept(this);
@@ -42,7 +43,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a if statement
      */
-    public Object visitIfStatement(JIfStatement self,
+    @Override
+	public Object visitIfStatement(JIfStatement self,
                                    JExpression cond,
                                    JStatement thenClause,
                                    JStatement elseClause) {
@@ -67,7 +69,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a compound statement
      */
-    public Object visitCompoundStatement(JCompoundStatement self,
+    @Override
+	public Object visitCompoundStatement(JCompoundStatement self,
                                          JStatement[] body) {
         for (int i = 0; i < body.length; i++) {
             JStatement newBody = (JStatement)body[i].accept(this);
@@ -81,7 +84,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a do statement
      */
-    public Object visitDoStatement(JDoStatement self,
+    @Override
+	public Object visitDoStatement(JDoStatement self,
                                    JExpression cond,
                                    JStatement body) {
         JExpression newExp = (JExpression)cond.accept(this);
@@ -100,7 +104,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an expression statement
      */
-    public Object visitBlockStatement(JBlock self,
+    @Override
+	public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
         for (ListIterator it = self.getStatementIterator(); it.hasNext(); ) {
             JStatement oldBody = (JStatement)it.next();
@@ -108,7 +113,7 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
             if (!(newBody instanceof JStatement))
                 continue;
             if (newBody!=null && newBody!=oldBody) {
-                it.set((JStatement)newBody);
+                it.set(newBody);
             }
         }
         visitComments(comments);
@@ -118,7 +123,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array length expression
      */
-    public Object visitSwitchGroup(JSwitchGroup self,
+    @Override
+	public Object visitSwitchGroup(JSwitchGroup self,
                                    JSwitchLabel[] labels,
                                    JStatement[] stmts) {
         for (int i = 0; i < labels.length; i++) {
@@ -136,7 +142,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * visits a for statement
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -169,7 +176,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a field declaration
      */
-    public Object visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public Object visitFieldDeclaration(JFieldDeclaration self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -198,7 +206,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a while statement
      */
-    public Object visitWhileStatement(JWhileStatement self,
+    @Override
+	public Object visitWhileStatement(JWhileStatement self,
                                       JExpression cond,
                                       JStatement body) {
         JExpression newExp = (JExpression)cond.accept(this);
@@ -217,7 +226,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a variable declaration statement
      */
-    public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                     JVariableDefinition[] vars) {
 
         // how many defs were replaced with JEmptyStatements
@@ -257,7 +267,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a variable declaration statement
      */
-    public Object visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public Object visitVariableDefinition(JVariableDefinition self,
                                           int modifiers,
                                           CType type,
                                           String ident,
@@ -285,7 +296,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a throw statement
      */
-    public Object visitThrowStatement(JThrowStatement self,
+    @Override
+	public Object visitThrowStatement(JThrowStatement self,
                                       JExpression expr) {
         Utils.fail("Replacing visitor doesn't support throw statements yet");
         return super.visitThrowStatement(self, expr);
@@ -294,7 +306,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a synchronized statement
      */
-    public Object visitSynchronizedStatement(JSynchronizedStatement self,
+    @Override
+	public Object visitSynchronizedStatement(JSynchronizedStatement self,
                                              JExpression cond,
                                              JStatement body) {
         Utils.fail("Replacing visitor doesn't support synchronized " +
@@ -305,7 +318,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a switch statement
      */
-    public Object visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public Object visitSwitchStatement(JSwitchStatement self,
                                        JExpression expr,
                                        JSwitchGroup[] body) {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -322,7 +336,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a return statement
      */
-    public Object visitReturnStatement(JReturnStatement self,
+    @Override
+	public Object visitReturnStatement(JReturnStatement self,
                                        JExpression expr) {
         if (expr != null) {
             JExpression newExp = (JExpression)expr.accept(this);
@@ -336,7 +351,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an expression statement
      */
-    public Object visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public Object visitExpressionStatement(JExpressionStatement self,
                                            JExpression expr) {
         JExpression newExp = (JExpression)expr.accept(this);
         if (newExp!=null && newExp!=expr) {
@@ -348,7 +364,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an expression list statement
      */
-    public Object visitExpressionListStatement(JExpressionListStatement self,
+    @Override
+	public Object visitExpressionListStatement(JExpressionListStatement self,
                                                JExpression[] expr) {
         for (int i = 0; i < expr.length; i++) {
             JExpression newExp = (JExpression)expr[i].accept(this);
@@ -362,7 +379,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an unary plus expression
      */
-    public Object visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public Object visitUnaryPlusExpression(JUnaryExpression self,
                                            JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -375,7 +393,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an unary minus expression
      */
-    public Object visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public Object visitUnaryMinusExpression(JUnaryExpression self,
                                             JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -388,7 +407,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a bitwise complement expression
      */
-    public Object visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public Object visitBitwiseComplementExpression(JUnaryExpression self,
                                                    JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -401,7 +421,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a logical complement expression
      */
-    public Object visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public Object visitLogicalComplementExpression(JUnaryExpression self,
                                                    JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -414,7 +435,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a this expression
      */
-    public Object visitThisExpression(JThisExpression self,
+    @Override
+	public Object visitThisExpression(JThisExpression self,
                                       JExpression prefix) {
         if (prefix != null) {
             JExpression newExp = (JExpression)prefix.accept(this);
@@ -428,7 +450,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a shift expression
      */
-    public Object visitShiftExpression(JShiftExpression self,
+    @Override
+	public Object visitShiftExpression(JShiftExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {
@@ -438,7 +461,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a shift expressiona
      */
-    public Object visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public Object visitRelationalExpression(JRelationalExpression self,
                                             int oper,
                                             JExpression left,
                                             JExpression right) {
@@ -448,7 +472,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a prefix expression
      */
-    public Object visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public Object visitPrefixExpression(JPrefixExpression self,
                                         int oper,
                                         JExpression expr) {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -462,7 +487,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a postfix expression
      */
-    public Object visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public Object visitPostfixExpression(JPostfixExpression self,
                                          int oper,
                                          JExpression expr) {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -476,7 +502,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a parenthesed expression
      */
-    public Object visitParenthesedExpression(JParenthesedExpression self,
+    @Override
+	public Object visitParenthesedExpression(JParenthesedExpression self,
                                              JExpression expr) {
         // parenthesized expressions are evil, they tend to cause
         // problems for passes looking for literals in specific
@@ -484,13 +511,14 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
         while (self.getExpr() instanceof JParenthesedExpression) {
             self = (JParenthesedExpression)self.getExpr();
         }
-        return (JExpression)expr.accept(this);
+        return expr.accept(this);
     }
 
     /**
      * Prints an unqualified anonymous class instance creation expression.
      */
-    public Object visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
+    @Override
+	public Object visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
                                                   JExpression prefix,
                                                   String ident,
                                                   JExpression[] params,
@@ -509,7 +537,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * Prints an unqualified instance creation expression.
      */
-    public Object visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
+    @Override
+	public Object visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
                                                  JExpression prefix,
                                                  String ident,
                                                  JExpression[] params)
@@ -526,7 +555,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array length expression
      */
-    public Object visitFormalParameters(JFormalParameter self,
+    @Override
+	public Object visitFormalParameters(JFormalParameter self,
                                         boolean isFinal,
                                         CType type,
                                         String ident) {
@@ -548,7 +578,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array length expression
      */
-    public Object visitArgs(JExpression[] args) {
+    @Override
+	public Object visitArgs(JExpression[] args) {
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 JExpression newExp = (JExpression)args[i].accept(this);
@@ -563,7 +594,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array allocator expression
      */
-    public Object visitNewArrayExpression(JNewArrayExpression self,
+    @Override
+	public Object visitNewArrayExpression(JNewArrayExpression self,
                                           CType type,
                                           JExpression[] dims,
                                           JArrayInitializer init)
@@ -588,7 +620,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a name expression
      */
-    public Object visitNameExpression(JNameExpression self,
+    @Override
+	public Object visitNameExpression(JNameExpression self,
                                       JExpression prefix,
                                       String ident) {
         if (prefix != null) {
@@ -603,7 +636,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array allocator expression
      */
-    public Object visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public Object visitBinaryExpression(JBinaryExpression self,
                                         String oper,
                                         JExpression left,
                                         JExpression right) {
@@ -613,7 +647,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a method call expression
      */
-    public Object visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public Object visitMethodCallExpression(JMethodCallExpression self,
                                             JExpression prefix,
                                             String ident,
                                             JExpression[] args) {
@@ -630,7 +665,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an instanceof expression
      */
-    public Object visitInstanceofExpression(JInstanceofExpression self,
+    @Override
+	public Object visitInstanceofExpression(JInstanceofExpression self,
                                             JExpression expr,
                                             CType dest) {
         Utils.fail("Replacing visitor doesn't support instanceof yet.");
@@ -640,7 +676,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an equality expression
      */
-    public Object visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public Object visitEqualityExpression(JEqualityExpression self,
                                           boolean equal,
                                           JExpression left,
                                           JExpression right) {
@@ -650,7 +687,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a conditional expression
      */
-    public Object visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public Object visitConditionalExpression(JConditionalExpression self,
                                              JExpression cond,
                                              JExpression left,
                                              JExpression right) {
@@ -675,7 +713,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a compound expression
      */
-    public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                     int oper,
                                                     JExpression left,
                                                     JExpression right) {
@@ -704,7 +743,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a field expression
      */
-    public Object visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public Object visitFieldExpression(JFieldAccessExpression self,
                                        JExpression left,
                                        String ident)
     {
@@ -719,7 +759,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a cast expression
      */
-    public Object visitCastExpression(JCastExpression self,
+    @Override
+	public Object visitCastExpression(JCastExpression self,
                                       JExpression expr,
                                       CType type)
     {
@@ -734,7 +775,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a cast expression
      */
-    public Object visitUnaryPromoteExpression(JUnaryPromote self,
+    @Override
+	public Object visitUnaryPromoteExpression(JUnaryPromote self,
                                               JExpression expr,
                                               CType type)
     {
@@ -749,7 +791,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints a compound assignment expression
      */
-    public Object visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public Object visitBitwiseExpression(JBitwiseExpression self,
                                          int oper,
                                          JExpression left,
                                          JExpression right) {
@@ -759,7 +802,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an assignment expression
      */
-    public Object visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public Object visitAssignmentExpression(JAssignmentExpression self,
                                             JExpression left,
                                             JExpression right) {
         return doBinaryExpression(self, left, right);
@@ -768,7 +812,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array length expression
      */
-    public Object visitArrayLengthExpression(JArrayLengthExpression self,
+    @Override
+	public Object visitArrayLengthExpression(JArrayLengthExpression self,
                                              JExpression prefix) {
         JExpression newExp = (JExpression)prefix.accept(this);
         if (newExp!=null && newExp!=prefix) {
@@ -781,7 +826,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array length expression
      */
-    public Object visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public Object visitArrayAccessExpression(JArrayAccessExpression self,
                                              JExpression prefix,
                                              JExpression accessor) {
         JExpression newExp = (JExpression)prefix.accept(this);
@@ -818,7 +864,8 @@ public class ReplacingVisitor extends EmptyAttributeVisitor {
     /**
      * prints an array length expression
      */
-    public Object visitSwitchLabel(JSwitchLabel self,
+    @Override
+	public Object visitSwitchLabel(JSwitchLabel self,
                                    JExpression expr) {
         if (expr != null) {
             JExpression newExp = (JExpression)expr.accept(this);

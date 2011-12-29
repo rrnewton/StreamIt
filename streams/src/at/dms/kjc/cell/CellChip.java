@@ -24,11 +24,13 @@ public class CellChip implements ComputeNodesI<CellComputeCodeStore> {
         }
     }
 
-    public boolean canAllocateNewComputeNode() {
+    @Override
+	public boolean canAllocateNewComputeNode() {
         return true;
     }
 
-    public CellPU getNthComputeNode(int n) {
+    @Override
+	public CellPU getNthComputeNode(int n) {
         return cellPUs.elementAt(n);
     }
     
@@ -45,16 +47,19 @@ public class CellChip implements ComputeNodesI<CellComputeCodeStore> {
         return spus;
     }
 
-    public boolean isValidComputeNodeNumber(int cellpuNumber) {
+    @Override
+	public boolean isValidComputeNodeNumber(int cellpuNumber) {
         return 0 <= cellpuNumber && cellpuNumber < cellPUs.size();
     }
 
-    public int newComputeNode() {
+    @Override
+	public int newComputeNode() {
         cellPUs.add(new SPU(cellPUs.size()));
         return cellPUs.size() - 1;
     }
 
-    public int size() {
+    @Override
+	public int size() {
         return cellPUs.size();
     }
     

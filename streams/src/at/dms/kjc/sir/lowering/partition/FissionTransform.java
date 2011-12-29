@@ -26,7 +26,8 @@ public class FissionTransform extends StreamTransform {
     /**
      * Perform the transform on <str> and return new stream.
      */
-    protected SIRStream doMyTransform(SIRStream str) {
+    @Override
+	protected SIRStream doMyTransform(SIRStream str) {
         // make sure we're fissable
         assert ((str instanceof SIRFilter) && StatelessDuplicate.isFissable((SIRFilter)str)) :
             "Didn't get a filter or it wasn't fissable: " + str;
@@ -34,7 +35,8 @@ public class FissionTransform extends StreamTransform {
         return StatelessDuplicate.doit((SIRFilter)str, reps);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Fission transform, #" + id + " (" + reps + " ways)";
     }
 }

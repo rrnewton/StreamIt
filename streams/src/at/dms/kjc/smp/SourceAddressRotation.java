@@ -69,7 +69,8 @@ public class SourceAddressRotation extends RotatingBuffer {
         return inputBuffer;
     }
     
-    public void setBufferSize() {
+    @Override
+	public void setBufferSize() {
         if (inputBuffer == null)
             return;
         bufSize = inputBuffer.getBufferSize();
@@ -91,7 +92,8 @@ public class SourceAddressRotation extends RotatingBuffer {
      * Generate the code to setup the structure of the rotating buffer 
      * as a circular linked list.
      */
-    protected void setupRotation() {
+    @Override
+	protected void setupRotation() {
     	    	
         String temp = "__temp__";
         SMPComputeCodeStore cs = parent.getComputeCode();
@@ -152,11 +154,13 @@ public class SourceAddressRotation extends RotatingBuffer {
         return list;
     }
     
-    public JFieldAccessExpression writeBufRef() {
+    @Override
+	public JFieldAccessExpression writeBufRef() {
         assert false;
         return null;
     }
 
+	@Override
 	public JArrayAccessExpression readBufRef(JExpression offset) {
 		assert false;
 		return null;

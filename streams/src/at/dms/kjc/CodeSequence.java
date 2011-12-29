@@ -70,7 +70,7 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
      */
     public static CodeSequence getCodeSequence() {
         CodeSequence    seq;
-        if (!Constants.ENV_USE_CACHE || stack.empty()) {
+        if (!at.dms.classfile.Constants.ENV_USE_CACHE || stack.empty()) {
             seq = new CodeSequence();
         } else {
             seq = stack.pop();
@@ -86,7 +86,7 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
      * Release a code sequence
      */
     public void release() {
-        if (Constants.ENV_USE_CACHE) {
+        if (at.dms.classfile.Constants.ENV_USE_CACHE) {
             stack.push(this);
             handlers.setSize(0);
             lines.setSize(0);
@@ -451,12 +451,13 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
         // if there is a label planted as last instruction, add a dummy
         // instruction at the end: it will never be reached
         if (labelAtEnd) {
-            plantNoArgInstruction(Constants.opc_nop);
+            plantNoArgInstruction(at.dms.classfile.Constants.opc_nop);
         }
 
         try {
             AccessorTransformer transformer = new AccessorTransformer() {
-                    public InstructionAccessor transform(InstructionAccessor accessor,
+                    @Override
+					public InstructionAccessor transform(InstructionAccessor accessor,
                                                          AccessorContainer container)
                     {
                         // the only accessors to resolve are labels
@@ -521,7 +522,8 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CodeSequence other = new at.dms.kjc.CodeSequence();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

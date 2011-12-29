@@ -18,7 +18,8 @@ package streamit.library;
 
 public class DuplicateSplitter extends Splitter
 {
-    public void init()
+    @Override
+	public void init()
     {
         duplicateSplitter = true;
     }
@@ -26,12 +27,14 @@ public class DuplicateSplitter extends Splitter
     /* this work function remains here (instead of using work function
        in the parent) because it copies single data to many channels
        and remains atomic */
-    public void work ()
+    @Override
+	public void work ()
     {
         duplicateOneData (inputChannel, outputChannel);
     }
 
-    public int [] getWeights ()
+    @Override
+	public int [] getWeights ()
     {
         int numChildren = dest.size ();
         int [] weights = new int [numChildren];
@@ -48,12 +51,14 @@ public class DuplicateSplitter extends Splitter
         return weights;
     }
     
-    public int getConsumption ()
+    @Override
+	public int getConsumption ()
     {
         return 1;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "duplicate";
     }
 }

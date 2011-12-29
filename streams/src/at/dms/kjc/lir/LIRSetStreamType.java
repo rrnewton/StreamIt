@@ -26,7 +26,8 @@ public class LIRSetStreamType extends LIRNode {
         this.streamType = streamType;
     }
 
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitSetStreamType(this, 
                              this.getStreamContext(), 

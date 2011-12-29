@@ -62,32 +62,38 @@ public class SplitJoinIter
     Pair[] splitWorks = null;
     Pair[] joinWorks = null;
 
-    public Object getObject()
+    @Override
+	public Object getObject()
     {
         return splitjoin;
     }
 
-    public streamit.scheduler2.iriter.Iterator getUnspecializedIter()
+    @Override
+	public streamit.scheduler2.iriter.Iterator getUnspecializedIter()
     {
         return new Iterator(splitjoin, factory);
     }
 
-    public int getNumChildren()
+    @Override
+	public int getNumChildren()
     {
         return splitjoin.getNumChildren();
     }
 
-    public streamit.scheduler2.iriter.Iterator getChild(int n)
+    @Override
+	public streamit.scheduler2.iriter.Iterator getChild(int n)
     {
         return new Iterator(splitjoin.getChildN(n), factory);
     }
 
-    public int getFanOut()
+    @Override
+	public int getFanOut()
     {
         return getNumChildren();
     }
 
-    public int getSplitterNumWork()
+    @Override
+	public int getSplitterNumWork()
     {
         if (splitjoin.getSplitter() instanceof NullSplitter || splitjoin.getSplitter().getConsumption() == 0)
             {
@@ -104,14 +110,16 @@ public class SplitJoinIter
             }
     }
 
-    public Object getSplitterWork(int nWork)
+    @Override
+	public Object getSplitterWork(int nWork)
     {
         assert nWork >= 0 && nWork < getSplitterNumWork();
 
         return splitjoin.getSplitter().getWork(nWork);
     }
 
-    public int getJoinerNumWork()
+    @Override
+	public int getJoinerNumWork()
     {
         if (splitjoin.getJoiner() instanceof NullJoiner || splitjoin.getJoiner().getProduction() == 0)
             {
@@ -128,7 +136,8 @@ public class SplitJoinIter
             }
     }
 
-    public Object getJoinerWork(int nWork)
+    @Override
+	public Object getJoinerWork(int nWork)
     {
         assert nWork >= 0 && nWork < getJoinerNumWork();
 
@@ -138,7 +147,8 @@ public class SplitJoinIter
     int splitWeights[] = null, joinWeights[] = null;
     int fineSplitPushWeights[][], fineJoinPushWeights[][];
 
-    public int[] getSplitPushWeights(int nWork)
+    @Override
+	public int[] getSplitPushWeights(int nWork)
     {
         if (splitWeights == null)
             {
@@ -166,12 +176,14 @@ public class SplitJoinIter
             return splitWeights;
     }
 
-    public int getFanIn()
+    @Override
+	public int getFanIn()
     {
         return getNumChildren();
     }
 
-    public int[] getJoinPopWeights(int nWork)
+    @Override
+	public int[] getJoinPopWeights(int nWork)
     {
         if (joinWeights == null)
             {
@@ -198,7 +210,8 @@ public class SplitJoinIter
             return joinWeights;
     }
 
-    public int getSplitPop(int nWork)
+    @Override
+	public int getSplitPop(int nWork)
     {
         int throughput = splitjoin.getSplitter().getConsumption();
         if (splitterFineGrained && throughput != 0)
@@ -207,7 +220,8 @@ public class SplitJoinIter
             return throughput;
     }
 
-    public int getJoinPush(int nWork)
+    @Override
+	public int getJoinPush(int nWork)
     {
         int throughput  = splitjoin.getJoiner().getProduction();
         
@@ -217,7 +231,8 @@ public class SplitJoinIter
             return throughput;
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof SplitJoinIter))
             return false;
@@ -225,7 +240,8 @@ public class SplitJoinIter
         return otherSJ.getObject() == this.getObject();
     }
 
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return splitjoin.hashCode();
     }

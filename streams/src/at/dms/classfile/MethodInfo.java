@@ -103,7 +103,8 @@ public class MethodInfo extends Member {
     /**
      * Returns the name of this method
      */
-    public String getName() {
+    @Override
+	public String getName() {
         return name.getValue();
     }
 
@@ -117,7 +118,8 @@ public class MethodInfo extends Member {
     /**
      * Returns the type of the this method
      */
-    public String getSignature() {
+    @Override
+	public String getSignature() {
         return type.getValue();
     }
 

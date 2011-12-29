@@ -72,21 +72,24 @@ public class ConstructSIRTree {
         // visit the hoister in all containers
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
                 /* pre-visit a pipeline */
-                public void preVisitPipeline(SIRPipeline self,
+                @Override
+				public void preVisitPipeline(SIRPipeline self,
                                              SIRPipelineIter iter) {
                     self.clear();
                     self.getInit().accept(new InitializationHoister(self));
                 }
         
                 /* pre-visit a splitjoin */
-                public void preVisitSplitJoin(SIRSplitJoin self,
+                @Override
+				public void preVisitSplitJoin(SIRSplitJoin self,
                                               SIRSplitJoinIter iter) {
                     self.clear();
                     self.getInit().accept(new InitializationHoister(self));
                 }
         
                 /* pre-visit a feedbackloop */
-                public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+                @Override
+				public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                                  SIRFeedbackLoopIter iter) {
                     self.clear();
                     self.getInit().accept(new InitializationHoister(self));
@@ -118,7 +121,8 @@ public class ConstructSIRTree {
             this.parent = parent;
         }
 
-        public Object visitInitStatement(SIRInitStatement oldSelf,
+        @Override
+		public Object visitInitStatement(SIRInitStatement oldSelf,
                                          SIRStream oldTarget) {
             // visit children
             SIRInitStatement self = 
@@ -131,7 +135,7 @@ public class ConstructSIRTree {
             // references.
             try {
                 for (int i=0; i<self.getArgs().size(); i++) {
-                    JExpression arg = (JExpression)self.getArgs().get(i);
+                    JExpression arg = self.getArgs().get(i);
                     assert isConstantArg(arg):
                         "Expected constant arguments to init, " +
                         "but found non-constant " + self.getArgs().get(i) +
@@ -175,7 +179,7 @@ public class ConstructSIRTree {
                 final int iter = i;
                 if (!isConstantArg((JExpression)args.get(i))) {
                     // keep track of new arg
-                    newArgs.add((JExpression)args.get(i));
+                    newArgs.add(args.get(i));
                 } else {
                     // for arrays, change parameter into local decl -- in
                     // case we were using parameter name to hold the
@@ -187,7 +191,8 @@ public class ConstructSIRTree {
                                                                                 null);
                         // replace all references to <params[i]> with references to <def>
                         initBlock.accept(new SLIRReplacingVisitor() {
-                                public Object visitLocalVariableExpression(JLocalVariableExpression myself,
+                                @Override
+								public Object visitLocalVariableExpression(JLocalVariableExpression myself,
                                                                            String ident) {
                                     if (myself.getVariable()==params[iter]) {
                                         return new JLocalVariableExpression(null, def);

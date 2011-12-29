@@ -2,6 +2,7 @@ package at.dms.kjc.tilera;
 
 import java.util.List;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JArrayAccessExpression;
@@ -37,7 +38,7 @@ public class BufferDMATransfers extends BufferTransfers {
         //set up the head pointer for writing
         writeHeadName = buf.getIdent() + "head";
         writeHeadDefn = new JVariableDefinition(null,
-                at.dms.kjc.Constants.ACC_STATIC,
+                Constants.ACC_STATIC,
                 CStdType.Integer, writeHeadName, null);
         
         head = new JFieldAccessExpression(writeHeadName);
@@ -107,12 +108,14 @@ public class BufferDMATransfers extends BufferTransfers {
         }
     }
     
-    public JStatement zeroOutHead(SchedulingPhase phase) {
+    @Override
+	public JStatement zeroOutHead(SchedulingPhase phase) {
         return new JExpressionStatement(
                         new JAssignmentExpression(head, new JIntLiteral(0)));
     }
     
-    public JMethodDeclaration pushMethod() {
+    @Override
+	public JMethodDeclaration pushMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
                 parent.getType(),
@@ -121,7 +124,7 @@ public class BufferDMATransfers extends BufferTransfers {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 parent.pushMethodName(),
                 new JFormalParameter[]{val},

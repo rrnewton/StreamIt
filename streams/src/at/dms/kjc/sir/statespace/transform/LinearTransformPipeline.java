@@ -39,7 +39,8 @@ public class LinearTransformPipeline extends LinearTransform {
         this.repList = new LinkedList<LinearFilterRepresentation>(l);
     }
 
-    public LinearFilterRepresentation transform() throws NoTransformPossibleException {
+    @Override
+	public LinearFilterRepresentation transform() throws NoTransformPossibleException {
     
         // we know that our rep list has at least two children in it.
         // start running down the rep list transforming things

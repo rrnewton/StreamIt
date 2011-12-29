@@ -244,7 +244,8 @@ public abstract class SIROperator implements Finalizable, Serializable, DeepClon
     }
 
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return Namer.getUniqueNumber(this);
     }
 
@@ -260,7 +261,8 @@ public abstract class SIROperator implements Finalizable, Serializable, DeepClon
     /**
      * This should be called in every mutator.
      */
-    public void assertMutable() {
+    @Override
+	public void assertMutable() {
         assert !IterFactory.isFinalized(this):
             "A mutability check failed.";
     }
@@ -304,7 +306,8 @@ public abstract class SIROperator implements Finalizable, Serializable, DeepClon
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.sir.SIROperator other) {

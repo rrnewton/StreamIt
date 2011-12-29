@@ -119,7 +119,8 @@ public class Lookahead implements Cloneable {
     /**
      * Make a deep copy of everything in this object
      */
-    public Object clone() {
+    @Override
+	public Object clone() {
         Lookahead p=null;
         try {
             p = (Lookahead)super.clone();
@@ -174,7 +175,8 @@ public class Lookahead implements Cloneable {
     }
     public void resetEpsilon() { hasEpsilon=false; }
     public void setEpsilon() { hasEpsilon = true; }
-    public String toString() {
+    @Override
+	public String toString() {
         String e="",b,f="",d="";
         b = fset.toString(",");
         if ( containsEpsilon() ) {

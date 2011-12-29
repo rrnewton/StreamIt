@@ -76,7 +76,8 @@ public class StmtHelperCall extends Statement
      * @param v  visitor to accept
      * @return   defined by the visitor object
      */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtHelperCall(this);
     }

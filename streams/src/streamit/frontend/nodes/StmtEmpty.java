@@ -35,7 +35,8 @@ public class StmtEmpty extends Statement
         super(context);
     }
     
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtEmpty(this);
     }

@@ -70,7 +70,8 @@ public class JArrayAccessExpression extends JExpression {
         this.type = type;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "ArrayAccess:"+prefix+"["+accessor+"]";
     }
     
@@ -81,7 +82,8 @@ public class JArrayAccessExpression extends JExpression {
     /**
      * @return  the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return type;
     }
 
@@ -102,7 +104,8 @@ public class JArrayAccessExpression extends JExpression {
     /**
      * @return  true if this expression is a variable already valued
      */
-    public boolean isInitialized(CExpressionContext context) {
+    @Override
+	public boolean isInitialized(CExpressionContext context) {
         // nothing to do in array access 15.12 Array Access Expressions
         return true;
     }
@@ -113,19 +116,22 @@ public class JArrayAccessExpression extends JExpression {
      * @exception   UnpositionedError an error if this object can't actually
      *      be assignated this may happen with final variables.
      */
-    public void setInitialized(CExpressionContext context) {
+    @Override
+	public void setInitialized(CExpressionContext context) {
         // nothing to do in array access 15.12 Array Access Expressions
     }
 
     /**
      *
      */
-    public boolean isLValue(CExpressionContext context) {
+    @Override
+	public boolean isLValue(CExpressionContext context) {
         // nothing to do in array access 15.12 Array Access Expressions
         return true;
     }
 
-    public String getIdent() {
+    @Override
+	public String getIdent() {
         return ((CArrayType)prefix.getType()).getElementType()+"[]";
     }
 
@@ -139,7 +145,8 @@ public class JArrayAccessExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         // evaluate the accessor in rhs mode, result will be used
         accessor = accessor.analyse(new CExpressionContext(context));
         check(context,
@@ -165,7 +172,8 @@ public class JArrayAccessExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitArrayAccessExpression(this, prefix, accessor);
     }
 
@@ -173,7 +181,8 @@ public class JArrayAccessExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitArrayAccessExpression(this, prefix, accessor);
     }
 
@@ -194,7 +203,8 @@ public class JArrayAccessExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         prefix.genCode(code, false);
@@ -217,7 +227,8 @@ public class JArrayAccessExpression extends JExpression {
      *
      * @param   code        the code list
      */
-    public void genStartStoreCode(CodeSequence code) {
+    @Override
+	public void genStartStoreCode(CodeSequence code) {
         prefix.genCode(code, false);
         accessor.genCode(code, false);
     }
@@ -234,7 +245,8 @@ public class JArrayAccessExpression extends JExpression {
      * @param   code        the code list
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genEndStoreCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genEndStoreCode(CodeSequence code, boolean discardValue) {
         if (!discardValue) {
             if (getType().getSize() == 2) {
                 code.plantNoArgInstruction(opc_dup2_x2);
@@ -256,7 +268,8 @@ public class JArrayAccessExpression extends JExpression {
         prefix = p;
     }
 
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         this.type = type;
     }
     
@@ -293,7 +306,8 @@ public class JArrayAccessExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JArrayAccessExpression other = new at.dms.kjc.JArrayAccessExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

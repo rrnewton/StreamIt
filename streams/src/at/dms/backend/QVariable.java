@@ -41,14 +41,16 @@ class QVariable extends QTemporary {
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "V" + insn.getLocal().getIndex();
     }
 
     /**
      * The type of this instruction
      */
-    public int getType() {
+    @Override
+	public int getType() {
         return insn.getInstruction().getReturnType();
     }
 

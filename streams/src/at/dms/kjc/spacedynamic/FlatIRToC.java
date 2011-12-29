@@ -128,7 +128,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
         //     ((SIRFilter)node.contents).getName()+"...");
 
         (new FinalUnitOptimize(){
-            protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
+            @Override
+			protected boolean optimizeThisMethod(SIRCodeUnit unit, JMethodDeclaration method) {
                 //don't do anything for the work function if it is inlined or for the init work
                 return !((RawExecutionCode.INLINE_WORK && method.getName().startsWith("work")) || 
                         method.getName().startsWith("initWork"));
@@ -194,7 +195,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
     }
     
     
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
 
         //       System.out.println(self.getName());
@@ -438,7 +440,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
         p.print("}\n\n\n");
     }
 
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         assert false;
     }
@@ -461,7 +464,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
     /**
      * prints a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -509,7 +513,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
     /**
      * prints a empty statement
      */
-    public void visitEmptyStatement(JEmptyStatement self) {
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self) {
         //if we are inside a for loop header, we need to print 
         //the ; of an empty statement
         if (forLoopHeader > 0) {
@@ -521,7 +526,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
     /**
      * prints a method declaration
      */
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -605,7 +611,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -675,7 +682,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
 
@@ -757,7 +765,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -836,28 +845,33 @@ public class FlatIRToC extends ToC implements StreamVisitor
         p.print(")");
     }
 
-    public void visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public void visitDynamicToken(SIRDynamicToken self) {
         Utils.fail("We should not see a dynamic token in FlatIRToC");
     }
 
-    public void visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public void visitRangeExpression(SIRRangeExpression self) {
         Utils.fail("We should not see a range expression in FlatIRToC");
     }
 
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression num)
     {
         Utils.fail("FlatIRToC should see no peek expressions");
     }
     
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType)
     {
         Utils.fail("FlatIRToC should see no pop expressions");
     }
     
-    public void visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression exp)
     {
         //handle the print statment using a magic instruction
@@ -971,7 +985,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
         p.print("}\n");
     }
     
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression val)
     {
@@ -983,7 +998,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
             pushScalar(self, tapeType, val);
     }
     
-    public void visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public void visitRegReceiverStatement(SIRRegReceiverStatement self,
                                           JExpression portal,
                                           SIRStream receiver, 
                                           JMethodDeclaration[] methods)
@@ -996,7 +1012,8 @@ public class FlatIRToC extends ToC implements StreamVisitor
         // (But shouldn't there be a latency field in here?)
     }
     
-    public void visitRegSenderStatement(SIRRegSenderStatement self,
+    @Override
+	public void visitRegSenderStatement(SIRRegSenderStatement self,
                                         String fn,
                                         SIRLatency latency)
     {
@@ -1013,21 +1030,24 @@ public class FlatIRToC extends ToC implements StreamVisitor
     // ----------------------------------------------------------------------
 
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self,
+    @Override
+	public void preVisitPipeline(SIRPipeline self,
                                  SIRPipelineIter iter) 
     {
     }
     
 
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter)
     {
     }
     
 
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter)
     {
     }
@@ -1038,19 +1058,22 @@ public class FlatIRToC extends ToC implements StreamVisitor
      */
             
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self,
+    @Override
+	public void postVisitPipeline(SIRPipeline self,
                                   SIRPipelineIter iter) {
     }
     
 
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
     }
     
 
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
     }
 

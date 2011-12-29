@@ -150,7 +150,8 @@ public class GenerateCCode {
     private void renameFilterContents(FlatNode top) {
         top.accept(
                    new FlatVisitor() {
-                       public void visitNode(FlatNode node) {
+                       @Override
+					public void visitNode(FlatNode node) {
                            if (node.isFilter()) {
                                RenameAll.renameFilterContents((SIRFilter) node.contents);
                            }
@@ -312,7 +313,8 @@ public class GenerateCCode {
 
         //convert all field accesses to local accesses
         main.accept(new SLIRReplacingVisitor() {
-                public Object visitFieldExpression(JFieldAccessExpression self,
+                @Override
+				public Object visitFieldExpression(JFieldAccessExpression self,
                                                    JExpression left, String ident) {
                     //if not a this expression, then we have a field access of a 
                     //variable that is a structure.  So just visit the expression

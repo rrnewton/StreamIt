@@ -219,6 +219,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	/**
 	 * @return
 	 */
+	@Override
 	public String peekMethodName() {
 		//return "dynamic_buffer_peek";
 		String type = edge.getType().toString();
@@ -228,6 +229,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	/**
 	 * @return
 	 */
+	@Override
 	public String popManyMethodName() {
 		//return "dynamic_buffer_pop_many";
 		String type = edge.getType().toString();
@@ -237,11 +239,13 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	/**
 	 * @return
 	 */
+	@Override
 	public String popMethodName() {
 		String type = edge.getType().toString();
 		return type + "_queue_pop";
 	}
 
+	@Override
 	public String pushMethodName() {
 		String type = edge.getType().toString();
 		return type + "_queue_push";

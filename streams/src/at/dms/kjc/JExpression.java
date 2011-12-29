@@ -248,7 +248,8 @@ public abstract class JExpression extends JPhylum {
      * @param   params      the array of parameters
      *
      */
-    protected void fail(CContext context, MessageDescription key, Object[] params)
+    @Override
+	protected void fail(CContext context, MessageDescription key, Object[] params)
         throws PositionedError
     {
         throw new CLineError(getTokenReference(), key, params);
@@ -299,13 +300,15 @@ public abstract class JExpression extends JPhylum {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public abstract void accept(KjcVisitor p);
+    @Override
+	public abstract void accept(KjcVisitor p);
     /**
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      * @return  data to pass back up
      */
-    public abstract Object accept(AttributeVisitor p);
+    @Override
+	public abstract Object accept(AttributeVisitor p);
     /**
      * Accepts the specified expression visitor
      * @param <S> output type
@@ -373,7 +376,8 @@ public abstract class JExpression extends JPhylum {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.JExpression other) {

@@ -56,7 +56,7 @@ public class LowerIterationExpression extends SLIRReplacingVisitor {
 
         for (SIRFilter filter : iterFilters) {
             JVariableDefinition iterVar = new JVariableDefinition(
-                Constants.ACC_PRIVATE,
+                at.dms.classfile.Constants.ACC_PRIVATE,
                 CStdType.Integer,
                 ITER_VAR_NAME,
                 new JIntLiteral(0));
@@ -82,7 +82,8 @@ public class LowerIterationExpression extends SLIRReplacingVisitor {
         return iterFilters;
     }
 
-    public Object visitIterationExpression(SIRIterationExpression iter) {
+    @Override
+	public Object visitIterationExpression(SIRIterationExpression iter) {
         this.found = true;
         JExpression jFieldCall = new JFieldAccessExpression(ITER_VAR_NAME);
         return jFieldCall;

@@ -36,7 +36,8 @@ public class WorkSorted implements FlatVisitor {
         return ws.sortedList;
     }
     
-    public void visitNode(FlatNode node) {
+    @Override
+	public void visitNode(FlatNode node) {
         if (node.isFilter()) {
             //System.out.println("Adding " + node);
             //find the correct place to insert this node

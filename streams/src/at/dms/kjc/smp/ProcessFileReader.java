@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JBlock;
@@ -81,7 +82,7 @@ public class ProcessFileReader {
     }
 
     private void generateCode(WorkNode dsFilter) {
-        InputRotatingBuffer destBuf = InputRotatingBuffer.getInputBuffer(dsFilter);
+        InputRotatingBuffer destBuf = RotatingBuffer.getInputBuffer(dsFilter);
         FileReaderCodeKey frcKey = new FileReaderCodeKey(filterNode, dsFilter);
 
         FileReaderCode fileReaderCode = fileReaderCodeStore.get(frcKey);
@@ -105,7 +106,7 @@ public class ProcessFileReader {
         JBlock statements = new JBlock(fileReaderCode.commandsInit);
 
         //create a method 
-        JMethodDeclaration initMethod = new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+        JMethodDeclaration initMethod = new JMethodDeclaration(null, Constants.ACC_PUBLIC,
                 CStdType.Void,
                 "__File_Reader_Init__" + fileReaderCode.getID() + "__",
                 JFormalParameter.EMPTY,
@@ -129,7 +130,7 @@ public class ProcessFileReader {
             JBlock statements = new JBlock(fileReaderCode.commandsSteady);
 
             //create a method 
-            JMethodDeclaration ppMethod = new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+            JMethodDeclaration ppMethod = new JMethodDeclaration(null, Constants.ACC_PUBLIC,
                     CStdType.Void,
                     "__File_Reader_PrimePump__" + fileReaderCode.getID() + "__",
                     JFormalParameter.EMPTY,
@@ -241,7 +242,8 @@ public class ProcessFileReader {
             this.dsFilter = dsFilter;
         }
 
-        public boolean equals(Object obj) {
+        @Override
+		public boolean equals(Object obj) {
             if(obj instanceof FileReaderCodeKey) {
                 FileReaderCodeKey id = (FileReaderCodeKey)obj;
 
@@ -256,7 +258,8 @@ public class ProcessFileReader {
             return false;
         }
 
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             return filter.hashCode() + dsFilter.hashCode();
         }
     }

@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import at.dms.compiler.tools.antlr.runtime.ParserException;
+import at.dms.compiler.tools.common.CompilerMessages;
 import at.dms.compiler.tools.common.PositionedError;
 import at.dms.compiler.tools.common.TokenReference;
 import at.dms.compiler.tools.common.Utils;
@@ -71,13 +72,13 @@ class DefinitionFile {
 
             return defs;
         } catch (FileNotFoundException e) {
-            throw new LexgenError(LexgenMessages.FILE_NOT_FOUND, sourceFile);
+            throw new LexgenError(CompilerMessages.FILE_NOT_FOUND, sourceFile);
         } catch (IOException e) {
-            throw new LexgenError(LexgenMessages.IO_EXCEPTION, sourceFile, e.getMessage());
+            throw new LexgenError(CompilerMessages.IO_EXCEPTION, sourceFile, e.getMessage());
         } catch (ParserException e) {
-            throw new LexgenError(LexgenMessages.FORMATTED_ERROR,
+            throw new LexgenError(CompilerMessages.FORMATTED_ERROR,
                                   new PositionedError(new TokenReference(sourceFile, e.getLine()),
-                                                      LexgenMessages.SYNTAX_ERROR,
+                                                      CompilerMessages.SYNTAX_ERROR,
                                                       e.getMessage()));
         }
     }

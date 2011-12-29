@@ -11,21 +11,25 @@ public class JccPipeline extends JccCompositeFilter {
 
 	JccPipeline(Pipeline pipeline, JccStream[] filters) {
 		this.pipeline = pipeline;
-		this.filters = (JccStream[]) filters.clone();
+		this.filters = filters.clone();
 	}
 
+	@Override
 	Stream getStreamIt() {
 		return pipeline;
 	}
 
+	@Override
 	void setInChannel(JccChannel channel) {
 		filters[0].setInChannel(channel);
 	}
 
+	@Override
 	void setOutChannel(JccChannel channel) {
 		filters[filters.length - 1].setOutChannel(channel);
 	}
 
+	@Override
 	public void init() {
 		for (int i = 0; i < filters.length; i++) {
 			filters[i].init();

@@ -21,8 +21,12 @@ import streamit.scheduler2.Scheduler;
 public abstract class Structure extends Stream implements Cloneable
 {
     // Can't add child streams to a structure.
-    public void add(Stream s) { throw new UnsupportedOperationException(); }
-    public void connectGraph() { }
-    public void setupBufferLengths(Scheduler schedule) { }
-    public Object clone() throws CloneNotSupportedException { return super.clone(); }
+    @Override
+	public void add(Stream s) { throw new UnsupportedOperationException(); }
+    @Override
+	public void connectGraph() { }
+    @Override
+	public void setupBufferLengths(Scheduler schedule) { }
+    @Override
+	public Object clone() throws CloneNotSupportedException { return super.clone(); }
 }

@@ -41,7 +41,8 @@ class QOperator implements QOrigin {
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String  s = at.dms.classfile.OpcodeNames.getName(operator.getOpcode()) + " {";
 
         for (int i = operands.length - 1; i >= 0; i--) {
@@ -54,21 +55,24 @@ class QOperator implements QOrigin {
     /**
      * The type of this instruction
      */
-    public int getType() {
+    @Override
+	public int getType() {
         return operator.getInstruction().getReturnType();
     }
 
     /**
      * Returns the primitive instruction
      */
-    public InstructionHandle getInstruction() {
+    @Override
+	public InstructionHandle getInstruction() {
         return operator;
     }
 
     /**
      * Duplicate this node
      */
-    public QOrigin duplicate() {
+    @Override
+	public QOrigin duplicate() {
         throw new InconsistencyException("NYI");
     }
 
@@ -79,7 +83,8 @@ class QOperator implements QOrigin {
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         Vector  vect = new Vector();
 
         for (int i = 0; i < operands.length; i++) {
@@ -94,14 +99,16 @@ class QOperator implements QOrigin {
     /**
      * returns the parameters of this instruction
      */
-    public QOrigin[] getOrigins() {
+    @Override
+	public QOrigin[] getOrigins() {
         return operands;
     }
 
     /**
      * Sets the parameters of this instruction
      */
-    public void setOrigin(QOrigin origin, int i) {
+    @Override
+	public void setOrigin(QOrigin origin, int i) {
         operands[i] = origin;
     }
 
@@ -113,7 +120,8 @@ class QOperator implements QOrigin {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
         for (int i = operands.length - 1; i >= 0; i--) {
             operands[i].generate(seq);
         }

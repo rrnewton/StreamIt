@@ -64,7 +64,8 @@ public abstract class Portal
      * deterministic behavior in sets and containers (was causing
      * unpredictable exceptions).
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return id;
     }
 

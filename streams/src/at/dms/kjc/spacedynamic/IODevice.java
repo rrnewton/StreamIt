@@ -11,7 +11,8 @@ public abstract class IODevice {
     /** true if this IODevice communicates over the GDN **/
     protected boolean isDynamic;
 
-    public abstract String toString();
+    @Override
+	public abstract String toString();
 
     public IOPort getPort() {
         return port;

@@ -78,11 +78,13 @@ public class CThrowableInfo extends at.dms.util.Utils {
     // OPTIMIZATION
     // ----------------------------------------------------------------------
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return ((CThrowableInfo)o).throwable.getCClass() == throwable.getCClass();
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return throwable.getCClass().hashCode();
     }
 
@@ -97,7 +99,8 @@ public class CThrowableInfo extends at.dms.util.Utils {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CThrowableInfo other = new at.dms.kjc.CThrowableInfo();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

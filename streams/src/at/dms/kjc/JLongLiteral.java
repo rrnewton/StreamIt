@@ -106,14 +106,16 @@ public class JLongLiteral extends JLiteral {
     /**
      * Returns the type of this expression.
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Long;
     }
 
     /**
      * Returns the constant value of the expression.
      */
-    public long longValue() {
+    @Override
+	public long longValue() {
         return value;
     }
 
@@ -121,14 +123,16 @@ public class JLongLiteral extends JLiteral {
      * Returns true iff the value of this literal is the
      * default value for this type (JLS 4.5.5).
      */
-    public boolean isDefault() {
+    @Override
+	public boolean isDefault() {
         return value == 0;
     }
 
     /**
      * Returns a string representation of this literal.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JLongLiteral[");
@@ -141,7 +145,8 @@ public class JLongLiteral extends JLiteral {
         return buffer.toString();
     }
 
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         return ""+value;
     }
 
@@ -155,7 +160,8 @@ public class JLongLiteral extends JLiteral {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         check(context, !this.invert, KjcMessages.INVALID_LONG_LITERAL, "9223372036854775808L (= 2^63)");
         return this;
     }
@@ -165,7 +171,8 @@ public class JLongLiteral extends JLiteral {
      * changes the type of this expression to an other
      * @param  dest the destination type
      */
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         if (this.invert) {
             throw new InconsistencyException();
         }
@@ -182,9 +189,9 @@ public class JLongLiteral extends JLiteral {
         case TID_LONG:
             return this;
         case TID_FLOAT:
-            return new JFloatLiteral(getTokenReference(), (float)value);
+            return new JFloatLiteral(getTokenReference(), value);
         case TID_DOUBLE:
-            return new JDoubleLiteral(getTokenReference(), (double)value);
+            return new JDoubleLiteral(getTokenReference(), value);
         case TID_CLASS:
             if (dest != CStdType.String) {
                 throw new InconsistencyException("cannot convert from long to " + dest);
@@ -203,7 +210,8 @@ public class JLongLiteral extends JLiteral {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitLongLiteral(value);
     }
 
@@ -211,7 +219,8 @@ public class JLongLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitLongLiteral(this, value);
     }
 
@@ -233,7 +242,8 @@ public class JLongLiteral extends JLiteral {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantInstruction(new PushLiteralInstruction(value));
@@ -244,7 +254,8 @@ public class JLongLiteral extends JLiteral {
      * Returns whether or <pre>o</pre> this represents a literal with the same
      * value as this.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o!=null && 
                 (o instanceof JLongLiteral) &&
                 ((JLongLiteral)o).value==this.value);
@@ -261,7 +272,8 @@ public class JLongLiteral extends JLiteral {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JLongLiteral other = new at.dms.kjc.JLongLiteral();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

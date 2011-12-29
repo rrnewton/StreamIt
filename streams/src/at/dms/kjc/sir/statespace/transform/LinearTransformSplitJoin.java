@@ -49,7 +49,8 @@ public class LinearTransformSplitJoin extends LinearTransform{
      * of the expanded matricies into a new linear transform in the correct
      * order.
      **/
-    public LinearFilterRepresentation transform() throws NoTransformPossibleException {
+    @Override
+	public LinearFilterRepresentation transform() throws NoTransformPossibleException {
     
         int filterCount = linearRepresentations.length;
         LinearPrinter.println(" preparing to combine splitjoin of " +
@@ -366,7 +367,8 @@ public class LinearTransformSplitJoin extends LinearTransform{
             this.push = u;
         }
         /** Nice human readable string (for debugging...) **/
-        public String toString() {
+        @Override
+		public String toString() {
             return ("(stored:" + this.storedInputs +
                     ", pop:" + this.pop +
                     ", push:" + this.push +

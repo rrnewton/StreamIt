@@ -854,7 +854,8 @@ public class FilterMatrix {
      * Return true if the passed object is a FilterMatrix and represents the same matrix as this,
      * on an element by element basis.
      **/
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (o == null) {return false;}
         if (!(o instanceof FilterMatrix)) {return false;}
         FilterMatrix other = (FilterMatrix)o;
@@ -955,7 +956,8 @@ public class FilterMatrix {
      * are equal, they should produce the same hash code. Performance
      * will be bad in large programs, but correctness is guaranteed.
      **/
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return 1;
     }
 
@@ -992,7 +994,8 @@ public class FilterMatrix {
     
 
     /** PrettyPrint our matrix. **/
-    public String toString() {
+    @Override
+	public String toString() {
 
         String returnString = "[";
         // for each row

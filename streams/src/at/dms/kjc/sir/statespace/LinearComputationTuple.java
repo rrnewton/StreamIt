@@ -35,7 +35,8 @@ public class LinearComputationTuple {
     }
     
     /** Two tuples are equal if their position and coefficient are equal. **/
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (!(o instanceof LinearComputationTuple)) {
             return false;
         }
@@ -48,11 +49,13 @@ public class LinearComputationTuple {
      * Reimplement hashcode so that if two tuples are equal, their
      * hashcodes are also equal.
      **/
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return this.position + (int)this.coefficient.getReal();
     }
     /** Pretty print. **/
-    public String toString() {
+    @Override
+	public String toString() {
         return ("<" + this.position + "," + this.coefficient + ">");
     }
 }

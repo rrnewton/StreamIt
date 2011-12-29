@@ -137,7 +137,7 @@ public class FuseSplit {
             // if fusing whole thing
             SIRStream fused=fuse(sj);
             if(fused instanceof SIRFilter)
-                lastFused=(SIRFilter)fused;
+                lastFused=fused;
             else {
                 if(KjcOptions.partition_greedier)
                     if(fused instanceof SIRPipeline) {
@@ -166,7 +166,7 @@ public class FuseSplit {
             if (partition.get(i)>1) {
                 SIRStream fused=fuse((SIRSplitJoin)sj.get(i));
                 if(fused instanceof SIRFilter)
-                    lastFused=(SIRFilter)fused;
+                    lastFused=fused;
                 else {
                     if(KjcOptions.partition_greedier)
                         if(fused instanceof SIRPipeline) {
@@ -354,7 +354,7 @@ public class FuseSplit {
             // the peek buffer
             JVariableDefinition peekBufferVar = 
                 new JVariableDefinition(null,
-                                        at.dms.kjc.Constants.ACC_FINAL,
+                                        at.dms.classfile.Constants.ACC_FINAL,
                                         new CArrayType(Utils.voidToInt(filter.
                                                                        getInputType()), 
                                                        1 /* dimension */,
@@ -370,7 +370,7 @@ public class FuseSplit {
             // push buffer
             JVariableDefinition pushBufferVar = 
                 new JVariableDefinition(null,
-                                        at.dms.kjc.Constants.ACC_FINAL,
+                                        at.dms.classfile.Constants.ACC_FINAL,
                                         new CArrayType(Utils.voidToInt(filter.
                                                                        getOutputType()), 
                                                        1 /* dimension */ ,
@@ -481,7 +481,7 @@ public class FuseSplit {
         Iterator<SIRStream> iter = children.iterator();
         while (iter.hasNext()) {
             SIRFilter filter = (SIRFilter)iter.next();
-            RenameAll.renameFilterContents((SIRFilter)filter);
+            RenameAll.renameFilterContents(filter);
         }
     }
 
@@ -892,7 +892,7 @@ public class FuseSplit {
         // make the work function based on statements
         JMethodDeclaration newWork =
             new JMethodDeclaration(null,
-                                   at.dms.kjc.Constants.ACC_PUBLIC,
+                                   at.dms.classfile.Constants.ACC_PUBLIC,
                                    CStdType.Void,
                                    "initWork",
                                    JFormalParameter.EMPTY,
@@ -951,7 +951,7 @@ public class FuseSplit {
         // make the work function based on statements
         JMethodDeclaration newWork =
             new JMethodDeclaration(null,
-                                   at.dms.kjc.Constants.ACC_PUBLIC,
+                                   at.dms.classfile.Constants.ACC_PUBLIC,
                                    CStdType.Void,
                                    "work",
                                    JFormalParameter.EMPTY,
@@ -989,7 +989,8 @@ public class FuseSplit {
         
                 private boolean inExpressionStatement = false;
            
-                public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
+                @Override
+				public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
                     boolean oldInExpressionStatement = inExpressionStatement;
                     if (expr instanceof SIRPopExpression) {inExpressionStatement = true;}
                     Object result = super.visitExpressionStatement(self,expr);
@@ -997,7 +998,8 @@ public class FuseSplit {
                     return result;
                 }
 
-                public Object visitPopExpression(SIRPopExpression oldSelf,
+                @Override
+				public Object visitPopExpression(SIRPopExpression oldSelf,
                                                  CType oldTapeType) {
                     // Recurse into children.
                     SIRPopExpression self = (SIRPopExpression)
@@ -1027,7 +1029,8 @@ public class FuseSplit {
                                                                         ref),
                                                  oldTapeType);
                 }
-                public Object visitPeekExpression(SIRPeekExpression oldSelf,
+                @Override
+				public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                                   CType oldTapeType,
                                                   JExpression arg) {
                     // Recurse into children.
@@ -1161,7 +1164,7 @@ public class FuseSplit {
             Map<SIROperator, int[]>[] execCount = SIRScheduler.getExecutionCounts(sj);
             for (int i=0; i<sj.size(); i++) {
                 // get the steady-state count
-                int[] count = (int[])execCount[1].get(sj.get(i));
+                int[] count = execCount[1].get(sj.get(i));
                 if (count==null) {
                     this.child[i] = 0;
                 } else {
@@ -1315,7 +1318,8 @@ public class FuseSplit {
         }
 
         // determines if JExpressionStatement immediately wraps SIRPopExpression
-        public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
+        @Override
+		public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
             boolean oldInExpressionStatement = inExpressionStatement;
             if (expr instanceof SIRPopExpression) {inExpressionStatement = true;}
             Object result = super.visitExpressionStatement(self,expr);
@@ -1327,7 +1331,8 @@ public class FuseSplit {
         /**
          * Visits a push expression -- convert to pushing to array.
          */
-        public Object visitPushExpression(SIRPushExpression oldSelf,
+        @Override
+		public Object visitPushExpression(SIRPushExpression oldSelf,
                                           CType oldTapeType,
                                           JExpression oldArg) {
             SIRPushExpression self = (SIRPushExpression)super.visitPushExpression(oldSelf, oldTapeType, oldArg);
@@ -1337,7 +1342,8 @@ public class FuseSplit {
         /**
          * Visits a pop expression.
          */
-        public Object visitPopExpression(SIRPopExpression oldSelf,
+        @Override
+		public Object visitPopExpression(SIRPopExpression oldSelf,
                                          CType oldTapeType) {
             SIRPopExpression self = (SIRPopExpression)super.visitPopExpression(oldSelf, oldTapeType);
 
@@ -1370,7 +1376,8 @@ public class FuseSplit {
         /**
          * Visits a peek expression - convert to peek in buffer.
          */
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType,
                                           JExpression oldArg) {
             SIRPeekExpression self = (SIRPeekExpression)super.visitPeekExpression(oldSelf, oldTapeType, oldArg);

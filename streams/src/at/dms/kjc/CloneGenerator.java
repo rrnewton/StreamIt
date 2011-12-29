@@ -34,7 +34,8 @@ public class CloneGenerator {
     // disable access control when this class is running
     static {
         System.setSecurityManager(new SecurityManager() {
-                public void checkPermission(Permission perm) {}
+                @Override
+				public void checkPermission(Permission perm) {}
             });
     }
 

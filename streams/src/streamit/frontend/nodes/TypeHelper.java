@@ -104,7 +104,8 @@ public class TypeHelper extends Type
     }
     
     // Remember, equality and such only test on the name.
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (other instanceof TypeHelper)
             {
@@ -115,12 +116,14 @@ public class TypeHelper extends Type
         return false;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return name.hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return name;
     }

@@ -146,7 +146,8 @@ abstract public class SplitJoin extends StreamWithSplitNJoin
      * @return fan-out of a splitter
      */
 
-    public int getSplitFanOut()
+    @Override
+	public int getSplitFanOut()
     {
         return nChildren;
     }
@@ -156,7 +157,8 @@ abstract public class SplitJoin extends StreamWithSplitNJoin
      * @return fan-in of a joiner
      */
 
-    public int getJoinFanIn()
+    @Override
+	public int getJoinFanIn()
     {
         return nChildren;
     }
@@ -428,7 +430,7 @@ abstract public class SplitJoin extends StreamWithSplitNJoin
                 int index;
                 for (index = 0; index < nChildren; index++)
                     {
-                        Fraction childRate = (Fraction) childrenRates[index];
+                        Fraction childRate = childrenRates[index];
                         assert childRate != null;
 
                         BigInteger rateDenom = childRate.getDenominator();
@@ -472,7 +474,7 @@ abstract public class SplitJoin extends StreamWithSplitNJoin
                     int nChild;
                     for (nChild = 0; nChild < nChildren; nChild++)
                         {
-                            Fraction childRate = (Fraction) childrenRates[nChild];
+                            Fraction childRate = childrenRates[nChild];
                             assert childRate != null;
 
                             Fraction newChildRate =
@@ -531,7 +533,8 @@ abstract public class SplitJoin extends StreamWithSplitNJoin
         }
     }
     
-    public int getNumNodes () 
+    @Override
+	public int getNumNodes () 
     { 
         int nodes = 0;
         for (int nChild = 0; nChild < nChildren; nChild++)
@@ -546,7 +549,8 @@ abstract public class SplitJoin extends StreamWithSplitNJoin
         return nodes;
     }
     
-    public int getNumNodeFirings() 
+    @Override
+	public int getNumNodeFirings() 
     {
         int firings = 0;
         for (int nChild = 0; nChild < nChildren; nChild++)

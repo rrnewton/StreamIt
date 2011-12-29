@@ -138,7 +138,8 @@ public class RawExecutionCode extends at.dms.util.Utils
         top.accept((new RawExecutionCode()), null, true);
     }
     
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.isFilter()){
             SIRFilter filter = (SIRFilter)node.contents;
@@ -195,7 +196,7 @@ public class RawExecutionCode extends at.dms.util.Utils
             //create the method and add it to the filter
             JMethodDeclaration rawMainFunct = 
                 new JMethodDeclaration(null, 
-                                       at.dms.kjc.Constants.ACC_PUBLIC,
+                                       at.dms.classfile.Constants.ACC_PUBLIC,
                                        CStdType.Void,
                                        rawMain,
                                        JFormalParameter.EMPTY,
@@ -510,7 +511,7 @@ public class RawExecutionCode extends at.dms.util.Utils
 
             JVariableDefinition recvBufVar = 
                 new JVariableDefinition(null, 
-                                        at.dms.kjc.Constants.ACC_FINAL, //?????????
+                                        at.dms.classfile.Constants.ACC_FINAL, //?????????
                                         new CArrayType(CommonUtils.getBaseType(filter.getInputType()), 
                                                        dim /* dimension */ ,
                                                        bufferDims(filter, filter.getInputType(), buffersize)),
@@ -521,7 +522,7 @@ public class RawExecutionCode extends at.dms.util.Utils
             //the size of the buffer 
             JVariableDefinition recvBufferSizeVar = 
                 new JVariableDefinition(null, 
-                                        at.dms.kjc.Constants.ACC_FINAL, //?????????
+                                        at.dms.classfile.Constants.ACC_FINAL, //?????????
                                         CStdType.Integer,
                                         recvBufferSize,
                                         new JIntLiteral(buffersize));
@@ -529,7 +530,7 @@ public class RawExecutionCode extends at.dms.util.Utils
             //the size of the buffer 
             JVariableDefinition recvBufferBitsVar = 
                 new JVariableDefinition(null, 
-                                        at.dms.kjc.Constants.ACC_FINAL, //?????????
+                                        at.dms.classfile.Constants.ACC_FINAL, //?????????
                                         CStdType.Integer,
                                         recvBufferBits,
                                         new JIntLiteral(buffersize - 1));
@@ -605,7 +606,7 @@ public class RawExecutionCode extends at.dms.util.Utils
 
             JVariableDefinition sendBufVar = 
                 new JVariableDefinition(null, 
-                                        at.dms.kjc.Constants.ACC_FINAL, //?????????
+                                        at.dms.classfile.Constants.ACC_FINAL, //?????????
                                         new CArrayType(filter.getOutputType(), 
                                                        1 /* dimension */ ,
                                                        dims),
@@ -1280,7 +1281,8 @@ public class RawExecutionCode extends at.dms.util.Utils
     
         //for pop expressions convert to the form
         // (recvBuffer[++recvBufferIndex % recvBufferSize])
-        public Object visitPopExpression(SIRPopExpression oldSelf,
+        @Override
+		public Object visitPopExpression(SIRPopExpression oldSelf,
                                          CType oldTapeType) {
             assert oldSelf.getNumPop() == 1: "need to update code here for multiple pop";
             // do the super
@@ -1311,7 +1313,8 @@ public class RawExecutionCode extends at.dms.util.Utils
     
         //convert peek exps into:
         // (recvBuffer[(recvBufferIndex + (arg) + 1) mod recvBufferSize])
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType,
                                           JExpression oldArg) {
             // do the super
@@ -1360,7 +1363,8 @@ public class RawExecutionCode extends at.dms.util.Utils
     
         //for pop expressions convert to the form
         // (recvBuffer[++recvBufferIndex % recvBufferSize])
-        public Object visitPopExpression(SIRPopExpression self,
+        @Override
+		public Object visitPopExpression(SIRPopExpression self,
                                          CType tapeType) {
       
             //create the increment of the index var
@@ -1402,7 +1406,8 @@ public class RawExecutionCode extends at.dms.util.Utils
     
         //convert peek exps into:
         // (recvBuffer[(recvBufferIndex + (arg) + 1) mod recvBufferSize])
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType,
                                           JExpression oldArg) {
             // do the super
@@ -1469,7 +1474,8 @@ public class RawExecutionCode extends at.dms.util.Utils
         /**
          * Visits a push expression.
          */
-        public Object visitPushExpression(SIRPushExpression self,
+        @Override
+		public Object visitPushExpression(SIRPushExpression self,
                                           CType tapeType,
                                           JExpression arg) {
             JExpression newExp = (JExpression)arg.accept(this);

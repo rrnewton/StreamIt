@@ -44,7 +44,8 @@ class Estimator implements StreamVisitor {
      * Recalculate code and locals size for a filter
      */
 
-    public void visitFilter(SIRFilter filter,
+    @Override
+	public void visitFilter(SIRFilter filter,
                             SIRFilterIter iter) { 
 
         int code, locals;
@@ -61,7 +62,8 @@ class Estimator implements StreamVisitor {
      * Phased Filters are not supported!
      */
 
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         // This is a stub; it'll get filled in once we figure out how phased
         // filters should actually work.
@@ -72,26 +74,32 @@ class Estimator implements StreamVisitor {
      */
         
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {}
+    @Override
+	public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {}
     
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {}
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {}
     
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
     
     /**
      * POST-VISITS 
      */
         
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {}
+    @Override
+	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {}
    
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {}
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {}
 
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
 
 
 }

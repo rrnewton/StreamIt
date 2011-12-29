@@ -32,7 +32,8 @@ public final class FusionTransform extends StreamTransform {
     /**
      * Perform the transform on <str> and return new stream.
      */
-    public SIRStream doMyTransform(SIRStream str) {
+    @Override
+	public SIRStream doMyTransform(SIRStream str) {
         // make sure we have a container
         assert (str instanceof SIRContainer): "Expected container as target of fusion, but got: " + str;
         // if we have as many partitions as children, then we're done
@@ -98,7 +99,8 @@ public final class FusionTransform extends StreamTransform {
         return PartitionGroup.createFromArray(result);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Fusion transform, #" + id + " (Will fuse into " + (partitions.size()-1) + " components)";
     }
 

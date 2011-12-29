@@ -40,34 +40,40 @@ public class PipelineIter
     Pipeline pipeline;
     IterFactory factory;
     
-    public Object getObject ()
+    @Override
+	public Object getObject ()
     {
         return pipeline;
     }
     
-    public streamit.scheduler2.iriter.Iterator getUnspecializedIter()
+    @Override
+	public streamit.scheduler2.iriter.Iterator getUnspecializedIter()
     {
         return new Iterator(pipeline, factory);
     }
     
-    public int getNumChildren ()
+    @Override
+	public int getNumChildren ()
     {
         return pipeline.getNumChildren ();
     }
     
-    public streamit.scheduler2.iriter.Iterator getChild (int n)
+    @Override
+	public streamit.scheduler2.iriter.Iterator getChild (int n)
     {
         return new Iterator (pipeline.getChildN (n), factory);
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof PipelineIter)) return false;
         PipelineIter otherPipe = (PipelineIter) other;
         return otherPipe.getObject() == this.getObject();
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return pipeline.hashCode();
     }

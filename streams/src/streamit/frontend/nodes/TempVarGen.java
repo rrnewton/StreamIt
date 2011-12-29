@@ -88,7 +88,8 @@ public class TempVarGen
         // Use the lowest character higher than any of the old
         // prefixes.
         prog.accept(new FEReplacer() {
-                public Object visitExprVar(ExprVar expr)
+                @Override
+				public Object visitExprVar(ExprVar expr)
                 {
                     String name = expr.getName();
                     if (name.startsWith("__s") && name.length() > 3)
@@ -96,7 +97,8 @@ public class TempVarGen
                     return super.visitExprVar(expr);
                 }
 
-                public Object visitStreamSpec(StreamSpec ss)
+                @Override
+				public Object visitStreamSpec(StreamSpec ss)
                 {
                     String name = ss.getName();
                     if (name != null &&
@@ -115,7 +117,7 @@ public class TempVarGen
                 char op = prefix.charAt(0);
                 if (c >= op)
                     {
-                        char np = (char)((int)c + 1);
+                        char np = (char)(c + 1);
                         prefix = String.valueOf(np);
                     }
             }

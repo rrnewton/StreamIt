@@ -228,7 +228,7 @@ public class DirectCommunication extends at.dms.util.Utils
     
         JMethodDeclaration rawMainFunct = 
             new JMethodDeclaration(null, 
-                                   at.dms.kjc.Constants.ACC_PUBLIC,
+                                   at.dms.classfile.Constants.ACC_PUBLIC,
                                    CStdType.Void,
                                    RawExecutionCode.rawMain,
                                    JFormalParameter.EMPTY,
@@ -242,7 +242,8 @@ public class DirectCommunication extends at.dms.util.Utils
 
     static class DirectConvertCommunication extends SLIRReplacingVisitor 
     {
-        public Object visitAssignmentExpression(JAssignmentExpression oldself,
+        @Override
+		public Object visitAssignmentExpression(JAssignmentExpression oldself,
                                                 JExpression oldleft,
                                                 JExpression oldright) 
         {
@@ -277,7 +278,8 @@ public class DirectCommunication extends at.dms.util.Utils
         }
     
 
-        public Object visitPopExpression(SIRPopExpression oldSelf,
+        @Override
+		public Object visitPopExpression(SIRPopExpression oldSelf,
                                          CType oldTapeType) {
     
             // do the super
@@ -343,7 +345,8 @@ public class DirectCommunication extends at.dms.util.Utils
             return static_receive;
         }
 
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType,
                                           JExpression oldArg) {
             Utils.fail("Should not see a peek expression when generating " +
@@ -372,18 +375,21 @@ public class DirectCommunication extends at.dms.util.Utils
             return false;
         }
 
-        public void visitPeekExpression(SIRPeekExpression self,
+        @Override
+		public void visitPeekExpression(SIRPeekExpression self,
                                         CType tapeType,
                                         JExpression arg) {
             found = true;
         }
 
-        public void visitPopExpression(SIRPopExpression self,
+        @Override
+		public void visitPopExpression(SIRPopExpression self,
                                        CType tapeType) {
             found = true;
         }
 
-        public void visitPushExpression(SIRPushExpression self,
+        @Override
+		public void visitPushExpression(SIRPushExpression self,
                                         CType tapeType,
                                         JExpression arg) {
             arg.accept(this);
@@ -407,19 +413,22 @@ public class DirectCommunication extends at.dms.util.Utils
             return pushBeforePop;
         }
 
-        public void visitPeekExpression(SIRPeekExpression self,
+        @Override
+		public void visitPeekExpression(SIRPeekExpression self,
                                         CType tapeType,
                                         JExpression arg) {
             Utils.fail("Should not see a peek expression");
         }
 
-        public void visitPopExpression(SIRPopExpression self,
+        @Override
+		public void visitPopExpression(SIRPopExpression self,
                                        CType tapeType) {
             if (sawPush)
                 pushBeforePop = true;
         }
 
-        public void visitPushExpression(SIRPushExpression self,
+        @Override
+		public void visitPushExpression(SIRPushExpression self,
                                         CType tapeType,
                                         JExpression arg) {
             
@@ -433,7 +442,8 @@ public class DirectCommunication extends at.dms.util.Utils
         //case where a push comes before a pop
     
     
-        public void visitWhileStatement(JWhileStatement self,
+        @Override
+		public void visitWhileStatement(JWhileStatement self,
                                         JExpression cond,
                                         JStatement body) {
             cond.accept(this);
@@ -443,7 +453,8 @@ public class DirectCommunication extends at.dms.util.Utils
             body.accept(this);
         }
 
-        public void visitForStatement(JForStatement self,
+        @Override
+		public void visitForStatement(JForStatement self,
                                       JStatement init,
                                       JExpression cond,
                                       JStatement incr,
@@ -468,7 +479,8 @@ public class DirectCommunication extends at.dms.util.Utils
             body.accept(this);
         }
 
-        public void visitDoStatement(JDoStatement self,
+        @Override
+		public void visitDoStatement(JDoStatement self,
                                      JExpression cond,
                                      JStatement body) {
             body.accept(this);
@@ -494,7 +506,8 @@ public class DirectCommunication extends at.dms.util.Utils
         /**
          * if we find a peek expression set found to true;
          */
-        public void visitPeekExpression(SIRPeekExpression self,
+        @Override
+		public void visitPeekExpression(SIRPeekExpression self,
                                         CType tapeType,
                                         JExpression arg) {
             found = true;

@@ -63,17 +63,22 @@ abstract class Stream extends DestroyedClass implements StreamInterface
      * deterministic behavior in sets and containers (was causing
      * unpredictable exceptions).
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return id;
     }
     
-    public Iterator getStreamIter () { return streamIter; }
+    @Override
+	public Iterator getStreamIter () { return streamIter; }
     
     private int steadyPeek, steadyPop, steadyPush;
     
-    public int getSteadyPeek () { return steadyPeek; }
-    public int getSteadyPop () { return steadyPop; }
-    public int getSteadyPush () { return steadyPush; }
+    @Override
+	public int getSteadyPeek () { return steadyPeek; }
+    @Override
+	public int getSteadyPop () { return steadyPop; }
+    @Override
+	public int getSteadyPush () { return steadyPush; }
     
     /**
      * set the steady peek value
@@ -99,7 +104,8 @@ abstract class Stream extends DestroyedClass implements StreamInterface
         steadyPush = _steadyPush;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return ""+streamIter.getObject();
     }
 }

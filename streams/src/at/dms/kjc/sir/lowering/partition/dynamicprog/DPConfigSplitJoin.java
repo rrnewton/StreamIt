@@ -18,7 +18,8 @@ class DPConfigSplitJoin extends DPConfigContainer {
         return result;
     }
 
-    protected DPConfig childConfig(int x, int y) {
+    @Override
+	protected DPConfig childConfig(int x, int y) {
         assert y==0: "Looking for y=" + y + " in DPConfigSplitJoin.get";
         return partitioner.getConfig(cont.get(x));
     }

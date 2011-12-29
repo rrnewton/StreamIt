@@ -47,7 +47,8 @@ import streamit.frontend.nodes.StmtVarDecl;
  */
 public class SeparateInitializers extends FEReplacer
 {
-    public Object visitStmtVarDecl(StmtVarDecl stmt)
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt)
     {
         // Make sure the variable declaration stays first.  This will
         // have no initializers, except for where there is an array
@@ -88,7 +89,8 @@ public class SeparateInitializers extends FEReplacer
         return null;
     }
 
-    public Object visitStmtFor(StmtFor stmt)
+    @Override
+	public Object visitStmtFor(StmtFor stmt)
     {
         // Only recurse into the body.
         Statement newBody = (Statement)stmt.getBody().accept(this);

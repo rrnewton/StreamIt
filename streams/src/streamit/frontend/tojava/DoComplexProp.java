@@ -172,12 +172,14 @@ public class DoComplexProp extends SymbolTableVisitor
         return nl;
     }
 
-    protected Expression doExpression(Expression expr)
+    @Override
+	protected Expression doExpression(Expression expr)
     {
         return doExprProp(expr);
     }
 
-    public Object visitExprPeek(ExprPeek expr)
+    @Override
+	public Object visitExprPeek(ExprPeek expr)
     {
         Expression x = (Expression)super.visitExprPeek(expr);
         // If the stream's input type is complex, we want a temporary
@@ -187,7 +189,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return x;
     }
 
-    public Object visitExprPop(ExprPop expr)
+    @Override
+	public Object visitExprPop(ExprPop expr)
     {
         Expression x = (Expression)super.visitExprPop(expr);
         // If the stream's input type is complex, we want a temporary
@@ -197,7 +200,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return x;
     }
 
-    public Object visitExprVar(ExprVar exp)
+    @Override
+	public Object visitExprVar(ExprVar exp)
     {
         if (getType(exp).isComplex())
             return makeComplexPair(exp);
@@ -205,7 +209,8 @@ public class DoComplexProp extends SymbolTableVisitor
             return exp;
     }
 
-    public Object visitExprField(ExprField exp)
+    @Override
+	public Object visitExprField(ExprField exp)
     {
         // If the expression is already visiting a field of a Complex
         // object, don't recurse further.
@@ -218,7 +223,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return super.visitExprField(exp);
     }
 
-    public Object visitExprArray(ExprArray exp)
+    @Override
+	public Object visitExprArray(ExprArray exp)
     {
         // If the type of the expression is complex, decompose it;
         // otherwise, move on.
@@ -230,7 +236,8 @@ public class DoComplexProp extends SymbolTableVisitor
             return exp;
     }
 
-    public Object visitExprArrayInit(ExprArrayInit exp)
+    @Override
+	public Object visitExprArrayInit(ExprArrayInit exp)
     {
         // Not sure what to do here -- let's try visiting the super.
         // I bet that static initializers with complex numbers would
@@ -238,7 +245,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return super.visitExprArrayInit(exp);
     }
 
-    public Object visitSCSimple(SCSimple creator)
+    @Override
+	public Object visitSCSimple(SCSimple creator)
     {
         // Run propagation, but insert temporaries for any
         // complex variables that are left.
@@ -249,7 +257,8 @@ public class DoComplexProp extends SymbolTableVisitor
                             creator.getPortals());
     }
 
-    public Object visitStmtAssign(StmtAssign stmt)
+    @Override
+	public Object visitStmtAssign(StmtAssign stmt)
     {
         Expression lhs = stmt.getLHS();
         Expression rhs = doExprProp(stmt.getRHS());
@@ -289,7 +298,8 @@ public class DoComplexProp extends SymbolTableVisitor
             return stmt;
     }
 
-    public Object visitStmtEnqueue(StmtEnqueue stmt)
+    @Override
+	public Object visitStmtEnqueue(StmtEnqueue stmt)
     {
         Expression value = stmt.getValue();
         value = doExprProp(value);
@@ -297,7 +307,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return new StmtEnqueue(stmt.getContext(), value);
     }
 
-    public Object visitStmtExpr(StmtExpr stmt)
+    @Override
+	public Object visitStmtExpr(StmtExpr stmt)
     {
         Expression newExpr = doExprProp(stmt.getExpression());
         if (newExpr instanceof ExprComplex)
@@ -312,7 +323,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return new StmtExpr(stmt.getContext(), newExpr);
     }
 
-    public Object visitStmtPush(StmtPush stmt)
+    @Override
+	public Object visitStmtPush(StmtPush stmt)
     {
         Expression value = stmt.getValue();
         value = doExprProp(value);
@@ -320,7 +332,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return new StmtPush(stmt.getContext(), value);
     }
 
-    public Object visitStmtReturn(StmtReturn stmt)
+    @Override
+	public Object visitStmtReturn(StmtReturn stmt)
     {
         Expression value = stmt.getValue();
         if (value == null) return stmt;
@@ -329,7 +342,8 @@ public class DoComplexProp extends SymbolTableVisitor
         return new StmtReturn(stmt.getContext(), value);
     }
 
-    public Object visitStmtVarDecl(StmtVarDecl stmt)
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt)
     {
         stmt = (StmtVarDecl)super.visitStmtVarDecl(stmt);
 

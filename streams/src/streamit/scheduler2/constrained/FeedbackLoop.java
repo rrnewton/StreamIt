@@ -51,7 +51,8 @@ public class FeedbackLoop
             }
     }
 
-    public void initiateConstrained()
+    @Override
+	public void initiateConstrained()
     {
         latencySplitter = latencyGraph.addSplitter(this);
         latencyJoiner = latencyGraph.addJoiner(this);
@@ -118,12 +119,14 @@ public class FeedbackLoop
         }
     }
 
-    public StreamInterface getTopConstrainedStream()
+    @Override
+	public StreamInterface getTopConstrainedStream()
     {
         return this;
     }
 
-    public StreamInterface getBottomConstrainedStream()
+    @Override
+	public StreamInterface getBottomConstrainedStream()
     {
         return this;
     }
@@ -148,17 +151,20 @@ public class FeedbackLoop
         return (StreamInterface)getBody();
     }
 
-    public LatencyNode getBottomLatencyNode()
+    @Override
+	public LatencyNode getBottomLatencyNode()
     {
         return latencySplitter;
     }
 
-    public LatencyNode getTopLatencyNode()
+    @Override
+	public LatencyNode getTopLatencyNode()
     {
         return latencyJoiner;
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         ERROR("Not implemented yet.");
 
@@ -166,33 +172,39 @@ public class FeedbackLoop
     
 
 
-    public void registerConstraint(P2PPortal portal)
+    @Override
+	public void registerConstraint(P2PPortal portal)
     {
         ERROR ("not implemented");
     }
     
-    public void createSteadyStateRestrictions(int streamNumExecs)
+    @Override
+	public void createSteadyStateRestrictions(int streamNumExecs)
     {
         ERROR ("not implemented");
     }
     
-    public void initRestrictionsCompleted(P2PPortal portal)
+    @Override
+	public void initRestrictionsCompleted(P2PPortal portal)
     {
         ERROR ("not implemented");
     }
     
-    public void initializeRestrictions(Restrictions _restrictions)
+    @Override
+	public void initializeRestrictions(Restrictions _restrictions)
     {
         ERROR ("not implemented");
     }
     
-    public boolean isDoneInitializing ()
+    @Override
+	public boolean isDoneInitializing ()
     {
         ERROR ("not implemented");
         return false;
     }
 
-    public PhasingSchedule getNextPhase(
+    @Override
+	public PhasingSchedule getNextPhase(
                                         Restrictions restrs,
                                         int nDataAvailable)
     {
@@ -200,18 +212,21 @@ public class FeedbackLoop
         return null;
     }
     
-    public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
+    @Override
+	public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
     {
         ERROR("not implemented");
     }
     
-    public boolean isDoneSteadyState ()
+    @Override
+	public boolean isDoneSteadyState ()
     {
         ERROR("not implemented");
         return false;
     }
 
-    public void doneSteadyState (LatencyNode node)
+    @Override
+	public void doneSteadyState (LatencyNode node)
     {
         ERROR("not implemented");
     }

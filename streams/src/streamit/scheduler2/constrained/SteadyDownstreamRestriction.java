@@ -53,7 +53,8 @@ public class SteadyDownstreamRestriction extends Restriction
             }
     }
 
-    public boolean notifyExpired()
+    @Override
+	public boolean notifyExpired()
     {
         upstreamRestr.notifyDownstreamRestrictionBlocked();
 
@@ -91,7 +92,8 @@ public class SteadyDownstreamRestriction extends Restriction
         return false;
     }
 
-    public PhasingSchedule checkMsg()
+    @Override
+	public PhasingSchedule checkMsg()
     {
         if (portal.isDownstream())
             {

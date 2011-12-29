@@ -367,7 +367,8 @@ public final class FlatNode {
      * not changing ie now hashcode is synched with equals() and equality
      * doesn't change just because ones ways, etc changes
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return label;
     }
 
@@ -515,7 +516,8 @@ public final class FlatNode {
     /**
      * @see FlatNode#getName
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "FlatNode:" + getName();
     }
  

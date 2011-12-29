@@ -73,7 +73,8 @@ public class LineNumberInfo implements AccessorContainer {
     /**
      * Transforms targets (deferences to actual instructions).
      */
-    public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
+    @Override
+	public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
         this.inst = this.inst.transform(transformer, this);
     }
 

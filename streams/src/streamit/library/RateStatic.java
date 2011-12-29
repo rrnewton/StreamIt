@@ -33,7 +33,8 @@ public class RateStatic extends Rate {
     /**
      * Returns whether or not this is a statically known rate.
      */
-    public boolean isStatic() {
+    @Override
+	public boolean isStatic() {
         return true;
     }
 

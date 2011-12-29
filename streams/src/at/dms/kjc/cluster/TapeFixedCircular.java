@@ -25,24 +25,28 @@ public class TapeFixedCircular extends TapeFixedBase implements Tape {
     }
 
     /** @return string for expression for *offset* items from pop position on tape. */
-    protected String tailOffsetExpr(String offset) {
+    @Override
+	protected String tailOffsetExpr(String offset) {
         return
         "("+ tailName+ "+" + offset + ")&" + maskName;
     }
     /** @return string for statements that increment the pop position by *numPosition* items. */
-    protected String tailIncrementStmts(String numExpression) {
+    @Override
+	protected String tailIncrementStmts(String numExpression) {
         return
         tailName + "+=" + numExpression + ";\n"
         + tailName + "&=" + maskName + ";\n";
     }
     /** @return string for statement(s) that increment the pop position by 1. */
-    protected String tailIncrementStmts() {
+    @Override
+	protected String tailIncrementStmts() {
         return
         tailName + "++;\n"
         + tailName + "&=" + maskName + ";\n";
     }
     /** @return string for statement(s) that increment the push position by 1. */
-    protected String headIncrementStmts() {
+    @Override
+	protected String headIncrementStmts() {
         return
         headName + "++;\n"
         + headName + "&=" + maskName + ";\n";
@@ -135,12 +139,14 @@ public class TapeFixedCircular extends TapeFixedBase implements Tape {
         return popExprNoCleanup() + popExprCleanup();
     }
 
-    public String popExprNoCleanup() {
+    @Override
+	public String popExprNoCleanup() {
         return 
         bufferName + "[" + tailName + "]";
     }
     
-    public String popExprCleanup() {
+    @Override
+	public String popExprCleanup() {
         return
           "; "
         + tailName + "++; "

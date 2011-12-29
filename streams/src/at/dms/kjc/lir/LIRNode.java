@@ -41,7 +41,8 @@ public class LIRNode extends JStatement {
     /**
      * Analyses the statement (semantically) - NOT SUPPORTED YET.
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         at.dms.util.Utils.fail("Analysis of LIR nodes not supported yet.");
     }
 
@@ -52,7 +53,8 @@ public class LIRNode extends JStatement {
     /**
      * Accepts the specified visitor - NOT SUPPORTED YET.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor)
             this.accept((SLIRVisitor) p);
         else
@@ -63,7 +65,8 @@ public class LIRNode extends JStatement {
         p.visitNode(this);
     }
 
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         // no action is defined for attribute visitors on lir nodes
         return this;
     }
@@ -71,7 +74,8 @@ public class LIRNode extends JStatement {
     /**
      * Generates a sequence of bytescodes - NOT SUPPORTED YET.
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         at.dms.util.Utils.fail("Codegen of LIR nodes not supported yet.");
     }
 

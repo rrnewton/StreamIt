@@ -79,7 +79,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /**
      * Returns the output type of this.
      */
-    public CType getOutputType() {
+    @Override
+	public CType getOutputType() {
         // return output type of body
         return getBody().getOutputType();
     }
@@ -87,12 +88,14 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /**
      * Returns the input type of this.
      */
-    public CType getInputType() {
+    @Override
+	public CType getInputType() {
         // return input type of body
         return getBody().getInputType();
     }
 
-    public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
+    @Override
+	public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
         // get what the body pushes
         int bodyPush = getBody().getPushForSchedule(counts);
         // scale it by what is lost in the splitter
@@ -108,7 +111,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
         }
     }
 
-    public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
+    @Override
+	public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
         // get what body pops
         int bodyPop = getBody().getPopForSchedule(counts);
         // scale it by what is channeled through the joiner
@@ -123,7 +127,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /**
      * Returns the type of this stream.
      */
-    public LIRStreamType getStreamType() {
+    @Override
+	public LIRStreamType getStreamType() {
         return LIRStreamType.LIR_FEEDBACK_LOOP;
     }
 
@@ -153,7 +158,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /**
      * See documentation in SIRContainer.
      */
-    public void replace(SIRStream oldStr, SIRStream newStr) {
+    @Override
+	public void replace(SIRStream oldStr, SIRStream newStr) {
         newStr.setParent(this);
         if (getBody()==oldStr) {
             setBody(newStr);
@@ -175,7 +181,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
      * Returns a list of the children of this.  The children are
      * stream objects that are contained within this.
      */
-    public List<SIROperator> getChildren() {
+    @Override
+	public List<SIROperator> getChildren() {
         // build result
         LinkedList<SIROperator> result = new LinkedList<SIROperator>();
         // add the children: the joiner, splitter, body, and loop
@@ -187,7 +194,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
         return result;
     }
 
-    public void reclaimChildren() {
+    @Override
+	public void reclaimChildren() {
         super.reclaimChildren();
         splitter.setParent(this);
         joiner.setParent(this);
@@ -198,7 +206,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
      * the joiner as its successor.  All others are in order set by
      * <children>.
      */
-    public SIROperator getSuccessor(SIRStream child) {
+    @Override
+	public SIROperator getSuccessor(SIRStream child) {
         if (child==getLoop()) {
             return joiner;
         } else {
@@ -211,7 +220,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
      * representing a tape from the first element of each tuple to the
      * second.
      */
-    public List<SIROperator[]> getTapePairs() {
+    @Override
+	public List<SIROperator[]> getTapePairs() {
         // construct result
         SIROperator[][] entries
             = { {joiner, getBody()},    // connect joiner and body
@@ -225,7 +235,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /**
      * Accepts attribute visitor <v> at this node.
      */
-    public Object accept(AttributeStreamVisitor v) {
+    @Override
+	public Object accept(AttributeStreamVisitor v) {
         return v.visitFeedbackLoop(this,
                                    fields,
                                    methods,
@@ -311,7 +322,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /**
      * Whether or not <str> is an immediate child of this.
      */
-    public boolean contains(SIROperator str) {
+    @Override
+	public boolean contains(SIROperator str) {
         return str==getBody() || str==getLoop() || str==joiner || str==splitter;
     }
 
@@ -359,7 +371,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
         return initPath;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "SIRFeedbackLoop name=" + getName();
     }
 
@@ -367,7 +380,8 @@ public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRFeedbackLoop other = new at.dms.kjc.sir.SIRFeedbackLoop();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

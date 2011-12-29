@@ -261,7 +261,8 @@ public class FieldProp implements Constants
                     // If an expression statement is an assignment to a removed field
                     // then makeEmpty[0] will be set to true, in which case return 
                     // an empty statement.  Otherwise return this statement.
-                    public Object visitExpressionStatement(JExpressionStatement self,
+                    @Override
+					public Object visitExpressionStatement(JExpressionStatement self,
                                                            JExpression expr) {
                         makeEmpty[0] = false;
                         super.visitExpressionStatement(self,expr);
@@ -274,7 +275,8 @@ public class FieldProp implements Constants
                     // only need to look at direct JAssignmentExpression since
                     // that is all that propagation looks at.
                 
-                    public Object visitAssignmentExpression(JAssignmentExpression self,
+                    @Override
+					public Object visitAssignmentExpression(JAssignmentExpression self,
                                                             JExpression left, JExpression right) {
                         JExpression field = CommonUtils.lhsBaseExpr(left);
                         if (field instanceof JFieldAccessExpression) {
@@ -549,7 +551,8 @@ public class FieldProp implements Constants
                 // field declarations can be nested.  Else simple
                 // loop should do.
                 fields[i].accept(new SLIREmptyVisitor() {
-                        public void visitFieldDeclaration(JFieldDeclaration self,
+                        @Override
+						public void visitFieldDeclaration(JFieldDeclaration self,
                                                           int modifiers,
                                                           CType type,
                                                           String ident,
@@ -577,7 +580,8 @@ public class FieldProp implements Constants
         for (int i = 0; i < meths.length; i++)
             {
                 meths[i].accept(new SLIREmptyVisitor() {
-                        public void visitAssignmentExpression
+                        @Override
+						public void visitAssignmentExpression
                             (JAssignmentExpression self,
                              JExpression left,
                              JExpression right)
@@ -630,7 +634,8 @@ public class FieldProp implements Constants
                                         invalidateArray(name, slot);
                                 }
                         }
-                        public void visitCompoundAssignmentExpression
+                        @Override
+						public void visitCompoundAssignmentExpression
                             (JCompoundAssignmentExpression self,
                              int oper,
                              JExpression left,
@@ -641,7 +646,8 @@ public class FieldProp implements Constants
                             // Instant death.
                             invalidateExpression(left);
                         }
-                        public void visitPrefixExpression
+                        @Override
+						public void visitPrefixExpression
                             (JPrefixExpression self,
                              int oper,
                              JExpression expr)
@@ -650,7 +656,8 @@ public class FieldProp implements Constants
                             // Again, instant death.
                             invalidateExpression(expr);
                         }
-                        public void visitPostfixExpression
+                        @Override
+						public void visitPostfixExpression
                             (JPostfixExpression self,
                              int oper,
                              JExpression expr)
@@ -685,7 +692,8 @@ public class FieldProp implements Constants
         final boolean[] inLeftHandSide = {false};
         final boolean[] inArrayOffest = {false};
         SLIRReplacingVisitor theVisitor = new SLIRReplacingVisitor() {
-                public Object visitAssignmentExpression(JAssignmentExpression self,
+                @Override
+				public Object visitAssignmentExpression(JAssignmentExpression self,
                                                         JExpression left, JExpression right) {
                     inLeftHandSide[0] = true;
                     JExpression newLeft = (JExpression)left.accept(this);
@@ -695,7 +703,8 @@ public class FieldProp implements Constants
                                                      newLeft, newRight);
                 }
 
-                public Object visitFieldExpression(JFieldAccessExpression self,
+                @Override
+				public Object visitFieldExpression(JFieldAccessExpression self,
                                                    JExpression left, String ident) {
                     Object orig = super.visitFieldExpression(self, left, ident);
                     if (canFieldPropagate(ident)
@@ -708,7 +717,8 @@ public class FieldProp implements Constants
                     }
                 }
 
-                public Object visitArrayAccessExpression(JArrayAccessExpression self, JExpression prefix,
+                @Override
+				public Object visitArrayAccessExpression(JArrayAccessExpression self, JExpression prefix,
                                                          JExpression accessor) {
                     JExpression newPfx = (JExpression)prefix.accept(this);
                     if (newPfx != null && newPfx != prefix) {
@@ -842,7 +852,8 @@ public class FieldProp implements Constants
         meth.accept(new SLIREmptyVisitor() {
                 private HashSet<JLocalVariable> no = new HashSet<JLocalVariable>();
                 
-                public void visitAssignmentExpression
+                @Override
+				public void visitAssignmentExpression
                     (JAssignmentExpression self,
                      JExpression left,
                      JExpression right)
@@ -866,7 +877,8 @@ public class FieldProp implements Constants
                                 no.add(lv);
                         }
                 }
-                public void visitCompoundAssignmentExpression
+                @Override
+				public void visitCompoundAssignmentExpression
                     (JCompoundAssignmentExpression self,
                      int oper,
                      JExpression left,
@@ -883,7 +895,8 @@ public class FieldProp implements Constants
                             no.add(lv);
                         }
                 }
-                public void visitPrefixExpression
+                @Override
+				public void visitPrefixExpression
                     (JPrefixExpression self,
                      int oper,
                      JExpression expr)
@@ -898,7 +911,8 @@ public class FieldProp implements Constants
                             no.add(lv);
                         }
                 }
-                public void visitPostfixExpression
+                @Override
+				public void visitPostfixExpression
                     (JPostfixExpression self,
                      int oper,
                      JExpression expr)

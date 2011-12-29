@@ -36,19 +36,22 @@ public class SIRFilterIter extends SIRIterator implements FilterIter {
         this.obj = obj;
     }
 
-    public FilterIter isFilter() {
+    @Override
+	public FilterIter isFilter() {
         return this;
     }
 
     /**
      * Return the stream pointed to by this.
      */
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         checkValidity();
         return obj;
     }
 
-    public int getNumInitStages () {
+    @Override
+	public int getNumInitStages () {
         if (obj instanceof SIRTwoStageFilter) {
             return 1;
         } else {
@@ -56,7 +59,8 @@ public class SIRFilterIter extends SIRIterator implements FilterIter {
         }
     }
 
-    public int getInitPeekStage (int phase) {
+    @Override
+	public int getInitPeekStage (int phase) {
         if (obj instanceof SIRTwoStageFilter) {
             return ((SIRTwoStageFilter)obj).getInitPeekInt();
         } else {
@@ -64,7 +68,8 @@ public class SIRFilterIter extends SIRIterator implements FilterIter {
         }
     }
 
-    public int getInitPopStage (int phase) {
+    @Override
+	public int getInitPopStage (int phase) {
         if (obj instanceof SIRTwoStageFilter) {
             return ((SIRTwoStageFilter)obj).getInitPopInt();
         } else {
@@ -72,7 +77,8 @@ public class SIRFilterIter extends SIRIterator implements FilterIter {
         }
     }
 
-    public int getInitPushStage (int phase) {
+    @Override
+	public int getInitPushStage (int phase) {
         if (obj instanceof SIRTwoStageFilter) {
             return ((SIRTwoStageFilter)obj).getInitPushInt();
         } else {
@@ -80,7 +86,8 @@ public class SIRFilterIter extends SIRIterator implements FilterIter {
         }
     }
 
-    public Object getInitFunctionStage (int phase) {
+    @Override
+	public Object getInitFunctionStage (int phase) {
         if (obj instanceof SIRTwoStageFilter) {
             return ((SIRTwoStageFilter)obj).getInitWork();
         } else {
@@ -88,33 +95,39 @@ public class SIRFilterIter extends SIRIterator implements FilterIter {
         }
     }
     
-    public int getNumWorkPhases () {
+    @Override
+	public int getNumWorkPhases () {
         return 1;
     }
 
     /** Get number of peeks for phase. Has never handled the phase input. Now returns estimate if number not available. */
-    public int getPeekPhase (int phase) {
+    @Override
+	public int getPeekPhase (int phase) {
         return obj.getPeekInt();
         //return obj.getPeekEstimate(); // getPeekInt();
    }
 
     /** Get number of peeks for phase. Has never handled the phase input. Now returns estimate if number not available. */
-    public int getPopPhase (int phase) {
+    @Override
+	public int getPopPhase (int phase) {
         return obj.getPopInt();
         //return obj.getPopEstimate(); // getPopInt();
     }
 
     /** Get number of peeks for phase. Has never handled the phase input. Now returns estimate if number not available. */
-    public int getPushPhase (int phase) {
+    @Override
+	public int getPushPhase (int phase) {
         return obj.getPushInt();
         //return obj.getPushEstimate(); // getPushInt();
     }
 
-    public Object getWorkFunctionPhase (int phase) {
+    @Override
+	public Object getWorkFunctionPhase (int phase) {
         return obj.getWork();
     }
 
-    public void accept(StreamVisitor v) {
+    @Override
+	public void accept(StreamVisitor v) {
         v.visitFilter(obj, this);
     }
 
@@ -122,7 +135,8 @@ public class SIRFilterIter extends SIRIterator implements FilterIter {
      * This function is needed by the scheduler, but isn't useful from
      * the compiler.
      */
-    public Iterator getUnspecializedIter() {
+    @Override
+	public Iterator getUnspecializedIter() {
         return this;
     }
 }

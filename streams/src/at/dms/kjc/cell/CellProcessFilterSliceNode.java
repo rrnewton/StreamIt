@@ -29,7 +29,8 @@ public class CellProcessFilterSliceNode extends ProcessFilterWorkNode {
         ppuCS = backEndBits.getPPU().getComputeCode();
     }
     
-    public void processFilterSliceNode() {
+    @Override
+	public void processFilterSliceNode() {
         
         if (filterNode.isFileInput()) {
             if (whichPhase == SchedulingPhase.PREINIT) {

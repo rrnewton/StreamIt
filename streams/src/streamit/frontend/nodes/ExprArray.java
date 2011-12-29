@@ -52,7 +52,8 @@ public class ExprArray extends Expression
     public Expression getOffset() { return offset; }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprArray(this);
     }
@@ -63,22 +64,26 @@ public class ExprArray extends Expression
      *
      * @return always true
      */
-    public boolean isLValue()
+    @Override
+	public boolean isLValue()
     {
         return true;
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return base + "[" + offset + "]";
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return base.hashCode() ^ offset.hashCode();
     }
     
-    public boolean equals(Object o)
+    @Override
+	public boolean equals(Object o)
     {
         if (!(o instanceof ExprArray))
             return false;

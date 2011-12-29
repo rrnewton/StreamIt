@@ -118,7 +118,8 @@ public class UniBackEndFactory extends BackEndFactory<
      * @param computeNodes    the available compute nodes.
      */
 
-    public void processFilterWorkNode(WorkNode filter,
+    @Override
+	public void processFilterWorkNode(WorkNode filter,
             SchedulingPhase whichPhase, UniProcessors computeNodes) {
         new ProcessFilterWorkNode(filter,whichPhase,this).processFilterSliceNode();
     }

@@ -214,7 +214,8 @@ public class Propagator extends SLIRReplacingVisitor {
     // STATEMENT
     // ----------------------------------------------------------------------
 
-    public Object visitRegReceiverStatement(SIRRegReceiverStatement self, JExpression portal, SIRStream receiver, JMethodDeclaration[] methods) {
+    @Override
+	public Object visitRegReceiverStatement(SIRRegReceiverStatement self, JExpression portal, SIRStream receiver, JMethodDeclaration[] methods) {
         // first try to resolve the <portal> from a JLocalVariable to
         // an SIRPortal if it has not been done already
         if (portal instanceof JLocalVariableExpression) {
@@ -242,7 +243,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a while statement
      */
-    public Object visitWhileStatement(JWhileStatement self,
+    @Override
+	public Object visitWhileStatement(JWhileStatement self,
                                       JExpression cond,
                                       JStatement body) {
         loopDepth++;
@@ -280,7 +282,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a do statement
      */
-    public Object visitDoStatement(JDoStatement self,
+    @Override
+	public Object visitDoStatement(JDoStatement self,
                                    JExpression cond,
                                    JStatement body) {
         loopDepth++;
@@ -297,7 +300,7 @@ public class Propagator extends SLIRReplacingVisitor {
             Enumeration<JLocalVariable> remove=newProp.changed.keys();
             //BUG!!!  visiting with newProp could replace references!
             while(remove.hasMoreElements()) {
-                JLocalVariable var=(JLocalVariable)remove.nextElement();
+                JLocalVariable var=remove.nextElement();
                 constants.remove(var);
                 changed.put(var,Boolean.TRUE);
             }
@@ -328,7 +331,8 @@ public class Propagator extends SLIRReplacingVisitor {
         // we want to use a treeset just for efficiency, but that
         // requires a comparator, so just compare based on hashcodes.
         Comparator<JLocalVariable> hashCodeComparator = new Comparator<JLocalVariable>() {
-                public int compare(JLocalVariable o1, JLocalVariable o2) { 
+                @Override
+				public int compare(JLocalVariable o1, JLocalVariable o2) { 
                     int h1 = o1.hashCode();
                     int h2 = o2.hashCode();
                     if (h1 < h2) {
@@ -348,7 +352,8 @@ public class Propagator extends SLIRReplacingVisitor {
         final TreeSet<JLocalVariable> defined = new TreeSet<JLocalVariable>(hashCodeComparator);
         final TreeSet<JLocalVariable> used = new TreeSet<JLocalVariable>(hashCodeComparator);
         phylum.accept(new SLIREmptyVisitor() {
-                public void visitFormalParameters(JFormalParameter self,
+                @Override
+				public void visitFormalParameters(JFormalParameter self,
                                                   boolean isFinal,
                                                   CType type,
                                                   String ident) {
@@ -356,7 +361,8 @@ public class Propagator extends SLIRReplacingVisitor {
                     defined.add(self);
                 }
 
-                public void visitVariableDefinition(JVariableDefinition self,
+                @Override
+				public void visitVariableDefinition(JVariableDefinition self,
                                                     int modifiers,
                                                     CType type,
                                                     String ident,
@@ -365,7 +371,8 @@ public class Propagator extends SLIRReplacingVisitor {
                     defined.add(self);
                 }
 
-                public void visitLocalVariableExpression(JLocalVariableExpression self,
+                @Override
+				public void visitLocalVariableExpression(JLocalVariableExpression self,
                                                          String ident) {
                     super.visitLocalVariableExpression(self, ident);
                     used.add(self.getVariable());
@@ -380,7 +387,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a variable declaration statement
      */
-    public Object visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public Object visitVariableDefinition(JVariableDefinition self,
                                           int modifiers,
                                           CType type,
                                           String ident,
@@ -554,7 +562,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a switch statement
      */
-    public Object visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public Object visitSwitchStatement(JSwitchStatement self,
                                        JExpression expr,
                                        JSwitchGroup[] body) {
         if(!write) {
@@ -623,7 +632,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a return statement
      */
-    public Object visitReturnStatement(JReturnStatement self,
+    @Override
+	public Object visitReturnStatement(JReturnStatement self,
                                        JExpression expr) {
         if (expr != null) {
             JExpression newExp = (JExpression)expr.accept(this);
@@ -637,7 +647,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a if statement
      */
-    public Object visitIfStatement(JIfStatement self,
+    @Override
+	public Object visitIfStatement(JIfStatement self,
                                    JExpression cond,
                                    JStatement thenClause,
                                    JStatement elseClause) {
@@ -796,7 +807,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a for statement
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -822,7 +834,7 @@ public class Propagator extends SLIRReplacingVisitor {
             body.accept(newProp);
             Enumeration<JLocalVariable> remove=newProp.changed.keys();
             while(remove.hasMoreElements()) {
-                JLocalVariable var=(JLocalVariable)remove.nextElement();
+                JLocalVariable var=remove.nextElement();
                 constants.remove(var);
                 changed.put(var,Boolean.TRUE);
             }
@@ -857,7 +869,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an expression statement
      */
-    public Object visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public Object visitExpressionStatement(JExpressionStatement self,
                                            JExpression expr) {
         JExpression newExp = (JExpression)expr.accept(this);
         if (write&&(newExp!=expr)) {
@@ -883,7 +896,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a print statement.
      */
-    public Object visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public Object visitPrintStatement(SIRPrintStatement self,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
         if (write&&newExp!=null && newExp!=arg) {
@@ -896,7 +910,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a peek expression.
      */
-    public Object visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public Object visitPeekExpression(SIRPeekExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
@@ -910,7 +925,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a push expression.
      */
-    public Object visitPushExpression(SIRPushExpression self,
+    @Override
+	public Object visitPushExpression(SIRPushExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
@@ -921,7 +937,8 @@ public class Propagator extends SLIRReplacingVisitor {
         return self;
     }
     
-    public Object visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public Object visitPostfixExpression(JPostfixExpression self,
                                          int oper,
                                          JExpression expr) {
         //System.out.println("Operand: "+expr);
@@ -947,7 +964,8 @@ public class Propagator extends SLIRReplacingVisitor {
         return self;
     }
     
-    public Object visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public Object visitPrefixExpression(JPrefixExpression self,
                                         int oper,
                                         JExpression expr) {
         if(expr instanceof JLocalVariableExpression) {
@@ -973,7 +991,8 @@ public class Propagator extends SLIRReplacingVisitor {
         return self;
     }
 
-    public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                     int oper,
                                                     JExpression left,
                                                     JExpression right) {
@@ -1006,7 +1025,8 @@ public class Propagator extends SLIRReplacingVisitor {
         }
     }
 
-    public Object visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public Object visitFieldExpression(JFieldAccessExpression self,
       JExpression left,
       String ident)
       {
@@ -1027,7 +1047,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an assignment expression
      */
-    public Object visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public Object visitAssignmentExpression(JAssignmentExpression self,
                                             JExpression left,
                                             JExpression right)
     {
@@ -1201,7 +1222,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an unary plus expression
      */
-    public Object visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public Object visitUnaryPlusExpression(JUnaryExpression self,
                                            JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -1218,7 +1240,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * visits a cast expression
      */
-    public Object visitCastExpression(JCastExpression self,
+    @Override
+	public Object visitCastExpression(JCastExpression self,
                                       JExpression expr,
                                       CType type) {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -1246,7 +1269,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * visits a type promotion expression
      */
-    public Object visitUnaryPromoteExpression(JUnaryPromote self,
+    @Override
+	public Object visitUnaryPromoteExpression(JUnaryPromote self,
                                               JExpression expr,
                                               CType type) {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -1268,7 +1292,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an unary minus expression
      */
-    public Object visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public Object visitUnaryMinusExpression(JUnaryExpression self,
                                             JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -1286,7 +1311,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a bitwise complement expression
      */
-    public Object visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public Object visitBitwiseComplementExpression(JUnaryExpression self,
                                                    JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -1303,7 +1329,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a logical complement expression
      */
-    public Object visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public Object visitLogicalComplementExpression(JUnaryExpression self,
                                                    JExpression expr)
     {
         JExpression newExp = (JExpression)expr.accept(this);
@@ -1325,7 +1352,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a shift expression
      */
-    public Object visitShiftExpression(JShiftExpression self,
+    @Override
+	public Object visitShiftExpression(JShiftExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {
@@ -1359,7 +1387,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an array allocator expression
      */
-    public Object visitNewArrayExpression(JNewArrayExpression self,
+    @Override
+	public Object visitNewArrayExpression(JNewArrayExpression self,
                                           CType type,
                                           JExpression[] dims,
                                           JArrayInitializer init)
@@ -1381,7 +1410,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a local variable expression
      */
-    public Object visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public Object visitLocalVariableExpression(JLocalVariableExpression self,
                                                String ident) {
         // if we know the value of the variable, return a literal.
         // otherwise, just return self
@@ -1405,7 +1435,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a relational expression
      */
-    public Object visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public Object visitRelationalExpression(JRelationalExpression self,
                                             int oper,
                                             JExpression left,
                                             JExpression right) {
@@ -1415,7 +1446,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a conditional expression
      */
-    public Object visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public Object visitConditionalExpression(JConditionalExpression self,
                                              JExpression cond,
                                              JExpression left,
                                              JExpression right) {
@@ -1453,7 +1485,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * prints an array allocator expression
      */
-    public Object visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public Object visitBinaryExpression(JBinaryExpression self,
                                         String oper,
                                         JExpression left,
                                         JExpression right) {
@@ -1463,7 +1496,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a compound assignment expression
      */
-    public Object visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public Object visitBitwiseExpression(JBitwiseExpression self,
                                          int oper,
                                          JExpression left,
                                          JExpression right) {
@@ -1499,7 +1533,8 @@ public class Propagator extends SLIRReplacingVisitor {
         }
     }
 
-    public Object visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public Object visitEqualityExpression(JEqualityExpression self,
                                           boolean equal,
                                           JExpression left,
                                           JExpression right) {
@@ -1524,7 +1559,8 @@ public class Propagator extends SLIRReplacingVisitor {
      * Visits a method call expression.  Simplifies known idempotent
      * functions.
      */
-    public Object visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public Object visitMethodCallExpression(JMethodCallExpression self,
                                             JExpression prefix,
                                             String ident,
                                             JExpression[] args)
@@ -1553,7 +1589,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a max latency.
      */
-    public Object visitLatencyMax(SIRLatencyMax self) {
+    @Override
+	public Object visitLatencyMax(SIRLatencyMax self) {
         self.setMaxExpression((JExpression)self.getMaxExpression().accept(this));
         return self;
     }
@@ -1561,7 +1598,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a latency range.
      */
-    public Object visitLatencyRange(SIRLatencyRange self) {
+    @Override
+	public Object visitLatencyRange(SIRLatencyRange self) {
         //System.err.println("recursing into latency range, from " + self.getMaxExpression() + " to " + self.getMaxExpression().accept(this));
         self.setMinExpression((JExpression)self.getMinExpression().accept(this));
         self.setMaxExpression((JExpression)self.getMaxExpression().accept(this));
@@ -1571,7 +1609,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an array length access expression
      */
-    public Object visitArrayLengthExpression(JArrayLengthExpression self,
+    @Override
+	public Object visitArrayLengthExpression(JArrayLengthExpression self,
                                              JExpression prefix) {
         JExpression newExp = (JExpression)prefix.accept(this);
         if(newExp instanceof JLocalVariableExpression) {
@@ -1589,7 +1628,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an array access expression
      */
-    public Object visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public Object visitArrayAccessExpression(JArrayAccessExpression self,
                                              JExpression prefix,
                                              JExpression accessor) {
         prefix.accept(this);
@@ -1658,14 +1698,15 @@ public class Propagator extends SLIRReplacingVisitor {
 
     //Breaks up complex assignments
     //Useful for Copy Prop
-    public Object visitBlockStatement(JBlock self,JavaStyleComment[] comments) {
+    @Override
+	public Object visitBlockStatement(JBlock self,JavaStyleComment[] comments) {
 //        Hashtable copyMap=new Hashtable();
         if(loopDepth<0)
             System.err.println("Neg Loop Depth!");
         if(loopDepth==0){
             int size=self.size();
             for (int i=0;i<size;i++) {
-                JStatement state=(JStatement)self.getStatement(i);
+                JStatement state=self.getStatement(i);
                 if(state instanceof JExpressionStatement) {
                     JExpression expr=((JExpressionStatement)state).getExpression();
                     if(expr instanceof JAssignmentExpression) {
@@ -1728,7 +1769,7 @@ public class Propagator extends SLIRReplacingVisitor {
         }
         int size=self.size();
         for(int i=0;i<size;i++) {
-            JStatement oldBody=(JStatement)self.getStatement(i);
+            JStatement oldBody=self.getStatement(i);
             Object newBody = oldBody.accept(this);
             if (!(newBody instanceof JStatement))
                 continue;
@@ -1789,7 +1830,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits an array length expression
      */
-    public Object visitSwitchLabel(JSwitchLabel self,
+    @Override
+	public Object visitSwitchLabel(JSwitchLabel self,
                                    JExpression expr) {
         if (expr != null) {
             JExpression newExp = (JExpression)expr.accept(this);
@@ -1803,7 +1845,8 @@ public class Propagator extends SLIRReplacingVisitor {
     /**
      * Visits a set of arguments
      */
-    public Object visitArgs(JExpression[] args) {
+    @Override
+	public Object visitArgs(JExpression[] args) {
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 JExpression newExp = (JExpression)args[i].accept(this);

@@ -75,7 +75,8 @@ public class JLabeledStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         check(context,
               context.getLabeledStatement(label) == null,
               KjcMessages.LABEL_ALREADY_EXISTS, label);
@@ -124,7 +125,8 @@ public class JLabeledStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitLabeledStatement(this, label, body);
     }
@@ -133,7 +135,8 @@ public class JLabeledStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitLabeledStatement(this, label, body);
     } 
       
@@ -142,7 +145,8 @@ public class JLabeledStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         endLabel = new CodeLabel();
@@ -154,7 +158,8 @@ public class JLabeledStatement extends JStatement {
     /**
      * Returns the end of this block (for break statement).
      */
-    public CodeLabel getBreakLabel() {
+    @Override
+	public CodeLabel getBreakLabel() {
         return endLabel;
     }
 
@@ -176,7 +181,8 @@ public class JLabeledStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JLabeledStatement other = new at.dms.kjc.JLabeledStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

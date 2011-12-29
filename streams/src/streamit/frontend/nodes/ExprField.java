@@ -45,7 +45,8 @@ public class ExprField extends Expression
     public String getName() { return name; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprField(this);
     }
@@ -56,17 +57,20 @@ public class ExprField extends Expression
      *
      * @return always true
      */
-    public boolean isLValue()
+    @Override
+	public boolean isLValue()
     {
         return true;
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return left + "." + name;
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprField))
             return false;
@@ -78,7 +82,8 @@ public class ExprField extends Expression
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return left.hashCode() ^ name.hashCode();
     }

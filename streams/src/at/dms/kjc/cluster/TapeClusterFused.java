@@ -102,7 +102,8 @@ public class TapeClusterFused extends TapeCluster implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#topOfWorkIteration(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public String topOfWorkIteration() {
+    @Override
+	public String topOfWorkIteration() {
         return "";
     }
     

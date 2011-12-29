@@ -51,7 +51,8 @@ public class ExprConstStr extends Expression
     public String getVal() { return val; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprConstStr(this);
     }

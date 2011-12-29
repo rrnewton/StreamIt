@@ -619,7 +619,7 @@ public class Getopt extends Object
         else
             {
                 posixly_correct = true;
-                _messages = PropertyResourceBundle.getBundle("at.dms.compiler.getopt/MessagesBundle",
+                _messages = ResourceBundle.getBundle("at.dms.compiler.getopt/MessagesBundle",
                                                              Locale.US);
             }
 

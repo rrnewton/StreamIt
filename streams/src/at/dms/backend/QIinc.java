@@ -41,7 +41,8 @@ class QIinc extends QNode {
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "iinc " + temp;
     }
 
@@ -66,28 +67,32 @@ class QIinc extends QNode {
     /**
      * Returns the defined temporary.
      */
-    public QTemporary getDef() {
+    @Override
+	public QTemporary getDef() {
         return temp;
     }
 
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         return new QTemporary[]{temp};
     }
 
     /**
      * returns the parameters of this instruction
      */
-    public QOrigin[] getOrigins() {
+    @Override
+	public QOrigin[] getOrigins() {
         return new QOrigin[0]; // !!! share
     }
 
     /**
      * Sets the parameters of this instruction
      */
-    public void setOrigin(QOrigin origin, int i) {
+    @Override
+	public void setOrigin(QOrigin origin, int i) {
         throw new InconsistencyException();
     }
 
@@ -99,7 +104,8 @@ class QIinc extends QNode {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
         seq.plantInstruction(new IincInstruction(temp.getRegister(), iinc.getIncrement()));
     }
 

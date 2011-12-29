@@ -31,6 +31,7 @@ import at.dms.compiler.tools.antlr.runtime.FileLineFormatter;
 import at.dms.compiler.tools.antlr.runtime.RecognitionException;
 import at.dms.compiler.tools.antlr.runtime.TokenBuffer;
 import at.dms.compiler.tools.antlr.runtime.TokenStreamException;
+import at.dms.compiler.tools.common.CompilerMessages;
 import at.dms.compiler.tools.common.Message;
 import at.dms.compiler.tools.common.MessageDescription;
 
@@ -97,7 +98,7 @@ public class Main {
         }
         if (options.nonOptions.length == 0) {
             options.usage();
-            inform(AntlrMessages.NO_INPUT_FILE);
+            inform(CompilerMessages.NO_INPUT_FILE);
             return false;
         }
         return true;

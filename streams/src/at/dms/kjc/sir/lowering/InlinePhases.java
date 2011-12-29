@@ -47,7 +47,8 @@ public class InlinePhases {
         JMethodDeclaration[] methods = filter.getMethods();
         for (int i=0; i<methods.length; i++) {
             methods[i].accept(new SLIRReplacingVisitor() {
-                    public Object visitExpressionStatement(JExpressionStatement self,
+                    @Override
+					public Object visitExpressionStatement(JExpressionStatement self,
                                                            JExpression expr) {
                         // see if we have method call, with method
                         // target corresponding to phase.  Since
@@ -59,7 +60,7 @@ public class InlinePhases {
                                                                 ((JMethodCallExpression)expr).getIdent());
                             if (phase!=null) {
                                 // replace call with body of phase
-                                return (JBlock)ObjectDeepCloner.deepCopy(phase.getBody());
+                                return ObjectDeepCloner.deepCopy(phase.getBody());
                             }
                         }
                         // no point recursing further, as we won't find a phase

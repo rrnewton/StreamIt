@@ -68,7 +68,8 @@ public class MultiarrayInstruction extends Instruction {
      * Returns true iff control flow can reach the next instruction
      * in textual order.
      */
-    public boolean canComplete() {
+    @Override
+	public boolean canComplete() {
         return true;
     }
 
@@ -77,14 +78,16 @@ public class MultiarrayInstruction extends Instruction {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {
         cp.addItem(type);
     }
 
     /**
      * Returns the number of bytes used by the the instruction in the code array.
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return 1 + 3;
     }
 
@@ -105,21 +108,24 @@ public class MultiarrayInstruction extends Instruction {
     /**
      * Returns the size of data pushed on the stack by this instruction
      */
-    public int getPushedOnStack() {
+    @Override
+	public int getPushedOnStack() {
         return 1;
     }
 
     /**
      * Return the amount of stack (positive or negative) used by this instruction
      */
-    public int getStack() {
+    @Override
+	public int getStack() {
         return 1 - dims;
     }
 
     /**
      * Returns the type pushed on the stack
      */
-    public byte getReturnType() {
+    @Override
+	public byte getReturnType() {
         return TYP_REFERENCE;
     }
 
@@ -135,7 +141,8 @@ public class MultiarrayInstruction extends Instruction {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte((byte)getOpcode());
 
         out.writeShort(type.getIndex());

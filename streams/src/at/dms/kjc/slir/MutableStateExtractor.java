@@ -57,7 +57,8 @@ public class MutableStateExtractor {
                         inAssignment[0] = old;
                     }
 
-                    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+                    @Override
+					public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                                   int oper,
                                                                   JExpression left,
                                                                   JExpression right) {
@@ -65,7 +66,8 @@ public class MutableStateExtractor {
                         right.accept(this);
                     }
 
-                    public void visitAssignmentExpression(JAssignmentExpression self,
+                    @Override
+					public void visitAssignmentExpression(JAssignmentExpression self,
                                                           JExpression left,
                                                           JExpression right) {
                         wrapVisit(left);
@@ -73,14 +75,16 @@ public class MutableStateExtractor {
                     }
 
                     // need to count i++ as mutated state if i is a field
-                    public void visitPostfixExpression(JPostfixExpression self,
+                    @Override
+					public void visitPostfixExpression(JPostfixExpression self,
                                                        int oper,
                                                        JExpression expr) {
                         wrapVisit(expr);
                     }
 
                     // need to count ++i as mutated state if i is a field
-                    public void visitPrefixExpression(JPrefixExpression self,
+                    @Override
+					public void visitPrefixExpression(JPrefixExpression self,
                                                       int oper,
                                                       JExpression expr) {
                         wrapVisit(expr);
@@ -88,7 +92,8 @@ public class MutableStateExtractor {
 
 
 
-                    public void visitFieldExpression(JFieldAccessExpression self,
+                    @Override
+					public void visitFieldExpression(JFieldAccessExpression self,
                                                      JExpression left,
                                                      String ident) {
                         // if we are in assignment, mark that there is mutable state

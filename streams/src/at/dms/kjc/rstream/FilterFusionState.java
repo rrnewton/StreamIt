@@ -70,7 +70,8 @@ public abstract class FilterFusionState extends FusionState
     
     /** return the number of items remaining on the pop buffer after this 
         filter has fired in the initialization stage **/
-    public int getRemaining(FlatNode prev, boolean isInit) 
+    @Override
+	public int getRemaining(FlatNode prev, boolean isInit) 
     {
         //if this filter is not necessary then return the downstream's
         //remaining count
@@ -93,10 +94,12 @@ public abstract class FilterFusionState extends FusionState
     }
 
     /** return the incoming buffer size for this filter **/
-    public abstract int getBufferSize(FlatNode prev, boolean init);
+    @Override
+	public abstract int getBufferSize(FlatNode prev, boolean init);
     
     /** return the buffer var representing the incoming buffer for this filter **/
-    public JVariableDefinition getBufferVar(FlatNode prev, boolean init) 
+    @Override
+	public JVariableDefinition getBufferVar(FlatNode prev, boolean init) 
     {
         //if this filter is not necessary, return the downstream's incoming buffer var
         if (!necessary && node.ways > 0) {
@@ -123,14 +126,16 @@ public abstract class FilterFusionState extends FusionState
     }
     
     /** Add any necessary initialization tasks to the SIR code containers **/
-    public abstract void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
+    @Override
+	public abstract void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
                                    JBlock initFunctionCalls, JBlock main);
     
     /** get the SIR block representing the imperative code necessary to execute 
         this filter in the init stage (*isInit* == true) or the steady-state 
         stage (*isInit* == false)
     **/
-    public abstract JStatement[] getWork(JBlock enclosingBlock, boolean isInit);
+    @Override
+	public abstract JStatement[] getWork(JBlock enclosingBlock, boolean isInit);
     
     /** 
         Check helper function *meth* (not init or work) for field accesses.
@@ -140,7 +145,8 @@ public abstract class FilterFusionState extends FusionState
     {
         //check the method for field accessed
         meth.accept(new SLIREmptyVisitor() {
-                public void visitFieldExpression(JFieldAccessExpression self,
+                @Override
+				public void visitFieldExpression(JFieldAccessExpression self,
                                                  JExpression left,
                                                  String ident)
                 {

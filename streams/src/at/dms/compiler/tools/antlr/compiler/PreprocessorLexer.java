@@ -50,7 +50,8 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
         setCaseSensitive(true);
     }
 
-    public Token nextToken() throws TokenStreamException {
+    @Override
+	public Token nextToken() throws TokenStreamException {
         Token theRetToken=null;
         tryAgain:
         for (;;) {
@@ -154,7 +155,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                     default:
                         {
                             if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-                            else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                            else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                         }
                     }
                     if ( _returnToken==null ) { continue tryAgain; } // found SKIP token
@@ -191,7 +192,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
             else if ((_tokenSet_1.member(LA(1))) && (true)) {
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -209,7 +210,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -225,7 +226,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                         else if ((_tokenSet_1.member(LA(1))) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
                 
                     }
@@ -243,7 +244,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                             }
                         default:
                             {
-                                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                             }
                         }
                     }
@@ -281,7 +282,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                     mNEWLINE(false);
                 }
                 else {
-                    if ( _cnt80>=1 ) { break _loop80; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                    if ( _cnt80>=1 ) { break _loop80; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                 }
             
                 _cnt80++;
@@ -332,7 +333,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
             else if ((_tokenSet_3.member(LA(1))) && (true)) {
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -354,7 +355,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                             }
                         default:
                             {
-                                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                             }
                         }
                     }
@@ -366,7 +367,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                         else if ((_tokenSet_3.member(LA(1))) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
                 
                     }
@@ -391,7 +392,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -493,7 +494,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
             }
         default:
             {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         }
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -516,7 +517,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                 mML_COMMENT(false);
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -686,7 +687,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -718,7 +719,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                 newline();
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -793,7 +794,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                     else if ((_tokenSet_7.member(LA(1))) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
                     }
                     else {
-                        throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                        throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                     }
             
                 }
@@ -811,7 +812,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                         }
                     default:
                         {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
                     }
                 }
@@ -936,7 +937,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -1202,7 +1203,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                                 else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                                 }
                                 else {
-                                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                                 }
                 
                             }
@@ -1210,7 +1211,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -1228,7 +1229,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -1245,7 +1246,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -1296,7 +1297,7 @@ public class PreprocessorLexer extends at.dms.compiler.tools.antlr.runtime.CharS
             }
         default:
             {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         }
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {

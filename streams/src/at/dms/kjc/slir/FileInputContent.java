@@ -1,5 +1,6 @@
 package at.dms.kjc.slir;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CEmittedTextType;
 import at.dms.kjc.CStdType;
@@ -88,7 +89,8 @@ public class FileInputContent extends InputContent implements at.dms.kjc.DeepClo
      * current version handles int and floating point only.
      * Should be expanded to handle structs and arrays.
      */
-    public void createContent() {
+    @Override
+	public void createContent() {
         // on entry: 
         // name is set to something reasonable
         // input and output types set correctly
@@ -143,7 +145,7 @@ public class FileInputContent extends InputContent implements at.dms.kjc.DeepClo
                 })));
         //set this as the init function...
         JMethodDeclaration initMethod = new JMethodDeclaration(null,
-                at.dms.kjc.Constants.ACC_PUBLIC,
+                Constants.ACC_PUBLIC,
                 CStdType.Void,
                 "init_fileread" + my_unique_ID ,
                 JFormalParameter.EMPTY,
@@ -234,7 +236,7 @@ public class FileInputContent extends InputContent implements at.dms.kjc.DeepClo
         workBlock.addStatement(new JExpressionStatement(null, push, null));
 
         JMethodDeclaration workMethod = new JMethodDeclaration(null,
-                at.dms.kjc.Constants.ACC_PUBLIC,
+                Constants.ACC_PUBLIC,
                 CStdType.Void,
                 "work_fileread" + my_unique_ID ,
                 JFormalParameter.EMPTY,
@@ -255,7 +257,8 @@ public class FileInputContent extends InputContent implements at.dms.kjc.DeepClo
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.FileInputContent other = new at.dms.kjc.slir.FileInputContent();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

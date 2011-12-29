@@ -2,6 +2,7 @@ package at.dms.kjc.cell;
 
 import java.util.LinkedList;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JAssignmentExpression;
@@ -42,7 +43,8 @@ public class CellProcessInputSliceNode extends ProcessInputFilterNode {
      * collect information about the whole graph, assign filters and channels
      * IDs, and extract splitters and joiners as separate filters as necessary.
      */
-    public void additionalPreInitProcessing() {
+    @Override
+	public void additionalPreInitProcessing() {
         if (inputNode.getNextFilter().isFileOutput())
             return;
         // If InputSliceNode is a joiner (i.e. has at least 2 inputs), add it
@@ -233,7 +235,7 @@ public class CellProcessInputSliceNode extends ProcessInputFilterNode {
         assert size > 0 : "asking for code generation for null joiner";
         
         JMethodDeclaration joiner_method = new JMethodDeclaration(
-                null, at.dms.kjc.Constants.ACC_STATIC | at.dms.kjc.Constants.ACC_INLINE,
+                null, Constants.ACC_STATIC | Constants.ACC_INLINE,
                 joiner.getType(),
                 joiner_method_name,
                 new JFormalParameter[]{},

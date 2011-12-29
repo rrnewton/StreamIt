@@ -144,6 +144,7 @@ class WorkComparator<T> implements Comparator<T>{
 		this.estimates = estimates;
 	}
 	
+	@Override
 	public int compare(T a, T b) {
 		
 	    if(estimates.get(a).longValue() < estimates.get(b).longValue()) {

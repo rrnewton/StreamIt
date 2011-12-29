@@ -11,7 +11,8 @@ public class OffChipMemory extends Core {
         super(-1, machine);
     }
     
-    public boolean isComputeNode() {
+    @Override
+	public boolean isComputeNode() {
         return false;
     }
 }

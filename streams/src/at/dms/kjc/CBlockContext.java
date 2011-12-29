@@ -97,7 +97,8 @@ public class CBlockContext extends CBodyContext {
     /**
      * Verify everything is okay at the end of this context
      */
-    public void close(TokenReference ref) {
+    @Override
+	public void close(TokenReference ref) {
         // default, no errors
         verifyLocalVarUsed();
 
@@ -172,7 +173,8 @@ public class CBlockContext extends CBodyContext {
      * @param   ident       the name of the variable
      * @return  a variable from an ident in current context
      */
-    public JLocalVariable lookupLocalVariable(String ident) {
+    @Override
+	public JLocalVariable lookupLocalVariable(String ident) {
         if (localVars != null) {
             for (int i = 0; i < localsIndex; i++) {
                 JLocalVariable  var = localVars.elementAt(i);
@@ -193,7 +195,8 @@ public class CBlockContext extends CBodyContext {
         localsPosition += 1;
     }
 
-    public int localsPosition() {
+    @Override
+	public int localsPosition() {
         return localsPosition;
     }
 
@@ -201,7 +204,8 @@ public class CBlockContext extends CBodyContext {
         return parentIndex + localsIndex;
     }
 
-    public CBlockContext getBlockContext() {
+    @Override
+	public CBlockContext getBlockContext() {
         return this;
     }
 
@@ -236,7 +240,8 @@ public class CBlockContext extends CBodyContext {
      * @return  the class if found, null otherwise
      * @exception UnpositionedError this error will be positioned soon
      */
-    public CClassType lookupClass(CClass caller, String ident) throws UnpositionedError {
+    @Override
+	public CClassType lookupClass(CClass caller, String ident) throws UnpositionedError {
         // search local class first
         if (localClasses != null) {
             CClass  clazz;
@@ -269,7 +274,8 @@ public class CBlockContext extends CBodyContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CBlockContext other = new at.dms.kjc.CBlockContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

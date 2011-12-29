@@ -26,7 +26,8 @@ public final class HorizontalCutTransform extends IdempotentTransform {
      * Perform the transform on <str> and return new stream.  Requires
      * that <str> is a SplitJoin.
      */
-    public SIRStream doMyTransform(SIRStream str) {
+    @Override
+	public SIRStream doMyTransform(SIRStream str) {
         if (str instanceof SIRPipeline) {
             // represents a cut in the immediate children of a pipeline
             SIRPipeline pipe = (SIRPipeline)str;
@@ -57,7 +58,8 @@ public final class HorizontalCutTransform extends IdempotentTransform {
         }
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Horizontal Cut transform, #" + id + " (pos = " + cutPos + ")";
     }
 }

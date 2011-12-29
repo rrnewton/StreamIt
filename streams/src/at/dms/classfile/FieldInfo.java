@@ -91,7 +91,8 @@ public class FieldInfo extends Member {
     /**
      * Returns the name of the this field
      */
-    public String getName() {
+    @Override
+	public String getName() {
         return name.getValue();
     }
 
@@ -105,7 +106,8 @@ public class FieldInfo extends Member {
     /**
      * Returns the type of the this field
      */
-    public String getSignature() {
+    @Override
+	public String getSignature() {
         return type.getValue();
     }
 

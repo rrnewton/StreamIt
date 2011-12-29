@@ -62,7 +62,8 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * prints a prefix expression
      */
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         sideEffect = true;
@@ -72,7 +73,8 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -86,7 +88,8 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
         sideEffect = true;
@@ -97,7 +100,8 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * prints a compound expression
      */
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {
@@ -109,21 +113,24 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * prints a postfix expression
      */
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         sideEffect = true;
         expr.accept(this);
     }
 
-    public void visitCreatePortalExpression(SIRCreatePortal self) {
+    @Override
+	public void visitCreatePortalExpression(SIRCreatePortal self) {
         sideEffect = true;
     }
 
     /**
      * Visits a peek expression.
      */
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         arg.accept(this);
@@ -132,7 +139,8 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * Visits a pop expression.
      */
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType) {
         sideEffect = true;
     }
@@ -140,7 +148,8 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * Visits a push expression.
      */
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         sideEffect = true;
@@ -150,7 +159,8 @@ public class HasSideEffects extends SLIREmptyVisitor
     /**
      * Visits InlineAssembly
      */
-    public void visitInlineAssembly(InlineAssembly self,String[] asm,
+    @Override
+	public void visitInlineAssembly(InlineAssembly self,String[] asm,
                                     String[] input,String[] clobber) {
         sideEffect = true;
     

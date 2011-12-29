@@ -78,7 +78,7 @@ public class DuplicateBottleneck {
         //update the comm and comp numbers...
         if (str instanceof SIRFilter) {
             if (str instanceof SIRFileWriter)
-                return ((int[])map.get(str))[0];
+                return map.get(str)[0];
             else
                 return 0;
         }
@@ -308,7 +308,7 @@ public class DuplicateBottleneck {
                 continue;
             }
             //System.out.println(((int[])work.getExecutionCounts().get(filter))[0]);
-            long commRate = ((long)((int[])work.getExecutionCounts().get(filter))[0]) * 
+            long commRate = ((long)work.getExecutionCounts().get(filter)[0]) * 
                  (filter.getPushInt() + filter.getPopInt());
             long filterWork = work.getWork(filter);
             if (filterWork / commRate <= 10) {
@@ -326,7 +326,7 @@ public class DuplicateBottleneck {
                 double workFraction = estimateWorkFraction(filter, averageWork);
                 System.out.println("   Filter " + filter + " has " + cousins + " cousins and does " + workFraction + " of the work.");
                 if (cousins < tiles) {
-                    int reps = (int)Math.floor(workFraction * ((double)tiles));
+                    int reps = (int)Math.floor(workFraction * tiles);
                     reps = Math.min(tiles - cousins + 1, reps);
                    
                     System.out.println("   Calling dup with: " + reps);
@@ -461,7 +461,7 @@ public class DuplicateBottleneck {
         System.out.println("Ideal Work: " + idealWork);
         
         for (int i = sortedFilters.size() -1 ; i >= 0; i--) {
-            if (sortedFilters.getWork(i) >= (int)(1.5 * ((double)idealWork)) &&
+            if (sortedFilters.getWork(i) >= (int)(1.5 * idealWork) &&
                     StatelessDuplicate.isFissable(sortedFilters.getFilter(i))) {
                 change = true;
                 int reps = (int)Math.max(2.0, 
@@ -590,7 +590,7 @@ public class DuplicateBottleneck {
             int mycount = 0;
             // visit children to accumulate sum, count
             for (int i=0; i<cont.size(); i++) {
-                SIRStream child = (SIRStream) cont.get(i);
+                SIRStream child = cont.get(i);
                 findWork(child, work, count, sum, average);
                 mysum += sum.get(child);
                 mycount += count.get(child);

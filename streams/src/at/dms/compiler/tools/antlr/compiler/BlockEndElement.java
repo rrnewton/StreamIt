@@ -33,10 +33,12 @@ class BlockEndElement extends AlternativeElement {
         super(g);
         lock = new boolean[g.maxk+1];
     }
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
-    public String toString() {
+    @Override
+	public String toString() {
         //return " [BlkEnd]";
         return "";
     }

@@ -229,7 +229,8 @@ public class Flattener {
         // look for dynamic expressions in peek or pop rate
         // declarations of all filters and phased filters in graph.
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     // look for dynamic expressions
                     if (self.getPush().isDynamic() ||
@@ -240,7 +241,8 @@ public class Flattener {
                 }
         
                 /* visit a phased filter */
-                public void visitPhasedFilter(SIRPhasedFilter self,
+                @Override
+				public void visitPhasedFilter(SIRPhasedFilter self,
                                               SIRPhasedFilterIter iter) {
                     // check init phases
                     JMethodDeclaration[] init = self.getInitPhases();

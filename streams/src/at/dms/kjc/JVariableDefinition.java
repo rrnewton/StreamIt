@@ -70,7 +70,8 @@ public class JVariableDefinition extends JLocalVariable {
         this(null, 0, type, ident, null);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "VarDef["+name+"="+expr+"]";
     }
     
@@ -89,7 +90,8 @@ public class JVariableDefinition extends JLocalVariable {
     /**
      * @return  the initial value
      */
-    public JExpression getValue() {
+    @Override
+	public JExpression getValue() {
         return expr;
     }
 
@@ -150,7 +152,8 @@ public class JVariableDefinition extends JLocalVariable {
                 // first see if RHS has array initializer
                 final boolean[] hasArray = { false };
                 expr.accept(new KjcEmptyVisitor() {
-                        public void visitArrayInitializer(JArrayInitializer self,
+                        @Override
+						public void visitArrayInitializer(JArrayInitializer self,
                                                           JExpression[] elems) {
                             hasArray[0] = true;
                         }
@@ -160,7 +163,8 @@ public class JVariableDefinition extends JLocalVariable {
                     check(context, type.isArrayType(), KjcMessages.ARRAY_INIT_NOARRAY, type);
                     final CArrayType myType = (CArrayType)type;
                     expr.accept(new KjcEmptyVisitor() {
-                            public void visitArrayInitializer(JArrayInitializer self,
+                            @Override
+							public void visitArrayInitializer(JArrayInitializer self,
                                                               JExpression[] elems) {
                                 self.setType(myType);
                             }
@@ -193,7 +197,8 @@ public class JVariableDefinition extends JLocalVariable {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitVariableDefinition(this, modifiers, type, getIdent(), expr);
     }
 
@@ -201,7 +206,8 @@ public class JVariableDefinition extends JLocalVariable {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitVariableDefinition(this, modifiers, type, getIdent(), expr);
     }
 
@@ -209,7 +215,8 @@ public class JVariableDefinition extends JLocalVariable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JVariableDefinition other = new at.dms.kjc.JVariableDefinition();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

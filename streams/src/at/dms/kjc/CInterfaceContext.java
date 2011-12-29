@@ -51,7 +51,8 @@ public class CInterfaceContext extends CClassContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CInterfaceContext other = new at.dms.kjc.CInterfaceContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

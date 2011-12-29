@@ -41,7 +41,8 @@ public class SteadyUpstreamRestriction extends Restriction
             portal.getParent().registerNewlyBlockedSteadyRestriction(this);
     }
 
-    public boolean notifyExpired()
+    @Override
+	public boolean notifyExpired()
     {
         downstreamRestr.notifyUpstreamRestrictionBlocked();
         if (portal.isDownstream())
@@ -70,7 +71,8 @@ public class SteadyUpstreamRestriction extends Restriction
         return false;
     }
 
-    public PhasingSchedule checkMsg()
+    @Override
+	public PhasingSchedule checkMsg()
     {
         if (portal.isDownstream())
             {

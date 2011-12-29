@@ -110,7 +110,8 @@ public class Message implements at.dms.kjc.DeepCloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.util.Message other = new at.dms.util.Message();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

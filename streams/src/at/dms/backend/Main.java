@@ -33,6 +33,7 @@ import at.dms.classfile.ClassFileFormatException;
 import at.dms.classfile.ClassInfo;
 import at.dms.classfile.CodeInfo;
 import at.dms.classfile.MethodInfo;
+import at.dms.compiler.CompilerMessages;
 import at.dms.compiler.UnpositionedError;
 
 /**
@@ -56,7 +57,7 @@ public class Main {
 
         if (infiles.length == 0) {
             options.usage();
-            System.err.println(BackendMessages.NO_INPUT_FILE);
+            System.err.println(CompilerMessages.NO_INPUT_FILE);
             System.exit(1);
         } else {
             boolean errorsFound = false;
@@ -164,7 +165,7 @@ public class Main {
         } catch (ClassFileFormatException e) {
             throw new UnpositionedError(BackendMessages.SEMANTIC_ERROR, new Object[] { fileName, e.getMessage() });
         } catch (IOException e) {
-            throw new UnpositionedError(BackendMessages.IO_EXCEPTION, new Object[] { fileName, e.getMessage() });
+            throw new UnpositionedError(CompilerMessages.IO_EXCEPTION, new Object[] { fileName, e.getMessage() });
         }
     }
 
@@ -181,7 +182,7 @@ public class Main {
             throw new UnpositionedError(BackendMessages.SEMANTIC_ERROR, new Object[] { fileName, e.getMessage() });
         } catch (IOException e) {
             e.printStackTrace();
-            throw new UnpositionedError(BackendMessages.IO_EXCEPTION, new Object[] { fileName, e.getMessage() });
+            throw new UnpositionedError(CompilerMessages.IO_EXCEPTION, new Object[] { fileName, e.getMessage() });
         }
     }
 

@@ -349,7 +349,7 @@ public class Channel extends streamit.misc.DestroyedClass
         // make a copy of structures in case they are subsequently
         // modified -- the changes should not appear in the consumer
         if (o instanceof Structure) {
-            o = (Structure)Cloner.doCopy(o);
+            o = Cloner.doCopy(o);
         }
         
         enqueue (o);
@@ -539,7 +539,7 @@ public class Channel extends streamit.misc.DestroyedClass
             // modified -- the changes should not appear in the producer
             // or in subsequent peek / pop's
             if (data instanceof Structure) {
-                data = (Structure)Cloner.doCopy(data);
+                data = Cloner.doCopy(data);
             }
 
             return data;

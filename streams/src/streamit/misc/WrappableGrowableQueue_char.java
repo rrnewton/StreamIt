@@ -78,7 +78,8 @@ public class WrappableGrowableQueue_char implements WrappableGrowableQueue {
         }
     }
 
-    public int size() {
+    @Override
+	public int size() {
         return sizeof_queue;
     }
 
@@ -106,7 +107,8 @@ public class WrappableGrowableQueue_char implements WrappableGrowableQueue {
         sizeof_queue = new_sizeof_queue;
     }
 
-    public void setBufferSize(int size) {
+    @Override
+	public void setBufferSize(int size) {
         if (sizeof_queue > size) {
             throw new IllegalArgumentException("sizeof_queue " + sizeof_queue + " size " + size);
         }

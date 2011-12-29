@@ -38,21 +38,24 @@ class QLiteral extends QOperand {
     /**
      * The size (in instruction) of the subtree
      */
-    public int getType() {
+    @Override
+	public int getType() {
         return insn.getInstruction().getReturnType();
     }
 
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "" + ((PushLiteralInstruction)insn.getInstruction()).getLiteral();
     }
 
     /**
      * Duplicate this node
      */
-    public QOrigin duplicate() {
+    @Override
+	public QOrigin duplicate() {
         return new QLiteral(new InstructionHandle(insn.getInstruction(), null));
     }
 
@@ -63,7 +66,8 @@ class QLiteral extends QOperand {
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         return QTemporary.EMPTY;
     }
 
@@ -75,7 +79,8 @@ class QLiteral extends QOperand {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
         seq.plantInstruction(insn);
     }
 

@@ -149,7 +149,8 @@ public class PartitionGroup {
         return sum;
     }
 
-    public String toString () {
+    @Override
+	public String toString () {
         StringBuffer result = new StringBuffer("PartitionGroup with sizes={");
         for (int i=0; i<partitions.length; i++) {
             result.append(partitions[i]);

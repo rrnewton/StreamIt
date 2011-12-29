@@ -180,7 +180,8 @@ public class ClusterFusion implements FlatVisitor {
      *   }
      */
 
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         SIROperator op = node.contents;
         Integer partition = partitionMap.get(op);

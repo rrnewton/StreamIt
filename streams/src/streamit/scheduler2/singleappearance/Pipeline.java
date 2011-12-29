@@ -36,7 +36,8 @@ public class Pipeline extends streamit.scheduler2.hierarchical.Pipeline
         super(iterator, factory);
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         // first compute schedules for all my children
         {

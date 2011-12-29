@@ -316,7 +316,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     // o  for incr, need to remove a trailing semicolon if one occurs.
     // o need statements to produce a final ';', but no '\n' after it.
     
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
             JStatement init,
             JExpression cond,
             JStatement incr,
@@ -369,7 +370,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
      * 
      * Works with visitForStatment, if you override one then override both.
      */
-    public void visitEmptyStatement(JEmptyStatement self) {
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self) {
         //if we are inside a for loop header, we need to print 
         //the ; of an empty statement
         if (forLoopHeader > 0) {
@@ -381,7 +383,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a while statement
      */
-    public void visitWhileStatement(JWhileStatement self,
+    @Override
+	public void visitWhileStatement(JWhileStatement self,
                                     JExpression cond,
                                     JStatement body) {
         p.newLine();
@@ -394,7 +397,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public void visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                   JVariableDefinition[] vars) {
         for (int i = 0; i < vars.length; i++) {
             vars[i].accept(this);
@@ -404,7 +408,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a switch statement
      */
-    public void visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public void visitSwitchStatement(JSwitchStatement self,
                                      JExpression expr,
                                      JSwitchGroup[] body) {
         p.print("switch (");
@@ -420,7 +425,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a return statement
      */
-    public void visitReturnStatement(JReturnStatement self,
+    @Override
+	public void visitReturnStatement(JReturnStatement self,
                                      JExpression expr) {
         p.print("return");
         if (expr != null) {
@@ -433,7 +439,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a labeled statement
      */
-    public void visitLabeledStatement(JLabeledStatement self,
+    @Override
+	public void visitLabeledStatement(JLabeledStatement self,
                                       String label,
                                       JStatement stmt) {
         p.print(label + ":");
@@ -443,7 +450,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a compound statement: 2-argument form
      */
-    public void visitCompoundStatement(JCompoundStatement self,
+    @Override
+	public void visitCompoundStatement(JCompoundStatement self,
                                        JStatement[] body) {
         visitCompoundStatement(body);
     }
@@ -451,7 +459,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints an expression statement
      */
-    public void visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public void visitExpressionStatement(JExpressionStatement self,
                                          JExpression expr) {
         expr.accept(this);
         p.print(";");
@@ -460,7 +469,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints an expression list statement
      */
-    public void visitExpressionListStatement(JExpressionListStatement self,
+    @Override
+	public void visitExpressionListStatement(JExpressionListStatement self,
                                              JExpression[] expr) {
         // Want expressions parenthesized here to not have problems with
         // relative precedence with ","
@@ -476,7 +486,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a do statement
      */
-    public void visitDoStatement(JDoStatement self,
+    @Override
+	public void visitDoStatement(JDoStatement self,
                                  JExpression cond,
                                  JStatement body) {
         p.newLine();
@@ -491,7 +502,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a continue statement
      */
-    public void visitContinueStatement(JContinueStatement self,
+    @Override
+	public void visitContinueStatement(JContinueStatement self,
                                        String label) {
         p.newLine();
         p.print("continue");
@@ -504,7 +516,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a break statement
      */
-    public void visitBreakStatement(JBreakStatement self,
+    @Override
+	public void visitBreakStatement(JBreakStatement self,
                                     String label) {
         p.newLine();
         p.print("break");
@@ -518,7 +531,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a compound statement
      */
-    public void visitCompoundStatement(JStatement[] body) {
+    @Override
+	public void visitCompoundStatement(JStatement[] body) {
         for (int i = 0; i < body.length; i++) {
             if (!(body[i] instanceof JEmptyStatement))
                 p.newLine();
@@ -529,7 +543,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints an block statement
      */
-    public void visitBlockStatement(JBlock self,
+    @Override
+	public void visitBlockStatement(JBlock self,
                                     JavaStyleComment[] comments) {
         p.print("{");
         p.indent();
@@ -542,7 +557,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a type declaration statement
      */
-    public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
+    @Override
+	public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
                                               JTypeDeclaration decl) {
     
         decl.accept(this);
@@ -574,7 +590,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints an unary plus expression
      */
-    public void visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryPlusExpression(JUnaryExpression self,
                                          JExpression expr)
     {
         p.print("(");
@@ -586,7 +603,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints an unary minus expression
      */
-    public void visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryMinusExpression(JUnaryExpression self,
                                           JExpression expr)
     {
         p.print("(");
@@ -598,7 +616,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a bitwise complement expression
      */
-    public void visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         p.print("(");
@@ -610,7 +629,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a logical complement expression
      */
-    public void visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitLogicalComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         p.print("(");
@@ -622,7 +642,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a type name expression
      */
-    public void visitTypeNameExpression(JTypeNameExpression self,
+    @Override
+	public void visitTypeNameExpression(JTypeNameExpression self,
                                         CType type) {
         p.print("(");
         printType(type);
@@ -633,7 +654,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a shift expression
      */
-    public void visitShiftExpression(JShiftExpression self,
+    @Override
+	public void visitShiftExpression(JShiftExpression self,
                                      int oper,
                                      JExpression left,
                                      JExpression right) {
@@ -653,7 +675,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a prefix expression
      */
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         printLParen();
@@ -669,7 +692,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a postfix expression
      */
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         printLParen();
@@ -685,7 +709,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a parenthesed expression
      */
-    public void visitParenthesedExpression(JParenthesedExpression self,
+    @Override
+	public void visitParenthesedExpression(JParenthesedExpression self,
                                            JExpression expr) {
         p.print("(");
         expr.accept(this);
@@ -696,14 +721,16 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a local variable expression
      */
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident) {
         p.print(ident);
     }
     /**
      * prints an equality expression
      */
-    public void visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public void visitEqualityExpression(JEqualityExpression self,
                                         boolean equal,
                                         JExpression left,
                                         JExpression right) {
@@ -717,7 +744,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a conditional expression
      */
-    public void visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public void visitConditionalExpression(JConditionalExpression self,
                                            JExpression cond,
                                            JExpression left,
                                            JExpression right) {
@@ -733,7 +761,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a compound expression
      */
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {
@@ -781,7 +810,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a cast expression
      */
-    public void visitCastExpression(JCastExpression self,
+    @Override
+	public void visitCastExpression(JCastExpression self,
                                     JExpression expr,
                                     CType type)
     {
@@ -805,7 +835,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * prints a cast expression
      */
-    public void visitUnaryPromoteExpression(JUnaryPromote self,
+    @Override
+	public void visitUnaryPromoteExpression(JUnaryPromote self,
                                             JExpression expr,
                                             CType type)
     {
@@ -910,7 +941,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
                 continue;
             }
             String typeString = t.toString();
-            String printPrefix = (String)(printPrefixMap.get(typeString));
+            String printPrefix = (printPrefixMap.get(typeString));
             if (printPrefix == null) {
                 System.err.println("Print statement does not support type "
                                    + t);
@@ -919,7 +950,7 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
                 p.print(printPrefix);
                 exp.accept(this);
                 String printPostfix = 
-                    (String)(printPostfixMap.get(typeString));
+                    (printPostfixMap.get(typeString));
                 if (printPostfix == null) {
                     printPostfix = "); ";
                 }
@@ -935,7 +966,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
      * to our output languages C or C++
      */
     
-    public void visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression exp) { 
     	
     	printExp(exp);
@@ -949,7 +981,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
     /**
      * Print marker as a comment.
      */
-    public void visitMarker(SIRMarker self) {
+    @Override
+	public void visitMarker(SIRMarker self) {
         if (self instanceof SIRBeginMarker) {
             p.println("// mark begin: " + ((SIRBeginMarker)self).getName());
         }
@@ -976,7 +1009,8 @@ public abstract class ToCCommon extends SLIREmptyVisitor {
      * @param type    s CType, presumably a CCLassNameType....
      */
 
-    public void visitClassExpression(JClassExpression self,
+    @Override
+	public void visitClassExpression(JClassExpression self,
 				     CType type) {
 	printType(type);	// should be instance of CClassNameType
     }

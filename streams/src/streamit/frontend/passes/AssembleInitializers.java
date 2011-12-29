@@ -45,7 +45,8 @@ import streamit.frontend.nodes.StmtVarDecl;
  */
 public class AssembleInitializers extends FEReplacer
 {
-    public Object visitStmtBlock(StmtBlock block)
+    @Override
+	public Object visitStmtBlock(StmtBlock block)
     {
         List<Statement> oldStatements = newStatements;
         newStatements = new java.util.ArrayList<Statement>();

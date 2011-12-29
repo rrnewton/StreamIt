@@ -130,7 +130,7 @@ public class SIRScheduler implements Constants {
     	@SuppressWarnings("rawtypes")
 		HashMap[] myarray = { new HashMap<SIRStream, int[]>(), new HashMap<SIRStream, int[]>() } ;
         @SuppressWarnings("unchecked")
-		HashMap<SIROperator, int[]>[] result = (HashMap<SIROperator, int[]>[])myarray;
+		HashMap<SIROperator, int[]>[] result = myarray;
         
         // fill in the init schedule
         fillExecutionCounts(scheduler.getOptimizedInitSchedule(), result[0], 1);
@@ -154,9 +154,10 @@ public class SIRScheduler implements Constants {
     	@SuppressWarnings("rawtypes")
 		HashMap[] myarray = { new HashMap<SIRStream, int[]>(), new HashMap<SIRStream, int[]>() } ;
         @SuppressWarnings("unchecked")
-		final HashMap<SIROperator, int[]>[] result = (HashMap<SIROperator, int[]>[])myarray;        
+		final HashMap<SIROperator, int[]>[] result = myarray;        
         str.accept(new EmptyAttributeStreamVisitor() {
-                public Object visitFilter(SIRFilter self,
+                @Override
+				public Object visitFilter(SIRFilter self,
                                           JFieldDeclaration[] fields,
                                           JMethodDeclaration[] methods,
                                           JMethodDeclaration init,
@@ -166,7 +167,8 @@ public class SIRScheduler implements Constants {
                     return self;
                 }
 
-                public Object visitPhasedFilter(SIRPhasedFilter self,
+                @Override
+				public Object visitPhasedFilter(SIRPhasedFilter self,
                                                 JFieldDeclaration[] fields,
                                                 JMethodDeclaration[] methods,
                                                 JMethodDeclaration init,
@@ -178,14 +180,16 @@ public class SIRScheduler implements Constants {
                     return self;
                 }
 
-                public Object visitSplitter(SIRSplitter self,
+                @Override
+				public Object visitSplitter(SIRSplitter self,
                                             SIRSplitType type,
                                             JExpression[] weights) {
                     register(self);
                     return self;
                 }
                 
-                public Object visitJoiner(SIRJoiner self,
+                @Override
+				public Object visitJoiner(SIRJoiner self,
                                           SIRJoinType type,
                                           JExpression[] weights) {
                     register(self);
@@ -342,8 +346,7 @@ public class SIRScheduler implements Constants {
         // add a method to <flatClass>
         flatClass.addMethod(
                             new JMethodDeclaration( /* tokref     */ null,
-                                                    /* modifiers  */ at.dms.kjc.
-                                                    Constants.ACC_PUBLIC,
+                                                    /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                                     /* returntype */ CStdType.Void,
                                                     /* identifier */ "main",
                                                     /* parameters */ JFormalParameter.EMPTY,
@@ -455,8 +458,7 @@ public class SIRScheduler implements Constants {
         // build the method declaration to return
         JMethodDeclaration result = 
             new JMethodDeclaration( /* tokref     */ null,
-                                    /* modifiers  */ at.dms.kjc.
-                                    Constants.ACC_PUBLIC,
+                                    /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                     /* returntype */ CStdType.Void,
                                     /* identifier */ LoweringConstants.
                                     getAnonWorkName(),

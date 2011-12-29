@@ -50,7 +50,8 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
     /**
      * Returns the output type of this.
      */
-    public CType getOutputType() {
+    @Override
+	public CType getOutputType() {
         // output type is output type of last element in list
         return get(size()-1).getOutputType();
     }
@@ -58,7 +59,8 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
     /**
      * Returns the input type of this.
      */
-    public CType getInputType() {
+    @Override
+	public CType getInputType() {
         // input type is input type of first element of the list
         return get(0).getInputType();
     }
@@ -66,16 +68,19 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
     /**
      * Returns the type of this stream.
      */
-    public LIRStreamType getStreamType() {
+    @Override
+	public LIRStreamType getStreamType() {
         return LIRStreamType.LIR_PIPELINE;
     }
 
-    public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
+    @Override
+	public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
         // the pipeline pushes what the last element pushes
         return get(size()-1).getPushForSchedule(counts);
     }
 
-    public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
+    @Override
+	public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
         // the pipeline pops what the first item pops
         return get(0).getPopForSchedule(counts);
     }
@@ -133,7 +138,8 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
      * representing a tape from the first element of each tuple to the
      * second.
      */
-    public List<SIROperator[]> getTapePairs() {
+    @Override
+	public List<SIROperator[]> getTapePairs() {
         // construct result
         LinkedList<SIROperator[]> result = new LinkedList<SIROperator[]>();
         // go through list of children
@@ -150,7 +156,8 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
     /**
      * See documentation in SIRContainer.
      */
-    public void replace(SIRStream oldStr, SIRStream newStr) {
+    @Override
+	public void replace(SIRStream oldStr, SIRStream newStr) {
         int index = myChildren().indexOf(oldStr);
         assert index!=-1:
             "Trying to replace with bad parameters, since " + this +
@@ -183,14 +190,16 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
     /**
      * Accepts attribute visitor <v> at this node.
      */
-    public Object accept(AttributeStreamVisitor v) {
+    @Override
+	public Object accept(AttributeStreamVisitor v) {
         return v.visitPipeline(this,
                                fields,
                                methods,
                                init);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "SIRPipeline name=" + getName();
     }
 
@@ -198,7 +207,8 @@ public class SIRPipeline extends SIRContainer implements Cloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRPipeline other = new at.dms.kjc.sir.SIRPipeline();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

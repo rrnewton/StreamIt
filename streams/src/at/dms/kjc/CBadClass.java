@@ -53,7 +53,8 @@ public class CBadClass extends CClass {
      * @param   from    an other CClass
      * @return  true if this class inherit from "from" or equals "from"
      */
-    public boolean descendsFrom(CClass from) {
+    @Override
+	public boolean descendsFrom(CClass from) {
         return false;
     }
 
@@ -61,7 +62,8 @@ public class CBadClass extends CClass {
      * @param   ident       the name of the field
      * @return  the field
      */
-    public final CField getField(String ident) {
+    @Override
+	public final CField getField(String ident) {
         return null;
     }
 
@@ -78,7 +80,8 @@ public class CBadClass extends CClass {
      * @param   caller      the class of the caller
      * @param   name        a TypeName (6.5.2)
      */
-    public CClass lookupClass(CClass caller, String name) {
+    @Override
+	public CClass lookupClass(CClass caller, String name) {
         return null;
     }
 
@@ -102,7 +105,8 @@ public class CBadClass extends CClass {
      * @param   params      method parameters
      * @exception UnpositionedError this error will be positioned soon
      */
-    public CMethod[] lookupSuperMethod(String name, CType[] params) {
+    @Override
+	public CMethod[] lookupSuperMethod(String name, CType[] params) {
         return new CMethod[0];
     }
 
@@ -120,14 +124,16 @@ public class CBadClass extends CClass {
     /**
      * @return  true if this member is accessible
      */
-    public boolean isAccessible(CClass from) {
+    @Override
+	public boolean isAccessible(CClass from) {
         return false;
     }
 
     /**
      * Returns a list of abstract methods
      */
-    public CMethod[] getAbstractMethods() {
+    @Override
+	public CMethod[] getAbstractMethods() {
         return new CMethod[0];
     }
 
@@ -164,7 +170,8 @@ public class CBadClass extends CClass {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CBadClass other = new at.dms.kjc.CBadClass();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

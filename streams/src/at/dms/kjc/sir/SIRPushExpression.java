@@ -74,14 +74,16 @@ public class SIRPushExpression extends JExpression {
     /**
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Void;
     }
 
     /**
      * must be CStdType.Void (Not really an expression...).
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         assert type == CStdType.Void;
     }
 
@@ -97,7 +99,8 @@ public class SIRPushExpression extends JExpression {
     /**
      * Returns true iff this expression can be used as a statement (JLS 14.8)
      */
-    public boolean isStatementExpression() {
+    @Override
+	public boolean isStatementExpression() {
         return true;
     }
 
@@ -108,7 +111,8 @@ public class SIRPushExpression extends JExpression {
     /**
      * Throws an exception (NOT SUPPORTED YET)
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         at.dms.util.Utils.fail("Analysis of SIR nodes not supported yet.");
         return this;
     }
@@ -120,7 +124,8 @@ public class SIRPushExpression extends JExpression {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitPushExpression(this, tapeType, arg);
         } else {
@@ -133,7 +138,8 @@ public class SIRPushExpression extends JExpression {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitPushExpression(this,
                                                                  tapeType,
@@ -161,14 +167,16 @@ public class SIRPushExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         at.dms.util.Utils.fail("Codegen of SIR nodes not supported yet.");
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRPushExpression other = new at.dms.kjc.sir.SIRPushExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -57,7 +57,8 @@ public class Pipeline
 
     LatencyEdge connectingLatencyEdges[];
 
-    public void initiateConstrained()
+    @Override
+	public void initiateConstrained()
     {
         // register all children
         for (int nChild = 0; nChild < getNumChildren(); nChild++)
@@ -102,23 +103,27 @@ public class Pipeline
         return (StreamInterface)child;
     }
 
-    public LatencyNode getBottomLatencyNode()
+    @Override
+	public LatencyNode getBottomLatencyNode()
     {
         return getConstrainedChild(getNumChildren() - 1)
             .getBottomLatencyNode();
     }
 
-    public LatencyNode getTopLatencyNode()
+    @Override
+	public LatencyNode getTopLatencyNode()
     {
         return getConstrainedChild(0).getTopLatencyNode();
     }
 
-    public StreamInterface getTopConstrainedStream()
+    @Override
+	public StreamInterface getTopConstrainedStream()
     {
         return getConstrainedChild(0).getTopConstrainedStream();
     }
 
-    public StreamInterface getBottomConstrainedStream()
+    @Override
+	public StreamInterface getBottomConstrainedStream()
     {
         return getConstrainedChild(getNumChildren() - 1)
             .getBottomConstrainedStream();
@@ -127,7 +132,8 @@ public class Pipeline
     OMap portal2sdep = new OMap();
     OMap portal2restrictionPair = new OMap();
 
-    public void registerConstraint(P2PPortal portal)
+    @Override
+	public void registerConstraint(P2PPortal portal)
     {
         int minLatency = portal.getMinLatency();
         int maxLatency = portal.getMaxLatency();
@@ -170,7 +176,8 @@ public class Pipeline
     // some restrictions
     final DLList initRestrictedChildren = new DLList();
 
-    public void initializeRestrictions(Restrictions _restrictions)
+    @Override
+	public void initializeRestrictions(Restrictions _restrictions)
     {
         restrictions = _restrictions;
 
@@ -252,7 +259,8 @@ public class Pipeline
         }
     }
 
-    public void initRestrictionsCompleted(P2PPortal portal)
+    @Override
+	public void initRestrictionsCompleted(P2PPortal portal)
     {
         // first decrease the current count of restrictions
         numInitialRestrictions--;
@@ -285,7 +293,8 @@ public class Pipeline
                                       new Pair(upstreamRestriction, downstreamRestriction));
     }
 
-    public boolean isDoneInitializing()
+    @Override
+	public boolean isDoneInitializing()
     {
         if (numInitialRestrictions != 0)
             return false;
@@ -310,7 +319,8 @@ public class Pipeline
     final DLList steadyStateRestrictedChildren = new DLList();
     boolean checkForAllMessagesNow = false;
 
-    public void createSteadyStateRestrictions(int streamNumExecs)
+    @Override
+	public void createSteadyStateRestrictions(int streamNumExecs)
     {
         for (int nChild = 0; nChild < getNumChildren(); nChild++)
             {
@@ -329,12 +339,14 @@ public class Pipeline
         checkForAllMessagesNow = true;
     }
 
-    public void doneSteadyState(LatencyNode node)
+    @Override
+	public void doneSteadyState(LatencyNode node)
     {
         ERROR("Pipelines do not own any nodes to have steady state!");
     }
 
-    public boolean isDoneSteadyState()
+    @Override
+	public boolean isDoneSteadyState()
     {
         while (!steadyStateRestrictedChildren.empty())
             {
@@ -357,14 +369,16 @@ public class Pipeline
 
     final DLList newlyBlockedRestrictions = new DLList();
 
-    public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
+    @Override
+	public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
     {
         newlyBlockedRestrictions.pushBack(restriction);
     }
 
     int internalDataAvailable[];
 
-    public PhasingSchedule getNextPhase(
+    @Override
+	public PhasingSchedule getNextPhase(
                                         Restrictions restrs,
                                         int nDataAvailable)
     {
@@ -442,7 +456,8 @@ public class Pipeline
         return phase;
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         restrictions = new Restrictions();
         initializeRestrictions(restrictions);

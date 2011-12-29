@@ -120,7 +120,8 @@ abstract public class FeedbackLoop extends StreamWithSplitNJoin
      * @return fan-out of a splitter
      */
 
-    public int getSplitFanOut()
+    @Override
+	public int getSplitFanOut()
     {
         return 2;
     }
@@ -130,7 +131,8 @@ abstract public class FeedbackLoop extends StreamWithSplitNJoin
      * @return fan-in of a joiner
      */
 
-    public int getJoinFanIn()
+    @Override
+	public int getJoinFanIn()
     {
         return 2;
     }
@@ -302,13 +304,15 @@ abstract public class FeedbackLoop extends StreamWithSplitNJoin
         }
     }
     
-    public int getNumNodes () 
+    @Override
+	public int getNumNodes () 
     { 
         int nodes = 2 + body.getNumNodes () + loop.getNumNodes();
         return nodes;
     }
     
-    public int getNumNodeFirings() 
+    @Override
+	public int getNumNodeFirings() 
     {
         int firings = 0;
         firings += body.getNumNodeFirings ();

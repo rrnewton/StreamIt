@@ -83,7 +83,8 @@ public abstract class CClass extends CMember {
     /**
      * @return  the interface
      */
-    public CClass getCClass() {
+    @Override
+	public CClass getCClass() {
         return this;
     }
 
@@ -146,7 +147,8 @@ public abstract class CClass extends CMember {
     /**
      * @return the full name of this class
      */
-    public String getQualifiedName() {
+    @Override
+	public String getQualifiedName() {
         return qualifiedName;
     }
 
@@ -298,7 +300,8 @@ public abstract class CClass extends CMember {
     /**
      * Returns a string representation of this class.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return qualifiedName;
     }
 
@@ -715,7 +718,8 @@ public abstract class CClass extends CMember {
      *
      * @return  true iff this member is accessible
      */
-    public boolean isAccessible(CClass from) {
+    @Override
+	public boolean isAccessible(CClass from) {
         if (!isNested()) {
             // JLS 6.6.1
             // If a TOP LEVEL class or interface type is declared public, then it
@@ -809,7 +813,8 @@ public abstract class CClass extends CMember {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CClass other) {

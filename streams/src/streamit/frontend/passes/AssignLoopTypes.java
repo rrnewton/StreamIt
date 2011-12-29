@@ -54,7 +54,8 @@ public class AssignLoopTypes extends FEReplacer
     // Detected loop and body stream type; used by nested visitor classes
     private StreamType theLoop, theBody;
     
-    public Object visitProgram(Program prog)
+    @Override
+	public Object visitProgram(Program prog)
     {
         // init:
         toplevels = new HashMap<String, StreamType>();
@@ -76,7 +77,8 @@ public class AssignLoopTypes extends FEReplacer
         return result;
     }
 
-    public Object visitStreamSpec(StreamSpec ss)
+    @Override
+	public Object visitStreamSpec(StreamSpec ss)
     {
         // Recurse.
         ss = (StreamSpec)super.visitStreamSpec(ss);
@@ -108,12 +110,14 @@ public class AssignLoopTypes extends FEReplacer
         theLoop = null;
         theBody = null;
         ss.accept(new FEReplacer() {
-                public Object visitStmtBody(StmtBody stmt)
+                @Override
+				public Object visitStmtBody(StmtBody stmt)
                 {
                     noticeChildStream(stmt.getCreator(), false);
                     return stmt; // not recursing
                 }
-                public Object visitStmtLoop(StmtLoop stmt)
+                @Override
+				public Object visitStmtLoop(StmtLoop stmt)
                 {
                     noticeChildStream(stmt.getCreator(), true);
                     return stmt; // not recursing

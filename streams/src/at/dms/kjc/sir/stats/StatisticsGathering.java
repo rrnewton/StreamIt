@@ -51,6 +51,7 @@ public class StatisticsGathering {
 	/**
 	 * Reset for new filter.
 	 */
+	@Override
 	void reset() {
 	    for (int i=0; i<peek.length; i++) {
 		peek[i] = 0;
@@ -63,6 +64,7 @@ public class StatisticsGathering {
 	/**
 	 * Report to screen (should be to file, probably in excel format, eventually.)
 	 */
+	@Override
 	void report() {
 	    System.err.println("For filter " + filter.getName() + ", found:");
 	    for (int i=0; i<3; i++) {
@@ -75,6 +77,7 @@ public class StatisticsGathering {
 	/**
 	 * Keep track of control flow counter.
 	 */
+	@Override
 	public void visitForStatement(JForStatement self,
 				      JStatement init,
 				      JExpression cond,
@@ -94,6 +97,7 @@ public class StatisticsGathering {
 	    numControl--;
 	}
 
+	@Override
 	public void visitDoStatement(JDoStatement self,
 				     JExpression cond,
 				     JStatement body) {
@@ -103,6 +107,7 @@ public class StatisticsGathering {
 	    cond.accept(this);
 	}
 
+	@Override
 	public void visitWhileStatement(JWhileStatement self,
 					JExpression cond,
 					JStatement body) {
@@ -112,6 +117,7 @@ public class StatisticsGathering {
 	    numControl--;
 	}
 
+	@Override
 	public void visitIfStatement(JIfStatement self,
 				     JExpression cond,
 				     JStatement thenClause,
@@ -128,6 +134,7 @@ public class StatisticsGathering {
 	/**
 	 * Count different kinds of push, pop, peek.
 	 */
+	@Override
 	public void visitPushExpression(SIRPushExpression self,
 					CType tapeType,
 					JExpression arg) {
@@ -135,6 +142,7 @@ public class StatisticsGathering {
 	    push[Math.min(numControl,3)]++;
 	}
 
+	@Override
 	public void visitPeekExpression(SIRPeekExpression self,
 					CType tapeType,
 					JExpression arg) {
@@ -142,6 +150,7 @@ public class StatisticsGathering {
 	    peek[Math.min(numControl,3)]++;
 	}
 
+	@Override
 	public void visitPopExpression(SIRPopExpression self,
 				       CType tapeType) {
 	    super.visitPopExpression(self, tapeType);
@@ -166,7 +175,8 @@ public class StatisticsGathering {
 	public void doit(SIRStream str) {
 	    final FilterWorkVisitor me = this;
 	    IterFactory.createFactory().createIter(str).accept((new EmptyStreamVisitor() {
-		    public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+		    @Override
+			public void visitFilter(SIRFilter self, SIRFilterIter iter) {
 			me.filter = self;
 			if (self.needsWork()) {
 			    me.reset();

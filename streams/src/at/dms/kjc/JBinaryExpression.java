@@ -57,11 +57,13 @@ public abstract class JBinaryExpression extends JExpression {
     /**
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return type;
     }
 
-    public void setType(CType t) {
+    @Override
+	public void setType(CType t) {
         this.type = t;
     }
 
@@ -101,7 +103,8 @@ public abstract class JBinaryExpression extends JExpression {
      * This method helps to handle heavy optimizables conditions
      * @param   code        the code list
      */
-    public void genBranch(boolean cond, CodeSequence code, CodeLabel label) {
+    @Override
+	public void genBranch(boolean cond, CodeSequence code, CodeLabel label) {
         genBranch(left, right, cond, code, label);
     }
 
@@ -157,7 +160,8 @@ public abstract class JBinaryExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.JBinaryExpression other) {

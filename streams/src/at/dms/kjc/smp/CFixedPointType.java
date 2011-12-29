@@ -14,7 +14,8 @@ public class CFixedPointType extends CIntType {
     /**
      * Returns a string representation of this type.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "fixed";
     }
     

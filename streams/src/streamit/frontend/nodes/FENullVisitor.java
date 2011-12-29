@@ -29,59 +29,114 @@ package streamit.frontend.nodes;
  */
 public class FENullVisitor implements FEVisitor
 {
-    public Object visitExprArray(ExprArray exp) { return null; }
-    public Object visitExprArrayInit(ExprArrayInit exp) { return null; }
-    public Object visitExprBinary(ExprBinary exp) { return null; }
-    public Object visitExprComplex(ExprComplex exp) { return null; }
-    public Object visitExprComposite(ExprComposite exp) { return null; }
-    public Object visitExprConstBoolean(ExprConstBoolean exp) { return null; }
-    public Object visitExprConstChar(ExprConstChar exp) { return null; }
-    public Object visitExprConstFloat(ExprConstFloat exp) { return null; }
-    public Object visitExprConstInt(ExprConstInt exp) { return null; }
-    public Object visitExprConstStr(ExprConstStr exp) { return null; }
-    public Object visitExprDynamicToken(ExprDynamicToken exp) { return null; }
-    public Object visitExprField(ExprField exp) { return null; }
-    public Object visitExprFunCall(ExprFunCall exp) { return null; }
-    public Object visitExprHelperCall(ExprHelperCall exp) { return null; }
+    @Override
+	public Object visitExprArray(ExprArray exp) { return null; }
+    @Override
+	public Object visitExprArrayInit(ExprArrayInit exp) { return null; }
+    @Override
+	public Object visitExprBinary(ExprBinary exp) { return null; }
+    @Override
+	public Object visitExprComplex(ExprComplex exp) { return null; }
+    @Override
+	public Object visitExprComposite(ExprComposite exp) { return null; }
+    @Override
+	public Object visitExprConstBoolean(ExprConstBoolean exp) { return null; }
+    @Override
+	public Object visitExprConstChar(ExprConstChar exp) { return null; }
+    @Override
+	public Object visitExprConstFloat(ExprConstFloat exp) { return null; }
+    @Override
+	public Object visitExprConstInt(ExprConstInt exp) { return null; }
+    @Override
+	public Object visitExprConstStr(ExprConstStr exp) { return null; }
+    @Override
+	public Object visitExprDynamicToken(ExprDynamicToken exp) { return null; }
+    @Override
+	public Object visitExprField(ExprField exp) { return null; }
+    @Override
+	public Object visitExprFunCall(ExprFunCall exp) { return null; }
+    @Override
+	public Object visitExprHelperCall(ExprHelperCall exp) { return null; }
+	@Override
 	public Object visitExprIter(ExprIter exprIter) { return null; }
-    public Object visitExprPeek(ExprPeek exp) { return null; }
-    public Object visitExprPop(ExprPop exp) { return null; }
-    public Object visitExprRange(ExprRange exp) { return null; }
-    public Object visitExprTernary(ExprTernary exp) { return null; }
-    public Object visitExprTypeCast(ExprTypeCast exp) { return null; }
-    public Object visitExprUnary(ExprUnary exp) { return null; }
-    public Object visitExprVar(ExprVar exp) { return null; }
-    public Object visitFieldDecl(FieldDecl field) { return null; }
-    public Object visitFunction(Function func) { return null; }
-    public Object visitFuncWork(FuncWork func) { return null; }
-    public Object visitProgram(Program prog) { return null; }
-    public Object visitSCAnon(SCAnon creator) { return null; }
-    public Object visitSCSimple(SCSimple creator) { return null; }
-    public Object visitSJDuplicate(SJDuplicate sj) { return null; }
-    public Object visitSJRoundRobin(SJRoundRobin sj) { return null; }
-    public Object visitSJWeightedRR(SJWeightedRR sj) { return null; }
-    public Object visitStmtAdd(StmtAdd stmt) { return null; }
-    public Object visitStmtAssign(StmtAssign stmt) { return null; }
-    public Object visitStmtBlock(StmtBlock stmt) { return null; }
-    public Object visitStmtBody(StmtBody stmt) { return null; }
-    public Object visitStmtBreak(StmtBreak stmt) { return null; }
-    public Object visitStmtContinue(StmtContinue stmt) { return null; }
-    public Object visitStmtDoWhile(StmtDoWhile stmt) { return null; }
-    public Object visitStmtEmpty(StmtEmpty stmt) { return null; }
-    public Object visitStmtEnqueue(StmtEnqueue stmt) { return null; }
-    public Object visitStmtExpr(StmtExpr stmt) { return null; }
-    public Object visitStmtFor(StmtFor stmt) { return null; }
-    public Object visitStmtIfThen(StmtIfThen stmt) { return null; }
-    public Object visitStmtJoin(StmtJoin stmt) { return null; }
-    public Object visitStmtLoop(StmtLoop stmt) { return null; }
-    public Object visitStmtPush(StmtPush stmt) { return null; }
-    public Object visitStmtReturn(StmtReturn stmt) { return null; }
-    public Object visitStmtSendMessage(StmtSendMessage stmt) { return null; }
-    public Object visitStmtHelperCall(StmtHelperCall stmt) { return null; }
-    public Object visitStmtSplit(StmtSplit stmt) { return null; }
-    public Object visitStmtVarDecl(StmtVarDecl stmt) { return null; }
-    public Object visitStmtWhile(StmtWhile stmt) { return null; }
-    public Object visitStreamSpec(StreamSpec spec) { return null; }
-    public Object visitStreamType(StreamType type) { return null; }
-    public Object visitOther(FENode node) { return null; }
+    @Override
+	public Object visitExprPeek(ExprPeek exp) { return null; }
+    @Override
+	public Object visitExprPop(ExprPop exp) { return null; }
+    @Override
+	public Object visitExprRange(ExprRange exp) { return null; }
+    @Override
+	public Object visitExprTernary(ExprTernary exp) { return null; }
+    @Override
+	public Object visitExprTypeCast(ExprTypeCast exp) { return null; }
+    @Override
+	public Object visitExprUnary(ExprUnary exp) { return null; }
+    @Override
+	public Object visitExprVar(ExprVar exp) { return null; }
+    @Override
+	public Object visitFieldDecl(FieldDecl field) { return null; }
+    @Override
+	public Object visitFunction(Function func) { return null; }
+    @Override
+	public Object visitFuncWork(FuncWork func) { return null; }
+    @Override
+	public Object visitProgram(Program prog) { return null; }
+    @Override
+	public Object visitSCAnon(SCAnon creator) { return null; }
+    @Override
+	public Object visitSCSimple(SCSimple creator) { return null; }
+    @Override
+	public Object visitSJDuplicate(SJDuplicate sj) { return null; }
+    @Override
+	public Object visitSJRoundRobin(SJRoundRobin sj) { return null; }
+    @Override
+	public Object visitSJWeightedRR(SJWeightedRR sj) { return null; }
+    @Override
+	public Object visitStmtAdd(StmtAdd stmt) { return null; }
+    @Override
+	public Object visitStmtAssign(StmtAssign stmt) { return null; }
+    @Override
+	public Object visitStmtBlock(StmtBlock stmt) { return null; }
+    @Override
+	public Object visitStmtBody(StmtBody stmt) { return null; }
+    @Override
+	public Object visitStmtBreak(StmtBreak stmt) { return null; }
+    @Override
+	public Object visitStmtContinue(StmtContinue stmt) { return null; }
+    @Override
+	public Object visitStmtDoWhile(StmtDoWhile stmt) { return null; }
+    @Override
+	public Object visitStmtEmpty(StmtEmpty stmt) { return null; }
+    @Override
+	public Object visitStmtEnqueue(StmtEnqueue stmt) { return null; }
+    @Override
+	public Object visitStmtExpr(StmtExpr stmt) { return null; }
+    @Override
+	public Object visitStmtFor(StmtFor stmt) { return null; }
+    @Override
+	public Object visitStmtIfThen(StmtIfThen stmt) { return null; }
+    @Override
+	public Object visitStmtJoin(StmtJoin stmt) { return null; }
+    @Override
+	public Object visitStmtLoop(StmtLoop stmt) { return null; }
+    @Override
+	public Object visitStmtPush(StmtPush stmt) { return null; }
+    @Override
+	public Object visitStmtReturn(StmtReturn stmt) { return null; }
+    @Override
+	public Object visitStmtSendMessage(StmtSendMessage stmt) { return null; }
+    @Override
+	public Object visitStmtHelperCall(StmtHelperCall stmt) { return null; }
+    @Override
+	public Object visitStmtSplit(StmtSplit stmt) { return null; }
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt) { return null; }
+    @Override
+	public Object visitStmtWhile(StmtWhile stmt) { return null; }
+    @Override
+	public Object visitStreamSpec(StreamSpec spec) { return null; }
+    @Override
+	public Object visitStreamType(StreamType type) { return null; }
+    @Override
+	public Object visitOther(FENode node) { return null; }
 }

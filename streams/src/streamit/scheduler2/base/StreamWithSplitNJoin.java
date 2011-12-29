@@ -160,23 +160,27 @@ abstract public class StreamWithSplitNJoin
             }
     }
 
-    public SplitFlow getSteadySplitFlow()
+    @Override
+	public SplitFlow getSteadySplitFlow()
     {
         return steadySplitFlow;
     }
 
-    public JoinFlow getSteadyJoinFlow()
+    @Override
+	public JoinFlow getSteadyJoinFlow()
     {
         return steadyJoinFlow;
     }
 
-    public SplitFlow getSplitFlow(int nPhase)
+    @Override
+	public SplitFlow getSplitFlow(int nPhase)
     {
         assert nPhase >= 0;
         return splitFlow[nPhase];
     }
 
-    public JoinFlow getJoinFlow(int nPhase)
+    @Override
+	public JoinFlow getJoinFlow(int nPhase)
     {
         assert nPhase >= 0;
         return joinFlow[nPhase];

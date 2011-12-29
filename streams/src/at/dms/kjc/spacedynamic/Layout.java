@@ -141,7 +141,8 @@ public class Layout extends at.dms.util.Utils implements StreamGraphVisitor,
      * visit each node of the ssg and find out which flatnodes should be
      * assigned to tiles
      **************************************************************************/
-    public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
+    @Override
+	public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
         ssg.getTopLevel().accept(this, new HashSet<FlatNode>(), false);
     }
 
@@ -1107,7 +1108,7 @@ public class Layout extends at.dms.util.Utils implements StreamGraphVisitor,
         double R = random.nextDouble();
 
         if (e_new >= e_old)
-            P = Math.exp((((double) e_old) - ((double) e_new)) / T);
+            P = Math.exp((e_old - e_new) / T);
 
         if (R < P) {
             return true;
@@ -1206,7 +1207,8 @@ public class Layout extends at.dms.util.Utils implements StreamGraphVisitor,
     }
     
     /** visit each flatnode and decide whether is should be assigned * */
-    public void visitNode(FlatNode node) {
+    @Override
+	public void visitNode(FlatNode node) {
         if (node.isFilter()) {
             // create an entry in the memory foot print map
             memoryFP.put(node, new Integer(DataEstimate

@@ -368,13 +368,15 @@ public class TapeCluster extends TapeBase implements Tape {
       return s.toString();
     }
 
-    public String pushManyItems(String sourceBuffer, int sourceOffset, int numItems) {
+    @Override
+	public String pushManyItems(String sourceBuffer, int sourceOffset, int numItems) {
         StringBuffer s = new StringBuffer();
         s.append(producer_name + ".push_items(&" + sourceBuffer + "[" + sourceOffset + "], " + numItems + ");");
         return s.toString();
     }
 
-    public String popManyItems(String destBuffer, int destOffset, int numItems) {
+    @Override
+	public String popManyItems(String destBuffer, int destOffset, int numItems) {
         StringBuffer s = new StringBuffer();
         s.append("    " + consumer_name + ".pop_items(&" + destBuffer + "[" + destOffset + "], " + numItems + ");\n");
         return s.toString();
@@ -595,7 +597,8 @@ public class TapeCluster extends TapeBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#topOfWorkIteration(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public String topOfWorkIteration() {
+    @Override
+	public String topOfWorkIteration() {
         return "// topOfWorkIteration " + tapeName + "\n";
     }
     
@@ -603,7 +606,8 @@ public class TapeCluster extends TapeBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#upstreamCleanup()
      */
-    public String upstreamCleanup() {
+    @Override
+	public String upstreamCleanup() {
         return null;
 //  Eventually put cleanup into CLusterCodeGenerator but
 // not yet.
@@ -615,7 +619,8 @@ public class TapeCluster extends TapeBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#downstreamCleanup()
      */
-    public String downstreamCleanup() {
+    @Override
+	public String downstreamCleanup() {
         return 
         consumer_name + ".delete_socket_obj();\n";
     }
@@ -645,11 +650,13 @@ public class TapeCluster extends TapeBase implements Tape {
         return consumer_name + ".pop()";
     }
 
-    public String popExprNoCleanup() {
+    @Override
+	public String popExprNoCleanup() {
         return popExpr();
     }
     
-    public String popExprCleanup() {
+    @Override
+	public String popExprCleanup() {
         return "";
     }
     
@@ -684,20 +691,23 @@ public class TapeCluster extends TapeBase implements Tape {
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushbackInit(int)
      */
-    public String pushbackInit(int numberToPushBack) {
+    @Override
+	public String pushbackInit(int numberToPushBack) {
         return consumer_name + ".start_push(" + numberToPushBack + ");\n";
     }
     /*
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushbackPrefix()
      */
-    public String pushbackPrefix() {
+    @Override
+	public String pushbackPrefix() {
         return consumer_name + ".push(";
     }
     /*
      * 
      */
-    public String pushbackSuffix() {
+    @Override
+	public String pushbackSuffix() {
         return ")";
     }
     
@@ -705,11 +715,13 @@ public class TapeCluster extends TapeBase implements Tape {
      *  (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushbackCleanup()
      */
-    public String pushbackCleanup() {
+    @Override
+	public String pushbackCleanup() {
         return "";
     }
     
-    public String assignPopToVar(String varName) {
+    @Override
+	public String assignPopToVar(String varName) {
         if (type instanceof CArrayType) {
             return "memcpy(" + varName
             + ", " + pop_name + "(), " + "sizeof(" + varName + "));\n";
@@ -718,7 +730,8 @@ public class TapeCluster extends TapeBase implements Tape {
         }
     }
     
-    public String assignPeekToVar(String varName, String offset) {
+    @Override
+	public String assignPeekToVar(String varName, String offset) {
         if (type instanceof CArrayType) {
             return "memcpy(" + varName
             + ", " + peek_name + "(" + offset + "), " + "sizeof(" + varName + "));\n";

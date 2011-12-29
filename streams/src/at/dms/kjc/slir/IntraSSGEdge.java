@@ -40,7 +40,8 @@ public class IntraSSGEdge<S extends InternalFilterNode,T extends InternalFilterN
     	super();
     }
 
-    public CType getType() {
+    @Override
+	public CType getType() {
         if (type != null) {
             return type;
         }
@@ -82,7 +83,8 @@ public class IntraSSGEdge<S extends InternalFilterNode,T extends InternalFilterN
     }
 
 
-    public String toString() {
+    @Override
+	public String toString() {
         return src + "->" + dst + "(" + hashCode() + ")";
     }
     /**
@@ -119,7 +121,8 @@ public class IntraSSGEdge<S extends InternalFilterNode,T extends InternalFilterN
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.IntraSSGEdge other = new at.dms.kjc.slir.IntraSSGEdge();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

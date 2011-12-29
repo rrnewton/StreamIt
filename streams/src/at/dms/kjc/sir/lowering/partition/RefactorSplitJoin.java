@@ -217,11 +217,13 @@ public class RefactorSplitJoin {
         Lifter.lift(str);
         // make all splitjoins rectangular and add synchronization
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
+                @Override
+				public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
                     super.preVisitSplitJoin(self, iter);
                     self.makeRectangular();
                 }
-                public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
+                @Override
+				public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
                     super.postVisitSplitJoin(self, iter);
                     // don't need to do anything if only one level in <pre>self</pre>
                     if (self.getRectangularHeight()>1) {
@@ -302,7 +304,7 @@ public class RefactorSplitJoin {
             if (i==0) {
                 split = (sj.getSplitter().getType()==SIRSplitType.DUPLICATE ? 
                          SIRSplitter.create(newSJ, SIRSplitType.DUPLICATE, sj.size()) :
-                         SIRSplitter.createWeightedRR(newSJ, (JExpression[])sj.getSplitter().getInternalWeights().clone()));
+                         SIRSplitter.createWeightedRR(newSJ, sj.getSplitter().getInternalWeights().clone()));
             } else {
                 JExpression[] weights = new JExpression[sj.size()];
                 for (int j=0; j<sj.size(); j++) {
@@ -312,7 +314,7 @@ public class RefactorSplitJoin {
             }
             SIRJoiner join;
             if (i==partition.size()-1) {
-                join = SIRJoiner.createWeightedRR(newSJ, (JExpression[])sj.getJoiner().getInternalWeights().clone());
+                join = SIRJoiner.createWeightedRR(newSJ, sj.getJoiner().getInternalWeights().clone());
             } else {
                 JExpression[] weights = new JExpression[sj.size()];
                 for (int j=0; j<sj.size(); j++) {

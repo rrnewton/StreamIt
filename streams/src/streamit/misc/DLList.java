@@ -35,7 +35,8 @@ public class DLList implements DLList_const
     /**
      * Make a copy of the list. This does NOT copy the elements!
      */
-    public DLList copy()
+    @Override
+	public DLList copy()
     {
         DLList other = new DLList();
 
@@ -52,7 +53,8 @@ public class DLList implements DLList_const
     /**
      * Returns the first element of a list. 
      */
-    public DLListIterator front()
+    @Override
+	public DLListIterator front()
     {
         return new DLListIterator(theList.nextElem);
     }
@@ -62,17 +64,20 @@ public class DLList implements DLList_const
      * The last element of a list is not actually a valid element, it is the
      * element beyond the last element.
      */
-    public DLListIterator back()
+    @Override
+	public DLListIterator back()
     {
         return new DLListIterator(theList);
     }
 
-    public DLListIterator begin()
+    @Override
+	public DLListIterator begin()
     {
         return new DLListIterator(theList.nextElem);
     }
 
-    public DLListIterator end()
+    @Override
+	public DLListIterator end()
     {
         return new DLListIterator(theList);
     }
@@ -148,7 +153,8 @@ public class DLList implements DLList_const
     /**
      * Returns true iff the list has no elements in it
      */
-    public boolean empty()
+    @Override
+	public boolean empty()
     {
         return theList.nextElem == theList;
     }

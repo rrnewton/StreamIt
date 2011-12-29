@@ -345,7 +345,8 @@ public class DynamicProgPartitioner extends ListPartitioner {
     private SIRStream fuseIdentities(SIRStream str) {
         final HashSet<SIRStream> allIdentities = new HashSet<SIRStream>();
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void postVisitStream(SIRStream self,
+                @Override
+				public void postVisitStream(SIRStream self,
                                             SIRIterator iter) {
                     if (self instanceof SIRFilter) {
                         // for filters, add if an identity
@@ -407,7 +408,8 @@ public class DynamicProgPartitioner extends ListPartitioner {
             // sort the partitions by work
             Collections.sort(partitions,
                              new Comparator<PartitionRecord>() {
-                public int compare(PartitionRecord p1, PartitionRecord p2) {
+                @Override
+				public int compare(PartitionRecord p1, PartitionRecord p2) {
                     if (p1.getWork() < p2.getWork()) return -1;
                     if (p1.getWork() > p2.getWork()) return 1;
                     return 0;
@@ -565,7 +567,8 @@ public class DynamicProgPartitioner extends ListPartitioner {
 
     class ConfigBuilder extends EmptyAttributeStreamVisitor {
 
-        public Object visitSplitJoin(SIRSplitJoin self,
+        @Override
+		public Object visitSplitJoin(SIRSplitJoin self,
                                      JFieldDeclaration[] fields,
                                      JMethodDeclaration[] methods,
                                      JMethodDeclaration init,
@@ -582,7 +585,8 @@ public class DynamicProgPartitioner extends ListPartitioner {
             }
         }
 
-        public Object visitPipeline(SIRPipeline self,
+        @Override
+		public Object visitPipeline(SIRPipeline self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init) {
@@ -591,7 +595,8 @@ public class DynamicProgPartitioner extends ListPartitioner {
         }
 
         /* pre-visit a feedbackloop */
-        public Object visitFeedbackLoop(SIRFeedbackLoop self,
+        @Override
+		public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                         JFieldDeclaration[] fields,
                                         JMethodDeclaration[] methods,
                                         JMethodDeclaration init,
@@ -600,7 +605,8 @@ public class DynamicProgPartitioner extends ListPartitioner {
             return makeConfig(self);
         }
 
-        public Object visitFilter(SIRFilter self,
+        @Override
+		public Object visitFilter(SIRFilter self,
                                   JFieldDeclaration[] fields,
                                   JMethodDeclaration[] methods,
                                   JMethodDeclaration init,

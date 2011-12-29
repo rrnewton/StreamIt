@@ -43,7 +43,8 @@ public class NumberDot extends StreamItDot
         }
     }
 
-    public Object visitFilter(SIRFilter self,
+    @Override
+	public Object visitFilter(SIRFilter self,
                               JFieldDeclaration[] fields,
                               JMethodDeclaration[] methods,
                               JMethodDeclaration init,
@@ -68,7 +69,8 @@ public class NumberDot extends StreamItDot
      * Prints out the subgraph cluser line that is needed in to make clusters. This method is overridden to make colored
      * pipelines and splitjoins in LinearDot.
      **/
-    public String getClusterString(SIRStream self) {
+    @Override
+	public String getClusterString(SIRStream self) {
         String qualified = self.getIdent()+"";
         int i = qualified.lastIndexOf(".");
         if (i>0) {

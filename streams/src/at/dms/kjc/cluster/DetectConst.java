@@ -105,7 +105,8 @@ public class DetectConst extends SLIREmptyVisitor {
     }
 
 
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -117,7 +118,8 @@ public class DetectConst extends SLIREmptyVisitor {
         this.visitBlockStatement(body, null);
     }
 
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -131,7 +133,8 @@ public class DetectConst extends SLIREmptyVisitor {
 
 
 
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
 
@@ -142,7 +145,8 @@ public class DetectConst extends SLIREmptyVisitor {
         }
     }
 
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
 
@@ -154,7 +158,8 @@ public class DetectConst extends SLIREmptyVisitor {
     }
 
 
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
 
@@ -177,7 +182,8 @@ public class DetectConst extends SLIREmptyVisitor {
 
 
 
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {

@@ -36,14 +36,16 @@ class QJump extends QVoid  {
     /**
      * isJump
      */
-    public boolean isJump() {
+    @Override
+	public boolean isJump() {
         return true;
     }
 
     /**
      * Returns this node a a jump
      */
-    public QJump getJump() {
+    @Override
+	public QJump getJump() {
         return this;
     }
 

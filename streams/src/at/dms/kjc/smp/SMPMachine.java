@@ -54,16 +54,19 @@ public class SMPMachine implements ComputeNodesI<SMPComputeCodeStore> {
         return ts;
     }
     
-    public boolean canAllocateNewComputeNode() {
+    @Override
+	public boolean canAllocateNewComputeNode() {
         return false;
     }
     
-    public Core getNthComputeNode(int n) {
+    @Override
+	public Core getNthComputeNode(int n) {
         assert !(n > numCores || n < 0) : "out of bounds in getNthComputeNode() of Machine";
         return cores[n];
     }
 
-    public boolean isValidComputeNodeNumber(int nodeNumber) {
+    @Override
+	public boolean isValidComputeNodeNumber(int nodeNumber) {
         if(nodeNumber >= 0 && nodeNumber < numCores)
             return true;
         
@@ -77,12 +80,14 @@ public class SMPMachine implements ComputeNodesI<SMPComputeCodeStore> {
         return -1;
     }
 
-    public int newComputeNode() {
+    @Override
+	public int newComputeNode() {
         assert false;
         return 0;
     }
 
-    public int size() {
+    @Override
+	public int size() {
         return numCores;
     }
 

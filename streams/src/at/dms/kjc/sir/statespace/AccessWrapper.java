@@ -49,7 +49,8 @@ abstract class AccessWrapper {
     }
 
     /** check identities. **/
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (o == null) {return false;}
         if (!(o instanceof AccessWrapper)) {return false;}
         // cast for convenience
@@ -62,7 +63,8 @@ abstract class AccessWrapper {
     }
 
     /** Return the hashcode from the string identity. **/
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return this.ident.hashCode();
     }
     /** returns the identity string of this access wrapper. **/

@@ -83,7 +83,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a compilation unit
      */
-    public void visitCompilationUnit(JCompilationUnit self,
+    @Override
+	public void visitCompilationUnit(JCompilationUnit self,
                                      JPackageName packageName,
                                      JPackageImport[] importedPackages,
                                      JClassImport[] importedClasses,
@@ -121,7 +122,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a class declaration
      */
-    public void visitClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitClassDeclaration(JClassDeclaration self,
                                       int modifiers,
                                       String ident,
                                       String superName,
@@ -155,7 +157,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      *
      */
-    public void visitClassBody(JTypeDeclaration[] decls,
+    @Override
+	public void visitClassBody(JTypeDeclaration[] decls,
                                JFieldDeclaration[] fields,
                                JMethodDeclaration[] methods,
                                JPhylum[] body) {
@@ -186,7 +189,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a class declaration
      */
-    public void visitInnerClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitInnerClassDeclaration(JClassDeclaration self,
                                            int modifiers,
                                            String ident,
                                            String superName,
@@ -214,7 +218,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an interface declaration
      */
-    public void visitInterfaceDeclaration(JInterfaceDeclaration self,
+    @Override
+	public void visitInterfaceDeclaration(JInterfaceDeclaration self,
                                           int modifiers,
                                           String ident,
                                           CClassType[] interfaces,
@@ -251,7 +256,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a field declaration
      */
-    public void visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public void visitFieldDeclaration(JFieldDeclaration self,
                                       int modifiers,
                                       CType type,
                                       String ident,
@@ -275,7 +281,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a method declaration
      */
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -327,7 +334,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a method declaration
      */
-    public void visitConstructorDeclaration(JConstructorDeclaration self,
+    @Override
+	public void visitConstructorDeclaration(JConstructorDeclaration self,
                                             int modifiers,
                                             String ident,
                                             JFormalParameter[] parameters,
@@ -369,7 +377,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a while statement
      */
-    public void visitWhileStatement(JWhileStatement self,
+    @Override
+	public void visitWhileStatement(JWhileStatement self,
                                     JExpression cond,
                                     JStatement body) {
         print("while (");
@@ -382,7 +391,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public void visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                   JVariableDefinition[] vars) {
         for (int i = 0; i < vars.length; i++) {
             vars[i].accept(this);
@@ -392,7 +402,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -411,7 +422,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a try-catch statement
      */
-    public void visitTryCatchStatement(JTryCatchStatement self,
+    @Override
+	public void visitTryCatchStatement(JTryCatchStatement self,
                                        JBlock tryClause,
                                        JCatchClause[] catchClauses) {
         print("try ");
@@ -424,7 +436,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a try-finally statement
      */
-    public void visitTryFinallyStatement(JTryFinallyStatement self,
+    @Override
+	public void visitTryFinallyStatement(JTryFinallyStatement self,
                                          JBlock tryClause,
                                          JBlock finallyClause) {
         print("try ");
@@ -438,7 +451,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a throw statement
      */
-    public void visitThrowStatement(JThrowStatement self,
+    @Override
+	public void visitThrowStatement(JThrowStatement self,
                                     JExpression expr) {
         print("throw ");
         expr.accept(this);
@@ -448,7 +462,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a synchronized statement
      */
-    public void visitSynchronizedStatement(JSynchronizedStatement self,
+    @Override
+	public void visitSynchronizedStatement(JSynchronizedStatement self,
                                            JExpression cond,
                                            JStatement body) {
         print("synchronized (");
@@ -460,7 +475,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a switch statement
      */
-    public void visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public void visitSwitchStatement(JSwitchStatement self,
                                      JExpression expr,
                                      JSwitchGroup[] body) {
         print("switch (");
@@ -476,7 +492,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a return statement
      */
-    public void visitReturnStatement(JReturnStatement self,
+    @Override
+	public void visitReturnStatement(JReturnStatement self,
                                      JExpression expr) {
         print("return");
         if (expr != null) {
@@ -489,7 +506,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a labeled statement
      */
-    public void visitLabeledStatement(JLabeledStatement self,
+    @Override
+	public void visitLabeledStatement(JLabeledStatement self,
                                       String label,
                                       JStatement stmt) {
         print(label + ":");
@@ -499,7 +517,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a if statement
      */
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause) {
@@ -525,7 +544,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -561,7 +581,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a compound statement
      */
-    public void visitCompoundStatement(JCompoundStatement self,
+    @Override
+	public void visitCompoundStatement(JCompoundStatement self,
                                        JStatement[] body) {
         visitCompoundStatement(body);
     }
@@ -594,7 +615,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an expression statement
      */
-    public void visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public void visitExpressionStatement(JExpressionStatement self,
                                          JExpression expr) {
         expr.accept(this);
         if (!forInit) {
@@ -605,7 +627,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an expression list statement
      */
-    public void visitExpressionListStatement(JExpressionListStatement self,
+    @Override
+	public void visitExpressionListStatement(JExpressionListStatement self,
                                              JExpression[] expr) {
         for (int i = 0; i < expr.length; i++) {
             if (i != 0) {
@@ -621,7 +644,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a empty statement
      */
-    public void visitEmptyStatement(JEmptyStatement self) {
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self) {
         newLine();
         print(";");
     }
@@ -629,7 +653,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a do statement
      */
-    public void visitDoStatement(JDoStatement self,
+    @Override
+	public void visitDoStatement(JDoStatement self,
                                  JExpression cond,
                                  JStatement body) {
         newLine();
@@ -644,7 +669,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a continue statement
      */
-    public void visitContinueStatement(JContinueStatement self,
+    @Override
+	public void visitContinueStatement(JContinueStatement self,
                                        String label) {
         newLine();
         print("continue");
@@ -657,7 +683,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a break statement
      */
-    public void visitBreakStatement(JBreakStatement self,
+    @Override
+	public void visitBreakStatement(JBreakStatement self,
                                     String label) {
         newLine();
         print("break");
@@ -670,7 +697,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an expression statement
      */
-    public void visitBlockStatement(JBlock self,
+    @Override
+	public void visitBlockStatement(JBlock self,
                                     JavaStyleComment[] comments) {
         print("{");
         pos += TAB_SIZE;
@@ -686,7 +714,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a type declaration statement
      */
-    public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
+    @Override
+	public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
                                               JTypeDeclaration decl) {
         decl.accept(this);
     }
@@ -698,7 +727,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an unary plus expression
      */
-    public void visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryPlusExpression(JUnaryExpression self,
                                          JExpression expr)
     {
         print("+");
@@ -708,7 +738,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an unary minus expression
      */
-    public void visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryMinusExpression(JUnaryExpression self,
                                           JExpression expr)
     {
         print("-");
@@ -718,7 +749,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a bitwise complement expression
      */
-    public void visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         print("~");
@@ -728,7 +760,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a logical complement expression
      */
-    public void visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitLogicalComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         print("!");
@@ -738,7 +771,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a type name expression
      */
-    public void visitTypeNameExpression(JTypeNameExpression self,
+    @Override
+	public void visitTypeNameExpression(JTypeNameExpression self,
                                         CType type) {
         print(type);
     }
@@ -746,7 +780,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a this expression
      */
-    public void visitThisExpression(JThisExpression self,
+    @Override
+	public void visitThisExpression(JThisExpression self,
                                     JExpression prefix) {
         if (prefix != null) {
             prefix.accept(this);
@@ -759,14 +794,16 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a super expression
      */
-    public void visitSuperExpression(JSuperExpression self) {
+    @Override
+	public void visitSuperExpression(JSuperExpression self) {
         print("super");
     }
 
     /**
      * prints a shift expression
      */
-    public void visitShiftExpression(JShiftExpression self,
+    @Override
+	public void visitShiftExpression(JShiftExpression self,
                                      int oper,
                                      JExpression left,
                                      JExpression right) {
@@ -784,7 +821,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a shift expressiona
      */
-    public void visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public void visitRelationalExpression(JRelationalExpression self,
                                           int oper,
                                           JExpression left,
                                           JExpression right) {
@@ -811,7 +849,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a prefix expression
      */
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         if (oper == OPE_PREINC) {
@@ -825,7 +864,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a postfix expression
      */
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         expr.accept(this);
@@ -839,7 +879,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a parenthesed expression
      */
-    public void visitParenthesedExpression(JParenthesedExpression self,
+    @Override
+	public void visitParenthesedExpression(JParenthesedExpression self,
                                            JExpression expr) {
         print("(");
         expr.accept(this);
@@ -849,7 +890,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * Prints an unqualified anonymous class instance creation expression.
      */
-    public void visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
+    @Override
+	public void visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
                                                 JExpression prefix,
                                                 String ident,
                                                 JExpression[] params,
@@ -865,7 +907,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * Prints an unqualified instance creation expression.
      */
-    public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
+    @Override
+	public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
                                                JExpression prefix,
                                                String ident,
                                                JExpression[] params)
@@ -879,7 +922,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * Prints an unqualified anonymous class instance creation expression.
      */
-    public void visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self,
+    @Override
+	public void visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self,
                                                   CClassType type,
                                                   JExpression[] params,
                                                   JClassDeclaration decl)
@@ -893,7 +937,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * Prints an unqualified instance creation expression.
      */
-    public void visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self,
+    @Override
+	public void visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self,
                                                  CClassType type,
                                                  JExpression[] params)
     {
@@ -905,7 +950,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array allocator expression
      */
-    public void visitNewArrayExpression(JNewArrayExpression self,
+    @Override
+	public void visitNewArrayExpression(JNewArrayExpression self,
                                         CType type,
                                         JExpression[] dims,
                                         JArrayInitializer init)
@@ -927,7 +973,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a name expression
      */
-    public void visitNameExpression(JNameExpression self,
+    @Override
+	public void visitNameExpression(JNameExpression self,
                                     JExpression prefix,
                                     String ident) {
         if (prefix != null) {
@@ -940,7 +987,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array allocator expression
      */
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right) {
@@ -954,7 +1002,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -975,7 +1024,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a local variable expression
      */
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident) {
         print(ident);
     }
@@ -983,7 +1033,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an instanceof expression
      */
-    public void visitInstanceofExpression(JInstanceofExpression self,
+    @Override
+	public void visitInstanceofExpression(JInstanceofExpression self,
                                           JExpression expr,
                                           CType dest) {
         expr.accept(this);
@@ -994,7 +1045,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an equality expression
      */
-    public void visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public void visitEqualityExpression(JEqualityExpression self,
                                         boolean equal,
                                         JExpression left,
                                         JExpression right) {
@@ -1006,7 +1058,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a conditional expression
      */
-    public void visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public void visitConditionalExpression(JConditionalExpression self,
                                            JExpression cond,
                                            JExpression left,
                                            JExpression right) {
@@ -1020,7 +1073,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a compound expression
      */
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {
@@ -1066,7 +1120,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident)
     {
@@ -1086,7 +1141,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a class expression
      */
-    public void visitClassExpression(JClassExpression self, CType type) {
+    @Override
+	public void visitClassExpression(JClassExpression self, CType type) {
         print(type);
         print(".class");
     }
@@ -1094,7 +1150,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a cast expression
      */
-    public void visitCastExpression(JCastExpression self,
+    @Override
+	public void visitCastExpression(JCastExpression self,
                                     JExpression expr,
                                     CType type)
     {
@@ -1107,7 +1164,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a cast expression
      */
-    public void visitUnaryPromoteExpression(JUnaryPromote self,
+    @Override
+	public void visitUnaryPromoteExpression(JUnaryPromote self,
                                             JExpression expr,
                                             CType type)
     {
@@ -1122,7 +1180,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a compound assignment expression
      */
-    public void visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public void visitBitwiseExpression(JBitwiseExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {
@@ -1146,7 +1205,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
         if ((left instanceof JFieldAccessExpression) &&
@@ -1162,7 +1222,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitArrayLengthExpression(JArrayLengthExpression self,
+    @Override
+	public void visitArrayLengthExpression(JArrayLengthExpression self,
                                            JExpression prefix) {
         prefix.accept(this);
         print(".length");
@@ -1171,7 +1232,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor) {
         prefix.accept(this);
@@ -1183,7 +1245,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitComments(JavaStyleComment[] comments) {
+    @Override
+	public void visitComments(JavaStyleComment[] comments) {
         for (int i = 0; i < comments.length; i++) {
             if (comments[i] != null) {
                 visitComment(comments[i]);
@@ -1194,7 +1257,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitComment(JavaStyleComment comment) {
+    @Override
+	public void visitComment(JavaStyleComment comment) {
         StringTokenizer tok = new StringTokenizer(comment.getText(), "\n");
 
         if (comment.hadSpaceBefore()) {
@@ -1235,7 +1299,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitJavadoc(JavadocComment comment) {
+    @Override
+	public void visitJavadoc(JavadocComment comment) {
         StringTokenizer tok = new StringTokenizer(comment.getText(), "\n");
         boolean     isFirst = true;
 
@@ -1344,7 +1409,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitSwitchLabel(JSwitchLabel self,
+    @Override
+	public void visitSwitchLabel(JSwitchLabel self,
                                  JExpression expr) {
         newLine();
         if (expr != null) {
@@ -1359,7 +1425,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitSwitchGroup(JSwitchGroup self,
+    @Override
+	public void visitSwitchGroup(JSwitchGroup self,
                                  JSwitchLabel[] labels,
                                  JStatement[] stmts) {
         for (int i = 0; i < labels.length; i++) {
@@ -1376,7 +1443,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitCatchClause(JCatchClause self,
+    @Override
+	public void visitCatchClause(JCatchClause self,
                                  JFormalParameter exception,
                                  JBlock body) {
         print(" catch (");
@@ -1388,21 +1456,24 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a boolean literal
      */
-    public void visitBooleanLiteral(boolean value) {
+    @Override
+	public void visitBooleanLiteral(boolean value) {
         print(value);
     }
 
     /**
      * prints a byte literal
      */
-    public void visitByteLiteral(byte value) {
+    @Override
+	public void visitByteLiteral(byte value) {
         print("(byte)" + value);
     }
 
     /**
      * prints a character literal
      */
-    public void visitCharLiteral(char value) {
+    @Override
+	public void visitCharLiteral(char value) {
         switch (value) {
         case '\b':
             print("'\\b'");
@@ -1436,56 +1507,64 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints a double literal
      */
-    public void visitDoubleLiteral(double value) {
+    @Override
+	public void visitDoubleLiteral(double value) {
         print("(double)" + value);
     }
 
     /**
      * prints a float literal
      */
-    public void visitFloatLiteral(float value) {
+    @Override
+	public void visitFloatLiteral(float value) {
         print(value + "F");
     }
 
     /**
      * prints a int literal
      */
-    public void visitIntLiteral(int value) {
+    @Override
+	public void visitIntLiteral(int value) {
         print(value);
     }
 
     /**
      * prints a long literal
      */
-    public void visitLongLiteral(long value) {
+    @Override
+	public void visitLongLiteral(long value) {
         print(value + "L");
     }
 
     /**
      * prints a short literal
      */
-    public void visitShortLiteral(short value) {
+    @Override
+	public void visitShortLiteral(short value) {
         print("(short)" + value);
     }
 
     /**
      * prints a string literal
      */
-    public void visitStringLiteral(String value) {
+    @Override
+	public void visitStringLiteral(String value) {
         print('"' + value + '"');
     }
 
     /**
      * prints a null literal
      */
-    public void visitNullLiteral() {
+    @Override
+	public void visitNullLiteral() {
         print("null");
     }
 
     /**
      * prints an array length expression
      */
-    public void visitPackageName(String name) {
+    @Override
+	public void visitPackageName(String name) {
         print("package " + name + ";");
         newLine();
     }
@@ -1493,21 +1572,24 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitPackageImport(String name) {
+    @Override
+	public void visitPackageImport(String name) {
         print("import " + name.replace('/', '.') + ".*;");
     }
 
     /**
      * prints an array length expression
      */
-    public void visitClassImport(String name) {
+    @Override
+	public void visitClassImport(String name) {
         print("import " + name.replace('/', '.') + ";");
     }
 
     /**
      * prints an array length expression
      */
-    public void visitFormalParameters(JFormalParameter self,
+    @Override
+	public void visitFormalParameters(JFormalParameter self,
                                       boolean isFinal,
                                       CType type,
                                       String ident) {
@@ -1538,7 +1620,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array length expression
      */
-    public void visitConstructorCall(JConstructorCall self,
+    @Override
+	public void visitConstructorCall(JConstructorCall self,
                                      boolean functorIsThis,
                                      JExpression[] params)
     {
@@ -1552,7 +1635,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /**
      * prints an array initializer expression
      */
-    public void visitArrayInitializer(JArrayInitializer self,
+    @Override
+	public void visitArrayInitializer(JArrayInitializer self,
                                       JExpression[] elems)
     {
         newLine();
@@ -1566,12 +1650,13 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
         print("}");
     }
 
-    public void visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
+    @Override
+	public void visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
         for (Object part : parts) {
             if (part instanceof String) {
                 print((String)part);
             } else if (part instanceof CType) {
-                print((CType)part);
+                print(part);
             } else if (part instanceof JExpression) {
                 ((JExpression)part).accept(this);
             } else {
@@ -1628,7 +1713,8 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.KjcPrettyPrinter other = new at.dms.kjc.KjcPrettyPrinter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

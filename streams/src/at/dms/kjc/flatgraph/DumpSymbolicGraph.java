@@ -85,7 +85,8 @@ public class DumpSymbolicGraph implements FlatVisitor
         // them.
         str.accept(new EmptyAttributeStreamVisitor() {
                 /* visit a filter */
-                public Object visitFilter(SIRFilter self,
+                @Override
+				public Object visitFilter(SIRFilter self,
                                           JFieldDeclaration[] fields,
                                           JMethodDeclaration[] methods,
                                           JMethodDeclaration init,
@@ -97,7 +98,8 @@ public class DumpSymbolicGraph implements FlatVisitor
                 }
                 
                 /* visit a splitter */
-                public Object visitSplitter(SIRSplitter self,
+                @Override
+				public Object visitSplitter(SIRSplitter self,
                                             SIRSplitType type,
                                             JExpression[] weights) {
                     //System.out.println(count[0] + " " + self);
@@ -106,7 +108,8 @@ public class DumpSymbolicGraph implements FlatVisitor
                 }
                 
                 /* visit a joiner */
-                public Object visitJoiner(SIRJoiner self,
+                @Override
+				public Object visitJoiner(SIRJoiner self,
                                           SIRJoinType type,
                                           JExpression[] weights) {
                     //System.out.println(count[0] + " " + self);
@@ -130,7 +133,8 @@ public class DumpSymbolicGraph implements FlatVisitor
      * 
      * @param node The current node we are visiting.
      */
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         // our node count
         nodeId++;

@@ -51,14 +51,16 @@ public class JSuperExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return  the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return self.getType();
     }
     
     /**
      * 
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         self.setType(type);
     }
 
@@ -73,7 +75,8 @@ public class JSuperExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         self = context.getClassContext().getCClass().getSuperClass();
 
         check(context, !context.getMethodContext().getCMethod().isStatic(), KjcMessages.BAD_SUPER_STATIC);
@@ -89,7 +92,8 @@ public class JSuperExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitSuperExpression(this);
     }
 
@@ -97,7 +101,8 @@ public class JSuperExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitSuperExpression(this);
     }
 
@@ -119,7 +124,8 @@ public class JSuperExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantLoadThis();
@@ -135,7 +141,8 @@ public class JSuperExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JSuperExpression other = new at.dms.kjc.JSuperExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -340,7 +340,8 @@ public class GreedyPartitioner {
         // first get all the siroperators
         final LinkedList operators = new LinkedList();
         str.accept(new EmptyAttributeStreamVisitor() {
-                public Object visitFilter(SIRFilter self,
+                @Override
+				public Object visitFilter(SIRFilter self,
                                           JFieldDeclaration[] fields,
                                           JMethodDeclaration[] methods,
                                           JMethodDeclaration init,
@@ -350,14 +351,16 @@ public class GreedyPartitioner {
                     return self;
                 }
 
-                public Object visitSplitter(SIRSplitter self,
+                @Override
+				public Object visitSplitter(SIRSplitter self,
                                             SIRSplitType type,
                                             JExpression[] weights) {
                     operators.add(self);
                     return self;
                 }
     
-                public Object visitJoiner(SIRJoiner self,
+                @Override
+				public Object visitJoiner(SIRJoiner self,
                                           SIRJoinType type,
                                           JExpression[] weights) {
                     operators.add(self);

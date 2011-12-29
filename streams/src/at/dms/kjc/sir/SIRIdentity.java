@@ -61,7 +61,8 @@ public class SIRIdentity extends SIRPredefinedFilter implements Cloneable, Const
     }
 
 
-    public void propagatePredefinedFields(Propagator propagator) {
+    @Override
+	public void propagatePredefinedFields(Propagator propagator) {
         JExpression newRate = (JExpression)rate.accept(propagator);
         if (newRate!=null && newRate!=rate) {
             rate = newRate;
@@ -79,7 +80,8 @@ public class SIRIdentity extends SIRPredefinedFilter implements Cloneable, Const
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRIdentity other = new at.dms.kjc.sir.SIRIdentity();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

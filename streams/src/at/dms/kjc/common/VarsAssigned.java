@@ -81,7 +81,8 @@ public class VarsAssigned extends SLIREmptyVisitor
     }
     
 
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
         vars.addAll(lValues(left));
@@ -89,7 +90,8 @@ public class VarsAssigned extends SLIREmptyVisitor
         right.accept(this);
     }
 
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {
@@ -99,13 +101,15 @@ public class VarsAssigned extends SLIREmptyVisitor
         right.accept(this);
     }
     
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         vars.addAll(lValues(expr));
     }
 
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         vars.addAll(lValues(expr));

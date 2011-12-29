@@ -206,7 +206,8 @@ public class StatelessDuplicate {
                         inAssignment[0] = old;
                     }
 
-                    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+                    @Override
+					public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                                   int oper,
                                                                   JExpression left,
                                                                   JExpression right) {
@@ -214,7 +215,8 @@ public class StatelessDuplicate {
                         right.accept(this);
                     }
 
-                    public void visitAssignmentExpression(JAssignmentExpression self,
+                    @Override
+					public void visitAssignmentExpression(JAssignmentExpression self,
                                                           JExpression left,
                                                           JExpression right) {
                         wrapVisit(left);
@@ -222,14 +224,16 @@ public class StatelessDuplicate {
                     }
 
                     // need to count i++ as mutated state if i is a field
-                    public void visitPostfixExpression(JPostfixExpression self,
+                    @Override
+					public void visitPostfixExpression(JPostfixExpression self,
                                                        int oper,
                                                        JExpression expr) {
                         wrapVisit(expr);
                     }
 
                     // need to count ++i as mutated state if i is a field
-                    public void visitPrefixExpression(JPrefixExpression self,
+                    @Override
+					public void visitPrefixExpression(JPrefixExpression self,
                                                       int oper,
                                                       JExpression expr) {
                         wrapVisit(expr);
@@ -237,7 +241,8 @@ public class StatelessDuplicate {
 
 
 
-                    public void visitFieldExpression(JFieldAccessExpression self,
+                    @Override
+					public void visitFieldExpression(JFieldAccessExpression self,
                                                      JExpression left,
                                                      String ident) {
                         // if we are in assignment, mark that there is mutable state
@@ -388,7 +393,7 @@ public class StatelessDuplicate {
             // build up the argument list
             LinkedList args = new LinkedList();
             for (ListIterator pit = params.listIterator(); pit.hasNext(); ) {
-                args.add((JExpression)pit.next());
+                args.add(pit.next());
             }
             // add the child and the argument to the parent
             sj.add(it.next(), args);

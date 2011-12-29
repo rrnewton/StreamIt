@@ -86,7 +86,8 @@ public class LinearDot extends StreamItDot {
     /**
      * Override visitFilter to color filters that compute linear functions.
      **/
-    public Object visitFilter(SIRFilter self,
+    @Override
+	public Object visitFilter(SIRFilter self,
                               JFieldDeclaration[] fields,
                               JMethodDeclaration[] methods,
                               JMethodDeclaration init,
@@ -134,7 +135,8 @@ public class LinearDot extends StreamItDot {
      * Override the string used to create a new subgraph, to color it if we have a
      * linear rep for it.
      **/
-    public String getClusterString(SIRStream self) {
+    @Override
+	public String getClusterString(SIRStream self) {
         // if we have a linear rep of this object, color the resulting dot graph rose.
         if (linearData.hasLinearRepresentation(self)) {
             return ("subgraph cluster_" +

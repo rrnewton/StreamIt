@@ -34,7 +34,8 @@ class JavaCharFormatter implements CharFormatter {
      * @param c   The character of interest.
      * @param forCharLiteral  true to escape for char literal, false for string literal
      */
-    public String escapeChar(int c, boolean forCharLiteral) {
+    @Override
+	public String escapeChar(int c, boolean forCharLiteral) {
         switch (c) {
             //      case GrammarAnalyzer.EPSILON_TYPE : return "<end-of-token>";
         case '\n' : return "\\n";
@@ -64,7 +65,8 @@ class JavaCharFormatter implements CharFormatter {
      * when surrounded by double-quotes.
      * @param s The String to be changed into a literal
      */
-    public String escapeString(String s) {
+    @Override
+	public String escapeString(String s) {
         String retval = new String();
         for (int i = 0; i < s.length(); i++) {
             retval += escapeChar(s.charAt(i), false);
@@ -78,7 +80,8 @@ class JavaCharFormatter implements CharFormatter {
      * Code-generators for languages should override this method.
      * @param c   The character of interest.
      */
-    public String literalChar(int c) {
+    @Override
+	public String literalChar(int c) {
         return "'"  + escapeChar(c, true) + "'";
     }
     /**
@@ -87,7 +90,8 @@ class JavaCharFormatter implements CharFormatter {
      * Code-generators for languages should override this method.
      * @param s The String to be changed into a literal
      */
-    public String literalString(String s) {
+    @Override
+	public String literalString(String s) {
         return "\"" + escapeString(s) + "\"";
     }
 }

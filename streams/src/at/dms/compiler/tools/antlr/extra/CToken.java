@@ -32,11 +32,13 @@ public final class CToken extends Token {
         this.text = text;
     }
 
-    public String getText() {
+    @Override
+	public String getText() {
         return text;
     }
 
-    public void setText(String text) {
+    @Override
+	public void setText(String text) {
         this.text = text;
     }
 

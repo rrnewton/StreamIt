@@ -93,17 +93,20 @@ public class ExprComplex extends Expression
     }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprComplex(this);
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return "((" + real + ")+(" + imag + ")i)";
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprComplex))
             return false;
@@ -115,7 +118,8 @@ public class ExprComplex extends Expression
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return real.hashCode() ^ imag.hashCode();
     }

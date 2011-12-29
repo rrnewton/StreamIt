@@ -63,7 +63,8 @@ public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisito
         (new RemoveUnusedVars()).visitFilter(filter);
     }
     
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.isFilter()) {
             SIRFilter filter = (SIRFilter)node.contents;
@@ -89,7 +90,8 @@ public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisito
         filter.setFields(newFields.toArray(new JFieldDeclaration[0]));
     }
     
-    public Object visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public Object visitAssignmentExpression(JAssignmentExpression self,
                                             JExpression left,
                                             JExpression right) {
         //remove an assignment expression if it 
@@ -126,7 +128,8 @@ public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisito
     /**
      * prints an expression statement
      */
-    public Object visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public Object visitExpressionStatement(JExpressionStatement self,
                                            JExpression expr) {
         JExpression newExp = (JExpression)expr.accept(this);
         if (newExp == null) {
@@ -141,7 +144,8 @@ public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisito
     /**
      * prints a variable declaration statement
      */
-    public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                     JVariableDefinition[] vars) {
         Vector<JVariableDefinition> newDecls = new Vector<JVariableDefinition>();
         for (int i = 0; i < vars.length; i++) {
@@ -162,7 +166,8 @@ public class RemoveUnusedVars extends SLIRReplacingVisitor implements FlatVisito
     /**
      * prints a variable declaration statement
      */
-    public Object visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public Object visitVariableDefinition(JVariableDefinition self,
                                           int modifiers,
                                           CType type,
                                           String ident,

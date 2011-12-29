@@ -69,7 +69,8 @@ public class JReturnStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         CType   returnType = context.getMethodContext().getCMethod().getReturnType();
 
         if (expr != null) {
@@ -97,7 +98,8 @@ public class JReturnStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitReturnStatement(this, expr);
     }
@@ -105,7 +107,8 @@ public class JReturnStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitReturnStatement(this, expr);
     }
     
@@ -128,7 +131,8 @@ public class JReturnStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         if (expr != null) {
@@ -165,7 +169,8 @@ public class JReturnStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JReturnStatement other = new at.dms.kjc.JReturnStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

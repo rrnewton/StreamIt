@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import at.dms.classfile.Constants;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.compiler.JavadocComment;
 import at.dms.compiler.PositionedError;
@@ -123,7 +124,7 @@ public class JMethodDeclaration extends JMemberDeclaration {
                               String ident,
                               JFormalParameter[] parameters,
                               JBlock body) {
-        this(null, at.dms.kjc.Constants.ACC_PUBLIC, returnType, ident, parameters, CClassType.EMPTY, body, null, null);
+        this(null, Constants.ACC_PUBLIC, returnType, ident, parameters, CClassType.EMPTY, body, null, null);
     }
 
     /**
@@ -611,7 +612,8 @@ public class JMethodDeclaration extends JMemberDeclaration {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
 
         p.visitMethodDeclaration(this,
@@ -628,7 +630,8 @@ public class JMethodDeclaration extends JMemberDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         Object trash =  super.accept(p);
 
         return p.visitMethodDeclaration(this,
@@ -701,7 +704,8 @@ public class JMethodDeclaration extends JMemberDeclaration {
         return new JMethodDeclaration[0];
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "JMethodDeclaration, ident=" + ident;
     }
 
@@ -716,7 +720,8 @@ public class JMethodDeclaration extends JMemberDeclaration {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JMethodDeclaration other = new at.dms.kjc.JMethodDeclaration();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

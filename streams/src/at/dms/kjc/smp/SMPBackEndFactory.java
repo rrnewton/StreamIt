@@ -240,6 +240,7 @@ public class SMPBackEndFactory extends
 	 * at.dms.kjc.backendSupport.SchedulingPhase,
 	 * at.dms.kjc.backendSupport.ComputeNodesI)
 	 */
+	@Override
 	public void processFilterWorkNode(WorkNode filter,
 			SchedulingPhase whichPhase, SMPMachine chip) {
 		

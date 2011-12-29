@@ -103,7 +103,8 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
      * that directly implements the linear representation. This only
      * occurs if the replace calculator says that this stream should be replaced.
      **/
-    public boolean makeReplacement(SIRStream self) {
+    @Override
+	public boolean makeReplacement(SIRStream self) {
         LinearPrinter.println("Creating linear replacement for " + self);
         SIRContainer parent = self.getParent();
         if (parent == null) {
@@ -933,7 +934,8 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
          * replace the generic code given with our matrix code. Stick in the appropriate
          * mapping in doReplace and then return.
          **/
-        public Object visitFilter(SIRFilter self,
+        @Override
+		public Object visitFilter(SIRFilter self,
                                   JFieldDeclaration[] fields,
                                   JMethodDeclaration[] methods,
                                   JMethodDeclaration init,
@@ -945,7 +947,8 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
             return self;
         }
 
-        public Object visitFeedbackLoop(SIRFeedbackLoop self,
+        @Override
+		public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                         JFieldDeclaration[] fields,
                                         JMethodDeclaration[] methods,
                                         JMethodDeclaration init,
@@ -954,13 +957,15 @@ public class LinearDirectReplacer extends LinearReplacer implements Constants{
             return self;
         }
         /* pre-visit a pipeline */
-        public Object visitPipeline(SIRPipeline self,
+        @Override
+		public Object visitPipeline(SIRPipeline self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init) {
             return visitContainer(self);
         }
-        public Object visitSplitJoin(SIRSplitJoin self,
+        @Override
+		public Object visitSplitJoin(SIRSplitJoin self,
                                      JFieldDeclaration[] fields,
                                      JMethodDeclaration[] methods,
                                      JMethodDeclaration init,

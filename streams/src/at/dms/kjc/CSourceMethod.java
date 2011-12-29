@@ -110,7 +110,8 @@ public class CSourceMethod extends CMethod {
     /**
      * @return the type of this field
      */
-    public String getSignature() {
+    @Override
+	public String getSignature() {
         CType[]     params = getParameters();
 
         if (getOwner().isNested() && isConstructor()) {
@@ -161,7 +162,8 @@ public class CSourceMethod extends CMethod {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CSourceMethod other = new at.dms.kjc.CSourceMethod();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

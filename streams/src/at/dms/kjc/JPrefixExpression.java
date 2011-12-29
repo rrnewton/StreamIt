@@ -50,7 +50,8 @@ public class JPrefixExpression extends JExpression {
         this.expr = expr;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Prefix:"+oper+expr;
     }
 
@@ -62,14 +63,16 @@ public class JPrefixExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return type;
     }
 
     /**
      * 
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         this.type = type;
     }
 
@@ -90,7 +93,8 @@ public class JPrefixExpression extends JExpression {
     /**
      * Returns true iff this expression can be used as a statement (JLS 14.8)
      */
-    public boolean isStatementExpression() {
+    @Override
+	public boolean isStatementExpression() {
         return true;
     }
 
@@ -104,7 +108,8 @@ public class JPrefixExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         expr = expr.analyse(new CExpressionContext(context, true, context.discardValue()));
         check(context, expr.getType().isNumeric(), KjcMessages.PREFIX_BADTYPE, expr.getType());
         check(context, expr.isLValue(context), KjcMessages.PREFIX_NOTLVALUE);
@@ -123,7 +128,8 @@ public class JPrefixExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitPrefixExpression(this, oper, expr);
     }
 
@@ -131,7 +137,8 @@ public class JPrefixExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitPrefixExpression(this, oper, expr);
     }
 
@@ -153,7 +160,8 @@ public class JPrefixExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         int         val = oper == OPE_PREINC ? 1 : -1;
@@ -219,7 +227,8 @@ public class JPrefixExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JPrefixExpression other = new at.dms.kjc.JPrefixExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

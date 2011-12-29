@@ -34,7 +34,8 @@ public class IMEMEstimation implements FlatVisitor
         user = getUser();
     }
 
-    public void visitNode(FlatNode node) {
+    @Override
+	public void visitNode(FlatNode node) {
         if (node.contents instanceof SIRFilter) {
             SIRFilter filter = (SIRFilter)node.contents;
             // don't do anything if we've already detected overflow

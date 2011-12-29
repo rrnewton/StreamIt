@@ -203,7 +203,8 @@ public class SIRTwoStageFilter extends SIRFilter {
     }
 
     /* Overridden from SIRPhasedFilter: */
-    public void setInitPhases(JMethodDeclaration[] initPhases) 
+    @Override
+	public void setInitPhases(JMethodDeclaration[] initPhases) 
     {
         if (initPhases.length != 1)
             throw new UnsupportedOperationException
@@ -214,7 +215,8 @@ public class SIRTwoStageFilter extends SIRFilter {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRTwoStageFilter other = new at.dms.kjc.sir.SIRTwoStageFilter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

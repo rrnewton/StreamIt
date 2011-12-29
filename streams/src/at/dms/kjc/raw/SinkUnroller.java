@@ -24,7 +24,8 @@ public class SinkUnroller extends at.dms.util.Utils
         top.accept((new SinkUnroller()), null, true);
     }
 
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.isFilter()){
             //do not unroll file writers...

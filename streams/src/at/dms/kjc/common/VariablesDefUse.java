@@ -69,14 +69,16 @@ public class VariablesDefUse extends SLIREmptyVisitor
     }
     
 
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident) 
     {
         vars.add(ident);
     }
 
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident) 
     {
         vars.add(self.getVariable());

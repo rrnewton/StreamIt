@@ -39,7 +39,8 @@ import streamit.frontend.nodes.StmtExpr;
  */
 public class TrimDumbDeadCode extends FEReplacer
 {
-    public Object visitStmtExpr(StmtExpr stmt)
+    @Override
+	public Object visitStmtExpr(StmtExpr stmt)
     {
         Expression expr = stmt.getExpression();
         // NB: for array and field expressions, we really should look

@@ -313,7 +313,8 @@ public class StreamSpec extends FENode
      * @return   object returned from the visitor
      * @see      FEVisitor#visitStreamSpec
      */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStreamSpec(this);
     }

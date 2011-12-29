@@ -65,70 +65,80 @@ class HashLiterals extends SLIREmptyVisitor {
     /**
      * prints a boolean literal
      */
-    public void visitBooleanLiteral(boolean value) {
+    @Override
+	public void visitBooleanLiteral(boolean value) {
         registerVal(value ? 0 : 1);
     }
 
     /**
      * prints a byte literal
      */
-    public void visitByteLiteral(byte value) {
+    @Override
+	public void visitByteLiteral(byte value) {
         registerVal(value);
     }
 
     /**
      * prints a character literal
      */
-    public void visitCharLiteral(char value) {
+    @Override
+	public void visitCharLiteral(char value) {
         registerVal(Character.getNumericValue(value));
     }
 
     /**
      * prints a double literal
      */
-    public void visitDoubleLiteral(double value) {
+    @Override
+	public void visitDoubleLiteral(double value) {
         registerVal(Double.doubleToLongBits(value));
     }
 
     /**
      * prints a float literal
      */
-    public void visitFloatLiteral(float value) {
+    @Override
+	public void visitFloatLiteral(float value) {
         registerVal(Double.doubleToLongBits(value));
     }
 
     /**
      * prints a int literal
      */
-    public void visitIntLiteral(int value) {
+    @Override
+	public void visitIntLiteral(int value) {
         registerVal(value);
     }
 
     /**
      * prints a long literal
      */
-    public void visitLongLiteral(long value) {
+    @Override
+	public void visitLongLiteral(long value) {
         registerVal(value);
     }
 
     /**
      * prints a short literal
      */
-    public void visitShortLiteral(short value) {
+    @Override
+	public void visitShortLiteral(short value) {
         registerVal(value);
     }
 
     /**
      * prints a string literal
      */
-    public void visitStringLiteral(String value) {
+    @Override
+	public void visitStringLiteral(String value) {
         registerVal(value.hashCode());
     }
 
     /**
      * prints a null literal
      */
-    public void visitNullLiteral() {
+    @Override
+	public void visitNullLiteral() {
         // arbitrary constant
         registerVal(1);
     }

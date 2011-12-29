@@ -53,7 +53,8 @@ final class CVoidPtrType extends CType {
      * necessary to resolve String into java/lang/String
      * @exception   UnpositionedError   this error will be positioned soon
      */
-    public void checkType(CContext context) throws UnpositionedError {
+    @Override
+	public void checkType(CContext context) throws UnpositionedError {
     }
 
     /**
@@ -61,7 +62,8 @@ final class CVoidPtrType extends CType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isAssignableTo(CType dest) {
+    @Override
+	public boolean isAssignableTo(CType dest) {
         return false;
     }
 
@@ -70,7 +72,8 @@ final class CVoidPtrType extends CType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isCastableTo(CType dest) {
+    @Override
+	public boolean isCastableTo(CType dest) {
         return false;
     }
 
@@ -81,21 +84,24 @@ final class CVoidPtrType extends CType {
     /**
      * Transforms this type to a string
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "void *";
     }
 
     /**
      * Returns the VM signature of this type.
      */
-    public String getSignature() {
+    @Override
+	public String getSignature() {
         return "V";
     }
 
     /**
      * Appends the VM signature of this type to the specified buffer.
      */
-    protected void appendSignature(SimpleStringBuffer buffer) {
+    @Override
+	protected void appendSignature(SimpleStringBuffer buffer) {
         buffer.append('V');
     }
 
@@ -104,25 +110,29 @@ final class CVoidPtrType extends CType {
      * of bytes needed in C on 32-bit machine) used by a value of this
      * type.
      */
-    public int getSizeInC() {
+    @Override
+	public int getSizeInC() {
         return 4;
     }
 
     /**
      * Returns the stack size used by a value of this type.
      */
-    public int getSize() {
+    @Override
+	public int getSize() {
         return 1;
     }
     
-    public boolean isReference() {
+    @Override
+	public boolean isReference() {
         return true;
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.smp.CVoidPtrType other = new at.dms.kjc.smp.CVoidPtrType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

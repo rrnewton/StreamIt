@@ -348,7 +348,8 @@ public abstract class Filter extends Stream
     public Filter(Object o1,Object o2,Object o3) {super(o1,o2,o3);}
 
     // add was present in Operator, but is not defined in Filter anymore
-    public void add(Stream s)
+    @Override
+	public void add(Stream s)
     {
         throw new UnsupportedOperationException();
     }
@@ -736,7 +737,8 @@ public abstract class Filter extends Stream
         }
     }
 
-    public boolean canFire() {
+    @Override
+	public boolean canFire() {
         PhaseInfo phase = getCurrentPhase();
         if (phase.e==Rate.DYNAMIC_RATE || phase.o==Rate.DYNAMIC_RATE) {
             return false;
@@ -745,7 +747,8 @@ public abstract class Filter extends Stream
         }
     }
 
-    public void prepareToWork() {
+    @Override
+	public void prepareToWork() {
         if (!Stream.scheduledRun) {
             // if the phase is static-rate, we require enough inputs
             // to execute the whole phase.  This ensures that all
@@ -759,7 +762,8 @@ public abstract class Filter extends Stream
         super.prepareToWork();
     }
 
-    public void doWork() {
+    @Override
+	public void doWork() {
         prepareToWork();
 
         // call work or prework, etc.
@@ -776,7 +780,8 @@ public abstract class Filter extends Stream
         cleanupWork();
     }
 
-    public void cleanupWork() {
+    @Override
+	public void cleanupWork() {
         super.cleanupWork();
 
         if (!Stream.scheduledRun) {
@@ -874,7 +879,8 @@ public abstract class Filter extends Stream
     // connectGraph doesn't connect anything for a Filter,
     // but it can register all sinks:
     // also make sure that any input/output point to the filter itself
-    public void connectGraph()
+    @Override
+	public void connectGraph()
     {
         if (ccStyleInit)
             {
@@ -940,11 +946,13 @@ public abstract class Filter extends Stream
         initCount();
     }
 
-    public void work() { ERROR ("You must declare your own \"work\" function in a Filter!\n(unless you're using multi-phased Filters and don't have a \"work\"function"); }
+    @Override
+	public void work() { ERROR ("You must declare your own \"work\" function in a Filter!\n(unless you're using multi-phased Filters and don't have a \"work\"function"); }
     public void prework() { ERROR ("You must declare your own \"prework\" function in a Filter!\n(unless you're using a filter that doesn't have a \"prework\"function"); }
 
     // provide some empty functions to make writing filters a bit easier
-    public void init()
+    @Override
+	public void init()
     {
         invalidInitError();
     }
@@ -971,12 +979,14 @@ public abstract class Filter extends Stream
             }
     }
 
-    void setupBufferLengths(Scheduler buffers)
+    @Override
+	void setupBufferLengths(Scheduler buffers)
     {
         // this function doesn't need to do anything
     }
 
-    public Stream getChild(int nChild)
+    @Override
+	public Stream getChild(int nChild)
     {
         ERROR ("Filters do not have children!");
         return null;

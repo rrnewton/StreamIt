@@ -65,13 +65,15 @@ public abstract class PooledConstant implements Constants {
      * CONVENTION: return XXXXXXXXXXXX &lt;&lt; 4 + Y
      * with Y = ident of the type of the pooled constant
      */
-    public abstract int hashCode();
+    @Override
+	public abstract int hashCode();
 
     /**
      * equals (an exact comparison)
      * ASSERT: this.hashCode == o.hashCode ===&gt; cast
      */
-    public abstract boolean equals(Object o);
+    @Override
+	public abstract boolean equals(Object o);
 
     public final short getIndex() {
         return index;

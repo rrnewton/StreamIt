@@ -463,7 +463,8 @@ public abstract class Stream extends Operator
      * deterministic behavior in sets and containers (was causing
      * unpredictable exceptions).
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return id;
     }
 
@@ -506,7 +507,8 @@ public abstract class Stream extends Operator
         return inputChannel;
     }
 
-    public abstract void connectGraph();
+    @Override
+	public abstract void connectGraph();
 
     /**
      * Initialize the buffer lengths for a stream, given a schedule:

@@ -35,7 +35,8 @@ public class Memoizer {
     // access control on all fields
     static {
         System.setSecurityManager(new SecurityManager() {
-                public void checkPermission(Permission perm) {}
+                @Override
+				public void checkPermission(Permission perm) {}
             });
     }
 
@@ -298,7 +299,8 @@ public class Memoizer {
             return Memoizer.compareStructure(s.obj, this.obj);
         }
 
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             return hashCode;
         }
     }

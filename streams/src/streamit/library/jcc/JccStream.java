@@ -31,10 +31,12 @@ public abstract class JccStream extends JccOperator {
 		super.setOutStream(channel.getSourceEnd());
 	}
 
+	@Override
 	public final void setInStream(InStream in) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public final void setOutStream(OutStream out) {
 		throw new UnsupportedOperationException();
 	}

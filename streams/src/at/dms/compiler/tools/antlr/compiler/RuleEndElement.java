@@ -36,10 +36,12 @@ class RuleEndElement extends BlockEndElement {
         super(g);
         cache = new Lookahead[g.maxk+1];
     }
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
-    public String toString() {
+    @Override
+	public String toString() {
         //return " [RuleEnd]";
         return "";
     }

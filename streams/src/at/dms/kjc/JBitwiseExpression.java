@@ -75,7 +75,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         left = left.analyse(context);
         right = right.analyse(context);
 
@@ -117,7 +118,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
      * Computes the result of the operation at compile-time (JLS 15.28).
      * @return  a literal resulting of an operation over two literals
      */
-    public JExpression constantFolding() {
+    @Override
+	public JExpression constantFolding() {
         if (left.getType() == CStdType.Boolean) {
             boolean     result;
 
@@ -144,7 +146,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
      * @param   right       the seconds operand
      * @return  the result of the operation
      */
-    public int compute(int left, int right) {
+    @Override
+	public int compute(int left, int right) {
         switch (oper) {
         case OPE_BAND:
             return left & right;
@@ -163,7 +166,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
      * @param   right       the seconds operand
      * @return  the result of the operation
      */
-    public long compute(long left, long right) {
+    @Override
+	public long compute(long left, long right) {
         switch (oper) {
         case OPE_BAND:
             return left & right;
@@ -203,7 +207,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitBitwiseExpression(this, oper, left, right);
     }
 
@@ -211,7 +216,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitBitwiseExpression(this, oper, left, right);
     }
 
@@ -260,7 +266,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         left.genCode(code, false);
@@ -281,7 +288,8 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JBitwiseExpression other = new at.dms.kjc.JBitwiseExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

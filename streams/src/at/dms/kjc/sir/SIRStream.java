@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -74,7 +75,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
     /*
      * Set the fields member variable 
      */
-    public void setFields (JFieldDeclaration[] f) {
+    @Override
+	public void setFields (JFieldDeclaration[] f) {
         this.fields = f;
     }
 
@@ -104,7 +106,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      * 
      * Adds to end of fields.
      */
-    public void addFields (JFieldDeclaration[] f) {
+    @Override
+	public void addFields (JFieldDeclaration[] f) {
         JFieldDeclaration[] newFields = 
             new JFieldDeclaration[fields.length + f.length];
         for (int i=0; i<fields.length; i++) {
@@ -157,7 +160,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      * Adds <m> to the methods of this.  Does not check for
      * duplicates. 
      */
-    public void addMethods (JMethodDeclaration[] m) {
+    @Override
+	public void addMethods (JMethodDeclaration[] m) {
         JMethodDeclaration[] newMethods = 
             new JMethodDeclaration[methods.length + m.length];
         for (int i=0; i<methods.length; i++) {
@@ -172,14 +176,16 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
     /**
      * Gets the field decl's of this stream.
      */
-    public JFieldDeclaration[] getFields() {
+    @Override
+	public JFieldDeclaration[] getFields() {
         return fields;
     }
 
     /**
      * Gets the method decl's of this stream.
      */
-    public JMethodDeclaration[] getMethods() {
+    @Override
+	public JMethodDeclaration[] getMethods() {
         checkRep();
         return methods;
     }
@@ -191,11 +197,13 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
         this.ident = ident;
     }
 
-    public String getIdent() {
+    @Override
+	public String getIdent() {
         return ident;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return (this.getClass()) + " " + getIdent();
     }
 
@@ -231,7 +239,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      * Set the methods member variable.  Asserts that all the methods
      * in <m> are non-null.
      */
-    public void setMethods (JMethodDeclaration[] m) {
+    @Override
+	public void setMethods (JMethodDeclaration[] m) {
         if(m!=null)
             for (int i=0; i<m.length; i++) {
                 assert m[i]!=null:
@@ -262,7 +271,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
     public SIRStream getStreamWithNumber(final int num) {
         final SIRStream[] result = new SIRStream[1];
         IterFactory.createFactory().createIter(this).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     if (self.getNumber()==num) {
                         result[0] = self;
@@ -380,7 +390,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      * adds method <meth> to this, if <meth> is not already registered
      * as a method of this.  Requires that <method> is non-null.
      */
-    public void addMethod(JMethodDeclaration method) {
+    @Override
+	public void addMethod(JMethodDeclaration method) {
         assert method!=null;
         // see if we already have <method> in this
         for (int i=0; i<methods.length; i++) {
@@ -406,7 +417,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      * adds field <field> to this, if <field> is not already registered
      * as a field of this.  
      */
-    public void addField(JFieldDeclaration field) {
+    @Override
+	public void addField(JFieldDeclaration field) {
         // see if we already have <field> in this
         for (int i=0; i<fields.length; i++) {
             if (fields[i]==field) {
@@ -495,7 +507,7 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
      * Returns an empty void method with given name.
      */
     private static JMethodDeclaration makeEmptyVoidMethod(String name) {
-        return new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+        return new JMethodDeclaration(null, Constants.ACC_PUBLIC,
                                       CStdType.Void, name,
                                       JFormalParameter.EMPTY, CClassType.EMPTY,
                                       new JBlock(), null, null);
@@ -525,7 +537,8 @@ public abstract class SIRStream extends SIROperator implements Cloneable, SIRCod
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.sir.SIRStream other) {

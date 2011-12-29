@@ -106,7 +106,8 @@ public class JSwitchLabel extends JPhylum {
      * @param   params      the array of parameters
      *
      */
-    protected void fail(CContext context, MessageDescription key, Object[] params)
+    @Override
+	protected void fail(CContext context, MessageDescription key, Object[] params)
         throws PositionedError
     {
         throw new CLineError(getTokenReference(), key, params);
@@ -120,7 +121,8 @@ public class JSwitchLabel extends JPhylum {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitSwitchLabel(this, expr);
     }
 
@@ -128,7 +130,8 @@ public class JSwitchLabel extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitSwitchLabel(this, expr);
     }
 
@@ -168,7 +171,8 @@ public class JSwitchLabel extends JPhylum {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JSwitchLabel other = new at.dms.kjc.JSwitchLabel();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

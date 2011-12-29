@@ -82,7 +82,8 @@ public class FormattedException extends Exception {
     /**
      * Returns a string explaining the exception.
      */
-    public String getMessage() {
+    @Override
+	public String getMessage() {
         return message.getMessage();
     }
 

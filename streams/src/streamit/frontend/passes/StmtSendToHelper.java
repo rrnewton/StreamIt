@@ -40,10 +40,11 @@ public class StmtSendToHelper extends SymbolTableVisitor
     }
 
     
-    public Object visitStmtSendMessage(StmtSendMessage stmt)
+    @Override
+	public Object visitStmtSendMessage(StmtSendMessage stmt)
     {
 
-        Expression receiver = (Expression)stmt.getReceiver();
+        Expression receiver = stmt.getReceiver();
         if (receiver instanceof ExprVar) {
             ExprVar var = (ExprVar)receiver;
             try {

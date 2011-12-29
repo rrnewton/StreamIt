@@ -49,7 +49,8 @@ public class JoinerScheduleNode {
     }
 
     /** print the c code for this node */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer ret = new StringBuffer();
         StringBuffer arrayAccess = new StringBuffer();
         boolean fp = ctype.isFloatingPoint();
@@ -186,7 +187,8 @@ public class JoinerScheduleNode {
      * Returns whether <pre>other</pre> has the same type and buffer name as
      * this.
      */
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if (!(obj instanceof JoinerScheduleNode))
             return false;
         JoinerScheduleNode other = (JoinerScheduleNode)obj;

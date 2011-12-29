@@ -11,7 +11,8 @@ public class InitializationSourceRestriction extends Restriction
         runNTimes = 0;
     }
 
-    public boolean notifyExpired()
+    @Override
+	public boolean notifyExpired()
     {
         // okay, I now have executed the entire initialization.
         // don't do ANYTHING, but don't allow yourself to be removed either
@@ -30,7 +31,8 @@ public class InitializationSourceRestriction extends Restriction
         restrictions.add(this);
     }
 
-    public void useRestrictions(Restrictions _restrictions)
+    @Override
+	public void useRestrictions(Restrictions _restrictions)
     {
         super.useRestrictions(_restrictions);
         setMaxExecutions(runNTimes);

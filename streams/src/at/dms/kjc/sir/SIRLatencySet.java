@@ -57,7 +57,8 @@ public class SIRLatencySet extends SIRLatency {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitLatencySet(this);
         } else {
@@ -68,7 +69,8 @@ public class SIRLatencySet extends SIRLatency {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitLatencySet(this);
         } else {
@@ -79,7 +81,8 @@ public class SIRLatencySet extends SIRLatency {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRLatencySet other = new at.dms.kjc.sir.SIRLatencySet();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

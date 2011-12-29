@@ -78,7 +78,8 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public CType getOutputType() {
+    @Override
+	public CType getOutputType() {
         throw new RuntimeException("Can't get output type of recursive stub.");
         //return null;
     }
@@ -86,7 +87,8 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public CType getInputType() {
+    @Override
+	public CType getInputType() {
         throw new RuntimeException("Can't get input type of recursive stub.");
         //return null;
     }
@@ -94,7 +96,8 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public int getPushForSchedule(Map<SIROperator, int[]>[] counts)
+    @Override
+	public int getPushForSchedule(Map<SIROperator, int[]>[] counts)
     {
         throw new RuntimeException("Can't get push for schedule of recursive stub.");
         //return -1;
@@ -103,7 +106,8 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public int getPopForSchedule(Map<SIROperator, int[]>[] counts)
+    @Override
+	public int getPopForSchedule(Map<SIROperator, int[]>[] counts)
     {
         throw new RuntimeException("Can't get pop for schedule of recursive stub.");
         //return -1;
@@ -112,7 +116,8 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public LIRStreamType getStreamType() {
+    @Override
+	public LIRStreamType getStreamType() {
         throw new RuntimeException("Can't get stream type of recursive stub.");
         //return null;
     }
@@ -120,7 +125,8 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
      * Shouldn't be calling this.
      */
-    public Object accept(AttributeStreamVisitor v) {
+    @Override
+	public Object accept(AttributeStreamVisitor v) {
         throw new RuntimeException("Can't visit RecursiveStub.");
         //return null;
     }
@@ -128,7 +134,8 @@ public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRRecursiveStub other = new at.dms.kjc.sir.SIRRecursiveStub();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

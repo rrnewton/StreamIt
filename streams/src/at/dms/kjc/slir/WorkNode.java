@@ -53,7 +53,8 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
         return workNodeContent;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return workNodeContent.toString();   
     }
     
@@ -82,7 +83,8 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.WorkNode other = new at.dms.kjc.slir.WorkNode();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

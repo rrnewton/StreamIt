@@ -36,7 +36,8 @@ class QStack extends QTemporary {
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "S";
     }
 
@@ -47,14 +48,16 @@ class QStack extends QTemporary {
     /**
      * Returns the defined temporary.
      */
-    public QTemporary getDef() {
+    @Override
+	public QTemporary getDef() {
         return null;
     }
 
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         return QTemporary.EMPTY;
     }
 
@@ -66,14 +69,16 @@ class QStack extends QTemporary {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
     }
 
     /**
      * Generates instructions for destination
      * @param   seq     The code sequence of instruction
      */
-    public void store(CodeSequence seq, boolean isLive) {
+    @Override
+	public void store(CodeSequence seq, boolean isLive) {
         System.err.println("<<<<<<<<<<<<<<<<<<<<" + this);
     }
 

@@ -91,7 +91,8 @@ public class NameAndTypeConstant extends PooledConstant {
     /**
      * Returns the associated literal: this constant type has none
      */
-    /*package*/ Object getLiteral() {
+    @Override
+	/*package*/ Object getLiteral() {
         throw new InconsistencyException("UNEXPECTED ACCESS TO LITERAL IN NON LITERAL CONSTANT");
     }
 
@@ -104,7 +105,8 @@ public class NameAndTypeConstant extends PooledConstant {
      * CONVENTION: return XXXXXXXXXXXX &lt;&lt; 4 + Y
      * with Y = ident of the type of the pooled constant
      */
-    public final int hashCode() {
+    @Override
+	public final int hashCode() {
         // ADD is not perfect, but...
         // we know already that name is an ascii: &
         return ((name.hashCode() + type.hashCode()) & 0xFFFFFFF0) + POO_NAT_CONSTANT;
@@ -114,7 +116,8 @@ public class NameAndTypeConstant extends PooledConstant {
      * equals (an exact comparison)
      * ASSERT: this.hashCode == o.hashCode ===&gt; cast
      */
-    public final boolean equals(Object o) {
+    @Override
+	public final boolean equals(Object o) {
         return (o instanceof NameAndTypeConstant) &&
             ((NameAndTypeConstant)o).name.equals(name) &&
             ((NameAndTypeConstant)o).type.equals(type);
@@ -130,7 +133,8 @@ public class NameAndTypeConstant extends PooledConstant {
      * @param   pc      the already in pooled constant
      * ASSERT pc.getClass() == this.getClass()
      */
-    /*package*/ final void resolveConstants(PooledConstant pc) {
+    /*package*/ @Override
+	final void resolveConstants(PooledConstant pc) {
         setIndex(pc.getIndex());
         name.setIndex(((NameAndTypeConstant)pc).name.getIndex());
         type.setIndex(((NameAndTypeConstant)pc).type.getIndex());
@@ -141,7 +145,8 @@ public class NameAndTypeConstant extends PooledConstant {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {
         cp.addItem(name);
         cp.addItem(type);
     }
@@ -155,7 +160,8 @@ public class NameAndTypeConstant extends PooledConstant {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte(CST_NAMEANDTYPE);
         out.writeShort(name.getIndex());
         out.writeShort(type.getIndex());

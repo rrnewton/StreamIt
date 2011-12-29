@@ -63,12 +63,14 @@ public class FeedbackLoop
     // and splitter - single appearance schedules only need one
     // phase for the splitter and joiner schedules respectively
 
-    public int getNumSplitPhases()
+    @Override
+	public int getNumSplitPhases()
     {
         return 1;
     }
 
-    public PhasingSchedule getSplitPhase(int nPhase)
+    @Override
+	public PhasingSchedule getSplitPhase(int nPhase)
     {
         // single appearance schedule has only one split phase
         assert nPhase == 0;
@@ -83,12 +85,14 @@ public class FeedbackLoop
         return splitSched;
     }
 
-    public int getNumJoinPhases()
+    @Override
+	public int getNumJoinPhases()
     {
         return 1;
     }
 
-    public PhasingSchedule getJoinPhase(int nPhase)
+    @Override
+	public PhasingSchedule getJoinPhase(int nPhase)
     {
         // single appearance schedule has only one join phase
         assert nPhase == 0;
@@ -104,7 +108,8 @@ public class FeedbackLoop
     }
 
     // this function is basically copied from scheduler v1
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         StreamInterface body = getHierarchicalBody();
         StreamInterface feedback = getHierarchicalLoop();

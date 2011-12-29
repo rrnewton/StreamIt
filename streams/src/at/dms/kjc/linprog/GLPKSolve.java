@@ -25,7 +25,8 @@ public class GLPKSolve extends MPSWriter implements LinearProgramSolver {
      * Solve the program and return the value of the the variables
      * (indices 0...numVars-1) in the optimum.
      */
-    public double[] solve() {
+    @Override
+	public double[] solve() {
         // write mps to file
         printMPSToFile("partitions.mps");
         // run the solver
@@ -72,7 +73,7 @@ public class GLPKSolve extends MPSWriter implements LinearProgramSolver {
             String index = line.substring(8, 13).trim();
             String val = line.substring(23, 36).trim();
             int i = Integer.valueOf(index).intValue();
-            double v = (double)Double.valueOf(val).doubleValue();
+            double v = Double.valueOf(val).doubleValue();
             result[i] = v;
         }
     

@@ -79,7 +79,8 @@ public class RemoveGlobals extends at.dms.util.Utils
       }*/
         
 
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.isFilter()){
             //do nothing for these types of filters
@@ -196,7 +197,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             return found;
         }
 
-        public void visitVariableDefinition(JVariableDefinition self,
+        @Override
+		public void visitVariableDefinition(JVariableDefinition self,
                                             int modifiers,
                                             CType type,
                                             String ident,
@@ -214,7 +216,8 @@ public class RemoveGlobals extends at.dms.util.Utils
         }
     
         //something here that checks array dimensions
-        public void visitFieldExpression(JFieldAccessExpression self,
+        @Override
+		public void visitFieldExpression(JFieldAccessExpression self,
                                          JExpression left,
                                          String ident)
         {
@@ -234,7 +237,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             }
         }
     
-        public void visitLocalVariableExpression(JLocalVariableExpression self,
+        @Override
+		public void visitLocalVariableExpression(JLocalVariableExpression self,
                                                  String ident) {
             try {
                 if (self.getVariable().getType().isArrayType()) {
@@ -269,7 +273,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             return found;
         }
     
-        public void visitMethodCallExpression(JMethodCallExpression self,
+        @Override
+		public void visitMethodCallExpression(JMethodCallExpression self,
                                               JExpression prefix,
                                               String ident,
                                               JExpression[] args) {
@@ -321,7 +326,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             return global;
         }
     
-        public void visitFieldExpression(JFieldAccessExpression self,
+        @Override
+		public void visitFieldExpression(JFieldAccessExpression self,
                                          JExpression left,
                                          String ident)
         {
@@ -344,7 +350,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             return children;
         }
         
-        public void visitExpressionStatement(JExpressionStatement self,
+        @Override
+		public void visitExpressionStatement(JExpressionStatement self,
                                              JExpression expr) 
         {
             children.add(expr);
@@ -364,7 +371,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             method.accept(new FunctionCall());
             return methodCall;
         }
-        public void visitMethodCallExpression(JMethodCallExpression self,
+        @Override
+		public void visitMethodCallExpression(JMethodCallExpression self,
                                               JExpression prefix,
                                               String ident,
                                               JExpression[] args) {
@@ -396,7 +404,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             RemoveGlobals.getRawMain(filter).accept(new InlineFunctionCalls());
         }
 
-        public Object visitExpressionStatement(JExpressionStatement self,
+        @Override
+		public Object visitExpressionStatement(JExpressionStatement self,
                                                JExpression expr) {
 
             //inline the function call if this is a method call expression
@@ -597,7 +606,8 @@ public class RemoveGlobals extends at.dms.util.Utils
             return null;
         }
 
-        public Object visitFieldExpression(JFieldAccessExpression self,
+        @Override
+		public Object visitFieldExpression(JFieldAccessExpression self,
                                            JExpression left,
                                            String ident)
         {

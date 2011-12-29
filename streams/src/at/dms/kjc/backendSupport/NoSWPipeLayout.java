@@ -38,7 +38,7 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     
     public NoSWPipeLayout(BasicSpaceTimeSchedule spaceTime, Ts chip) {
         this.chip = chip;
-        this.slicer = (StaticSubGraph)spaceTime.getSSG();
+        this.slicer = spaceTime.getSSG();
         scheduleOrder = 
             DataFlowOrder.getTraversal(spaceTime.getSSG().getFilterGraph());
         assignedFilters = new LinkedList<InternalFilterNode>();
@@ -48,14 +48,16 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     /**
      * only valid after run();
      */
-    public T getComputeNode(InternalFilterNode node) {
+    @Override
+	public T getComputeNode(InternalFilterNode node) {
         return layout.get(node);
     }
     
     /**
      * only valid after run()
      */
-    public void setComputeNode(InternalFilterNode node, T tile) {
+    @Override
+	public void setComputeNode(InternalFilterNode node, T tile) {
         layout.put(node, tile);
     }
     
@@ -65,7 +67,8 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * Callable only during {@link at.dms.kjc.common.SimulatedAnnealing Simulated Annealing}.
      * @param newAssign
      */
-    public void setAssignment(HashMap newAssign) {
+    @Override
+	public void setAssignment(HashMap newAssign) {
         this.assignment = newAssign;
     }
     
@@ -74,7 +77,8 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * perturbConfiguration() decides if we should keep the new assignment.
      * The assignment should contain only {@link at.dms.kjc.slicegraphFilterSliceNode FilterSliceNode}s when this is called.
      */
-    public void swapAssignment() {
+    @Override
+	public void swapAssignment() {
         WorkNode filter1 = (WorkNode)assignedFilters.get(rand.nextInt(assignedFilters.size()));
         assignment.put(filter1, chip.getNthComputeNode(rand.nextInt(chip.size())));
     }
@@ -82,7 +86,8 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
     /**
      * Random initial assignment.
      */
-    public void initialPlacement() {
+    @Override
+	public void initialPlacement() {
         Iterator<Filter> slices = scheduleOrder.iterator();
         int tile = 0;
         while (slices.hasNext()) {
@@ -108,7 +113,8 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * @param debug Might want to do some debugging...
      * @return placement cost
      */
-    public double placementCost(boolean debug) {
+    @Override
+	public double placementCost(boolean debug) {
     	assert false : "placement() should not be called";
     	
     	double tileCosts[] = new double[chip.size()];
@@ -161,7 +167,8 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * simulated annealing. This does not include the initial placement. 
      *
      */
-    public void initialize() {
+    @Override
+	public void initialize() {
         
     }
     
@@ -174,11 +181,13 @@ public class NoSWPipeLayout<T extends ComputeNode, Ts extends ComputeNodesI> ext
      * @return Should we set the min config to this config (they have the same
      * cost). 
      */
-    protected boolean keepNewEqualMin() {
+    @Override
+	protected boolean keepNewEqualMin() {
         return false;
     }
         
-    public void runLayout() { 
+    @Override
+	public void runLayout() { 
         //initialPlacement();
         
         // set up assignemts for filters in assignment

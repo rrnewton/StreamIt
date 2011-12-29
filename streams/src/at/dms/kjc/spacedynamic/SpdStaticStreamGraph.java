@@ -87,7 +87,8 @@ public class SpdStaticStreamGraph  extends at.dms.kjc.flatgraph.ScheduledStaticS
         return this.numTilesAssigned;
     }
 
-    protected void createExecutionCounts() {
+    @Override
+	protected void createExecutionCounts() {
         // create execution counts, before raw considerations.
         super.createExecutionCounts();
         // now, in the above calculation, an execution of a joiner node is

@@ -48,44 +48,52 @@ public abstract class CNumericType extends CType {
     /**
      * Returns a string representation of this type.
      */
-    public abstract String toString();
+    @Override
+	public abstract String toString();
 
     /**
      * Returns the VM signature of this type.
      */
-    public abstract String getSignature();
+    @Override
+	public abstract String getSignature();
 
     /**
      * Appends the VM signature of this type to the specified buffer.
      */
-    protected abstract void appendSignature(SimpleStringBuffer buffer);
+    @Override
+	protected abstract void appendSignature(SimpleStringBuffer buffer);
 
     /**
      * Returns the stack size (conservative estimate of maximum number
      * of bytes needed in C on 32-bit machine) used by a value of this
      * type.
      */
-    public abstract int getSizeInC();
+    @Override
+	public abstract int getSizeInC();
 
     /**
      * Returns the stack size used by a value of this type.
      */
-    public abstract int getSize();
+    @Override
+	public abstract int getSize();
 
     /**
      * Is this type ordinal ?
      */
-    public abstract boolean isOrdinal();
+    @Override
+	public abstract boolean isOrdinal();
 
     /**
      * Is this a floating point type ?
      */
-    public abstract boolean isFloatingPoint();
+    @Override
+	public abstract boolean isFloatingPoint();
 
     /**
      * Is this a numeric type ?
      */
-    public boolean isNumeric() {
+    @Override
+	public boolean isNumeric() {
         return true;
     }
 
@@ -98,7 +106,8 @@ public abstract class CNumericType extends CType {
      * necessary to resolve String into java/lang/String
      * @exception   UnpositionedError   this error will be positioned soon
      */
-    public void checkType(CContext context) throws UnpositionedError {
+    @Override
+	public void checkType(CContext context) throws UnpositionedError {
     }
 
     /**
@@ -106,14 +115,16 @@ public abstract class CNumericType extends CType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public abstract boolean isAssignableTo(CType dest);
+    @Override
+	public abstract boolean isAssignableTo(CType dest);
 
     /**
      * Can this type be converted to the specified type by casting conversion (JLS 5.5) ?
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isCastableTo(CType dest) {
+    @Override
+	public boolean isCastableTo(CType dest) {
         return dest.isNumeric();
     }
 
@@ -172,7 +183,8 @@ public abstract class CNumericType extends CType {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CNumericType other) {

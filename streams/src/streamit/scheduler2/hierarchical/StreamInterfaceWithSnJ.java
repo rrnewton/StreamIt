@@ -38,7 +38,8 @@ public interface StreamInterfaceWithSnJ
      * Get the number of phases that the split of this SplitJoin has.
      * @return number of split's phases
      */
-    public int getNumSplitPhases();
+    @Override
+	public int getNumSplitPhases();
 
     /**
      * Get the appropriate phase for the split of this SplitJoin.
@@ -50,7 +51,8 @@ public interface StreamInterfaceWithSnJ
      * Get the number of phases that the join of this SplitJoin has.
      * @return number of split's join
      */
-    public int getNumJoinPhases();
+    @Override
+	public int getNumJoinPhases();
 
     /**
      * Get the appropriate phase for the join of this SplitJoin.

@@ -62,7 +62,8 @@ public class JContinueStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         if (label != null) {
             target = context.getLabeledStatement(label);
             check(context, target != null, KjcMessages.LABEL_UNKNOWN, label);
@@ -87,7 +88,8 @@ public class JContinueStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitContinueStatement(this, label);
     }
 
@@ -95,7 +97,8 @@ public class JContinueStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitContinueStatement(this, label);
     }
 
@@ -103,7 +106,8 @@ public class JContinueStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         code.plantBreak(target);
@@ -122,7 +126,8 @@ public class JContinueStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JContinueStatement other = new at.dms.kjc.JContinueStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

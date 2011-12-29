@@ -9,7 +9,8 @@ final class CInt64Type extends CLongType {
     /**
      * Returns a string representation of this type.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "uint64_t";
     }
 }

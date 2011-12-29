@@ -92,7 +92,8 @@ public class UnresolvedConstant extends PooledConstant {
     // DUMMY METHODS
     // --------------------------------------------------------------------
 
-    /*package*/ Object getLiteral() {
+    /*package*/ @Override
+	Object getLiteral() {
         throw new InconsistencyException("method should not be called");
     }
 
@@ -101,7 +102,8 @@ public class UnresolvedConstant extends PooledConstant {
      * CONVENTION: return XXXXXXXXXXXX &lt;&lt; 4 + Y
      * with Y = ident of the type of the pooled constant
      */
-    public final int hashCode() {
+    @Override
+	public final int hashCode() {
         throw new InconsistencyException("method should not be called");
     }
 
@@ -109,7 +111,8 @@ public class UnresolvedConstant extends PooledConstant {
      * equals (an exact comparison)
      * ASSERT: this.hashCode == o.hashCode ===&gt; cast
      */
-    public final boolean equals(Object o) {
+    @Override
+	public final boolean equals(Object o) {
         throw new InconsistencyException("method should not be called");
     }
 
@@ -119,7 +122,8 @@ public class UnresolvedConstant extends PooledConstant {
      * @param   pc      the already in pooled constant
      * ASSERT pc.getClass() == this.getClass()
      */
-    /*package*/ final void resolveConstants(PooledConstant pc) {
+    /*package*/ @Override
+	final void resolveConstants(PooledConstant pc) {
         throw new InconsistencyException("method should not be called");
     }
 
@@ -128,7 +132,8 @@ public class UnresolvedConstant extends PooledConstant {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp)  {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp)  {
         throw new InconsistencyException("method should not be called");
     }
 
@@ -139,7 +144,8 @@ public class UnresolvedConstant extends PooledConstant {
      * @param   cp      the constant pool that contain all data
      * @param   out     the file where to write this object info
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) {
         throw new InconsistencyException("method should not be called");
     }
 

@@ -159,14 +159,16 @@ public class CodeInfo extends Attribute {
     /**
      * Returns the attribute's tag
      */
-    /*package*/ int getTag() {
+    @Override
+	/*package*/ int getTag() {
         return Constants.ATT_CODE;
     }
 
     /**
      * Returns the space in bytes used by this attribute in the classfile
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         if (codeLength == -1) {
             throw new InconsistencyException("code length not yet computed");
         }
@@ -273,7 +275,8 @@ public class CodeInfo extends Attribute {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) throws ClassFileFormatException {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) throws ClassFileFormatException {
         cp.addItem(attr);
 
         for (int i = 0; i < instructions.length; i++) {
@@ -300,7 +303,8 @@ public class CodeInfo extends Attribute {
      * @exception   ClassFileFormatException    attempt to
      *                  write a bad classfile info
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out)
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out)
         throws IOException, ClassFileFormatException
     {
         out.writeShort(attr.getIndex());

@@ -47,6 +47,7 @@ import at.dms.kjc.sir.StreamVisitor;
  * @author Janis
  * @deprecated
  */
+@Deprecated
 class IncreaseFilterMult implements StreamVisitor {
 
     class WorkInfo {
@@ -122,18 +123,21 @@ class IncreaseFilterMult implements StreamVisitor {
     }
 
 
-    public void preVisitPipeline(SIRPipeline self, 
+    @Override
+	public void preVisitPipeline(SIRPipeline self, 
                                  SIRPipelineIter iter) {
 //        start_of_pipeline = true;
     }
 
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter) {
         sj_counter++;
 //        start_of_pipeline = true;
     }
 
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
         sj_counter--;
     }
@@ -183,7 +187,7 @@ class IncreaseFilterMult implements StreamVisitor {
                     boolean fused = true;
             
                     for (int i = 0; i < parent.size(); i++) {
-                        SIRStream str = (SIRStream)parent.get(i);
+                        SIRStream str = parent.get(i);
                         if (!isFusedWith(str, oper, partitionMap)) {
                             fused = false;
                             break;
@@ -206,7 +210,7 @@ class IncreaseFilterMult implements StreamVisitor {
             // recurse up if split join has duplicate splitter
             // or if we are the first element in the pipeline
         
-            child = (SIRStream)parent;
+            child = parent;
             parent = parent.getParent();
         
             assert(!(parent instanceof SIRFeedbackLoop)); 
@@ -275,7 +279,8 @@ class IncreaseFilterMult implements StreamVisitor {
         return mult;
     }
     
-    public void visitFilter(SIRFilter filter,
+    @Override
+	public void visitFilter(SIRFilter filter,
                             SIRFilterIter iter) { 
     
         int _mult = calcMult(filter);
@@ -409,7 +414,7 @@ class IncreaseFilterMult implements StreamVisitor {
 
         JMethodDeclaration new_work = 
             new JMethodDeclaration(null, 
-                                   at.dms.kjc.Constants.ACC_PUBLIC,
+                                   at.dms.classfile.Constants.ACC_PUBLIC,
                                    CStdType.Void,
                                    work.getName(),
                                    JFormalParameter.EMPTY,
@@ -450,7 +455,8 @@ class IncreaseFilterMult implements StreamVisitor {
             System.out.println(" new work: "+filter.getWork().getName());
     }
 
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         // This is a stub; it'll get filled in once we figure out how phased
         // filters should actually work.
@@ -467,19 +473,22 @@ class IncreaseFilterMult implements StreamVisitor {
     //public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {}
     
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
     
     /**
      * POST-VISITS 
      */
         
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {}
+    @Override
+	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {}
    
     /* post-visit a splitjoin */
     //public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {}
 
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {}
 
 }

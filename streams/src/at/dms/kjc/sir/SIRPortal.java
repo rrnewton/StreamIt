@@ -58,7 +58,8 @@ public class SIRPortal extends JLiteral /*JExpression*/ {
     public static boolean findMessageStatements(SIRStream str) {
         final FindMessageStatements finder = new FindMessageStatements();
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream self, SIRIterator iter) {
+                @Override
+				public void preVisitStream(SIRStream self, SIRIterator iter) {
                     finder.setSender(self);
                     JMethodDeclaration[] methods = self.getMethods();
                     for (int i=0; i<methods.length; i++) {
@@ -157,7 +158,8 @@ public class SIRPortal extends JLiteral /*JExpression*/ {
             return foundMessageStatement;
         }
 
-        public Object visitMessageStatement(SIRMessageStatement self, 
+        @Override
+		public Object visitMessageStatement(SIRMessageStatement self, 
                                             JExpression portal, 
                                             java.lang.String iname, 
                                             java.lang.String ident, 
@@ -178,21 +180,25 @@ public class SIRPortal extends JLiteral /*JExpression*/ {
     /**
      * Throws an exception (NOT SUPPORTED YET)
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         at.dms.util.Utils.fail("Analysis of custom nodes not supported yet.");
         return this;
     }
 
-    public boolean isConstant() 
+    @Override
+	public boolean isConstant() 
     {
         return true;
     }
 
-    public boolean isDefault() { 
+    @Override
+	public boolean isDefault() { 
         return false; 
     }
 
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         throw new InconsistencyException("cannot convert Potral type"); 
     }
 
@@ -200,7 +206,8 @@ public class SIRPortal extends JLiteral /*JExpression*/ {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Null;
     }
 
@@ -208,7 +215,8 @@ public class SIRPortal extends JLiteral /*JExpression*/ {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitPortal(this);
         } else {
@@ -220,7 +228,8 @@ public class SIRPortal extends JLiteral /*JExpression*/ {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitPortal(this);
         } else {
@@ -247,14 +256,16 @@ public class SIRPortal extends JLiteral /*JExpression*/ {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (!discardValue) {
             setLineNumber(code);
             code.plantNoArgInstruction(opc_aconst_null);
         }
     }
     
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         // does not make sense for an sir portal
         return "[SIRPortal]";
     }

@@ -308,7 +308,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * Constant prop should have removed all resolvable array expressions, so if we see one
      * then it is not linear and therefore we should return null;
      **/
-    public Object visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public Object visitArrayAccessExpression(JArrayAccessExpression self,
                                              JExpression prefix,
                                              JExpression accessor) {
         return getMapping(self);
@@ -318,7 +319,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * ignoring arrays on the principle that constprop gets rid of all the ones that are
      * known at compile time.
      **/
-    public Object visitArrayInitializer(JArrayInitializer self, JExpression[] elems){
+    @Override
+	public Object visitArrayInitializer(JArrayInitializer self, JExpression[] elems){
         LinearPrinter.warn("Ignoring array initialization expression: " + self);
         throw new RuntimeException("Array initializations are not supported yet.");
     }
@@ -331,7 +333,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * the variable (JLocalVariableExpression or JFieldAccessExpression)
      * to the linear form in the variablesToLinearForm map.
      **/
-    public Object visitAssignmentExpression(JAssignmentExpression self, JExpression left, JExpression right) {
+    @Override
+	public Object visitAssignmentExpression(JAssignmentExpression self, JExpression left, JExpression right) {
         LinearPrinter.println("  visiting assignment expression: " + self);
         LinearPrinter.println("   left side: " + left);
         LinearPrinter.println("   right side: " + right);
@@ -420,7 +423,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * ever run into this situation because constant prop should get
      * rid of them all.
      **/
-    public Object visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public Object visitBinaryExpression(JBinaryExpression self,
                                         String oper,
                                         JExpression left,
                                         JExpression right) {
@@ -530,8 +534,10 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
     
     
 
-    public Object visitBitwiseComplementExpression(JUnaryExpression self, JExpression expr){return null;}
-    public Object visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public Object visitBitwiseComplementExpression(JUnaryExpression self, JExpression expr){return null;}
+    @Override
+	public Object visitBitwiseExpression(JBitwiseExpression self,
                                          int oper,
                                          JExpression left,
                                          JExpression right){return null;}
@@ -543,7 +549,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * an integer, byte, etc. If we cast something to an int, that is a non linear operation, so we
      * just return null.
      **/
-    public Object visitCastExpression(JCastExpression self, JExpression expr, CType type){
+    @Override
+	public Object visitCastExpression(JCastExpression self, JExpression expr, CType type){
         // if we have a non ordinal type for the expression, and an ordinal type for
         // the cast, then this is a non linear operation, and we should return null.
         if (type.isOrdinal() && (!expr.getType().isOrdinal())) {
@@ -580,7 +587,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * If the left hand side is a JLocalVariableExpression or JFieldAccessExpression
      * we add the appropriate mapping in variablesToLinearForms.
      **/
-    public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                     int oper, JExpression left,
                                                     JExpression right){
 
@@ -623,7 +631,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * handle reducing this case if the conditional expression expr is constant, we assume that a
      * JConditionalExpression is non linear, and thus return null.
      **/
-    public Object visitConditionalExpression(JConditionalExpression self, JExpression cond,
+    @Override
+	public Object visitConditionalExpression(JConditionalExpression self, JExpression cond,
                                              JExpression left, JExpression right){
         return null; 
     }
@@ -635,7 +644,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
     //     public Object visitDoStatement(JDoStatement self, JExpression cond, JStatement body){return null;}
     //     public Object visitEmptyStatement(JEmptyStatement self){return null;}
     /** Equality is a non linear operation, so we return null. **/
-    public Object visitEqualityExpression(JEqualityExpression self, boolean equal,
+    @Override
+	public Object visitEqualityExpression(JEqualityExpression self, boolean equal,
                                           JExpression left, JExpression right){
         return null;
     }
@@ -649,7 +659,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * expression in variablesToLinearForms, we return that. If there is no linear
      * form mapped to this expression, we simply return null;
      **/
-    public Object visitFieldExpression(JFieldAccessExpression self, JExpression left, String ident){
+    @Override
+	public Object visitFieldExpression(JFieldAccessExpression self, JExpression left, String ident){
         checkRep();
         LinearPrinter.println("  visiting field access expression: " + self);
         LinearPrinter.println("   left: " + left);
@@ -672,7 +683,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
     }
     //     public Object visitFormalParameters(JFormalParameter self, boolean isFinal,
     //                  CType type, String ident){return null;}
-    public Object visitForStatement(JForStatement self, JStatement init,
+    @Override
+	public Object visitForStatement(JForStatement self, JStatement init,
                                     JExpression cond, JStatement incr, JStatement body){
         this.nonLinearFlag = true;
         LinearPrinter.warn("Not yet implemented -- for loops are not handled yet (use --unroll 100000).");
@@ -685,7 +697,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * the conditional is a constant, constprop should have taken
      * care of it, so flag an error.
      **/
-    public Object visitIfStatement(JIfStatement self, JExpression cond,
+    @Override
+	public Object visitIfStatement(JIfStatement self, JExpression cond,
                                    JStatement thenClause, JStatement elseClause){
         LinearForm condForm = (LinearForm)cond.accept(this);
         // if the cond form is a constant (eg only an offset), we should bomb an error as
@@ -732,7 +745,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * variable in our mappings to linear forms, return the linear form
      * otherwise return null.
      **/
-    public Object visitLocalVariableExpression(JLocalVariableExpression self, String ident){
+    @Override
+	public Object visitLocalVariableExpression(JLocalVariableExpression self, String ident){
         LinearPrinter.println("  visiting local var expression: " + self);
         LinearPrinter.println("   variable: " + self.getVariable());
 
@@ -744,7 +758,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * Eventually, we should do interprodcedural analysis. Right now instead, we will
      * simply ignore them (eg return null signifying that they do not generate linear things).
      **/
-    public Object visitMethodCallExpression(JMethodCallExpression self, JExpression prefix,
+    @Override
+	public Object visitMethodCallExpression(JMethodCallExpression self, JExpression prefix,
                                             String ident, JExpression[] args){  
         LinearPrinter.warn("Assuming method call expression non linear(" +
                            ident + "). Also removing all field mappings.");
@@ -752,7 +767,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
         return null;
     }
     
-    public Object visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public Object visitPrintStatement(SIRPrintStatement self,
                                       JExpression arg) {
         /* if this method call is to a method with side effects,
            mark the whole expression as non-linear. */
@@ -816,7 +832,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * a zero linear form (corresponding to initializing all array entries to zero
      * in StreamIt semantics.
      **/
-    public Object visitNewArrayExpression(JNewArrayExpression self, CType type,
+    @Override
+	public Object visitNewArrayExpression(JNewArrayExpression self, CType type,
                                           JExpression[] dims, JArrayInitializer init){
         // right now, only support one dimensional arrays. If more than one dimension, complain loudly
         if (dims.length > 1) { throw new RuntimeException("Multidimensional arrays are not supported yet"); }
@@ -826,7 +843,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
 
     //     public Object visitPackageImport(String name){return null;}
     //     public Object visitPackageName(String name){return null;}
-    public Object visitParenthesedExpression(JParenthesedExpression self, JExpression expr){
+    @Override
+	public Object visitParenthesedExpression(JParenthesedExpression self, JExpression expr){
         LinearPrinter.println("  visiting parenthesized expression");
         // pass ourselves through the parenthesized expression to generate the approprate constant forms
         return expr.accept(this);
@@ -844,7 +862,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * Since these are all non linear operatons, we need to return
      * null to flag the rest of the visitor that they are non linear operations.
      **/
-    public Object visitRelationalExpression(JRelationalExpression self, int oper,
+    @Override
+	public Object visitRelationalExpression(JRelationalExpression self, int oper,
                                             JExpression left, JExpression right){
         LinearPrinter.println("  visiting non linear" + self);
         return null;
@@ -859,7 +878,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * then make the shift a multiplication or division. Otherwise, this is
      * not a linear operation.
      **/
-    public Object visitShiftExpression(JShiftExpression self, int oper, JExpression left, JExpression right){
+    @Override
+	public Object visitShiftExpression(JShiftExpression self, int oper, JExpression left, JExpression right){
         // since the left and the right expressions are somre type of integer
         // or byte or something, we are all set. You can't shift floats, as it
         // is not in java syntax and KOPI disallows it in the semantic checking
@@ -916,7 +936,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
     //     public Object visitTypeNameExpression(JTypeNameExpression self, CType type){return null;}
 
     /* visit a unary minus expression to negate a value. */
-    public Object visitUnaryMinusExpression(JUnaryExpression self, JExpression expr){
+    @Override
+	public Object visitUnaryMinusExpression(JUnaryExpression self, JExpression expr){
         /* visit the internal expression to see if it is linear. */
         LinearForm exprForm = (LinearForm)expr.accept(this);
         if (exprForm != null) {
@@ -934,7 +955,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * type casts in the linear analysis, a promote
      * expression basically just visits the expression.
      **/
-    public Object visitUnaryPromoteExpression(JUnaryPromote self, JExpression expr, CType type){
+    @Override
+	public Object visitUnaryPromoteExpression(JUnaryPromote self, JExpression expr, CType type){
         return expr.accept(this);
     }
     
@@ -954,7 +976,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * then they are unlikely to do linear things and hence this filter is
      * most probably non-linear.
      **/
-    public Object visitWhileStatement(JWhileStatement self, JExpression cond, JStatement body){
+    @Override
+	public Object visitWhileStatement(JWhileStatement self, JExpression cond, JStatement body){
         this.nonLinearFlag = true;  
         LinearPrinter.warn("Not yet implemented -- while statements are not yet implemented");
         throw new NonLinearException("While statements are not implemented.");
@@ -963,7 +986,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
 
 
     ///// SIR Constructs that are interesting for linear analysis (eg push, pop, and peek expressions)
-    public Object visitIterationExpression(SIRIterationExpression self) {
+    @Override
+	public Object visitIterationExpression(SIRIterationExpression self) {
         assert false : "This feature is unsupported for iteration count";
     	return null;
     }
@@ -976,7 +1000,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * by copying the linear form into the appropriate column of A and the
      * appropriate location in b.
      **/
-    public Object visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
+    @Override
+	public Object visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
         LinearPrinter.println("  visiting push expression: " +
                               "argument: " + arg);
         // try and resolve the argument to a LinearForm by munging the argument
@@ -1018,7 +1043,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * one of the input values from the tapes, and therefore should correspond to a linear form
      * with a "1" at the appropriate place in the weights vector.
      **/
-    public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
+    @Override
+	public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
         LinearPrinter.println("  visiting pop expression: " + self);
         // A pop expression is one of the base cases for creating LinearForms
         // the pop expression will creates a linear form that corresponds to using
@@ -1054,7 +1080,8 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * the case when there haev been previous pops which change the relative position of the
      * index we are processing.
      **/
-    public Object visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
+    @Override
+	public Object visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
         LinearPrinter.println("  visiting peek expression" +
                               " peek index: " + arg);
 
@@ -1100,44 +1127,54 @@ class LinearFilterVisitor extends SLIREmptyAttributeVisitor implements SLIRAttri
      * Visit boolean literal. Boolean logic falls outside the
      * realm of linear filter analysis -- return null.
      **/
-    public Object visitBooleanLiteral(JBooleanLiteral self,boolean value) {return null;}
+    @Override
+	public Object visitBooleanLiteral(JBooleanLiteral self,boolean value) {return null;}
     /** Visit a byte literal. Create the appropriate valued offset. **/
-    public Object visitByteLiteral(JByteLiteral self, byte value) {
-        return this.getOffsetLinearForm((double)value);
+    @Override
+	public Object visitByteLiteral(JByteLiteral self, byte value) {
+        return this.getOffsetLinearForm(value);
     }
     /** Visit a character literal. Create the appropriate valued offset **/
-    public Object visitCharLiteral(JCharLiteral self,char value) {
-        return this.getOffsetLinearForm((double)value);
+    @Override
+	public Object visitCharLiteral(JCharLiteral self,char value) {
+        return this.getOffsetLinearForm(value);
     }
     /** Visit a double. Create the appropriate valued offset. **/
-    public Object visitDoubleLiteral(JDoubleLiteral self,double value) {
-        return this.getOffsetLinearForm((double)value);
+    @Override
+	public Object visitDoubleLiteral(JDoubleLiteral self,double value) {
+        return this.getOffsetLinearForm(value);
     }
     /** Visit a float. Create the appropriate valued offset. **/
-    public Object visitFloatLiteral(JFloatLiteral self,float value) {
-        return this.getOffsetLinearForm((double)value);
+    @Override
+	public Object visitFloatLiteral(JFloatLiteral self,float value) {
+        return this.getOffsetLinearForm(value);
     }
     /** Visit an int. Create the appropriate valued offset. **/
-    public Object visitIntLiteral(JIntLiteral self, int value) {
-        return this.getOffsetLinearForm((double)value);
+    @Override
+	public Object visitIntLiteral(JIntLiteral self, int value) {
+        return this.getOffsetLinearForm(value);
     }
     /**  Visit a long. Create the appropriate valued offset. **/
-    public Object visitLongLiteral(JLongLiteral self,long value) {
-        return this.getOffsetLinearForm((double)value);
+    @Override
+	public Object visitLongLiteral(JLongLiteral self,long value) {
+        return this.getOffsetLinearForm(value);
     }
     /** Visit a short. Create the appropriate valued offset. **/
-    public Object visitShortLiteral(JShortLiteral self,short value) {
-        return this.getOffsetLinearForm((double)value);
+    @Override
+	public Object visitShortLiteral(JShortLiteral self,short value) {
+        return this.getOffsetLinearForm(value);
     }
     /** Visit a string (don't handle). We can't deal with strings, not linear, return null **/
-    public Object visitStringLiteral(JStringLiteral self,String value) {
+    @Override
+	public Object visitStringLiteral(JStringLiteral self,String value) {
         return null;
     }
     /**
      * Visit a null literal (don't handle). If we have null nonsense, the expression
      * is not going to be linear. Return null (how appropriate).
      **/
-    public Object visitNullLiteral(JNullLiteral self) {
+    @Override
+	public Object visitNullLiteral(JNullLiteral self) {
         return null;
     }
 

@@ -35,7 +35,8 @@ public class Filter extends streamit.scheduler2.hierarchical.Filter
         super(iterator);
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         // this is really simple
         // a minimum-latency schedule for a filter consists of just 

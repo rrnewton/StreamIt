@@ -17,13 +17,15 @@ public class InitPeekRestriction extends Restriction
     
     
     
-    public boolean notifyExpired()
+    @Override
+	public boolean notifyExpired()
     {
         portal.getParent().initRestrictionsCompleted(portal);
         return true;
     }
 
-    public void useRestrictions(Restrictions _restrictions)
+    @Override
+	public void useRestrictions(Restrictions _restrictions)
     {
         super.useRestrictions(_restrictions);
         setMaxExecutions(portal.getMaxLatency());

@@ -36,7 +36,8 @@ import streamit.frontend.nodes.StreamSpec;
  */
 public class CreateInitFunctions extends FEReplacer
 {
-    public Object visitStreamSpec(StreamSpec ss)
+    @Override
+	public Object visitStreamSpec(StreamSpec ss)
     {
         boolean hasInit = false;
         for (Function func : ss.getFuncs())

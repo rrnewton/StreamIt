@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JCompoundStatement;
 import at.dms.kjc.JExpression;
@@ -38,7 +39,8 @@ public class ReplaceVarDecls extends SLIRReplacingVisitor {
     /**
      * Part of visitor: replace declarations from <i>var_names</i> with initialization statements but no declaration.
      */
-    public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                     JVariableDefinition[] vars) 
     {
     
@@ -59,7 +61,7 @@ public class ReplaceVarDecls extends SLIRReplacingVisitor {
             } else {
 
                 // the variable has been eliminated
-                if (vars[i].getType().getTypeID() == CType.TID_INT) {
+                if (vars[i].getType().getTypeID() == Constants.TID_INT) {
                     if (vars[i].getValue() != null) {           
                         Integer name = 
                             var_names.get(vars[i]);
@@ -71,7 +73,7 @@ public class ReplaceVarDecls extends SLIRReplacingVisitor {
                 }
         
         
-                if (vars[i].getType().getTypeID() == CType.TID_FLOAT) {
+                if (vars[i].getType().getTypeID() == Constants.TID_FLOAT) {
                     if (vars[i].getValue() != null) {           
                         Integer name = 
                             var_names.get(vars[i]);
@@ -111,19 +113,20 @@ public class ReplaceVarDecls extends SLIRReplacingVisitor {
     /**
      * Part of visitor: replace occurence of variables in <i>var_names</i> with reference to new name.
      */
-    public Object visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public Object visitLocalVariableExpression(JLocalVariableExpression self,
                                                String ident) {
 
         if (var_names.containsKey(self.getVariable())) {
 
             // variable has been eliminated
-            if (self.getType().getTypeID() == CType.TID_INT) {
+            if (self.getType().getTypeID() == Constants.TID_INT) {
                 Integer name = var_names.get(self.getVariable());
                 JVariableDefinition var = find_obj.getIntVar(name);
                 return new JLocalVariableExpression(null, var);
             }
 
-            if (self.getType().getTypeID() == CType.TID_FLOAT) {
+            if (self.getType().getTypeID() == Constants.TID_FLOAT) {
                 Integer name = var_names.get(self.getVariable());
                 JVariableDefinition var = find_obj.getFloatVar(name);
                 return new JLocalVariableExpression(null, var);

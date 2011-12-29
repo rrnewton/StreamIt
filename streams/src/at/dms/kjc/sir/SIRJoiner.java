@@ -152,7 +152,8 @@ public class SIRJoiner extends SIROperator {
     /**
      * Accepts attribute visitor <v> at this node.
      */
-    public Object accept(AttributeStreamVisitor v) {
+    @Override
+	public Object accept(AttributeStreamVisitor v) {
         return v.visitJoiner(this,
                              type,
                              weights);
@@ -185,11 +186,13 @@ public class SIRJoiner extends SIROperator {
     /**
      * See doc in SIROperator.
      */
-    public String getIdent() {
+    @Override
+	public String getIdent() {
         return type.toString() + "_Joiner";
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "SIRJoiner:"+getName();
     }
 
@@ -240,7 +243,8 @@ public class SIRJoiner extends SIROperator {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRJoiner other = new at.dms.kjc.sir.SIRJoiner();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -53,7 +53,8 @@ public class FileState implements StreamGraphVisitor, FlatVisitor {
     /** As we are assigning ports to writers, this is the next port num to assign */
     private int writerPort;
     
-    public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
+    @Override
+	public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
         ssg.getTopLevel().accept(this, new HashSet<FlatNode>(), false);
     }
 
@@ -119,7 +120,8 @@ public class FileState implements StreamGraphVisitor, FlatVisitor {
 
     /** If we have a file reader or writer, create the device and connect
         it to the raw chip **/
-    public void visitNode(FlatNode node) {
+    @Override
+	public void visitNode(FlatNode node) {
         //lots of duplication here, but oh well
         if (node.contents instanceof SIRFileReader) {
             FileReaderDevice dev = new FileReaderDevice(streamGraph, node);

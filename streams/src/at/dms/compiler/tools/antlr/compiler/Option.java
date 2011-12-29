@@ -36,7 +36,8 @@ class Option {
     public void setEnclosingGrammar(GrammarDefinition g) { enclosingGrammar=g; }
     public void setName(String n) {name=n;}
     public void setRHS(String rhs) {this.rhs = rhs;}
-    public String toString() {
+    @Override
+	public String toString() {
         return "\t"+name+rhs;
     }
 }

@@ -77,7 +77,8 @@ public class ComplexToStruct extends FEReplacer
         cplxType = null;
     }
     
-    public Object visitProgram(Program prog)
+    @Override
+	public Object visitProgram(Program prog)
     {
         // Go through the list of structures, and notice them all.
         // We also need to rewrite the structures, in case there are
@@ -118,7 +119,8 @@ public class ComplexToStruct extends FEReplacer
         return super.visitProgram(prog);
     }
 
-    public Object visitFieldDecl(FieldDecl field)
+    @Override
+	public Object visitFieldDecl(FieldDecl field)
     {
         List<Type> newTypes = new java.util.ArrayList<Type>();
         for (int i = 0; i < field.getNumFields(); i++)
@@ -127,7 +129,8 @@ public class ComplexToStruct extends FEReplacer
                              field.getNames(), field.getInits());
     }
 
-    public Object visitFunction(Function func)
+    @Override
+	public Object visitFunction(Function func)
     {
         // Visit the parameter list, then let FEReplacer do the
         // rest of the work.
@@ -151,7 +154,8 @@ public class ComplexToStruct extends FEReplacer
                                                 func.getPushRate()));
     }
 
-    public Object visitStmtVarDecl(StmtVarDecl stmt)
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt)
     {
         List<Type> newTypes = new java.util.ArrayList<Type>();
         for (int i = 0; i < stmt.getNumVars(); i++)
@@ -160,7 +164,8 @@ public class ComplexToStruct extends FEReplacer
                                stmt.getNames(), stmt.getInits());
     }
 
-    public Object visitStreamSpec(StreamSpec ss)
+    @Override
+	public Object visitStreamSpec(StreamSpec ss)
     {
         // Visit the parameter list, then let FEReplacer do the
         // rest of the work.
@@ -182,7 +187,8 @@ public class ComplexToStruct extends FEReplacer
                                                     ss.isStateful()));
     }
 
-    public Object visitStreamType(StreamType st)
+    @Override
+	public Object visitStreamType(StreamType st)
     {
         return new StreamType(st.getContext(),
                               remapType(st.getIn()),

@@ -167,7 +167,8 @@ public class ManualPartition {
     public static SIRStream[] getStreams(SIRStream str, final String prefix) {
         final ArrayList<SIRStream> result = new ArrayList<SIRStream>();
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     if (self.getName().startsWith(prefix)) {
                         result.add(self);
@@ -184,7 +185,8 @@ public class ManualPartition {
     public static SIRStream[] getStreamsContaining(SIRStream str, final String subStr) {
         final ArrayList<SIRStream> result = new ArrayList<SIRStream>();
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     if (self.getName().indexOf(subStr)>=0) {
                         result.add(self);
@@ -201,7 +203,8 @@ public class ManualPartition {
     public static SIRStream getStream(SIRStream str, final String name) {
         final ArrayList<SIRStream> result = new ArrayList<SIRStream>();
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     if (self.getName().equals(name)) {
                         result.add(self);
@@ -538,7 +541,8 @@ public class ManualPartition {
         KjcOptions.unroll = limit;
 
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     // unroll in all methods
                     JMethodDeclaration[] methods = self.getMethods();

@@ -104,7 +104,8 @@ public class SIRPrintStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
     }
 
     // ----------------------------------------------------------------------
@@ -115,13 +116,15 @@ public class SIRPrintStatement extends JStatement {
      * Generates a sequence of bytescodes - NOT IMPLEMENTED YET.
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {}
+    @Override
+	public void genCode(CodeSequence code) {}
 
     /**
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitPrintStatement(this,
                                                                  arg);
@@ -133,7 +136,8 @@ public class SIRPrintStatement extends JStatement {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitPrintStatement(this, arg);
         } else {
@@ -144,7 +148,8 @@ public class SIRPrintStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRPrintStatement other = new at.dms.kjc.sir.SIRPrintStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

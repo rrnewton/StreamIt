@@ -64,19 +64,23 @@ public abstract class SIRIterator implements Iterator {
         this.pos = pos;
     }
 
-    public FilterIter isFilter() {
+    @Override
+	public FilterIter isFilter() {
         return null;
     }
 
-    public PipelineIter isPipeline() {
+    @Override
+	public PipelineIter isPipeline() {
         return null;
     }
 
-    public SplitJoinIter isSplitJoin() {
+    @Override
+	public SplitJoinIter isSplitJoin() {
         return null;
     }
 
-    public FeedbackLoopIter isFeedbackLoop() {
+    @Override
+	public FeedbackLoopIter isFeedbackLoop() {
         return null;
     }
     
@@ -121,7 +125,8 @@ public abstract class SIRIterator implements Iterator {
      * Return the stream pointed to by this.  (Redundant with
      * getStream(), but required for Iterator interface.)
      */
-    public Object getObject() {
+    @Override
+	public Object getObject() {
         return getStream();
     }
 
@@ -179,7 +184,8 @@ public abstract class SIRIterator implements Iterator {
      * stream objects they're iterating over.  This is required for
      * the scheduler interface.
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return getStream().hashCode();
     } 
 
@@ -188,7 +194,8 @@ public abstract class SIRIterator implements Iterator {
      * stream objects they're iterating over.  This is required for
      * the scheduler interface.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return o instanceof SIRIterator && ((SIRIterator)o).getStream()==this.getStream();
     } 
 

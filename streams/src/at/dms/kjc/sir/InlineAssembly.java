@@ -105,7 +105,8 @@ public class InlineAssembly extends JStatement {
      * anything. InlineAssembly should be blackbox to everyone but
      * codegen.
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         //Utils.fail("accept(AttributeVisitor) not supported by InlineAssembly");
         return null;
     }
@@ -114,7 +115,8 @@ public class InlineAssembly extends JStatement {
      * Dummy method for genCode(CodeSequence). This is not needed by
      * InlineAssembly.
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         Utils.fail("genCode(CodeSequence) not supported by InlineAssembly");
     }
 
@@ -122,7 +124,8 @@ public class InlineAssembly extends JStatement {
      * Dummy method for analyse(CBodyContext context). This is not
      * needed by InlineAssembly.
      */
-    public void analyse(CBodyContext context) {
+    @Override
+	public void analyse(CBodyContext context) {
         Utils.fail("analyse(CBodyContext) not supported by InlineAssembly");
     }
 
@@ -131,7 +134,8 @@ public class InlineAssembly extends JStatement {
      * to
      * p.visitInlineAssembly(this,getInstructions(),getInput(),getClobber()).
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if(p instanceof SLIREmptyVisitor)
             ((SLIREmptyVisitor)p).visitInlineAssembly(this,getInstructions(),getInput(),getClobber());
     }

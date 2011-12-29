@@ -53,7 +53,8 @@ public class OptgenLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
         setCaseSensitive(true);
     }
 
-    public Token nextToken() throws TokenStreamException {
+    @Override
+	public Token nextToken() throws TokenStreamException {
         Token theRetToken=null;
         tryAgain:
         for (;;) {
@@ -124,7 +125,7 @@ public class OptgenLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                         }
                         else {
                             if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-                            else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                            else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                         }
                     }
                     if ( _returnToken==null ) { continue tryAgain; } // found SKIP token
@@ -191,7 +192,7 @@ public class OptgenLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -288,7 +289,7 @@ public class OptgenLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -432,7 +433,7 @@ public class OptgenLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -483,7 +484,7 @@ public class OptgenLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
             }
         default:
             {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         }
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -534,7 +535,7 @@ public class OptgenLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }

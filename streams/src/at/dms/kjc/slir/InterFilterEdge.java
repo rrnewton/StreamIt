@@ -75,19 +75,19 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
     @Override
     public OutputNode getSrc() {
         
-        return (OutputNode)src;
+        return src;
     }
 
     @Override
     public InputNode getDest() {
-        return (InputNode)dst;
+        return dst;
     }
 
     @Override
     public void setSrc(OutputNode src) {
  
         //make sure we did not create this edge before!
-        EdgeDescriptor edgeDscr = new EdgeDescriptor((OutputNode)src, getDest());      
+        EdgeDescriptor edgeDscr = new EdgeDescriptor(src, getDest());      
         InterFilterEdge edge = edges.get(edgeDscr);
         assert (edge == null) : "trying to create 2 identical edges";
         //remember this edge
@@ -99,7 +99,7 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
     @Override
     public void setDest(InputNode dest) {
         //make sure we did not create this edge before!
-        EdgeDescriptor edgeDscr = new EdgeDescriptor(getSrc(), (InputNode)dest);      
+        EdgeDescriptor edgeDscr = new EdgeDescriptor(getSrc(), dest);      
         InterFilterEdge edge = edges.get(edgeDscr);
         assert (edge == null) : "trying to create 2 identical edges";
         //remember this edge
@@ -117,16 +117,16 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
     public int initItems() {
         int itemsReceived, itemsSent;
 
-        WorkNodeInfo next = WorkNodeInfo.getFilterInfo((WorkNode) ((InputNode)dst)
+        WorkNodeInfo next = WorkNodeInfo.getFilterInfo((WorkNode) dst
                                                    .getNext());
         
-        itemsSent = (int) ((double) next.initItemsReceived() * ((InputNode)dst).ratio(this, SchedulingPhase.INIT));
+        itemsSent = (int) (next.initItemsReceived() * dst.ratio(this, SchedulingPhase.INIT));
         //System.out.println(next.initItemsReceived()  + " * " + ((InputSliceNode)dest).ratio(this));
         
         // calculate the items the output slice sends
-        WorkNodeInfo prev = WorkNodeInfo.getFilterInfo((WorkNode) ((OutputNode)src)
+        WorkNodeInfo prev = WorkNodeInfo.getFilterInfo((WorkNode) src
                                                    .getPrevious());
-        itemsReceived = (int) ((double) prev.initItemsSent() * ((OutputNode)src).ratio(this, SchedulingPhase.INIT));
+        itemsReceived = (int) (prev.initItemsSent() * src.ratio(this, SchedulingPhase.INIT));
 
         if (itemsSent != itemsReceived) {
             System.out.println("*** Init: Items received != Items Sent!");
@@ -136,9 +136,9 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
             System.out.println("Push: " + prev.prePush + " " + prev.push);
             System.out.println("Pop: " + next.pop);
             System.out.println("Init items Sent * Ratio: " + prev.initItemsSent() + " * " +
-                    ((OutputNode)src).ratio(this, SchedulingPhase.INIT));
+                    src.ratio(this, SchedulingPhase.INIT));
             System.out.println("Items Received: " + next.initItemsReceived(true));
-            System.out.println("Ratio received: " + ((InputNode)dst).ratio(this, SchedulingPhase.INIT));
+            System.out.println("Ratio received: " + dst.ratio(this, SchedulingPhase.INIT));
             
         }
         
@@ -157,15 +157,15 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
         int itemsReceived, itemsSent;
 
         // calculate the items the input slice receives
-        WorkNodeInfo next = WorkNodeInfo.getFilterInfo(((InputNode)dst).getNextFilter());
-        itemsSent = (int) ((next.steadyMult * next.pop) * ((double) ((InputNode)dst)
-                                                           .getWeight(this, SchedulingPhase.STEADY) / ((InputNode)dst).totalWeights(SchedulingPhase.STEADY)));
+        WorkNodeInfo next = WorkNodeInfo.getFilterInfo(dst.getNextFilter());
+        itemsSent = (int) ((next.steadyMult * next.pop) * ((double) dst
+                                                           .getWeight(this, SchedulingPhase.STEADY) / dst.totalWeights(SchedulingPhase.STEADY)));
 
         // calculate the items the output slice sends
-        WorkNodeInfo prev = WorkNodeInfo.getFilterInfo((WorkNode) ((OutputNode)src)
+        WorkNodeInfo prev = WorkNodeInfo.getFilterInfo((WorkNode) src
                                                    .getPrevious());
-        itemsReceived = (int) ((prev.steadyMult * prev.push) * ((double) ((OutputNode)src)
-                                                                .getWeight(this, SchedulingPhase.STEADY) / ((OutputNode)src).totalWeights(SchedulingPhase.STEADY)));
+        itemsReceived = (int) ((prev.steadyMult * prev.push) * ((double) src
+                                                                .getWeight(this, SchedulingPhase.STEADY) / src.totalWeights(SchedulingPhase.STEADY)));
 
         assert (itemsSent == itemsReceived) : "Calculating steady state: items received != items sent on buffer "
             + itemsSent + " " + itemsReceived + " " + prev + " " + next;
@@ -181,8 +181,8 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
     * @return ...
     */
     public int primePumpItems() {
-        return (int) ((double) WorkNodeInfo.getFilterInfo(((OutputNode)src).getPrevFilter())
-                      .totalItemsSent(SchedulingPhase.PRIMEPUMP) * ((OutputNode)src).ratio(this, SchedulingPhase.STEADY));
+        return (int) (WorkNodeInfo.getFilterInfo(src.getPrevFilter())
+                      .totalItemsSent(SchedulingPhase.PRIMEPUMP) * src.ratio(this, SchedulingPhase.STEADY));
     }
     
     /**
@@ -191,7 +191,8 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
      * @param other the other interslice edge
      * @return -1, 0, 1
      */
-    public int compareTo(InterFilterEdge other) {
+    @Override
+	public int compareTo(InterFilterEdge other) {
         if (this.steadyItems() < other.steadyItems())
             return -1;
         else if (this.steadyItems() > other.steadyItems())
@@ -215,7 +216,8 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
             this(edge.getSrc(), edge.getDest());
         }
         
-        public boolean equals(Object obj) {
+        @Override
+		public boolean equals(Object obj) {
             if(obj instanceof EdgeDescriptor) {
                 EdgeDescriptor edge = (EdgeDescriptor)obj;
                 
@@ -229,7 +231,8 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
             return false;
         }
         
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             return src.hashCode() + dest.hashCode();
         }
     }
@@ -237,7 +240,8 @@ public class InterFilterEdge extends IntraSSGEdge<OutputNode, InputNode> impleme
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.InterFilterEdge other = new at.dms.kjc.slir.InterFilterEdge();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

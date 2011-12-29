@@ -51,7 +51,8 @@ public class Pair<S,T>
      * are the same handles.
      * @return true if same as o; false otherwise
      */
-    public boolean equals(Object o)
+    @Override
+	public boolean equals(Object o)
     {
         // you can only compare two pairs!
         //assert o instanceof Pair;

@@ -60,7 +60,8 @@ public class DisambiguateUnaries extends SymbolTableVisitor
         this.varGen = varGen;
     }
     
-    protected void doStatement(Statement stmt)
+    @Override
+	protected void doStatement(Statement stmt)
     {
         successors = new java.util.ArrayList();
         visitPopPeek = calcVisitPopPeek(stmt);
@@ -98,11 +99,13 @@ public class DisambiguateUnaries extends SymbolTableVisitor
         final int[] popCount = { 0 };
         final int[] peekCount = { 0 };
         stmt.accept(new FEReplacer() {
-                public Object visitExprPop(ExprPop expr) {
+                @Override
+				public Object visitExprPop(ExprPop expr) {
                     popCount[0]++;
                     return super.visitExprPop(expr);
                 }
-                public Object visitExprPeek(ExprPeek expr) {
+                @Override
+				public Object visitExprPeek(ExprPeek expr) {
                     peekCount[0]++;
                     return super.visitExprPeek(expr);
                 }
@@ -113,7 +116,8 @@ public class DisambiguateUnaries extends SymbolTableVisitor
                 popCount[0] >= 1 && peekCount[0] >= 1);
     }
 
-    public Object visitExprUnary(ExprUnary expr)
+    @Override
+	public Object visitExprUnary(ExprUnary expr)
     {
         /* RMR { do not transform ++/-- operators to new expressions,
          * instead simply return the original expression
@@ -180,7 +184,8 @@ public class DisambiguateUnaries extends SymbolTableVisitor
         return var;
     }
     
-    public Object visitExprPeek(ExprPeek expr)
+    @Override
+	public Object visitExprPeek(ExprPeek expr)
     {
         // Why do we need to visit peek expressions here?  If we have
         // peek(0) + pop() + peek(0), the two peeks have different
@@ -190,12 +195,14 @@ public class DisambiguateUnaries extends SymbolTableVisitor
         return visitPeekOrPop(expr);
     }
 
-    public Object visitExprPop(ExprPop expr)
+    @Override
+	public Object visitExprPop(ExprPop expr)
     {
         return visitPeekOrPop(expr);
     }
 
-    public Object visitStmtFor(StmtFor stmt)
+    @Override
+	public Object visitStmtFor(StmtFor stmt)
     {
         // C-style for loops are a *big pain*: if nothing else, the
         // possible presence of a continue statement means that the
@@ -213,7 +220,8 @@ public class DisambiguateUnaries extends SymbolTableVisitor
                            stmt.getIncr(), newBody);
     }
 
-    public Object visitStmtIfThen(StmtIfThen stmt)
+    @Override
+	public Object visitStmtIfThen(StmtIfThen stmt)
     {
         // Need to reset successors list in between visiting children.
         Statement newCons = (Statement)stmt.getCons().accept(this);
@@ -229,7 +237,8 @@ public class DisambiguateUnaries extends SymbolTableVisitor
         return new StmtIfThen(stmt.getContext(), newCond, newCons, newAlt);
     }
 
-    public Object visitStmtWhile(StmtWhile stmt)
+    @Override
+	public Object visitStmtWhile(StmtWhile stmt)
     {
         // Similar problem: if the condition results in inserting
         // statements, they'd need to go both before the loop and

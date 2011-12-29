@@ -48,8 +48,8 @@ public class NumberGathering extends at.dms.util.Utils
 
     public static boolean doit(FlatNode top, HashMap[] executionCounts) 
     {
-	HashMap initExecutionCounts = (HashMap) executionCounts[0];
-	HashMap steadyExecutionCounts = (HashMap) executionCounts[1];
+	HashMap initExecutionCounts = executionCounts[0];
+	HashMap steadyExecutionCounts = executionCounts[1];
 
         // reset variables since we might be called multiple times
         printsPerSteady = 0;
@@ -147,7 +147,8 @@ public class NumberGathering extends at.dms.util.Utils
             top.accept(new RemovePrintln(), null, true);
         }
     
-        public void visitNode(FlatNode node) 
+        @Override
+		public void visitNode(FlatNode node) 
         {
             //iterate over all the methods of all the flatnodes 
             if (node.isFilter()) {
@@ -161,7 +162,8 @@ public class NumberGathering extends at.dms.util.Utils
             }
         }
         //remove the print statement if this isn't the sink
-        public Object visitPrintStatement(SIRPrintStatement self,
+        @Override
+		public Object visitPrintStatement(SIRPrintStatement self,
                                           JExpression arg) {
             JExpression newExp = (JExpression)arg.accept(this);
             return new JExpressionStatement(null, newExp, null);
@@ -305,7 +307,8 @@ public class NumberGathering extends at.dms.util.Utils
         }
     
 
-        public void visitNode(FlatNode node) 
+        @Override
+		public void visitNode(FlatNode node) 
         {
             if (node.isFilter()) {
                 SIRFilter filter = (SIRFilter)node.contents;
@@ -339,7 +342,8 @@ public class NumberGathering extends at.dms.util.Utils
             }
             return false;
         }
-        public void visitPrintStatement(SIRPrintStatement self,
+        @Override
+		public void visitPrintStatement(SIRPrintStatement self,
                                         JExpression arg) {
             found = true;
         }
@@ -389,7 +393,8 @@ public class NumberGathering extends at.dms.util.Utils
         /**
          * Visits a print statement.
          */
-        public void visitPrintStatement(SIRPrintStatement self,
+        @Override
+		public void visitPrintStatement(SIRPrintStatement self,
                                         JExpression arg) {
             prints++;
             if (controlFlow > 0)
@@ -399,7 +404,8 @@ public class NumberGathering extends at.dms.util.Utils
         }
 
 
-        public void visitWhileStatement(JWhileStatement self,
+        @Override
+		public void visitWhileStatement(JWhileStatement self,
                                         JExpression cond,
                                         JStatement body) {
             controlFlow++;
@@ -411,7 +417,8 @@ public class NumberGathering extends at.dms.util.Utils
         /**
          * prints a switch statement
          */
-        public void visitSwitchStatement(JSwitchStatement self,
+        @Override
+		public void visitSwitchStatement(JSwitchStatement self,
                                          JExpression expr,
                                          JSwitchGroup[] body) {
             expr.accept(this);
@@ -422,7 +429,8 @@ public class NumberGathering extends at.dms.util.Utils
             controlFlow--;
         }
     
-        public void visitIfStatement(JIfStatement self,
+        @Override
+		public void visitIfStatement(JIfStatement self,
                                      JExpression cond,
                                      JStatement thenClause,
                                      JStatement elseClause) {
@@ -435,7 +443,8 @@ public class NumberGathering extends at.dms.util.Utils
             controlFlow--;
         }
     
-        public void visitForStatement(JForStatement self,
+        @Override
+		public void visitForStatement(JForStatement self,
                                       JStatement init,
                                       JExpression cond,
                                       JStatement incr,
@@ -472,7 +481,8 @@ public class NumberGathering extends at.dms.util.Utils
             }
         }
     
-        public void visitDoStatement(JDoStatement self,
+        @Override
+		public void visitDoStatement(JDoStatement self,
                                      JExpression cond,
                                      JStatement body) {
             controlFlow++;

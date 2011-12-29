@@ -61,7 +61,8 @@ public class Scheduler extends streamit.scheduler2.Scheduler
         return new Scheduler(_root, false);
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         if (steadySchedule != null)
             return;

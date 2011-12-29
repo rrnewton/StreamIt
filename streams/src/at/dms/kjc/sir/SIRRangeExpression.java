@@ -88,14 +88,16 @@ public class SIRRangeExpression extends JExpression {
     /**
      * Ranges are for integers.
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Integer;
     }
     
     /**
      * must be CStdType.Integer
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         assert type == CStdType.Integer;
     }
 
@@ -103,7 +105,8 @@ public class SIRRangeExpression extends JExpression {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitRangeExpression(this);
         } else {
@@ -118,7 +121,8 @@ public class SIRRangeExpression extends JExpression {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitRangeExpression(this);
         } else {
@@ -141,7 +145,8 @@ public class SIRRangeExpression extends JExpression {
     /**
      * Returns string representation as range, e.g, [1,2,3]
      */
-    public String toString() {
+    @Override
+	public String toString() {
         // strings for min, ave, max
         String minStr,aveStr,maxStr;
         // take int value, otherwise IR toString
@@ -177,7 +182,8 @@ public class SIRRangeExpression extends JExpression {
      * Returns true only for SIRRangeExpressions, which represent a
      * dynamic range of values.
      */
-    public boolean isDynamic() {
+    @Override
+	public boolean isDynamic() {
         return true;
     }
 
@@ -187,7 +193,8 @@ public class SIRRangeExpression extends JExpression {
     /**
      * Throws an exception (NOT SUPPORTED YET)
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         at.dms.util.Utils.fail("Analysis of custom nodes not supported yet.");
         return this;
     }
@@ -197,7 +204,8 @@ public class SIRRangeExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         at.dms.util.Utils.fail("Visitors to custom nodes not supported yet.");
     }
     // ----------------------------------------------------------------------
@@ -206,7 +214,8 @@ public class SIRRangeExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRRangeExpression other = new at.dms.kjc.sir.SIRRangeExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

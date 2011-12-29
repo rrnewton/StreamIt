@@ -91,12 +91,14 @@ public class ExprBinary extends Expression
     public Expression getRight() { return right; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprBinary(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprBinary))
             return false;
@@ -110,12 +112,14 @@ public class ExprBinary extends Expression
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return left.hashCode() ^ right.hashCode() ^ new Integer(op).hashCode();
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         String theOp;
         switch (op)

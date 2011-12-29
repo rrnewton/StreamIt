@@ -48,11 +48,13 @@ class CConfigPipeline extends CConfigContainer {
 
     }
 
-    public boolean getPeek() {
+    @Override
+	public boolean getPeek() {
         return childConfig(0).getPeek();
     }
 
-    public int numberOfTiles() {
+    @Override
+	public int numberOfTiles() {
         if (num_tiles > 0) return num_tiles; // check if we have precomputed
 
         num_tiles = numberOfTiles(0, cont.size()-1);
@@ -398,7 +400,8 @@ class CConfigPipeline extends CConfigContainer {
         }
     }
 
-    public FusionInfo getFusionInfo() {
+    @Override
+	public FusionInfo getFusionInfo() {
         return getFusionInfo(0, cont.size() - 1);
     }
     
@@ -507,7 +510,8 @@ class CConfigPipeline extends CConfigContainer {
         return fusion_info[from][to];
     }
 
-    protected SIRStream doCut(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition,
+    @Override
+	protected SIRStream doCut(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition,
                               int x1, int x2, int xPivot, int tileLimit, int tPivot, SIRStream str) {
         // there's a division at this <yPivot>.  We'll
         // return result of a horizontal cut.
@@ -547,7 +551,8 @@ class CConfigPipeline extends CConfigContainer {
      * For now, fusion overhead of a pipeline is 0.
      */
     private static final CCost fusionOverhead = new CCost(0);
-    protected CCost fusionOverhead() {
+    @Override
+	protected CCost fusionOverhead() {
         return fusionOverhead;
     }
     

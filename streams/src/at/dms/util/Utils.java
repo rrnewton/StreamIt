@@ -666,7 +666,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 		// check rest of vals are equal
 		for (int i=1; i<arr.length; i++) {
 			if (!(arr[i] instanceof JLiteral) ||
-					!((JLiteral)arr[i]).equals((JLiteral)val)) {
+					!((JLiteral)arr[i]).equals(val)) {
 				return false;
 			}
 		}
@@ -729,6 +729,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	 * @param   type        the type of the elements
 	 * @deprecated
 	 */
+	@Deprecated
 	public static Object[] toArray(Vector vect, Class type) {
 		if (vect != null && vect.size() > 0) {
 			Object[]    array = (Object[])Array.newInstance(type, vect.size());
@@ -912,6 +913,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 		final SIREndMarker[] last = { null };
 		// find first and last marker
 		stmt.accept(new SLIREmptyVisitor() {
+			@Override
 			public void visitMarker(SIRMarker self) {
 				// record first and last
 				if (self instanceof SIRBeginMarker && first[0] == null) {
@@ -933,6 +935,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 		// of the statement.  replace the markers with empty
 		// statements in the IR
 		stmt.accept(new SLIRReplacingVisitor() {
+			@Override
 			public Object visitMarker(SIRMarker self) {
 				if (self==first[0] || self==last[0]) {
 					return new JEmptyStatement();
@@ -958,6 +961,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	 */
 	public static JStatement removeUnusedPops(JStatement stmt) {
 		return (JStatement)stmt.accept(new SLIRReplacingVisitor() {
+			@Override
 			public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
 				if (expr instanceof SIRPopExpression) {
 					return new JEmptyStatement();
@@ -983,10 +987,12 @@ public abstract class Utils implements Serializable, DeepCloneable {
 		{
 			final boolean seenPop1[] = { false };
 			stmt.accept(new SLIREmptyVisitor() {
+				@Override
 				public void visitPopExpression(SIRPopExpression self,
 						CType tapeType) {
 					seenPop1[0] = true;
 				}
+				@Override
 				public void visitPeekExpression(SIRPeekExpression self,
 						CType tapeType,
 						JExpression arg) {
@@ -1007,6 +1013,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 			final boolean seenPop2[] = { false };
 			final boolean seenPeek2[] = { false };
 			stmt.accept(new SLIREmptyVisitor() {
+				@Override
 				public void visitForStatement(JForStatement self,
 						JStatement init,
 						JExpression cond,
@@ -1019,6 +1026,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 					updateStats();
 				}
 
+				@Override
 				public void visitWhileStatement(JWhileStatement self,
 						JExpression cond,
 						JStatement body) {
@@ -1049,10 +1057,12 @@ public abstract class Utils implements Serializable, DeepCloneable {
 				}
 
 
+				@Override
 				public void visitPopExpression(SIRPopExpression self,
 						CType tapeType) {
 					seenPop2[0] = true;
 				}
+				@Override
 				public void visitPeekExpression(SIRPeekExpression self,
 						CType tapeType,
 						JExpression arg) {
@@ -1146,6 +1156,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 				// automatically in other backends, causes problems in
 				// rstream, who doesn't want a var decl included.)
 				body.accept(new SLIRReplacingVisitor() {
+					@Override
 					public Object visitLocalVariableExpression(JLocalVariableExpression self,
 							String ident) {
 						if (self.getVariable()==loopIndex) { return new JIntLiteral(0); }
@@ -1703,6 +1714,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	/** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
 	/** Returns a deep clone of this object. */
+	@Override
 	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
 	/** Clones all fields of this into <pre>other</pre> */

@@ -9,7 +9,8 @@ public class FilterInitRestriction extends Restriction
         setMaxExecutions(filter.getNumInitStages());
     }
     
-    public boolean notifyExpired ()
+    @Override
+	public boolean notifyExpired ()
     {
         return true;
     }

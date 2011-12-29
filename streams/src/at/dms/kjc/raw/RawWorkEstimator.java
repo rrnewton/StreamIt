@@ -261,7 +261,8 @@ public class RawWorkEstimator extends EmptyStreamVisitor
         System.out.println("Finished Testing Work Estimator ... ");
     }
     
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) 
     {
         System.out.println(self.getName() + " " + estimateWork(self));

@@ -65,14 +65,16 @@ public class JQualifiedAnonymousCreation extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return type;
     }
 
     /**
      * must be a CClassType.
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         assert type instanceof CClassType;
         this.type = (CClassType)type;
     }
@@ -80,7 +82,8 @@ public class JQualifiedAnonymousCreation extends JExpression {
     /**
      * Returns true iff this expression can be used as a statement (JLS 14.8)
      */
-    public boolean isStatementExpression() {
+    @Override
+	public boolean isStatementExpression() {
         return true;
     }
 
@@ -94,7 +97,8 @@ public class JQualifiedAnonymousCreation extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         context = new CExpressionContext(context);
 
         prefix = prefix.analyse(context);
@@ -277,7 +281,8 @@ public class JQualifiedAnonymousCreation extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitQualifiedAnonymousCreation(this, prefix, ident, params, decl);
     }
 
@@ -285,7 +290,8 @@ public class JQualifiedAnonymousCreation extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitQualifiedAnonymousCreation(this, prefix, ident, params, decl);
     }
 
@@ -307,7 +313,8 @@ public class JQualifiedAnonymousCreation extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         code.plantClassRefInstruction(opc_new, type.getCClass().getQualifiedName());
@@ -359,7 +366,8 @@ public class JQualifiedAnonymousCreation extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JQualifiedAnonymousCreation other = new at.dms.kjc.JQualifiedAnonymousCreation();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

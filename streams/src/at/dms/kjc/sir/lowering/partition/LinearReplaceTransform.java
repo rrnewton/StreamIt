@@ -29,7 +29,8 @@ public final class LinearReplaceTransform extends StreamTransform {
     /**
      * Perform the transform on <str> and return new stream.
      */
-    public SIRStream doMyTransform(SIRStream str) {
+    @Override
+	public SIRStream doMyTransform(SIRStream str) {
         // again detect that <str> is linear, since it is a newly constructed stream
         LinearAnalyzer.findLinearFilters(str, KjcOptions.debug, lfa);
         LinearFilterRepresentation linearRep = lfa.getLinearRepresentation(str);
@@ -58,7 +59,8 @@ public final class LinearReplaceTransform extends StreamTransform {
         return null;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "LinearReplace Transform, #" + id;
     }
 

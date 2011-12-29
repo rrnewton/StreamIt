@@ -34,7 +34,8 @@ public class CompareFilterWork implements Comparator<Filter> {
      * 
      * @return The comparison 
      */
-    public int compare(Filter o1, Filter o2) {
+    @Override
+	public int compare(Filter o1, Filter o2) {
 //        assert o1 instanceof Slice && o2 instanceof Slice;
         
         if (ssg.getWorkEstimate(o1.getWorkNodeContent()) < 

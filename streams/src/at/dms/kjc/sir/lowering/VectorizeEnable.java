@@ -302,7 +302,7 @@ public class VectorizeEnable {
             SIRStream parent = pred.getParent();
             assert parent instanceof SIRSplitJoin;
             SIROperator predpred = SIRNavigationUtils.getPredecessorOper(parent);
-            if (predpred instanceof SIRFilter && allHavingVectorOutput.contains((SIRFilter)predpred)) {
+            if (predpred instanceof SIRFilter && allHavingVectorOutput.contains(predpred)) {
                 allWorthwhile.add((SIRFilter)predpred);
             } else {
                 SIRPipeline wrapper = SIRContainer.makeWrapper(parent);
@@ -629,7 +629,7 @@ public class VectorizeEnable {
         if (str instanceof SIRFilter) {
             // filter is vectorizable if passed data says that it is
             // (and if we descend to it)
-            boolean vectorizable = vectorizableFilters.contains((SIRFilter)str);
+            boolean vectorizable = vectorizableFilters.contains(str);
             if (vectorizable) {
                 segments.put(str, null);
             }
@@ -651,7 +651,7 @@ public class VectorizeEnable {
         } else if (str instanceof SIRPipeline) {
             // a bit messy, so pull out updating segments for <str>
             addVectorizablesegments(vectorizableFilters, (SIRPipeline)str, segments);
-            List<intPair> segmentsForStr = segments.get((SIRPipeline)str);
+            List<intPair> segmentsForStr = segments.get(str);
             // Pipeline is vectorizable if it has a single vectorizable segment
             // that is the whole pipeline.
             boolean retval = segmentsForStr != null &&
@@ -674,7 +674,8 @@ public class VectorizeEnable {
         IterFactory.createFactory().createIter(str).accept(
                 new EmptyStreamVisitor() {
                     /* visit a filter */
-                    public void visitFilter(SIRFilter self,
+                    @Override
+					public void visitFilter(SIRFilter self,
                                             SIRFilterIter iter) {
                         if (Vectorizable.vectorizable(self)) {
                             vectorizableFilters.add(self);
@@ -727,17 +728,20 @@ public class VectorizeEnable {
     private static void dumpContents(final SIRStream s) {
         IterFactory.createFactory().createIter(s).accept(
                 new EmptyStreamVisitor() {
-                    public void preVisitPipeline(SIRPipeline self,
+                    @Override
+					public void preVisitPipeline(SIRPipeline self,
                             SIRPipelineIter iter) {
                         /*if (self != s)*/ {System.err.print(self.getName() + " ");}
                         super.preVisitPipeline(self,iter);
                     }
-                    public void preVisitSplitJoin(SIRSplitJoin self,
+                    @Override
+					public void preVisitSplitJoin(SIRSplitJoin self,
                             SIRSplitJoinIter iter) {
                         /*if (self != s)*/ {System.err.print(self.getName() + " ");}
                         super.preVisitSplitJoin(self, iter);
                     }
-                    public void visitFilter(SIRFilter self,
+                    @Override
+					public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
                         /*if (self != s)*/ {System.err.print(self.getName() + " ");}
                         super.visitFilter(self, iter);
@@ -756,15 +760,18 @@ class intPair {
       this.first = first;
       this.second = second;
     }        
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return first << 2 + second;
     }
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         return obj.getClass().equals(intPair.class) &&
         ((intPair)(obj)).first == first &&
         ((intPair)(obj)).second == second;
     }
-    public String toString() {
+    @Override
+	public String toString() {
         return "["+first+","+second+"]";
     }
 }

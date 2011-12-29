@@ -21,7 +21,8 @@ public class InitDownstreamRestriction extends Restriction
         parent = _parent;
     }
 
-    public boolean notifyExpired()
+    @Override
+	public boolean notifyExpired()
     {
         return false;
     }

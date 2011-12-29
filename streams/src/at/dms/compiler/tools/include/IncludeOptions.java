@@ -17,7 +17,8 @@ public class IncludeOptions extends at.dms.compiler.tools.common.Options {
     public String pattern = "%%include";
     public String directory = ".";
 
-    public boolean processOption(int code, Getopt g) {
+    @Override
+	public boolean processOption(int code, Getopt g) {
         switch (code) {
         case 'o':
             output = getString(g, ""); return true;
@@ -30,7 +31,8 @@ public class IncludeOptions extends at.dms.compiler.tools.common.Options {
         }
     }
 
-    public String[] getOptions() {
+    @Override
+	public String[] getOptions() {
         String[]    parent = super.getOptions();
         String[]    total = new String[parent.length + 3];
         System.arraycopy(parent, 0, total, 0, parent.length);
@@ -42,22 +44,26 @@ public class IncludeOptions extends at.dms.compiler.tools.common.Options {
     }
 
 
-    public String getShortOptions() {
+    @Override
+	public String getShortOptions() {
         return "o:p:d:" + super.getShortOptions();
     }
 
 
-    public void version() {
+    @Override
+	public void version() {
         System.out.println("Version 1.5B released 9 August 2001");
     }
 
 
-    public void usage() {
+    @Override
+	public void usage() {
         System.err.println("usage: at.dms.compiler.tools.include.Main [option]* [--help] <input-file>");
     }
 
 
-    public void help() {
+    @Override
+	public void help() {
         System.err.println("usage: at.dms.compiler.tools.include.Main [option]* [--help] <input-file>");
         printOptions();
         System.err.println();
@@ -67,7 +73,8 @@ public class IncludeOptions extends at.dms.compiler.tools.common.Options {
         System.err.println("For more info, please see: http://www.dms.at/kopi");
     }
 
-    public LongOpt[] getLongOptions() {
+    @Override
+	public LongOpt[] getLongOptions() {
         LongOpt[]   parent = super.getLongOptions();
         LongOpt[]   total = new LongOpt[parent.length + LONGOPTS.length];
     

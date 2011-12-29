@@ -30,7 +30,8 @@ public class FissionReplacer extends LinearReplacer {
     /**
      * Overrides replacement method in LinearReplacer.
      */
-    public boolean makeReplacement(SIRStream self) {
+    @Override
+	public boolean makeReplacement(SIRStream self) {
         // only deal with filters
         if (!(self instanceof SIRFilter)) {
             return false;

@@ -18,21 +18,25 @@ public class JccSplitJoin extends JccCompositeFilter {
 		this.splitJoin = splitJoin;
 		this.splitter = splitter;
 		this.joiner = joiner;
-		this.filters = (JccStream[]) filters.clone();
+		this.filters = filters.clone();
 	}
 
+	@Override
 	Stream getStreamIt() {
 		return splitJoin;
 	}
 
+	@Override
 	void setInChannel(JccChannel channel) {
 		splitter.setInChannel(channel);
 	}
 
+	@Override
 	void setOutChannel(JccChannel channel) {
 		joiner.setOutChannel(channel);
 	}
 
+	@Override
 	public void init() {
 		splitter.init();
 		joiner.init();

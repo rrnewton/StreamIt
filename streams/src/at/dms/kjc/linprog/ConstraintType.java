@@ -19,11 +19,13 @@ class ConstraintType implements Serializable {
         this.name = name;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Constraint type: " + name;
     }
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o instanceof ConstraintType &&
                 ((ConstraintType)o).name.equals(this.name));
     }

@@ -179,7 +179,8 @@ public class MoveStreamParameters extends InitMunger
                             init.getPeekRate(), init.getPopRate(), init.getPushRate());
     }
 
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         spec = (StreamSpec)super.visitStreamSpec(spec);
         

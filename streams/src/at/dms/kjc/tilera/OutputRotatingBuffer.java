@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
@@ -57,7 +58,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
                 //and this slice uses the downstream's input buffer as an outputbuffer, if so, we don't
                 //need an output buffer
                 for (InterFilterEdge edge : slice.getOutputNode().getDestSet(SchedulingPhase.STEADY)) {
-                    InputRotatingBuffer inBuf = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
+                    InputRotatingBuffer inBuf = RotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
                     if (inBuf != null && inBuf.getLocalSrcFilter() == slice.getWorkNode()) {
                         assert RotatingBuffer.getOutputBuffer(slice.getWorkNode()) != null;
                         createBuffer = false;
@@ -96,22 +97,24 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         
         firstExeName = "__first__" + this.getIdent();        
         firstExe = new JVariableDefinition(null,
-                at.dms.kjc.Constants.ACC_STATIC,
+                Constants.ACC_STATIC,
                 CStdType.Boolean, firstExeName, new JBooleanLiteral(true));
         
     }
    
     /** Create an array reference given an offset */   
-    public JFieldAccessExpression writeBufRef() {
+    @Override
+	public JFieldAccessExpression writeBufRef() {
         return new JFieldAccessExpression(new JThisExpression(), currentWriteBufName);
      
     }
     
-    public void createAddressBuffers() {
+    @Override
+	public void createAddressBuffers() {
       //fill the addressbuffers array
         addressBuffers = new HashMap<InputRotatingBuffer, SourceAddressRotation>();
         for (InterFilterEdge edge : outputNode.getDestSet(SchedulingPhase.STEADY)) {
-            InputRotatingBuffer input = InputRotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
+            InputRotatingBuffer input = RotatingBuffer.getInputBuffer(edge.getDest().getNextFilter());
             addressBuffers.put(input, input.getAddressRotation(tile));               
         }
     }
@@ -133,7 +136,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#endInitWrite()
      */
-    public List<JStatement> endInitWrite() {
+    @Override
+	public List<JStatement> endInitWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         //in the init stage we use dma to send the output to the dest filter
         //but we have to wait until the end because are not double buffering
@@ -146,7 +150,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      *  We don't want to transfer during the first execution of the primepump
      *  so guard the execution in an if statement.
      */
-    public List<JStatement> beginPrimePumpWrite() {
+    @Override
+	public List<JStatement> beginPrimePumpWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
                 
         list.add(transferCommands.zeroOutHead(SchedulingPhase.PRIMEPUMP));
@@ -165,7 +170,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         return list;
     }
 
-    public List<JStatement> endPrimePumpWrite() {
+    @Override
+	public List<JStatement> endPrimePumpWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
 
 
@@ -219,7 +225,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#beginSteadyWrite()
      */
-    public List<JStatement> beginSteadyWrite() {
+    @Override
+	public List<JStatement> beginSteadyWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         list.add(transferCommands.zeroOutHead(SchedulingPhase.STEADY));
         if (TileraBackend.DMA)
@@ -243,7 +250,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#endSteadyWrite()
      */
-    public List<JStatement> endSteadyWrite() {
+    @Override
+	public List<JStatement> endSteadyWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         
         if (TileraBackend.DMA) 
@@ -267,7 +275,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#writeDecls()
      */
-    public List<JStatement> writeDecls() {
+    @Override
+	public List<JStatement> writeDecls() {
         List<JStatement> retval = new LinkedList<JStatement>();
         if (TileraBackend.DMA) {
             JStatement firstDecl = new JVariableDeclarationStatement(firstExe);
@@ -277,7 +286,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
         return retval;
     }   
     
-    protected void setBufferSize() {
+    @Override
+	protected void setBufferSize() {
         WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(filterNode);
         
         bufSize = Math.max(fi.totalItemsSent(SchedulingPhase.INIT),
@@ -288,14 +298,16 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popMethodName()
      */
-    public String popMethodName() {
+    @Override
+	public String popMethodName() {
         assert false : "Should not call pop() method on output buffer.";
         return "";
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popMethod()
      */
-    public JMethodDeclaration popMethod() {
+    @Override
+	public JMethodDeclaration popMethod() {
         assert false : "Should not call pop() method on output buffer.";
         return null;
     }
@@ -304,7 +316,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popManyMethodName()
      */
-    public String popManyMethodName() {
+    @Override
+	public String popManyMethodName() {
         assert false : "Should not call pop() method on output buffer.";
         return "";
     }
@@ -313,7 +326,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * Pop many items at once ignoring them.
      * Default method generated here to call popMethod() repeatedly.
      */
-    public JMethodDeclaration popManyMethod() {
+    @Override
+	public JMethodDeclaration popManyMethod() {
         assert false : "Should not call pop() method on output buffer.";
         return null;
      }
@@ -321,14 +335,16 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPopMethodName()
      */
-    public String assignFromPopMethodName() {
+    @Override
+	public String assignFromPopMethodName() {
         assert false : "Should not call pop() method on output buffer.";
         return "";
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPopMethod()
      */
-    public JMethodDeclaration assignFromPopMethod() {
+    @Override
+	public JMethodDeclaration assignFromPopMethod() {
         assert false : "Should not call pop() method on output buffer.";
         return null;
     }
@@ -336,14 +352,16 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#peekMethodName()
      */
-    public String peekMethodName() {
+    @Override
+	public String peekMethodName() {
         assert false : "Should not call peek() method on output buffer.";
         return "";
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#peekMethod()
      */
-    public JMethodDeclaration peekMethod() {
+    @Override
+	public JMethodDeclaration peekMethod() {
         assert false : "Should not call peek() method on output buffer.";
         return null;
     }
@@ -351,14 +369,16 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPeekMethodName()
      */
-    public String assignFromPeekMethodName() {
+    @Override
+	public String assignFromPeekMethodName() {
         assert false : "Should not call peek() method on output buffer.";
         return "";
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#assignFromPeekMethod()
      */
-    public JMethodDeclaration assignFromPeekMethod() {
+    @Override
+	public JMethodDeclaration assignFromPeekMethod() {
         assert false : "Should not call peek() method on output buffer.";
         return null;
     }
@@ -366,20 +386,23 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#pushMethodName()
      */
-    public String pushMethodName() {
+    @Override
+	public String pushMethodName() {
         return "__push_" + unique_id;
     }
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#pushMethod()
      */
-    public JMethodDeclaration pushMethod() {
+    @Override
+	public JMethodDeclaration pushMethod() {
         return transferCommands.pushMethod();
     }
     
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#beginInitWrite()
      */
-    public List<JStatement> beginInitWrite() {
+    @Override
+	public List<JStatement> beginInitWrite() {
         LinkedList<JStatement> list = new LinkedList<JStatement>();
         if (WorkNodeInfo.getFilterInfo(filterNode).totalItemsSent(SchedulingPhase.INIT) > 0)
             list.add(transferCommands.zeroOutHead(SchedulingPhase.INIT));   
@@ -404,21 +427,24 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#topOfWorkSteadyWrite()
      */
-    public List<JStatement> topOfWorkSteadyWrite() {
+    @Override
+	public List<JStatement> topOfWorkSteadyWrite() {
         return new LinkedList<JStatement>(); 
     }
  
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#dataDeclsH()
      */
-    public List<JStatement> dataDeclsH() {
+    @Override
+	public List<JStatement> dataDeclsH() {
         return new LinkedList<JStatement>();
     }
     
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#dataDecls()
      */
-    public List<JStatement> dataDecls() {
+    @Override
+	public List<JStatement> dataDecls() {
         List<JStatement> retval = new LinkedList<JStatement>();
         return retval;
     }
@@ -426,7 +452,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#writeDeclsExtern()
      */
-    public List<JStatement> writeDeclsExtern() {
+    @Override
+	public List<JStatement> writeDeclsExtern() {
         return new LinkedList<JStatement>();
     }   
 
@@ -434,7 +461,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
      * Generate the code to setup the structure of the rotating buffer 
      * as a circular linked list.
      */
-    protected void setupRotation() {
+    @Override
+	protected void setupRotation() {
         String temp = "__temp__";
         TileCodeStore cs = parent.getComputeCode();
         //this is the typedef we will use for this buffer rotation structure

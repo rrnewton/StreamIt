@@ -50,5 +50,6 @@ abstract class GrammarElement {
         return line;
     }
     public Lookahead look(int k) { return null; }
-    public abstract String toString();
+    @Override
+	public abstract String toString();
 }

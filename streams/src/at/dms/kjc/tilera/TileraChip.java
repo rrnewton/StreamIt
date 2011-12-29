@@ -162,20 +162,24 @@ public class TileraChip implements ComputeNodesI<TileCodeStore> {
         return "";
     }
     
-    public boolean canAllocateNewComputeNode() {
+    @Override
+	public boolean canAllocateNewComputeNode() {
         return false;
     }
 
-    public Tile getNthComputeNode(int n) {
+    @Override
+	public Tile getNthComputeNode(int n) {
         return tiles[n / gYSize][n % gYSize];
     }
 
-    public boolean isValidComputeNodeNumber(int nodeNumber) {
+    @Override
+	public boolean isValidComputeNodeNumber(int nodeNumber) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public int newComputeNode() {
+    @Override
+	public int newComputeNode() {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -266,7 +270,8 @@ public class TileraChip implements ComputeNodesI<TileCodeStore> {
         return getNthComputeNode(translateTileNumber(n));
     }
     
-    public int size() {
+    @Override
+	public int size() {
         // TODO Auto-generated method stub
         return gXSize * gYSize;
     }

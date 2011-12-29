@@ -22,7 +22,8 @@ public class DFTraversal implements FlatVisitor
     }
     
     
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         traversal.add(node);
     }

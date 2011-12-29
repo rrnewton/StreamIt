@@ -45,35 +45,40 @@ class QQuadruple extends QNode implements QOrigin {
     /**
      * isStore
      */
-    public boolean isStore() {
+    @Override
+	public boolean isStore() {
         return true;
     }
 
     /**
      * Returns this node a a jump
      */
-    public QQuadruple getStore() {
+    @Override
+	public QQuadruple getStore() {
         return this;
     }
 
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return dest + " <- " + origin;
     }
 
     /**
      * The type of this instruction
      */
-    public int getType() {
+    @Override
+	public int getType() {
         return at.dms.classfile.Constants.TYP_VOID;
     }
 
     /**
      * Duplicate this node
      */
-    public QOrigin duplicate() {
+    @Override
+	public QOrigin duplicate() {
         throw new InconsistencyException("NYI");
     }
 
@@ -87,14 +92,16 @@ class QQuadruple extends QNode implements QOrigin {
     /**
      * returns the parameters of this instruction
      */
-    public QOrigin[] getOrigins() {
+    @Override
+	public QOrigin[] getOrigins() {
         return origin.getOrigins();
     }
 
     /**
      * Sets the parameters of this instruction
      */
-    public void setOrigin(QOrigin origin, int i) {
+    @Override
+	public void setOrigin(QOrigin origin, int i) {
         if (this.origin instanceof QOperator) {
             this.origin.setOrigin(origin, i);
         } else if (i == 0) {
@@ -111,14 +118,16 @@ class QQuadruple extends QNode implements QOrigin {
     /**
      * Returns the defined temporary.
      */
-    public QTemporary getDef() {
+    @Override
+	public QTemporary getDef() {
         return (QTemporary)dest;
     }
 
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         return origin.getUses();
     }
 
@@ -130,7 +139,8 @@ class QQuadruple extends QNode implements QOrigin {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
         origin.generate(seq);
         if (dest instanceof QTemporary) {
             dest.store(seq, isLive((QTemporary)dest));

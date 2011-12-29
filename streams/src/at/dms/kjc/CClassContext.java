@@ -143,7 +143,8 @@ public class CClassContext extends CContext {
     /**
      * Returns the field definition state.
      */
-    public CVariableInfo getFieldInfo() {
+    @Override
+	public CVariableInfo getFieldInfo() {
         return fieldInfo;
     }
 
@@ -151,7 +152,8 @@ public class CClassContext extends CContext {
      * @param   index     the definition of a field
      * @return  all informations we have about this field
      */
-    public int getFieldInfo(int index) {
+    @Override
+	public int getFieldInfo(int index) {
         return fieldInfo.getInfo(index);
     }
 
@@ -162,7 +164,8 @@ public class CClassContext extends CContext {
      * We make it a local copy of this information and at the end of this context
      * we will transfert it to the parent context according to controlFlow
      */
-    public void setFieldInfo(int index, int info) {
+    @Override
+	public void setFieldInfo(int index, int info) {
         fieldInfo.setInfo(index, info);
     }
 
@@ -213,7 +216,8 @@ public class CClassContext extends CContext {
      * @return  the class if found, null otherwise
      * @exception UnpositionedError this error will be positioned soon
      */
-    public CClassType lookupClass(CClass caller, String name) throws UnpositionedError {
+    @Override
+	public CClassType lookupClass(CClass caller, String name) throws UnpositionedError {
         CClass  clazz = self.lookupClass(caller, name);
 
         if (clazz != null) {
@@ -240,7 +244,8 @@ public class CClassContext extends CContext {
      * @return  the method or null if not found
      * @exception UnpositionedError this error will be positioned soon
      */
-    public CMethod lookupMethod(CClass caller, String ident, CType[] actuals)
+    @Override
+	public CMethod lookupMethod(CClass caller, String ident, CType[] actuals)
         throws UnpositionedError
     {
         CMethod method;
@@ -292,7 +297,8 @@ public class CClassContext extends CContext {
      * @return  the field definition
      * @exception UnpositionedError this error will be positioned soon
      */
-    public CField lookupField(CClass caller, String ident)
+    @Override
+	public CField lookupField(CClass caller, String ident)
         throws UnpositionedError
     {
         return getCClass().lookupField(caller, ident);
@@ -321,7 +327,8 @@ public class CClassContext extends CContext {
      * @param   ident       the name of the local variable
      * @return  a variable from an ident in current context
      */
-    public JLocalVariable lookupLocalVariable(String ident) {
+    @Override
+	public JLocalVariable lookupLocalVariable(String ident) {
         return null;
     }
 
@@ -333,7 +340,8 @@ public class CClassContext extends CContext {
      * getClassContext
      * @return  the near parent of type CClassContext
      */
-    public CClassContext getClassContext() {
+    @Override
+	public CClassContext getClassContext() {
         return this;
     }
 
@@ -349,7 +357,8 @@ public class CClassContext extends CContext {
      * getMethod
      * @return  the near parent of type CMethodContext
      */
-    public CMethodContext getMethodContext() {
+    @Override
+	public CMethodContext getMethodContext() {
         return getParentContext().getMethodContext();
     }
 
@@ -377,7 +386,8 @@ public class CClassContext extends CContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CClassContext other = new at.dms.kjc.CClassContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

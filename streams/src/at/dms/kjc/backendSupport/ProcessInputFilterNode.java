@@ -3,6 +3,7 @@ package at.dms.kjc.backendSupport;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CArrayType;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
@@ -276,7 +277,7 @@ public class ProcessInputFilterNode {
             String weight_name = joiner_name + "_weight";
     
             JVariableDefinition edgeVar = new JVariableDefinition(
-                    at.dms.kjc.Constants.ACC_STATIC,
+                    Constants.ACC_STATIC,
                     CStdType.Integer,
                     edge_name,
                     new JIntLiteral(size - 1));
@@ -285,7 +286,7 @@ public class ProcessInputFilterNode {
             JFieldAccessExpression edgeExpr = new JFieldAccessExpression(edge_name);
             
             JVariableDefinition weightVar = new JVariableDefinition(
-                    at.dms.kjc.Constants.ACC_STATIC,
+                    Constants.ACC_STATIC,
                     CStdType.Integer,
                     weight_name,
                     new JIntLiteral(0));
@@ -304,7 +305,7 @@ public class ProcessInputFilterNode {
             }
             
             JVariableDefinition weightsArray = new JVariableDefinition(
-                    at.dms.kjc.Constants.ACC_STATIC | at.dms.kjc.Constants.ACC_FINAL,  // static const in C
+                    Constants.ACC_STATIC | Constants.ACC_FINAL,  // static const in C
                     new CArrayType(CStdType.Integer,
                             1, new JExpression[]{new JIntLiteral(size)}),
                     "weights",
@@ -363,7 +364,7 @@ public class ProcessInputFilterNode {
     
             
             JMethodDeclaration joiner_method = new JMethodDeclaration(
-                    null, at.dms.kjc.Constants.ACC_STATIC | at.dms.kjc.Constants.ACC_INLINE,
+                    null, Constants.ACC_STATIC | Constants.ACC_INLINE,
                     joiner.getType(),
                     joiner_method_name,
                     new JFormalParameter[]{},

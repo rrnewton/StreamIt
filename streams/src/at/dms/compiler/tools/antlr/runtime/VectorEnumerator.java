@@ -33,12 +33,14 @@ class VectorEnumerator implements Enumeration {
         vector = v;
         i = 0;
     }
-    public boolean hasMoreElements() {
+    @Override
+	public boolean hasMoreElements() {
         synchronized (vector) {
             return i <= vector.lastElement;
         }
     }
-    public Object nextElement() {
+    @Override
+	public Object nextElement() {
         synchronized (vector) {
             if (i <= vector.lastElement) {
                 return vector.data[i++];

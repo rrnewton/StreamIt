@@ -26,7 +26,8 @@ public class OffChipMemory extends Tile {
      * 
      * @return The tile number
      */
-    public int getTileNumber() {
+    @Override
+	public int getTileNumber() {
        return getUniqueId();
     }
     
@@ -34,7 +35,8 @@ public class OffChipMemory extends Tile {
      * Return the Tile64Chip we are a part of.
      * @return the Tile64Chip we are a part of.
      */
-    public TileraChip getRawChip() {
+    @Override
+	public TileraChip getRawChip() {
         return tile64Chip;
     }
     
@@ -42,7 +44,8 @@ public class OffChipMemory extends Tile {
      * Return the x coordinate.
      * @return the x coordinate.
      */
-    public int getX() {
+    @Override
+	public int getX() {
         assert false;
         return -1;
     }
@@ -51,7 +54,8 @@ public class OffChipMemory extends Tile {
      * Return the y coordinate.
      * @return the y coordinate.
      */
-    public int getY() {
+    @Override
+	public int getY() {
         assert false;
         return Y;
     }

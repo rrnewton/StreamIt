@@ -56,7 +56,8 @@ public class JTypeDeclarationStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         CClass  owner = context.getClassContext().getCClass();
         String  prefix = owner.getQualifiedName() + "$" + context.getClassContext().getNextSyntheticIndex();
 
@@ -81,7 +82,8 @@ public class JTypeDeclarationStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitTypeDeclarationStatement(this, decl);
     }
@@ -90,7 +92,8 @@ public class JTypeDeclarationStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitTypeDeclarationStatement(this, decl);
     }
 
@@ -98,7 +101,8 @@ public class JTypeDeclarationStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         // nothing to do here
     }
 
@@ -111,7 +115,8 @@ public class JTypeDeclarationStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JTypeDeclarationStatement other = new at.dms.kjc.JTypeDeclarationStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

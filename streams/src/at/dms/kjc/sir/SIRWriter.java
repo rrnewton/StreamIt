@@ -48,6 +48,7 @@ public class SIRWriter extends SIRPredefinedFilter implements Cloneable {
 		return ((JStringLiteral)fileName).stringValue();
 	}
 
+	@Override
 	public void propagatePredefinedFields(Propagator propagator) {
 		JExpression newFilename = (JExpression)fileName.accept(propagator);
 		if (newFilename!=null && newFilename!=fileName) {

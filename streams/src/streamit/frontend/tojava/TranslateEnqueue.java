@@ -133,7 +133,8 @@ public class TranslateEnqueue extends FEReplacer
                                   null, null, null);
     }
 
-    public Object visitStreamSpec(StreamSpec ss)
+    @Override
+	public Object visitStreamSpec(StreamSpec ss)
     {
         List<Expression> lastVals = vals;
         vals = new ArrayList<Expression>();
@@ -152,7 +153,8 @@ public class TranslateEnqueue extends FEReplacer
         return ssNew;
     }
 
-    public Object visitFunction(Function fn)
+    @Override
+	public Object visitFunction(Function fn)
     {
         // Function bodies are outside of control flow.
         boolean lastControl = inControl;
@@ -182,7 +184,8 @@ public class TranslateEnqueue extends FEReplacer
         return fnNew;
     }
 
-    public Object visitStmtDoWhile(StmtDoWhile stmt)
+    @Override
+	public Object visitStmtDoWhile(StmtDoWhile stmt)
     {
         boolean lastControl = inControl;
         inControl = true;
@@ -191,7 +194,8 @@ public class TranslateEnqueue extends FEReplacer
         return rtn;
     }
 
-    public Object visitStmtEnqueue(StmtEnqueue stmt)
+    @Override
+	public Object visitStmtEnqueue(StmtEnqueue stmt)
     {
         // If we're inside control flow, that's bad.
         if (inControl)
@@ -210,7 +214,8 @@ public class TranslateEnqueue extends FEReplacer
         return null;
     }
 
-    public Object visitStmtFor(StmtFor stmt)
+    @Override
+	public Object visitStmtFor(StmtFor stmt)
     {
         boolean lastControl = inControl;
         inControl = true;
@@ -219,7 +224,8 @@ public class TranslateEnqueue extends FEReplacer
         return rtn;
     }
 
-    public Object visitStmtIfThen(StmtIfThen stmt)
+    @Override
+	public Object visitStmtIfThen(StmtIfThen stmt)
     {
         boolean lastControl = inControl;
         inControl = true;
@@ -228,7 +234,8 @@ public class TranslateEnqueue extends FEReplacer
         return rtn;
     }
 
-    public Object visitStmtWhile(StmtWhile stmt)
+    @Override
+	public Object visitStmtWhile(StmtWhile stmt)
     {
         boolean lastControl = inControl;
         inControl = true;

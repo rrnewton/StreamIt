@@ -101,7 +101,8 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
             }
     }
 
-    public Object visitBlockStatement(JBlock self,
+    @Override
+	public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
         if(parent==null) {
             parent=self;
@@ -114,7 +115,7 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
             boolean neg=false;
             //if(i<0)
             //continue;
-            JStatement oldBody = (JStatement)self.getStatement(i);
+            JStatement oldBody = self.getStatement(i);
             Object newBody = oldBody.accept(this);
             if (!(newBody instanceof JStatement))
                 continue;
@@ -124,7 +125,7 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
                 varDefs.add(newBody);
                 JVariableDefinition[] vars=((JVariableDeclarationStatement)newBody).getVars();
                 for(int j=vars.length-1;j>=0;j--) {
-                    JVariableDefinition def=(JVariableDefinition)vars[j];
+                    JVariableDefinition def=vars[j];
                     JExpression val=def.getValue();
                     // move array initializers up because they have to
                     // stick with their declaration.  This might be
@@ -136,7 +137,7 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
                         def.setValue(null);
                         TokenReference ref=((JVariableDeclarationStatement)newBody).getTokenReference();
                         JStatement state=new JExpressionStatement(ref,new JAssignmentExpression(ref,new JLocalVariableExpression(ref,def),val),null);
-                        self.addStatement(i,(JStatement)state);
+                        self.addStatement(i,state);
                         //i++;
                         size++;
                     }
@@ -204,7 +205,7 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
                 JVariableDefinition[] varArray=varDec.getVars();
                 LinkedList<JLocalVariable> newVars=new LinkedList<JLocalVariable>();
                 for(int j=0;j<varArray.length;j++) {
-                    JLocalVariable var=(JLocalVariable)varArray[j];
+                    JLocalVariable var=varArray[j];
                     if(!visitedVars.containsKey(var.getIdent())) {
                         visitedVars.put(var.getIdent(),Boolean.TRUE);
                         newVars.add(var);
@@ -227,7 +228,8 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
     /**
      * Visits a for statement
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -260,7 +262,7 @@ public class VarDeclRaiser extends SLIRReplacingVisitor {
             JVariableDefinition[] vars=((JVariableDeclarationStatement)newInit).getVars();
             if(vars.length>1)
                 System.err.println("Warning: Compound Variable Declaration in for loop (not handled)"); //Not handled
-            JVariableDefinition def=(JVariableDefinition)vars[0];
+            JVariableDefinition def=vars[0];
             JExpression val=def.getValue();
             varDefs.add(newInit);
             if(val!=null) {

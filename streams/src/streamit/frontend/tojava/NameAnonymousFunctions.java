@@ -30,7 +30,8 @@ import streamit.frontend.nodes.Function;
  */
 public class NameAnonymousFunctions extends FEReplacer
 {
-    public Object visitFunction(Function func)
+    @Override
+	public Object visitFunction(Function func)
     {
         func = (Function)super.visitFunction(func);
         if (func.getName() != null) return func;
@@ -51,7 +52,8 @@ public class NameAnonymousFunctions extends FEReplacer
                             func.getPushRate());
     }
     
-    public Object visitFuncWork(FuncWork func)
+    @Override
+	public Object visitFuncWork(FuncWork func)
     {
         func = (FuncWork)super.visitFuncWork(func);
         if (func.getName() != null) return func;

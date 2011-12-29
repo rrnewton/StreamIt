@@ -123,7 +123,8 @@ public class UseDefInfo extends SLIREmptyVisitor
         uses.get(exp.getVariable()).add(exp);
     }
     
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident) {
         addUse(self);
     }

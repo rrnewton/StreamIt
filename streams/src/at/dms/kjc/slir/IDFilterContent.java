@@ -18,32 +18,37 @@ public class IDFilterContent extends WorkNodeContent {
         peek = 1;
     }
     
-    public void setInputType(CType type) {
+    @Override
+	public void setInputType(CType type) {
         inputType = type;
     }
     
-    public void setOutputType(CType type) {
+    @Override
+	public void setOutputType(CType type) {
         outputType = type;
     }
     
     /**
      * Returns push amount.
      */
-    public int getPushInt() {
+    @Override
+	public int getPushInt() {
         return 1;
     }
 
     /**
      * Returns pop amount.
      */
-    public int getPopInt() {
+    @Override
+	public int getPopInt() {
         return 1;
     }
 
     /**
      * Returns peek amount.
      */
-    public int getPeekInt() {
+    @Override
+	public int getPeekInt() {
         return 1;
     }
 
@@ -51,7 +56,8 @@ public class IDFilterContent extends WorkNodeContent {
      * Returns push amount of init stage.
      * result may be garbage or error if !isTwoStage()
      */
-    public int getPreworkPush() {
+    @Override
+	public int getPreworkPush() {
         return 0;
     }
 
@@ -59,7 +65,8 @@ public class IDFilterContent extends WorkNodeContent {
      * Returns pop amount of init stage.
      * result may be garbage or error if !isTwoStage()
      */
-    public int getPreworkPop() {
+    @Override
+	public int getPreworkPop() {
         return 0;
     }
 
@@ -67,7 +74,8 @@ public class IDFilterContent extends WorkNodeContent {
      * Returns peek amount of init stage.
      * result may be garbage or error if !isTwoStage()
      */
-    public int getPreworkPeek() {
+    @Override
+	public int getPreworkPeek() {
         return 0;
     }
   

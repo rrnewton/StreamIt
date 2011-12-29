@@ -60,7 +60,8 @@ class ConvertChannelExprsPhase2 extends SLIRReplacingVisitor
     /**
      * convert a push expression into a MIV access of the push buffer
      */
-    public Object visitPushExpression(SIRPushExpression self,
+    @Override
+	public Object visitPushExpression(SIRPushExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
@@ -86,7 +87,8 @@ class ConvertChannelExprsPhase2 extends SLIRReplacingVisitor
     /**
      * make sure we replace expressions of expression statements
      */
-    public Object visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public Object visitExpressionStatement(JExpressionStatement self,
                                            JExpression expr) {
     
         //if we have just a pop expression, not nested in anything, then 
@@ -108,7 +110,8 @@ class ConvertChannelExprsPhase2 extends SLIRReplacingVisitor
     /**
      * convert a peek expression into a MIV access of the pop buffer..
      */
-    public Object visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public Object visitPeekExpression(SIRPeekExpression self,
                                       CType tapeType,
                                       JExpression arg) {
         JExpression newExp = (JExpression)arg.accept(this);
@@ -184,7 +187,8 @@ class ConvertChannelExprsPhase2 extends SLIRReplacingVisitor
     /**
      * convert a pop expression to a buffer access with MIV expression
      */
-    public Object visitPopExpression(SIRPopExpression self,
+    @Override
+	public Object visitPopExpression(SIRPopExpression self,
                                      CType tapeType) {
 
         // build ref to pop array

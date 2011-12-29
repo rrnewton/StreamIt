@@ -23,7 +23,8 @@ public class LinearTransformNull extends LinearTransform {
         this.reason = r;
     }
     
-    public LinearFilterRepresentation transform() throws NoTransformPossibleException {
+    @Override
+	public LinearFilterRepresentation transform() throws NoTransformPossibleException {
         throw new NoTransformPossibleException(reason);
     }
 }

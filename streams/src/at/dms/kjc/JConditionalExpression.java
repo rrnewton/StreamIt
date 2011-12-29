@@ -61,14 +61,16 @@ public class JConditionalExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return type;
     }
 
     /**
      * 
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         this.type = type;
     }
 
@@ -88,7 +90,8 @@ public class JConditionalExpression extends JExpression {
     /**
      * Returns a string representation of this literal.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JConditionalExpression[");
@@ -111,7 +114,8 @@ public class JConditionalExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         cond = cond.analyse(context);
         left = left.analyse(context);
         right = right.analyse(context);
@@ -207,7 +211,8 @@ public class JConditionalExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitConditionalExpression(this, cond, left, right);
     }
 
@@ -215,7 +220,8 @@ public class JConditionalExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitConditionalExpression(this, cond, left, right);
     }
 
@@ -237,7 +243,8 @@ public class JConditionalExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         CodeLabel       rightLabel = new CodeLabel();
@@ -271,7 +278,8 @@ public class JConditionalExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JConditionalExpression other = new at.dms.kjc.JConditionalExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

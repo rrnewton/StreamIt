@@ -61,7 +61,8 @@ class CheckForCommunication extends SLIREmptyVisitor
      * if we get here.  Called by the visitor.
      *
      */
-    public void visitPopExpression(SIRPopExpression oldSelf,
+    @Override
+	public void visitPopExpression(SIRPopExpression oldSelf,
                                    CType oldTapeType) {
       
         found = true;
@@ -72,7 +73,8 @@ class CheckForCommunication extends SLIREmptyVisitor
      * if we get here.  Called by the visitor.
      *
      */
-    public void visitPeekExpression(SIRPeekExpression oldSelf,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression oldSelf,
                                     CType oldTapeType,
                                     JExpression oldArg) {
         found = true;
@@ -83,7 +85,8 @@ class CheckForCommunication extends SLIREmptyVisitor
      * if we get here.  Called by the visitor.
      *
      */
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         found = true;

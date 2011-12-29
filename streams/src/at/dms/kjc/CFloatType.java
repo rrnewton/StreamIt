@@ -52,7 +52,8 @@ public class CFloatType extends CNumericType {
     /**
      * Returns a string representation of this type.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         //sorry, this is such a horrible hack, god, this is for 
         //generated fixed point code on tilera
         if (KjcOptions.fixedpoint)
@@ -64,14 +65,16 @@ public class CFloatType extends CNumericType {
     /**
      * Returns the VM signature of this type.
      */
-    public String getSignature() {
+    @Override
+	public String getSignature() {
         return "F";
     }
 
     /**
      * Appends the VM signature of this type to the specified buffer.
      */
-    protected void appendSignature(SimpleStringBuffer buffer) {
+    @Override
+	protected void appendSignature(SimpleStringBuffer buffer) {
         buffer.append('F');
     }
 
@@ -80,28 +83,32 @@ public class CFloatType extends CNumericType {
      * of bytes needed in C on 32-bit machine) used by a value of this
      * type.
      */
-    public int getSizeInC() {
+    @Override
+	public int getSizeInC() {
         return 4;
     }
 
     /**
      * Returns the stack size used by a value of this type.
      */
-    public int getSize() {
+    @Override
+	public int getSize() {
         return 1;
     }
 
     /**
      * Is this type ordinal ?
      */
-    public boolean isOrdinal() {
+    @Override
+	public boolean isOrdinal() {
         return false;
     }
 
     /**
      * Is this a floating point type ?
      */
-    public boolean isFloatingPoint() {
+    @Override
+	public boolean isFloatingPoint() {
         return true;
     }
 
@@ -110,7 +117,8 @@ public class CFloatType extends CNumericType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isAssignableTo(CType dest) {
+    @Override
+	public boolean isAssignableTo(CType dest) {
         if (dest == this) {
             // JLS 5.1.1 Identity Conversion
             return true;
@@ -130,7 +138,8 @@ public class CFloatType extends CNumericType {
      * @param   dest        the destination type
      * @param   code        the code sequence
      */
-    public void genCastTo(CNumericType dest, CodeSequence code) {
+    @Override
+	public void genCastTo(CNumericType dest, CodeSequence code) {
         if (dest != this) {
             switch (dest.type) {
             case TID_BYTE:
@@ -169,7 +178,8 @@ public class CFloatType extends CNumericType {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CFloatType other = new at.dms.kjc.CFloatType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -65,7 +65,8 @@ public class FileWriter extends Filter
         this(fileName, type, false);
     }
 
-    public void init ()
+    @Override
+	public void init ()
     {
         // This is part of the hack to make FileReader/Writer&lt;bit:gt; work
         if (fileType == null) {
@@ -102,7 +103,8 @@ public class FileWriter extends Filter
     private int bits_to_go = 8;
     private byte the_bits = 0;
 
-    public void work ()
+    @Override
+	public void work ()
     {
         try {
             // This is part of the hack to make FileReader/Writer&lt;bit:gt; work
@@ -179,7 +181,8 @@ public class FileWriter extends Filter
      * 
      */
 
-    public void DELETE() // on finalize: inherits from DestroyedClass
+    @Override
+	public void DELETE() // on finalize: inherits from DestroyedClass
     {
         close();
     }

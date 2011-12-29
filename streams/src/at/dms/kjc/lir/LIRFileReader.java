@@ -47,7 +47,8 @@ public class LIRFileReader extends LIRNode {
         return fileName;
     }
 
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitFileReader(this);
     }

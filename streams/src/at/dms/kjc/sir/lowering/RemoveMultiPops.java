@@ -63,7 +63,8 @@ public class RemoveMultiPops extends SLIRReplacingVisitor {
     private void removeMultiProps(SIRStream str) {
         final SLIRReplacingVisitor visitor =this;
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     for (int i = 0; i < self.getMethods().length; i++) {
                         self.getMethods()[i].accept(visitor);
@@ -71,7 +72,8 @@ public class RemoveMultiPops extends SLIRReplacingVisitor {
                 }});
     }
 
-    public Object visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public Object visitExpressionStatement(JExpressionStatement self,
                                            JExpression expr) {
         if (expr instanceof SIRPopExpression) {
             SIRPopExpression popExp = (SIRPopExpression) expr;
@@ -87,7 +89,8 @@ public class RemoveMultiPops extends SLIRReplacingVisitor {
      */
     private static void checkEliminated(SIRStream str) {
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     for (int i = 0; i < self.getMethods().length; i++) {
                         // for each method...
@@ -102,7 +105,8 @@ public class RemoveMultiPops extends SLIRReplacingVisitor {
     private static void checkEliminated(JPhylum phylum) {
         phylum.accept(new SLIREmptyVisitor() {
                 // and each pop expression...
-                public void visitPopExpression(SIRPopExpression self,
+                @Override
+				public void visitPopExpression(SIRPopExpression self,
                                                CType tapeType) {
                     // throw an error if the pop is for more than 1 item
                     if (self.getNumPop()>1) {

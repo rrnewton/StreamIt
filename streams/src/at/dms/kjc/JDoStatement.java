@@ -66,7 +66,8 @@ public class JDoStatement extends JLoopStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         try {
             CLoopContext    loopContext;
 
@@ -118,7 +119,8 @@ public class JDoStatement extends JLoopStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitDoStatement(this, cond, body);
     }
@@ -127,7 +129,8 @@ public class JDoStatement extends JLoopStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitDoStatement(this, cond, body);
     }
 
@@ -156,7 +159,8 @@ public class JDoStatement extends JLoopStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         code.pushContext(this);
@@ -182,7 +186,8 @@ public class JDoStatement extends JLoopStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JDoStatement other = new at.dms.kjc.JDoStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

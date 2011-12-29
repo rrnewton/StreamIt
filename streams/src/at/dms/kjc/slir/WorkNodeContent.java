@@ -293,7 +293,8 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /**
      * Returns string representation of this FilterContent.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         if(array==null)
             return name;
         else {
@@ -541,14 +542,16 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /**
      * Returns method declarations.
      */
-    public JMethodDeclaration[] getMethods() {
+    @Override
+	public JMethodDeclaration[] getMethods() {
         return methods;
     }
     
     /**
      * Returns field declarations.
      */
-    public JFieldDeclaration[] getFields() 
+    @Override
+	public JFieldDeclaration[] getFields() 
     {
         return fields;
     }
@@ -586,7 +589,8 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /**
      * Method exists to allow SIRCodeUnit interface but should not be called.
      */
-    public void addField(JFieldDeclaration field) {
+    @Override
+	public void addField(JFieldDeclaration field) {
         throw new AssertionError("should not call");
     }
 
@@ -604,14 +608,16 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /**
      * Method exists to allow SIRCodeUnit interface but should not be called.
      */
-    public void addFields(JFieldDeclaration[] fields) {
+    @Override
+	public void addFields(JFieldDeclaration[] fields) {
         throw new AssertionError("should not call");
     }
 
     /**
      * Method exists to allow SIRCodeUnit interface but should not be called.
      */
-    public void addMethod(JMethodDeclaration method) {
+    @Override
+	public void addMethod(JMethodDeclaration method) {
         JMethodDeclaration[] newMethods = new JMethodDeclaration[methods.length + 1];
         for (int i = 0; i < methods.length; i++)
             newMethods[i] = methods[i];
@@ -633,14 +639,16 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /**
      * Method exists to allow SIRCodeUnit interface but should not be called.
      */
-    public void addMethods(JMethodDeclaration[] methods) {
+    @Override
+	public void addMethods(JMethodDeclaration[] methods) {
         throw new AssertionError("should not call");
     }
 
     /**
      * Method exists to allow SIRCodeUnit interface but should not be called.
      */
-    public void setFields(JFieldDeclaration[] fields) {
+    @Override
+	public void setFields(JFieldDeclaration[] fields) {
         this.fields = fields;
         //throw new AssertionError("should not call");
     }
@@ -648,7 +656,8 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /**
      * Method exists to allow SIRCodeUnit interface but should not be called.
      */
-    public void setMethods(JMethodDeclaration[] methods) {
+    @Override
+	public void setMethods(JMethodDeclaration[] methods) {
         throw new AssertionError("should not call");
     }
     
@@ -680,7 +689,8 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.WorkNodeContent other = new at.dms.kjc.slir.WorkNodeContent();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -39,7 +39,8 @@ public class FileVisitor implements FlatVisitor {
         fileNodes = new HashSet<Object>();
     }
     
-    public void visitNode (FlatNode node) 
+    @Override
+	public void visitNode (FlatNode node) 
     {
         if (node.contents instanceof SIRFileReader) {
             fileReaders.add(node);

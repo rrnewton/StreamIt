@@ -30,7 +30,8 @@ class ArrayInitArguments
         componentType = _componentType;
         dimensions = _dimensions;
     }
-        public boolean equals(Object o) 
+        @Override
+		public boolean equals(Object o) 
     {
         if (o instanceof ArrayInitArguments)
             {
@@ -42,7 +43,8 @@ class ArrayInitArguments
         else
             return false;
     }
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return dimensions.hashCode() * componentType.hashCode();
     }
 }

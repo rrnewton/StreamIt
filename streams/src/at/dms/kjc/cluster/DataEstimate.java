@@ -11,6 +11,7 @@ import at.dms.kjc.CNullType;
 import at.dms.kjc.CType;
 import at.dms.kjc.CVectorType;
 import at.dms.kjc.CVectorTypeLow;
+import at.dms.kjc.Constants;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
@@ -41,20 +42,20 @@ public class DataEstimate {
 
     public static int getTypeSize(CType type) {
 
-        if (type.getTypeID() == CType.TID_VOID) return 0;
+        if (type.getTypeID() == Constants.TID_VOID) return 0;
 
-        if (type.getTypeID() == CType.TID_BYTE) return 1;
-        if (type.getTypeID() == CType.TID_SHORT) return 2;
-        if (type.getTypeID() == CType.TID_CHAR) return 1;
+        if (type.getTypeID() == Constants.TID_BYTE) return 1;
+        if (type.getTypeID() == Constants.TID_SHORT) return 2;
+        if (type.getTypeID() == Constants.TID_CHAR) return 1;
 
-        if (type.getTypeID() == CType.TID_INT) return 4;
-        if (type.getTypeID() == CType.TID_LONG) return 4;
+        if (type.getTypeID() == Constants.TID_INT) return 4;
+        if (type.getTypeID() == Constants.TID_LONG) return 4;
 
-        if (type.getTypeID() == CType.TID_FLOAT) return 4;
-        if (type.getTypeID() == CType.TID_DOUBLE) return 8;
+        if (type.getTypeID() == Constants.TID_FLOAT) return 4;
+        if (type.getTypeID() == Constants.TID_DOUBLE) return 8;
 
-        if (type.getTypeID() == CType.TID_BOOLEAN) return 1;
-        if (type.getTypeID() == CType.TID_BIT) return 1;
+        if (type.getTypeID() == Constants.TID_BOOLEAN) return 1;
+        if (type.getTypeID() == Constants.TID_BIT) return 1;
         
         if (type instanceof CVectorType || type instanceof CVectorTypeLow) {
             // KjcOptions.vectorize is a numeric value giving size of vector in bytes.

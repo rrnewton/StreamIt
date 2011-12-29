@@ -35,14 +35,16 @@ public class NoViableAltException extends RecognitionException {
     /**
      * Returns a clean error message (no line number/column information)
      */
-    public String getMessage() {
+    @Override
+	public String getMessage() {
         return "unexpected token: "+token.getText();
     }
 
     /**
      * Returns a string representation of this exception.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return FileLineFormatter.getFormatter().getFormatString(fileName,line)+getMessage();
     }
 }

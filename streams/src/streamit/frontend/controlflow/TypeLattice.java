@@ -32,17 +32,20 @@ public class TypeLattice extends AnyTypeLattice
     public TypeLattice(Type t) { super(t); }
     public TypeLattice(boolean isTop) { super(isTop); }
 
-    public Lattice getTop() 
+    @Override
+	public Lattice getTop() 
     {
         return new TypeLattice(true);
     }
     
-    public Lattice getBottom()
+    @Override
+	public Lattice getBottom()
     {
         return new TypeLattice(false);
     }
     
-    public Lattice meet(Lattice other)
+    @Override
+	public Lattice meet(Lattice other)
     {
         AnyTypeLattice that = (AnyTypeLattice)other;
 

@@ -95,7 +95,8 @@ public class LinearIndirectReplacer extends LinearDirectReplacer implements Cons
         IterFactory.createFactory().createIter(str).accept(replacer);
     }
 
-    protected SIRFilter makeEfficientImplementation(SIRStream oldStream,
+    @Override
+	protected SIRFilter makeEfficientImplementation(SIRStream oldStream,
                                                     LinearFilterRepresentation linearRep) {
         // only deal with real things for now
         assert linearRep.getA().isReal() && linearRep.getb().isReal():
@@ -271,7 +272,8 @@ public class LinearIndirectReplacer extends LinearDirectReplacer implements Cons
      * }
      * </pre>
      **/
-    public Vector makePushStatementVector(LinearFilterRepresentation linearRep,
+    @Override
+	public Vector makePushStatementVector(LinearFilterRepresentation linearRep,
                                           CType inputType,
                                           CType outputType) {
         Vector result = new Vector();

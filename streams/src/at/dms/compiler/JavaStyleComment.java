@@ -89,7 +89,8 @@ public class JavaStyleComment implements Serializable, at.dms.kjc.DeepCloneable 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.compiler.JavaStyleComment other = new at.dms.compiler.JavaStyleComment();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -142,7 +142,8 @@ public class ThreeAddressCode {
         IterFactory.createFactory().createIter(str).accept(
                 new EmptyStreamVisitor() {
                     /* visit a filter */
-                    public void visitFilter(SIRFilter self,
+                    @Override
+					public void visitFilter(SIRFilter self,
                                                      SIRFilterIter iter) {
                         threeAddressCodeFilter(self);
                     }
@@ -624,7 +625,7 @@ public class ThreeAddressCode {
         
         private List<JStatement> recurrExpression(JExpression expr, JLocalVariableExpression tmp) {
             // convenient place to hang a breakpoint on top-level conversion.
-            return ((List<JStatement>)expr.accept(this,tmp));
+            return expr.accept(this,tmp);
         }
 
         /**
@@ -690,7 +691,7 @@ public class ThreeAddressCode {
                  new JVariableDeclarationStatement(defn);
              JLocalVariableExpression v = new JLocalVariableExpression(defn);
              stmts.add(decl);
-             stmts.addAll((List<JStatement>) exp.accept(this, v));
+             stmts.addAll(exp.accept(this, v));
             return v;
          }
          
@@ -723,14 +724,16 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitAdd(JAddExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JAddExpression(self.getTokenReference(),left,right);}});                    
         }
 
         @Override
         public List<JStatement> visitArrayAccess(JArrayAccessExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getPrefix(), self.getAccessor(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression prefix, JExpression accessor) 
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression prefix, JExpression accessor) 
                         {return new JArrayAccessExpression(self.getTokenReference(), prefix, accessor, 
                                 self.getType());}});
         }
@@ -753,7 +756,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitArrayLength(JArrayLengthExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getPrefix(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression prefix) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression prefix) 
                         {return new JArrayLengthExpression(self.getTokenReference(), prefix);}});
         }
 
@@ -761,7 +765,8 @@ public class ThreeAddressCode {
         public List<JStatement> visitAssignment(JAssignmentExpression self, JLocalVariableExpression tmp) {
             assert false : "Assignment should be handled at statement level";
             return recurrTwoExprs(tmp,self.getLeft(), self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression prefix, JExpression accessor) 
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression prefix, JExpression accessor) 
                         {return new JAssignmentExpression(self.getTokenReference(), prefix, accessor);}});
 
         }
@@ -781,7 +786,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitBitwise(JBitwiseExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JBitwiseExpression(self.getTokenReference(),
                             ((JBitwiseExpression)self).getOper(),left,right);}});                    
         }
@@ -789,14 +795,16 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitBitwiseComplement(JBitwiseComplementExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression expr) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression expr) 
                         {return new JBitwiseComplementExpression(self.getTokenReference(), expr);}});
         }
 
         @Override
         public List<JStatement> visitCast(JCastExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression expr) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression expr) 
                         {return new JCastExpression(self.getTokenReference(), expr,
                                 ((JCastExpression)self).getType());}});
         }
@@ -817,7 +825,8 @@ public class ThreeAddressCode {
         public List<JStatement> visitCompoundAssignment(JCompoundAssignmentExpression self, JLocalVariableExpression tmp) {
             assert false : "CompoundAssignment should be handled at statement level";
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JCompoundAssignmentExpression(self.getTokenReference(),
                             ((JCompoundAssignmentExpression)self).getOper(),left,right);}});                    
         }
@@ -854,20 +863,20 @@ public class ThreeAddressCode {
                         tmp2);
                 JLocalVariableExpression v = new JLocalVariableExpression(tmp2);
                 newstmts.add(decl);
-                newstmts.addAll((List<JStatement>) econd.accept(this, v));
+                newstmts.addAll(econd.accept(this, v));
                 cond = v;
             } else {
                 cond = econd;
             }
 
             if (convertleft) {
-                thenPart = structureOptBlock((List<JStatement>) left.accept(this, tmp));
+                thenPart = structureOptBlock(left.accept(this, tmp));
             } else {
                 thenPart = structureOptBlock(recurrBase(tmp,left));
             }
 
             if (convertright) {
-                elsePart = structureOptBlock((List<JStatement>) right.accept(this, tmp));
+                elsePart = structureOptBlock(right.accept(this, tmp));
             } else {
                 elsePart = structureOptBlock(recurrBase(tmp,right));
             }
@@ -899,7 +908,7 @@ public class ThreeAddressCode {
                 JStatement thenBranch;
                 if (convert1) {
                     // need to convert first subexpression => if (tmp) then ... else {}
-                    newstmts.addAll((List<JStatement>)subexp1.accept(this,tmp));
+                    newstmts.addAll(subexp1.accept(this,tmp));
                     cond = tmp;
                     elseBranch = new JEmptyStatement();
                 } else {
@@ -909,7 +918,7 @@ public class ThreeAddressCode {
                 }
                 if (convert2) {
                     // second subexpression also converts into tmp.
-                    thenBranch = structureOptBlock((List<JStatement>)subexp2.accept(this,tmp));
+                    thenBranch = structureOptBlock(subexp2.accept(this,tmp));
                 } else {
                     thenBranch = newAssignment(tmp,subexp2);
                 }
@@ -942,7 +951,7 @@ public class ThreeAddressCode {
                 JStatement thenBranch;
                 if (convert1) {
                     // need to convert first subexpression => if (tmp) then {} else ...
-                    newstmts.addAll((List<JStatement>)subexp1.accept(this,tmp));
+                    newstmts.addAll(subexp1.accept(this,tmp));
                     cond = new JLogicalComplementExpression(null,tmp);
                     thenBranch = new JEmptyStatement();
                 } else {
@@ -952,7 +961,7 @@ public class ThreeAddressCode {
                 }
                 if (convert2) {
                     // second subexpression also converts into tmp.
-                    elseBranch = structureOptBlock((List<JStatement>)subexp2.accept(this,tmp));
+                    elseBranch = structureOptBlock(subexp2.accept(this,tmp));
                 } else {
                     elseBranch = newAssignment(tmp,subexp2);
                 }
@@ -976,7 +985,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitDivide(JDivideExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JDivideExpression(self.getTokenReference(),left,right);}});                    
         }
 
@@ -988,7 +998,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitEquality(JEqualityExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JEqualityExpression(self.getTokenReference(),
                             ((JEqualityExpression)self).getEqual(),left,right);}});                    
         }
@@ -996,7 +1007,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitFieldAccess(JFieldAccessExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getPrefix(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression prefix) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression prefix) 
                         {return new JFieldAccessExpression(self.getTokenReference(), prefix, 
                                 self.getIdent());}});
         }
@@ -1026,7 +1038,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitLogicalComplement(JLogicalComplementExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression expr) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression expr) 
                         {return new JLogicalComplementExpression(self.getTokenReference(), expr);}});
         }
 
@@ -1051,21 +1064,24 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitMinus(JMinusExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JMinusExpression(self.getTokenReference(),left,right);}});                    
         }
 
         @Override
         public List<JStatement> visitModulo(JModuloExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JModuloExpression(self.getTokenReference(),left,right);}});                    
         }
 
         @Override
         public List<JStatement> visitMult(JMultExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JMultExpression(self.getTokenReference(),left,right);}});                    
         }
 
@@ -1110,7 +1126,7 @@ public class ThreeAddressCode {
 
         @Override
         public List<JStatement> visitParenthesed(JParenthesedExpression self, JLocalVariableExpression tmp) {
-            return (List<JStatement>)self.getExpr().accept(this,tmp);
+            return self.getExpr().accept(this,tmp);
         }
 
         @Override
@@ -1122,7 +1138,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitPeek(SIRPeekExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getArg(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression v) {return new SIRPeekExpression(v);}});
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression v) {return new SIRPeekExpression(v);}});
         }
 
         @Override
@@ -1133,7 +1150,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitPostfix(JPostfixExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression v) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression v) 
                     {return new JPostfixExpression(self.getTokenReference(),
                             ((JPostfixExpression)self).getOper(),v);}});
         }
@@ -1141,7 +1159,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitPrefix(JPrefixExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression v) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression v) 
                     {return new JPrefixExpression(self.getTokenReference(),
                             ((JPrefixExpression)self).getOper(),v);}});
        }
@@ -1150,7 +1169,8 @@ public class ThreeAddressCode {
         public List<JStatement> visitPush(SIRPushExpression self, JLocalVariableExpression tmp) {
             assert false : "Push should be handled at statement level";
             return recurrOneExpr(tmp,self.getArg(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression v) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression v) 
                     {return new SIRPushExpression(v,
                             ((SIRPushExpression)self).getTapeType());}});
        }
@@ -1188,7 +1208,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitRelational(JRelationalExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JRelationalExpression(self.getTokenReference(),
                             ((JRelationalExpression)self).getOper(),left,right);}});                    
         }
@@ -1196,7 +1217,8 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitShift(JShiftExpression self, JLocalVariableExpression tmp) {
             return recurrTwoExprs(tmp,self.getLeft(),self.getRight(),self,
-                    new C2(){public JExpression mk(JExpression self, JExpression left, JExpression right)
+                    new C2(){@Override
+					public JExpression mk(JExpression self, JExpression left, JExpression right)
                     {return new JShiftExpression(self.getTokenReference(),
                             ((JShiftExpression)self).getOper(),left,right);}});                    
         }
@@ -1227,21 +1249,24 @@ public class ThreeAddressCode {
         @Override
         public List<JStatement> visitUnaryMinus(JUnaryMinusExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression expr) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression expr) 
                         {return new JUnaryMinusExpression(self.getTokenReference(), expr);}});
         }
 
         @Override
         public List<JStatement> visitUnaryPlus(JUnaryPlusExpression self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression expr) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression expr) 
                         {return new JUnaryPlusExpression(self.getTokenReference(), expr);}});
         }
 
         @Override
         public List<JStatement> visitUnaryPromote(JUnaryPromote self, JLocalVariableExpression tmp) {
             return recurrOneExpr(tmp,self.getExpr(),self,
-                    new C1(){public JExpression mk(JExpression self, JExpression expr) 
+                    new C1(){@Override
+					public JExpression mk(JExpression self, JExpression expr) 
                         {return new JUnaryPromote(expr, self.getType());}});        }
 
         @Override
@@ -1285,7 +1310,7 @@ public class ThreeAddressCode {
             if (! shouldConvertExpression(expr)) {
                 return new Pair(new LinkedList<JStatement>(),expr);
             } else {
-                return new Pair((List<JStatement>)expr.accept(this,null), expr);
+                return new Pair(expr.accept(this,null), expr);
             }
         }
         
@@ -1377,27 +1402,32 @@ public class ThreeAddressCode {
         }
 
 
-        public List<JStatement> visitCreatePortalExpression(SIRCreatePortal self) {
+        @Override
+		public List<JStatement> visitCreatePortalExpression(SIRCreatePortal self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitDynamicToken(SIRDynamicToken self) {
+        @Override
+		public List<JStatement> visitDynamicToken(SIRDynamicToken self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitFileReader(LIRFileReader self) {
+        @Override
+		public List<JStatement> visitFileReader(LIRFileReader self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitFileWriter(LIRFileWriter self) {
+        @Override
+		public List<JStatement> visitFileWriter(LIRFileWriter self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitFunctionPointer(LIRFunctionPointer self, String name) {
+        @Override
+		public List<JStatement> visitFunctionPointer(LIRFunctionPointer self, String name) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1407,7 +1437,8 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitInitStatement(SIRInitStatement self, SIRStream target) {
+        @Override
+		public List<JStatement> visitInitStatement(SIRInitStatement self, SIRStream target) {
             if (shouldConvertStatement(self)) {
                 List<JExpression> args = self.getArgs();
                 if (args == null) { args = Collections.emptyList(); }
@@ -1418,36 +1449,42 @@ public class ThreeAddressCode {
                 newstmts.add(newself);
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)self);
+                return singletonStatementList(self);
             }
         }
 
-        public List<JStatement> visitInterfaceTable(SIRInterfaceTable self) {
+        @Override
+		public List<JStatement> visitInterfaceTable(SIRInterfaceTable self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitLatency(SIRLatency self) {
+        @Override
+		public List<JStatement> visitLatency(SIRLatency self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitLatencyMax(SIRLatencyMax self) {
+        @Override
+		public List<JStatement> visitLatencyMax(SIRLatencyMax self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitLatencyRange(SIRLatencyRange self) {
+        @Override
+		public List<JStatement> visitLatencyRange(SIRLatencyRange self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitLatencySet(SIRLatencySet self) {
+        @Override
+		public List<JStatement> visitLatencySet(SIRLatencySet self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitMainFunction(LIRMainFunction self, String typeName, LIRFunctionPointer init, List<JStatement> initStatements) {
+        @Override
+		public List<JStatement> visitMainFunction(LIRMainFunction self, String typeName, LIRFunctionPointer init, List<JStatement> initStatements) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1455,15 +1492,17 @@ public class ThreeAddressCode {
         /**
          * S[[marker]] = marker
          */
-        public List<JStatement> visitMarker(SIRMarker self) {
-            return singletonStatementList((JStatement)self);
+        @Override
+		public List<JStatement> visitMarker(SIRMarker self) {
+            return singletonStatementList(self);
         }
 
         /**
          * S[[message(E1,name,ident,[E2...En],latency]] = type1 v1 E[[E1]](v1) ... typen vn E[[En]](vn) 
          *                                                message(v1,name,ident,[v2...vn],latency 
          */
-        public List<JStatement> visitMessageStatement(SIRMessageStatement self,
+        @Override
+		public List<JStatement> visitMessageStatement(SIRMessageStatement self,
                 JExpression portal, String iname, String ident,
                 JExpression[] args, SIRLatency latency) {
             if (shouldConvertStatement(self)) {
@@ -1484,37 +1523,43 @@ public class ThreeAddressCode {
                 newstmts.add(newmsg);
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)self);
+                return singletonStatementList(self);
             }
         }
 
-        public List<JStatement> visitNode(LIRNode self) {
+        @Override
+		public List<JStatement> visitNode(LIRNode self) {
             assert false : "ThreeAddressCode does not accept LIRNode";
             return Collections.emptyList();
         }
         
+		@Override
 		public List<JStatement> visitIterationExpression(
 				SIRIterationExpression self) {
             assert false : "Not a statement";
         	return Collections.emptyList();
 		}
 
-        public List<JStatement> visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
+        @Override
+		public List<JStatement> visitPeekExpression(SIRPeekExpression self, CType tapeType, JExpression arg) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitPopExpression(SIRPopExpression self, CType tapeType) {
+        @Override
+		public List<JStatement> visitPopExpression(SIRPopExpression self, CType tapeType) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitPortal(SIRPortal self) {
+        @Override
+		public List<JStatement> visitPortal(SIRPortal self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitPrintStatement(SIRPrintStatement self, JExpression arg) {
+        @Override
+		public List<JStatement> visitPrintStatement(SIRPrintStatement self, JExpression arg) {
             if (shouldConvertStatement(self)) {
                 Pair<List<JStatement>,JExpression> cvtd = (new E()).recurrTopExpression(arg);
                 List<JStatement> newstmts = new LinkedList<JStatement>();
@@ -1524,16 +1569,18 @@ public class ThreeAddressCode {
                     new SIRPrintStatement(self.getTokenReference(),newexpr,self.getComments()));
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)self);
+                return singletonStatementList(self);
             }
         }
 
-        public List<JStatement> visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
+        @Override
+		public List<JStatement> visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitRangeExpression(SIRRangeExpression self) {
+        @Override
+		public List<JStatement> visitRangeExpression(SIRRangeExpression self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1547,7 +1594,8 @@ public class ThreeAddressCode {
          * @param methods
          * @return xlated
          */
-        public List<JStatement> visitRegReceiverStatement(SIRRegReceiverStatement self, JExpression portal, SIRStream receiver, JMethodDeclaration[] methods) {
+        @Override
+		public List<JStatement> visitRegReceiverStatement(SIRRegReceiverStatement self, JExpression portal, SIRStream receiver, JMethodDeclaration[] methods) {
             if (shouldConvertStatement(self)) {
                 Pair<List<JStatement>,JExpression> cvtd = (new E()).recurrTopExpression(portal);
                 List<JStatement> newstmts = cvtd.getFirst();
@@ -1557,12 +1605,13 @@ public class ThreeAddressCode {
                 newstmts.add(newstm);
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)self);
+                return singletonStatementList(self);
             }
         }
 
-        public List<JStatement> visitRegSenderStatement(SIRRegSenderStatement self, String portal, SIRLatency latency) {
-            return singletonStatementList((JStatement)self);
+        @Override
+		public List<JStatement> visitRegSenderStatement(SIRRegSenderStatement self, String portal, SIRLatency latency) {
+            return singletonStatementList(self);
         }
 
         public List<JStatement> visitRegisterReceiver(LIRRegisterReceiver self, JExpression streamContext, SIRPortal portal, String childName, SIRInterfaceTable itable) {
@@ -1570,77 +1619,92 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetBodyOfFeedback(LIRSetBodyOfFeedback self, JExpression streamContext, JExpression childContext, CType inputType, CType outputType, int inputSize, int outputSize) {
+        @Override
+		public List<JStatement> visitSetBodyOfFeedback(LIRSetBodyOfFeedback self, JExpression streamContext, JExpression childContext, CType inputType, CType outputType, int inputSize, int outputSize) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetChild(LIRSetChild self, JExpression streamContext, String childType, String childName) {
+        @Override
+		public List<JStatement> visitSetChild(LIRSetChild self, JExpression streamContext, String childType, String childName) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetDecode(LIRSetDecode self, JExpression streamContext, LIRFunctionPointer fp) {
+        @Override
+		public List<JStatement> visitSetDecode(LIRSetDecode self, JExpression streamContext, LIRFunctionPointer fp) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetDelay(LIRSetDelay self, JExpression data, JExpression streamContext, int delay, CType type, LIRFunctionPointer fp) {
+        @Override
+		public List<JStatement> visitSetDelay(LIRSetDelay self, JExpression data, JExpression streamContext, int delay, CType type, LIRFunctionPointer fp) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetEncode(LIRSetEncode self, JExpression streamContext, LIRFunctionPointer fp) {
+        @Override
+		public List<JStatement> visitSetEncode(LIRSetEncode self, JExpression streamContext, LIRFunctionPointer fp) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetJoiner(LIRSetJoiner self, JExpression streamContext, SIRJoinType type, int ways, int[] weights) {
+        @Override
+		public List<JStatement> visitSetJoiner(LIRSetJoiner self, JExpression streamContext, SIRJoinType type, int ways, int[] weights) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetLoopOfFeedback(LIRSetLoopOfFeedback self, JExpression streamContext, JExpression childContext, CType inputType, CType outputType, int inputSize, int outputSize) {
+        @Override
+		public List<JStatement> visitSetLoopOfFeedback(LIRSetLoopOfFeedback self, JExpression streamContext, JExpression childContext, CType inputType, CType outputType, int inputSize, int outputSize) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetParallelStream(LIRSetParallelStream self, JExpression streamContext, JExpression childContext, int position, CType inputType, CType outputType, int inputSize, int outputSize) {
+        @Override
+		public List<JStatement> visitSetParallelStream(LIRSetParallelStream self, JExpression streamContext, JExpression childContext, int position, CType inputType, CType outputType, int inputSize, int outputSize) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetPeek(LIRSetPeek self, JExpression streamContext, int peek) {
+        @Override
+		public List<JStatement> visitSetPeek(LIRSetPeek self, JExpression streamContext, int peek) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetPop(LIRSetPop self, JExpression streamContext, int pop) {
+        @Override
+		public List<JStatement> visitSetPop(LIRSetPop self, JExpression streamContext, int pop) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetPush(LIRSetPush self, JExpression streamContext, int push) {
+        @Override
+		public List<JStatement> visitSetPush(LIRSetPush self, JExpression streamContext, int push) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetSplitter(LIRSetSplitter self, JExpression streamContext, SIRSplitType type, int ways, int[] weights) {
+        @Override
+		public List<JStatement> visitSetSplitter(LIRSetSplitter self, JExpression streamContext, SIRSplitType type, int ways, int[] weights) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetStreamType(LIRSetStreamType self, JExpression streamContext, LIRStreamType streamType) {
+        @Override
+		public List<JStatement> visitSetStreamType(LIRSetStreamType self, JExpression streamContext, LIRStreamType streamType) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetTape(LIRSetTape self, JExpression streamContext, JExpression srcStruct, JExpression dstStruct, CType type, int size) {
+        @Override
+		public List<JStatement> visitSetTape(LIRSetTape self, JExpression streamContext, JExpression srcStruct, JExpression dstStruct, CType type, int size) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSetWork(LIRSetWork self, JExpression streamContext, LIRFunctionPointer fn) {
+        @Override
+		public List<JStatement> visitSetWork(LIRSetWork self, JExpression streamContext, LIRFunctionPointer fn) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1655,37 +1719,44 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitArrayAccessExpression(JArrayAccessExpression self, JExpression prefix, JExpression accessor) {
+        @Override
+		public List<JStatement> visitArrayAccessExpression(JArrayAccessExpression self, JExpression prefix, JExpression accessor) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitArrayInitializer(JArrayInitializer self, JExpression[] elems) {
+        @Override
+		public List<JStatement> visitArrayInitializer(JArrayInitializer self, JExpression[] elems) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitArrayLengthExpression(JArrayLengthExpression self, JExpression prefix) {
+        @Override
+		public List<JStatement> visitArrayLengthExpression(JArrayLengthExpression self, JExpression prefix) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitAssignmentExpression(JAssignmentExpression self, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitAssignmentExpression(JAssignmentExpression self, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitBinaryExpression(JBinaryExpression self, String oper, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitBinaryExpression(JBinaryExpression self, String oper, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitBitwiseComplementExpression(JUnaryExpression self, JExpression expr) {
+        @Override
+		public List<JStatement> visitBitwiseComplementExpression(JUnaryExpression self, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitBitwiseExpression(JBitwiseExpression self, int oper, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitBitwiseExpression(JBitwiseExpression self, int oper, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1693,7 +1764,8 @@ public class ThreeAddressCode {
         /**
          * S[[Block {S1; ... Sn}]] = Block { S[[S1]]; ... S[[Sn]] }
          */
-        public List<JStatement> visitBlockStatement(JBlock self,
+        @Override
+		public List<JStatement> visitBlockStatement(JBlock self,
                 JavaStyleComment[] comments) {
             return singletonStatementList(recurrStmt(self));
         }
@@ -1706,8 +1778,9 @@ public class ThreeAddressCode {
         /**
          * S[[break]] = break
          */
-        public List<JStatement> visitBreakStatement(JBreakStatement self, String label) {
-            return singletonStatementList((JStatement)self);
+        @Override
+		public List<JStatement> visitBreakStatement(JBreakStatement self, String label) {
+            return singletonStatementList(self);
         }
 
         public List<JStatement> visitByteLiteral(byte value) {
@@ -1715,12 +1788,14 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitCastExpression(JCastExpression self, JExpression expr, CType type) {
+        @Override
+		public List<JStatement> visitCastExpression(JCastExpression self, JExpression expr, CType type) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitCatchClause(JCatchClause self, JFormalParameter exception, JBlock body) {
+        @Override
+		public List<JStatement> visitCatchClause(JCatchClause self, JFormalParameter exception, JBlock body) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1730,42 +1805,50 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitClassBody(JTypeDeclaration[] decls, JFieldDeclaration[] fields, JMethodDeclaration[] methods, JPhylum[] body) {
+        @Override
+		public List<JStatement> visitClassBody(JTypeDeclaration[] decls, JFieldDeclaration[] fields, JMethodDeclaration[] methods, JPhylum[] body) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitClassDeclaration(JClassDeclaration self, int modifiers, String ident, String superName, CClassType[] interfaces, JPhylum[] body, JFieldDeclaration[] fields, JMethodDeclaration[] methods, JTypeDeclaration[] decls) {
+        @Override
+		public List<JStatement> visitClassDeclaration(JClassDeclaration self, int modifiers, String ident, String superName, CClassType[] interfaces, JPhylum[] body, JFieldDeclaration[] fields, JMethodDeclaration[] methods, JTypeDeclaration[] decls) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitClassExpression(JClassExpression self, CType type) {
+        @Override
+		public List<JStatement> visitClassExpression(JClassExpression self, CType type) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitClassImport(String name) {
+        @Override
+		public List<JStatement> visitClassImport(String name) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitComment(JavaStyleComment comment) {
+        @Override
+		public List<JStatement> visitComment(JavaStyleComment comment) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitComments(JavaStyleComment[] comments) {
+        @Override
+		public List<JStatement> visitComments(JavaStyleComment[] comments) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitCompilationUnit(JCompilationUnit self, JPackageName packageName, JPackageImport[] importedPackages, JClassImport[] importedClasses, JTypeDeclaration[] typeDeclarations) {
+        @Override
+		public List<JStatement> visitCompilationUnit(JCompilationUnit self, JPackageName packageName, JPackageImport[] importedPackages, JClassImport[] importedClasses, JTypeDeclaration[] typeDeclarations) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitCompoundAssignmentExpression(JCompoundAssignmentExpression self, int oper, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitCompoundAssignmentExpression(JCompoundAssignmentExpression self, int oper, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1773,22 +1856,26 @@ public class ThreeAddressCode {
         /**
          * S[[ compound(S1 ... Sn)]] = compound(S[[S1]] ... S[[Sn]])
          */
-        public List<JStatement> visitCompoundStatement(JCompoundStatement self,
+        @Override
+		public List<JStatement> visitCompoundStatement(JCompoundStatement self,
                 JStatement[] body) {
             return singletonStatementList(recurrStmt(self));
         }
 
-        public List<JStatement> visitConditionalExpression(JConditionalExpression self, JExpression cond, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitConditionalExpression(JConditionalExpression self, JExpression cond, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitConstructorCall(JConstructorCall self, boolean functorIsThis, JExpression[] params) {
+        @Override
+		public List<JStatement> visitConstructorCall(JConstructorCall self, boolean functorIsThis, JExpression[] params) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitConstructorDeclaration(JConstructorDeclaration self, int modifiers, String ident, JFormalParameter[] parameters, CClassType[] exceptions, JConstructorBlock body) {
+        @Override
+		public List<JStatement> visitConstructorDeclaration(JConstructorDeclaration self, int modifiers, String ident, JFormalParameter[] parameters, CClassType[] exceptions, JConstructorBlock body) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1796,14 +1883,16 @@ public class ThreeAddressCode {
         /**
          * S[[continue;]] = continue;
          */
-        public List<JStatement> visitContinueStatement(JContinueStatement self, String label) {
-            return singletonStatementList((JStatement)self);
+        @Override
+		public List<JStatement> visitContinueStatement(JContinueStatement self, String label) {
+            return singletonStatementList(self);
         }       
         
         /**
          * S[[ do S while E ]] = boolean v do S[[ {S, E[[E]](v)} ]] while v
          */
-        public List<JStatement> visitDoStatement(JDoStatement self, JExpression cond, JStatement body) {
+        @Override
+		public List<JStatement> visitDoStatement(JDoStatement self, JExpression cond, JStatement body) {
             if (shouldConvertStatement(self)) {
                 JVariableDefinition tmp = new JVariableDefinition(CStdType.Boolean, nextTemp());
                 JVariableDeclarationStatement decl = new JVariableDeclarationStatement(tmp);
@@ -1820,9 +1909,8 @@ public class ThreeAddressCode {
                 newstmts.add(newdo);
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)
-                        new JDoStatement(self.getTokenReference(), cond,
-                                recurrStmt(body),self.getComments()));
+                return singletonStatementList(new JDoStatement(self.getTokenReference(), cond,
+				        recurrStmt(body),self.getComments()));
             }
         }
 
@@ -1834,11 +1922,13 @@ public class ThreeAddressCode {
         /**
          * S[[;]] =       // empty list.
          */
-        public List<JStatement> visitEmptyStatement(JEmptyStatement self) {
+        @Override
+		public List<JStatement> visitEmptyStatement(JEmptyStatement self) {
             return new LinkedList<JStatement>();
         }
 
-        public List<JStatement> visitEqualityExpression(JEqualityExpression self, boolean equal, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitEqualityExpression(JEqualityExpression self, boolean equal, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1846,7 +1936,8 @@ public class ThreeAddressCode {
         /**
          * S[[expressionListStatement(E1; ... EN)]] = type v1; E[[E1]](v1) ... type vn; E[[En]](vn) 
          */
-        public List<JStatement> visitExpressionListStatement(
+        @Override
+		public List<JStatement> visitExpressionListStatement(
                 JExpressionListStatement self, JExpression[] expr) {
             List<JStatement> newstmts = new LinkedList<JStatement>();
             for (JExpression e : expr) {
@@ -1862,7 +1953,8 @@ public class ThreeAddressCode {
         /**
          * S[[E]] = type v; E[[E]](v)
          */
-        public List<JStatement> visitExpressionStatement(JExpressionStatement self, JExpression expr) {
+        @Override
+		public List<JStatement> visitExpressionStatement(JExpressionStatement self, JExpression expr) {
             if (shouldConvertStatement(self)) {
                 List<JStatement> newstmts = new LinkedList<JStatement>();
                 if (expr instanceof SIRPushExpression) {
@@ -1877,13 +1969,13 @@ public class ThreeAddressCode {
                                 self.getComments()));
                         return newstmts;
                     } else {
-                        return singletonStatementList((JStatement)self);
+                        return singletonStatementList(self);
                     }
                 } 
                 
                 if (expr instanceof JPrefixExpression || expr instanceof JPostfixExpression) {
                     // no value, only side effect.
-                    return singletonStatementList((JStatement)self);
+                    return singletonStatementList(self);
                 }
  
                 if (expr instanceof JAssignmentExpression) {
@@ -1928,16 +2020,18 @@ public class ThreeAddressCode {
                 return newstmts;
             } else {
                 // statement does not require conversion.
-                return singletonStatementList((JStatement)self);
+                return singletonStatementList(self);
             }
         }
 
-        public List<JStatement> visitFieldDeclaration(JFieldDeclaration self, int modifiers, CType type, String ident, JExpression expr) {
+        @Override
+		public List<JStatement> visitFieldDeclaration(JFieldDeclaration self, int modifiers, CType type, String ident, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitFieldExpression(JFieldAccessExpression self, JExpression left, String ident) {
+        @Override
+		public List<JStatement> visitFieldExpression(JFieldAccessExpression self, JExpression left, String ident) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1950,7 +2044,8 @@ public class ThreeAddressCode {
         /**
          * S[[for (S1,E,S2) S3]] = S[[S1]] S[[while E {S2; S3}]]
          */
-        public List<JStatement> visitForStatement(JForStatement self, JStatement init, JExpression cond, JStatement incr, JStatement body) {
+        @Override
+		public List<JStatement> visitForStatement(JForStatement self, JStatement init, JExpression cond, JStatement incr, JStatement body) {
             if (shouldConvertStatement(self)) {
                 List<JStatement> newstmts = new LinkedList<JStatement>();
                 newstmts.addAll((List<JStatement>) init.accept(this));
@@ -1962,17 +2057,17 @@ public class ThreeAddressCode {
                 newstmts.addAll((List<JStatement>) wstmt.accept(this));
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)
-                        new JForStatement(
-                                self.getTokenReference(),
-                                init, cond, incr,
-                                recurrStmt(body),
-                                self.getComments()
-                        ));
+                return singletonStatementList(new JForStatement(
+				        self.getTokenReference(),
+				        init, cond, incr,
+				        recurrStmt(body),
+				        self.getComments()
+				));
             }
         }
 
-        public List<JStatement> visitFormalParameters(JFormalParameter self, boolean isFinal, CType type, String ident) {
+        @Override
+		public List<JStatement> visitFormalParameters(JFormalParameter self, boolean isFinal, CType type, String ident) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -1980,7 +2075,8 @@ public class ThreeAddressCode {
         /**
          * S[[if E then S1 else S2]] = boolean v; E[[E]](v); if v then S[[S1]] else S[[S2]]
          */
-        public List<JStatement> visitIfStatement(JIfStatement self, JExpression cond, JStatement thenClause, JStatement elseClause) {
+        @Override
+		public List<JStatement> visitIfStatement(JIfStatement self, JExpression cond, JStatement thenClause, JStatement elseClause) {
             if (shouldConvertStatement(self)) {
                 Pair<List<JStatement>,JExpression> xlateCond = (new E()).recurrTopExpression(cond);
                 List<JStatement> newstmts = xlateCond.getFirst();
@@ -1995,21 +2091,22 @@ public class ThreeAddressCode {
                 newstmts.add(newIf);
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)
-                        new JIfStatement(
-                                self.getTokenReference(),cond,
-                                recurrStmt(thenClause),
-                                recurrStmt(elseClause),
-                                self.getComments()));
+                return singletonStatementList(new JIfStatement(
+				        self.getTokenReference(),cond,
+				        recurrStmt(thenClause),
+				        recurrStmt(elseClause),
+				        self.getComments()));
             }
         }
 
-        public List<JStatement> visitInnerClassDeclaration(JClassDeclaration self, int modifiers, String ident, String superName, CClassType[] interfaces, JTypeDeclaration[] decls, JPhylum[] body, JFieldDeclaration[] fields, JMethodDeclaration[] methods) {
+        @Override
+		public List<JStatement> visitInnerClassDeclaration(JClassDeclaration self, int modifiers, String ident, String superName, CClassType[] interfaces, JTypeDeclaration[] decls, JPhylum[] body, JFieldDeclaration[] fields, JMethodDeclaration[] methods) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitInstanceofExpression(JInstanceofExpression self, JExpression expr, CType dest) {
+        @Override
+		public List<JStatement> visitInstanceofExpression(JInstanceofExpression self, JExpression expr, CType dest) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -2019,27 +2116,32 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitInterfaceDeclaration(JInterfaceDeclaration self, int modifiers, String ident, CClassType[] interfaces, JPhylum[] body, JMethodDeclaration[] methods) {
+        @Override
+		public List<JStatement> visitInterfaceDeclaration(JInterfaceDeclaration self, int modifiers, String ident, CClassType[] interfaces, JPhylum[] body, JMethodDeclaration[] methods) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitJavadoc(JavadocComment comment) {
+        @Override
+		public List<JStatement> visitJavadoc(JavadocComment comment) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitLabeledStatement(JLabeledStatement self, String label, JStatement stmt) {
+        @Override
+		public List<JStatement> visitLabeledStatement(JLabeledStatement self, String label, JStatement stmt) {
             assert false : "LabeledStatement not in StreamIt language";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitLocalVariableExpression(JLocalVariableExpression self, String ident) {
+        @Override
+		public List<JStatement> visitLocalVariableExpression(JLocalVariableExpression self, String ident) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitLogicalComplementExpression(JUnaryExpression self, JExpression expr) {
+        @Override
+		public List<JStatement> visitLogicalComplementExpression(JUnaryExpression self, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -2049,22 +2151,26 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitMethodCallExpression(JMethodCallExpression self, JExpression prefix, String ident, JExpression[] args) {
+        @Override
+		public List<JStatement> visitMethodCallExpression(JMethodCallExpression self, JExpression prefix, String ident, JExpression[] args) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitMethodDeclaration(JMethodDeclaration self, int modifiers, CType returnType, String ident, JFormalParameter[] parameters, CClassType[] exceptions, JBlock body) {
+        @Override
+		public List<JStatement> visitMethodDeclaration(JMethodDeclaration self, int modifiers, CType returnType, String ident, JFormalParameter[] parameters, CClassType[] exceptions, JBlock body) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitNameExpression(JNameExpression self, JExpression prefix, String ident) {
+        @Override
+		public List<JStatement> visitNameExpression(JNameExpression self, JExpression prefix, String ident) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitNewArrayExpression(JNewArrayExpression self, CType type, JExpression[] dims, JArrayInitializer init) {
+        @Override
+		public List<JStatement> visitNewArrayExpression(JNewArrayExpression self, CType type, JExpression[] dims, JArrayInitializer init) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -2074,47 +2180,56 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitPackageImport(String name) {
+        @Override
+		public List<JStatement> visitPackageImport(String name) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitPackageName(String name) {
+        @Override
+		public List<JStatement> visitPackageName(String name) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitParenthesedExpression(JParenthesedExpression self, JExpression expr) {
+        @Override
+		public List<JStatement> visitParenthesedExpression(JParenthesedExpression self, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitPostfixExpression(JPostfixExpression self, int oper, JExpression expr) {
+        @Override
+		public List<JStatement> visitPostfixExpression(JPostfixExpression self, int oper, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitPrefixExpression(JPrefixExpression self, int oper, JExpression expr) {
+        @Override
+		public List<JStatement> visitPrefixExpression(JPrefixExpression self, int oper, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self, JExpression prefix, String ident, JExpression[] params, JClassDeclaration decl) {
+        @Override
+		public List<JStatement> visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self, JExpression prefix, String ident, JExpression[] params, JClassDeclaration decl) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitQualifiedInstanceCreation(JQualifiedInstanceCreation self, JExpression prefix, String ident, JExpression[] params) {
+        @Override
+		public List<JStatement> visitQualifiedInstanceCreation(JQualifiedInstanceCreation self, JExpression prefix, String ident, JExpression[] params) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitRelationalExpression(JRelationalExpression self, int oper, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitRelationalExpression(JRelationalExpression self, int oper, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitReturnStatement(JReturnStatement self, JExpression expr) {
+        @Override
+		public List<JStatement> visitReturnStatement(JReturnStatement self, JExpression expr) {
             if (shouldConvertStatement(self)) {
                 Pair<List<JStatement>,JExpression> xlateCond = (new E()).recurrTopExpression(expr);
                 List<JStatement> newstmts = xlateCond.getFirst();
@@ -2125,11 +2240,12 @@ public class ThreeAddressCode {
                         self.getComments()));
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)self);
+                return singletonStatementList(self);
             }
         }
 
-        public List<JStatement> visitShiftExpression(JShiftExpression self, int oper, JExpression left, JExpression right) {
+        @Override
+		public List<JStatement> visitShiftExpression(JShiftExpression self, int oper, JExpression left, JExpression right) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -2144,82 +2260,98 @@ public class ThreeAddressCode {
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSuperExpression(JSuperExpression self) {
+        @Override
+		public List<JStatement> visitSuperExpression(JSuperExpression self) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSwitchGroup(JSwitchGroup self, JSwitchLabel[] labels, JStatement[] stmts) {
+        @Override
+		public List<JStatement> visitSwitchGroup(JSwitchGroup self, JSwitchLabel[] labels, JStatement[] stmts) {
             assert false : "Switch groups not in StreamIt language";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSwitchLabel(JSwitchLabel self, JExpression expr) {
+        @Override
+		public List<JStatement> visitSwitchLabel(JSwitchLabel self, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSwitchStatement(JSwitchStatement self, JExpression expr, JSwitchGroup[] body) {
+        @Override
+		public List<JStatement> visitSwitchStatement(JSwitchStatement self, JExpression expr, JSwitchGroup[] body) {
             assert false : "Switch not in StreamIt language";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitSynchronizedStatement(JSynchronizedStatement self, JExpression cond, JStatement body) {
+        @Override
+		public List<JStatement> visitSynchronizedStatement(JSynchronizedStatement self, JExpression cond, JStatement body) {
             assert false : "Synchronized not in StreamIt language";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitThisExpression(JThisExpression self, JExpression prefix) {
+        @Override
+		public List<JStatement> visitThisExpression(JThisExpression self, JExpression prefix) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitThrowStatement(JThrowStatement self, JExpression expr) {
+        @Override
+		public List<JStatement> visitThrowStatement(JThrowStatement self, JExpression expr) {
             assert false : "Throw not in StreamIt language";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitTryCatchStatement(JTryCatchStatement self, JBlock tryClause, JCatchClause[] catchClauses) {
+        @Override
+		public List<JStatement> visitTryCatchStatement(JTryCatchStatement self, JBlock tryClause, JCatchClause[] catchClauses) {
             assert false : "TryCatch not in StreamIt language";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitTryFinallyStatement(JTryFinallyStatement self, JBlock tryClause, JBlock finallyClause) {
+        @Override
+		public List<JStatement> visitTryFinallyStatement(JTryFinallyStatement self, JBlock tryClause, JBlock finallyClause) {
             assert false : "TryFinally not in StreamIt language";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitTypeDeclarationStatement(JTypeDeclarationStatement self, JTypeDeclaration decl) {
+        @Override
+		public List<JStatement> visitTypeDeclarationStatement(JTypeDeclarationStatement self, JTypeDeclaration decl) {
             assert false : "Class declarations not in StreamIt language.";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitTypeNameExpression(JTypeNameExpression self, CType type) {
+        @Override
+		public List<JStatement> visitTypeNameExpression(JTypeNameExpression self, CType type) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitUnaryMinusExpression(JUnaryExpression self, JExpression expr) {
+        @Override
+		public List<JStatement> visitUnaryMinusExpression(JUnaryExpression self, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitUnaryPlusExpression(JUnaryExpression self, JExpression expr) {
+        @Override
+		public List<JStatement> visitUnaryPlusExpression(JUnaryExpression self, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitUnaryPromoteExpression(JUnaryPromote self, JExpression expr, CType type) {
+        @Override
+		public List<JStatement> visitUnaryPromoteExpression(JUnaryPromote self, JExpression expr, CType type) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self, CClassType type, JExpression[] params, JClassDeclaration decl) {
+        @Override
+		public List<JStatement> visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self, CClassType type, JExpression[] params, JClassDeclaration decl) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
 
-        public List<JStatement> visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self, CClassType type, JExpression[] params) {
+        @Override
+		public List<JStatement> visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self, CClassType type, JExpression[] params) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -2229,7 +2361,8 @@ public class ThreeAddressCode {
          * If E[[E]]v produces a single statement, we could recombine declaration and init into a 
          * single declaration, but this is not guaranteed.
          */
-        public List<JStatement> visitVariableDeclarationStatement(JVariableDeclarationStatement self, JVariableDefinition[] vars) {
+        @Override
+		public List<JStatement> visitVariableDeclarationStatement(JVariableDeclarationStatement self, JVariableDefinition[] vars) {
             if (shouldConvertStatement(self)) {
                 List<JStatement> newstmts = new LinkedList<JStatement>();
                 for (JVariableDefinition var : vars) {
@@ -2242,8 +2375,7 @@ public class ThreeAddressCode {
                         var.setValue(null);
                         newstmts.add(new JVariableDeclarationStatement(self.getTokenReference(),
                                 var, self.getComments()));
-                        List<JStatement> initstmts = (List<JStatement>)
-                            initializer.accept(new E(), new JLocalVariableExpression(var));
+                        List<JStatement> initstmts = initializer.accept(new E(), new JLocalVariableExpression(var));
                         newstmts.addAll(initstmts);
                     } else { // don't need to convert this definition.
                         JVariableDeclarationStatement decl = new JVariableDeclarationStatement(self.getTokenReference(),
@@ -2253,11 +2385,12 @@ public class ThreeAddressCode {
                 }
                 return newstmts;
             } else {
-                return singletonStatementList((JStatement)self);
+                return singletonStatementList(self);
             }
         }
 
-        public List<JStatement> visitVariableDefinition(JVariableDefinition self, int modifiers, CType type, String ident, JExpression expr) {
+        @Override
+		public List<JStatement> visitVariableDefinition(JVariableDefinition self, int modifiers, CType type, String ident, JExpression expr) {
             assert false : "Not a statement";
             return Collections.emptyList();
         }
@@ -2273,7 +2406,8 @@ public class ThreeAddressCode {
          * S[[while (E) S]] = while (true) { if ! E then break; S } to
          * seems to work with propagator, so using that.
          */
-        public List<JStatement> visitWhileStatement(JWhileStatement self, JExpression cond, JStatement body) {
+        @Override
+		public List<JStatement> visitWhileStatement(JWhileStatement self, JExpression cond, JStatement body) {
             if (shouldConvertStatement(self)) {
                 
 //                JBreakStatement brk = new JBreakStatement(null,null,null);
@@ -2301,69 +2435,80 @@ public class ThreeAddressCode {
                 return (List<JStatement>) doit.accept(this);
                
             } else {
-                return singletonStatementList((JStatement)
-                        new JWhileStatement(self.getTokenReference(),cond,
-                                recurrStmt(body),
-                                self.getComments()));
+                return singletonStatementList(new JWhileStatement(self.getTokenReference(),cond,
+				        recurrStmt(body),
+				        self.getComments()));
             }
         }
 
-        public List<JStatement> visitBooleanLiteral(JBooleanLiteral self, boolean value) {
+        @Override
+		public List<JStatement> visitBooleanLiteral(JBooleanLiteral self, boolean value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitByteLiteral(JByteLiteral self, byte value) {
+        @Override
+		public List<JStatement> visitByteLiteral(JByteLiteral self, byte value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitCharLiteral(JCharLiteral self, char value) {
+        @Override
+		public List<JStatement> visitCharLiteral(JCharLiteral self, char value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitDoubleLiteral(JDoubleLiteral self, double value) {
+        @Override
+		public List<JStatement> visitDoubleLiteral(JDoubleLiteral self, double value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
+        @Override
+		public List<JStatement> visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
             throw new AssertionError("Not a statement");
         }
 
 
-        public List<JStatement> visitFloatLiteral(JFloatLiteral self, float value) {
+        @Override
+		public List<JStatement> visitFloatLiteral(JFloatLiteral self, float value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitIntLiteral(JIntLiteral self, int value) {
+        @Override
+		public List<JStatement> visitIntLiteral(JIntLiteral self, int value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitLongLiteral(JLongLiteral self, long value) {
+        @Override
+		public List<JStatement> visitLongLiteral(JLongLiteral self, long value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitNullLiteral(JNullLiteral self) {
+        @Override
+		public List<JStatement> visitNullLiteral(JNullLiteral self) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitShortLiteral(JShortLiteral self, short value) {
+        @Override
+		public List<JStatement> visitShortLiteral(JShortLiteral self, short value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitStringLiteral(JStringLiteral self, String value) {
+        @Override
+		public List<JStatement> visitStringLiteral(JStringLiteral self, String value) {
             assert false: "Not a statement";
             return null;
         }
 
-        public List<JStatement> visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
+        @Override
+		public List<JStatement> visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
             assert false: "Not a statement";
             return null;
         }

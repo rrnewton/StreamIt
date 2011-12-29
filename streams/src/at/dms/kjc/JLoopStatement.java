@@ -51,14 +51,16 @@ public abstract class JLoopStatement extends JStatement {
     /**
      * Return the end of this block (for break statement)
      */
-    public CodeLabel getBreakLabel() {
+    @Override
+	public CodeLabel getBreakLabel() {
         return endLabel;
     }
 
     /**
      * Return the beginning of this block (for continue statement)
      */
-    public CodeLabel getContinueLabel() {
+    @Override
+	public CodeLabel getContinueLabel() {
         return contLabel;
     }
 
@@ -72,7 +74,8 @@ public abstract class JLoopStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.JLoopStatement other) {

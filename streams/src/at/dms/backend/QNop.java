@@ -37,7 +37,8 @@ class QNop extends QNode {
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "...";
     }
 
@@ -51,7 +52,8 @@ class QNop extends QNode {
     /**
      * Returns the primitive instruction
      */
-    public InstructionHandle getInstruction() {
+    @Override
+	public InstructionHandle getInstruction() {
         return null;
     }
 
@@ -62,28 +64,32 @@ class QNop extends QNode {
     /**
      * Returns the defined temporary.
      */
-    public QTemporary getDef() {
+    @Override
+	public QTemporary getDef() {
         return null;
     }
 
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         return QTemporary.EMPTY;
     }
 
     /**
      * returns the parameters of this instruction
      */
-    public QOrigin[] getOrigins() {
+    @Override
+	public QOrigin[] getOrigins() {
         return new QOrigin[0]; // !!! share
     }
 
     /**
      * Sets the parameters of this instruction
      */
-    public void setOrigin(QOrigin origin, int i) {
+    @Override
+	public void setOrigin(QOrigin origin, int i) {
         throw new InconsistencyException();
     }
 
@@ -95,6 +101,7 @@ class QNop extends QNode {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
     }
 }

@@ -122,7 +122,8 @@ public class JoinerFusionState extends FusionState
     /** Perform the initialization tasks of this joiner, including declaring 
      * the incoming buffers and calling the init path function and placing the
      * results in the correct incoming buffer if this joiner is a feedback joiner **/
-    public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
+    @Override
+	public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
                           JBlock initFunctionCalls, JBlock main) 
     {
         //add the declarations for all the incoming buffers
@@ -194,7 +195,8 @@ public class JoinerFusionState extends FusionState
     
     /** Construct the code necessary to perform the joining of the incoming buffers 
         as given by the round-robin weights of the joiner **/
-    public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
+    @Override
+	public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
     {
     
         JBlock statements = new JBlock(null, new JStatement[0], null);
@@ -337,7 +339,8 @@ public class JoinerFusionState extends FusionState
     }
 
     /** return the var def of the incoming (pop) buffer from *node* to this joiner **/
-    public JVariableDefinition getBufferVar(FlatNode node, boolean init)
+    @Override
+	public JVariableDefinition getBufferVar(FlatNode node, boolean init)
     {
         assert bufferMap.containsKey(node);
 
@@ -354,7 +357,8 @@ public class JoinerFusionState extends FusionState
         }
     }
     /** return the buffer size for the incoming buffer from *prev* to this node **/
-    public int getBufferSize(FlatNode prev, boolean init) 
+    @Override
+	public int getBufferSize(FlatNode prev, boolean init) 
     {
         return bufferSizes[node.getIncomingWay(prev)];
     }
@@ -391,7 +395,8 @@ public class JoinerFusionState extends FusionState
         on the incoming buffer from *prev* to this node.
         remember to add the initpath items that were not consumed 
         by this joiner if it is a feedback joiner **/
-    public int getRemaining(FlatNode prev, boolean isInit) 
+    @Override
+	public int getRemaining(FlatNode prev, boolean isInit) 
     {
         //if this is the feedback incoming edge of a feedback loop joiner
         //then the joiner executes before the incoming edge's source

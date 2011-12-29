@@ -40,7 +40,8 @@ public class ExprVar extends Expression
     public String getName() { return name; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprVar(this);
     }
@@ -53,22 +54,26 @@ public class ExprVar extends Expression
      *
      * @return always true
      */
-    public boolean isLValue()
+    @Override
+	public boolean isLValue()
     {
         return true;
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return name;
     }
 
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return name.hashCode();
     }
     
-    public boolean equals(Object o)
+    @Override
+	public boolean equals(Object o)
     {
         if (!(o instanceof ExprVar))
             return false;

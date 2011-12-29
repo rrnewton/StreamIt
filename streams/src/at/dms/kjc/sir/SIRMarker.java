@@ -30,7 +30,8 @@ public class SIRMarker extends JStatement {
     /**
      * Analyses the statement (semantically) - NOT SUPPORTED YET.
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         at.dms.util.Utils.fail("Analysis of SIR nodes not supported yet.");
     }
 
@@ -41,7 +42,8 @@ public class SIRMarker extends JStatement {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitMarker(this);
         } else {
@@ -53,7 +55,8 @@ public class SIRMarker extends JStatement {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitMarker(this);
         } else {
@@ -64,14 +67,16 @@ public class SIRMarker extends JStatement {
     /**
      * Generates a sequence of bytescodes - NOT SUPPORTED YET.
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         at.dms.util.Utils.fail("Codegen of SIR nodes not supported yet.");
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRMarker other = new at.dms.kjc.sir.SIRMarker();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

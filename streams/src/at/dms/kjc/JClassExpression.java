@@ -74,14 +74,16 @@ public class JClassExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Class;
     }
 
     /**
      * No-op: class has manifest type {@link CStdType#Class}.
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         //
     }
 
@@ -104,7 +106,8 @@ public class JClassExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         if (prefix != null) {
             prefix = prefix.analyse(new CExpressionContext(context));
             check(context,
@@ -133,7 +136,8 @@ public class JClassExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitClassExpression(this, type);
     }
 
@@ -141,7 +145,8 @@ public class JClassExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitClassExpression(this, type);
     }
 
@@ -163,7 +168,8 @@ public class JClassExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         String      className;
@@ -228,7 +234,8 @@ public class JClassExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JClassExpression other = new at.dms.kjc.JClassExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

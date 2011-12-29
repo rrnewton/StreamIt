@@ -51,7 +51,7 @@ public class PartitionUtil {
         for (int i=0; i<partitions.size(); i++) {
             PartitionRecord pr = partitions.get(i);
             double util = ((double)pr.getWork()) / ((double)maxWork);
-            totalUtil += util / ((double)numTiles);
+            totalUtil += util / numTiles;
         }
         return totalUtil;
     }

@@ -20,7 +20,8 @@ package streamit.misc;
 
 public class HashComperator implements Comperator
 {
-    public boolean isLess(Object left, Object right)
+    @Override
+	public boolean isLess(Object left, Object right)
     {
         int leftHash = left.hashCode ();
         int rightHash = right.hashCode ();

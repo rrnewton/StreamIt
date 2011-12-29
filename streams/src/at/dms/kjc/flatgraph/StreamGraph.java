@@ -519,7 +519,8 @@ public class StreamGraph {
      */
     public SIRStream recreateSIR() {
         topLevel.accept(new StreamGraphVisitor(){
-            public void visitStaticStreamGraph(StaticStreamGraph ssg) {
+            @Override
+			public void visitStaticStreamGraph(StaticStreamGraph ssg) {
                 ssg.reconnectOutputs();
             }
         }, null,true);

@@ -43,7 +43,8 @@ public class SemanticChecker {
         }
     
         /* pre-visit a feedbackloop */
-        public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+        @Override
+		public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                          SIRFeedbackLoopIter iter) {
             if (self.getLoop()==null) {
                 out.println("ERROR:  Loop stream is null in " + iter + ";\n" +

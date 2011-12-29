@@ -57,14 +57,16 @@ public class JBooleanLiteral extends JLiteral {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Boolean;
     }
 
     /**
      * Returns a string representation of this literal.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JBooleanLiteral[");
@@ -73,14 +75,16 @@ public class JBooleanLiteral extends JLiteral {
         return buffer.toString();
     }
 
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         return ""+value;
     }
 
     /**
      * Returns the constant value of the expression.
      */
-    public boolean booleanValue() {
+    @Override
+	public boolean booleanValue() {
         return value;
     }
 
@@ -88,7 +92,8 @@ public class JBooleanLiteral extends JLiteral {
      * Returns true iff the value of this literal is the
      * default value for this type (JLS 4.5.5).
      */
-    public boolean isDefault() {
+    @Override
+	public boolean isDefault() {
         return !value;
     }
 
@@ -101,7 +106,8 @@ public class JBooleanLiteral extends JLiteral {
      * changes the type of this expression to an other
      * @param  dest the destination type
      */
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         switch (dest.getTypeID()) {
         case TID_BOOLEAN:
             return this;
@@ -123,7 +129,8 @@ public class JBooleanLiteral extends JLiteral {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitBooleanLiteral(value);
     }
 
@@ -131,7 +138,8 @@ public class JBooleanLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitBooleanLiteral(this, value);
     }
 
@@ -153,7 +161,8 @@ public class JBooleanLiteral extends JLiteral {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantInstruction(new PushLiteralInstruction(value ? 1 : 0));
@@ -164,7 +173,8 @@ public class JBooleanLiteral extends JLiteral {
      * Returns whether or <pre>o</pre> this represents a literal with the same
      * value as this.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o!=null && 
                 (o instanceof JBooleanLiteral) &&
                 ((JBooleanLiteral)o).value==this.value);
@@ -175,7 +185,8 @@ public class JBooleanLiteral extends JLiteral {
      * This method helps to handle heavy optimizables conditions
      * @param   code        the code list
      */
-    public void genBranch(boolean cond, CodeSequence code, CodeLabel label) {
+    @Override
+	public void genBranch(boolean cond, CodeSequence code, CodeLabel label) {
         setLineNumber(code);
 
         if (value == cond) {
@@ -193,7 +204,8 @@ public class JBooleanLiteral extends JLiteral {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JBooleanLiteral other = new at.dms.kjc.JBooleanLiteral();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

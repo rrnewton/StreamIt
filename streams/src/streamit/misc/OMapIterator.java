@@ -65,7 +65,8 @@ public class OMapIterator
         return new OMapIterator(setIter);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof OMapIterator))
             return false;

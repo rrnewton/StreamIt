@@ -96,7 +96,7 @@ class Greedy {
                     Iterator<LatencyConstraint> ci = cons.iterator();
                     while (ci.hasNext()) {
                         LatencyConstraint c = ci.next();
-                        SIRFilter dst = (SIRFilter)c.getReceiver();
+                        SIRFilter dst = c.getReceiver();
                         boolean down = LatencyConstraints.isMessageDirectionDownstream(src, dst);
                         int init_c = c.getSourceInit();
                         //System.out.println("Constraint from: "+src+" to: "+dst+(down?" DOWN":" UP")+" init-credit: "+init_c);
@@ -267,8 +267,8 @@ class Greedy {
                         //System.out.println("latency constraint");
 
                         LatencyConstraint c = ci.next();
-                        SIRFilter dst = (SIRFilter)c.getReceiver();
-                        boolean down = LatencyConstraints.isMessageDirectionDownstream((SIRFilter)oper, (SIRFilter)dst);
+                        SIRFilter dst = c.getReceiver();
+                        boolean down = LatencyConstraints.isMessageDirectionDownstream((SIRFilter)oper, dst);
                         int init_c = c.getSourceInit();
             
                         if (down) {
@@ -334,7 +334,7 @@ class Greedy {
                     int sum = 0;
 
                     for (int z = last; z < phase_num; z++) {
-                        sum += ((Integer)phases.get(z).get(node_id)).intValue();
+                        sum += phases.get(z).get(node_id).intValue();
                     }
         
                     if (sum % steady_count == 0 &&
@@ -397,7 +397,7 @@ class Greedy {
                 while (it.hasNext()) {
                     SIROperator oper = it.next();
                     int id = NodeEnumerator.getSIROperatorId(oper);
-                    int exec = ((Integer)phases.get(curr).get(node_id)).intValue();
+                    int exec = phases.get(curr).get(node_id).intValue();
 
                     int _iter = iteration.get(oper).intValue();
 
@@ -436,8 +436,8 @@ class Greedy {
                             //System.out.println("latency constraint");
                 
                             LatencyConstraint c = ci.next();
-                            SIRFilter dst = (SIRFilter)c.getReceiver();
-                            boolean down = LatencyConstraints.isMessageDirectionDownstream((SIRFilter)oper, (SIRFilter)dst);
+                            SIRFilter dst = c.getReceiver();
+                            boolean down = LatencyConstraints.isMessageDirectionDownstream((SIRFilter)oper, dst);
                             int init_c = c.getSourceInit();
                 
                             if (down) {
@@ -500,8 +500,8 @@ class Greedy {
                 SIROperator oper = it.next();
                 int id = NodeEnumerator.getSIROperatorId(oper);
 
-                int steady_count = ((Integer)phases.get(combine_ptr).get(node_id)).intValue() +
-                    ((Integer)phases.get(combine_ptr+1).get(node_id)).intValue();
+                int steady_count = phases.get(combine_ptr).get(node_id).intValue() +
+                    phases.get(combine_ptr+1).get(node_id).intValue();
 
                 node_id++;
 
@@ -578,8 +578,8 @@ class Greedy {
                         //System.out.println("latency constraint");
 
                         LatencyConstraint c = ci.next();
-                        SIRFilter dst = (SIRFilter)c.getReceiver();
-                        boolean down = LatencyConstraints.isMessageDirectionDownstream((SIRFilter)oper, (SIRFilter)dst);
+                        SIRFilter dst = c.getReceiver();
+                        boolean down = LatencyConstraints.isMessageDirectionDownstream((SIRFilter)oper, dst);
                         int init_c = c.getSourceInit();
             
                         if (down) {

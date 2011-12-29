@@ -68,7 +68,8 @@ public class ComplexProp extends FEReplacer
         return new ExprComplex(exp.getContext(), real, imag);
     }
 
-    public Object visitExprBinary(ExprBinary exp)
+    @Override
+	public Object visitExprBinary(ExprBinary exp)
     {
         Expression left = (Expression)exp.getLeft().accept(this);
         Expression right = (Expression)exp.getRight().accept(this);
@@ -240,7 +241,8 @@ public class ComplexProp extends FEReplacer
             return new ExprBinary(exp.getContext(), exp.getOp(), left, right);
     }
 
-    public Object visitExprTernary(ExprTernary exp)
+    @Override
+	public Object visitExprTernary(ExprTernary exp)
     {
         // Only one case of these, so don't bother checking the op.
         Expression a = (Expression)exp.getA().accept(this);
@@ -268,7 +270,8 @@ public class ComplexProp extends FEReplacer
         return new ExprComplex(ctx, real, imag);
     }
 
-    public Object visitExprUnary(ExprUnary exp)
+    @Override
+	public Object visitExprUnary(ExprUnary exp)
     {
         // The only operation this makes sense for is negation,
         // and we're ignoring error-checking everywhere else anyways.
@@ -284,7 +287,8 @@ public class ComplexProp extends FEReplacer
         return new ExprComplex(exp.getContext(), real, imag);
     }
 
-    public Object visitExprFunCall(ExprFunCall exp)
+    @Override
+	public Object visitExprFunCall(ExprFunCall exp)
     {
         // Start by resolving all of the parameters.
         List<Object> params = new ArrayList<Object>();

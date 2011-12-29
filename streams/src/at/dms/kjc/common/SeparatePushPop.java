@@ -83,7 +83,8 @@ public class SeparatePushPop extends SLIRReplacingVisitor {
      * If push expression has a pop in the arg, then assign the arg
      * to a temp and then push the temp. 
      */
-    public Object visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public Object visitExpressionStatement(JExpressionStatement self,
             JExpression expr) {
         if (expr instanceof SIRPushExpression) {
             SIRPushExpression push = (SIRPushExpression)expr;
@@ -119,7 +120,8 @@ public class SeparatePushPop extends SLIRReplacingVisitor {
         final boolean foundPop[] = {false};
         
         expr.accept(new SLIREmptyVisitor() {
-            public void visitPopExpression(SIRPopExpression self, CType tapeType) {
+            @Override
+			public void visitPopExpression(SIRPopExpression self, CType tapeType) {
                 foundPop[0] = true;
             }
         });

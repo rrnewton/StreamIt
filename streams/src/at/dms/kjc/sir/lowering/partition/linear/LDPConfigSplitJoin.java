@@ -18,7 +18,8 @@ class LDPConfigSplitJoin extends LDPConfigContainer {
         return result;
     }
 
-    protected LDPConfig childConfig(int x, int y) {
+    @Override
+	protected LDPConfig childConfig(int x, int y) {
         assert y==0: "Looking for y=" + y + " in LDPConfigSplitJoin.get";
         return partitioner.getConfig(cont.get(x));
     }

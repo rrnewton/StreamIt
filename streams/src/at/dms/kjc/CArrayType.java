@@ -91,7 +91,8 @@ public class CArrayType extends CClassType {
      * Transforms this type to a string
      * @return  the ksm form of this type
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String res;
         if (baseType.isArrayType()) {
             res = "(" + baseType.toString() + ")";
@@ -114,14 +115,16 @@ public class CArrayType extends CClassType {
     /**
      *
      */
-    public String getQualifiedName() {
+    @Override
+	public String getQualifiedName() {
         return getSignature();
     }
 
     /**
      * Appends the VM signature of this type to the specified buffer.
      */
-    public void appendSignature(SimpleStringBuffer buffer) {
+    @Override
+	public void appendSignature(SimpleStringBuffer buffer) {
         for (int i = 0; i < arrayBound; i++) {
             buffer.append('[');
         }
@@ -131,7 +134,8 @@ public class CArrayType extends CClassType {
     /**
      * @return  the size used in stack by value of this type
      */
-    public int getSize() {
+    @Override
+	public int getSize() {
         return 1;
     }
 
@@ -159,7 +163,8 @@ public class CArrayType extends CClassType {
      * of bytes needed in C on 32-bit machine) used by a value of this
      * type.
      */
-    public int getSizeInC() {
+    @Override
+	public int getSizeInC() {
         // to get number of bytes, multiply total number of elements
         // by size of basetype
         return getTotalNumElements() * baseType.getSizeInC();
@@ -169,14 +174,16 @@ public class CArrayType extends CClassType {
      * Checks if a type is a reference type
      * @return  is it a type that accept null value ?
      */
-    public boolean isReference() {
+    @Override
+	public boolean isReference() {
         return true;
     }
 
     /**
      * @return  is this type an array ?
      */
-    public boolean isArrayType() {
+    @Override
+	public boolean isArrayType() {
         return true;
     }
 
@@ -220,14 +227,16 @@ public class CArrayType extends CClassType {
     /**
      * @return  true if this type is valid
      */
-    public boolean checked() {
+    @Override
+	public boolean checked() {
         return baseType.checked();
     }
 
     /**
      * equals
      */
-    public boolean equals(CType other) {
+    @Override
+	public boolean equals(CType other) {
         if (!other.isArrayType()) {
             return false;
         } else {
@@ -246,7 +255,8 @@ public class CArrayType extends CClassType {
      * necessary to resolve String into java/lang/String
      * @exception UnpositionedError this error will be positioned soon
      */
-    public void checkType(CContext context) throws UnpositionedError {
+    @Override
+	public void checkType(CContext context) throws UnpositionedError {
         if (!isChecked()) {
             setClass(CStdType.Object.getCClass());
             baseType.checkType(context);
@@ -282,7 +292,8 @@ public class CArrayType extends CClassType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isAssignableTo(CType dest) {
+    @Override
+	public boolean isAssignableTo(CType dest) {
         if (dest.isArrayType()) {
             if (arrayBound == ((CArrayType)dest).arrayBound &&
                 baseType.isAssignableTo(((CArrayType)dest).baseType)) {
@@ -306,7 +317,8 @@ public class CArrayType extends CClassType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isCastableTo(CType dest) {
+    @Override
+	public boolean isCastableTo(CType dest) {
         // test for array first because array types are classes
 
         if (dest.isArrayType()) {
@@ -385,7 +397,8 @@ public class CArrayType extends CClassType {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CArrayType other = new at.dms.kjc.CArrayType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

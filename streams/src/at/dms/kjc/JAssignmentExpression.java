@@ -73,7 +73,8 @@ public class JAssignmentExpression extends JBinaryExpression {
     /**
      * Returns true iff this expression can be used as a statement (JLS 14.8)
      */
-    public boolean isStatementExpression() {
+    @Override
+	public boolean isStatementExpression() {
         return true;
     }
 
@@ -87,7 +88,8 @@ public class JAssignmentExpression extends JBinaryExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         right = right.analyse(new CExpressionContext(context, false, false));
         if (right instanceof JTypeNameExpression) {
             check(context, false, KjcMessages.VAR_UNKNOWN, ((JTypeNameExpression)right).getQualifiedName());
@@ -129,7 +131,8 @@ public class JAssignmentExpression extends JBinaryExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitAssignmentExpression(this, left, right);
     }
 
@@ -137,7 +140,8 @@ public class JAssignmentExpression extends JBinaryExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitAssignmentExpression(this, left, right);
     }
 
@@ -156,7 +160,8 @@ public class JAssignmentExpression extends JBinaryExpression {
     /**
      * Returns a string representation of this object.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JAssignmentExpression[");
@@ -173,7 +178,8 @@ public class JAssignmentExpression extends JBinaryExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         left.genStartStoreCode(code);
@@ -184,7 +190,8 @@ public class JAssignmentExpression extends JBinaryExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JAssignmentExpression other = new at.dms.kjc.JAssignmentExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

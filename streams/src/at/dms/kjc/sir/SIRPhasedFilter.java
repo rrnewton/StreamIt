@@ -79,7 +79,8 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     /**
      * Returns the type of this stream.
      */
-    public LIRStreamType getStreamType() 
+    @Override
+	public LIRStreamType getStreamType() 
     {
         // Might want to create a new type.
         return LIRStreamType.LIR_FILTER;
@@ -108,7 +109,8 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     /**
      * Accepts attribute visitor v at this node.
      */
-    public Object accept(AttributeStreamVisitor v)
+    @Override
+	public Object accept(AttributeStreamVisitor v)
     {
         return v.visitPhasedFilter(this,
                                    fields,
@@ -124,14 +126,16 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     public void setInputType(CType t){
         this.inputType = t;
     }
-    public CType getInputType(){
+    @Override
+	public CType getInputType(){
         return inputType;
     }
 
     public void setOutputType(CType t) {
         this.outputType = t;
     }
-    public CType getOutputType() {
+    @Override
+	public CType getOutputType() {
         return this.outputType;
     }
 
@@ -175,11 +179,13 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         this.phases = phases;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "SIRPhasedFilter name=" + getName();
     }
 
-    public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
+    @Override
+	public int getPushForSchedule(Map<SIROperator, int[]>[] counts) {
         // not implementing this right now because I'm unclear if
         // there is a distinct execution count for each phase.  can
         // fix without too much trouble later. --bft
@@ -187,7 +193,8 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         return -1;
     }
 
-    public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
+    @Override
+	public int getPopForSchedule(Map<SIROperator, int[]>[] counts) {
         // not implementing this right now because I'm unclear if
         // there is a distinct execution count for each phase.  can
         // fix without too much trouble later. --bft
@@ -198,7 +205,8 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRPhasedFilter other = new at.dms.kjc.sir.SIRPhasedFilter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

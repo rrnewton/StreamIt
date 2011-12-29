@@ -170,7 +170,8 @@ public class RenameDestroyedVars extends SLIRReplacingVisitor {
         }
     }
 
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -207,7 +208,8 @@ public class RenameDestroyedVars extends SLIRReplacingVisitor {
     }
 
 
-    public Object visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public Object visitAssignmentExpression(JAssignmentExpression self,
                                             JExpression left,
                                             JExpression right) {
 
@@ -224,7 +226,8 @@ public class RenameDestroyedVars extends SLIRReplacingVisitor {
         return self;
     }
 
-    public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public Object visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                     int oper,
                                                     JExpression left,
                                                     JExpression right) {
@@ -243,7 +246,8 @@ public class RenameDestroyedVars extends SLIRReplacingVisitor {
     }
 
 
-    public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                     JVariableDefinition[] vars) {
 
         if (!RENAME) return self;
@@ -265,7 +269,8 @@ public class RenameDestroyedVars extends SLIRReplacingVisitor {
         }
     }
 
-    public Object visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public Object visitLocalVariableExpression(JLocalVariableExpression self,
                                                String ident) {
         JLocalVariable var = self.getVariable();
         if (destroyedVars.contains(var)) {

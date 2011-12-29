@@ -133,7 +133,7 @@ public abstract class StreamTransform {
     
         // visit transforms
         for (int i=0; i<cont.size(); i++) {
-            SIRStream child = (SIRStream)cont.get(i);
+            SIRStream child = cont.get(i);
             SIRStream newChild = transforms.get(i).doTransform(child);
             // some people did their own replacing, returning the orig
             // stream or null, so only do it if it's not done

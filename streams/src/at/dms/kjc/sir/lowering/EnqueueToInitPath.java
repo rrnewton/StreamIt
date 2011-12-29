@@ -54,7 +54,8 @@ public class EnqueueToInitPath
     {
         SIRIterator iter = IterFactory.createFactory().createIter(str);
         iter.accept(new EmptyStreamVisitor() {
-                public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+                @Override
+				public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                                   SIRFeedbackLoopIter iter)
                 {
                     doRewrite(self);
@@ -79,7 +80,8 @@ public class EnqueueToInitPath
         final List<JExpression> values = new java.util.ArrayList<JExpression>();
         final String[] enqTypeWrapper = new String[1];
         init.getBody().accept(new SLIREmptyVisitor() {
-                public void visitBlockStatement(JBlock self,
+                @Override
+				public void visitBlockStatement(JBlock self,
                                                 JavaStyleComment[] comments) {
                     super.visitBlockStatement(self, comments);
                     for (Iterator iter = self.getStatementIterator(); iter.hasNext(); )

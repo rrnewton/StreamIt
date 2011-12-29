@@ -3,6 +3,7 @@ package at.dms.kjc.backendSupport;
 import java.util.LinkedList;
 import java.util.List;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JAddExpression;
@@ -66,12 +67,13 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     }
     
     /** input_type pop(). */
-    public JMethodDeclaration popMethod() {
+    @Override
+	public JMethodDeclaration popMethod() {
         ALocalVariable tmp = ALocalVariable.makeTmp(edge.getType());
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 edge.getType(),
                 popMethodName(),
                 new JFormalParameter[0],
@@ -93,7 +95,8 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     }
    
     /** void pop(int N). */
-    public JMethodDeclaration popManyMethod() {
+    @Override
+	public JMethodDeclaration popManyMethod() {
         String parameterName = "__n";
         JFormalParameter n = new JFormalParameter(
                 CStdType.Integer,
@@ -102,7 +105,7 @@ public class ChannelAsCircularArray extends ChannelAsArray {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 popManyMethodName(),
                 new JFormalParameter[]{n},
@@ -121,7 +124,8 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     
     
     /** void pop(input_type val)  generally assign if val is not an array, else memcpy */
-    public JMethodDeclaration assignFromPopMethod() {
+    @Override
+	public JMethodDeclaration assignFromPopMethod() {
         String parameterName = "__val";
         JFormalParameter val = new JFormalParameter(
                 CStdType.Integer,
@@ -130,7 +134,7 @@ public class ChannelAsCircularArray extends ChannelAsArray {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 assignFromPopMethodName(),
                 new JFormalParameter[]{val},
@@ -144,7 +148,8 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     }
     
     /** input_type peek(int offset) */
-    public JMethodDeclaration peekMethod() {
+    @Override
+	public JMethodDeclaration peekMethod() {
         String parameterName = "__offset";
         JFormalParameter offset = new JFormalParameter(
                 CStdType.Integer,
@@ -153,7 +158,7 @@ public class ChannelAsCircularArray extends ChannelAsArray {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 edge.getType(),
                 peekMethodName(),
                 new JFormalParameter[]{offset},
@@ -169,7 +174,8 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     }
 
     /** void peek(input_type val, int offset)  generally assign if val is not an array, else memcpy */
-    public JMethodDeclaration assignFromPeekMethod() {
+    @Override
+	public JMethodDeclaration assignFromPeekMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
                 CStdType.Integer,
@@ -183,7 +189,7 @@ public class ChannelAsCircularArray extends ChannelAsArray {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 assignFromPeekMethodName(),
                 new JFormalParameter[]{val,offset},
@@ -197,7 +203,8 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     }
 
    /** void push(output_type val) */
-    public JMethodDeclaration pushMethod() {
+    @Override
+	public JMethodDeclaration pushMethod() {
         String valName = "__val";
         JFormalParameter val = new JFormalParameter(
                 edge.getType(),
@@ -206,7 +213,7 @@ public class ChannelAsCircularArray extends ChannelAsArray {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 pushMethodName(),
                 new JFormalParameter[]{val},
@@ -239,7 +246,8 @@ public class ChannelAsCircularArray extends ChannelAsArray {
     /** Statements for beginning of steady state iteration on write (upstream) end of buffer 
      * overrides superclass to have no statements here. 
      */
-    public List<JStatement> beginSteadyWrite() {
+    @Override
+	public List<JStatement> beginSteadyWrite() {
         List<JStatement> retval = new LinkedList<JStatement>();
         return retval; 
     }

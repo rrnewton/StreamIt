@@ -57,6 +57,7 @@ public class PPAnalyze extends SLIREmptyVisitor {
 	    nul = true;
 	}
 
+	@Override
 	public String toString() {
 	    if (nul) {
 		return "NULL";
@@ -100,7 +101,8 @@ public class PPAnalyze extends SLIREmptyVisitor {
 	info.setNul();
     }
 
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -116,7 +118,8 @@ public class PPAnalyze extends SLIREmptyVisitor {
 
     }
 
-    public void visitPopExpression(SIRPopExpression self, CType tapeType) {
+    @Override
+	public void visitPopExpression(SIRPopExpression self, CType tapeType) {
 
 	incBalance(1);
 	//System.out.println("------- pop newBalance="+peekBalance());
@@ -124,7 +127,8 @@ public class PPAnalyze extends SLIREmptyVisitor {
 	super.visitPopExpression(self, tapeType);
     }
 
-    public void visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
+    @Override
+	public void visitPushExpression(SIRPushExpression self, CType tapeType, JExpression arg) {
 
 	super.visitPushExpression(self, tapeType, arg);
 
@@ -133,7 +137,8 @@ public class PPAnalyze extends SLIREmptyVisitor {
     }
  
 
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause) {
@@ -166,7 +171,8 @@ public class PPAnalyze extends SLIREmptyVisitor {
 
     
 
-    public void/*Object*/ visitForStatement(JForStatement self,
+    @Override
+	public void/*Object*/ visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -304,7 +310,8 @@ public class PPAnalyze extends SLIREmptyVisitor {
 	
     }
 
-    public void visitDoStatement(JDoStatement self,
+    @Override
+	public void visitDoStatement(JDoStatement self,
                                  JExpression cond,
                                  JStatement body) {
 
@@ -330,7 +337,8 @@ public class PPAnalyze extends SLIREmptyVisitor {
 	//System.out.println("------- Do stmt balance="+info+" newBalance="+peekBalance());
     }
 
-    public void visitWhileStatement(JWhileStatement self,
+    @Override
+	public void visitWhileStatement(JWhileStatement self,
                                  JExpression cond,
                                  JStatement body) {
 

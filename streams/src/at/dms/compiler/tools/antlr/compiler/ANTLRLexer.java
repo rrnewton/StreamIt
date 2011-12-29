@@ -116,7 +116,8 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
         setCaseSensitive(true);
     }
 
-    public Token nextToken() throws TokenStreamException {
+    @Override
+	public Token nextToken() throws TokenStreamException {
         Token theRetToken=null;
         tryAgain:
         for (;;) {
@@ -291,7 +292,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                         }
                         else {
                             if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-                            else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                            else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                         }
                     }
                     if ( _returnToken==null ) { continue tryAgain; } // found SKIP token
@@ -354,7 +355,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                     }
                 }
                 else {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -386,7 +387,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                 }
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -432,7 +433,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                 match('\n');
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -462,7 +463,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
             else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
             }
             else {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         
         }
@@ -780,7 +781,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -867,7 +868,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                                 else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                                 }
                                 else {
-                                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                                 }
                 
                             }
@@ -875,7 +876,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -895,7 +896,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                         else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
             
                     }
@@ -912,7 +913,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                 }
             default:
                 {
-                    throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                    throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                 }
             }
         }
@@ -1015,7 +1016,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
             }
         default:
             {
-                throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
             }
         }
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -1064,7 +1065,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                     matchRange('0','9');
                 }
                 else {
-                    if ( _cnt167>=1 ) { break _loop167; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+                    if ( _cnt167>=1 ) { break _loop167; } else {throw new NoViableAltForCharException(LA(1), getFilename(), getLine());}
                 }
             
                 _cnt167++;
@@ -1258,7 +1259,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
                             }
                         }
                         else {
-                            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+                            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
                         }
                 
                     }
@@ -1550,7 +1551,7 @@ public class ANTLRLexer extends at.dms.compiler.tools.antlr.runtime.CharScanner 
             match('a');
         }
         else {
-            throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+            throw new NoViableAltForCharException(LA(1), getFilename(), getLine());
         }
         
         if ( _createToken && _token==null && _ttype!=Token.SKIP ) {

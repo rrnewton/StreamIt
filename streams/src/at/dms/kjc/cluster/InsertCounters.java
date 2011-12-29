@@ -139,7 +139,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
      * Visitors
      ******************************************************/
     
-    public void visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryPlusExpression(JUnaryExpression self,
                                          JExpression expr)
     {
         beginWrapper("UNOP_POS");
@@ -147,7 +148,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryMinusExpression(JUnaryExpression self,
                                           JExpression expr)
     {
         beginWrapper("UNOP_NEG");
@@ -155,7 +157,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         beginWrapper("UNOP_COMPLEMENT");
@@ -163,7 +166,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitLogicalComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         beginWrapper("UNOP_NOT");
@@ -171,7 +175,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitShiftExpression(JShiftExpression self,
+    @Override
+	public void visitShiftExpression(JShiftExpression self,
                                      int oper,
                                      JExpression left,
                                      JExpression right) {
@@ -180,7 +185,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public void visitRelationalExpression(JRelationalExpression self,
                                           int oper,
                                           JExpression left,
                                           JExpression right) {
@@ -189,7 +195,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         beginWrapper(oper);
@@ -197,7 +204,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         beginWrapper(oper);
@@ -205,7 +213,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right) {
@@ -217,7 +226,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public void visitEqualityExpression(JEqualityExpression self,
                                         boolean equal,
                                         JExpression left,
                                         JExpression right) {
@@ -226,7 +236,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {
@@ -235,7 +246,8 @@ public class InsertCounters extends at.dms.kjc.common.ToC implements Constants {
         endWrapper();
     }
 
-    public void visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public void visitBitwiseExpression(JBitwiseExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {

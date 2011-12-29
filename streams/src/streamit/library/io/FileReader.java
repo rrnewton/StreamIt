@@ -71,7 +71,8 @@ public class FileReader extends Filter
             }
     }
 
-    public void init ()
+    @Override
+	public void init ()
     {
         // Hacked to make FileReader/Writer<bit> work
         if (fileType == null) {
@@ -106,7 +107,8 @@ public class FileReader extends Filter
     private int bits_to_go = 0;
     private byte the_bits = 0;
 
-    public void work ()
+    @Override
+	public void work ()
     {
         boolean done = false;
         while (!done) {

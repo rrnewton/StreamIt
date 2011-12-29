@@ -115,7 +115,7 @@ public class Schedule extends AssertedClass
     {
         assert subScheds != null;
         assert nSched >= 0 && nSched < subScheds.size();
-        return (Schedule) subScheds.get(nSched).getFirst();
+        return subScheds.get(nSched).getFirst();
     }
 
     /**
@@ -126,7 +126,7 @@ public class Schedule extends AssertedClass
     {
         assert subScheds != null;
         assert nSched >= 0 && nSched < subScheds.size();
-        return ((Integer) subScheds.get(nSched).getSecond()).intValue();
+        return subScheds.get(nSched).getSecond().intValue();
     }
 
     /**
@@ -182,7 +182,8 @@ public class Schedule extends AssertedClass
      * deterministic behavior in sets and containers (was causing
      * unpredictable exceptions).
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return id;
     }
 

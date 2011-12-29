@@ -417,27 +417,32 @@ public class LatencyEdge extends Misc implements SDEPData
         return dst;
     }
 
-    public int getNumDstInitPhases()
+    @Override
+	public int getNumDstInitPhases()
     {
         return numInitDstExec;
     }
 
-    public int getNumSrcInitPhases()
+    @Override
+	public int getNumSrcInitPhases()
     {
         return numInitSrcExec;
     }
 
-    public int getNumDstSteadyPhases()
+    @Override
+	public int getNumDstSteadyPhases()
     {
         return numSteadyDstExec;
     }
 
-    public int getNumSrcSteadyPhases()
+    @Override
+	public int getNumSrcSteadyPhases()
     {
         return numSteadySrcExec;
     }
 
-    public int getSrcPhase4DstPhase(int nDstPhase)
+    @Override
+	public int getSrcPhase4DstPhase(int nDstPhase)
     {
         if (nDstPhase < numInitDstExec + 1)
             {
@@ -456,7 +461,8 @@ public class LatencyEdge extends Misc implements SDEPData
             }
     }
 
-    public int getDstPhase4SrcPhase(int nSrcPhase)
+    @Override
+	public int getDstPhase4SrcPhase(int nSrcPhase)
     {
         // first have to figure out if I need to "wrap around"
         int addDstPhase = 0;

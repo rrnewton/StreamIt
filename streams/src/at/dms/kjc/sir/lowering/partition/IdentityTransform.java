@@ -15,11 +15,13 @@ public final class IdentityTransform extends IdempotentTransform {
     /**
      * Perform the transform on 'str' and return new stream.
      */
-    public SIRStream doMyTransform(SIRStream str) {
+    @Override
+	public SIRStream doMyTransform(SIRStream str) {
         return str;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Identity Transform, #" + id;
     }
 }

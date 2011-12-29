@@ -93,7 +93,8 @@ public class ConvertLonelyPops implements Constants {
                         (JLiteral)new JIntLiteral(0));
         // replace the lonely receives
         method.getBody().accept(new SLIRReplacingVisitor() {
-            public Object visitExpressionStatement(JExpressionStatement self,
+            @Override
+			public Object visitExpressionStatement(JExpressionStatement self,
                     JExpression expr) {
                 
                 // this this statement consists only of a method call

@@ -37,11 +37,13 @@ class TokenRefElement extends GrammarAtom {
         line = t.getLine();
     }
 
-    public void generate(JavaCodeGenerator generator) {
+    @Override
+	public void generate(JavaCodeGenerator generator) {
         generator.gen(this);
     }
 
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
 }

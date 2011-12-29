@@ -25,20 +25,23 @@ public class FindTapeOps extends SLIREmptyVisitor {
 
     public FindTapeOps() { tape_op = false; }
     
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression val)
     {
         tape_op = true;
     }
     
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType)
     {
         tape_op = true;
     }    
 
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression num)
     {

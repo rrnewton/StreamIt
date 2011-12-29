@@ -50,7 +50,8 @@ public class Core extends ComputeNode<SMPComputeCodeStore> {
         return machine;
     }
     
-    public SMPComputeCodeStore getComputeCode() {
+    @Override
+	public SMPComputeCodeStore getComputeCode() {
         return computeCode;
     }
     

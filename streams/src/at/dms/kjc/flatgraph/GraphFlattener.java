@@ -904,7 +904,7 @@ public class GraphFlattener extends at.dms.util.Utils
         if ((init ? initExecutionCounts : steadyExecutionCounts) == null)
             return -1;
         Integer val = 
-            ((Integer)(init ? initExecutionCounts.get(node) : steadyExecutionCounts.get(node)));
+            (init ? initExecutionCounts.get(node) : steadyExecutionCounts.get(node));
         if (val == null)
             return 0;
         else 

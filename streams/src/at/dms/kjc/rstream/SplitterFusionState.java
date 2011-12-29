@@ -168,7 +168,8 @@ public class SplitterFusionState extends FusionState
     /** perform any initialization tasks, including setting the downstream buffers to be 
         this splitter's incoming buffer if this splitter is unnecessary (thereby bypassing it)
         and declaring the incoming buffer **/
-    public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
+    @Override
+	public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
                           JBlock initFunctionCalls, JBlock main) 
     {
         //if this filter is unnecessary, make sure all the downstream neighbor
@@ -197,7 +198,8 @@ public class SplitterFusionState extends FusionState
         assignments from the incoming buffer to the outgoing buffer in order and frequency
         given by the round-robin weights
     **/
-    public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
+    @Override
+	public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
     {
     
         JBlock statements = new JBlock(null, new JStatement[0], null);
@@ -336,13 +338,15 @@ public class SplitterFusionState extends FusionState
     }
 
     /** return the outgoing buffersize **/
-    public int getBufferSize(FlatNode prev, boolean init) 
+    @Override
+	public int getBufferSize(FlatNode prev, boolean init) 
     {
         return  bufferSize;
     }
     
     /** return the outgoing buffer var for this splitter **/
-    public JVariableDefinition getBufferVar(FlatNode prev, boolean init) 
+    @Override
+	public JVariableDefinition getBufferVar(FlatNode prev, boolean init) 
     {
         return bufferVar[0];
     }
@@ -439,7 +443,8 @@ public class SplitterFusionState extends FusionState
                           BUFFERNAME + myUniqueID);
     }
     /** return the items remaining on the incoming buffer after the init stage **/
-    public int getRemaining(FlatNode prev, boolean isInit) 
+    @Override
+	public int getRemaining(FlatNode prev, boolean isInit) 
     {
         return remaining[0];
     }

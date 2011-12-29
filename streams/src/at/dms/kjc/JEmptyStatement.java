@@ -55,7 +55,8 @@ public class JEmptyStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) {
+    @Override
+	public void analyse(CBodyContext context) {
     }
 
     // ----------------------------------------------------------------------
@@ -66,7 +67,8 @@ public class JEmptyStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitEmptyStatement(this);
     }
@@ -75,7 +77,8 @@ public class JEmptyStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitEmptyStatement(this);
     }
 
@@ -85,14 +88,16 @@ public class JEmptyStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         // nothing to do here
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JEmptyStatement other = new at.dms.kjc.JEmptyStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

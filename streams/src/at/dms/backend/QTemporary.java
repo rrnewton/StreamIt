@@ -47,14 +47,16 @@ class QTemporary extends QOperand implements QDestination {
     /**
      * Returns the defined temporary.
      */
-    public QTemporary getDef() {
+    @Override
+	public QTemporary getDef() {
         return null;
     }
 
     /**
      * Returns the used temporaries.
      */
-    public QTemporary[] getUses() {
+    @Override
+	public QTemporary[] getUses() {
         return new QTemporary[]{this};
     }
 
@@ -93,14 +95,16 @@ class QTemporary extends QOperand implements QDestination {
     /**
      * The size (in instruction) of the subtree
      */
-    public int getType() {
+    @Override
+	public int getType() {
         return type;
     }
 
     /**
      * Human readable form
      */
-    public String toString() {
+    @Override
+	public String toString() {
         int     name = register == UNINITIALIZED ? pos : register;
 
         if (precolor != Integer.MAX_VALUE) {
@@ -117,7 +121,8 @@ class QTemporary extends QOperand implements QDestination {
     /**
      * Duplicate this node
      */
-    public QOrigin duplicate() {
+    @Override
+	public QOrigin duplicate() {
         return this;
     }
 
@@ -183,7 +188,8 @@ class QTemporary extends QOperand implements QDestination {
      * Generates instructions for this quadruple
      * @param   seq     The code sequence of instruction
      */
-    public void generate(CodeSequence seq) {
+    @Override
+	public void generate(CodeSequence seq) {
         int     opcode;
 
         if (register != UNUSED) {
@@ -217,7 +223,8 @@ class QTemporary extends QOperand implements QDestination {
      * Generates instructions for destination
      * @param   seq     The code sequence of instruction
      */
-    public void store(CodeSequence seq, boolean isLive) {
+    @Override
+	public void store(CodeSequence seq, boolean isLive) {
         int     opcode;
 
         if (register != UNUSED && isLive) {

@@ -310,7 +310,8 @@ public class EmitTileCode extends EmitCode {
      * @param n The ComputeNode to emit code for.
      * @param p The CodegenPrintWriter (left open on return).
      */
-    public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
+    @Override
+	public void emitCodeForComputeStore (SIRCodeUnit fieldsAndMethods,
             ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
         
         // Standard final optimization of a code unit before code emission:
@@ -332,8 +333,8 @@ public class EmitTileCode extends EmitCode {
         codegen.setDeclOnly(false);
 
         // generate code for ends of channels that connect to code on this ComputeNode
-        Set <RotatingBuffer> outputBuffers = OutputRotatingBuffer.getOutputBuffersOnTile((Tile)n);
-        Set <InputRotatingBuffer> inputBuffers = InputRotatingBuffer.getInputBuffersOnTile((Tile)n);
+        Set <RotatingBuffer> outputBuffers = RotatingBuffer.getOutputBuffersOnTile((Tile)n);
+        Set <InputRotatingBuffer> inputBuffers = RotatingBuffer.getInputBuffersOnTile((Tile)n);
         
         // externs
         for (RotatingBuffer c : outputBuffers) {

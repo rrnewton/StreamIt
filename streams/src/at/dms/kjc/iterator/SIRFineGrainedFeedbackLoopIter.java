@@ -29,7 +29,8 @@ public class SIRFineGrainedFeedbackLoopIter extends SIRFeedbackLoopIter {
      * Returns the number of work functions for this Splitter.
      * @return number of work functions for this Splitter
      */
-    public int getSplitterNumWork () {
+    @Override
+	public int getSplitterNumWork () {
         return SIRFineGrainedUtil.getSplitterNumWork(obj.getSplitter());
     }
 
@@ -42,7 +43,8 @@ public class SIRFineGrainedFeedbackLoopIter extends SIRFeedbackLoopIter {
      * @return distribution of weights on a particular invocation
      * of work function for the Splitter of this Stream.
      */
-    public int[] getSplitPushWeights (int nWork) {
+    @Override
+	public int[] getSplitPushWeights (int nWork) {
         return SIRFineGrainedUtil.getSplitPushWeights(obj.getSplitter(), nWork);
     }
 
@@ -54,7 +56,8 @@ public class SIRFineGrainedFeedbackLoopIter extends SIRFeedbackLoopIter {
      * @return number of data items consumed by a particular invocation
      * of work function for Splitter of this Stream.
      */
-    public int getSplitPop (int nWork) {
+    @Override
+	public int getSplitPop (int nWork) {
         return SIRFineGrainedUtil.getSplitPop(obj.getSplitter(), nWork);
     }
 
@@ -64,7 +67,8 @@ public class SIRFineGrainedFeedbackLoopIter extends SIRFeedbackLoopIter {
      * @return number of work functions for the JOiner of this 
      * Stream
      */
-    public int getJoinerNumWork () {
+    @Override
+	public int getJoinerNumWork () {
         return SIRFineGrainedUtil.getJoinerNumWork(obj.getJoiner());
     }
 
@@ -77,7 +81,8 @@ public class SIRFineGrainedFeedbackLoopIter extends SIRFeedbackLoopIter {
      * @return distribution of weights on a particular invocation
      * of work function for Joiner of this SplitJoin.
      */
-    public int[] getJoinPopWeights (int nWork) {
+    @Override
+	public int[] getJoinPopWeights (int nWork) {
         return SIRFineGrainedUtil.getJoinPopWeights(obj.getJoiner(), nWork);
     }
     
@@ -88,7 +93,8 @@ public class SIRFineGrainedFeedbackLoopIter extends SIRFeedbackLoopIter {
      * @return number of data items produced by a particular invocation
      * of work function for Joiner of this SplitJoin.
      */
-    public int getJoinPush (int nWork) {
+    @Override
+	public int getJoinPush (int nWork) {
         return SIRFineGrainedUtil.getJoinPush(obj.getJoiner(), nWork);
     }
 }

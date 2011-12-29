@@ -49,7 +49,8 @@ public class DefaultFilter implements at.dms.compiler.WarningFilter {
      * @param   warning     a warning to be filtred
      * @return  FLT_REJECT, FLT_FORCE, FLT_ACCEPT
      */
-    public int filter(CWarning warning) {
+    @Override
+	public int filter(CWarning warning) {
         if (warning.hasDescription(KjcMessages.UNUSED_PARAMETER)
             || warning.hasDescription(KjcMessages.CONSTANT_VARIABLE_NOT_FINAL)
             || warning.hasDescription(KjcMessages.UNUSED_CATCH_PARAMETER)) {

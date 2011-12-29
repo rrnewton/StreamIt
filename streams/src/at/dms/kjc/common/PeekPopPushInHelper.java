@@ -35,16 +35,19 @@ public class PeekPopPushInHelper extends SLIREmptyVisitor {
 	return false;
     }
 
-    public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
 				    JExpression arg) {
 	found = true;
     }
 
-    public void visitPopExpression(SIRPopExpression self, CType tapeType) {
+    @Override
+	public void visitPopExpression(SIRPopExpression self, CType tapeType) {
 	found = true;
     }
 
-    public void visitPushExpression(SIRPushExpression self, CType tapeType,
+    @Override
+	public void visitPushExpression(SIRPushExpression self, CType tapeType,
 				    JExpression arg) {
 	found = true;
 	arg.accept(this);

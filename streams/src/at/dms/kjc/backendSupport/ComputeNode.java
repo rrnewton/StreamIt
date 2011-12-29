@@ -28,7 +28,7 @@ public class ComputeNode<StoreType extends ComputeCodeStore<?>> extends ProcElem
      * </pre>
      */
     public ComputeNode() {
-        computeCode = (StoreType)null;
+        computeCode = null;
     }
     
     /**

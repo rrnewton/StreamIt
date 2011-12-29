@@ -93,7 +93,8 @@ public class LocalVariableInfo implements AccessorContainer {
     /**
      * Transforms targets (deferences to actual instructions).
      */
-    public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
+    @Override
+	public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
         this.start = this.start.transform(transformer, this);
         this.end = this.end.transform(transformer, this);
     }

@@ -120,7 +120,8 @@ public class GetSteadyMethods {
             for (int i=0; i<methods.length; i++) {
                 if (reachable.contains(methods[i].getName())) {
                     methods[i].accept(new SLIREmptyVisitor() {
-                            public void visitMethodCallExpression(JMethodCallExpression self,
+                            @Override
+							public void visitMethodCallExpression(JMethodCallExpression self,
                                                                   JExpression prefix,
                                                                   String ident,
                                                                   JExpression[] args) {

@@ -40,7 +40,8 @@ abstract class GrammarAtom extends AlternativeElement {
         atomText = t.getText();
     }
 
-    public String getLabel() {
+    @Override
+	public String getLabel() {
         return label;
     }
 
@@ -52,7 +53,8 @@ abstract class GrammarAtom extends AlternativeElement {
         return tokenType;
     }
 
-    public void setLabel(String label_) {
+    @Override
+	public void setLabel(String label_) {
         label = label_;
     }
 
@@ -61,7 +63,8 @@ abstract class GrammarAtom extends AlternativeElement {
                            grammar.getFilename(), option.getLine());
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         String s = " ";
         if ( label!=null ) {
             s += label+":";

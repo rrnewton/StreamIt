@@ -19,7 +19,8 @@ public class LexgenOptions extends at.dms.compiler.tools.common.Options {
     public boolean tokens = false;
     public boolean flexrules = false;
 
-    public boolean processOption(int code, Getopt g) {
+    @Override
+	public boolean processOption(int code, Getopt g) {
         switch (code) {
         case 'd':
             definition = !false; return true;
@@ -36,7 +37,8 @@ public class LexgenOptions extends at.dms.compiler.tools.common.Options {
         }
     }
 
-    public String[] getOptions() {
+    @Override
+	public String[] getOptions() {
         String[]    parent = super.getOptions();
         String[]    total = new String[parent.length + 5];
         System.arraycopy(parent, 0, total, 0, parent.length);
@@ -50,22 +52,26 @@ public class LexgenOptions extends at.dms.compiler.tools.common.Options {
     }
 
 
-    public String getShortOptions() {
+    @Override
+	public String getShortOptions() {
         return "diktf" + super.getShortOptions();
     }
 
 
-    public void version() {
+    @Override
+	public void version() {
         System.out.println("Version 1.5B released 9 August 2001");
     }
 
 
-    public void usage() {
+    @Override
+	public void usage() {
         System.err.println("usage: at.dms.lexgen.Main [option]* [--help] <file>");
     }
 
 
-    public void help() {
+    @Override
+	public void help() {
         System.err.println("usage: at.dms.lexgen.Main [option]* [--help] <file>");
         printOptions();
         System.err.println();
@@ -75,7 +81,8 @@ public class LexgenOptions extends at.dms.compiler.tools.common.Options {
         System.err.println("For more info, please see: http://www.dms.at/kopi");
     }
 
-    public LongOpt[] getLongOptions() {
+    @Override
+	public LongOpt[] getLongOptions() {
         LongOpt[]   parent = super.getLongOptions();
         LongOpt[]   total = new LongOpt[parent.length + LONGOPTS.length];
     

@@ -56,7 +56,8 @@ public class JOuterLocalVariableExpression extends JLocalVariableExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         // First we have to find the right context
         CContext    body = context.getBodyContext();
         while (body.getClassContext().getCClass() != outer) {
@@ -92,7 +93,8 @@ public class JOuterLocalVariableExpression extends JLocalVariableExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JOuterLocalVariableExpression other = new at.dms.kjc.JOuterLocalVariableExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

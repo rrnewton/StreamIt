@@ -42,7 +42,8 @@ public class FineGrainSimulator extends Simulator  implements FlatVisitor
     //true if we are simulating the init schedule
     private boolean initSimulation;
 
-    public void simulate(FlatNode top) 
+    @Override
+	public void simulate(FlatNode top) 
     {
         System.out.println("FineGrainSimulator Running...");
     
@@ -654,7 +655,8 @@ public class FineGrainSimulator extends Simulator  implements FlatVisitor
     }
    
 
-    public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts, 
+    @Override
+	public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts, 
                            SimulationCounter counters) 
     {
         if (node == null)
@@ -721,7 +723,8 @@ public class FineGrainSimulator extends Simulator  implements FlatVisitor
     }
     
     //Just a debugging function, not used
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         System.out.println(node.contents.getName());
         if (node.contents instanceof SIRTwoStageFilter) {

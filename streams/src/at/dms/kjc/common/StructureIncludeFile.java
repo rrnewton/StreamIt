@@ -74,7 +74,8 @@ public class StructureIncludeFile implements FlatVisitor
      * 
      * Only public to avoid using an inner class.
      */
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.isFilter()) {
             SIRFilter fnode = (SIRFilter)node.contents;

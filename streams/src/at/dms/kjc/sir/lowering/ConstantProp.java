@@ -222,15 +222,18 @@ public class ConstantProp {
             super(constants,write);
         }
     
-        public Propagator construct(Hashtable constants) {
+        @Override
+		public Propagator construct(Hashtable constants) {
             return new InitPropagator(constants);
         }
     
-        public Propagator construct(Hashtable constants,boolean write) {
+        @Override
+		public Propagator construct(Hashtable constants,boolean write) {
             return new InitPropagator(constants,write);
         }
     
-        public Object visitInitStatement(SIRInitStatement oldSelf,
+        @Override
+		public Object visitInitStatement(SIRInitStatement oldSelf,
                                          SIRStream oldTarget) {
             SIRInitStatement self=(SIRInitStatement)super.visitInitStatement(oldSelf,oldTarget);
             SIRStream target = self.getTarget();
@@ -281,7 +284,7 @@ public class ConstantProp {
             if (args.get(i) instanceof JLiteral) {
                 //System.err.println("!! top finding " + parameters[i].getIdent() + " " + parameters[i].hashCode() + " = " + args.get(i) + " in call to " + str.getIdent());
                 // if it's already a literal, record it
-                constants.put(parameters[i], (JLiteral)args.get(i));
+                constants.put(parameters[i], args.get(i));
             } else if (args.get(i) instanceof SIRPortal ||
                        (args.get(i) instanceof JLocalVariableExpression &&
                         ((JLocalVariableExpression)args.get(i)).getType() instanceof CClassType &&
@@ -344,7 +347,8 @@ public class ConstantProp {
         /**
          * Visits an init statement -- adds <target> to list of children.
          */
-        public void visitInitStatement(SIRInitStatement self,
+        @Override
+		public void visitInitStatement(SIRInitStatement self,
                                        SIRStream target) {
             // remember <target> as a child
             children.add(target);

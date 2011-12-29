@@ -45,7 +45,8 @@ public class ConstrainedStreamFactory
 
     private final Map<Iterator, StreamInterface> iter2stream = new HashMap<Iterator, StreamInterface>();
 
-    public StreamInterface newFrom(Iterator streamIter, Iterator parent)
+    @Override
+	public StreamInterface newFrom(Iterator streamIter, Iterator parent)
     {
         if (iter2stream.containsKey(streamIter))
             {
@@ -82,17 +83,20 @@ public class ConstrainedStreamFactory
         return newStream;
     }
 
-    public LatencyGraph getLatencyGraph()
+    @Override
+	public LatencyGraph getLatencyGraph()
     {
         return latencyGraph;
     }
     
-    public Scheduler getScheduler ()
+    @Override
+	public Scheduler getScheduler ()
     {
         return scheduler;
     }
 
-    public boolean needsSchedule() {
+    @Override
+	public boolean needsSchedule() {
         return needsSchedule;
     }
 }

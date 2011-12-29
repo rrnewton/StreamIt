@@ -84,7 +84,8 @@ public class LinearRedundancyReplacer extends LinearReplacer implements Constant
      * that directly implements the linear representation. This only
      * occurs if the replace calculator says that this stream should be replaced.
      **/
-    public boolean makeReplacement(SIRStream self) {
+    @Override
+	public boolean makeReplacement(SIRStream self) {
         LinearPrinter.println("starting redundancy replacement for " + self);
         SIRContainer parent = self.getParent();
         if (parent == null) {
@@ -647,7 +648,8 @@ public class LinearRedundancyReplacer extends LinearReplacer implements Constant
         }
 
         /** for debugging -- text dump of the data structures. **/
-        public String toString() {
+        @Override
+		public String toString() {
             String returnString = "minUse:\n";
             returnString += hash2String(this.minUse);
             returnString += "maxUse:\n";
@@ -694,7 +696,8 @@ public class LinearRedundancyReplacer extends LinearReplacer implements Constant
             this.tuple = t;
             this.use = u;
         }
-        public String toString() {
+        @Override
+		public String toString() {
             return ("(" + tuple + "," + use + ")");
         }
     }

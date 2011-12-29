@@ -168,7 +168,7 @@ public class PartitionDot extends StreamItDot {
                          // map colors based on annotation RANK:
                          //color_table[((int)Math.floor((double)i/(double)values.length*(double)color_table.length))]);
                          // map colors based on annotation VALUE:
-                         color_table[((int)Math.floor((double)values[i].longValue()/((double)values[values.length-1].longValue()+1.0)*(double)color_table.length))]);
+                         color_table[((int)Math.floor(values[i].longValue()/(values[values.length-1].longValue()+1.0)*color_table.length))]);
 
         }
     }
@@ -239,7 +239,8 @@ public class PartitionDot extends StreamItDot {
     }
 
     /* visit a filter */
-    public Object visitFilter(SIRFilter self,
+    @Override
+	public Object visitFilter(SIRFilter self,
                               JFieldDeclaration[] fields,
                               JMethodDeclaration[] methods,
                               JMethodDeclaration init,
@@ -255,7 +256,8 @@ public class PartitionDot extends StreamItDot {
     }
 
     /* visit a splitter */
-    public Object visitSplitter(SIRSplitter self,
+    @Override
+	public Object visitSplitter(SIRSplitter self,
                                 SIRSplitType type,
                                 JExpression[] expWeights)
     {
@@ -277,7 +279,8 @@ public class PartitionDot extends StreamItDot {
     }
     
     /* visit a joiner */
-    public Object visitJoiner(SIRJoiner self,
+    @Override
+	public Object visitJoiner(SIRJoiner self,
                               SIRJoinType type,
                               JExpression[] expWeights)
     {
@@ -300,7 +303,8 @@ public class PartitionDot extends StreamItDot {
     /**
      * Override to show partitions.
      */
-    public String getClusterString(SIRStream self) {
+    @Override
+	public String getClusterString(SIRStream self) {
         // if we have a linear rep of this object, label it
         if (partitions.containsKey(self)) {
             String tile = "" + partitions.get(self);
@@ -350,7 +354,7 @@ public class PartitionDot extends StreamItDot {
         allKeys.addAll(maps[0].keySet());
         allKeys.addAll(maps[1].keySet());
         for (Iterator<SIROperator> it = allKeys.iterator(); it.hasNext(); ) {
-            SIROperator op = (SIROperator)it.next();
+            SIROperator op = it.next();
             String string;
             // retain rate labels for filters
             if (op instanceof SIRFilter) {
@@ -359,8 +363,8 @@ public class PartitionDot extends StreamItDot {
                 string = "";
             }
             // add schedule labels
-            int[] initCount = (int[])maps[0].get(op);
-            int[] steadyCount = (int[])maps[1].get(op);
+            int[] initCount = maps[0].get(op);
+            int[] steadyCount = maps[1].get(op);
             if (initCount!=null) {
                 string += "\\ninit reps=" + initCount[0];
             }

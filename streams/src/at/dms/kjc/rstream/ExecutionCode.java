@@ -90,7 +90,7 @@ public class ExecutionCode extends at.dms.util.Utils
         //create the method and add it to the filter
         JMethodDeclaration mainFunct = 
             new JMethodDeclaration(null, 
-                                   at.dms.kjc.Constants.ACC_PUBLIC,
+                                   at.dms.classfile.Constants.ACC_PUBLIC,
                                    CStdType.Void,
                                    Names.main,
                                    JFormalParameter.EMPTY,

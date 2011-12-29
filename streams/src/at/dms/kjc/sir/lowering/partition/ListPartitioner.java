@@ -81,30 +81,35 @@ public abstract class ListPartitioner {
         SIRIterator it = IterFactory.createFactory().createIter(str);
         it.accept(new EmptyStreamVisitor() {
 
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     first.put(self, new Integer(nodes.size()));
                 }
 
-                public void postVisitStream(SIRStream self,
+                @Override
+				public void postVisitStream(SIRStream self,
                                             SIRIterator iter) {
                     last.put(self, new Integer(nodes.size()-1));
                 }
 
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     preVisitStream(self, iter);
                     nodes.add(self);
                     postVisitStream(self, iter);
                 }
 
-                public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+                @Override
+				public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                                  SIRFeedbackLoopIter iter) {
                     super.preVisitFeedbackLoop(self, iter);
                     nodes.add(self.getJoiner());
                 }
         
-                public void postVisitSplitJoin(SIRSplitJoin self,
+                @Override
+				public void postVisitSplitJoin(SIRSplitJoin self,
                                                SIRSplitJoinIter iter) {
                     nodes.add(self.getJoiner());
                     super.postVisitSplitJoin(self, iter);

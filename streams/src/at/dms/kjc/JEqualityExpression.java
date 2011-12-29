@@ -60,7 +60,8 @@ public class JEqualityExpression extends JBinaryExpression {
     /**
      * Returns a string representation of this literal.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JEqualityExpression[");
@@ -86,7 +87,8 @@ public class JEqualityExpression extends JBinaryExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         left = left.analyse(context);
         right = right.analyse(context);
 
@@ -133,7 +135,8 @@ public class JEqualityExpression extends JBinaryExpression {
     /**
      * @return  a literal resulting of an operation over two literals
      */
-    public JExpression constantFolding() {
+    @Override
+	public JExpression constantFolding() {
         boolean result;
 
         switch (left.getType().getTypeID()) {
@@ -205,14 +208,16 @@ public class JEqualityExpression extends JBinaryExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         genBooleanResultCode(code, discardValue);
     }
 
     /**
      * Optimize a bi-conditional expression
      */
-    protected void genBranch(JExpression left,
+    @Override
+	protected void genBranch(JExpression left,
                              JExpression right,
                              boolean cond,
                              CodeSequence code,
@@ -276,7 +281,8 @@ public class JEqualityExpression extends JBinaryExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JEqualityExpression other = new at.dms.kjc.JEqualityExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

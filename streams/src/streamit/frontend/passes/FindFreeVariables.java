@@ -52,7 +52,8 @@ public class FindFreeVariables extends SymbolTableVisitor
         freeVars = null;
     }
 
-    public Object visitExprVar(ExprVar expr)
+    @Override
+	public Object visitExprVar(ExprVar expr)
     {
         Object result = super.visitExprVar(expr);
         if (!(symtab.hasVar(expr.getName())))
@@ -60,7 +61,8 @@ public class FindFreeVariables extends SymbolTableVisitor
         return result;
     }
 
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         // Skip all of this if the spec is named.
         if (spec.getName() != null)
@@ -88,7 +90,8 @@ public class FindFreeVariables extends SymbolTableVisitor
                         Type type = symtab.lookupVar(name);
                         result = ((FENode)result).accept
                             (new SymbolTableVisitor(new SymbolTable(null)) {
-                                    public Object visitExprVar(ExprVar expr)
+                                    @Override
+									public Object visitExprVar(ExprVar expr)
                                     {
                                         Object result = super.visitExprVar(expr);
                                         try

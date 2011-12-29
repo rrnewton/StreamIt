@@ -47,20 +47,25 @@ public class RecognitionException extends ParserException {
         this.line = line;
     }
 
-    public int getColumn() { return column; }
+    @Override
+	public int getColumn() { return column; }
 
     /**
      * @deprecated As of ANTLR 2.7.0
      */
-    public String getErrorMessage () { return getMessage(); }
+    @Deprecated
+	public String getErrorMessage () { return getMessage(); }
 
-    public String getFilename() {
+    @Override
+	public String getFilename() {
         return fileName;
     }
 
-    public int getLine() { return line; }
+    @Override
+	public int getLine() { return line; }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return FileLineFormatter.getFormatter().
             getFormatString(fileName,line)+getMessage();
     }

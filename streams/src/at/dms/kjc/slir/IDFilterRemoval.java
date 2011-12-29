@@ -121,7 +121,7 @@ public class IDFilterRemoval {
             indexToIndex.put(edge.getSrc(), outputs.size() - 1);
             DistributionUnroller.unroll(edge.getSrc());
         }
-        usOutputs = (OutputNode[])outputs.toArray(new OutputNode[0]);
+        usOutputs = outputs.toArray(new OutputNode[0]);
         usOutputIndices = new int[usOutputs.length];
         Arrays.fill(usOutputIndices, -1);
         
@@ -132,7 +132,7 @@ public class IDFilterRemoval {
             indexToIndex.put(edge.getDest(), inputs.size() - 1);
             DistributionUnroller.unroll(edge.getDest());
         }
-        dsInputs = (InputNode[])inputs.toArray(new InputNode[0]);
+        dsInputs = inputs.toArray(new InputNode[0]);
         dsInputIndices = new int[dsInputs.length];
         Arrays.fill(dsInputIndices, -1);
         

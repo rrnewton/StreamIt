@@ -45,7 +45,8 @@ public class RoundRobinJoiner extends Joiner
     }
     */
 
-    public int [] getWeights ()
+    @Override
+	public int [] getWeights ()
     {
         int numChildren = srcs.size ();
         int [] weights = new int [numChildren];
@@ -62,7 +63,8 @@ public class RoundRobinJoiner extends Joiner
         return weights;
     }
     
-    public int getProduction ()
+    @Override
+	public int getProduction ()
     {
         int numChildren = srcs.size ();
         int outputTotal = 0;
@@ -79,7 +81,8 @@ public class RoundRobinJoiner extends Joiner
         return outputTotal;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "roundrobin";
     }
 }

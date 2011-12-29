@@ -45,7 +45,8 @@ public class CCatchContext extends CBodyContext {
         clearThrowables();
     }
 
-    public void close(TokenReference ref) {
+    @Override
+	public void close(TokenReference ref) {
     }
 
     // ----------------------------------------------------------------------
@@ -59,7 +60,8 @@ public class CCatchContext extends CBodyContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CCatchContext other = new at.dms.kjc.CCatchContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

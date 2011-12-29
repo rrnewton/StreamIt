@@ -58,7 +58,8 @@ public class JUnaryMinusExpression extends JUnaryExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         // special case for MIN_INT and MIN_LONG literals
         if (expr instanceof JIntLiteral) {
             return ((JIntLiteral)expr).getOppositeLiteral();
@@ -103,7 +104,8 @@ public class JUnaryMinusExpression extends JUnaryExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitUnaryMinusExpression(this, expr);
     }
 
@@ -111,7 +113,8 @@ public class JUnaryMinusExpression extends JUnaryExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitUnaryMinusExpression(this, expr);
     }
 
@@ -133,7 +136,8 @@ public class JUnaryMinusExpression extends JUnaryExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         expr.genCode(code, false);
@@ -158,7 +162,8 @@ public class JUnaryMinusExpression extends JUnaryExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JUnaryMinusExpression other = new at.dms.kjc.JUnaryMinusExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

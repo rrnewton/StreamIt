@@ -143,7 +143,7 @@ public class Vectorize {
         // may or may not actually need buffer.
         JVariableDefinition pokeBufDefn = new JVariableDefinition(
                 null,
-                at.dms.kjc.Constants.ACC_FINAL,
+                at.dms.classfile.Constants.ACC_FINAL,
                 new CArrayType(filter.getOutputType(),
                         1, 
                         new JExpression[]{new JIntLiteral(
@@ -307,7 +307,7 @@ public class Vectorize {
             }
             JArrayInitializer init = new JArrayInitializer(initElems);
             JVariableDefinition defn = new JVariableDefinition(
-                    at.dms.kjc.Constants.ACC_STATIC | at.dms.kjc.Constants.ACC_FINAL,
+                    at.dms.classfile.Constants.ACC_STATIC | at.dms.classfile.Constants.ACC_FINAL,
                     new CVectorTypeLow(scalartype, KjcOptions.vectorize),
                     ThreeAddressCode.nextTemp(), 
                     init);

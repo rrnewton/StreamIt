@@ -53,17 +53,20 @@ public class CountLattice implements Lattice
         value = 0; // arbitrary
     }
     
-    public Lattice getTop() 
+    @Override
+	public Lattice getTop() 
     {
         return new CountLattice(true);
     }
     
-    public Lattice getBottom()
+    @Override
+	public Lattice getBottom()
     {
         return new CountLattice(false);
     }
     
-    public Lattice meet(Lattice other)
+    @Override
+	public Lattice meet(Lattice other)
     {
         // ASSERT: other is a CountLattice
         CountLattice that = (CountLattice)other;
@@ -103,7 +106,8 @@ public class CountLattice implements Lattice
         return value;
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof CountLattice))
             return false;

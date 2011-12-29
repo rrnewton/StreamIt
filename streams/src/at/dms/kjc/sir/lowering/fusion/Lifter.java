@@ -93,7 +93,8 @@ public class Lifter implements StreamVisitor {
      */
     public static void eliminateIdentities(SIRStream str) {
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
+                @Override
+				public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
                     for (int i=self.size()-1; i>=0; i--) {
                         if (self.get(i) instanceof SIRIdentity) {
                             // don't completely wipe out the pipeline,
@@ -196,12 +197,14 @@ public class Lifter implements StreamVisitor {
      */
         
     /* visit a filter */
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
     }
 
     /* visit a phased filter */
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
     }
   
@@ -210,7 +213,8 @@ public class Lifter implements StreamVisitor {
      */
         
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self,
+    @Override
+	public void preVisitPipeline(SIRPipeline self,
                                  SIRPipelineIter iter) {
         liftChildren(self);
         if (syncRemoval==SYNC_REMOVAL_NO_NEW_JOINERS) {
@@ -221,13 +225,15 @@ public class Lifter implements StreamVisitor {
     }
 
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter) {
         visitSplitJoin(self, iter);
     }
 
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
         liftChildren(self);
     }
@@ -237,7 +243,8 @@ public class Lifter implements StreamVisitor {
      */
         
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self,
+    @Override
+	public void postVisitPipeline(SIRPipeline self,
                                   SIRPipelineIter iter) {
         if (syncRemoval==SYNC_REMOVAL_NO_NEW_JOINERS) {
             RefactorSplitJoin.removeMatchingSyncPoints(self);
@@ -247,7 +254,8 @@ public class Lifter implements StreamVisitor {
     }
 
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
         // have to visit on way up, because pipeline child might have
         // done a sync during descent.
@@ -255,7 +263,8 @@ public class Lifter implements StreamVisitor {
     }
 
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
     }
 
@@ -293,7 +302,7 @@ public class Lifter implements StreamVisitor {
         do {
             changing = false;
             for (int i=0; i<str.size(); i++) {
-                SIROperator child = (SIROperator)str.get(i);
+                SIROperator child = str.get(i);
                 if (child instanceof SIRPipeline) {
                     changing = eliminatePipe((SIRPipeline)child) || changing;
                 } else if (child instanceof SIRSplitJoin) {
@@ -323,7 +332,8 @@ public class Lifter implements StreamVisitor {
                     // popping
                     final boolean[] ok = { true };
                     twoStage.getInitWork().getBody().accept(new SLIREmptyVisitor() {
-                            public void visitPeekExpression(SIRPeekExpression self,
+                            @Override
+							public void visitPeekExpression(SIRPeekExpression self,
                                                             CType tapeType,
                                                             JExpression arg) {
                                 ok[0] = false;

@@ -21,7 +21,8 @@
 package at.dms.compiler.antlr.runtime;
 
 public class DefaultFileLineFormatter extends FileLineFormatter {
-    public String getFormatString(String fileName, int line) {
+    @Override
+	public String getFormatString(String fileName, int line) {
         if (fileName != null) {
             return fileName+":"+line+": ";
         } else if (line != 0) {

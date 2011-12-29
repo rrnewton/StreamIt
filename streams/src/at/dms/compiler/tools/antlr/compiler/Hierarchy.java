@@ -77,7 +77,7 @@ public class Hierarchy {
     public static String optionsToString(IndexedVector options) {
         String s = "options {"+System.getProperty("line.separator");
         for (Enumeration e = options.elements() ; e.hasMoreElements() ;) {
-            s += (Option)e.nextElement()+System.getProperty("line.separator");
+            s += e.nextElement()+System.getProperty("line.separator");
         }
         s += "}"+
             System.getProperty("line.separator")+

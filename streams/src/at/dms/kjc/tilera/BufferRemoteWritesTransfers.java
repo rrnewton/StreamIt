@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JArrayAccessExpression;
@@ -70,7 +71,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         //set up the head pointer for writing
         writeHeadName = buf.getIdent() + "head";
         writeHeadDefn = new JVariableDefinition(null,
-                at.dms.kjc.Constants.ACC_STATIC,
+                Constants.ACC_STATIC,
                 CStdType.Integer, writeHeadName, null);
         
         head = new JFieldAccessExpression(writeHeadName);
@@ -297,7 +298,8 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             return 0;
     }
 
-    public JStatement zeroOutHead(SchedulingPhase phase) {
+    @Override
+	public JStatement zeroOutHead(SchedulingPhase phase) {
         //if we have shared buffer, then we are using it for the output and input of filters
         //on the same tile, so we need to do special things to the head
         int literal = 0; 
@@ -334,7 +336,8 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         return block;
     }
 
-    public JMethodDeclaration pushMethod() {
+    @Override
+	public JMethodDeclaration pushMethod() {
         JExpression bufRef = null;
         //set the buffer reference to the input buffer of the remote buffer that we are writing to
         if (directWrite) {
@@ -366,7 +369,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 parent.pushMethodName(),
                 new JFormalParameter[]{val},

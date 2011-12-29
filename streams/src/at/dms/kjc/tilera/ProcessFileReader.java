@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JBlock;
@@ -61,7 +62,7 @@ public class ProcessFileReader {
     private void generateCode(WorkNode dsFilter) {
         //TODO: fix so that file reader code is not created twice!
         FileReaderCode fileReaderCode;
-        InputRotatingBuffer destBuf = InputRotatingBuffer.getInputBuffer(dsFilter);
+        InputRotatingBuffer destBuf = RotatingBuffer.getInputBuffer(dsFilter);
         if (TileraBackend.DMA)
             fileReaderCode = new FileReaderDMACommands(destBuf);
         else
@@ -80,7 +81,7 @@ public class ProcessFileReader {
             InputRotatingBuffer destBuf) {
         JBlock statements = new JBlock(fileReaderCode.commandsInit);
         //create a method 
-        JMethodDeclaration initMethod = new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+        JMethodDeclaration initMethod = new JMethodDeclaration(null, Constants.ACC_PUBLIC,
                 CStdType.Void,
                 "__File_Reader_Init__",
                 JFormalParameter.EMPTY,
@@ -101,7 +102,7 @@ public class ProcessFileReader {
         if (!PPMethods.containsKey(node)) {
             JBlock statements = new JBlock(fileReaderCode.commandsSteady);
             //create a method 
-            JMethodDeclaration ppMethod = new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+            JMethodDeclaration ppMethod = new JMethodDeclaration(null, Constants.ACC_PUBLIC,
                     CStdType.Void,
                     "__File_Reader_PrimePump__",
                     JFormalParameter.EMPTY,

@@ -41,7 +41,8 @@ public class WorkBasedSimulator extends Simulator
     
     private WorkEstimatesMap workEstimatesMap;
 
-    public void simulate() 
+    @Override
+	public void simulate() 
     {
         System.out.println("WorkBasedSimulator Running...");
 
@@ -642,7 +643,8 @@ public class WorkBasedSimulator extends Simulator
       }    
     */    
     
-    protected int fireJoiner(FlatNode fire, SimulationCounter counters, HashMap<FlatNode, Integer> executionCounts)
+    @Override
+	protected int fireJoiner(FlatNode fire, SimulationCounter counters, HashMap<FlatNode, Integer> executionCounts)
     {
         //  System.out.println("Firing " + fire.contents.getName());
         //The joiner is passing a data item, record this as an execution
@@ -773,7 +775,8 @@ public class WorkBasedSimulator extends Simulator
     }
 
 
-    public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts, 
+    @Override
+	public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts, 
                            SimulationCounter counters) 
     {
         if (node == null)

@@ -45,7 +45,8 @@ public class ExprConstChar extends Expression
     public char getVal() { return val; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprConstChar(this);
     }

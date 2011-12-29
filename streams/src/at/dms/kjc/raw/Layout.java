@@ -602,7 +602,7 @@ public class Layout extends at.dms.util.Utils implements FlatVisitor {
         double R = layout.random.nextDouble();
 
         if (e_new >= e_old)
-            P = Math.exp((((double)e_old) - ((double)e_new)) / T);
+            P = Math.exp((e_old - e_new) / T);
     
         if (R < P) {
             return true;
@@ -837,7 +837,8 @@ public class Layout extends at.dms.util.Utils implements FlatVisitor {
         }
     }
 
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.contents instanceof SIRFilter &&
             ! (FileVisitor.fileNodes.contains(node))) {

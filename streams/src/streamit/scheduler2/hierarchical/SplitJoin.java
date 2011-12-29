@@ -92,7 +92,8 @@ abstract public class SplitJoin
     /**
      * compute the initialization and steady state schedules
      */
-    abstract public void computeSchedule();
+    @Override
+	abstract public void computeSchedule();
 
     /**
      * Return an appropriate hierarchical child.  All children of a 
@@ -113,44 +114,52 @@ abstract public class SplitJoin
         return (StreamInterface)child;
     }
 
-    public int getNumSplitPhases()
+    @Override
+	public int getNumSplitPhases()
     {
         return splitjoin.getSplitterNumWork();
     }
 
-    public PhasingSchedule getSplitPhase(int nPhase)
+    @Override
+	public PhasingSchedule getSplitPhase(int nPhase)
     {
         assert nPhase >= 0 && nPhase < getNumSplitPhases();
         return splitPhases[nPhase];
     }
 
-    public int getNumJoinPhases()
+    @Override
+	public int getNumJoinPhases()
     {
         return splitjoin.getJoinerNumWork();
     }
 
-    public PhasingSchedule getJoinPhase(int nPhase)
+    @Override
+	public PhasingSchedule getJoinPhase(int nPhase)
     {
         assert nPhase >= 0 && nPhase < getNumJoinPhases();
         return joinPhases[nPhase];
     }
 
-    public PhasingSchedule getSplitterPhases(int nPhases)
+    @Override
+	public PhasingSchedule getSplitterPhases(int nPhases)
     {
         return algorithm.getSplitterPhases(nPhases);
     }
 
-    public PhasingSchedule getJoinerPhases(int nPhases)
+    @Override
+	public PhasingSchedule getJoinerPhases(int nPhases)
     {
         return algorithm.getJoinerPhases(nPhases);
     }
 
-    public streamit.scheduler2.base.StreamInterface getTop()
+    @Override
+	public streamit.scheduler2.base.StreamInterface getTop()
     {
         return this;
     }
 
-    public streamit.scheduler2.base.StreamInterface getBottom()
+    @Override
+	public streamit.scheduler2.base.StreamInterface getBottom()
     {
         return this;
     }
@@ -159,52 +168,62 @@ abstract public class SplitJoin
     // I have to use this stupid style of coding to accomodate
     // Java with its lack of multiple inheritance
 
-    public int getInitPeek()
+    @Override
+	public int getInitPeek()
     {
         return algorithm.getInitPeek();
     }
 
-    public int getInitPop()
+    @Override
+	public int getInitPop()
     {
         return algorithm.getInitPop();
     }
 
-    public int getInitPush()
+    @Override
+	public int getInitPush()
     {
         return algorithm.getInitPush();
     }
 
-    public int getNumInitStages()
+    @Override
+	public int getNumInitStages()
     {
         return algorithm.getNumInitStages();
     }
 
-    public int getInitStageNumPeek(int stage)
+    @Override
+	public int getInitStageNumPeek(int stage)
     {
         return algorithm.getInitStageNumPeek(stage);
     }
 
-    public int getInitStageNumPop(int stage)
+    @Override
+	public int getInitStageNumPop(int stage)
     {
         return algorithm.getInitStageNumPop(stage);
     }
 
-    public int getInitStageNumPush(int stage)
+    @Override
+	public int getInitStageNumPush(int stage)
     {
         return algorithm.getInitStageNumPush(stage);
     }
 
-    public PhasingSchedule getInitScheduleStage(int stage)
+    @Override
+	public PhasingSchedule getInitScheduleStage(int stage)
     {
         return algorithm.getInitScheduleStage(stage);
     }
 
-    public PhasingSchedule getPhasingInitSchedule()
+    @Override
+	public PhasingSchedule getPhasingInitSchedule()
     {
         return algorithm.getPhasingInitSchedule();
     }
 
-    public Schedule getInitSchedule()
+    @Override
+	public Schedule getInitSchedule()
     {
         return algorithm.getInitSchedule();
     }
@@ -214,42 +233,50 @@ abstract public class SplitJoin
         algorithm.addInitScheduleStage(newStage);
     }
 
-    public int getNumSteadyPhases()
+    @Override
+	public int getNumSteadyPhases()
     {
         return algorithm.getNumSteadyPhases();
     }
 
-    public int getSteadyPhaseNumPeek(int phase)
+    @Override
+	public int getSteadyPhaseNumPeek(int phase)
     {
         return algorithm.getSteadyPhaseNumPeek(phase);
     }
 
-    public int getSteadyPhaseNumPop(int phase)
+    @Override
+	public int getSteadyPhaseNumPop(int phase)
     {
         return algorithm.getSteadyPhaseNumPop(phase);
     }
 
-    public int getSteadyPhaseNumPush(int phase)
+    @Override
+	public int getSteadyPhaseNumPush(int phase)
     {
         return algorithm.getSteadyPhaseNumPush(phase);
     }
 
-    public PhasingSchedule getSteadySchedulePhase(int phase)
+    @Override
+	public PhasingSchedule getSteadySchedulePhase(int phase)
     {
         return algorithm.getSteadySchedulePhase(phase);
     }
 
-    public PhasingSchedule getPhasingSteadySchedule()
+    @Override
+	public PhasingSchedule getPhasingSteadySchedule()
     {
         return algorithm.getPhasingSteadySchedule();
     }
 
-    public Schedule getSteadySchedule()
+    @Override
+	public Schedule getSteadySchedule()
     {
         return algorithm.getSteadySchedule();
     }
 
-    public void addSteadySchedulePhase(PhasingSchedule newPhase)
+    @Override
+	public void addSteadySchedulePhase(PhasingSchedule newPhase)
     {
         algorithm.addSteadySchedulePhase(newPhase);
     }
@@ -345,7 +372,8 @@ abstract public class SplitJoin
         return getJoinSteadyPhase(0);
     }
 
-    public SplitFlow getSplitSteadyPhaseFlow(int nPhase)
+    @Override
+	public SplitFlow getSplitSteadyPhaseFlow(int nPhase)
     {
         return algorithm.getSplitSteadyPhaseFlow(nPhase);
     }
@@ -355,7 +383,8 @@ abstract public class SplitJoin
         return getSplitSteadyPhaseFlow(0);
     }
 
-    public JoinFlow getJoinSteadyPhaseFlow(int nPhase)
+    @Override
+	public JoinFlow getJoinSteadyPhaseFlow(int nPhase)
     {
         return algorithm.getJoinSteadyPhaseFlow(nPhase);
     }

@@ -32,28 +32,32 @@ public class BasicIterFactory implements IterFactory {
     /**
      * Returns a new basic iterator for <pre>filter</pre>.
      */
-    public streamit.scheduler2.iriter.FilterIter newFrom(Filter filter) {
-        return new streamit.library.iriter.FilterIter((Filter) filter, this);
+    @Override
+	public streamit.scheduler2.iriter.FilterIter newFrom(Filter filter) {
+        return new streamit.library.iriter.FilterIter(filter, this);
     }
 
     /**
      * Returns a new basic iterator for <pre>pipeline</pre>.
      */
-    public streamit.scheduler2.iriter.PipelineIter newFrom(Pipeline pipeline) {
-        return new streamit.library.iriter.PipelineIter((Pipeline) pipeline, this);
+    @Override
+	public streamit.scheduler2.iriter.PipelineIter newFrom(Pipeline pipeline) {
+        return new streamit.library.iriter.PipelineIter(pipeline, this);
     }
     
     /**
      * Returns a new basic iterator for <pre>sj</pre>.
      */
-    public streamit.scheduler2.iriter.SplitJoinIter newFrom(SplitJoin sj) {
-        return new streamit.library.iriter.SplitJoinIter((SplitJoin) sj, this);
+    @Override
+	public streamit.scheduler2.iriter.SplitJoinIter newFrom(SplitJoin sj) {
+        return new streamit.library.iriter.SplitJoinIter(sj, this);
     }
     
     /**
      * Returns a new basic iterator for <pre>fl</pre>.
      */
-    public streamit.scheduler2.iriter.FeedbackLoopIter newFrom(FeedbackLoop fl) {
-        return new streamit.library.iriter.FeedbackLoopIter((FeedbackLoop) fl, this);
+    @Override
+	public streamit.scheduler2.iriter.FeedbackLoopIter newFrom(FeedbackLoop fl) {
+        return new streamit.library.iriter.FeedbackLoopIter(fl, this);
     }
 }

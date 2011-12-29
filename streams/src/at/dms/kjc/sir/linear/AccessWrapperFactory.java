@@ -111,7 +111,8 @@ class AccessWrapperFactory {
         public IntegerAccessWrapper(JIntLiteral val) {
             super("integer"); this.value=val;
         }
-        public boolean equals(Object o) {
+        @Override
+		public boolean equals(Object o) {
             if (!super.equals(o)) {return false;}
             if (!(o instanceof IntegerAccessWrapper)) {return false;}
             IntegerAccessWrapper other = (IntegerAccessWrapper)o;
@@ -124,7 +125,8 @@ class AccessWrapperFactory {
         public ThisAccessWrapper() {
             super("this");
         }
-        public boolean equals(Object o) {
+        @Override
+		public boolean equals(Object o) {
             if (!super.equals(o)) {return false;}
             if (!(o instanceof ThisAccessWrapper)) {return false;}
             return true;
@@ -149,7 +151,8 @@ class AccessWrapperFactory {
             super(pre.getIdent() + "." + f);
             this.prefix = pre;
         }
-        public boolean equals(Object o) {
+        @Override
+		public boolean equals(Object o) {
             if (!super.equals(o)) {return false;}
             if (!(o instanceof FieldAccessWrapper)) {return false;}
             FieldAccessWrapper other = (FieldAccessWrapper)o;
@@ -166,7 +169,8 @@ class AccessWrapperFactory {
             this.base = b;
             this.index = i;
         }
-        public boolean equals(Object o) {
+        @Override
+		public boolean equals(Object o) {
             if (!super.equals(o)) {return false;}
             if (!(o instanceof ArrayAccessWrapper)) {return false;}
             ArrayAccessWrapper other = (ArrayAccessWrapper)o;

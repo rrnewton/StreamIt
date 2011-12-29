@@ -56,14 +56,16 @@ public class NewarrayInstruction extends Instruction {
      * Returns true iff control flow can reach the next instruction
      * in textual order.
      */
-    public boolean canComplete() {
+    @Override
+	public boolean canComplete() {
         return true;
     }
 
     /**
      * Returns the number of bytes used by the the instruction in the code array.
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return 1 + 1;
     }
 
@@ -96,21 +98,24 @@ public class NewarrayInstruction extends Instruction {
     /**
      * Returns the type pushed on the stack
      */
-    public byte getReturnType() {
+    @Override
+	public byte getReturnType() {
         return TYP_REFERENCE;
     }
 
     /**
      * Return the amount of stack (positive or negative) used by this instruction
      */
-    public int getStack() {
+    @Override
+	public int getStack() {
         return 0;
     }
 
     /**
      * Returns the size of data pushed on the stack by this instruction
      */
-    public int getPushedOnStack() {
+    @Override
+	public int getPushedOnStack() {
         return 1;
     }
 
@@ -123,7 +128,8 @@ public class NewarrayInstruction extends Instruction {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {}
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {}
 
     /**
      * Write this instruction into a file
@@ -133,7 +139,8 @@ public class NewarrayInstruction extends Instruction {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte((byte)getOpcode());
         out.writeByte(type);
     }

@@ -50,7 +50,8 @@ public class ExprComposite extends Expression
     public Expression getW() { return w; }  
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprComposite(this);
     }
@@ -62,7 +63,8 @@ public class ExprComposite extends Expression
         return dim;
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         String result = "[" + x + "," + y;
         if (z != null)result += "," + z;
@@ -70,7 +72,8 @@ public class ExprComposite extends Expression
         return result + "]";
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprComposite))
             return false;
@@ -94,7 +97,8 @@ public class ExprComposite extends Expression
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return x.hashCode() ^ y.hashCode();
     }

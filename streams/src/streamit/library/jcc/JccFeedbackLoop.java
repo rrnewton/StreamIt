@@ -24,20 +24,24 @@ public class JccFeedbackLoop extends JccCompositeFilter {
 		this.loop = loop;
 	}
 
+	@Override
 	Stream getStreamIt() {
 		return this.feedbackLoop;
 	}
 
+	@Override
 	void setInChannel(JccChannel channel) {
 		// Input 0 of the joiner is used as the feedbackloop's input
 		joiner.setInChannel(0, channel);
 	}
 
+	@Override
 	void setOutChannel(JccChannel channel) {
 		// Output 0 of the splitter is used as the feedbackloop's output
 		splitter.setOutChannel(0, channel);
 	}
 
+	@Override
 	public void init() {
 		joiner.init();
 		splitter.init();

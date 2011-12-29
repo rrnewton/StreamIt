@@ -103,11 +103,13 @@ public class BasicStats {
 
         // gather counts of stream type
         IterFactory.createFactory().createIter(str).accept((new EmptyStreamVisitor() {
-                public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
+                @Override
+				public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
                     numPipelines++;
                 }
                 
-                public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
+                @Override
+				public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
                     if (self.getSplitter().getType().isDuplicate()) {
                         numDupSplitjoins++;
                     } else {
@@ -131,11 +133,13 @@ public class BasicStats {
                     }                    
                 }
                 
-                public void preVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {
+                @Override
+				public void preVisitFeedbackLoop(SIRFeedbackLoop self, SIRFeedbackLoopIter iter) {
                     numFeedbackloops++;
                 }
                 
-                public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+                @Override
+				public void visitFilter(SIRFilter self, SIRFilterIter iter) {
                     numFilters++;
                     long myWork = work.getWork(self);
                     totalWork += myWork;

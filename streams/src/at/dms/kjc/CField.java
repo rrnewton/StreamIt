@@ -75,7 +75,8 @@ public abstract class CField extends CMember {
     /**
      * @return  the interface
      */
-    public CField getField() {
+    @Override
+	public CField getField() {
         return this;
     }
 
@@ -120,7 +121,8 @@ public abstract class CField extends CMember {
     /**
      * Returns a string representation of this object.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getQualifiedName();
     }
 
@@ -224,7 +226,8 @@ public abstract class CField extends CMember {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CField other) {

@@ -38,6 +38,7 @@ abstract class JccSplitter extends JccOperator {
 		outChannelList.set(index, channel);
 	}
 
+	@Override
 	public void init() {
 		outChannels = outChannelList.toArray(new JccChannel[0]);
 		outStreams = new OutStream[outChannels.length];
@@ -51,10 +52,12 @@ abstract class JccSplitter extends JccOperator {
 		super.init();
 	}
 
+	@Override
 	public final void setInStream(InStream in) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public final void setOutStream(OutStream out) {
 		throw new UnsupportedOperationException();
 	}
@@ -64,6 +67,7 @@ abstract class JccSplitter extends JccOperator {
 	 */
 	static class DuplicateSplitter extends JccSplitter {
 
+		@Override
 		public void work() {
 			Promise item = pop();
 
@@ -107,6 +111,7 @@ abstract class JccSplitter extends JccOperator {
 			weightList.add(Integer.valueOf(weight));
 		}
 
+		@Override
 		public void init() {
 			assert weightList.size() == outChannelList.size();
 
@@ -121,6 +126,7 @@ abstract class JccSplitter extends JccOperator {
 			super.init();
 		}
 
+		@Override
 		public void work() {
 			if (outputItems == 0) {
 				// Next output channel

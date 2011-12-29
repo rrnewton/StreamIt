@@ -33,21 +33,24 @@ public class LPSolve implements LinearProgramSolver {
      * linear program (which the client can then fill in with
      * coefficients before checking in as a new constraint.)
      */
-    public double[] getEmptyConstraint() {
+    @Override
+	public double[] getEmptyConstraint() {
         return new double[wrap(numVars)];
     }
 
     /**
      * Sets the objective function to be <obj>.
      */
-    public void setObjective(double[] obj) {
+    @Override
+	public void setObjective(double[] obj) {
         solver.set_obj_fn(lp, wrap(obj));
     }
 
     /**
      * Constrains the i'th variable of this to be an integer.
      */
-    public void setBoolVar(int i) {
+    @Override
+	public void setBoolVar(int i) {
         solver.set_int(lp, wrap(i), constant.TRUE);
     }
 
@@ -57,7 +60,8 @@ public class LPSolve implements LinearProgramSolver {
      *
      * That is, <constraint> <dot> <variables> >= <rhs>. 
      */
-    public void addConstraintGE(double[] constraint, double rhs) {
+    @Override
+	public void addConstraintGE(double[] constraint, double rhs) {
         solver.add_constraint(lp, wrap(constraint), constant.GE, rhs);
     }
 
@@ -65,7 +69,8 @@ public class LPSolve implements LinearProgramSolver {
      * Adds an equality constraint between the variables with
      * coefficients <constraint> and the right-hand-side <rhs>.
      */
-    public void addConstraintEQ(double[] constraint, double rhs) {
+    @Override
+	public void addConstraintEQ(double[] constraint, double rhs) {
         solver.add_constraint(lp, wrap(constraint), constant.EQ, rhs);
     }
     
@@ -73,7 +78,8 @@ public class LPSolve implements LinearProgramSolver {
      * Solve the program and return the value of the the variables
      * (indices 0...numVars-1) in the optimum.
      */
-    public double[] solve() {
+    @Override
+	public double[] solve() {
         solver.dosolve(lp);
         double[] result = new double[numVars];
         for (int i=0; i<numVars; i++) {

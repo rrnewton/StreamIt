@@ -137,7 +137,7 @@ public class Util extends at.dms.util.Utils {
 
         // prev is a splitter
         double rate = getRRSplitterWeight(prev, node);
-        return ((int) (rate * (double) getCount(counts, prev)));
+        return ((int) (rate * getCount(counts, prev)));
     }
 
     // get the percentage of items sent from splitter prev to node

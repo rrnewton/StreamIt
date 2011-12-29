@@ -343,9 +343,11 @@ public class StreamItToJcc {
 		// Create JCC vat to do the conversion and execution in
 		Teller teller = Vat.makeVat(new Vat.BasicInitCall() {
 
+			@Override
 			public Agent getAgent() {
 				return new BasicAgent() {
 
+					@Override
 					public void now() {
 						// Report the thread object
 						synchronized (StreamItToJcc.this) {
@@ -357,6 +359,7 @@ public class StreamItToJcc {
 						run(iterations);
 					}
 
+					@Override
 					public Agent next() {
 						// Return an agent that aborts on the next tick so the
 						// vat can terminate

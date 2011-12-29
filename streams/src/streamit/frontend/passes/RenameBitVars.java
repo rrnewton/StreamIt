@@ -40,7 +40,8 @@ public class RenameBitVars extends SymbolTableVisitor
         super(null);
     }
 
-    public Object visitExprVar(ExprVar var)
+    @Override
+	public Object visitExprVar(ExprVar var)
     {
         Type type = symtab.lookupVar(var);
         if ((type instanceof TypePrimitive) &&
@@ -49,7 +50,8 @@ public class RenameBitVars extends SymbolTableVisitor
         return var;
     }
 
-    public Object visitStmtVarDecl(StmtVarDecl stmt)
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt)
     {
         // Register the variable in the symbol table;
         stmt = (StmtVarDecl)super.visitStmtVarDecl(stmt);

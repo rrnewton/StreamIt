@@ -68,7 +68,8 @@ class CCost {
       }
     */
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (!(o instanceof CCost)) {
             return false;
         }
@@ -76,7 +77,8 @@ class CCost {
         return other.cost==this.cost;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "[cost=" + cost + "]";
     }
 }

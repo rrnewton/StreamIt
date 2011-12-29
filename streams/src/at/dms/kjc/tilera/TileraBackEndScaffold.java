@@ -18,18 +18,21 @@ import at.dms.kjc.slir.SchedulingPhase;
  */
 public class TileraBackEndScaffold extends BackEndScaffold {
     
-    protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
+    @Override
+	protected void beforeScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
     
-    protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
+    @Override
+	protected void betweenScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do in default case.
     }
     
    
-    protected void afterScheduling(BasicSpaceTimeSchedule schedule,
+    @Override
+	protected void afterScheduling(BasicSpaceTimeSchedule schedule,
             BackEndFactory resources) {
         // nothing to do.
     }
@@ -45,7 +48,8 @@ public class TileraBackEndScaffold extends BackEndScaffold {
      * @param input InputSliceNode to consider for to a joiner.
      * @return
      */
-    protected boolean doNotCreateJoiner(InputNode input) {
+    @Override
+	protected boolean doNotCreateJoiner(InputNode input) {
         return false;
     }
     
@@ -56,7 +60,8 @@ public class TileraBackEndScaffold extends BackEndScaffold {
      * @param computeNodes
      * @param resources The instance of BackEndFactory to be used for callbacks, data.
      */
-    public void run(BasicSpaceTimeSchedule schedule, BackEndFactory resources) {
+    @Override
+	public void run(BasicSpaceTimeSchedule schedule, BackEndFactory resources) {
    
         ComputeNodesI computeNodes = resources.getComputeNodes();
         this.backEndFactory = resources;
@@ -96,15 +101,15 @@ public class TileraBackEndScaffold extends BackEndScaffold {
         Filter slice;
 
         for (int i = 0; i < slices.length; i++) {
-            slice = (Filter) slices[i];
+            slice = slices[i];
             //create code for joining input to the trace
-            backEndFactory.processFilterInputNode((InputNode)slice.getInputNode(),
+            backEndFactory.processFilterInputNode(slice.getInputNode(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
             backEndFactory.processFilterWorkNode(slice.getWorkNode(), whichPhase, computeNodes);
             //create communication code for splitting the output
-            backEndFactory.processFilterOutputNode((OutputNode)slice.getOutputNode(),
+            backEndFactory.processFilterOutputNode(slice.getOutputNode(),
                     whichPhase, computeNodes);
             
         }

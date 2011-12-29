@@ -18,21 +18,25 @@ package streamit.library;
 
 public class NullJoiner extends Joiner
 {
-    public void work ()
+    @Override
+	public void work ()
     {
         // a null joiner should never have its work function called
         ERROR ("work function called in a NullJoiner");  
     }
     
-    public int [] getWeights ()
+    @Override
+	public int [] getWeights ()
     {
         // null joiners do not distribute any weights
         throw new UnsupportedOperationException();
     }
     
-    public int getProduction () { return 0; }
+    @Override
+	public int getProduction () { return 0; }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "roundrobin(0)";
     }
 }

@@ -62,7 +62,7 @@ public class BasicGenerateSteadyStateSchedule {
      */
     private void scheduleWork() {
         // sort traces into decreasing order by bottleneck work.
-        Filter[] tempArray = (Filter[]) ssg.getFilterGraph().clone();
+        Filter[] tempArray = ssg.getFilterGraph().clone();
         Arrays.sort(tempArray, new CompareFilterWork(ssg));
         LinkedList<Filter> sortedTraces = new LinkedList<Filter>(Arrays.asList(tempArray));
         Collections.reverse(sortedTraces);

@@ -671,7 +671,8 @@ public class OutputNode extends InternalFilterNode implements at.dms.kjc.DeepClo
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.OutputNode other = new at.dms.kjc.slir.OutputNode();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

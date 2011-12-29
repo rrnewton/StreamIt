@@ -107,7 +107,8 @@ public class JFormalParameter extends JLocalVariable {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitFormalParameters(this, isFinal(), getType(), getIdent());
     }
 
@@ -115,7 +116,8 @@ public class JFormalParameter extends JLocalVariable {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitFormalParameters(this, isFinal(), getType(), getIdent());
     }
 
@@ -128,7 +130,8 @@ public class JFormalParameter extends JLocalVariable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JFormalParameter other = new at.dms.kjc.JFormalParameter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

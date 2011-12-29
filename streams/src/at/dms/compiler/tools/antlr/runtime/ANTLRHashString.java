@@ -49,7 +49,8 @@ public class ANTLRHashString {
         return (s!=null) ? s.charAt(index) : buf[index];
     }
     // Return true if o is an ANTLRHashString equal to this.
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (!(o instanceof ANTLRHashString) && !(o instanceof String)) {
             return false;
         }
@@ -79,7 +80,8 @@ public class ANTLRHashString {
         }
         return true;
     }
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         int hashval = 0;
         int l = length();
 

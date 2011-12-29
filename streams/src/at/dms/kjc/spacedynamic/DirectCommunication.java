@@ -236,7 +236,7 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
         }
 
         JMethodDeclaration rawMainFunct = new JMethodDeclaration(null,
-                                                                 at.dms.kjc.Constants.ACC_PUBLIC, CStdType.Void,
+                                                                 at.dms.classfile.Constants.ACC_PUBLIC, CStdType.Void,
                                                                  RawExecutionCode.rawMain, JFormalParameter.EMPTY,
                                                                  CClassType.EMPTY, statements, null, null);
         filter.addMethod(rawMainFunct);
@@ -250,7 +250,8 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
             dynamic = dynamicInput;
         }
 
-        public Object visitAssignmentExpression(JAssignmentExpression oldself,
+        @Override
+		public Object visitAssignmentExpression(JAssignmentExpression oldself,
                                                 JExpression oldleft, JExpression oldright) {
             // a little optimization, use the pointer version of the
             // structure's pop in struct.h to avoid copying
@@ -283,7 +284,8 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
             return self;
         }
 
-        public Object visitPopExpression(SIRPopExpression oldSelf,
+        @Override
+		public Object visitPopExpression(SIRPopExpression oldSelf,
                                          CType oldTapeType) {
 
             // do the super
@@ -317,7 +319,8 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
              */
         }
 
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType, JExpression oldArg) {
             Utils.fail("Should not see a peek expression when generating "
                        + "direct communication");
@@ -340,17 +343,20 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
             return pushBeforePop;
         }
 
-        public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
+        @Override
+		public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
                                         JExpression arg) {
             Utils.fail("Should not see a peek expression");
         }
 
-        public void visitPopExpression(SIRPopExpression self, CType tapeType) {
+        @Override
+		public void visitPopExpression(SIRPopExpression self, CType tapeType) {
             if (sawPush)
                 pushBeforePop = true;
         }
 
-        public void visitPushExpression(SIRPushExpression self, CType tapeType,
+        @Override
+		public void visitPushExpression(SIRPushExpression self, CType tapeType,
                                         JExpression arg) {
             arg.accept(this);
             sawPush = true;
@@ -361,7 +367,8 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
         // after all the pops, we will flag this as a
         // case where a push comes before a pop
 
-        public void visitWhileStatement(JWhileStatement self, JExpression cond,
+        @Override
+		public void visitWhileStatement(JWhileStatement self, JExpression cond,
                                         JStatement body) {
             cond.accept(this);
             body.accept(this);
@@ -370,7 +377,8 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
             body.accept(this);
         }
 
-        public void visitForStatement(JForStatement self, JStatement init,
+        @Override
+		public void visitForStatement(JForStatement self, JStatement init,
                                       JExpression cond, JStatement incr, JStatement body) {
             if (init != null) {
                 init.accept(this);
@@ -392,7 +400,8 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
             body.accept(this);
         }
 
-        public void visitDoStatement(JDoStatement self, JExpression cond,
+        @Override
+		public void visitDoStatement(JDoStatement self, JExpression cond,
                                      JStatement body) {
             body.accept(this);
             cond.accept(this);
@@ -414,7 +423,8 @@ public class DirectCommunication extends at.dms.util.Utils implements Constants 
         /**
          * if we find a peek expression set found to true;
          */
-        public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
+        @Override
+		public void visitPeekExpression(SIRPeekExpression self, CType tapeType,
                                         JExpression arg) {
             found = true;
         }

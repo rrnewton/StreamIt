@@ -57,7 +57,8 @@ public class RegisterStreams {
     public static void init(FlatNode top) {
         top.accept(new FlatVisitor() {
 
-            public void visitNode(FlatNode node) {
+            @Override
+			public void visitNode(FlatNode node) {
 
                 CType input_t = null, output_t = null;
 

@@ -26,7 +26,8 @@ public class IntraFilterEdge extends IntraSSGEdge<InternalFilterNode, InternalFi
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.IntraFilterEdge other = new at.dms.kjc.slir.IntraFilterEdge();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

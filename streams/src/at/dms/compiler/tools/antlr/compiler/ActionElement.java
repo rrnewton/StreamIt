@@ -32,13 +32,16 @@ class ActionElement extends AlternativeElement {
         actionText = t.getText();
         line = t.getLine();
     }
-    public void generate(JavaCodeGenerator generator) {
+    @Override
+	public void generate(JavaCodeGenerator generator) {
         generator.gen(this);
     }
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
-    public String toString() {
+    @Override
+	public String toString() {
         return " "+actionText + (isSemPred?"?":"");
     }
 }

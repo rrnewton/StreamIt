@@ -53,6 +53,7 @@ public class PeepholeOptimizer extends TreeWalker {
     // PRIVATE METHODS
     // --------------------------------------------------------------------
 
-    protected void processNode(QNode node) {
+    @Override
+	protected void processNode(QNode node) {
     }
 }

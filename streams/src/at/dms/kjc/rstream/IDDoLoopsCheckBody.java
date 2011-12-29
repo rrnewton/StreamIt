@@ -103,7 +103,8 @@ class IDDoLoopsCheckBody extends SLIREmptyVisitor
         }
     }
 
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {

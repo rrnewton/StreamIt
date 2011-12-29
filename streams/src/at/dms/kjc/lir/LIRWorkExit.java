@@ -12,7 +12,8 @@ public class LIRWorkExit extends LIRNode
     {
         super(streamContext);
     }
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitWorkExit(this);
     }

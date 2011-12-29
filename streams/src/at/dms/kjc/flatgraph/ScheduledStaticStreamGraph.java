@@ -52,7 +52,8 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
       * Given the current toplevel flatnode, create the SIR graph, also
       * regenerating the flatgraph *
       */
-     public void createSIRGraph() {
+     @Override
+	public void createSIRGraph() {
          int suffix = Double.valueOf(Math.random() * 1000).intValue();
          /*
          (new DumpGraph()).dumpGraph(topLevel, Utils
@@ -69,7 +70,8 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
          */
      }
 
-     public void setTopLevelSIR(SIRStream topLevelStream) {
+     @Override
+	public void setTopLevelSIR(SIRStream topLevelStream) {
          executionCountsValid = false;
          super.setTopLevelSIR(topLevelStream);
      }
@@ -117,7 +119,7 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
              for (Iterator it = executionCounts[i].keySet().iterator(); it
                       .hasNext();) {
                  SIROperator obj = (SIROperator) it.next();
-                 int val = ((int[]) executionCounts[i].get(obj))[0];
+                 int val = executionCounts[i].get(obj)[0];
                  // System.err.println("execution count for " + obj + ": " +
                  // val);
                  /*
@@ -164,8 +166,8 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
                                   .get(node.incoming[0]).intValue();
                  if ((initCount == -1)
                      && (executionCounts[0].get(node.incoming[0].contents) != null))
-                     initCount = ((int[]) executionCounts[0]
-                                  .get(node.incoming[0].contents))[0];
+                     initCount = executionCounts[0]
+                                  .get(node.incoming[0].contents)[0];
              }
              int steadyCount = -1;
              if (node.incoming.length > 0) {
@@ -174,8 +176,8 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
                                     .get(node.incoming[0]).intValue();
                  if ((steadyCount == -1)
                      && (executionCounts[1].get(node.incoming[0].contents) != null))
-                     steadyCount = ((int[]) executionCounts[1]
-                                    .get(node.incoming[0].contents))[0];
+                     steadyCount = executionCounts[1]
+                                    .get(node.incoming[0].contents)[0];
              }
              if (node.contents instanceof SIRIdentity) {
                  if (initCount >= 0)
@@ -204,11 +206,11 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
              } else if (node.contents instanceof SIRJoiner) {
                  //FlatNode oldNode = graphFlattener.getFlatNode(node.contents);
                  if (executionCounts[0].get(node.oldContents) != null)
-                     initExecutionCounts.put(node, new Integer(((int[]) executionCounts[0]
-                                                      .get(node.oldContents))[0]));
+                     initExecutionCounts.put(node, new Integer(executionCounts[0]
+                                                      .get(node.oldContents)[0]));
                  if (executionCounts[1].get(node.oldContents) != null)
-                     steadyExecutionCounts.put(node, new Integer(((int[]) executionCounts[1]
-                                                      .get(node.oldContents))[0]));
+                     steadyExecutionCounts.put(node, new Integer(executionCounts[1]
+                                                      .get(node.oldContents)[0]));
              }
          }
      }
@@ -241,7 +243,8 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
          final Map<SIROperator, int[]> strmap = init ? executionCounts[0] : executionCounts[1];
          final HashMap<FlatNode,int[]> nodemap = new HashMap<FlatNode,int[]>();
          topLevel.accept(new FlatVisitor(){
-             public void visitNode(FlatNode node) {
+             @Override
+			public void visitNode(FlatNode node) {
                  if (strmap.containsKey(node.contents)) {
                      nodemap.put(node,strmap.get(node.contents));
                  }
@@ -263,8 +266,8 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
          assert !(!init && !steadyExecutionCounts.containsKey(node)) : "Asking for steady mult for a filter that is not in the steady schedule "
              + node;
 
-         Integer val = ((Integer) (init ? initExecutionCounts.get(node)
-                                   : steadyExecutionCounts.get(node)));
+         Integer val = (init ? initExecutionCounts.get(node)
+                                   : steadyExecutionCounts.get(node));
          if (val == null)
              return 0;
          else
@@ -272,7 +275,8 @@ public class ScheduledStaticStreamGraph extends StaticStreamGraph {
      }
  
      /** accept a stream graph visitor  */
-     public void accept(StreamGraphVisitor s, HashSet<StaticStreamGraph> visited, boolean newHash) {
+     @Override
+	public void accept(StreamGraphVisitor s, HashSet<StaticStreamGraph> visited, boolean newHash) {
          if (newHash)
              visited = new HashSet<StaticStreamGraph>();
 

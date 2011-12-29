@@ -50,7 +50,8 @@ public class JNullLiteral extends JLiteral {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Null;
     }
 
@@ -58,7 +59,8 @@ public class JNullLiteral extends JLiteral {
      * Returns true iff the value of this literal is the
      * default value for this type (JLS 4.5.5).
      */
-    public boolean isDefault() {
+    @Override
+	public boolean isDefault() {
         return true;
     }
 
@@ -68,11 +70,13 @@ public class JNullLiteral extends JLiteral {
      *
      * @return  true iff this expression is constant
      */
-    public boolean isConstant() {
+    @Override
+	public boolean isConstant() {
         return false;
     }
 
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         return "null";
     }
 
@@ -86,7 +90,8 @@ public class JNullLiteral extends JLiteral {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) {
+    @Override
+	public JExpression analyse(CExpressionContext context) {
         return this;
     }
 
@@ -99,7 +104,8 @@ public class JNullLiteral extends JLiteral {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitNullLiteral();
     }
 
@@ -107,7 +113,8 @@ public class JNullLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitNullLiteral(this);
     }
 
@@ -127,7 +134,8 @@ public class JNullLiteral extends JLiteral {
      * Returns whether or <pre>o</pre> this represents a literal with the same
      * value as this.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o!=null && 
                 (o instanceof JNullLiteral));
     }
@@ -138,21 +146,24 @@ public class JNullLiteral extends JLiteral {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantNoArgInstruction(opc_aconst_null);
         }
     }
 
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         throw new InconsistencyException("cannot convert NullType");
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JNullLiteral other = new at.dms.kjc.JNullLiteral();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

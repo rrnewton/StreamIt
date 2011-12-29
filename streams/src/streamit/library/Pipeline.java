@@ -360,7 +360,8 @@ public class Pipeline extends Stream
     public int getNumChildren () { return streamElements.size (); }
     public Stream getChildN (int n) { return streamElements.get (n); }
     
-    public Stream getChild(int nChild)
+    @Override
+	public Stream getChild(int nChild)
     {
         return getChildN (nChild);
     }
@@ -386,7 +387,8 @@ public class Pipeline extends Stream
     //    - the output from the last child is copied over
     //      to the Operator and the operation is finished
 
-    public void connectGraph ()
+    @Override
+	public void connectGraph ()
     {
         // make sure I have some elements - not sure what to do otherwise
         assert !streamElements.isEmpty ();
@@ -424,7 +426,8 @@ public class Pipeline extends Stream
         }
     }
 
-    void setupBufferLengths (Scheduler buffers)
+    @Override
+	void setupBufferLengths (Scheduler buffers)
     {
         ListIterator<Stream> childIter;
         childIter = (ListIterator<Stream>) streamElements.iterator ();
@@ -449,7 +452,7 @@ public class Pipeline extends Stream
                         int buffSize = buffers.getBufferSizeBetween (new Iterator(source), new Iterator(sink));
                         assert buffSize != 0;
 
-                        StreamIt.totalBuffer += buffSize;
+                        Stream.totalBuffer += buffSize;
                 
                         source.getOutputChannel ().makePassThrough ();
                         sink.getInputChannel ().setChannelSize (buffSize);

@@ -102,7 +102,8 @@ public class JFloatLiteral extends JLiteral {
         this(null, value);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "JFloatLiteral["+value+"]";
     }
 
@@ -113,14 +114,16 @@ public class JFloatLiteral extends JLiteral {
     /**
      * Returns the type of this expression.
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Float;
     }
     
     /**
      * Returns the constant value of the expression.
      */
-    public float floatValue() {
+    @Override
+	public float floatValue() {
         return value;
     }
 
@@ -128,11 +131,13 @@ public class JFloatLiteral extends JLiteral {
      * Returns true iff the value of this literal is the
      * default value for this type (JLS 4.5.5).
      */
-    public boolean isDefault() {
+    @Override
+	public boolean isDefault() {
         return Float.floatToIntBits(value) == ZERO_BITS;
     }
 
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         return ""+value;
     }
 
@@ -145,7 +150,8 @@ public class JFloatLiteral extends JLiteral {
      * changes the type of this expression to an other
      * @param  dest the destination type
      */
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         switch (dest.getTypeID()) {
         case TID_BYTE:
             return new JByteLiteral(getTokenReference(), (byte)value);
@@ -160,7 +166,7 @@ public class JFloatLiteral extends JLiteral {
         case TID_FLOAT:
             return this;
         case TID_DOUBLE:
-            return new JDoubleLiteral(getTokenReference(), (double)value);
+            return new JDoubleLiteral(getTokenReference(), value);
         case TID_CLASS:
             if (dest != CStdType.String) {
                 throw new InconsistencyException("cannot convert from float to " + dest);
@@ -179,7 +185,8 @@ public class JFloatLiteral extends JLiteral {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitFloatLiteral(value);
     }
 
@@ -187,7 +194,8 @@ public class JFloatLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitFloatLiteral(this, value);
     }
 
@@ -208,7 +216,8 @@ public class JFloatLiteral extends JLiteral {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantInstruction(new PushLiteralInstruction(value));
@@ -219,7 +228,8 @@ public class JFloatLiteral extends JLiteral {
      * Returns whether or <o> this represents a literal with the same
      * value as this.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o!=null && 
                 (o instanceof JFloatLiteral) &&
                 ((JFloatLiteral)o).value==this.value);
@@ -235,7 +245,8 @@ public class JFloatLiteral extends JLiteral {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JFloatLiteral other = new at.dms.kjc.JFloatLiteral();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -49,24 +49,28 @@ public class StmtSplit extends Statement
     }
     
     /** Accepts a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtSplit(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof StmtSplit))
             return false;
         return ((StmtSplit)other).sj.equals(sj);
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return sj.hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return "split " + sj;
     }

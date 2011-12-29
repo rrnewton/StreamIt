@@ -93,7 +93,8 @@ public class CollapseDataParallelism {
     public void detectEligible(SIRStream str) {
         str.accept(new EmptyAttributeStreamVisitor() {
                 // from splitjoins, see if they're eligible
-                public Object visitSplitJoin(SIRSplitJoin sj,
+                @Override
+				public Object visitSplitJoin(SIRSplitJoin sj,
                                              JFieldDeclaration[] fields,
                                              JMethodDeclaration[] methods,
                                              JMethodDeclaration init,
@@ -105,7 +106,8 @@ public class CollapseDataParallelism {
                     final boolean[] stillEligible = { true };
                     // visit all initialization of children in the splitjoin
                     sj.getInit().accept(new SLIREmptyVisitor() {
-                            public void visitInitStatement(SIRInitStatement self,
+                            @Override
+							public void visitInitStatement(SIRInitStatement self,
                                                            SIRStream target) {
                                 if (stillEligible[0]) {
                                     stillEligible[0] = isEligible(target, self.getArgs(), count[0]);
@@ -124,7 +126,8 @@ public class CollapseDataParallelism {
                 }
 
                 // from pipelines, visit children
-                public Object visitPipeline(SIRPipeline self,
+                @Override
+				public Object visitPipeline(SIRPipeline self,
                                             JFieldDeclaration[] fields,
                                             JMethodDeclaration[] methods,
                                             JMethodDeclaration init) {
@@ -133,7 +136,8 @@ public class CollapseDataParallelism {
                 }
 
                 // from feedback, visit children
-                public Object visitFeedbackLoop(SIRFeedbackLoop self,
+                @Override
+				public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                                 JFieldDeclaration[] fields,
                                                 JMethodDeclaration[] methods,
                                                 JMethodDeclaration init,
@@ -146,7 +150,8 @@ public class CollapseDataParallelism {
                 private void visitChildren(SIRContainer self) {
                     final EmptyAttributeStreamVisitor visitor[] = { this };
                     self.getInit().accept(new SLIREmptyVisitor() {
-                            public void visitInitStatement(SIRInitStatement self,
+                            @Override
+							public void visitInitStatement(SIRInitStatement self,
                                                            SIRStream target) {
                                 target.accept(visitor[0]);
                             }
@@ -163,7 +168,8 @@ public class CollapseDataParallelism {
     public void doTransformations(SIRStream str) {
         // by returning void, this assumes toplevel stream is not a splitjoin
         str.accept(new ReplacingStreamVisitor() {
-                public Object visitSplitJoin(SIRSplitJoin self,
+                @Override
+				public Object visitSplitJoin(SIRSplitJoin self,
                                              JFieldDeclaration[] fields,
                                              JMethodDeclaration[] methods,
                                              JMethodDeclaration init,
@@ -285,7 +291,7 @@ public class CollapseDataParallelism {
     private JExpression[] createWeights(SIRSplitJoin sj, Map<SIROperator, int[]> reps, int k) {
         JExpression[] weights = new JExpression[sj.size()];
         for (int i=0; i<sj.size(); i++) {
-            weights[i] = new JIntLiteral(((int[])reps.get(sj.get(i)))[0] * k);
+            weights[i] = new JIntLiteral(reps.get(sj.get(i))[0] * k);
         }
         // collapse down to array of "k" if uniform (this decreases
         // the granularity slightly in common cases while maintaining

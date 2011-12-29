@@ -47,7 +47,8 @@ public class CircularSchedule {
         return id == 0;
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < list.size();i++)
             buf.append(list.get(i).toString() + "\n");

@@ -22,14 +22,16 @@ public class CPLEXServer extends UnicastRemoteObject implements RMISolver {
         return hostname + "-" + "base";
     }
 
-    public String getOpenPort() throws RemoteException {
+    @Override
+	public String getOpenPort() throws RemoteException {
         openPort++;
         String name = hostname + "-" + openPort;
         bindServer(name);
         return name;
     }
 
-    public void clearPort(String name) throws RemoteException {
+    @Override
+	public void clearPort(String name) throws RemoteException {
         try {
             Naming.unbind(name);
         } catch (Exception e) {
@@ -40,7 +42,8 @@ public class CPLEXServer extends UnicastRemoteObject implements RMISolver {
     /**
      * Returns solution to <model>
      */
-    public double[] solveOverRMI(CPLEXSolve model) throws RemoteException {
+    @Override
+	public double[] solveOverRMI(CPLEXSolve model) throws RemoteException {
         try {
             return model.solve();
         } catch (LPSolverFailedException e) {

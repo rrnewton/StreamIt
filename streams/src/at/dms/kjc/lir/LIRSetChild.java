@@ -40,7 +40,8 @@ public class LIRSetChild extends LIRNode {
         this.childName = childName;
     }
 
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitSetChild(this, 
                         this.getStreamContext(), 

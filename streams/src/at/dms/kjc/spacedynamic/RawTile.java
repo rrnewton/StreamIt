@@ -56,7 +56,8 @@ public class RawTile extends ComputeNode {
     }
     
         
-    public String toString() {
+    @Override
+	public String toString() {
         return "Tile["+X+", "+Y+"]";
     }
     

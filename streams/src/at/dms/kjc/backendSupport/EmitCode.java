@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CArrayType;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
@@ -344,7 +345,7 @@ assert false : "This feature is unsupported for iteration count";
     
         //if this is an array access expression, get the variable access
         if (left instanceof JArrayAccessExpression) {
-            var = CommonUtils.lhsBaseExpr((JArrayAccessExpression)left);
+            var = CommonUtils.lhsBaseExpr(left);
         }
 
         //copying arrays inside of structs is not currently supported.
@@ -505,10 +506,10 @@ assert false : "This feature is unsupported for iteration count";
         declsAreLocal = true;
         if (! this.isDeclOnly()) { p.newLine(); } // some extra space if not just declaration.
         p.newLine();
-        if ((modifiers & at.dms.kjc.Constants.ACC_PUBLIC) == 0) {
+        if ((modifiers & Constants.ACC_PUBLIC) == 0) {
             p.print("static ");
         }
-        if ((modifiers & at.dms.kjc.Constants.ACC_INLINE) != 0) {
+        if ((modifiers & Constants.ACC_INLINE) != 0) {
             p.print("inline ");
         }
         printType(returnType);

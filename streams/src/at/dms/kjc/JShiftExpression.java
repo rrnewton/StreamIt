@@ -69,7 +69,8 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         left = left.analyse(context);
         right = right.analyse(context);
 
@@ -110,7 +111,8 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
     /**
      * @return  a literal resulting of an operation over two literals
      */
-    public JExpression constantFolding() {
+    @Override
+	public JExpression constantFolding() {
         if (left.getType() == CStdType.Long) {
             long    result;
 
@@ -138,7 +140,8 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
      * @param   right       the seconds operand
      * @return  the result of the operation
      */
-    public int compute(int left, int right) {
+    @Override
+	public int compute(int left, int right) {
         switch (oper) {
         case OPE_SL:
             return left << right;
@@ -178,7 +181,8 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitShiftExpression(this, oper, left, right);
     }
 
@@ -186,7 +190,8 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitShiftExpression(this, oper, left, right);
     }
 
@@ -236,7 +241,8 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         left.genCode(code, false);
@@ -257,7 +263,8 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JShiftExpression other = new at.dms.kjc.JShiftExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -147,7 +147,7 @@ class GrammarDefinition {
         if ( superGrammar==null ) {
             return null;
         }
-        GrammarDefinition g = (GrammarDefinition)hier.getGrammar(superGrammar);
+        GrammarDefinition g = hier.getGrammar(superGrammar);
         return g;
     }
 
@@ -223,7 +223,8 @@ class GrammarDefinition {
     public void setType(String t) {
         type = t;
     }
-    public String toString() {
+    @Override
+	public String toString() {
         String s="";
         if ( preambleAction!=null ) {
             s += preambleAction;

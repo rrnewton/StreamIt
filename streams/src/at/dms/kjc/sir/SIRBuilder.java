@@ -44,8 +44,7 @@ public class SIRBuilder {
 
         JVariableDefinition x = 
             new JVariableDefinition(/* tokenref    */ null, 
-                                    /* modifiers   */ at.dms.kjc.
-                                    Constants.ACC_PUBLIC,
+                                    /* modifiers   */ at.dms.classfile.Constants.ACC_PUBLIC,
                                     /* type        */ CStdType.Integer,
                                     /* identifier  */ "x",
                                     /* initializer */ null);
@@ -82,8 +81,7 @@ public class SIRBuilder {
         JMethodDeclaration[] meth1 = 
             {/* init */
                 new JMethodDeclaration( /* tokref     */ null,
-                                        /* modifiers  */ at.dms.kjc.
-                                        Constants.ACC_PUBLIC,
+                                        /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                         /* returntype */ CStdType.Void,
                                         /* identifier */ "init",
                                         /* parameters */ JFormalParameter.EMPTY,
@@ -92,8 +90,7 @@ public class SIRBuilder {
                                         /* javadoc    */ null,
                                         /* comments   */ null),
                 /* work*/ new JMethodDeclaration( /* tokref     */ null,
-                                                  /* modifiers  */ at.dms.kjc.
-                                                  Constants.ACC_PUBLIC,
+                                                  /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                                   /* returntype */ CStdType.Void,
                                                   /* identifier */ "work",
                                                   /* parameters */ JFormalParameter.EMPTY,
@@ -132,8 +129,7 @@ public class SIRBuilder {
         JMethodDeclaration[] meth2 = 
             {/* init */
                 new JMethodDeclaration( /* tokref     */ null,
-                                        /* modifiers  */ at.dms.kjc.
-                                        Constants.ACC_PUBLIC,
+                                        /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                         /* returntype */ CStdType.Void,
                                         /* identifier */ "init",
                                         /* parameters */ JFormalParameter.EMPTY,
@@ -143,8 +139,7 @@ public class SIRBuilder {
                                         /* comments   */ null),
                 /* work*/
                 new JMethodDeclaration( /* tokref     */ null,
-                                        /* modifiers  */ at.dms.kjc.
-                                        Constants.ACC_PUBLIC,
+                                        /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                         /* returntype */ CStdType.Void,
                                         /* identifier */ "work",
                                         /* parameters */ JFormalParameter.EMPTY,
@@ -179,8 +174,7 @@ public class SIRBuilder {
             { new SIRInitStatement(f1),
               new SIRInitStatement(f2)};
         toplevel.setInit(new JMethodDeclaration( /* tokref     */ null,
-                                                 /* modifiers  */ at.dms.kjc.
-                                                 Constants.ACC_PUBLIC,
+                                                 /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                                  /* returntype */ CStdType.Void,
                                                  /* identifier */ "init",
                                                  /* parameters */ JFormalParameter.EMPTY,

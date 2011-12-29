@@ -62,7 +62,8 @@ public class LinearRedundancyAnalyzer {
     /**
      * Prints out the internal state of this analyzer for debugging purposes.
      **/
-    public String toString() {
+    @Override
+	public String toString() {
         String returnString = "";
         returnString += "Linear Redundancy Analysis:\n";
         Iterator<SIRStream> keyIter = this.filtersToRedundancy.keySet().iterator();

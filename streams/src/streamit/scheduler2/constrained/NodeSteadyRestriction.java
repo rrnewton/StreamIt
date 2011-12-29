@@ -22,14 +22,16 @@ public class NodeSteadyRestriction extends Restriction
         node = _node;
     }
 
-    public boolean notifyExpired()
+    @Override
+	public boolean notifyExpired()
     {
         // this restriction should never be removed or unblocked!
         portal.getParent().doneSteadyState(node);
         return false;
     }
 
-    public void useRestrictions(Restrictions _restrictions)
+    @Override
+	public void useRestrictions(Restrictions _restrictions)
     {
         super.useRestrictions(_restrictions);
         setMaxExecutions(portal.getMaxLatency());

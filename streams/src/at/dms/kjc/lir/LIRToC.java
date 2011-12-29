@@ -208,7 +208,8 @@ public class LIRToC
     /**
      * prints a compilation unit
      */
-    public void visitCompilationUnit(JCompilationUnit self,
+    @Override
+	public void visitCompilationUnit(JCompilationUnit self,
                                      JPackageName packageName,
                                      JPackageImport[] importedPackages,
                                      JClassImport[] importedClasses,
@@ -246,7 +247,8 @@ public class LIRToC
     /**
      * prints a class declaration
      */
-    public void visitClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitClassDeclaration(JClassDeclaration self,
                                       int modifiers,
                                       String ident,
                                       String superName,
@@ -264,7 +266,8 @@ public class LIRToC
     /**
      *
      */
-    public void visitClassBody(JTypeDeclaration[] decls,
+    @Override
+	public void visitClassBody(JTypeDeclaration[] decls,
                                JFieldDeclaration[] fields,
                                JMethodDeclaration[] methods,
                                JPhylum[] body) {
@@ -406,7 +409,8 @@ public class LIRToC
     /**
      * prints a class declaration
      */
-    public void visitInnerClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitInnerClassDeclaration(JClassDeclaration self,
                                            int modifiers,
                                            String ident,
                                            String superName,
@@ -437,7 +441,8 @@ public class LIRToC
     /**
      * prints an interface declaration
      */
-    public void visitInterfaceDeclaration(JInterfaceDeclaration self,
+    @Override
+	public void visitInterfaceDeclaration(JInterfaceDeclaration self,
                                           int modifiers,
                                           String ident,
                                           CClassType[] interfaces,
@@ -497,7 +502,8 @@ public class LIRToC
     /**
      * prints a field declaration
      */
-    public void visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public void visitFieldDeclaration(JFieldDeclaration self,
                                       int modifiers,
                                       CType type,
                                       String ident,
@@ -544,7 +550,8 @@ public class LIRToC
     /**
      * prints a method declaration
      */
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -604,7 +611,8 @@ public class LIRToC
     /**
      * prints a method declaration
      */
-    public void visitConstructorDeclaration(JConstructorDeclaration self,
+    @Override
+	public void visitConstructorDeclaration(JConstructorDeclaration self,
                                             int modifiers,
                                             String ident,
                                             JFormalParameter[] parameters,
@@ -650,7 +658,8 @@ public class LIRToC
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -676,7 +685,8 @@ public class LIRToC
     /**
      * prints a try-catch statement
      */
-    public void visitTryCatchStatement(JTryCatchStatement self,
+    @Override
+	public void visitTryCatchStatement(JTryCatchStatement self,
                                        JBlock tryClause,
                                        JCatchClause[] catchClauses) {
         p.print("try ");
@@ -689,7 +699,8 @@ public class LIRToC
     /**
      * prints a try-finally statement
      */
-    public void visitTryFinallyStatement(JTryFinallyStatement self,
+    @Override
+	public void visitTryFinallyStatement(JTryFinallyStatement self,
                                          JBlock tryClause,
                                          JBlock finallyClause) {
         p.print("try ");
@@ -703,7 +714,8 @@ public class LIRToC
     /**
      * prints a throw statement
      */
-    public void visitThrowStatement(JThrowStatement self,
+    @Override
+	public void visitThrowStatement(JThrowStatement self,
                                     JExpression expr) {
         p.print("throw ");
         expr.accept(this);
@@ -713,7 +725,8 @@ public class LIRToC
     /**
      * prints a synchronized statement
      */
-    public void visitSynchronizedStatement(JSynchronizedStatement self,
+    @Override
+	public void visitSynchronizedStatement(JSynchronizedStatement self,
                                            JExpression cond,
                                            JStatement body) {
         p.print("synchronized (");
@@ -741,7 +754,8 @@ public class LIRToC
     /**
      * prints a if statement
      */
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause) {
@@ -769,7 +783,8 @@ public class LIRToC
     /**
      * prints a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -837,7 +852,8 @@ public class LIRToC
     /**
      * prints a empty statement
      */
-    public void visitEmptyStatement(JEmptyStatement self) {
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self) {
         //if we are inside a for loop header, we need to print 
         //the ; of an empty statement
         if (forLoopHeader > 0) {
@@ -877,7 +893,8 @@ public class LIRToC
     /**
      * prints a this expression
      */
-    public void visitThisExpression(JThisExpression self,
+    @Override
+	public void visitThisExpression(JThisExpression self,
                                     JExpression prefix) {
         if (prefix != null) {
             prefix.accept(this);
@@ -890,14 +907,16 @@ public class LIRToC
     /**
      * prints a super expression
      */
-    public void visitSuperExpression(JSuperExpression self) {
+    @Override
+	public void visitSuperExpression(JSuperExpression self) {
         p.print("super");
     }
 
     /**
      * prints a shift expressiona
      */
-    public void visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public void visitRelationalExpression(JRelationalExpression self,
                                           int oper,
                                           JExpression left,
                                           JExpression right) {
@@ -926,7 +945,8 @@ public class LIRToC
     /**
      * Prints an unqualified anonymous class instance creation expression.
      */
-    public void visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
+    @Override
+	public void visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
                                                 JExpression prefix,
                                                 String ident,
                                                 JExpression[] params,
@@ -942,7 +962,8 @@ public class LIRToC
     /**
      * Prints an unqualified instance creation expression.
      */
-    public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
+    @Override
+	public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
                                                JExpression prefix,
                                                String ident,
                                                JExpression[] params)
@@ -956,7 +977,8 @@ public class LIRToC
     /**
      * Prints an unqualified anonymous class instance creation expression.
      */
-    public void visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self,
+    @Override
+	public void visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self,
                                                   CClassType type,
                                                   JExpression[] params,
                                                   JClassDeclaration decl)
@@ -975,7 +997,8 @@ public class LIRToC
     /**
      * Prints an unqualified instance creation expression.
      */
-    public void visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self,
+    @Override
+	public void visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self,
                                                  CClassType type,
                                                  JExpression[] params)
     {
@@ -999,7 +1022,8 @@ public class LIRToC
     /**
      * prints a name expression
      */
-    public void visitNameExpression(JNameExpression self,
+    @Override
+	public void visitNameExpression(JNameExpression self,
                                     JExpression prefix,
                                     String ident) {
         p.print("(");
@@ -1014,7 +1038,8 @@ public class LIRToC
     /**
      * prints an binary expression
      */
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right) {
@@ -1030,7 +1055,8 @@ public class LIRToC
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -1062,7 +1088,8 @@ public class LIRToC
     /**
      * prints a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident)
     {
@@ -1114,7 +1141,8 @@ public class LIRToC
     /**
      * prints a compound assignment expression
      */
-    public void visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public void visitBitwiseExpression(JBitwiseExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {
@@ -1140,7 +1168,8 @@ public class LIRToC
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
 
@@ -1211,7 +1240,8 @@ public class LIRToC
     /**
      * prints an array length expression
      */
-    public void visitArrayLengthExpression(JArrayLengthExpression self,
+    @Override
+	public void visitArrayLengthExpression(JArrayLengthExpression self,
                                            JExpression prefix) {
         prefix.accept(this);
         p.print(".length");
@@ -1220,7 +1250,8 @@ public class LIRToC
     /**
      * prints an array access expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor) {
         printLParen();
@@ -1234,7 +1265,8 @@ public class LIRToC
     /**
      * prints a comment expression
      */
-    public void visitComments(JavaStyleComment[] comments) {
+    @Override
+	public void visitComments(JavaStyleComment[] comments) {
         for (int i = 0; i < comments.length; i++) {
             if (comments[i] != null) {
                 visitComment(comments[i]);
@@ -1245,7 +1277,8 @@ public class LIRToC
     /**
      * prints a comment expression
      */
-    public void visitComment(JavaStyleComment comment) {
+    @Override
+	public void visitComment(JavaStyleComment comment) {
         StringTokenizer tok = new StringTokenizer(comment.getText(), "\n");
 
         if (comment.hadSpaceBefore()) {
@@ -1288,7 +1321,8 @@ public class LIRToC
     /**
      * prints a Javadoc expression
      */
-    public void visitJavadoc(JavadocComment comment) {
+    @Override
+	public void visitJavadoc(JavadocComment comment) {
         StringTokenizer tok = new StringTokenizer(comment.getText(), "\n");
         boolean         isFirst = true;
 
@@ -1394,17 +1428,20 @@ public class LIRToC
     // STREAMIT IR HANDLERS
     // ----------------------------------------------------------------------
 
-    public void visitCreatePortalExpression(SIRCreatePortal self) {
+    @Override
+	public void visitCreatePortalExpression(SIRCreatePortal self) {
         p.print("create_portal()");
     }
 
-    public void visitInitStatement(SIRInitStatement self,
+    @Override
+	public void visitInitStatement(SIRInitStatement self,
                                    SIRStream stream)
     {
         p.print("/* InitStatement */");
     }
 
-    public void visitInterfaceTable(SIRInterfaceTable self)
+    @Override
+	public void visitInterfaceTable(SIRInterfaceTable self)
     {
         String iname = self.getIface().getIdent();
         JMethodDeclaration[] methods = self.getMethods();
@@ -1420,27 +1457,32 @@ public class LIRToC
         p.print("}");
     }
     
-    public void visitLatency(SIRLatency self)
+    @Override
+	public void visitLatency(SIRLatency self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencyMax(SIRLatencyMax self)
+    @Override
+	public void visitLatencyMax(SIRLatencyMax self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencyRange(SIRLatencyRange self)
+    @Override
+	public void visitLatencyRange(SIRLatencyRange self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencySet(SIRLatencySet self)
+    @Override
+	public void visitLatencySet(SIRLatencySet self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
 
-    public void visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public void visitMessageStatement(SIRMessageStatement self,
                                       JExpression portal,
                                       String iname,
                                       String ident,
@@ -1461,20 +1503,24 @@ public class LIRToC
         p.print(");");
     }
 
-    public void visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public void visitRangeExpression(SIRRangeExpression self) {
         assert false : "Do not yet support dynamic rates in uniprocessor backend.";
     }
 
-    public void visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public void visitDynamicToken(SIRDynamicToken self) {
         assert false : "Do not yet support dynamic rates in uniprocessor backend.";
     }
 
+	@Override
 	public void visitIterationExpression(
 			SIRIterationExpression sirIterationExpression) {
 assert false : "This feature is unsupported for iteration count";
 	}
     
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression num)
     {
@@ -1488,7 +1534,8 @@ assert false : "This feature is unsupported for iteration count";
         p.print("))");
     }
     
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType)
     {
         if (self.getNumPop()>1) {
@@ -1508,7 +1555,8 @@ assert false : "This feature is unsupported for iteration count";
         }
     }
     
-    public void visitPortal(SIRPortal self)
+    @Override
+	public void visitPortal(SIRPortal self)
     {
         // Have we seen this portal before?
         if (!(portalNames.containsKey(self)))
@@ -1522,7 +1570,8 @@ assert false : "This feature is unsupported for iteration count";
 
     // visitPrintStatement inherited from ToCCommon.
     
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression val)
     {
@@ -1536,7 +1585,8 @@ assert false : "This feature is unsupported for iteration count";
         p.print("))");
     }
     
-    public void visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public void visitRegReceiverStatement(SIRRegReceiverStatement self,
                                           JExpression portal,
                                           SIRStream receiver, 
                                           JMethodDeclaration[] methods)
@@ -1549,7 +1599,8 @@ assert false : "This feature is unsupported for iteration count";
         // (But shouldn't there be a latency field in here?)
     }
     
-    public void visitRegSenderStatement(SIRRegSenderStatement self,
+    @Override
+	public void visitRegSenderStatement(SIRRegSenderStatement self,
                                         String fn,
                                         SIRLatency latency)
     {
@@ -1564,7 +1615,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a file reader.
      */
-    public void visitFileReader(LIRFileReader self) {
+    @Override
+	public void visitFileReader(LIRFileReader self) {
         String childName = THIS_NAME + "->" + self.getChildName();
         p.print(childName + " = malloc(sizeof(_ContextContainer));");
         p.newLine();
@@ -1580,7 +1632,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a file writer.
      */
-    public void visitFileWriter(LIRFileWriter self) {
+    @Override
+	public void visitFileWriter(LIRFileWriter self) {
         String childName = THIS_NAME + "->" + self.getChildName();
         p.print(childName + " = malloc(sizeof(_ContextContainer));");
         p.newLine();
@@ -1596,7 +1649,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits an identity filter.
      */
-    public void visitIdentity(LIRIdentity self) 
+    @Override
+	public void visitIdentity(LIRIdentity self) 
     {
         String childName = THIS_NAME + "->" + self.getChildName();
         p.print(childName + " = malloc(sizeof(_ContextContainer));");
@@ -1609,7 +1663,8 @@ assert false : "This feature is unsupported for iteration count";
         p.print(", " + childName + "->" + CONTEXT_NAME + ");");
     }
 
-    public void visitSetChild(LIRSetChild self,
+    @Override
+	public void visitSetChild(LIRSetChild self,
                               JExpression streamContext,
                               String childType,
                               String childName)
@@ -1627,7 +1682,8 @@ assert false : "This feature is unsupported for iteration count";
                 ");");
     }
     
-    public void visitSetTape(LIRSetTape self,
+    @Override
+	public void visitSetTape(LIRSetTape self,
                              JExpression streamContext,
                              JExpression srcStruct,
                              JExpression dstStruct,
@@ -1646,7 +1702,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a function pointer.
      */
-    public void visitFunctionPointer(LIRFunctionPointer self,
+    @Override
+	public void visitFunctionPointer(LIRFunctionPointer self,
                                      String name)
     {
         // This is an expression.
@@ -1656,7 +1713,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits an LIR node.
      */
-    public void visitNode(LIRNode self)
+    @Override
+	public void visitNode(LIRNode self)
     {
         // This should never be called directly.
         p.print("/* Unexpected visitNode */");
@@ -1665,7 +1723,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits an LIR register-receiver statement.
      */
-    public void visitRegisterReceiver(LIRRegisterReceiver self,
+    @Override
+	public void visitRegisterReceiver(LIRRegisterReceiver self,
                                       JExpression streamContext,
                                       SIRPortal portal,
                                       String childName,
@@ -1699,7 +1758,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a decoder registration node.
      */
-    public void visitSetDecode(LIRSetDecode self,
+    @Override
+	public void visitSetDecode(LIRSetDecode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp)
     {
@@ -1713,7 +1773,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a feedback loop delay node.
      */
-    public void visitSetDelay(LIRSetDelay self,
+    @Override
+	public void visitSetDelay(LIRSetDelay self,
                               JExpression data,
                               JExpression streamContext,
                               int delay,
@@ -1735,7 +1796,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits an encoder registration node.
      */
-    public void visitSetEncode(LIRSetEncode self,
+    @Override
+	public void visitSetEncode(LIRSetEncode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp)
     {
@@ -1749,7 +1811,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a joiner-setting node.
      */
-    public void visitSetJoiner(LIRSetJoiner self,
+    @Override
+	public void visitSetJoiner(LIRSetJoiner self,
                                JExpression streamContext,
                                SIRJoinType type,
                                int ways,
@@ -1771,7 +1834,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a peek-rate-setting node.
      */
-    public void visitSetPeek(LIRSetPeek self,
+    @Override
+	public void visitSetPeek(LIRSetPeek self,
                              JExpression streamContext,
                              int peek)
     {
@@ -1783,7 +1847,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a pop-rate-setting node.
      */
-    public void visitSetPop(LIRSetPop self,
+    @Override
+	public void visitSetPop(LIRSetPop self,
                             JExpression streamContext,
                             int pop)
     {
@@ -1795,7 +1860,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a push-rate-setting node.
      */
-    public void visitSetPush(LIRSetPush self,
+    @Override
+	public void visitSetPush(LIRSetPush self,
                              JExpression streamContext,
                              int push)
     {
@@ -1807,7 +1873,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a splitter-setting node.
      */
-    public void visitSetSplitter(LIRSetSplitter self,
+    @Override
+	public void visitSetSplitter(LIRSetSplitter self,
                                  JExpression streamContext,
                                  SIRSplitType type,
                                  int ways,
@@ -1827,7 +1894,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a stream-type-setting node.
      */
-    public void visitSetStreamType(LIRSetStreamType self,
+    @Override
+	public void visitSetStreamType(LIRSetStreamType self,
                                    JExpression streamContext,
                                    LIRStreamType streamType)
     {
@@ -1839,7 +1907,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a work-function-setting node.
      */
-    public void visitSetWork(LIRSetWork self,
+    @Override
+	public void visitSetWork(LIRSetWork self,
                              JExpression streamContext,
                              LIRFunctionPointer fn)
     {
@@ -1850,7 +1919,8 @@ assert false : "This feature is unsupported for iteration count";
         p.print(");");
     }
 
-    public void visitMainFunction(LIRMainFunction self,
+    @Override
+	public void visitMainFunction(LIRMainFunction self,
                                   String typeName,
                                   LIRFunctionPointer init,
                                   List<JStatement> initStatements)
@@ -1877,7 +1947,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a set body of feedback loop.
      */
-    public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
+    @Override
+	public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -1911,7 +1982,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a set loop of feedback loop.
      */
-    public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
+    @Override
+	public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -1941,7 +2013,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a set a parallel stream.
      */
-    public void visitSetParallelStream(LIRSetParallelStream self,
+    @Override
+	public void visitSetParallelStream(LIRSetParallelStream self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        int position,
@@ -1977,7 +2050,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a work function entry.
      */
-    public void visitWorkEntry(LIRWorkEntry self)
+    @Override
+	public void visitWorkEntry(LIRWorkEntry self)
     {
         p.print("VARS_DEFAULTB();");
         p.newLine();
@@ -1989,7 +2063,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * Visits a work function exit.
      */
-    public void visitWorkExit(LIRWorkExit self)
+    @Override
+	public void visitWorkExit(LIRWorkExit self)
     {
         p.print("UNLOCALIZE_DEFAULTB(");
         self.getStreamContext().accept(this);
@@ -2004,7 +2079,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints an array length expression
      */
-    public void visitSwitchLabel(JSwitchLabel self,
+    @Override
+	public void visitSwitchLabel(JSwitchLabel self,
                                  JExpression expr) {
         p.newLine();
         if (expr != null) {
@@ -2019,7 +2095,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints an array length expression
      */
-    public void visitSwitchGroup(JSwitchGroup self,
+    @Override
+	public void visitSwitchGroup(JSwitchGroup self,
                                  JSwitchLabel[] labels,
                                  JStatement[] stmts) {
         for (int i = 0; i < labels.length; i++) {
@@ -2036,7 +2113,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints an array length expression
      */
-    public void visitCatchClause(JCatchClause self,
+    @Override
+	public void visitCatchClause(JCatchClause self,
                                  JFormalParameter exception,
                                  JBlock body) {
         p.print(" catch (");
@@ -2048,7 +2126,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints a boolean literal
      */
-    public void visitBooleanLiteral(boolean value) {
+    @Override
+	public void visitBooleanLiteral(boolean value) {
         if (value)
             p.print(1);
         else
@@ -2058,14 +2137,16 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints a byte literal
      */
-    public void visitByteLiteral(byte value) {
+    @Override
+	public void visitByteLiteral(byte value) {
         p.print("((byte)" + value + ")");
     }
 
     /**
      * prints a character literal
      */
-    public void visitCharLiteral(char value) {
+    @Override
+	public void visitCharLiteral(char value) {
         switch (value) {
         case '\b':
             p.print("'\\b'");
@@ -2099,56 +2180,64 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints a double literal
      */
-    public void visitDoubleLiteral(double value) {
+    @Override
+	public void visitDoubleLiteral(double value) {
         p.print("((double)" + value + ")");
     }
 
     /**
      * prints a float literal
      */
-    public void visitFloatLiteral(float value) {
+    @Override
+	public void visitFloatLiteral(float value) {
         p.print("((float)" + value + ")");
     }
 
     /**
      * prints a int literal
      */
-    public void visitIntLiteral(int value) {
+    @Override
+	public void visitIntLiteral(int value) {
         p.print(value);
     }
 
     /**
      * prints a long literal
      */
-    public void visitLongLiteral(long value) {
+    @Override
+	public void visitLongLiteral(long value) {
         p.print("(" + value + "L)");
     }
 
     /**
      * prints a short literal
      */
-    public void visitShortLiteral(short value) {
+    @Override
+	public void visitShortLiteral(short value) {
         p.print("((short)" + value + ")");
     }
 
     /**
      * prints a string literal
      */
-    public void visitStringLiteral(String value) {
+    @Override
+	public void visitStringLiteral(String value) {
         p.print('"' + value + '"');
     }
 
     /**
      * prints a null literal
      */
-    public void visitNullLiteral() {
+    @Override
+	public void visitNullLiteral() {
         p.print("null");
     }
 
     /**
      * prints an array length expression
      */
-    public void visitPackageName(String name) {
+    @Override
+	public void visitPackageName(String name) {
         // p.print("package " + name + ";");
         // p.newLine();
     }
@@ -2156,21 +2245,24 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints an array length expression
      */
-    public void visitPackageImport(String name) {
+    @Override
+	public void visitPackageImport(String name) {
         // p.print("import " + name.replace('/', '.') + ".*;");
     }
 
     /**
      * prints an array length expression
      */
-    public void visitClassImport(String name) {
+    @Override
+	public void visitClassImport(String name) {
         // p.print("import " + name.replace('/', '.') + ";");
     }
 
     /**
      * prints an array length expression
      */
-    public void visitFormalParameters(JFormalParameter self,
+    @Override
+	public void visitFormalParameters(JFormalParameter self,
                                       boolean isFinal,
                                       CType type,
                                       String ident) {
@@ -2201,7 +2293,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints an array length expression
      */
-    public void visitConstructorCall(JConstructorCall self,
+    @Override
+	public void visitConstructorCall(JConstructorCall self,
                                      boolean functorIsThis,
                                      JExpression[] params)
     {
@@ -2215,7 +2308,8 @@ assert false : "This feature is unsupported for iteration count";
     /**
      * prints an array initializer expression
      */
-    public void visitArrayInitializer(JArrayInitializer self,
+    @Override
+	public void visitArrayInitializer(JArrayInitializer self,
                                       JExpression[] elems)
     {
         /*
@@ -2334,7 +2428,7 @@ assert false : "This feature is unsupported for iteration count";
                 break;
             }
             // assume rectangular arrays
-            JExpression next = (JExpression)init.getElems()[0];
+            JExpression next = init.getElems()[0];
             if (next instanceof JArrayInitializer) {
                 init = (JArrayInitializer)next;
             } else {
@@ -2399,7 +2493,8 @@ assert false : "This feature is unsupported for iteration count";
          * Don't visit variable defs, because these declare local
          * arrays.  They are stack allocated automatically.
          */
-        public void visitVariableDefinition(JVariableDefinition self,
+        @Override
+		public void visitVariableDefinition(JVariableDefinition self,
                                             int modifiers,
                                             CType type,
                                             String ident,
@@ -2407,7 +2502,8 @@ assert false : "This feature is unsupported for iteration count";
             return;
         }
 
-        public void visitAssignmentExpression(JAssignmentExpression self,
+        @Override
+		public void visitAssignmentExpression(JAssignmentExpression self,
                                               JExpression left,
                                               JExpression right) {
             if (right instanceof JArrayInitializer) {

@@ -95,7 +95,8 @@ public class JFieldAccessExpression extends JExpression {
     /**
      * Returns the simple name of the field.
      */
-    public String getIdent() {
+    @Override
+	public String getIdent() {
         return ident;
     }
 
@@ -111,7 +112,8 @@ public class JFieldAccessExpression extends JExpression {
     /**
      * Returns the type of the expression.
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         if(field==null)
             return null;
         return field.getType();
@@ -120,7 +122,8 @@ public class JFieldAccessExpression extends JExpression {
     /**
      * Set type: delegates to the CField, or creates a new CSourceField if none.
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         if (field != null) {
             field.setType(type);
         } else {
@@ -140,7 +143,8 @@ public class JFieldAccessExpression extends JExpression {
      *
      * @return  true iff this expression is constant
      */
-    public boolean isConstant() {
+    @Override
+	public boolean isConstant() {
         // A compile-time constant expression is an expression [...]
         // that is composed using only the following :
         // - Simple names that refer to final variables whose initializers
@@ -157,7 +161,8 @@ public class JFieldAccessExpression extends JExpression {
     /**
      * Returns true if this field accepts assignments.
      */
-    public boolean isLValue(CExpressionContext context) {
+    @Override
+	public boolean isLValue(CExpressionContext context) {
         if (!field.isFinal() || !(field instanceof CSourceField)) {
             return true;
         } else if (context.getClassContext().getCClass() == field.getOwner()
@@ -173,7 +178,8 @@ public class JFieldAccessExpression extends JExpression {
      *
      * @return true if the field is final.
      */
-    public boolean isFinal() {
+    @Override
+	public boolean isFinal() {
         return field.isFinal();
     }
 
@@ -197,7 +203,8 @@ public class JFieldAccessExpression extends JExpression {
     /**
      * Returns true iff this field is already initialized.
      */
-    public boolean isInitialized(CExpressionContext context) {
+    @Override
+	public boolean isInitialized(CExpressionContext context) {
         if (!(field instanceof CSourceField) || field.isStatic()) {
             return true;
         } else if (context.getClassContext().getCClass() == field.getOwner() &&
@@ -214,7 +221,8 @@ public class JFieldAccessExpression extends JExpression {
      * @exception   UnpositionedError an error if this object can't actually
      *      be assignated this may happen with final variables.
      */
-    public void setInitialized(CExpressionContext context) {
+    @Override
+	public void setInitialized(CExpressionContext context) {
         if ((field instanceof CSourceField) && (context.getClassContext().getCClass() == field.getOwner() && !((CSourceField)field).isFullyDeclared())) {
             context.setFieldInfo(((CSourceField)field).getPosition(), CVariableInfo.INITIALIZED);
         }
@@ -230,14 +238,16 @@ public class JFieldAccessExpression extends JExpression {
     /**
      * Returns the literal value of this field.
      */
-    public JLiteral getLiteral() {
+    @Override
+	public JLiteral getLiteral() {
         return (JLiteral)field.getValue();
     }
 
     /**
      * Returns a string representation of this expression.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JFieldAccessExpression[");
@@ -262,7 +272,8 @@ public class JFieldAccessExpression extends JExpression {
      * @return      an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         CClass  local = context.getClassContext().getCClass();
 
         findPrefix(local, context);
@@ -361,7 +372,8 @@ public class JFieldAccessExpression extends JExpression {
         }
     }
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o instanceof JFieldAccessExpression) &&
             field.equals(((JFieldAccessExpression)o).field) &&
             prefix.equals(((JFieldAccessExpression)o).prefix);
@@ -376,7 +388,8 @@ public class JFieldAccessExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitFieldExpression(this, prefix, getIdent());
     }
 
@@ -384,7 +397,8 @@ public class JFieldAccessExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return  p.visitFieldExpression(this, prefix, getIdent());
     }
 
@@ -406,7 +420,8 @@ public class JFieldAccessExpression extends JExpression {
      * @param   code            the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         if (! field.isStatic()) {
@@ -430,7 +445,8 @@ public class JFieldAccessExpression extends JExpression {
      *
      * @param   code        the code list
      */
-    public void genStartStoreCode(CodeSequence code) {
+    @Override
+	public void genStartStoreCode(CodeSequence code) {
         if (! field.isStatic()) {
             prefix.genCode(code, false);
         } else if (prefix != null) {
@@ -450,7 +466,8 @@ public class JFieldAccessExpression extends JExpression {
      * @param   code            the code list
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genEndStoreCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genEndStoreCode(CodeSequence code, boolean discardValue) {
         if (!discardValue) {
             int opcode;
 
@@ -490,7 +507,8 @@ public class JFieldAccessExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JFieldAccessExpression other = new at.dms.kjc.JFieldAccessExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

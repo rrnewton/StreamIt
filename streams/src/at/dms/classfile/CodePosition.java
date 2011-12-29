@@ -73,7 +73,8 @@ public final class CodePosition {
     /**
      * Returns a string representation.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "[min: " + min + ", max: " + max + "]";
     }
 

@@ -51,7 +51,8 @@ public class CInitializerContext extends CMethodContext {
      * Verify that all checked exceptions are defined in the throw list
      * @exception   UnpositionedError   this error will be positioned soon
      */
-    public void close(TokenReference ref) throws PositionedError {
+    @Override
+	public void close(TokenReference ref) throws PositionedError {
         if (! getCMethod().isStatic()) {
             ((CClassContext)parent).setInitializerInfo(fieldInfo);
         } else {
@@ -83,7 +84,8 @@ public class CInitializerContext extends CMethodContext {
      * @param   index     the definition of a field
      * @return  all informations we have about this field
      */
-    public int getFieldInfo(int index) {
+    @Override
+	public int getFieldInfo(int index) {
         if (fieldInfo == null) {
             return parent.getFieldInfo(index);
         } else {
@@ -98,7 +100,8 @@ public class CInitializerContext extends CMethodContext {
      * We make it a local copy of this information and at the end of this context
      * we will transfert it to the parent context according to controlFlow
      */
-    public void setFieldInfo(int index, int info) {
+    @Override
+	public void setFieldInfo(int index, int info) {
         if (fieldInfo == null) {
             fieldInfo = (CVariableInfo)getFieldInfo().clone();
         }
@@ -114,7 +117,8 @@ public class CInitializerContext extends CMethodContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CInitializerContext other = new at.dms.kjc.CInitializerContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

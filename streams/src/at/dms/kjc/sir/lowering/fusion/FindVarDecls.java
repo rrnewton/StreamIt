@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDeclarationStatement;
@@ -137,11 +138,11 @@ public class FindVarDecls extends SLIREmptyVisitor {
 
             if (type.isArrayType()) continue;
 
-            if (type.getTypeID() == CType.TID_INT) {
+            if (type.getTypeID() == Constants.TID_INT) {
                 var_names.put(vars[i],new Integer(int_count));
                 int_count++;
             }
-            if (type.getTypeID() == CType.TID_FLOAT) {
+            if (type.getTypeID() == Constants.TID_FLOAT) {
                 var_names.put(vars[i],new Integer(float_count));
                 float_count++;
             }

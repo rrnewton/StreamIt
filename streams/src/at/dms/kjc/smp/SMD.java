@@ -4,7 +4,8 @@ import at.dms.kjc.slir.InternalFilterNode;
 
 public class SMD extends Scheduler {
 
-    public void run(int tiles) {
+    @Override
+	public void run(int tiles) {
         
     }
     
@@ -12,7 +13,8 @@ public class SMD extends Scheduler {
      * @param node the {@link at.dms.kjc.slir.InternalFilterNode} to look up. 
      * @return the tile that should execute the {@link at.dms.kjc.slir.InternalFilterNode}. 
      */
-    public Core getComputeNode(InternalFilterNode node) {
+    @Override
+	public Core getComputeNode(InternalFilterNode node) {
         return null;
     }
     
@@ -21,12 +23,14 @@ public class SMD extends Scheduler {
      * @param node         the {@link at.dms.kjc.slir.InternalFilterNode} to associate with ...
      * @param tile   The tile to assign the node
      */
-    public void setComputeNode(InternalFilterNode node, Core tile) {
+    @Override
+	public void setComputeNode(InternalFilterNode node, Core tile) {
         
     }
     
 
-    public void runLayout() {
+    @Override
+	public void runLayout() {
         
     }
 }

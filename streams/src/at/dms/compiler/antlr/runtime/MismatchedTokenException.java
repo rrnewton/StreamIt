@@ -96,7 +96,8 @@ public class MismatchedTokenException extends RecognitionException {
      * Returns the error message that happened on the line/col given.
      * Copied from toString().
      */
-    public String getMessage() {
+    @Override
+	public String getMessage() {
         StringBuffer sb = new StringBuffer();
 
         switch (mismatchType) {
@@ -143,7 +144,8 @@ public class MismatchedTokenException extends RecognitionException {
     /**
      * @return a string representation of this exception.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return FileLineFormatter.getFormatter().getFormatString(fileName,line)+getMessage();
     }
 }

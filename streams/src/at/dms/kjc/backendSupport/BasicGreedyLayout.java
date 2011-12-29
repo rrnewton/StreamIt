@@ -39,7 +39,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
      * @param nodes
      */
     public BasicGreedyLayout(BasicSpaceTimeSchedule spaceTime, T[] nodes) {
-        this.ssg = (StaticSubGraph)spaceTime.getSSG();
+        this.ssg = spaceTime.getSSG();
         this.spaceTime = spaceTime;
         this.nodes = nodes;
         this.numBins = nodes.length;
@@ -57,14 +57,17 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
     }
     
     
-    public T getComputeNode(InternalFilterNode node) {
+    @Override
+	public T getComputeNode(InternalFilterNode node) {
         return assignment.get(node);
     }
    
-    public void setComputeNode(InternalFilterNode node, T tile) {
+    @Override
+	public void setComputeNode(InternalFilterNode node, T tile) {
         assignment.put(node, tile);
     }
-    public void runLayout() {
+    @Override
+	public void runLayout() {
         assignment = new HashMap<InternalFilterNode, T>();
         pack();
 
@@ -79,7 +82,7 @@ public class BasicGreedyLayout<T extends ComputeNode> implements Layout<T> {
         
     
         //if we are software pipelining then sort the traces by work
-        Filter[] tempArray = (Filter[]) spaceTime.getSSG().getFilterGraph().clone();
+        Filter[] tempArray = spaceTime.getSSG().getFilterGraph().clone();
         Arrays.sort(tempArray, new CompareFilterWork(ssg));
         scheduleOrder = new LinkedList<Filter>(Arrays.asList(tempArray));
         //reverse the list, we want the list in descending order!

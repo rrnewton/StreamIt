@@ -79,7 +79,8 @@ public class CSourceClass extends CClass {
     /**
      * add synthetic parameters to method def
      */
-    public CType[] genConstructorArray(CType[] params) {
+    @Override
+	public CType[] genConstructorArray(CType[] params) {
         boolean     hasOuterThis = isNested() && !isStatic() && hasOuterThis();
         int         size = params.length + (hasOuterThis ? 1 : 0) + (outers == null ? 0 : outers.size());
 
@@ -114,7 +115,8 @@ public class CSourceClass extends CClass {
     /**
      * add synthetic parameters to method call
      */
-    public void genOuterSyntheticParams(CodeSequence code) {//, boolean qualified)
+    @Override
+	public void genOuterSyntheticParams(CodeSequence code) {//, boolean qualified)
         //     if (isNested() && !isStatic() && hasOuterThis() && !qualified) {
         //       code.plantLoadThis();
         //     }
@@ -344,7 +346,8 @@ public class CSourceClass extends CClass {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CSourceClass other = new at.dms.kjc.CSourceClass();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

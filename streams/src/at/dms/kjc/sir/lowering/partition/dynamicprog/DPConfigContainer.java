@@ -267,14 +267,16 @@ abstract class DPConfigContainer extends DPConfig {
         }
     }
 
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         return cont;
     }
 
     /**
      * Requires <pre>str</pre> is a container.
      */
-    protected void setStream(SIRStream str) {
+    @Override
+	protected void setStream(SIRStream str) {
         assert str instanceof SIRContainer;
         this.cont = (SIRContainer)str;
     }
@@ -286,7 +288,8 @@ abstract class DPConfigContainer extends DPConfig {
         }
     }
 
-    protected DPCost get(int tileLimit, int nextToJoiner) {
+    @Override
+	protected DPCost get(int tileLimit, int nextToJoiner) {
         // otherwise, compute it
         return get(0, A.length-1, 0, A[0][0].length-1, tileLimit, nextToJoiner);
     }
@@ -376,7 +379,7 @@ abstract class DPConfigContainer extends DPConfig {
                 }
             }
             if (!fusable && numFilters>1) {
-                DPCost cost = new DPCost(Long.MAX_VALUE/2, Long.MAX_VALUE/2, partitioner.ICODE_THRESHOLD+1);
+                DPCost cost = new DPCost(Long.MAX_VALUE/2, Long.MAX_VALUE/2, DynamicProgPartitioner.ICODE_THRESHOLD+1);
 
                 A[x1][x2][y1][y2][tileLimit][nextToJoiner] = cost.getMaxCost();
                 B[x1][x2][y1][y2][tileLimit][nextToJoiner] = cost.getSumCost();
@@ -412,7 +415,7 @@ abstract class DPConfigContainer extends DPConfig {
                 int yPivot;
                 if (x1==x2) {
                     // if we have pipeline, then divide in half
-                    yPivot = (int)Math.floor(((float)(y1+y2))/2.0);
+                    yPivot = (int)Math.floor((y1+y2)/2.0);
                 } else {
                     // if ragged, then find the first change in width and, recurse
                     yPivot=y1;
@@ -571,7 +574,7 @@ abstract class DPConfigContainer extends DPConfig {
      * make it easier to deal with overflow conditions.)
      */
     private long getICodeCost(long cost, long iCode) {
-        if (iCode > partitioner.ICODE_THRESHOLD) {
+        if (iCode > DynamicProgPartitioner.ICODE_THRESHOLD) {
             return Long.MAX_VALUE/2-1;
         } else {
             return cost;
@@ -625,7 +628,8 @@ abstract class DPConfigContainer extends DPConfig {
     /**
      * Traceback function.
      */
-    public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, int nextToJoiner, SIRStream str) {
+    @Override
+	public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, int nextToJoiner, SIRStream str) {
         SIRStream result = traceback(partitions, curPartition, 0, A.length-1, 0, A[0][0].length-1, tileLimit, nextToJoiner, str);
         // if the whole container is assigned to one tile, record it
         // as such.
@@ -727,7 +731,7 @@ abstract class DPConfigContainer extends DPConfig {
                         int[] arr = { 1 + (xPivot-x1), x2-xPivot };
                         PartitionGroup pg = PartitionGroup.createFromArray(arr);
                         // do the vertical cut
-                        SIRSplitJoin sj = RefactorSplitJoin.addHierarchicalChildren((SIRSplitJoin)verticalObj, pg);
+                        SIRSplitJoin sj = RefactorSplitJoin.addHierarchicalChildren(verticalObj, pg);
 
                         // recurse left and right.
                         SIRStream left = traceback(partitions, curPartition, x1, xPivot, y1, y2, tPivot, 1, sj.get(0));

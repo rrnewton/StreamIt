@@ -177,14 +177,16 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         return head.toString() + tail.toString();
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         return "Filter: " + head + "->" + head.getNext() + "->...";
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.Filter other = new at.dms.kjc.slir.Filter(parent);
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

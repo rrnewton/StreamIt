@@ -18,12 +18,14 @@ public class SimpleCellLayout implements Layout<CellPU> {
         this.cellChip = cellChip;
     }
     
-    public CellPU getComputeNode(InternalFilterNode node) {
+    @Override
+	public CellPU getComputeNode(InternalFilterNode node) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void runLayout() {
+    @Override
+	public void runLayout() {
         Filter[] schedule = spaceTime.getSchedule();
         for (int i=0; i<schedule.length; i++) {
             Filter s = schedule[i];
@@ -31,7 +33,8 @@ public class SimpleCellLayout implements Layout<CellPU> {
         }
     }
 
-    public void setComputeNode(InternalFilterNode node, CellPU computeNode) {
+    @Override
+	public void setComputeNode(InternalFilterNode node, CellPU computeNode) {
         // TODO Auto-generated method stub
 
     }

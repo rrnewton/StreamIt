@@ -28,22 +28,26 @@ public class JccDynamicRateFilter extends JccFilter {
 		super(filter, hasPrework);
 	}
 
+	@Override
 	void setInChannel(JccChannel channel) {
 		super.setInChannel(channel);
 		inChannel.setDynamicRateSink(this);
 	}
 
+	@Override
 	void setOutChannel(JccChannel channel) {
 		super.setOutChannel(channel);
 		outChannel.setDynamicRateSource(this);
 	}
 
+	@Override
 	public void init() {
 		// Dynamic rate filters are never sources
 		assert inChannel != null;
 		super.init();
 	}
 
+	@Override
 	public void work() {
 		inChannel.updatePeekList();
 
@@ -58,6 +62,7 @@ public class JccDynamicRateFilter extends JccFilter {
 
 					Thread worker = new Thread(new Runnable() {
 
+						@Override
 						public void run() {
 							// Run the prework function if one exists and then
 							// repeatedly run the work function. The blocking is

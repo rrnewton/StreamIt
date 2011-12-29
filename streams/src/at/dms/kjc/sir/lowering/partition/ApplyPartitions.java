@@ -66,7 +66,8 @@ class ApplyPartitions extends EmptyAttributeStreamVisitor {
     // these are methods of empty attribute visitor
 
     /* visit a pipeline */
-    public Object visitPipeline(SIRPipeline self,
+    @Override
+	public Object visitPipeline(SIRPipeline self,
                                 JFieldDeclaration[] fields,
                                 JMethodDeclaration[] methods,
                                 JMethodDeclaration init) {
@@ -78,7 +79,8 @@ class ApplyPartitions extends EmptyAttributeStreamVisitor {
     }
 
     /* visit a splitjoin */
-    public Object visitSplitJoin(SIRSplitJoin self,
+    @Override
+	public Object visitSplitJoin(SIRSplitJoin self,
                                  JFieldDeclaration[] fields,
                                  JMethodDeclaration[] methods,
                                  JMethodDeclaration init,
@@ -107,7 +109,8 @@ class ApplyPartitions extends EmptyAttributeStreamVisitor {
     }
 
     /* visit a feedbackloop */
-    public Object visitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init,

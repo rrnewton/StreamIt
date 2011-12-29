@@ -106,21 +106,22 @@ public class MismatchedCharException extends RecognitionException {
      * Returns the error message that happened on the line/col given.
      * Copied from toString().
      */
-    public String getMessage() {
+    @Override
+	public String getMessage() {
         StringBuffer sb = new StringBuffer();
 
         switch (mismatchType) {
         case CHAR :
-            sb.append("expecting '" + (char)expecting + "', found '" + (char)foundChar + "'");
+            sb.append("expecting '" + (char)expecting + "', found '" + foundChar + "'");
             break;
         case NOT_CHAR :
             sb.append("expecting anything but '" + (char)expecting + "'; got it anyway");
             break;
         case RANGE :
-            sb.append("expecting token in range: '" + (char)expecting + "'..'" + (char)upper + "', found '" + (char)foundChar + "'");
+            sb.append("expecting token in range: '" + (char)expecting + "'..'" + (char)upper + "', found '" + foundChar + "'");
             break;
         case NOT_RANGE :
-            sb.append("expecting token NOT in range: " + (char)expecting + "'..'" + (char)upper + "', found '" + (char)foundChar + "'");
+            sb.append("expecting token NOT in range: " + (char)expecting + "'..'" + (char)upper + "', found '" + foundChar + "'");
             break;
         case SET :
         case NOT_SET :
@@ -131,7 +132,7 @@ public class MismatchedCharException extends RecognitionException {
                 sb.append((char)elems[i]);
                 sb.append("'");
             }
-            sb.append("), found '" + (char)foundChar + "'");
+            sb.append("), found '" + foundChar + "'");
             break;
         default :
             sb.append(super.getMessage());

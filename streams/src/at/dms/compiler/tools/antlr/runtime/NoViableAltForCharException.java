@@ -40,7 +40,8 @@ public class NoViableAltForCharException extends RecognitionException {
     /**
      * Returns a clean error message (no line number/column information)
      */
-    public String getMessage() {
-        return "unexpected char: "+(char)foundChar;
+    @Override
+	public String getMessage() {
+        return "unexpected char: "+foundChar;
     }
 }

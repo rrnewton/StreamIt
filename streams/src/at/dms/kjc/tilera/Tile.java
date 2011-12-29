@@ -113,7 +113,8 @@ public class Tile extends ComputeNode<TileCodeStore> {
         return Y;
     }
     
-    public TileCodeStore getComputeCode() {
+    @Override
+	public TileCodeStore getComputeCode() {
         assert isComputeTile();
         return computeCode;
     }

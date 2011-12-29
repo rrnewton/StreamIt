@@ -29,26 +29,30 @@ abstract class QOperand implements QOrigin {
     /**
      * The type of this instruction
      */
-    public abstract int getType();
+    @Override
+	public abstract int getType();
 
     /**
      * Returns the primitive instruction
      */
-    public InstructionHandle getInstruction() {
+    @Override
+	public InstructionHandle getInstruction() {
         throw new InconsistencyException();
     }
 
     /**
      * returns the parameters of this instruction
      */
-    public QOrigin[] getOrigins() {
+    @Override
+	public QOrigin[] getOrigins() {
         return new QOrigin[]{this};
     }
 
     /**
      * Sets the parameters of this instruction
      */
-    public void setOrigin(QOrigin origin, int i) {
+    @Override
+	public void setOrigin(QOrigin origin, int i) {
         throw new InconsistencyException();
     }
 }

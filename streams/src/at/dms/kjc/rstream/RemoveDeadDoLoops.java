@@ -17,6 +17,7 @@ import at.dms.kjc.common.VariablesDefUse;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
 import at.dms.kjc.sir.SIRFilter;
+import at.dms.util.Utils;
 
 /**
  * This class traverses the IR looking for do loops that will never execute
@@ -53,7 +54,8 @@ public class RemoveDeadDoLoops extends SLIRReplacingVisitor implements FlatVisit
         node.accept(this, null, true);
     }
     
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.isFilter()) {
             SIRFilter filter = (SIRFilter)node.contents;
@@ -65,7 +67,8 @@ public class RemoveDeadDoLoops extends SLIRReplacingVisitor implements FlatVisit
     }
     
     
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -89,7 +92,7 @@ public class RemoveDeadDoLoops extends SLIRReplacingVisitor implements FlatVisit
             if (whatToDo == 0) {
                 System.out.println("Removing Do loop (keeping body)");
                 //remember to recurse into the body
-                return (JStatement)body.accept(this);
+                return body.accept(this);
         
             }
         }
@@ -125,34 +128,34 @@ public class RemoveDeadDoLoops extends SLIRReplacingVisitor implements FlatVisit
     private int generateDoLoop(DoLoopInformation doInfo, JStatement body) 
     {
         //make sure the init and the incr are integers
-        if (Util.passThruParens(doInfo.incr) instanceof JIntLiteral &&
-            Util.passThruParens(doInfo.init) instanceof JIntLiteral) {
+        if (Utils.passThruParens(doInfo.incr) instanceof JIntLiteral &&
+            Utils.passThruParens(doInfo.init) instanceof JIntLiteral) {
 
-            JIntLiteral incr = (JIntLiteral)Util.passThruParens(doInfo.incr);
-            JIntLiteral init = (JIntLiteral)Util.passThruParens(doInfo.init);
+            JIntLiteral incr = (JIntLiteral)Utils.passThruParens(doInfo.incr);
+            JIntLiteral init = (JIntLiteral)Utils.passThruParens(doInfo.init);
             JIntLiteral cond = null;
 
             //if the cond is a int literal we are set
-            if (Util.passThruParens(doInfo.cond) instanceof JIntLiteral) {
-                cond = (JIntLiteral)Util.passThruParens(doInfo.cond);
+            if (Utils.passThruParens(doInfo.cond) instanceof JIntLiteral) {
+                cond = (JIntLiteral)Utils.passThruParens(doInfo.cond);
             }
         
             
             //if the cond is a binary expression, try to fold it
-            if (Util.passThruParens(doInfo.cond) instanceof JBinaryArithmeticExpression) {
+            if (Utils.passThruParens(doInfo.cond) instanceof JBinaryArithmeticExpression) {
                 JBinaryArithmeticExpression binExp = 
-                    (JBinaryArithmeticExpression)Util.passThruParens(doInfo.cond);
-                if (Util.passThruParens(binExp.getLeft()) instanceof JIntLiteral && 
-                    Util.passThruParens(binExp.getRight()) instanceof JIntLiteral) {
-                    JIntLiteral right = (JIntLiteral)Util.passThruParens(binExp.getRight());
-                    JIntLiteral left = (JIntLiteral)Util.passThruParens(binExp.getLeft());
+                    (JBinaryArithmeticExpression)Utils.passThruParens(doInfo.cond);
+                if (Utils.passThruParens(binExp.getLeft()) instanceof JIntLiteral && 
+                    Utils.passThruParens(binExp.getRight()) instanceof JIntLiteral) {
+                    JIntLiteral right = (JIntLiteral)Utils.passThruParens(binExp.getRight());
+                    JIntLiteral left = (JIntLiteral)Utils.passThruParens(binExp.getLeft());
             
                     //perform the folding
-                    if (Util.passThruParens(doInfo.cond) instanceof JAddExpression) {
+                    if (Utils.passThruParens(doInfo.cond) instanceof JAddExpression) {
                         cond = new JIntLiteral(left.intValue() + right.intValue());
                         doInfo.cond = cond;
                     }
-                    else if (Util.passThruParens(doInfo.cond) instanceof JMinusExpression) {
+                    else if (Utils.passThruParens(doInfo.cond) instanceof JMinusExpression) {
                         cond = new JIntLiteral(left.intValue() - right.intValue());
                         doInfo.cond = cond;
                     }

@@ -31,7 +31,8 @@ class LDPConfigFilter extends LDPConfig {
         }
     }
 
-    public long get(int collapse) {
+    @Override
+	public long get(int collapse) {
         // return memoized value if we have it
         if (A[collapse]!=-1) {
             return A[collapse];
@@ -90,7 +91,8 @@ class LDPConfigFilter extends LDPConfig {
         return cost;
     }
 
-    public StreamTransform traceback(int collapse) {
+    @Override
+	public StreamTransform traceback(int collapse) {
         if (LinearPartitioner.DEBUG) { printArray(); }
 
         switch(collapse) {
@@ -140,14 +142,16 @@ class LDPConfigFilter extends LDPConfig {
         return null;
     }
 
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         return filter;
     }
 
     /**
      * Requires <pre>str</pre> is a filter.
      */
-    protected void setStream(SIRStream str) {
+    @Override
+	protected void setStream(SIRStream str) {
         assert str instanceof SIRFilter;
         this.filter = (SIRFilter)str;
     }

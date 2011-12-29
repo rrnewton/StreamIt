@@ -41,23 +41,27 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
         this.obj = obj;
     }
 
-    public SplitJoinIter isSplitJoin() {
+    @Override
+	public SplitJoinIter isSplitJoin() {
         return this;
     }
 
     /**
      * Return the stream pointed to by this.
      */
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         checkValidity();
         return obj;
     }
 
-    public int getNumChildren () {
+    @Override
+	public int getNumChildren () {
         return obj.size();
     }
 
-    public Iterator getChild (int n) {
+    @Override
+	public Iterator getChild (int n) {
         return factory.createIter(obj.get(n), this, n);
     }
 
@@ -73,7 +77,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * Returns the number of ways this Splitter splits data.
      * @return return Splitter fan-out
      */
-    public int getFanOut () {
+    @Override
+	public int getFanOut () {
         return obj.size();
     }
     
@@ -81,7 +86,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * Returns the number of work functions for this Splitter.
      * @return number of work functions for this Splitter
      */
-    public int getSplitterNumWork () {
+    @Override
+	public int getSplitterNumWork () {
         return 1;
     }
 
@@ -94,7 +100,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * @return distribution of weights on a particular invocation
      * of work function for the Splitter of this Stream.
      */
-    public int[] getSplitPushWeights (int nWork) {
+    @Override
+	public int[] getSplitPushWeights (int nWork) {
         return obj.getSplitter().getWeights();
     }
     
@@ -106,7 +113,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * @return number of data items consumed by a particular invocation
      * of work function for Splitter of this Stream.
      */
-    public int getSplitPop (int nWork) {
+    @Override
+	public int getSplitPop (int nWork) {
         if (obj.getSplitter().getType()==SIRSplitType.DUPLICATE) {
             return 1;
         } else if (obj.getSplitter().getType()==SIRSplitType.NULL) {
@@ -123,7 +131,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * Returns the number of ways this Joiner joines data.
      * @return return Joiner fan-in
      */
-    public int getFanIn () {
+    @Override
+	public int getFanIn () {
         return obj.size();
     }
     
@@ -133,7 +142,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * @return number of work functions for the JOiner of this 
      * Stream
      */
-    public int getJoinerNumWork () {
+    @Override
+	public int getJoinerNumWork () {
         return 1;
     }
 
@@ -141,7 +151,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * Returns n-th work function associated with this Splitter.
      * @return n-th work function for the Splitter
      */
-    public Object getSplitterWork (int nWork) {
+    @Override
+	public Object getSplitterWork (int nWork) {
         return SIRSplitter.WORK_FUNCTION;
     }
 
@@ -149,7 +160,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * Returns n-th work function associated with this Joiner.
      * @return n-th work function for the Joiner
      */
-    public Object getJoinerWork(int nWork) {
+    @Override
+	public Object getJoinerWork(int nWork) {
         return SIRJoiner.WORK_FUNCTION;
     }
 
@@ -162,7 +174,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * @return distribution of weights on a particular invocation
      * of work function for Joiner of this SplitJoin.
      */
-    public int[] getJoinPopWeights (int nWork) {
+    @Override
+	public int[] getJoinPopWeights (int nWork) {
         return obj.getJoiner().getWeights();
     }
     
@@ -173,7 +186,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * @return number of data items produced by a particular invocation
      * of work function for Joiner of this SplitJoin.
      */
-    public int getJoinPush (int nWork) {
+    @Override
+	public int getJoinPush (int nWork) {
         SIRJoiner joiner = obj.getJoiner();
         if (joiner.getType()==SIRJoinType.NULL) {
             return 0;
@@ -185,7 +199,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
         }
     }
 
-    public void accept(StreamVisitor v) {
+    @Override
+	public void accept(StreamVisitor v) {
         v.preVisitSplitJoin(obj, this);
         for (int i=0; i<getNumChildren(); i++) {
             ((SIRIterator)getChild(i)).accept(v);
@@ -197,7 +212,8 @@ public class SIRSplitJoinIter extends SIRIterator implements SplitJoinIter {
      * This function is needed by the scheduler, but isn't useful from
      * the compiler.
      */
-    public Iterator getUnspecializedIter() {
+    @Override
+	public Iterator getUnspecializedIter() {
         return this;
     }
 }

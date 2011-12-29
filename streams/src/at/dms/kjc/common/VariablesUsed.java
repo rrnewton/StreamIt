@@ -100,7 +100,8 @@ public class VariablesUsed extends SLIREmptyVisitor
     
 
 
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident) 
     {
@@ -111,7 +112,8 @@ public class VariablesUsed extends SLIREmptyVisitor
         vars.add(ident);
     }
 
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident) 
     {
         vars.add(self.getVariable());
@@ -120,7 +122,8 @@ public class VariablesUsed extends SLIREmptyVisitor
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
         //count a complex right expression as a use for the left
@@ -143,7 +146,8 @@ public class VariablesUsed extends SLIREmptyVisitor
     /**
      * prints a compound expression
      */
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {

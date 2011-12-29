@@ -159,7 +159,8 @@ public class SIRToStreamIt
     // METHODS
     // -----------------------------------------------------------------------
 
-    public CodegenPrintWriter getPrinter() { return p; }
+    @Override
+	public CodegenPrintWriter getPrinter() { return p; }
     
     /**
      * Top-level entry point if you are processing SIR that
@@ -469,7 +470,8 @@ public class SIRToStreamIt
         p.newLine();
     }
 
-    public Object visitStructure(SIRStructure self,
+    @Override
+	public Object visitStructure(SIRStructure self,
                                  JFieldDeclaration[] fields)
     {
         p.print("struct " + self.getIdent());
@@ -510,7 +512,8 @@ public class SIRToStreamIt
     private boolean inInit = false;
     private boolean inWork = false;
     private boolean inInitWork = false;
-    public Object visitFilter(SIRFilter self,
+    @Override
+	public Object visitFilter(SIRFilter self,
                               JFieldDeclaration[] fields,
                               JMethodDeclaration[] methods,
                               JMethodDeclaration init,
@@ -548,7 +551,8 @@ public class SIRToStreamIt
     }
   
     /* visit a phased filter */
-    public Object visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public Object visitPhasedFilter(SIRPhasedFilter self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init,
@@ -562,7 +566,8 @@ public class SIRToStreamIt
     }
   
     /* visit a splitter */
-    public Object visitSplitter(SIRSplitter self,
+    @Override
+	public Object visitSplitter(SIRSplitter self,
                                 SIRSplitType type,
                                 JExpression[] weights)
     {
@@ -614,7 +619,8 @@ public class SIRToStreamIt
     }
     
     /* visit a joiner */
-    public Object visitJoiner(SIRJoiner self,
+    @Override
+	public Object visitJoiner(SIRJoiner self,
                               SIRJoinType type,
                               JExpression[] weights)
     {
@@ -669,7 +675,8 @@ public class SIRToStreamIt
     }
     
     /* pre-visit a pipeline */
-    public Object visitPipeline(SIRPipeline self,
+    @Override
+	public Object visitPipeline(SIRPipeline self,
                                 JFieldDeclaration[] fields,
                                 JMethodDeclaration[] methods,
                                 JMethodDeclaration init)
@@ -690,7 +697,8 @@ public class SIRToStreamIt
     }
 
     /* pre-visit a splitjoin */
-    public Object visitSplitJoin(SIRSplitJoin self,
+    @Override
+	public Object visitSplitJoin(SIRSplitJoin self,
                                  JFieldDeclaration[] fields,
                                  JMethodDeclaration[] methods,
                                  JMethodDeclaration init,
@@ -713,7 +721,8 @@ public class SIRToStreamIt
     }
 
     /* pre-visit a feedbackloop */
-    public Object visitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init,
@@ -739,7 +748,8 @@ public class SIRToStreamIt
     /**
      * prints a compilation unit
      */
-    public void visitCompilationUnit(JCompilationUnit self,
+    @Override
+	public void visitCompilationUnit(JCompilationUnit self,
                                      JPackageName packageName,
                                      JPackageImport[] importedPackages,
                                      JClassImport[] importedClasses,
@@ -777,7 +787,8 @@ public class SIRToStreamIt
     /**
      * prints a class declaration
      */
-    public void visitClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitClassDeclaration(JClassDeclaration self,
                                       int modifiers,
                                       String ident,
                                       String superName,
@@ -795,7 +806,8 @@ public class SIRToStreamIt
     /**
      *
      */
-    public void visitClassBody(JTypeDeclaration[] decls,
+    @Override
+	public void visitClassBody(JTypeDeclaration[] decls,
                                JFieldDeclaration[] fields,
                                JMethodDeclaration[] methods,
                                JPhylum[] body) {
@@ -853,7 +865,8 @@ public class SIRToStreamIt
     /**
      * prints a class declaration
      */
-    public void visitInnerClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitInnerClassDeclaration(JClassDeclaration self,
                                            int modifiers,
                                            String ident,
                                            String superName,
@@ -884,7 +897,8 @@ public class SIRToStreamIt
     /**
      * prints an interface declaration
      */
-    public void visitInterfaceDeclaration(JInterfaceDeclaration self,
+    @Override
+	public void visitInterfaceDeclaration(JInterfaceDeclaration self,
                                           int modifiers,
                                           String ident,
                                           CClassType[] interfaces,
@@ -945,7 +959,8 @@ public class SIRToStreamIt
     /**
      * prints a field declaration
      */
-    public void visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public void visitFieldDeclaration(JFieldDeclaration self,
                                       int modifiers,
                                       CType type,
                                       String ident,
@@ -964,7 +979,8 @@ public class SIRToStreamIt
     /**
      * prints a method declaration
      */
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -1031,7 +1047,8 @@ public class SIRToStreamIt
     /**
      * prints a method declaration
      */
-    public void visitConstructorDeclaration(JConstructorDeclaration self,
+    @Override
+	public void visitConstructorDeclaration(JConstructorDeclaration self,
                                             int modifiers,
                                             String ident,
                                             JFormalParameter[] parameters,
@@ -1077,7 +1094,8 @@ public class SIRToStreamIt
     /**
      * prints a while statement
      */
-    public void visitWhileStatement(JWhileStatement self,
+    @Override
+	public void visitWhileStatement(JWhileStatement self,
                                     JExpression cond,
                                     JStatement body) {
         p.print("while (");
@@ -1090,7 +1108,8 @@ public class SIRToStreamIt
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public void visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                   JVariableDefinition[] vars) {
         for (int i = 0; i < vars.length; i++) {
             vars[i].accept(this);
@@ -1111,7 +1130,8 @@ public class SIRToStreamIt
     /**
      * prints a variable declaration statement
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -1140,7 +1160,8 @@ public class SIRToStreamIt
     /**
      * prints a try-catch statement
      */
-    public void visitTryCatchStatement(JTryCatchStatement self,
+    @Override
+	public void visitTryCatchStatement(JTryCatchStatement self,
                                        JBlock tryClause,
                                        JCatchClause[] catchClauses) {
         // Not legit StreamIt code!
@@ -1155,7 +1176,8 @@ public class SIRToStreamIt
     /**
      * prints a try-finally statement
      */
-    public void visitTryFinallyStatement(JTryFinallyStatement self,
+    @Override
+	public void visitTryFinallyStatement(JTryFinallyStatement self,
                                          JBlock tryClause,
                                          JBlock finallyClause) {
         // Not legit StreamIt code!
@@ -1171,7 +1193,8 @@ public class SIRToStreamIt
     /**
      * prints a throw statement
      */
-    public void visitThrowStatement(JThrowStatement self,
+    @Override
+	public void visitThrowStatement(JThrowStatement self,
                                     JExpression expr) {
         // Not legit StreamIt code!
         assert false;
@@ -1183,7 +1206,8 @@ public class SIRToStreamIt
     /**
      * prints a synchronized statement
      */
-    public void visitSynchronizedStatement(JSynchronizedStatement self,
+    @Override
+	public void visitSynchronizedStatement(JSynchronizedStatement self,
                                            JExpression cond,
                                            JStatement body) {
         // Not legit StreamIt code!
@@ -1197,7 +1221,8 @@ public class SIRToStreamIt
     /**
      * prints a switch statement
      */
-    public void visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public void visitSwitchStatement(JSwitchStatement self,
                                      JExpression expr,
                                      JSwitchGroup[] body) {
         p.print("switch (");
@@ -1213,7 +1238,8 @@ public class SIRToStreamIt
     /**
      * prints a return statement
      */
-    public void visitReturnStatement(JReturnStatement self,
+    @Override
+	public void visitReturnStatement(JReturnStatement self,
                                      JExpression expr) {
         p.print("return");
         if (expr != null) {
@@ -1226,7 +1252,8 @@ public class SIRToStreamIt
     /**
      * prints a labeled statement
      */
-    public void visitLabeledStatement(JLabeledStatement self,
+    @Override
+	public void visitLabeledStatement(JLabeledStatement self,
                                       String label,
                                       JStatement stmt) {
         p.print(label + ":");
@@ -1236,7 +1263,8 @@ public class SIRToStreamIt
     /**
      * prints a if statement
      */
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause) {
@@ -1265,7 +1293,8 @@ public class SIRToStreamIt
     /**
      * prints a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -1319,7 +1348,8 @@ public class SIRToStreamIt
     /**
      * prints a compound statement
      */
-    public void visitCompoundStatement(JCompoundStatement self,
+    @Override
+	public void visitCompoundStatement(JCompoundStatement self,
                                        JStatement[] body) {
         visitCompoundStatement(body);
     }
@@ -1352,7 +1382,8 @@ public class SIRToStreamIt
     /**
      * prints an expression statement
      */
-    public void visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public void visitExpressionStatement(JExpressionStatement self,
                                          JExpression expr) {
         // Sometimes we want to discard the entire statement to
         // avoid empty statements.
@@ -1386,7 +1417,8 @@ public class SIRToStreamIt
     /**
      * prints an expression list statement
      */
-    public void visitExpressionListStatement(JExpressionListStatement self,
+    @Override
+	public void visitExpressionListStatement(JExpressionListStatement self,
                                              JExpression[] expr) {
         for (int i = 0; i < expr.length; i++) {
             if (i != 0) {
@@ -1400,7 +1432,8 @@ public class SIRToStreamIt
     /**
      * prints a empty statement
      */
-    public void visitEmptyStatement(JEmptyStatement self) {
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self) {
         //if we are inside a for loop header, we need to print 
         //the ; of an empty statement
         if (forLoopHeader > 0) {
@@ -1413,7 +1446,8 @@ public class SIRToStreamIt
     /**
      * prints a do statement
      */
-    public void visitDoStatement(JDoStatement self,
+    @Override
+	public void visitDoStatement(JDoStatement self,
                                  JExpression cond,
                                  JStatement body) {
         p.newLine();
@@ -1428,7 +1462,8 @@ public class SIRToStreamIt
     /**
      * prints a continue statement
      */
-    public void visitContinueStatement(JContinueStatement self,
+    @Override
+	public void visitContinueStatement(JContinueStatement self,
                                        String label) {
         p.newLine();
         p.print("continue");
@@ -1441,7 +1476,8 @@ public class SIRToStreamIt
     /**
      * prints a break statement
      */
-    public void visitBreakStatement(JBreakStatement self,
+    @Override
+	public void visitBreakStatement(JBreakStatement self,
                                     String label) {
         p.newLine();
         p.print("break");
@@ -1454,7 +1490,8 @@ public class SIRToStreamIt
     /**
      * prints an expression statement
      */
-    public void visitBlockStatement(JBlock self,
+    @Override
+	public void visitBlockStatement(JBlock self,
                                     JavaStyleComment[] comments) {
         boolean wasToplevel = toplevel;
         toplevel = false;
@@ -1511,7 +1548,8 @@ public class SIRToStreamIt
     /**
      * prints a type declaration statement
      */
-    public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
+    @Override
+	public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
                                               JTypeDeclaration decl) {
         decl.accept(this);
     }
@@ -1523,7 +1561,8 @@ public class SIRToStreamIt
     /**
      * prints an unary plus expression
      */
-    public void visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryPlusExpression(JUnaryExpression self,
                                          JExpression expr)
     {
         p.print("(");
@@ -1535,7 +1574,8 @@ public class SIRToStreamIt
     /**
      * prints an unary minus expression
      */
-    public void visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryMinusExpression(JUnaryExpression self,
                                           JExpression expr)
     {
         p.print("(");
@@ -1547,7 +1587,8 @@ public class SIRToStreamIt
     /**
      * prints a bitwise complement expression
      */
-    public void visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         p.print("(");
@@ -1559,7 +1600,8 @@ public class SIRToStreamIt
     /**
      * prints a logical complement expression
      */
-    public void visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitLogicalComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         p.print("(");
@@ -1571,7 +1613,8 @@ public class SIRToStreamIt
     /**
      * prints a type name expression
      */
-    public void visitTypeNameExpression(JTypeNameExpression self,
+    @Override
+	public void visitTypeNameExpression(JTypeNameExpression self,
                                         CType type) {
         p.print("(");
         printType(type);
@@ -1581,7 +1624,8 @@ public class SIRToStreamIt
     /**
      * prints a this expression
      */
-    public void visitThisExpression(JThisExpression self,
+    @Override
+	public void visitThisExpression(JThisExpression self,
                                     JExpression prefix) {
         // Not a concept we have in StreamIt code.
         // but if dumping sufficiently early after Kopi2SIR
@@ -1592,14 +1636,16 @@ public class SIRToStreamIt
     /**
      * prints a super expression
      */
-    public void visitSuperExpression(JSuperExpression self) {
+    @Override
+	public void visitSuperExpression(JSuperExpression self) {
         p.print("super");
     }
 
     /**
      * prints a shift expression
      */
-    public void visitShiftExpression(JShiftExpression self,
+    @Override
+	public void visitShiftExpression(JShiftExpression self,
                                      int oper,
                                      JExpression left,
                                      JExpression right) {
@@ -1619,7 +1665,8 @@ public class SIRToStreamIt
     /**
      * prints a shift expressiona
      */
-    public void visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public void visitRelationalExpression(JRelationalExpression self,
                                           int oper,
                                           JExpression left,
                                           JExpression right) {
@@ -1648,7 +1695,8 @@ public class SIRToStreamIt
     /**
      * prints a prefix expression
      */
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         // Maybe should be parenthesized, but exists in very
@@ -1664,7 +1712,8 @@ public class SIRToStreamIt
     /**
      * prints a postfix expression
      */
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         expr.accept(this);
@@ -1678,7 +1727,8 @@ public class SIRToStreamIt
     /**
      * prints a parenthesed expression
      */
-    public void visitParenthesedExpression(JParenthesedExpression self,
+    @Override
+	public void visitParenthesedExpression(JParenthesedExpression self,
                                            JExpression expr) {
         p.print("(");
         expr.accept(this);
@@ -1688,7 +1738,8 @@ public class SIRToStreamIt
     /**
      * Prints an unqualified anonymous class instance creation expression.
      */
-    public void visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
+    @Override
+	public void visitQualifiedAnonymousCreation(JQualifiedAnonymousCreation self,
                                                 JExpression prefix,
                                                 String ident,
                                                 JExpression[] params,
@@ -1704,7 +1755,8 @@ public class SIRToStreamIt
     /**
      * Prints an unqualified instance creation expression.
      */
-    public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
+    @Override
+	public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
                                                JExpression prefix,
                                                String ident,
                                                JExpression[] params)
@@ -1723,7 +1775,8 @@ public class SIRToStreamIt
     /**
      * Prints an unqualified anonymous class instance creation expression.
      */
-    public void visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self,
+    @Override
+	public void visitUnqualifiedAnonymousCreation(JUnqualifiedAnonymousCreation self,
                                                   CClassType type,
                                                   JExpression[] params,
                                                   JClassDeclaration decl)
@@ -1742,7 +1795,8 @@ public class SIRToStreamIt
     /**
      * Prints an unqualified instance creation expression.
      */
-    public void visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self,
+    @Override
+	public void visitUnqualifiedInstanceCreation(JUnqualifiedInstanceCreation self,
                                                  CClassType type,
                                                  JExpression[] params)
     {
@@ -1754,7 +1808,8 @@ public class SIRToStreamIt
     /**
      * prints an array allocator expression
      */
-    public void visitNewArrayExpression(JNewArrayExpression self,
+    @Override
+	public void visitNewArrayExpression(JNewArrayExpression self,
                                         CType type,
                                         JExpression[] dims,
                                         JArrayInitializer init)
@@ -1776,7 +1831,8 @@ public class SIRToStreamIt
     /**
      * prints a name expression
      */
-    public void visitNameExpression(JNameExpression self,
+    @Override
+	public void visitNameExpression(JNameExpression self,
                                     JExpression prefix,
                                     String ident)
     {
@@ -1792,7 +1848,8 @@ public class SIRToStreamIt
     /**
      * prints an array allocator expression
      */
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right) {
@@ -1808,7 +1865,8 @@ public class SIRToStreamIt
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -1831,7 +1889,8 @@ public class SIRToStreamIt
     /**
      * prints a local variable expression
      */
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident) {
         p.print(ident);
     }
@@ -1839,7 +1898,8 @@ public class SIRToStreamIt
     /**
      * prints an instanceof expression
      */
-    public void visitInstanceofExpression(JInstanceofExpression self,
+    @Override
+	public void visitInstanceofExpression(JInstanceofExpression self,
                                           JExpression expr,
                                           CType dest) {
         expr.accept(this);
@@ -1850,7 +1910,8 @@ public class SIRToStreamIt
     /**
      * prints an equality expression
      */
-    public void visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public void visitEqualityExpression(JEqualityExpression self,
                                         boolean equal,
                                         JExpression left,
                                         JExpression right) {
@@ -1864,7 +1925,8 @@ public class SIRToStreamIt
     /**
      * prints a conditional expression
      */
-    public void visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public void visitConditionalExpression(JConditionalExpression self,
                                            JExpression cond,
                                            JExpression left,
                                            JExpression right) {
@@ -1880,7 +1942,8 @@ public class SIRToStreamIt
     /**
      * prints a compound expression
      */
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {
@@ -1927,7 +1990,8 @@ public class SIRToStreamIt
     /**
      * prints a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident)
     {
@@ -1963,7 +2027,8 @@ public class SIRToStreamIt
     /**
      * prints a class expression
      */
-    public void visitClassExpression(JClassExpression self, CType type) {
+    @Override
+	public void visitClassExpression(JClassExpression self, CType type) {
         printType(type);
         p.print(".class");
     }
@@ -1971,7 +2036,8 @@ public class SIRToStreamIt
     /**
      * prints a cast expression
      */
-    public void visitCastExpression(JCastExpression self,
+    @Override
+	public void visitCastExpression(JCastExpression self,
                                     JExpression expr,
                                     CType type)
     {
@@ -1986,7 +2052,8 @@ public class SIRToStreamIt
     /**
      * prints a cast expression
      */
-    public void visitUnaryPromoteExpression(JUnaryPromote self,
+    @Override
+	public void visitUnaryPromoteExpression(JUnaryPromote self,
                                             JExpression expr,
                                             CType type)
     {
@@ -2003,7 +2070,8 @@ public class SIRToStreamIt
     /**
      * prints a compound assignment expression
      */
-    public void visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public void visitBitwiseExpression(JBitwiseExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {
@@ -2029,7 +2097,8 @@ public class SIRToStreamIt
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
         // As an expression, this could be nested in parens.  But
@@ -2044,7 +2113,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitArrayLengthExpression(JArrayLengthExpression self,
+    @Override
+	public void visitArrayLengthExpression(JArrayLengthExpression self,
                                            JExpression prefix) {
         assert false : "StreamIt doesn't support Java array.length";
         prefix.accept(this);
@@ -2054,7 +2124,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor) {
         prefix.accept(this);
@@ -2066,7 +2137,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitComments(JavaStyleComment[] comments) {
+    @Override
+	public void visitComments(JavaStyleComment[] comments) {
         for (int i = 0; i < comments.length; i++) {
             if (comments[i] != null) {
                 visitComment(comments[i]);
@@ -2077,7 +2149,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitComment(JavaStyleComment comment) {
+    @Override
+	public void visitComment(JavaStyleComment comment) {
         // We don't care terribly.
         /*
           StringTokenizer   tok = new StringTokenizer(comment.getText(), "\n");
@@ -2123,7 +2196,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitJavadoc(JavadocComment comment) {
+    @Override
+	public void visitJavadoc(JavadocComment comment) {
         StringTokenizer tok = new StringTokenizer(comment.getText(), "\n");
         boolean     isFirst = true;
 
@@ -2229,11 +2303,13 @@ public class SIRToStreamIt
     // STREAMIT IR HANDLERS
     // ----------------------------------------------------------------------
 
-    public void visitCreatePortalExpression(SIRCreatePortal self) {
+    @Override
+	public void visitCreatePortalExpression(SIRCreatePortal self) {
         p.print("create_portal()");
     }
 
-    public void visitInitStatement(SIRInitStatement self,
+    @Override
+	public void visitInitStatement(SIRInitStatement self,
                                    SIRStream stream)
     {
         // What keyword do we print?  Always "add", unless we're
@@ -2279,7 +2355,8 @@ public class SIRToStreamIt
             }
     }
 
-    public void visitInterfaceTable(SIRInterfaceTable self)
+    @Override
+	public void visitInterfaceTable(SIRInterfaceTable self)
     {
         String iname = self.getIface().getIdent();
         JMethodDeclaration[] methods = self.getMethods();
@@ -2295,27 +2372,32 @@ public class SIRToStreamIt
         p.print("}");
     }
     
-    public void visitLatency(SIRLatency self)
+    @Override
+	public void visitLatency(SIRLatency self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencyMax(SIRLatencyMax self)
+    @Override
+	public void visitLatencyMax(SIRLatencyMax self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencyRange(SIRLatencyRange self)
+    @Override
+	public void visitLatencyRange(SIRLatencyRange self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
     
-    public void visitLatencySet(SIRLatencySet self)
+    @Override
+	public void visitLatencySet(SIRLatencySet self)
     {
         p.print("LATENCY_BEST_EFFORT");
     }
 
-    public void visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public void visitMessageStatement(SIRMessageStatement self,
                                       JExpression portal,
                                       String iname,
                                       String ident,
@@ -2336,7 +2418,8 @@ public class SIRToStreamIt
         p.print(");");
     }
 
-    public void visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public void visitRangeExpression(SIRRangeExpression self) {
         p.print("[");
         self.getMin().accept(this);
         p.print(",");
@@ -2346,16 +2429,19 @@ public class SIRToStreamIt
         p.print("]");
     }
 
-    public void visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public void visitDynamicToken(SIRDynamicToken self) {
         p.print("*");
     }
 
+	@Override
 	public void visitIterationExpression(
 			SIRIterationExpression sirIterationExpression) {
 		p.print("iter()");
 	}
 	
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression num)
     {
@@ -2364,7 +2450,8 @@ public class SIRToStreamIt
         p.print(")");
     }
     
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType)
     {
         if (self.getNumPop()>1) {
@@ -2374,7 +2461,8 @@ public class SIRToStreamIt
         }
     }
     
-    public void visitPortal(SIRPortal self)
+    @Override
+	public void visitPortal(SIRPortal self)
     {
         // Have we seen this portal before?
         if (!(portalNames.containsKey(self)))
@@ -2386,7 +2474,8 @@ public class SIRToStreamIt
         p.print(portalNames.get(self).toString());
     }
 
-    public void visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression exp)
     {
         p.print("println(");
@@ -2394,7 +2483,8 @@ public class SIRToStreamIt
         p.print(");");
     }
     
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression val)
     {
@@ -2403,7 +2493,8 @@ public class SIRToStreamIt
         p.print(")");
     }
     
-    public void visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public void visitRegReceiverStatement(SIRRegReceiverStatement self,
                                           JExpression portal,
                                           SIRStream receiver, 
                                           JMethodDeclaration[] methods)
@@ -2412,7 +2503,8 @@ public class SIRToStreamIt
         //        assert false : "TODO: implement SIR messaging";
     }
     
-    public void visitRegSenderStatement(SIRRegSenderStatement self,
+    @Override
+	public void visitRegSenderStatement(SIRRegSenderStatement self,
                                         String fn,
                                         SIRLatency latency)
     {
@@ -2420,7 +2512,8 @@ public class SIRToStreamIt
         //        assert false : "TODO: implement SIR messaging";
     }
 
-    public void visitMarker(SIRMarker self) {
+    @Override
+	public void visitMarker(SIRMarker self) {
         if (self instanceof SIRBeginMarker) {
             p.println("// mark begin: " + ((SIRBeginMarker)self).getName());
         }
@@ -2432,26 +2525,30 @@ public class SIRToStreamIt
     /**
      * Visits a file reader.
      */
-    public void visitFileReader(LIRFileReader self) {
+    @Override
+	public void visitFileReader(LIRFileReader self) {
         assert false;
     }
 
     /**
      * Visits a file writer.
      */
-    public void visitFileWriter(LIRFileWriter self) {
+    @Override
+	public void visitFileWriter(LIRFileWriter self) {
         assert false;
     }
 
     /**
      * Visits an identity filter.
      */
-    public void visitIdentity(LIRIdentity self) 
+    @Override
+	public void visitIdentity(LIRIdentity self) 
     {
         assert false;
     }
 
-    public void visitSetChild(LIRSetChild self,
+    @Override
+	public void visitSetChild(LIRSetChild self,
                               JExpression streamContext,
                               String childType,
                               String childName)
@@ -2459,7 +2556,8 @@ public class SIRToStreamIt
         assert false;
     }
     
-    public void visitSetTape(LIRSetTape self,
+    @Override
+	public void visitSetTape(LIRSetTape self,
                              JExpression streamContext,
                              JExpression srcStruct,
                              JExpression dstStruct,
@@ -2472,7 +2570,8 @@ public class SIRToStreamIt
     /**
      * Visits a function pointer.
      */
-    public void visitFunctionPointer(LIRFunctionPointer self,
+    @Override
+	public void visitFunctionPointer(LIRFunctionPointer self,
                                      String name)
     {
         assert false;
@@ -2481,7 +2580,8 @@ public class SIRToStreamIt
     /**
      * Visits an LIR node.
      */
-    public void visitNode(LIRNode self)
+    @Override
+	public void visitNode(LIRNode self)
     {
         assert false;
     }
@@ -2489,7 +2589,8 @@ public class SIRToStreamIt
     /**
      * Visits an LIR register-receiver statement.
      */
-    public void visitRegisterReceiver(LIRRegisterReceiver self,
+    @Override
+	public void visitRegisterReceiver(LIRRegisterReceiver self,
                                       JExpression streamContext,
                                       SIRPortal portal,
                                       String childName,
@@ -2513,7 +2614,8 @@ public class SIRToStreamIt
     /**
      * Visits a decoder registration node.
      */
-    public void visitSetDecode(LIRSetDecode self,
+    @Override
+	public void visitSetDecode(LIRSetDecode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp)
     {
@@ -2523,7 +2625,8 @@ public class SIRToStreamIt
     /**
      * Visits a feedback loop delay node.
      */
-    public void visitSetDelay(LIRSetDelay self,
+    @Override
+	public void visitSetDelay(LIRSetDelay self,
                               JExpression data,
                               JExpression streamContext,
                               int delay,
@@ -2545,7 +2648,8 @@ public class SIRToStreamIt
     /**
      * Visits an encoder registration node.
      */
-    public void visitSetEncode(LIRSetEncode self,
+    @Override
+	public void visitSetEncode(LIRSetEncode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp)
     {
@@ -2559,7 +2663,8 @@ public class SIRToStreamIt
     /**
      * Visits a joiner-setting node.
      */
-    public void visitSetJoiner(LIRSetJoiner self,
+    @Override
+	public void visitSetJoiner(LIRSetJoiner self,
                                JExpression streamContext,
                                SIRJoinType type,
                                int ways,
@@ -2581,7 +2686,8 @@ public class SIRToStreamIt
     /**
      * Visits a peek-rate-setting node.
      */
-    public void visitSetPeek(LIRSetPeek self,
+    @Override
+	public void visitSetPeek(LIRSetPeek self,
                              JExpression streamContext,
                              int peek)
     {
@@ -2593,7 +2699,8 @@ public class SIRToStreamIt
     /**
      * Visits a pop-rate-setting node.
      */
-    public void visitSetPop(LIRSetPop self,
+    @Override
+	public void visitSetPop(LIRSetPop self,
                             JExpression streamContext,
                             int pop)
     {
@@ -2605,7 +2712,8 @@ public class SIRToStreamIt
     /**
      * Visits a push-rate-setting node.
      */
-    public void visitSetPush(LIRSetPush self,
+    @Override
+	public void visitSetPush(LIRSetPush self,
                              JExpression streamContext,
                              int push)
     {
@@ -2617,7 +2725,8 @@ public class SIRToStreamIt
     /**
      * Visits a splitter-setting node.
      */
-    public void visitSetSplitter(LIRSetSplitter self,
+    @Override
+	public void visitSetSplitter(LIRSetSplitter self,
                                  JExpression streamContext,
                                  SIRSplitType type,
                                  int ways,
@@ -2637,7 +2746,8 @@ public class SIRToStreamIt
     /**
      * Visits a stream-type-setting node.
      */
-    public void visitSetStreamType(LIRSetStreamType self,
+    @Override
+	public void visitSetStreamType(LIRSetStreamType self,
                                    JExpression streamContext,
                                    LIRStreamType streamType)
     {
@@ -2649,14 +2759,16 @@ public class SIRToStreamIt
     /**
      * Visits a work-function-setting node.
      */
-    public void visitSetWork(LIRSetWork self,
+    @Override
+	public void visitSetWork(LIRSetWork self,
                              JExpression streamContext,
                              LIRFunctionPointer fn)
     {
         assert false;
     }
 
-    public void visitMainFunction(LIRMainFunction self,
+    @Override
+	public void visitMainFunction(LIRMainFunction self,
                                   String typeName,
                                   LIRFunctionPointer init,
                                   List<JStatement> initStatements)
@@ -2667,7 +2779,8 @@ public class SIRToStreamIt
     /**
      * Visits a set body of feedback loop.
      */
-    public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
+    @Override
+	public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -2680,7 +2793,8 @@ public class SIRToStreamIt
     /**
      * Visits a set loop of feedback loop.
      */
-    public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
+    @Override
+	public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -2693,7 +2807,8 @@ public class SIRToStreamIt
     /**
      * Visits a set a parallel stream.
      */
-    public void visitSetParallelStream(LIRSetParallelStream self,
+    @Override
+	public void visitSetParallelStream(LIRSetParallelStream self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        int position,
@@ -2729,7 +2844,8 @@ public class SIRToStreamIt
     /**
      * Visits a work function entry.
      */
-    public void visitWorkEntry(LIRWorkEntry self)
+    @Override
+	public void visitWorkEntry(LIRWorkEntry self)
     {
         // We have no way to deal with this, really.
         // Possibly not worth asserting, but we've probably gone too
@@ -2740,7 +2856,8 @@ public class SIRToStreamIt
     /**
      * Visits a work function exit.
      */
-    public void visitWorkExit(LIRWorkExit self)
+    @Override
+	public void visitWorkExit(LIRWorkExit self)
     {
         // Similarly.
         assert false;
@@ -2754,7 +2871,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitSwitchLabel(JSwitchLabel self,
+    @Override
+	public void visitSwitchLabel(JSwitchLabel self,
                                  JExpression expr) {
         p.newLine();
         if (expr != null) {
@@ -2769,7 +2887,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitSwitchGroup(JSwitchGroup self,
+    @Override
+	public void visitSwitchGroup(JSwitchGroup self,
                                  JSwitchLabel[] labels,
                                  JStatement[] stmts) {
         for (int i = 0; i < labels.length; i++) {
@@ -2786,7 +2905,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitCatchClause(JCatchClause self,
+    @Override
+	public void visitCatchClause(JCatchClause self,
                                  JFormalParameter exception,
                                  JBlock body) {
         p.print(" catch (");
@@ -2798,7 +2918,8 @@ public class SIRToStreamIt
     /**
      * prints a boolean literal
      */
-    public void visitBooleanLiteral(boolean value) {
+    @Override
+	public void visitBooleanLiteral(boolean value) {
         if (value)
             p.print("true");
         else
@@ -2808,14 +2929,16 @@ public class SIRToStreamIt
     /**
      * prints a byte literal
      */
-    public void visitByteLiteral(byte value) {
+    @Override
+	public void visitByteLiteral(byte value) {
         p.print("((byte)" + value + ")");
     }
 
     /**
      * prints a character literal
      */
-    public void visitCharLiteral(char value) {
+    @Override
+	public void visitCharLiteral(char value) {
         switch (value) {
         case '\b':
             p.print("'\\b'");
@@ -2849,7 +2972,8 @@ public class SIRToStreamIt
     /**
      * prints a double literal
      */
-    public void visitDoubleLiteral(double value) {
+    @Override
+	public void visitDoubleLiteral(double value) {
         System.err.println("Warning: converting double to float when printing StreamIt version of IR.\n" +
                            "         (StreamIt does not yet have syntax for doubles.)");
         p.print((float)value);
@@ -2858,42 +2982,48 @@ public class SIRToStreamIt
     /**
      * prints a float literal
      */
-    public void visitFloatLiteral(float value) {
+    @Override
+	public void visitFloatLiteral(float value) {
         p.print(value);
     }
 
     /**
      * prints a int literal
      */
-    public void visitIntLiteral(int value) {
+    @Override
+	public void visitIntLiteral(int value) {
         p.print(value);
     }
 
     /**
      * prints a long literal
      */
-    public void visitLongLiteral(long value) {
+    @Override
+	public void visitLongLiteral(long value) {
         p.print("(" + value + "L)");
     }
 
     /**
      * prints a short literal
      */
-    public void visitShortLiteral(short value) {
+    @Override
+	public void visitShortLiteral(short value) {
         p.print("((short)" + value + ")");
     }
 
     /**
      * prints a string literal
      */
-    public void visitStringLiteral(String value) {
+    @Override
+	public void visitStringLiteral(String value) {
         p.print('"' + value + '"');
     }
 
     /**
      * prints a null literal
      */
-    public void visitNullLiteral() {
+    @Override
+	public void visitNullLiteral() {
         assert false;
         p.print("null");
     }
@@ -2901,7 +3031,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitPackageName(String name) {
+    @Override
+	public void visitPackageName(String name) {
         assert false;
         // p.print("package " + name + ";");
         // p.newLine();
@@ -2910,7 +3041,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitPackageImport(String name) {
+    @Override
+	public void visitPackageImport(String name) {
         assert false;
         // p.print("import " + name.replace('/', '.') + ".*;");
     }
@@ -2918,7 +3050,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitClassImport(String name) {
+    @Override
+	public void visitClassImport(String name) {
         assert false;
         // p.print("import " + name.replace('/', '.') + ";");
     }
@@ -2926,7 +3059,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitFormalParameters(JFormalParameter self,
+    @Override
+	public void visitFormalParameters(JFormalParameter self,
                                       boolean isFinal,
                                       CType type,
                                       String ident) {
@@ -2954,7 +3088,8 @@ public class SIRToStreamIt
     /**
      * prints an array length expression
      */
-    public void visitConstructorCall(JConstructorCall self,
+    @Override
+	public void visitConstructorCall(JConstructorCall self,
                                      boolean functorIsThis,
                                      JExpression[] params)
     {
@@ -2968,7 +3103,8 @@ public class SIRToStreamIt
     /**
      * prints an array initializer expression
      */
-    public void visitArrayInitializer(JArrayInitializer self,
+    @Override
+	public void visitArrayInitializer(JArrayInitializer self,
                                       JExpression[] elems)
     {
         p.newLine();
@@ -2985,7 +3121,8 @@ public class SIRToStreamIt
     /**
      * Print vector literal expression as scalar expression followed by "v";
      */
-    public void visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
+    @Override
+	public void visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
         scalar.accept(this);
         p.print("/*v*/");
     }
@@ -3033,7 +3170,8 @@ public class SIRToStreamIt
             p.print(s.toString());
     }
 
-    public void visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
+    @Override
+	public void visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
         for (Object part : parts) {
             if (part instanceof JExpression) {
                 ((JExpression)part).accept(this);

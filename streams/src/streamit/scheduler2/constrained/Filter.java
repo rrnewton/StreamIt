@@ -74,39 +74,46 @@ public class Filter
 
     }
 
-    public StreamInterface getTopConstrainedStream()
+    @Override
+	public StreamInterface getTopConstrainedStream()
     {
         return this;
     }
 
-    public StreamInterface getBottomConstrainedStream()
+    @Override
+	public StreamInterface getBottomConstrainedStream()
     {
         return this;
     }
 
-    public void initiateConstrained()
+    @Override
+	public void initiateConstrained()
     {
         latencyNode = graph.addFilter(this);
 
         // create a schedule for this
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         ERROR("Should not be used for Filters in Constrained Scheduling!");
     }
 
-    public void registerConstraint(P2PPortal portal)
+    @Override
+	public void registerConstraint(P2PPortal portal)
     {
         ERROR ("not implemented");
     }
     
-    public LatencyNode getBottomLatencyNode()
+    @Override
+	public LatencyNode getBottomLatencyNode()
     {
         return latencyNode;
     }
 
-    public LatencyNode getTopLatencyNode()
+    @Override
+	public LatencyNode getTopLatencyNode()
     {
         return latencyNode;
     }
@@ -130,7 +137,8 @@ public class Filter
             }
     }
 
-    public PhasingSchedule getNextPhase(
+    @Override
+	public PhasingSchedule getNextPhase(
                                         Restrictions restrictions,
                                         int nDataAvailable)
     {
@@ -175,19 +183,22 @@ public class Filter
         return phase;
     }
 
-    public boolean isDoneInitializing()
+    @Override
+	public boolean isDoneInitializing()
     {
         return nCurrentPhase >= getNumInitStages();
     }
 
-    public void initRestrictionsCompleted(P2PPortal portal)
+    @Override
+	public void initRestrictionsCompleted(P2PPortal portal)
     {
         ERROR("not implemented!");
     }
 
     Restrictions restrictions = null;
 
-    public void initializeRestrictions(Restrictions _restrictions)
+    @Override
+	public void initializeRestrictions(Restrictions _restrictions)
     {
         restrictions = _restrictions;
         // I may need to execute my initialization phases!
@@ -202,7 +213,8 @@ public class Filter
 
     boolean isFilterDoneSteadyState = false;
 
-    public void createSteadyStateRestrictions(int streamNumExecs)
+    @Override
+	public void createSteadyStateRestrictions(int streamNumExecs)
     {
         NodeSteadyRestriction restriction =
             new NodeSteadyRestriction(
@@ -212,18 +224,21 @@ public class Filter
         restrictions.add(restriction);
     }
 
-    public void doneSteadyState(LatencyNode node)
+    @Override
+	public void doneSteadyState(LatencyNode node)
     {
         assert node == getLatencyNode();
         isFilterDoneSteadyState = true;
     }
 
-    public boolean isDoneSteadyState()
+    @Override
+	public boolean isDoneSteadyState()
     {
         return isFilterDoneSteadyState;
     }
 
-    public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
+    @Override
+	public void registerNewlyBlockedSteadyRestriction(Restriction restriction)
     {
         // this should only happen if a filter sends a msg to itself!
         ERROR("not implemented");

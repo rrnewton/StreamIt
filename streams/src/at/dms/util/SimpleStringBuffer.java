@@ -33,7 +33,8 @@ public final class SimpleStringBuffer {
     /**
      * Returns a string representation of the data in this buffer.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return String.valueOf(buf, 0, pos);
     }
 

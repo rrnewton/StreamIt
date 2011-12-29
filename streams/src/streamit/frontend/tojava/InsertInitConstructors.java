@@ -260,7 +260,8 @@ public class InsertInitConstructors extends InitMunger
         return result;
     }
     
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         // Set the active stream name so when we visit an array we know which
         // stream with which to associate it.
@@ -314,7 +315,8 @@ public class InsertInitConstructors extends InitMunger
                               newFuncs, spec.isStateful());
     }
 
-    public Object visitStmtVarDecl(StmtVarDecl decl)
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl decl)
     {
         // Prepass: check all of the types in the declaration.
         // If none of them need constructors, don't actually

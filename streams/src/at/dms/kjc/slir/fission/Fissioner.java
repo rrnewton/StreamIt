@@ -3,6 +3,7 @@ package at.dms.kjc.slir.fission;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
 import at.dms.kjc.JAddExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
@@ -448,7 +449,7 @@ public class Fissioner {
             newPreworkBody.addStatementFirst(initMultLoopVarDecl);
             
             JRelationalExpression initMultLoopCond =
-                new JRelationalExpression(JRelationalExpression.OPE_LT,
+                new JRelationalExpression(Constants.OPE_LT,
                                           new JLocalVariableExpression(initMultLoopVar),
                                           new JIntLiteral(newInitMult));
             
@@ -472,7 +473,7 @@ public class Fissioner {
                slice.getWorkNode().getWorkNodeContent().getPrework()[0] == null) {
                 JMethodDeclaration newPreworkMethod =
                     new JMethodDeclaration(null,
-                                           at.dms.kjc.Constants.ACC_PUBLIC,
+                                           at.dms.classfile.Constants.ACC_PUBLIC,
                                            CStdType.Void,
                                            "__fission_prework__" + myID,
                                            JFormalParameter.EMPTY,
@@ -804,7 +805,7 @@ public class Fissioner {
 
             // Add for-loop that wraps around existing work body
             JRelationalExpression steadyMultLoopCond =
-                new JRelationalExpression(JRelationalExpression.OPE_LT,
+                new JRelationalExpression(Constants.OPE_LT,
                                           new JLocalVariableExpression(steadyMultLoopVar),
                                           new JIntLiteral(newSteadyMult));
 

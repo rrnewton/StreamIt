@@ -303,7 +303,7 @@ public abstract class SimulatedAnnealing {
         //System.out.println(" old: " + e_old + " new: " + e_new);
         
         if (e_new > e_old)
-            P = Math.exp((((double) e_old) - ((double) e_new)) / T);
+            P = Math.exp((e_old - e_new) / T);
 
         if (R < P) {
             return true;

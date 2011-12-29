@@ -128,7 +128,8 @@ public class ComplexNumber {
     }
     
     /** Return true if the passed complex number is the same as this (by value). **/
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (o == null) {
             throw new RuntimeException("Null object passed to ComplexNumber.equals");
         }
@@ -148,12 +149,14 @@ public class ComplexNumber {
     }
     
     /** Hashcode so that data structures work correctly **/
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return 1;
     }
 
     /** PrettyPrint this complex number. **/
-    public String toString() {
+    @Override
+	public String toString() {
         return (this.getReal() + "+" + this.getImaginary() + "i");
     }       
 
@@ -176,9 +179,11 @@ public class ComplexNumber {
             this.kInternal = k;
         }
         /** override the real part to return cos(2*pi*k/n) **/
-        public double getReal() {return Math.cos((2*Math.PI*nInternal)/kInternal);}
+        @Override
+		public double getReal() {return Math.cos((2*Math.PI*nInternal)/kInternal);}
         /** override the imaginary part to return -sin(2*pi*k/n) **/
-        public double getImaginary() {return -1*Math.sin((2*Math.PI*nInternal)/kInternal);}
+        @Override
+		public double getImaginary() {return -1*Math.sin((2*Math.PI*nInternal)/kInternal);}
     
         /* get k */
         public int getK() {return this.kInternal;}

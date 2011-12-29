@@ -124,14 +124,16 @@ public class LocalVarInstruction extends Instruction {
      * Returns true iff control flow can reach the next instruction
      * in textual order.
      */
-    public boolean canComplete() {
+    @Override
+	public boolean canComplete() {
         return getOpcode() != opc_ret;
     }
 
     /**
      * Returns the number of bytes used by the the instruction in the code array.
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return width;
     }
 
@@ -145,7 +147,8 @@ public class LocalVarInstruction extends Instruction {
     /**
      * Returns the type pushed on the stack
      */
-    public byte getReturnType() {
+    @Override
+	public byte getReturnType() {
         return getOperandType();
     }
 
@@ -293,7 +296,8 @@ public class LocalVarInstruction extends Instruction {
      * Returns the maximum index of local vars used by this instruction.
      * A variable of type
      */
-    /*package*/ int getLocalVar() {
+    @Override
+	/*package*/ int getLocalVar() {
         switch (getOperandType()) {
         case TYP_ADDRESS:
         case TYP_FLOAT:
@@ -325,14 +329,16 @@ public class LocalVarInstruction extends Instruction {
     /**
      * Returns the size of data pushed on the stack by this instruction
      */
-    public int getPushedOnStack() {
+    @Override
+	public int getPushedOnStack() {
         return isLoad() ? getStack() : 0;
     }
 
     /**
      * Return the amount of stack (positive or negative) used by this instruction.
      */
-    public int getStack() {
+    @Override
+	public int getStack() {
         switch (getOpcode()) {
         case opc_lstore:
         case opc_lstore_0:
@@ -409,7 +415,8 @@ public class LocalVarInstruction extends Instruction {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {}
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {}
 
     /**
      * Write this instruction into a file
@@ -419,7 +426,8 @@ public class LocalVarInstruction extends Instruction {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         if (width == 4) {
             out.writeByte((byte)opc_wide);
         }

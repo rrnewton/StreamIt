@@ -196,7 +196,8 @@ public class LinearPartitioner {
 
     class ConfigBuilder extends EmptyAttributeStreamVisitor {
 
-        public Object visitSplitJoin(SIRSplitJoin self,
+        @Override
+		public Object visitSplitJoin(SIRSplitJoin self,
                                      JFieldDeclaration[] fields,
                                      JMethodDeclaration[] methods,
                                      JMethodDeclaration init,
@@ -213,7 +214,8 @@ public class LinearPartitioner {
             }
         }
 
-        public Object visitPipeline(SIRPipeline self,
+        @Override
+		public Object visitPipeline(SIRPipeline self,
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init) {
@@ -222,7 +224,8 @@ public class LinearPartitioner {
         }
 
         /* pre-visit a feedbackloop */
-        public Object visitFeedbackLoop(SIRFeedbackLoop self,
+        @Override
+		public Object visitFeedbackLoop(SIRFeedbackLoop self,
                                         JFieldDeclaration[] fields,
                                         JMethodDeclaration[] methods,
                                         JMethodDeclaration init,
@@ -231,7 +234,8 @@ public class LinearPartitioner {
             return makeConfig(self);
         }
 
-        public Object visitFilter(SIRFilter self,
+        @Override
+		public Object visitFilter(SIRFilter self,
                                   JFieldDeclaration[] fields,
                                   JMethodDeclaration[] methods,
                                   JMethodDeclaration init,

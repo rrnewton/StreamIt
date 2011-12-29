@@ -89,7 +89,8 @@ public class InsertTimers extends InsertCounters implements Constants {
      * Visitors
      ******************************************************/
 
-    public void visitMarker(SIRMarker self) {
+    @Override
+	public void visitMarker(SIRMarker self) {
         // still emit comment
         super.visitMarker(self);
 

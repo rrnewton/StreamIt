@@ -28,12 +28,14 @@ public class DataPrinter extends Filter
         fileType = type;
     }
 
-    public void init ()
+    @Override
+	public void init ()
     {
         inputChannel = new Channel (fileType, 1);
     }
 
-    public void work ()
+    @Override
+	public void work ()
     {
         try
             {

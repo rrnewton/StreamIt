@@ -50,7 +50,8 @@ public class CNullType extends CClassType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isAssignableTo(CType dest) {
+    @Override
+	public boolean isAssignableTo(CType dest) {
         return dest.isReference();
     }
 
@@ -59,7 +60,8 @@ public class CNullType extends CClassType {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isCastableTo(CType dest) {
+    @Override
+	public boolean isCastableTo(CType dest) {
         return dest.isReference();
     }
 
@@ -71,7 +73,8 @@ public class CNullType extends CClassType {
      *
      * @return the class object associated with this type
      */
-    public CClass getCClass() {
+    @Override
+	public CClass getCClass() {
         return CStdType.Object.getCClass();
     }
 
@@ -82,7 +85,8 @@ public class CNullType extends CClassType {
     /**
      * Transforms this type to a string
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "null-literal";
     }
 
@@ -91,7 +95,8 @@ public class CNullType extends CClassType {
      * of bytes needed in C on 32-bit machine) used by a value of this
      * type.
      */
-    public int getSizeInC() {
+    @Override
+	public int getSizeInC() {
         // not clear what to return here... what does null type mean in
         // C?
         return 4;
@@ -100,14 +105,16 @@ public class CNullType extends CClassType {
     /**
      * Returns the stack size used by a value of this type.
      */
-    public int getSize() {
+    @Override
+	public int getSize() {
         return 1;
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CNullType other = new at.dms.kjc.CNullType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

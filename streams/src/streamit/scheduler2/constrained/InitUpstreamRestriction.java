@@ -67,7 +67,8 @@ public class InitUpstreamRestriction extends Restriction
             }
     }
 
-    public boolean notifyExpired()
+    @Override
+	public boolean notifyExpired()
     {
         // okay, I now have executed the entire initialization.
         // get the parent stream to insert proper steady-state

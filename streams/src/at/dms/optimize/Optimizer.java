@@ -92,7 +92,8 @@ public class Optimizer implements AccessorContainer {
         // replace instruction handles by actual instructions
         try {
             AccessorTransformer transformer = new AccessorTransformer() {
-                    public InstructionAccessor transform(InstructionAccessor accessor,
+                    @Override
+					public InstructionAccessor transform(InstructionAccessor accessor,
                                                          AccessorContainer container)
                     {
                         // the only accessors to resolve are instruction handles
@@ -264,7 +265,8 @@ public class Optimizer implements AccessorContainer {
     /**
      * Transforms targets (deferences to actual instructions).
      */
-    public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
+    @Override
+	public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
         this.codeStart = (InstructionHandle)this.codeStart.transform(transformer, this);
     }
 

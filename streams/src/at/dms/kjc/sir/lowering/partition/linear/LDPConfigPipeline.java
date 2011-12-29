@@ -10,7 +10,8 @@ class LDPConfigPipeline extends LDPConfigContainer {
         super(cont, partitioner, getWidths(cont), cont.size());
     }
 
-    protected LDPConfig childConfig(int x, int y) {
+    @Override
+	protected LDPConfig childConfig(int x, int y) {
         SIRStream c1 = cont.get(y), c2;
         // if we're just accessing a hierarchical unit, return it
         if (x==0 && !(c1 instanceof SIRSplitJoin)) {

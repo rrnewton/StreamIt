@@ -43,7 +43,8 @@ public class WorkEstimatesMap implements FlatVisitor
         top.accept(this, null, true);
     }
     
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         addEstimate(node);
     }

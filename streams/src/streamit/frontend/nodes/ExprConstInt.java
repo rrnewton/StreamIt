@@ -52,24 +52,28 @@ public class ExprConstInt extends Expression
     public int getVal() { return val; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprConstInt(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprConstInt))
             return false;
         return val == ((ExprConstInt)other).getVal();
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return new Integer(val).hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return Integer.toString(val);
     }

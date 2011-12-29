@@ -45,7 +45,8 @@ public class LevelDotGraph implements FlatVisitor {
      * 
      * @param node The current node we are visiting.
      */
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         
         assert buf!=null;

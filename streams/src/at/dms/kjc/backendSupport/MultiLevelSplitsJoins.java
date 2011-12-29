@@ -280,7 +280,7 @@ public class MultiLevelSplitsJoins {
             //set the steady items based on the number of items the down stream 
             //filter receives
             int steadyItems = 
-                (int) (((double)(next.getSteadyMult() * next.getPopInt())) * 
+                (int) ((next.getSteadyMult() * next.getPopInt()) * 
                        downEdge.getDest().ratio(downEdge, SchedulingPhase.STEADY));
                     
             //System.out.println("Setting steady items " + steadyItems + " " + 
@@ -296,9 +296,9 @@ public class MultiLevelSplitsJoins {
                 InterFilterEdge upEdge = input.getSources(SchedulingPhase.STEADY)[s];
                WorkNodeContent prev = upEdge.getSrc().getPrevFilter().getWorkNodeContent();
                initItems += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
-                       ((double)prev.initItemsPushed()));
+                       prev.initItemsPushed());
                steadyItemsOther += (int)(upEdge.getSrc().ratio(upEdge, SchedulingPhase.STEADY) * 
-                       ((double)(prev.getPushInt() * prev.getSteadyMult())));
+                       (prev.getPushInt() * prev.getSteadyMult()));
             }
             traces[i].getInputNode().getNextFilter().getWorkNodeContent().setInitMult(initItems);
             
@@ -306,7 +306,7 @@ public class MultiLevelSplitsJoins {
             //on this edge
             int initItemsNeeded = 
                 (int)(downEdge.getDest().ratio(downEdge, SchedulingPhase.STEADY) * 
-                        ((double)next.initItemsNeeded()));
+                        next.initItemsNeeded());
             assert initItems >= initItemsNeeded :
                "The init mult for the Identity filter is not large enough, need " +
                initItemsNeeded + ", producing " + initItems;
@@ -480,7 +480,7 @@ public class MultiLevelSplitsJoins {
             //calculate the number of items the original trace sends to this
             //trace in the init stage
             int initItems = 
-                (int) (((double) prev.initItemsPushed()) * edge.getSrc().ratio(edge, SchedulingPhase.STEADY));
+                (int) (prev.initItemsPushed() * edge.getSrc().ratio(edge, SchedulingPhase.STEADY));
             slices[i].getInputNode().getNextFilter().getWorkNodeContent().setInitMult(initItems);
             
             //calc the number of steady items

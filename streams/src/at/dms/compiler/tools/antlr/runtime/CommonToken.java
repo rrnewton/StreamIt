@@ -35,22 +35,29 @@ public class CommonToken extends Token {
 
     public CommonToken(String s)    { text = s; }
 
-    public int  getLine()       { return line; }
+    @Override
+	public int  getLine()       { return line; }
 
-    public String getText()     { return text; }
+    @Override
+	public String getText()     { return text; }
 
-    public void setLine(int l)      { line = l; }
+    @Override
+	public void setLine(int l)      { line = l; }
 
-    public void setText(String s)   { text = s; }
+    @Override
+	public void setText(String s)   { text = s; }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "[\""+getText()+"\",<"+type+">,line="+line+",col="+col+"]";
     }
 
     /**
      * Return token's start column
      */
-    public int getColumn() { return col; }
+    @Override
+	public int getColumn() { return col; }
 
-    public void setColumn(int c) { col = c; }
+    @Override
+	public void setColumn(int c) { col = c; }
 }

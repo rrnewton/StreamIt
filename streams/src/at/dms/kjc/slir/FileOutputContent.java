@@ -1,5 +1,6 @@
 package at.dms.kjc.slir;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CEmittedTextType;
 import at.dms.kjc.CStdType;
@@ -119,7 +120,8 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
      * Create kopi code that when translated to C will manipulate the file.
      * The C file will need to include <stdio.h>
      */
-    public void createContent() {
+    @Override
+	public void createContent() {
         // on entry: 
         // name is set to something reasonable
         // input and output types set correctly
@@ -175,7 +177,7 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
                 })));
         //set this as the init function...
         JMethodDeclaration initMethod = new JMethodDeclaration(null,
-                at.dms.kjc.Constants.ACC_PUBLIC,
+                Constants.ACC_PUBLIC,
                 CStdType.Void,
                 "init_filewrite" + my_unique_ID ,
                 JFormalParameter.EMPTY,
@@ -264,7 +266,7 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
         workBlock.addStatement(new JExpressionStatement(null, fileio, null));
         
         JMethodDeclaration workMethod = new JMethodDeclaration(null,
-                at.dms.kjc.Constants.ACC_PUBLIC,
+                Constants.ACC_PUBLIC,
                 CStdType.Void,
                 "work_filewrite" + my_unique_ID ,
                 JFormalParameter.EMPTY,
@@ -290,7 +292,7 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
         body.addStatement(new JExpressionStatement(close));
         
         closeMethod = new JMethodDeclaration(null,
-                at.dms.kjc.Constants.ACC_PUBLIC,
+                Constants.ACC_PUBLIC,
                 CStdType.Void,
                 "close_filewrite" + my_unique_ID ,
                 JFormalParameter.EMPTY,
@@ -307,7 +309,8 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.FileOutputContent other = new at.dms.kjc.slir.FileOutputContent();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

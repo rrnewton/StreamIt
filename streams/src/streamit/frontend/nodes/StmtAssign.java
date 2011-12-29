@@ -73,12 +73,14 @@ public class StmtAssign extends Statement
         return op;
     }
 
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtAssign(this);
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         String theOp;
         switch (op)

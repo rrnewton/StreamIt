@@ -64,7 +64,8 @@ public class SIRLatencyRange extends SIRLatencyMax {
         return min==max;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
     
         return "SIRLatencyRange min=" + min + " max=" + max;
     }
@@ -73,7 +74,8 @@ public class SIRLatencyRange extends SIRLatencyMax {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitLatencyRange(this);
         } else {
@@ -84,7 +86,8 @@ public class SIRLatencyRange extends SIRLatencyMax {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitLatencyRange(this);
         } else {
@@ -95,7 +98,8 @@ public class SIRLatencyRange extends SIRLatencyMax {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRLatencyRange other = new at.dms.kjc.sir.SIRLatencyRange();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

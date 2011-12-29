@@ -84,7 +84,7 @@ class ClusterCodeGenerator {
         steady_counts = ClusterBackend.steadyExecutionCounts.get(node).intValue();
 
         if (oper instanceof SIRFilter) {
-            work_function = ClusterUtils.getWorkName(((SIRFilter)oper), id);
+            work_function = ClusterUtils.getWorkName(oper, id);
         } 
 
         if (oper instanceof SIRSplitter) {

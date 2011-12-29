@@ -22,19 +22,23 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     }
     
     /** @return string for expression for *offset* items from pop position on tape. */
-    protected String tailOffsetExpr(String offset) {
+    @Override
+	protected String tailOffsetExpr(String offset) {
         return tailName + "+" + offset;
     }
     /** @return string for statements that increment the pop position by *numPosition* items. */
-    protected String tailIncrementStmts(String numExpression) {
+    @Override
+	protected String tailIncrementStmts(String numExpression) {
         return tailName + "+=" + numExpression + ";\n";
     }
     /** @return string for statement(s) that increment the pop position by 1. */
-    protected String tailIncrementStmts() {
+    @Override
+	protected String tailIncrementStmts() {
         return tailName + "++;";
     }
     /** @return string for statement(s) that increment the push position by 1. */
-    protected String headIncrementStmts() {
+    @Override
+	protected String headIncrementStmts() {
         return headName + "++;";
     }
 
@@ -43,7 +47,8 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#dataDeclarationH()
      */
-    public String dataDeclarationH() {
+    @Override
+	public String dataDeclarationH() {
         StringBuffer s = new StringBuffer();
         if (extra > 0) {
             s.append("//destination peeks: "
@@ -91,7 +96,8 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#topOfWorkIteration(at.dms.kjc.common.CodegenPrintWriter)
      */
-    public String topOfWorkIteration() {
+    @Override
+	public String topOfWorkIteration() {
         if (extra > 0) {
             return
               "for (int __y = 0; __y < __PEEK_BUF_SIZE_"+src+"_"+dst+"; __y++) {\n"
@@ -121,7 +127,8 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushPrefix()
      */
-    public String pushPrefix() {
+    @Override
+	public String pushPrefix() {
         return
         bufferName + "[" + headName + "]="; 
     }
@@ -129,7 +136,8 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#pushSuffix()
      */
-    public String pushSuffix() {
+    @Override
+	public String pushSuffix() {
         return
           ";\n"
         + headName + "++; "
@@ -139,22 +147,26 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#popExpr()
      */
-    public String popExpr() {
+    @Override
+	public String popExpr() {
         return popExprNoCleanup() + popExprCleanup();
     }
 
-   public String popExprNoCleanup() {
+   @Override
+public String popExprNoCleanup() {
         return bufferName + "[" + tailName + "]";
     }
 
-   public String popExprCleanup() {
+   @Override
+public String popExprCleanup() {
        return "; " + tailName + "++";
    }
 
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#popNStmt(int)
      */
-    public String popNStmt(int N) {
+    @Override
+	public String popNStmt(int N) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -162,7 +174,8 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#peekPrefix()
      */
-    public String peekPrefix() {
+    @Override
+	public String peekPrefix() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -170,7 +183,8 @@ public class TapeFixedCopydown extends TapeFixedBase implements Tape {
     /* (non-Javadoc)
      * @see at.dms.kjc.cluster.Tape#peekSuffix()
      */
-    public String peekSuffix() {
+    @Override
+	public String peekSuffix() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -76,7 +76,8 @@ public class ExprArrayInit extends Expression
     public int getDims() { return dims; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprArrayInit(this);
     }
@@ -87,12 +88,14 @@ public class ExprArrayInit extends Expression
      *
      * @return always false
      */
-    public boolean isLValue()
+    @Override
+	public boolean isLValue()
     {
         return false;
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         StringBuffer sb = new StringBuffer();
         sb.append("{");
@@ -106,7 +109,8 @@ public class ExprArrayInit extends Expression
         return sb.toString();
     }
     
-    public boolean equals(Object o)
+    @Override
+	public boolean equals(Object o)
     {
         if (!(o instanceof ExprArrayInit))
             return false;

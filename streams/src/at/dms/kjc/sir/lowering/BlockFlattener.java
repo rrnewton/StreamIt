@@ -41,7 +41,8 @@ public class BlockFlattener extends SLIRReplacingVisitor implements FlatVisitor 
         super();
     }
 
-    public void visitNode(FlatNode node) {
+    @Override
+	public void visitNode(FlatNode node) {
         flattenBlocks(node.contents);
     }
 
@@ -82,7 +83,8 @@ public class BlockFlattener extends SLIRReplacingVisitor implements FlatVisitor 
             }
     }
 
-    public Object visitBlockStatement(JBlock self,
+    @Override
+	public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
         int size=self.size();
         for(int i=0;i<size;i++) {
@@ -101,7 +103,8 @@ public class BlockFlattener extends SLIRReplacingVisitor implements FlatVisitor 
     /**
      * prints a method declaration
      */
-    public Object visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public Object visitMethodDeclaration(JMethodDeclaration self,
                                          int modifiers,
                                          CType returnType,
                                          String ident,
@@ -122,7 +125,8 @@ public class BlockFlattener extends SLIRReplacingVisitor implements FlatVisitor 
     /**
      * visits a for statement
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -134,7 +138,8 @@ public class BlockFlattener extends SLIRReplacingVisitor implements FlatVisitor 
     /**
      * prints a if statement
      */
-    public Object visitIfStatement(JIfStatement self,
+    @Override
+	public Object visitIfStatement(JIfStatement self,
                                    JExpression cond,
                                    JStatement thenClause,
                                    JStatement elseClause) {

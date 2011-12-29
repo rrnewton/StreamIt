@@ -52,7 +52,8 @@ public class LIRSetTape extends LIRNode {
         this.size = size;
     }
 
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitSetTape(this, 
                        this.getStreamContext(), 

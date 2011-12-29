@@ -305,7 +305,8 @@ abstract public class Pipeline extends Stream
     }
 
 
-    public int getNumNodes () 
+    @Override
+	public int getNumNodes () 
     { 
         int nodes = 0;
         for (int nChild = 0; nChild < nChildren; nChild++)
@@ -318,7 +319,8 @@ abstract public class Pipeline extends Stream
         return nodes;
     }
     
-    public int getNumNodeFirings() 
+    @Override
+	public int getNumNodeFirings() 
     {
         int firings = 0;
         for (int nChild = 0; nChild < nChildren; nChild++)

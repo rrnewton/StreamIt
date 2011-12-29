@@ -33,15 +33,18 @@ public class SIRPredefinedFilter extends SIRFilter implements Cloneable {
               /* output type */ outputType);
     }
 
-    public boolean needsInit() {
+    @Override
+	public boolean needsInit() {
         return false;
     }
 
-    public boolean needsWork() {
+    @Override
+	public boolean needsWork() {
         return false;
     }
 
-    public String getTypeNameInC() {
+    @Override
+	public String getTypeNameInC() {
         return "ContextContainer";
     }
 
@@ -55,7 +58,8 @@ public class SIRPredefinedFilter extends SIRFilter implements Cloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRPredefinedFilter other = new at.dms.kjc.sir.SIRPredefinedFilter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

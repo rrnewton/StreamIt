@@ -32,7 +32,8 @@ public class BlockExecutionCounts implements FlatVisitor
         blockCounts = new HashMap<FlatNode, Integer>();
     }
     
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.contents instanceof SIRJoiner ||
             node.contents instanceof SIRSplitter) {

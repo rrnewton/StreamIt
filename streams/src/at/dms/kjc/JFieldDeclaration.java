@@ -201,7 +201,8 @@ public class JFieldDeclaration extends JMemberDeclaration {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitFieldDeclaration(this,
                                 variable.getModifiers(),
@@ -214,7 +215,8 @@ public class JFieldDeclaration extends JMemberDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         Object Trash = super.accept(p);
         return p.visitFieldDeclaration(this,
                                        variable.getModifiers(),
@@ -261,7 +263,8 @@ public class JFieldDeclaration extends JMemberDeclaration {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JFieldDeclaration other = new at.dms.kjc.JFieldDeclaration();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

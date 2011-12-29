@@ -154,7 +154,7 @@ class ShiftPipelineFusion {
             // number of executions (num[0] is init, num[1] is steady)
             int[] num = new int[2];
             for (int j=0; j<2; j++) {
-                int[] count = (int[])execCount[j].get(filter);
+                int[] count = execCount[j].get(filter);
                 if (count==null) {
                     num[j] = 0;
                 } else {
@@ -207,7 +207,7 @@ class ShiftPipelineFusion {
             // the peek buffer
             JVariableDefinition peekBufferVar = 
                 new JVariableDefinition(null,
-                                        at.dms.kjc.Constants.ACC_FINAL,
+                                        at.dms.classfile.Constants.ACC_FINAL,
                                         new CArrayType(Utils.voidToInt(filter.
                                                                        getInputType()), 
                                                        1 /* dimension */, 
@@ -311,7 +311,7 @@ class ShiftPipelineFusion {
         JExpression[] dims = { new JIntLiteral(null, lookedAt) };
         // make a buffer for all the items looked at in a round
         return new JVariableDefinition(null,
-                                       at.dms.kjc.Constants.ACC_FINAL,
+                                       at.dms.classfile.Constants.ACC_FINAL,
                                        new CArrayType(Utils.voidToInt(filter.
                                                                       getInputType()), 
                                                       1 /* dimension */,
@@ -345,7 +345,7 @@ class ShiftPipelineFusion {
         } else {
             // return result
             return new JMethodDeclaration(null,
-                                          at.dms.kjc.Constants.ACC_PUBLIC,
+                                          at.dms.classfile.Constants.ACC_PUBLIC,
                                           CStdType.Void,
                                           RenameAll.newName(init ? INIT_WORK_NAME() : "work"),
                                           JFormalParameter.EMPTY,
@@ -950,7 +950,8 @@ class ShiftPipelineFusion {
             this.inExpressionStatement = false;
         }
 
-        public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
+        @Override
+		public Object visitExpressionStatement(JExpressionStatement self, JExpression expr) {
             boolean oldInExpressionStatement = inExpressionStatement;
             if (expr instanceof SIRPopExpression) inExpressionStatement = true;
             Object result = super.visitExpressionStatement(self,expr);
@@ -958,7 +959,8 @@ class ShiftPipelineFusion {
             return result;
         }
 
-        public Object visitPopExpression(SIRPopExpression self,
+        @Override
+		public Object visitPopExpression(SIRPopExpression self,
                                          CType tapeType) {
 
             // leave it alone not fusing reads
@@ -992,7 +994,8 @@ class ShiftPipelineFusion {
             return new JArrayAccessExpression(null, lhs, rhs);
         }
 
-        public Object visitPeekExpression(SIRPeekExpression oldSelf,
+        @Override
+		public Object visitPeekExpression(SIRPeekExpression oldSelf,
                                           CType oldTapeType,
                                           JExpression oldArg) {
             // leave it alone not fusing reads
@@ -1024,7 +1027,8 @@ class ShiftPipelineFusion {
             return new JArrayAccessExpression(null, lhs, rhs);
         }
 
-        public Object visitPushExpression(SIRPushExpression oldSelf,
+        @Override
+		public Object visitPushExpression(SIRPushExpression oldSelf,
                                           CType oldTapeType,
                                           JExpression oldArg) {
             // leave it alone not fusing writes
@@ -1159,7 +1163,7 @@ class ShiftPipelineFusion {
         private void makeInitFunction() {
             // now we can make the init function
             this.initFunction = new JMethodDeclaration(null,
-                                                       at.dms.kjc.Constants.ACC_PUBLIC,
+                                                       at.dms.classfile.Constants.ACC_PUBLIC,
                                                        CStdType.Void,
                                                        RenameAll.newName("init"),
                                                        fusedParam.toArray(new 

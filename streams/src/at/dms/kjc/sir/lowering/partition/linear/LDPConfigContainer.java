@@ -167,14 +167,16 @@ abstract class LDPConfigContainer extends LDPConfig {
         }
     }
 
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         return cont;
     }
     
     /**
      * Requires <pre>str</pre> is a container.
      */
-    protected void setStream(SIRStream str) {
+    @Override
+	protected void setStream(SIRStream str) {
         assert str instanceof SIRContainer;
         this.cont = (SIRContainer)str;
     }
@@ -192,7 +194,8 @@ abstract class LDPConfigContainer extends LDPConfig {
         }
     }
 
-    protected long get(int collapse) {
+    @Override
+	protected long get(int collapse) {
         // otherwise, compute it
         return get(0, A.length-1, 0, A[0][0].length-1, collapse, this.cont);
     }
@@ -333,7 +336,7 @@ abstract class LDPConfigContainer extends LDPConfig {
                         // break along <xPivot>
                         int[] arr = { 1 + (xPivot-x1), x2-xPivot };
                         PartitionGroup pg = PartitionGroup.createFromArray(arr);
-                        SIRSplitJoin sj = RefactorSplitJoin.addHierarchicalChildren((SIRSplitJoin)verticalObj, pg);
+                        SIRSplitJoin sj = RefactorSplitJoin.addHierarchicalChildren(verticalObj, pg);
                         cost = Math.min( cost, 
                                          get(x1, xPivot, y1, y2, LinearPartitioner.COLLAPSE_ANY, sj.get(0)) +
                                          get(xPivot+1, x2, y1, y2, LinearPartitioner.COLLAPSE_ANY, sj.get(1)) );
@@ -524,7 +527,8 @@ abstract class LDPConfigContainer extends LDPConfig {
     /**
      * Traceback function.
      */
-    public StreamTransform traceback(int collapse) {
+    @Override
+	public StreamTransform traceback(int collapse) {
         if (LinearPartitioner.DEBUG) { printArray(); }
         StreamTransform st = traceback(0, A.length-1, 0, A[0][0].length-1, collapse, this.cont);
         return st;
@@ -639,7 +643,7 @@ abstract class LDPConfigContainer extends LDPConfig {
                             // found the optimum
                             int[] arr = { 1 + (xPivot-x1), x2-xPivot };
                             PartitionGroup pg = PartitionGroup.createFromArray(arr);
-                            SIRSplitJoin sj = RefactorSplitJoin.addHierarchicalChildren((SIRSplitJoin)verticalObj, pg);
+                            SIRSplitJoin sj = RefactorSplitJoin.addHierarchicalChildren(verticalObj, pg);
                 
                             // generate transform
                             StreamTransform result = new VerticalCutTransform(xPivot-x1);
@@ -738,7 +742,8 @@ abstract class LDPConfigContainer extends LDPConfig {
         for (int j=y1; j<=y2; j++) {
             for (int i=x1; i<=Math.min(x2,width[j]-1); i++) {
                 IterFactory.createFactory().createIter(childConfig(i,j).getStream()).accept(new EmptyStreamVisitor() {
-                        public void visitFilter(SIRFilter self, SIRFilterIter iter) {
+                        @Override
+						public void visitFilter(SIRFilter self, SIRFilterIter iter) {
                             LDPConfig.partitions.put(self, new Integer(LDPConfig.numAssigned));
                         }
                     });

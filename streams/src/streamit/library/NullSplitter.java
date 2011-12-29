@@ -18,21 +18,25 @@ package streamit.library;
 
 public class NullSplitter extends Splitter
 {
-    public void work ()
+    @Override
+	public void work ()
     {
         // a null splitter should never have its work function called
         ERROR ("work function called in a NullSplitter");  
     }
 
-    public int [] getWeights ()
+    @Override
+	public int [] getWeights ()
     {
         // null joiners do not distribute any weights
         throw new UnsupportedOperationException();
     }
     
-    public int getConsumption () { return 0; }
+    @Override
+	public int getConsumption () { return 0; }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "roundrobin(0)";
     }
 }

@@ -118,15 +118,15 @@ public class BackEndScaffold  {
         Filter slice;
 
         for (int i = 0; i < slices.length; i++) {
-            slice = (Filter) slices[i];
+            slice = slices[i];
             //create code for joining input to the trace
-            backEndFactory.processFilterInputNode((InputNode)slice.getInputNode(),
+            backEndFactory.processFilterInputNode(slice.getInputNode(),
                     whichPhase, computeNodes);
             //create the compute code and the communication code for the
             //filters of the trace
             backEndFactory.processFilterWorkNode(slice.getWorkNode(), whichPhase, computeNodes);
             //create communication code for splitting the output
-            backEndFactory.processFilterOutputNode((OutputNode)slice.getOutputNode(),
+            backEndFactory.processFilterOutputNode(slice.getOutputNode(),
                     whichPhase, computeNodes);
             
         }
@@ -147,25 +147,25 @@ public class BackEndScaffold  {
         Filter slice;
 
         for (int i = 0; i < slices.length; i++) {
-            slice = (Filter) slices[i];
+            slice = slices[i];
             //create code for joining input to the trace
-            backEndFactory.processFilterInputNode((InputNode)slice.getInputNode(),
+            backEndFactory.processFilterInputNode(slice.getInputNode(),
                     whichPhase, computeNodes);
         }
         for (int i = 0; i < slices.length; i++) {
-            slice = (Filter) slices[i];
+            slice = slices[i];
             //create the compute code and the communication code for the
             //filters of the trace
             if (slice instanceof Filter) {
-                backEndFactory.processFilterWorkNode(((Filter)slice).getWorkNode(), whichPhase, computeNodes);                
+                backEndFactory.processFilterWorkNode(slice.getWorkNode(), whichPhase, computeNodes);                
             } else {
                 backEndFactory.processFilterSlices(slice, whichPhase, computeNodes);
             }
         }
         for (int i = 0; i < slices.length; i++) {
-            slice = (Filter) slices[i];
+            slice = slices[i];
             //create communication code for splitting the output
-            backEndFactory.processFilterOutputNode((OutputNode)slice.getOutputNode(),
+            backEndFactory.processFilterOutputNode(slice.getOutputNode(),
                     whichPhase, computeNodes);
         }
     }
@@ -228,7 +228,7 @@ public class BackEndScaffold  {
                 if (hasBeenJoined.contains(slice.getInputNode())) {
                     scheduled.add(slice);
                     if (slice instanceof Filter) {
-                        backEndFactory.processFilterWorkNode(((Filter)slice).getWorkNode(), whichPhase, computeNodes);
+                        backEndFactory.processFilterWorkNode(slice.getWorkNode(), whichPhase, computeNodes);
                     }
                     //System.out.println("Scheduling " + trace.getHead().getNextFilter());
                     needToSchedule.removeFirst();

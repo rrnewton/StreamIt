@@ -69,7 +69,8 @@ public class JConstructorBlock extends JBlock {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         sourceClass = (CSourceClass)context.getClassContext().getCClass();
 
         // JLS 8.8.5 :
@@ -130,7 +131,8 @@ public class JConstructorBlock extends JBlock {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         if (constructorCall != null) {
@@ -146,7 +148,7 @@ public class JConstructorBlock extends JBlock {
         }
 
         for (int i = 0; i < body.size(); i++) {
-            ((JStatement)body.get(i)).genCode(code);
+            body.get(i).genCode(code);
         }
 
         //!!! graf 010529 : needed ?
@@ -165,7 +167,8 @@ public class JConstructorBlock extends JBlock {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JConstructorBlock other = new at.dms.kjc.JConstructorBlock();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

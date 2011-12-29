@@ -60,14 +60,16 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
      * Right now the super doesn't visit the variable in a jlocal var,
      * but make sure we don't, either.
      */
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident) {
     }
 
     /**
      * Visits a variable decl.
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -80,7 +82,8 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
     /**
      * visits a formal param.
      */
-    public void visitFormalParameters(JFormalParameter self,
+    @Override
+	public void visitFormalParameters(JFormalParameter self,
                                       boolean isFinal,
                                       CType type,
                                       String ident) {
@@ -92,7 +95,8 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
     /**
      * Visits an init statement (recurses into the target stream)
      */
-    public void visitInitStatement(SIRInitStatement self,
+    @Override
+	public void visitInitStatement(SIRInitStatement self,
                                    SIRStream target) {
         super.visitInitStatement(self, target);
         // also recurse into the stream target
@@ -122,14 +126,16 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
     }
         
     /* visit a filter */
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
         // visit node
         visitStream(self);
     }
 
     /* visit a phased filter */
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         visitStream(self);
     }
@@ -139,7 +145,8 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
      */
         
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self,
+    @Override
+	public void preVisitPipeline(SIRPipeline self,
                                  SIRPipelineIter iter) {
         // record this container as one that should be cloned
         toBeCloned.add(self);
@@ -148,7 +155,8 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
     }
 
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter) {
         // record this container as one that should be cloned
         toBeCloned.add(self);
@@ -157,7 +165,8 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
     }
 
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
         // record this container as one that should be cloned
         toBeCloned.add(self);
@@ -170,17 +179,20 @@ public class CloningVisitor extends SLIREmptyVisitor implements StreamVisitor {
      */
         
     /* post-visit a pipeline -- do nothing, visit on way down */
-    public void postVisitPipeline(SIRPipeline self,
+    @Override
+	public void postVisitPipeline(SIRPipeline self,
                                   SIRPipelineIter iter) {
     }
 
     /* post-visit a splitjoin -- do nothing, visit on way down */
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
     }
 
     /* post-visit a feedbackloop -- do nothing, visit on way down */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
     }
 }

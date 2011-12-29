@@ -66,7 +66,8 @@ public class FieldInitMover extends EmptyStreamVisitor {
      * FeedBackLoop) and move any field initialization out of the field
      * declaration into the body of the init.
      */
-    public void preVisitStream(SIRStream self,
+    @Override
+	public void preVisitStream(SIRStream self,
                                SIRIterator iter) {
         //System.out.println("!!visiting stream: " + self);
     
@@ -129,7 +130,8 @@ public class FieldInitMover extends EmptyStreamVisitor {
          * Visit a field declaration. Mutates the initialization expr if
          * present and creates the appropriate initialization statement instead.
          **/
-        public Object visitFieldDeclaration(JFieldDeclaration self,
+        @Override
+		public Object visitFieldDeclaration(JFieldDeclaration self,
                                             int modifiers,
                                             CType type,
                                             String ident,

@@ -43,7 +43,8 @@ public class FilterVector extends FilterMatrix {
     }
 
     /** return a copy of this filter vector. **/
-    public FilterMatrix copy() {
+    @Override
+	public FilterMatrix copy() {
         FilterVector fv = new FilterVector(this.getSize());
         // copy weights
         for (int i=0; i<this.getSize(); i++) {

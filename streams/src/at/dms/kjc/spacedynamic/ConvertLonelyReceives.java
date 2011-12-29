@@ -46,7 +46,8 @@ public class ConvertLonelyReceives
 
             //replace the lonely receives
             meth.getBody().accept(new SLIRReplacingVisitor() {
-                    public Object visitExpressionStatement(JExpressionStatement self,
+                    @Override
+					public Object visitExpressionStatement(JExpressionStatement self,
                                                            JExpression expr) {
 
                         //this this statement consists only of a method call and 

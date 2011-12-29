@@ -43,7 +43,8 @@ public class ArrayInitExpander {
     public static void doit(SIRStream str) {
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
                 // visit all streams
-                public void preVisitStream(SIRStream self,
+                @Override
+				public void preVisitStream(SIRStream self,
                                            SIRIterator iter) {
                     // iterate over all fields
                     JFieldDeclaration[] fields = self.getFields();
@@ -66,7 +67,8 @@ public class ArrayInitExpander {
     private static void expand(JPhylum phylum) {
         // translate all relevant method calls to static arrays
         phylum.accept(new SLIRReplacingVisitor() {
-                public Object visitMethodCallExpression(JMethodCallExpression self,
+                @Override
+				public Object visitMethodCallExpression(JMethodCallExpression self,
                                                         JExpression prefix,
                                                         String ident,
                                                         JExpression[] args) {

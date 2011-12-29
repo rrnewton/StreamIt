@@ -23,7 +23,8 @@ public final class FreqReplaceTransform extends StreamTransform {
     /**
      * Perform the transform on <str> and return new stream.
      */
-    public SIRStream doMyTransform(SIRStream str) {
+    @Override
+	public SIRStream doMyTransform(SIRStream str) {
         // again detect that <str> is linear, since it is a newly constructed stream
         LinearAnalyzer.findLinearFilters(str, KjcOptions.debug, lfa);
         FrequencyReplacer.doReplace(lfa, str);
@@ -33,7 +34,8 @@ public final class FreqReplaceTransform extends StreamTransform {
         return null;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "FreqReplace Transform, #" + id;
     }
 

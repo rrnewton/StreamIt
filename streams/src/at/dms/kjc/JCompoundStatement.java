@@ -53,7 +53,8 @@ public class JCompoundStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         for (int i = 0; i < body.length; i++) {
             if (!context.isReachable()) {
                 throw new CLineError(body[i].getTokenReference(), KjcMessages.STATEMENT_UNREACHABLE);
@@ -75,11 +76,13 @@ public class JCompoundStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitCompoundStatement(this, body);
     }
     
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitCompoundStatement(this, body);
     }
     
@@ -87,7 +90,8 @@ public class JCompoundStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         for (int i = 0; i < body.length; i++) {
             body[i].genCode(code);
         }
@@ -102,7 +106,8 @@ public class JCompoundStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JCompoundStatement other = new at.dms.kjc.JCompoundStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

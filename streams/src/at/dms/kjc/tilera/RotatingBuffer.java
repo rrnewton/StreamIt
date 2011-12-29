@@ -147,9 +147,9 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
      * rotation associated with this input slice node
      */
     public SourceAddressRotation getAddressBuffer(InputNode input) {
-        assert addressBuffers.containsKey(InputRotatingBuffer.getInputBuffer(input.getNextFilter())) ;
+        assert addressBuffers.containsKey(RotatingBuffer.getInputBuffer(input.getNextFilter())) ;
         
-        return addressBuffers.get(InputRotatingBuffer.getInputBuffer(input.getNextFilter()));
+        return addressBuffers.get(RotatingBuffer.getInputBuffer(input.getNextFilter()));
     }
     
     /**
@@ -186,7 +186,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
         //the tag for the messages that we are using to send around the address
         int tag = 0;
         TileCodeStore cs = ownerTile.getComputeCode();
-        InputRotatingBuffer buf = InputRotatingBuffer.getInputBuffer(filter);
+        InputRotatingBuffer buf = RotatingBuffer.getInputBuffer(filter);
         //if this filter does not have an input buffer, then continue
         if (buf == null)
             return;               
@@ -414,7 +414,8 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
     /**
      * DO NOT USE, WE ARE NOT USING EXTRACOUNT FOR DOUBLE BUFFERING ACCOUNTING!
      */
-    public int getExtraCount() {
+    @Override
+	public int getExtraCount() {
         assert false;
         return extraCount;
     }
@@ -422,7 +423,8 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
     /**
      * DO NOT USE, WE ARE NOT USING EXTRACOUNT FOR DOUBLE BUFFERING ACCOUNTING!
      */
-    public void setExtraCount(int extracount) {
+    @Override
+	public void setExtraCount(int extracount) {
         assert false;
         this.extraCount = extracount;
     }

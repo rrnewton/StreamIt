@@ -58,7 +58,8 @@ public class FFSNoPeekBuffer extends FilterFusionState
     }
 
     /** return the incoming buffer (pop buffer) size **/
-    public int getBufferSize(FlatNode prev, boolean init) 
+    @Override
+	public int getBufferSize(FlatNode prev, boolean init) 
     {
         return bufferSize;
     }
@@ -190,7 +191,8 @@ public class FFSNoPeekBuffer extends FilterFusionState
     /** Perform any initialization tasks necessary for the filter,
         including declaring the pop buffer, adding helper functions,
         adding fields, and adding the init function. **/
-    public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
+    @Override
+	public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
                           JBlock initFunctionCalls, JBlock main) 
     {
         //don't do anything if this filter is not being generated
@@ -251,7 +253,8 @@ public class FFSNoPeekBuffer extends FilterFusionState
      * to execution this filter in the init stage (*isInit* == true) or the
      * steady state (*isInit* == false), add all declaration to *enclosingBlock*.
      **/
-    public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
+    @Override
+	public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
     {
         JBlock statements = new JBlock(null, new JStatement[0], null);
 

@@ -66,7 +66,8 @@ public class JSwitchStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         expr = expr.analyse(new CExpressionContext(context));
         // !!! graf 010109:
         // The type of the Expression must be char, byte, short, or int, or a compile-time error occurs.
@@ -133,7 +134,8 @@ public class JSwitchStatement extends JStatement {
     /**
      * Return the end of this block (for break statement)
      */
-    public CodeLabel getBreakLabel() {
+    @Override
+	public CodeLabel getBreakLabel() {
         return endLabel;
     }
 
@@ -152,7 +154,8 @@ public class JSwitchStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitSwitchStatement(this, expr, groups);
     }
@@ -161,7 +164,8 @@ public class JSwitchStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitSwitchStatement(this, expr, groups);
     }
 
@@ -169,7 +173,8 @@ public class JSwitchStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         CodeLabel       defaultLabel = new CodeLabel();
@@ -212,7 +217,8 @@ public class JSwitchStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JSwitchStatement other = new at.dms.kjc.JSwitchStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

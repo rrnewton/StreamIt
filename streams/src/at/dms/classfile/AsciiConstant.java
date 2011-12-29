@@ -58,7 +58,8 @@ public class AsciiConstant extends PooledConstant {
     /**
      * Returns the value of the constant.
      */
-    /*package*/ Object getLiteral() {
+    @Override
+	/*package*/ Object getLiteral() {
         return value;
     }
 
@@ -71,7 +72,8 @@ public class AsciiConstant extends PooledConstant {
      * CONVENTION: return XXXXXXXXXXXX &lt;&lt; 4 + Y
      * with Y = ident of the type of the pooled constant
      */
-    public final int hashCode() {
+    @Override
+	public final int hashCode() {
         return (value.hashCode() << 4) + POO_ASCII_CONSTANT;
     }
 
@@ -79,7 +81,8 @@ public class AsciiConstant extends PooledConstant {
      * equals (an exact comparison)
      * ASSERT: this.hashCode == o.hashCode ===&gt; cast
      */
-    public final boolean equals(Object o) {
+    @Override
+	public final boolean equals(Object o) {
         return (o instanceof AsciiConstant) &&
             ((AsciiConstant)o).value.equals(value);
     }
@@ -94,7 +97,8 @@ public class AsciiConstant extends PooledConstant {
      * @param   pc      the already in pooled constant
      * ASSERT pc.getClass() == this.getClass()
      */
-    /*package*/ final void resolveConstants(PooledConstant pc) {
+    /*package*/ @Override
+	final void resolveConstants(PooledConstant pc) {
         setIndex(pc.getIndex());
     }
 
@@ -103,7 +107,8 @@ public class AsciiConstant extends PooledConstant {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {
         return;
     }
 
@@ -116,7 +121,8 @@ public class AsciiConstant extends PooledConstant {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool _cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool _cp, DataOutput out) throws IOException {
         out.writeByte(CST_UTF8);
         out.writeUTF(value);
     }

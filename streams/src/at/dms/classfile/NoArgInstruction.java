@@ -62,7 +62,8 @@ public class NoArgInstruction extends Instruction {
      * Returns true iff control flow can reach the next instruction
      * in textual order.
      */
-    public boolean canComplete() {
+    @Override
+	public boolean canComplete() {
         switch (getOpcode()) {
         case opc_dreturn:
         case opc_lreturn:
@@ -81,7 +82,8 @@ public class NoArgInstruction extends Instruction {
     /**
      * Returns the number of bytes used by the the instruction in the code array.
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return 1;
     }
 
@@ -92,7 +94,8 @@ public class NoArgInstruction extends Instruction {
     /**
      * Returns the type pushed on the stack
      */
-    public byte getReturnType() {
+    @Override
+	public byte getReturnType() {
         switch (getOpcode()) {
         case opc_dastore:
         case opc_lastore:
@@ -205,7 +208,8 @@ public class NoArgInstruction extends Instruction {
     /**
      * Returns the size of data pushed on the stack by this instruction
      */
-    public int getPushedOnStack() {
+    @Override
+	public int getPushedOnStack() {
         switch (getOpcode()) {
 
         case opc_dastore:
@@ -315,7 +319,8 @@ public class NoArgInstruction extends Instruction {
     /**
      * Return the amount of stack (positive or negative) used by this instruction
      */
-    public int getStack() {
+    @Override
+	public int getStack() {
         switch (getOpcode()) {
 
         case opc_dastore:
@@ -437,7 +442,8 @@ public class NoArgInstruction extends Instruction {
     /**
      * Return true if this instruction is a literal
      */
-    public boolean isLiteral() {
+    @Override
+	public boolean isLiteral() {
         return getOpcode() == opc_aconst_null;
     }
 
@@ -452,7 +458,8 @@ public class NoArgInstruction extends Instruction {
      *      and it can complete normally
      * @exception   ClassFileFormatException    a problem was detected
      */
-    /*package*/ void check(CodeEnv env, int curStack)
+    @Override
+	/*package*/ void check(CodeEnv env, int curStack)
         throws ClassFileFormatException
     {
         switch (getOpcode()) {
@@ -477,7 +484,8 @@ public class NoArgInstruction extends Instruction {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {}
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {}
 
     /**
      * Write this instruction into a file
@@ -487,7 +495,8 @@ public class NoArgInstruction extends Instruction {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte((byte)getOpcode());
     }
 }

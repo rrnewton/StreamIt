@@ -77,7 +77,7 @@ public class SIRNavigationUtils {
         // recurse down through op to find it's first
         // child that is not a container.
         while (op instanceof SIRContainer) {
-            op = (SIROperator)((SIRContainer)op).getChildren().get(0);
+            op = ((SIRContainer)op).getChildren().get(0);
         }
         return op;
     }

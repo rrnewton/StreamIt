@@ -214,7 +214,8 @@ public class JCompilationUnit extends JPhylum {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitCompilationUnit(this, packageName, importedPackages, importedClasses, typeDeclarations);
     }
 
@@ -222,7 +223,8 @@ public class JCompilationUnit extends JPhylum {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitCompilationUnit(this, packageName, importedPackages, importedClasses, typeDeclarations);
     }
 
@@ -245,7 +247,8 @@ public class JCompilationUnit extends JPhylum {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JCompilationUnit other = new at.dms.kjc.JCompilationUnit();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

@@ -93,7 +93,8 @@ public class JConstructorDeclaration extends JMethodDeclaration {
      * such as Classes, Interfaces, Methods, Constructors and Fields
      * @exception   PositionedError an error with reference to the source file
      */
-    public CSourceMethod checkInterface(CClassContext context) throws PositionedError {
+    @Override
+	public CSourceMethod checkInterface(CClassContext context) throws PositionedError {
         check(context,
               CModifier.isSubsetOf(modifiers, ACC_PUBLIC | ACC_PROTECTED | ACC_PRIVATE),
               KjcMessages.INVALID_CONSTRUCTOR_FLAGS,
@@ -111,7 +112,8 @@ public class JConstructorDeclaration extends JMethodDeclaration {
      * @param   context         the actual context of analyse
      * @exception   PositionedError Error catched as soon as possible
      */
-    public void checkBody1(CClassContext context) throws PositionedError {
+    @Override
+	public void checkBody1(CClassContext context) throws PositionedError {
         check(context, body != null, KjcMessages.CONSTRUCTOR_NOBODY, ident);
 
         CMethodContext  self = new CConstructorContext(context, getMethod());
@@ -156,7 +158,8 @@ public class JConstructorDeclaration extends JMethodDeclaration {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         genComments(p);
         p.visitConstructorDeclaration(this,
                                       modifiers,
@@ -170,7 +173,8 @@ public class JConstructorDeclaration extends JMethodDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         Object Trash = genComments1(p);
         return p.visitConstructorDeclaration(this,
                                              modifiers,
@@ -184,7 +188,8 @@ public class JConstructorDeclaration extends JMethodDeclaration {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JConstructorDeclaration other = new at.dms.kjc.JConstructorDeclaration();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

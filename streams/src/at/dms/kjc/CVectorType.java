@@ -117,7 +117,8 @@ public class CVectorType extends CType {
         return false;
     }
 
-    public boolean equals (CType other) {
+    @Override
+	public boolean equals (CType other) {
         if (other instanceof CVectorType) {
             return low_type.equals(
                     ((CVectorType)other).getLowType());

@@ -2,6 +2,7 @@ package at.dms.kjc.rstream;
 
 import java.util.Vector;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CArrayType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JAddExpression;
@@ -125,7 +126,7 @@ public class FFSPeekBuffer extends FilterFusionState
     
     
         peekBufferVar = new JVariableDefinition(null, 
-                                                at.dms.kjc.Constants.ACC_FINAL,
+                                                Constants.ACC_FINAL,
                                                 new CArrayType(Utils.voidToInt(filter.
                                                                                getInputType()), 
                                                                1 /* dimension */,
@@ -134,7 +135,8 @@ public class FFSPeekBuffer extends FilterFusionState
                                                 null);
     }
     
-    public int getBufferSize(FlatNode prev, boolean init)
+    @Override
+	public int getBufferSize(FlatNode prev, boolean init)
     {
         return StrToRStream.getMult(node, init) * filter.getPopInt() + remaining[0];
     }
@@ -162,7 +164,8 @@ public class FFSPeekBuffer extends FilterFusionState
     
     //this is called by an unnecesary duplicate splitters to make sure that 
     //all its downstream neighbors share the same incoming buffer
-    public void sharedBufferVar(JVariableDefinition buf)
+    @Override
+	public void sharedBufferVar(JVariableDefinition buf)
     {
         dontGeneratePopDecl = true;
         bufferVar[0] = buf;
@@ -323,7 +326,8 @@ public class FFSPeekBuffer extends FilterFusionState
                                         new JIntLiteral(remaining[0]));
     }
     
-    public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
+    @Override
+	public void initTasks(Vector<JFieldDeclaration> fields, Vector<JMethodDeclaration> functions,
                           JBlock initFunctionCalls, JBlock main) 
     {
         //don't do anything if this filter is not being generated
@@ -379,7 +383,8 @@ public class FFSPeekBuffer extends FilterFusionState
     }
     
     
-    public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
+    @Override
+	public JStatement[] getWork(JBlock enclosingBlock, boolean isInit) 
     {
         JBlock statements = new JBlock(null, new JStatement[0], null);
 

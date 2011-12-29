@@ -62,7 +62,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
     /**
      * Returns a string representation of this object.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JAddExpression[");
@@ -83,7 +84,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         left = left.analyse(context);
         right = right.analyse(context);
         check(context, left.getType() != CStdType.Void && right.getType() != CStdType.Void,
@@ -149,7 +151,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
         }
     }
 
-    public CType getType() {
+    @Override
+	public CType getType() {
         try {
             return computeType(left.getType(),right.getType());
         } catch(UnpositionedError e) {
@@ -167,7 +170,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * @param   right       the seconds operand
      * @return  the result of the operation
      */
-    public int compute(int left, int right) {
+    @Override
+	public int compute(int left, int right) {
         return left + right;
     }
 
@@ -177,7 +181,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * @param   right       the seconds operand
      * @return  the result of the operation
      */
-    public long compute(long left, long right) {
+    @Override
+	public long compute(long left, long right) {
         return left + right;
     }
 
@@ -187,7 +192,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * @param   right       the seconds operand
      * @return  the result of the operation
      */
-    public float compute(float left, float right) {
+    @Override
+	public float compute(float left, float right) {
         return left + right;
     }
 
@@ -197,7 +203,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * @param   right       the seconds operand
      * @return  the result of the operation
      */
-    public double compute(double left, double right) {
+    @Override
+	public double compute(double left, double right) {
         return left + right;
     }
 
@@ -209,7 +216,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitBinaryExpression(this, "+", left, right);
     }
 
@@ -217,7 +225,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitBinaryExpression(this, "+", left, right);
     }
 
@@ -256,7 +265,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         if (type.equals(CStdType.String)) {
@@ -322,7 +332,8 @@ public class JAddExpression extends JBinaryArithmeticExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JAddExpression other = new at.dms.kjc.JAddExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

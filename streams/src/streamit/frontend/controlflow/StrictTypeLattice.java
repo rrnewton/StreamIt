@@ -31,17 +31,20 @@ public class StrictTypeLattice extends AnyTypeLattice
     public StrictTypeLattice(Type t) { super(t); }
     public StrictTypeLattice(boolean isTop) { super(isTop); }
 
-    public Lattice getTop() 
+    @Override
+	public Lattice getTop() 
     {
         return new StrictTypeLattice(true);
     }
     
-    public Lattice getBottom()
+    @Override
+	public Lattice getBottom()
     {
         return new StrictTypeLattice(false);
     }
     
-    public Lattice meet(Lattice other)
+    @Override
+	public Lattice meet(Lattice other)
     {
         AnyTypeLattice that = (AnyTypeLattice)other;
 

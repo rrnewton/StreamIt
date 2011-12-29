@@ -99,30 +99,37 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
     /**
      * Abort the processing of a grammar due to syntax errors
      */
-    public void abortGrammar() {
+    @Override
+	public void abortGrammar() {
         if (grammar != null && grammar.getClassName() != null) {
             grammars.remove(grammar.getClassName());
         }
         grammar = null;
     }
 
-    public void beginAlt(boolean doAST_) {
+    @Override
+	public void beginAlt(boolean doAST_) {
     }
 
-    public void beginChildList() {
+    @Override
+	public void beginChildList() {
     }
 
     // Exception handling
-    public void beginExceptionGroup() {
+    @Override
+	public void beginExceptionGroup() {
     }
-    public void beginExceptionSpec(Token label) {
+    @Override
+	public void beginExceptionSpec(Token label) {
     }
-    public void beginSubRule(Token label, int line, boolean not) {
+    @Override
+	public void beginSubRule(Token label, int line, boolean not) {
     }
     /**
      * Define a lexer or parser rule
      */
-    public void defineRuleName(Token r, String access, String docComment)
+    @Override
+	public void defineRuleName(Token r, String access, String docComment)
         throws SemanticException
     {
         String id = r.getText();
@@ -162,7 +169,8 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
      * Define a token from tokens {...}.
      *  Must be label and literal or just label or just a literal.
      */
-    public void defineToken(Token tokname, Token tokliteral) {
+    @Override
+	public void defineToken(Token tokname, Token tokliteral) {
         String name = null;
         String literal = null;
         if (tokname != null) {
@@ -194,7 +202,7 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
             // if they provide a name/label and that name/label already
             // exists, just hook this literal onto old token.
             if (name != null) {
-                TokenSymbol ts = (TokenSymbol) grammar.tokenManager.getTokenSymbol(name);
+                TokenSymbol ts = grammar.tokenManager.getTokenSymbol(name);
                 if (ts != null) {
                     // watch out that the label is not more than just a token.
                     // If it already has a literal attached, then: conflict.
@@ -244,15 +252,20 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
             grammar.tokenManager.define(ts);
         }
     }
-    public void endAlt() {
+    @Override
+	public void endAlt() {
     }
-    public void endChildList() {
+    @Override
+	public void endChildList() {
     }
-    public void endExceptionGroup() {
+    @Override
+	public void endExceptionGroup() {
     }
-    public void endExceptionSpec() {
+    @Override
+	public void endExceptionSpec() {
     }
-    public void endGrammar() {
+    @Override
+	public void endGrammar() {
     }
     /**
      * Called after the optional options section, to compensate for
@@ -260,7 +273,8 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
      * This method is bigger than it needs to be, but is much more
      * clear if I delineate all the cases.
      */
-    public void endOptions() {
+    @Override
+	public void endOptions() {
         // NO VOCAB OPTIONS
         if ( grammar.exportVocab==null && grammar.importVocab==null ) {
             grammar.exportVocab = grammar.getClassName();
@@ -418,37 +432,51 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
             }
         }
     }
-    public void endRule(String r) {
+    @Override
+	public void endRule(String r) {
     }
-    public void endSubRule() {
+    @Override
+	public void endSubRule() {
     }
-    public void hasError() {
+    @Override
+	public void hasError() {
     }
-    public void oneOrMoreSubRule() {
+    @Override
+	public void oneOrMoreSubRule() {
     }
-    public void optionalSubRule() {
+    @Override
+	public void optionalSubRule() {
     }
-    public void setUserExceptions(String thr) {}
-    public void refAction(Token action) {
+    @Override
+	public void setUserExceptions(String thr) {}
+    @Override
+	public void refAction(Token action) {
     }
-    public void refArgAction(Token action) {
+    @Override
+	public void refArgAction(Token action) {
     }
-    public void refCharLiteral(Token lit, Token label, boolean inverted, boolean lastInRule) {
+    @Override
+	public void refCharLiteral(Token lit, Token label, boolean inverted, boolean lastInRule) {
     }
-    public void refCharRange(Token t1, Token t2, Token label, boolean lastInRule) {
+    @Override
+	public void refCharRange(Token t1, Token t2, Token label, boolean lastInRule) {
     }
 
-    public void refElementOption(Token option, Token value) {
+    @Override
+	public void refElementOption(Token option, Token value) {
     }
 
-    public void refTokensSpecElementOption(Token tok, Token option, Token value) {
+    @Override
+	public void refTokensSpecElementOption(Token tok, Token option, Token value) {
     }
 
-    public void refExceptionHandler(Token exTypeAndName, Token action) {
+    @Override
+	public void refExceptionHandler(Token exTypeAndName, Token action) {
     }
 
     // Header action applies to all parsers and lexers.
-    public void refHeaderAction(Token name,Token act) {
+    @Override
+	public void refHeaderAction(Token name,Token act) {
         headerActions.put((name==null) ? "" : Utils.stripFrontBack(name.getText(),"\"","\""), act);
     }
 
@@ -458,17 +486,22 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
         return (t == null) ? "" : t.getText();
     }
 
-    public void refInitAction(Token action) {
+    @Override
+	public void refInitAction(Token action) {
     }
-    public void refMemberAction(Token act) {
+    @Override
+	public void refMemberAction(Token act) {
     }
-    public void refPreambleAction(Token act) {
+    @Override
+	public void refPreambleAction(Token act) {
         thePreambleAction = act;
     }
-    public void refReturnAction(Token returnAction) {
+    @Override
+	public void refReturnAction(Token returnAction) {
     }
 
-    public void refRule(Token idAssign, Token r, Token label, Token args) {
+    @Override
+	public void refRule(Token idAssign, Token r, Token label, Token args) {
         String id = r.getText();
 
         //      if ( Character.isUpperCase(id.charAt(0)) ) { // lexer rule?
@@ -481,10 +514,12 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
         }
     }
 
-    public void refSemPred(Token pred) {
+    @Override
+	public void refSemPred(Token pred) {
     }
 
-    public void refStringLiteral(Token lit,
+    @Override
+	public void refStringLiteral(Token lit,
                                  Token label,
                                  boolean lastInRule) {
         _refStringLiteral(lit, label, lastInRule);
@@ -493,12 +528,14 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
     /**
      * Reference a token
      */
-    public void refToken(Token assignId, Token t, Token label, Token args,
+    @Override
+	public void refToken(Token assignId, Token t, Token label, Token args,
                          boolean inverted, boolean lastInRule) {
         _refToken(assignId, t, label, args, inverted, lastInRule);
     }
 
-    public void refTokenRange(Token t1, Token t2, Token label, boolean lastInRule) {
+    @Override
+	public void refTokenRange(Token t1, Token t2, Token label, boolean lastInRule) {
         // ensure that the DefineGrammarSymbols methods are called; otherwise a range addes more
         // token refs to the alternative by calling MakeGrammar.refToken etc...
         if ( t1.getText().charAt(0) == '"' ) {
@@ -513,7 +550,8 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
         }
     }
 
-    public void refWildcard(Token t, Token label) {
+    @Override
+	public void refWildcard(Token t, Token label) {
     }
 
     /**
@@ -523,13 +561,15 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
         grammar = null;
     }
 
-    public void setArgOfRuleRef(Token argaction) {
+    @Override
+	public void setArgOfRuleRef(Token argaction) {
     }
 
     /**
      * Set the character vocabulary for a lexer
      */
-    public void setCharVocabulary(BitSet b) {
+    @Override
+	public void setCharVocabulary(BitSet b) {
         // grammar should enforce that this is only called for lexer
         ((LexerGrammar)grammar).setCharVocabulary(b);
     }
@@ -540,18 +580,19 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
      * @param key The token containing the option name
      * @param value The token containing the option value.
      */
-    public void setFileOption(Token key, Token value, String filename) {
+    @Override
+	public void setFileOption(Token key, Token value, String filename) {
         if (key.getText().equals("mangleLiteralPrefix")) {
-            if (value.getType() == ANTLRParser.STRING_LITERAL) {
-                tool.literalsPrefix = Utils.stripFrontBack(value.getText(), "\"","\"");
+            if (value.getType() == ANTLRTokenTypes.STRING_LITERAL) {
+                Main.literalsPrefix = Utils.stripFrontBack(value.getText(), "\"","\"");
             } else {
                 tool.error("mangleLiteralPrefix option must be string", filename, value.getLine());
             }
         } else if (key.getText().equals("upperCaseMangledLiterals")) {
             if (value.getText().equals("true")) {
-                tool.upperCaseMangledLiterals = true;
+                Main.upperCaseMangledLiterals = true;
             } else if (value.getText().equals("false")) {
-                tool.upperCaseMangledLiterals = false;
+                Main.upperCaseMangledLiterals = false;
             } else {
                 grammar.tool.error("Value for upperCaseMangledLiterals must be true or false", filename, key.getLine());
             }
@@ -566,16 +607,17 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
      * @param key The token containing the option name
      * @param value The token containing the option value.
      */
-    public void setGrammarOption(Token key, Token value) {
+    @Override
+	public void setGrammarOption(Token key, Token value) {
         if (key.getText().equals("exportVocab")) {
             // Set the token manager associated with the parser
-            if (value.getType() == ANTLRParser.RULE_REF || value.getType() == ANTLRParser.TOKEN_REF) {
+            if (value.getType() == ANTLRTokenTypes.RULE_REF || value.getType() == ANTLRTokenTypes.TOKEN_REF) {
                 grammar.exportVocab = value.getText();
             } else {
                 tool.error("exportVocab must be an identifier", grammar.getFilename(), value.getLine());
             }
         } else if (key.getText().equals("importVocab")) {
-            if (value.getType() == ANTLRParser.RULE_REF || value.getType() == ANTLRParser.TOKEN_REF) {
+            if (value.getType() == ANTLRTokenTypes.RULE_REF || value.getType() == ANTLRTokenTypes.TOKEN_REF) {
                 grammar.importVocab = value.getText();
             } else {
                 tool.error("importVocab must be an identifier", grammar.getFilename(), value.getLine());
@@ -586,14 +628,17 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
         }
     }
 
-    public void setRuleOption(Token key, Token value) {
+    @Override
+	public void setRuleOption(Token key, Token value) {
     }
-    public void setSubruleOption(Token key, Token value) {
+    @Override
+	public void setSubruleOption(Token key, Token value) {
     }
     /**
      * Start a new lexer
      */
-    public void startLexer(String file, Token name, String doc) {
+    @Override
+	public void startLexer(String file, Token name, String doc) {
         if ( numLexers>0 ) {
             Utils.panic("You may only have one lexer per grammar file: class "+ name.getText());
         }
@@ -624,7 +669,8 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
     /**
      * Start a new parser
      */
-    public void startParser(String file, Token name, String doc) {
+    @Override
+	public void startParser(String file, Token name, String doc) {
         if ( numParsers>0 ) {
             Utils.panic("You may only have one parser per grammar file: class "+ name.getText());
         }
@@ -650,8 +696,10 @@ public class DefineGrammarSymbols implements ANTLRGrammarParseBehavior {
             thePreambleAction = new CommonToken(Token.INVALID_TYPE, "");
         }
     }
-    public void synPred() {
+    @Override
+	public void synPred() {
     }
-    public void zeroOrMoreSubRule() {
+    @Override
+	public void zeroOrMoreSubRule() {
     }
 }

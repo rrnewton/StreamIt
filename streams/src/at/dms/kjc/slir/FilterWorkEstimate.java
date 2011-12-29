@@ -138,7 +138,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * Visits a peek expression.
      */
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         super.visitPeekExpression(self, tapeType, arg);
@@ -148,7 +149,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * Visits a pop expression.
      */
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType) {
         super.visitPopExpression(self, tapeType);
         work += POP;
@@ -157,7 +159,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * Visits a print statement.
      */
-    public void visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression arg) {
         super.visitPrintStatement(self, arg);
         work += PRINT;
@@ -166,7 +169,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * Visits a push expression.
      */
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         super.visitPushExpression(self, tapeType, arg);
@@ -182,7 +186,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a while statement
      */
-    public void visitWhileStatement(JWhileStatement self,
+    @Override
+	public void visitWhileStatement(JWhileStatement self,
                                     JExpression cond,
                                     JStatement body) {
         //System.err.println("WARNING:  Estimating work in loop, assume N=" +
@@ -196,7 +201,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a switch statement
      */
-    public void visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public void visitSwitchStatement(JSwitchStatement self,
                                      JExpression expr,
                                      JSwitchGroup[] body) {
         super.visitSwitchStatement(self, expr, body);
@@ -206,7 +212,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a return statement
      */
-    public void visitReturnStatement(JReturnStatement self,
+    @Override
+	public void visitReturnStatement(JReturnStatement self,
                                      JExpression expr) {
         super.visitReturnStatement(self, expr);
         // overhead of returns is folded into method call overhead
@@ -215,7 +222,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a if statement
      */
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause) {
@@ -239,7 +247,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -269,7 +278,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a do statement
      */
-    public void visitDoStatement(JDoStatement self,
+    @Override
+	public void visitDoStatement(JDoStatement self,
                                  JExpression cond,
                                  JStatement body) {
         //System.err.println("WARNING:  Estimating work in loop, assume N=" +
@@ -283,7 +293,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a continue statement
      */
-    public void visitContinueStatement(JContinueStatement self,
+    @Override
+	public void visitContinueStatement(JContinueStatement self,
                                        String label) {
         super.visitContinueStatement(self, label);
         work += CONTINUE;
@@ -292,7 +303,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a break statement
      */
-    public void visitBreakStatement(JBreakStatement self,
+    @Override
+	public void visitBreakStatement(JBreakStatement self,
                                     String label) {
         super.visitBreakStatement(self, label);
         work += BREAK;
@@ -322,7 +334,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints an unary plus expression
      */
-    public void visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryPlusExpression(JUnaryExpression self,
                                          JExpression expr) {
         super.visitUnaryPlusExpression(self, expr);
         countArithOp(self);
@@ -331,7 +344,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints an unary minus expression
      */
-    public void visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryMinusExpression(JUnaryExpression self,
                                           JExpression expr) {
         super.visitUnaryMinusExpression(self, expr);
         countArithOp(self);
@@ -340,7 +354,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a bitwise complement expression
      */
-    public void visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         super.visitBitwiseComplementExpression(self, expr);
@@ -350,7 +365,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a logical complement expression
      */
-    public void visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitLogicalComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         super.visitLogicalComplementExpression(self, expr);
@@ -360,7 +376,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a shift expression
      */
-    public void visitShiftExpression(JShiftExpression self,
+    @Override
+	public void visitShiftExpression(JShiftExpression self,
                                      int oper,
                                      JExpression left,
                                      JExpression right) {
@@ -371,7 +388,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a shift expressiona
      */
-    public void visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public void visitRelationalExpression(JRelationalExpression self,
                                           int oper,
                                           JExpression left,
                                           JExpression right) {
@@ -382,7 +400,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a prefix expression
      */
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr) {
         super.visitPrefixExpression(self, oper, expr);
@@ -392,7 +411,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a postfix expression
      */
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr) {
         super.visitPostfixExpression(self, oper, expr);
@@ -402,7 +422,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a name expression
      */
-    public void visitNameExpression(JNameExpression self,
+    @Override
+	public void visitNameExpression(JNameExpression self,
                                     JExpression prefix,
                                     String ident) {
         super.visitNameExpression(self, prefix, ident);
@@ -412,7 +433,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints an array allocator expression
      */
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right) {
@@ -423,7 +445,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args) {
@@ -499,7 +522,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints an equality expression
      */
-    public void visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public void visitEqualityExpression(JEqualityExpression self,
                                         boolean equal,
                                         JExpression left,
                                         JExpression right) {
@@ -510,7 +534,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a conditional expression
      */
-    public void visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public void visitConditionalExpression(JConditionalExpression self,
                                            JExpression cond,
                                            JExpression left,
                                            JExpression right) {
@@ -521,7 +546,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a compound expression
      */
-    public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
+    @Override
+	public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
                                                   int oper,
                                                   JExpression left,
                                                   JExpression right) {
@@ -533,7 +559,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident) {
         super.visitFieldExpression(self, left, ident);
@@ -543,7 +570,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints a compound assignment expression
      */
-    public void visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public void visitBitwiseExpression(JBitwiseExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right) {
@@ -554,7 +582,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right) {
         // try to leave out const prop remnants
@@ -569,7 +598,8 @@ public class FilterWorkEstimate extends SLIREmptyVisitor implements
     /**
      * prints an array length expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor) {
         super.visitArrayAccessExpression(self, prefix, accessor);

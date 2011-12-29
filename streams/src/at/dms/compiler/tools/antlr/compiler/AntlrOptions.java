@@ -36,7 +36,8 @@ public class AntlrOptions extends at.dms.compiler.tools.common.Options {
     }
     public String destination = ".";
 
-    public boolean processOption(int code, Getopt g) {
+    @Override
+	public boolean processOption(int code, Getopt g) {
         switch (code) {
         case 'd':
             destination = getString(g, ""); return true;
@@ -45,7 +46,8 @@ public class AntlrOptions extends at.dms.compiler.tools.common.Options {
         }
     }
 
-    public String[] getOptions() {
+    @Override
+	public String[] getOptions() {
         String[]    parent = super.getOptions();
         String[]    total = new String[parent.length + 1];
         System.arraycopy(parent, 0, total, 0, parent.length);
@@ -55,22 +57,26 @@ public class AntlrOptions extends at.dms.compiler.tools.common.Options {
     }
 
 
-    public String getShortOptions() {
+    @Override
+	public String getShortOptions() {
         return "d:" + super.getShortOptions();
     }
 
 
-    public void version() {
+    @Override
+	public void version() {
         System.out.println("Version 1.5A released 24 May 2001");
     }
 
 
-    public void usage() {
+    @Override
+	public void usage() {
         System.err.println("usage: at.dms.compiler.tools.antlr.compiler.Main [option]* [--help] <grammar-files>");
     }
 
 
-    public void help() {
+    @Override
+	public void help() {
         System.err.println("usage: at.dms.compiler.tools.antlr.compiler.Main [option]* [--help] <grammar-files>");
         printOptions();
         System.err.println();
@@ -80,7 +86,8 @@ public class AntlrOptions extends at.dms.compiler.tools.common.Options {
         System.err.println("For more info, please see: http://www.dms.at/kopi");
     }
 
-    public LongOpt[] getLongOptions() {
+    @Override
+	public LongOpt[] getLongOptions() {
         LongOpt[]   parent = super.getLongOptions();
         LongOpt[]   total = new LongOpt[parent.length + LONGOPTS.length];
     

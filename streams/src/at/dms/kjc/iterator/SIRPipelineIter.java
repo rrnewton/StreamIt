@@ -35,23 +35,27 @@ public class SIRPipelineIter extends SIRIterator implements PipelineIter {
         this.obj = obj;
     }
 
-    public PipelineIter isPipeline() {
+    @Override
+	public PipelineIter isPipeline() {
         return this;
     }
 
     /**
      * Return the stream pointed to by this.
      */
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         checkValidity();
         return obj;
     }
 
-    public int getNumChildren () {
+    @Override
+	public int getNumChildren () {
         return obj.size();
     }
 
-    public Iterator getChild (int n) {
+    @Override
+	public Iterator getChild (int n) {
         return factory.createIter(obj.get(n), this, n);
     }
 
@@ -62,7 +66,8 @@ public class SIRPipelineIter extends SIRIterator implements PipelineIter {
         return (SIRIterator)getChild(n);
     }
 
-    public void accept(StreamVisitor v) {
+    @Override
+	public void accept(StreamVisitor v) {
         v.preVisitPipeline(obj, this);
         for (int i=0; i<getNumChildren(); i++) {
             ((SIRIterator)getChild(i)).accept(v);
@@ -74,7 +79,8 @@ public class SIRPipelineIter extends SIRIterator implements PipelineIter {
      * This function is needed by the scheduler, but isn't useful from
      * the compiler.
      */
-    public Iterator getUnspecializedIter() {
+    @Override
+	public Iterator getUnspecializedIter() {
         return this;
     }
 }

@@ -109,7 +109,8 @@ public class JClassDeclaration extends JTypeDeclaration {
      * such as Classes, Interfaces, Methods, Constructors and Fields
      * @exception   PositionedError an error with reference to the source file
      */
-    public void checkInterface(final CContext context) throws PositionedError {
+    @Override
+	public void checkInterface(final CContext context) throws PositionedError {
         checkModifiers(context);
 
         if (superClass == null) {
@@ -236,7 +237,8 @@ public class JClassDeclaration extends JTypeDeclaration {
      * Check that initializers are correct
      * @exception   PositionedError an error with reference to the source file
      */
-    public void checkInitializers(CContext context) throws PositionedError {
+    @Override
+	public void checkInitializers(CContext context) throws PositionedError {
         self = new CClassContext(context, sourceClass, this);
 
         compileStaticInitializer(self);
@@ -290,7 +292,8 @@ public class JClassDeclaration extends JTypeDeclaration {
      * @param context the actual context of analyse
      * @exception   PositionedError an error with reference to the source file
      */
-    public void checkTypeBody(CContext context) throws PositionedError {
+    @Override
+	public void checkTypeBody(CContext context) throws PositionedError {
         if (getCClass().isNested() && getOwner().getCClass().isClass() 
             && !getCClass().isStatic() && !context.isStaticContext()) {
             addOuterThis();
@@ -560,7 +563,8 @@ public class JClassDeclaration extends JTypeDeclaration {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
 
         p.visitClassDeclaration(this,
@@ -578,7 +582,8 @@ public class JClassDeclaration extends JTypeDeclaration {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         Object trash = super.accept(p);
         return p.visitClassDeclaration(this,
                                        modifiers,
@@ -626,7 +631,8 @@ public class JClassDeclaration extends JTypeDeclaration {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JClassDeclaration other = new at.dms.kjc.JClassDeclaration();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

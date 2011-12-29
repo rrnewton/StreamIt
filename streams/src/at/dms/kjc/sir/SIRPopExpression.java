@@ -67,7 +67,8 @@ public class SIRPopExpression extends JExpression {
         this.tapeType = type;
     }
     
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         setTapeType(type);
     }
 
@@ -78,7 +79,8 @@ public class SIRPopExpression extends JExpression {
     /**
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         if (tapeType != null)
             return tapeType;
         return CStdType.Void;
@@ -87,7 +89,8 @@ public class SIRPopExpression extends JExpression {
     /**
      * Returns true iff this expression can be used as a statement (JLS 14.8)
      */
-    public boolean isStatementExpression() {
+    @Override
+	public boolean isStatementExpression() {
         return true;
     }
 
@@ -98,7 +101,8 @@ public class SIRPopExpression extends JExpression {
     /**
      * Throws an exception (NOT SUPPORTED YET)
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         at.dms.util.Utils.fail("Analysis of custom nodes not supported yet.");
         return this;
     }
@@ -125,7 +129,8 @@ public class SIRPopExpression extends JExpression {
     /**
      * Accepts the specified visitor.
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         if (p instanceof SLIRVisitor) {
             ((SLIRVisitor)p).visitPopExpression(this, tapeType); 
         } else {
@@ -137,7 +142,8 @@ public class SIRPopExpression extends JExpression {
      * Accepts the specified attribute visitor.
      * @param   p               the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         if (p instanceof SLIRAttributeVisitor) {
             return ((SLIRAttributeVisitor)p).visitPopExpression(this,
                                                                 tapeType);
@@ -164,14 +170,16 @@ public class SIRPopExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         at.dms.util.Utils.fail("Visitors to custom nodes not supported yet.");
     }
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRPopExpression other = new at.dms.kjc.sir.SIRPopExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

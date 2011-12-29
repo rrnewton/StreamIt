@@ -49,13 +49,13 @@ public class SIRJoinType implements Serializable, DeepCloneable {
 
     private Object readResolve() throws Exception {
         if (this.name.equals("COMBINE"))
-            return this.COMBINE;
+            return SIRJoinType.COMBINE;
         if (this.name.equals("ROUND_ROBIN"))
-            return this.ROUND_ROBIN;
+            return SIRJoinType.ROUND_ROBIN;
         if (this.name.equals("WEIGHTED_ROUND_ROBIN"))
-            return this.WEIGHTED_RR;
+            return SIRJoinType.WEIGHTED_RR;
         if (this.name.equals("NULL_SJ"))
-            return this.NULL;
+            return SIRJoinType.NULL;
         else 
             throw new Exception();
     }
@@ -73,7 +73,8 @@ public class SIRJoinType implements Serializable, DeepCloneable {
         return false;
     }
    
-    public String toString() {
+    @Override
+	public String toString() {
         return name;
     }
 
@@ -81,7 +82,8 @@ public class SIRJoinType implements Serializable, DeepCloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRJoinType other = new at.dms.kjc.sir.SIRJoinType();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

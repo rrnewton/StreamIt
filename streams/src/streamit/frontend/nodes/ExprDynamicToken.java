@@ -36,26 +36,30 @@ public class ExprDynamicToken extends Expression
     }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprDynamicToken(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprDynamicToken))
             return false;
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         // following the pattern in the integer constants -- constants
         // of the same value have the same hashcode
         return new Character('*').hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return "*";
     }

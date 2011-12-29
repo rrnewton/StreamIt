@@ -28,6 +28,7 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 		System.out.println("InterSSGEdge(src,dst)");		
 	}
 
+	@Override
 	public String toString() {
 		Filter[] inputFilterGraph = src.getSSG().getFilterGraph();
 		Filter[] outputFilterGraph = dst.getSSG().getFilterGraph();

@@ -40,14 +40,16 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
         this.obj = obj;
     }
 
-    public FeedbackLoopIter isFeedbackLoop() {
+    @Override
+	public FeedbackLoopIter isFeedbackLoop() {
         return this;
     }
 
     /**
      * Return the stream pointed to by this.
      */
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         checkValidity();
         return obj;
     }
@@ -55,7 +57,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
     /**
      * Returns delay of feedbackloop
      */ 
-    public int getDelaySize() {
+    @Override
+	public int getDelaySize() {
         return obj.getDelayInt();
     }
 
@@ -63,7 +66,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * Returns an iterator for the body of the FeedbackLoop.
      * @return iterator for the body of the FeedbackLoop
      */
-    public Iterator getBodyChild () { 
+    @Override
+	public Iterator getBodyChild () { 
         return factory.createIter(obj.getBody(),
                                   this,
                                   SIRFeedbackLoop.BODY);
@@ -73,7 +77,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * Returns an iterator for the loop of the FeedbackLoop.
      * @return iterator for the loop of the FeedbackLoop
      */
-    public Iterator getLoopChild () { 
+    @Override
+	public Iterator getLoopChild () { 
         return factory.createIter(obj.getLoop(),
                                   this,
                                   SIRFeedbackLoop.LOOP);
@@ -96,9 +101,9 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      */
     public SIRIterator get (int i) {
         if (i==SIRFeedbackLoop.LOOP) {
-            return (SIRIterator)getLoop();
+            return getLoop();
         } else if (i==SIRFeedbackLoop.BODY) {
-            return (SIRIterator)getBody();
+            return getBody();
         } else {
             Utils.fail("bad arg to get");
             return null;
@@ -109,7 +114,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * Returns the number of ways this Splitter splits data.
      * @return return Splitter fan-out
      */
-    public int getFanOut () {
+    @Override
+	public int getFanOut () {
         return 2;
     }
     
@@ -117,7 +123,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * Returns the number of work functions for this Splitter.
      * @return number of work functions for this Splitter
      */
-    public int getSplitterNumWork () {
+    @Override
+	public int getSplitterNumWork () {
         return 1;
     }
 
@@ -125,7 +132,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * Returns n-th work function associated with this Splitter.
      * @return n-th work function for the Splitter
      */
-    public Object getSplitterWork (int nWork) {
+    @Override
+	public Object getSplitterWork (int nWork) {
         return SIRSplitter.WORK_FUNCTION;
     }
 
@@ -133,7 +141,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * Returns n-th work function associated with this Joiner.
      * @return n-th work function for the Joiner
      */
-    public Object getJoinerWork(int nWork) {
+    @Override
+	public Object getJoinerWork(int nWork) {
         return SIRJoiner.WORK_FUNCTION;
     }
 
@@ -146,7 +155,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * @return distribution of weights on a particular invocation
      * of work function for the Splitter of this Stream.
      */
-    public int[] getSplitPushWeights (int nWork) {
+    @Override
+	public int[] getSplitPushWeights (int nWork) {
         return obj.getSplitter().getWeights();
     }
     
@@ -158,7 +168,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * @return number of data items consumed by a particular invocation
      * of work function for Splitter of this Stream.
      */
-    public int getSplitPop (int nWork) {
+    @Override
+	public int getSplitPop (int nWork) {
         if (obj.getSplitter().getType()==SIRSplitType.DUPLICATE) {
             return 1;
         } else if (obj.getSplitter().getType()==SIRSplitType.NULL) {
@@ -172,7 +183,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * Returns the number of ways this Joiner joines data.
      * @return return Joiner fan-in
      */
-    public int getFanIn () {
+    @Override
+	public int getFanIn () {
         return 2;
     }
     
@@ -182,7 +194,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * @return number of work functions for the JOiner of this 
      * Stream
      */
-    public int getJoinerNumWork () {
+    @Override
+	public int getJoinerNumWork () {
         return 1;
     }
 
@@ -195,7 +208,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * @return distribution of weights on a particular invocation
      * of work function for Joiner of this SplitJoin.
      */
-    public int[] getJoinPopWeights (int nWork) {
+    @Override
+	public int[] getJoinPopWeights (int nWork) {
         return obj.getJoiner().getWeights();
     }
     
@@ -206,7 +220,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * @return number of data items produced by a particular invocation
      * of work function for Joiner of this SplitJoin.
      */
-    public int getJoinPush (int nWork) {
+    @Override
+	public int getJoinPush (int nWork) {
         SIRJoiner joiner = obj.getJoiner();
         if (joiner.getType()==SIRJoinType.NULL) {
             return 0;
@@ -215,10 +230,11 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
         }
     }
 
-    public void accept(StreamVisitor v) {
+    @Override
+	public void accept(StreamVisitor v) {
         v.preVisitFeedbackLoop(obj, this);
-        ((SIRIterator)getBody()).accept(v);
-        ((SIRIterator)getLoop()).accept(v);
+        getBody().accept(v);
+        getLoop().accept(v);
         v.postVisitFeedbackLoop(obj, this);
     }
 
@@ -226,7 +242,8 @@ public class SIRFeedbackLoopIter extends SIRIterator implements FeedbackLoopIter
      * This function is needed by the scheduler, but isn't useful from
      * the compiler.
      */
-    public Iterator getUnspecializedIter() {
+    @Override
+	public Iterator getUnspecializedIter() {
         return this;
     }
 }

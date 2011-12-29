@@ -70,14 +70,16 @@ public class LocalVariableTable extends Attribute {
     /**
      * Returns the attribute's tag
      */
-    /*package*/ int getTag() {
+    @Override
+	/*package*/ int getTag() {
         return Constants.ATT_LOCALVARIABLETABLE;
     }
 
     /**
      * Returns the space in bytes used by this attribute in the classfile
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return 2 + 4 + 2 + 10*entries.length;
     }
 
@@ -97,7 +99,8 @@ public class LocalVariableTable extends Attribute {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {
         cp.addItem(attr);
 
         for (int i = 0; i < entries.length; i++) {
@@ -114,7 +117,8 @@ public class LocalVariableTable extends Attribute {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeShort(attr.getIndex());
         out.writeInt(getSize() - 6);
         out.writeShort(entries.length);

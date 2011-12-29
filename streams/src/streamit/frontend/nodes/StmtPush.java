@@ -43,24 +43,28 @@ public class StmtPush extends Statement
     }
     
     /** Accepts a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitStmtPush(this);
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof StmtPush))
             return false;
         return value.equals(((StmtPush)other).getValue());
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return value.hashCode();
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return "push(" + value + ")";
     }

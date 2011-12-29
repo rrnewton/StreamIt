@@ -53,14 +53,16 @@ public class JShortLiteral extends JLiteral {
     /**
      * Returns the type of this expression.
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return CStdType.Short;
     }
 
     /**
      * Returns the constant value of the expression.
      */
-    public short shortValue() {
+    @Override
+	public short shortValue() {
         return value;
     }
 
@@ -68,11 +70,13 @@ public class JShortLiteral extends JLiteral {
      * Returns true iff the value of this literal is the
      * default value for this type (JLS 4.5.5).
      */
-    public boolean isDefault() {
+    @Override
+	public boolean isDefault() {
         return value == 0;
     }
 
-    public String convertToString() {
+    @Override
+	public String convertToString() {
         return ""+value;
     }
 
@@ -85,7 +89,8 @@ public class JShortLiteral extends JLiteral {
      * @param   dest        the destination type
      * @return  true iff the conversion is valid
      */
-    public boolean isAssignableTo(CType dest) {
+    @Override
+	public boolean isAssignableTo(CType dest) {
         switch (dest.getTypeID()) {
         case TID_BYTE:
             return (byte)value == value;
@@ -103,7 +108,8 @@ public class JShortLiteral extends JLiteral {
      * changes the type of this expression to an other
      * @param  dest the destination type
      */
-    public JExpression convertType(CType dest, CExpressionContext context) {
+    @Override
+	public JExpression convertType(CType dest, CExpressionContext context) {
         switch (dest.getTypeID()) {
         case TID_BYTE:
             return new JByteLiteral(getTokenReference(), (byte)value);
@@ -112,13 +118,13 @@ public class JShortLiteral extends JLiteral {
         case TID_CHAR:
             return new JCharLiteral(getTokenReference(), (char)value);
         case TID_INT:
-            return new JIntLiteral(getTokenReference(), (int)value);
+            return new JIntLiteral(getTokenReference(), value);
         case TID_LONG:
-            return new JLongLiteral(getTokenReference(), (long)value);
+            return new JLongLiteral(getTokenReference(), value);
         case TID_FLOAT:
-            return new JFloatLiteral(getTokenReference(), (float)value);
+            return new JFloatLiteral(getTokenReference(), value);
         case TID_DOUBLE:
-            return new JDoubleLiteral(getTokenReference(), (double)value);
+            return new JDoubleLiteral(getTokenReference(), value);
         case TID_CLASS:
             if (dest != CStdType.String) {
                 throw new InconsistencyException("cannot convert from short to " + dest);
@@ -137,7 +143,8 @@ public class JShortLiteral extends JLiteral {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitShortLiteral(value);
     }
 
@@ -145,7 +152,8 @@ public class JShortLiteral extends JLiteral {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitShortLiteral(this, value);
     }
 
@@ -167,7 +175,8 @@ public class JShortLiteral extends JLiteral {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         if (! discardValue) {
             setLineNumber(code);
             code.plantInstruction(new PushLiteralInstruction(value));
@@ -178,7 +187,8 @@ public class JShortLiteral extends JLiteral {
      * Returns whether or <pre>o</pre> this represents a literal with the same
      * value as this.
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return (o!=null && 
                 (o instanceof JShortLiteral) &&
                 ((JShortLiteral)o).value==this.value);
@@ -193,7 +203,8 @@ public class JShortLiteral extends JLiteral {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JShortLiteral other = new at.dms.kjc.JShortLiteral();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

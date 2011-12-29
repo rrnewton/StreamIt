@@ -85,7 +85,8 @@ public class Main extends Compiler {
      *
      * @param   args        the command line arguments
      */
-    public boolean run(String[] args) {
+    @Override
+	public boolean run(String[] args) {
         if (!parseArguments(args)) {
             return false;
         }
@@ -94,7 +95,7 @@ public class Main extends Compiler {
 
         if (infiles.size() == 0) {
             options.usage();
-            inform(KjcMessages.NO_INPUT_FILE);
+            inform(CompilerMessages.NO_INPUT_FILE);
             return false;
         }
 
@@ -372,7 +373,8 @@ public class Main extends Compiler {
     /**
      * returns true iff compilation in verbose mode is requested.
      */
-    public boolean verboseMode() {
+    @Override
+	public boolean verboseMode() {
         return KjcOptions.verbose;
     }
 
@@ -600,7 +602,8 @@ public class Main extends Compiler {
      *
      * @param   trouble     a description of the trouble to report.
      */
-    public void reportTrouble(PositionedError trouble) {
+    @Override
+	public void reportTrouble(PositionedError trouble) {
         if (trouble instanceof CWarning) {
             if (KjcOptions.warning != 0 && filterWarning((CWarning)trouble)) {
                 inform(trouble);
@@ -659,7 +662,8 @@ public class Main extends Compiler {
     /**
      * Returns true iff comments should be parsed (false if to be skipped)
      */
-    public boolean parseComments() {
+    @Override
+	public boolean parseComments() {
         return KjcOptions.deprecation || (KjcOptions.beautify && !KjcOptions.nowrite);
     }
 
@@ -695,7 +699,8 @@ public class Main extends Compiler {
             this.infiles = infiles;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             for (int count = start; count < end; count++) {
                 tree[count] = compiler.parseFile((File)infiles.elementAt(count));
             }
@@ -716,7 +721,8 @@ public class Main extends Compiler {
             this.tree = tree;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             for (int count = start; count < end; count++) {
                 compiler.checkBody(tree[count]);
                 tree[count] = null;
@@ -738,7 +744,8 @@ public class Main extends Compiler {
             this.compiler = compiler;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             for (int count = start; count < end; count++) {
                 tree[count].accept(compiler, destination);
             }
@@ -765,7 +772,8 @@ public class Main extends Compiler {
             this.destination = destination;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             try {
                 for (int count = start; count < end; count++) {
                     tree[count].genCode(optimizer,destination);

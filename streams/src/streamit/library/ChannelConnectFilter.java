@@ -29,7 +29,8 @@ public class ChannelConnectFilter extends Filter
         super (); 
     }
 
-    public void init ()
+    @Override
+	public void init ()
     {
         if (type != null)
             {
@@ -39,7 +40,8 @@ public class ChannelConnectFilter extends Filter
         addSteadyPhase(1, 1, 1, "work");
     }
 
-    public void work()
+    @Override
+	public void work()
     {
         passOneData (inputChannel, outputChannel);
     }

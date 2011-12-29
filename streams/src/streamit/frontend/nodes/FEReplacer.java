@@ -139,7 +139,8 @@ public class FEReplacer implements FEVisitor
         return (Expression)expr.accept(this);
     }
 
-    public Object visitExprArray(ExprArray exp)
+    @Override
+	public Object visitExprArray(ExprArray exp)
     {
         Expression base = doExpression(exp.getBase());
         Expression offset = doExpression(exp.getOffset());
@@ -149,7 +150,8 @@ public class FEReplacer implements FEVisitor
             return new ExprArray(exp.getContext(), base, offset);
     }
     
-    public Object visitExprArrayInit(ExprArrayInit exp)
+    @Override
+	public Object visitExprArrayInit(ExprArrayInit exp)
     {
         boolean hasChanged = false;
         List<Expression> newElements = new ArrayList<Expression>();
@@ -164,7 +166,8 @@ public class FEReplacer implements FEVisitor
         return new ExprArrayInit(exp.getContext(), newElements);
     }
 
-    public Object visitExprBinary(ExprBinary exp)
+    @Override
+	public Object visitExprBinary(ExprBinary exp)
     {
         Expression left = doExpression(exp.getLeft());
         Expression right = doExpression(exp.getRight());
@@ -174,7 +177,8 @@ public class FEReplacer implements FEVisitor
             return new ExprBinary(exp.getContext(), exp.getOp(), left, right);
     }
     
-    public Object visitExprComplex(ExprComplex exp)
+    @Override
+	public Object visitExprComplex(ExprComplex exp)
     {
         Expression real = exp.getReal();
         if (real != null) real = doExpression(real);
@@ -186,7 +190,8 @@ public class FEReplacer implements FEVisitor
             return new ExprComplex(exp.getContext(), real, imag);
     }
 
-    public Object visitExprComposite(ExprComposite exp) {
+    @Override
+	public Object visitExprComposite(ExprComposite exp) {
         Expression x = exp.getX();
         if (x != null) x = doExpression(x);
         Expression y = exp.getY();
@@ -202,14 +207,21 @@ public class FEReplacer implements FEVisitor
             return new ExprComposite(exp.getContext(), x, y, z, w);
     }
     
-    public Object visitExprConstBoolean(ExprConstBoolean exp) { return exp; }
-    public Object visitExprConstChar(ExprConstChar exp) { return exp; }
-    public Object visitExprConstFloat(ExprConstFloat exp) { return exp; }
-    public Object visitExprConstInt(ExprConstInt exp) { return exp; }
-    public Object visitExprConstStr(ExprConstStr exp) { return exp; }
-    public Object visitExprDynamicToken(ExprDynamicToken exp) { return exp; }
+    @Override
+	public Object visitExprConstBoolean(ExprConstBoolean exp) { return exp; }
+    @Override
+	public Object visitExprConstChar(ExprConstChar exp) { return exp; }
+    @Override
+	public Object visitExprConstFloat(ExprConstFloat exp) { return exp; }
+    @Override
+	public Object visitExprConstInt(ExprConstInt exp) { return exp; }
+    @Override
+	public Object visitExprConstStr(ExprConstStr exp) { return exp; }
+    @Override
+	public Object visitExprDynamicToken(ExprDynamicToken exp) { return exp; }
 
-    public Object visitExprField(ExprField exp)
+    @Override
+	public Object visitExprField(ExprField exp)
     {
         Expression left = doExpression(exp.getLeft());
         if (left == exp.getLeft())
@@ -218,7 +230,8 @@ public class FEReplacer implements FEVisitor
             return new ExprField(exp.getContext(), left, exp.getName());
     }
 
-    public Object visitExprFunCall(ExprFunCall exp)
+    @Override
+	public Object visitExprFunCall(ExprFunCall exp)
     {
         boolean hasChanged = false;
         List<Object> newParams = new ArrayList<Object>();
@@ -233,7 +246,8 @@ public class FEReplacer implements FEVisitor
         return new ExprFunCall(exp.getContext(), exp.getName(), newParams);
     }
 
-    public Object visitExprHelperCall(ExprHelperCall exp)
+    @Override
+	public Object visitExprHelperCall(ExprHelperCall exp)
     {
         boolean hasChanged = false;
         List<Expression> newParams = new ArrayList<Expression>();
@@ -249,11 +263,13 @@ public class FEReplacer implements FEVisitor
                                   exp.getName(), newParams);
     }
     
+	@Override
 	public Object visitExprIter(ExprIter exp) {
 		return exp;
 	}
 
-    public Object visitExprPeek(ExprPeek exp)
+    @Override
+	public Object visitExprPeek(ExprPeek exp)
     {
         Expression expr = doExpression(exp.getExpr());
         if (expr == exp.getExpr())
@@ -262,9 +278,11 @@ public class FEReplacer implements FEVisitor
             return new ExprPeek(exp.getContext(), expr);
     }
 
-    public Object visitExprPop(ExprPop exp) { return exp; }
+    @Override
+	public Object visitExprPop(ExprPop exp) { return exp; }
 
-    public Object visitExprRange(ExprRange exp) {
+    @Override
+	public Object visitExprRange(ExprRange exp) {
         Expression min = doExpression(exp.getMin());
         Expression ave = doExpression(exp.getAve());
         Expression max = doExpression(exp.getMax());
@@ -275,7 +293,8 @@ public class FEReplacer implements FEVisitor
         }
     }
     
-    public Object visitExprTernary(ExprTernary exp)
+    @Override
+	public Object visitExprTernary(ExprTernary exp)
     {
         Expression a = doExpression(exp.getA());
         Expression b = doExpression(exp.getB());
@@ -286,7 +305,8 @@ public class FEReplacer implements FEVisitor
             return new ExprTernary(exp.getContext(), exp.getOp(), a, b, c);
     }
     
-    public Object visitExprTypeCast(ExprTypeCast exp)
+    @Override
+	public Object visitExprTypeCast(ExprTypeCast exp)
     {
         Expression expr = doExpression(exp.getExpr());
         if (expr == exp.getExpr())
@@ -295,7 +315,8 @@ public class FEReplacer implements FEVisitor
             return new ExprTypeCast(exp.getContext(), exp.getType(), expr);
     }
 
-    public Object visitExprUnary(ExprUnary exp)
+    @Override
+	public Object visitExprUnary(ExprUnary exp)
     {
         Expression expr = doExpression(exp.getExpr());
         if (expr == exp.getExpr())
@@ -304,9 +325,11 @@ public class FEReplacer implements FEVisitor
             return new ExprUnary(exp.getContext(), exp.getOp(), expr);
     }
     
-    public Object visitExprVar(ExprVar exp) { return exp; }
+    @Override
+	public Object visitExprVar(ExprVar exp) { return exp; }
 
-    public Object visitFieldDecl(FieldDecl field)
+    @Override
+	public Object visitFieldDecl(FieldDecl field)
     {
         int num = field.getNumFields();
         List<Expression> newInits = new ArrayList<Expression>(num);
@@ -330,7 +353,8 @@ public class FEReplacer implements FEVisitor
                              field.getNames(), newInits);
     }
 
-    public Object visitFunction(Function func)
+    @Override
+	public Object visitFunction(Function func)
     {
         if (func.getCls() == Function.FUNC_NATIVE) return func;
         Statement newBody = (Statement)func.getBody().accept(this);
@@ -342,7 +366,8 @@ public class FEReplacer implements FEVisitor
                             func.getPushRate());
     }
     
-    public Object visitFuncWork(FuncWork func)
+    @Override
+	public Object visitFuncWork(FuncWork func)
     {
         Statement newBody = (Statement)func.getBody().accept(this);
         Expression newPeek = (func.getPeekRate() != null) ?
@@ -358,7 +383,8 @@ public class FEReplacer implements FEVisitor
                             newBody, newPeek, newPop, newPush);
     }
     
-    public Object visitProgram(Program prog)
+    @Override
+	public Object visitProgram(Program prog)
     {
         // Don't need to visit types, only streams.  Assume *something*
         // will change.
@@ -368,7 +394,7 @@ public class FEReplacer implements FEVisitor
 
         List<TypeHelper> newHelpers = prog.getHelpers();
         for (Iterator<TypeHelper> iter = newHelpers.iterator(); iter.hasNext(); ) {
-            TypeHelper helper = (TypeHelper)iter.next();
+            TypeHelper helper = iter.next();
             for (int i = 0; i < helper.getNumFuncs(); i++) {
                 helper.setFunction(i, (Function)helper.getFunction(i).accept(this));
             }
@@ -377,7 +403,8 @@ public class FEReplacer implements FEVisitor
         return new Program(prog.getContext(), newStreams, prog.getStructs(), newHelpers);
     }
     
-    public Object visitSCAnon(SCAnon creator)
+    @Override
+	public Object visitSCAnon(SCAnon creator)
     {
         StreamSpec newSpec = (StreamSpec)creator.getSpec().accept(this);
         if (newSpec == creator.getSpec()) return creator;
@@ -385,7 +412,8 @@ public class FEReplacer implements FEVisitor
                           creator.getPortals());
     }
     
-    public Object visitSCSimple(SCSimple creator)
+    @Override
+	public Object visitSCSimple(SCSimple creator)
     {
         List<Expression> newParams = new ArrayList<Expression>();
         List<Expression> newPortals = new ArrayList<Expression>();
@@ -410,16 +438,19 @@ public class FEReplacer implements FEVisitor
                             creator.getTypes(), newParams, newPortals);
     }
     
-    public Object visitSJDuplicate(SJDuplicate sj) { return sj; }
+    @Override
+	public Object visitSJDuplicate(SJDuplicate sj) { return sj; }
 
-    public Object visitSJRoundRobin(SJRoundRobin sj)
+    @Override
+	public Object visitSJRoundRobin(SJRoundRobin sj)
     {
         Expression newWeight = doExpression(sj.getWeight());
         if (newWeight == sj.getWeight()) return sj;
         return new SJRoundRobin(sj.getContext(), newWeight);
     }
     
-    public Object visitSJWeightedRR(SJWeightedRR sj)
+    @Override
+	public Object visitSJWeightedRR(SJWeightedRR sj)
     {
         boolean changed = false;
         List<Expression> newWeights = new ArrayList<Expression>();
@@ -434,7 +465,8 @@ public class FEReplacer implements FEVisitor
         return new SJWeightedRR(sj.getContext(), newWeights);
     }
         
-    public Object visitStmtAdd(StmtAdd stmt)
+    @Override
+	public Object visitStmtAdd(StmtAdd stmt)
     {
         StreamCreator newCreator =
             (StreamCreator)stmt.getCreator().accept(this);
@@ -442,7 +474,8 @@ public class FEReplacer implements FEVisitor
         return new StmtAdd(stmt.getContext(), newCreator);
     }
     
-    public Object visitStmtAssign(StmtAssign stmt)
+    @Override
+	public Object visitStmtAssign(StmtAssign stmt)
     {    
         Expression newLHS = doExpression(stmt.getLHS());
         Expression newRHS = doExpression(stmt.getRHS());
@@ -452,7 +485,8 @@ public class FEReplacer implements FEVisitor
                               stmt.getOp());
     }
     
-    public Object visitStmtBlock(StmtBlock stmt)
+    @Override
+	public Object visitStmtBlock(StmtBlock stmt)
     {
         List<Statement> oldStatements = newStatements;
         newStatements = new ArrayList<Statement>();
@@ -470,7 +504,8 @@ public class FEReplacer implements FEVisitor
         return result;
     }
     
-    public Object visitStmtBody(StmtBody stmt)
+    @Override
+	public Object visitStmtBody(StmtBody stmt)
     {
         StreamCreator newCreator =
             (StreamCreator)stmt.getCreator().accept(this);
@@ -478,10 +513,13 @@ public class FEReplacer implements FEVisitor
         return new StmtBody(stmt.getContext(), newCreator);
     }
 
-    public Object visitStmtBreak(StmtBreak stmt) { return stmt; }
-    public Object visitStmtContinue(StmtContinue stmt) { return stmt; }
+    @Override
+	public Object visitStmtBreak(StmtBreak stmt) { return stmt; }
+    @Override
+	public Object visitStmtContinue(StmtContinue stmt) { return stmt; }
 
-    public Object visitStmtDoWhile(StmtDoWhile stmt)
+    @Override
+	public Object visitStmtDoWhile(StmtDoWhile stmt)
     {
         Statement newBody = (Statement)stmt.getBody().accept(this);
         Expression newCond = doExpression(stmt.getCond());
@@ -490,23 +528,27 @@ public class FEReplacer implements FEVisitor
         return new StmtDoWhile(stmt.getContext(), newBody, newCond);
     }
     
-    public Object visitStmtEmpty(StmtEmpty stmt) { return stmt; }
+    @Override
+	public Object visitStmtEmpty(StmtEmpty stmt) { return stmt; }
 
-    public Object visitStmtEnqueue(StmtEnqueue stmt)
+    @Override
+	public Object visitStmtEnqueue(StmtEnqueue stmt)
     {
         Expression newValue = doExpression(stmt.getValue());
         if (newValue == stmt.getValue()) return stmt;
         return new StmtEnqueue(stmt.getContext(), newValue);
     }
     
-    public Object visitStmtExpr(StmtExpr stmt)
+    @Override
+	public Object visitStmtExpr(StmtExpr stmt)
     {
         Expression newExpr = doExpression(stmt.getExpression());
         if (newExpr == stmt.getExpression()) return stmt;
         return new StmtExpr(stmt.getContext(), newExpr);
     }
 
-    public Object visitStmtFor(StmtFor stmt)
+    @Override
+	public Object visitStmtFor(StmtFor stmt)
     {
         Statement newInit = (Statement)stmt.getInit().accept(this);
         Expression newCond = doExpression(stmt.getCond());
@@ -519,7 +561,8 @@ public class FEReplacer implements FEVisitor
                            newBody);
     }
     
-    public Object visitStmtIfThen(StmtIfThen stmt)
+    @Override
+	public Object visitStmtIfThen(StmtIfThen stmt)
     {
         Expression newCond = doExpression(stmt.getCond());
         Statement newCons = stmt.getCons() == null ? null :
@@ -532,7 +575,8 @@ public class FEReplacer implements FEVisitor
         return new StmtIfThen(stmt.getContext(), newCond, newCons, newAlt);
     }
     
-    public Object visitStmtJoin(StmtJoin stmt)
+    @Override
+	public Object visitStmtJoin(StmtJoin stmt)
     {
         SplitterJoiner newJoiner =
             (SplitterJoiner)stmt.getJoiner().accept(this);
@@ -540,7 +584,8 @@ public class FEReplacer implements FEVisitor
         return new StmtJoin(stmt.getContext(), newJoiner);
     }
         
-    public Object visitStmtLoop(StmtLoop stmt)
+    @Override
+	public Object visitStmtLoop(StmtLoop stmt)
     {
         StreamCreator newCreator =
             (StreamCreator)stmt.getCreator().accept(this);
@@ -548,14 +593,16 @@ public class FEReplacer implements FEVisitor
         return new StmtLoop(stmt.getContext(), newCreator);
     }
 
-    public Object visitStmtPush(StmtPush stmt)
+    @Override
+	public Object visitStmtPush(StmtPush stmt)
     {
         Expression newValue = doExpression(stmt.getValue());
         if (newValue == stmt.getValue()) return stmt;
         return new StmtPush(stmt.getContext(), newValue);
     }
     
-    public Object visitStmtReturn(StmtReturn stmt)
+    @Override
+	public Object visitStmtReturn(StmtReturn stmt)
     {
         Expression newValue = stmt.getValue() == null ? null :
             doExpression(stmt.getValue());
@@ -563,7 +610,8 @@ public class FEReplacer implements FEVisitor
         return new StmtReturn(stmt.getContext(), newValue);
     }
     
-    public Object visitStmtSendMessage(StmtSendMessage stmt)
+    @Override
+	public Object visitStmtSendMessage(StmtSendMessage stmt)
     {
         boolean hasChanged = false;
         Expression newReceiver = (Expression)stmt.getReceiver().accept(this);
@@ -587,7 +635,8 @@ public class FEReplacer implements FEVisitor
                                    stmt.getName(), newParams, newMin, newMax);
     }
 
-    public Object visitStmtHelperCall(StmtHelperCall stmt) 
+    @Override
+	public Object visitStmtHelperCall(StmtHelperCall stmt) 
     {
         boolean hasChanged = false;
         List<Expression> newParams = new ArrayList<Expression>();
@@ -602,7 +651,8 @@ public class FEReplacer implements FEVisitor
                                   stmt.getName(), newParams);
     }
 
-    public Object visitStmtSplit(StmtSplit stmt)
+    @Override
+	public Object visitStmtSplit(StmtSplit stmt)
     {
         SplitterJoiner newSplitter =
             (SplitterJoiner)stmt.getSplitter().accept(this);
@@ -610,7 +660,8 @@ public class FEReplacer implements FEVisitor
         return new StmtSplit(stmt.getContext(), newSplitter);
     }
 
-    public Object visitStmtVarDecl(StmtVarDecl stmt)
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt)
     {
         List<Expression> newInits = new ArrayList<Expression>();
         for (int i = 0; i < stmt.getNumVars(); i++)
@@ -624,7 +675,8 @@ public class FEReplacer implements FEVisitor
                                stmt.getNames(), newInits);
     }
     
-    public Object visitStmtWhile(StmtWhile stmt)
+    @Override
+	public Object visitStmtWhile(StmtWhile stmt)
     {
         Expression newCond = doExpression(stmt.getCond());
         Statement newBody = (Statement)stmt.getBody().accept(this);
@@ -633,7 +685,8 @@ public class FEReplacer implements FEVisitor
         return new StmtWhile(stmt.getContext(), newCond, newBody);
     }
 
-    public Object visitStreamSpec(StreamSpec spec)
+    @Override
+	public Object visitStreamSpec(StreamSpec spec)
     {
         // Oof, there's a lot here.  At least half of it doesn't get
         // visited...
@@ -666,8 +719,10 @@ public class FEReplacer implements FEVisitor
         
     }
     
-    public Object visitStreamType(StreamType type) { return type; }
-    public Object visitOther(FENode node) { 
+    @Override
+	public Object visitStreamType(StreamType type) { return type; }
+    @Override
+	public Object visitOther(FENode node) { 
         // streamit.frontend.tojava.StmtSetTypes: has only types
         // not processed.
         if (node instanceof StmtSetTypes) return node;

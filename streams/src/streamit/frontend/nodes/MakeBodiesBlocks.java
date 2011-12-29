@@ -37,7 +37,8 @@ public class MakeBodiesBlocks extends FEReplacer
         return new StmtBlock(stmt.getContext(), body);
     }
 
-    public Object visitFunction(Function func)
+    @Override
+	public Object visitFunction(Function func)
     {
         if (func.getCls() == Function.FUNC_NATIVE) return func;
         Statement newBody = (Statement)func.getBody().accept(this);
@@ -50,7 +51,8 @@ public class MakeBodiesBlocks extends FEReplacer
                             func.getPushRate());
     }
     
-    public Object visitFuncWork(FuncWork func)
+    @Override
+	public Object visitFuncWork(FuncWork func)
     {
         Statement newBody = (Statement)func.getBody().accept(this);
         newBody = buildBlock(newBody);
@@ -61,7 +63,8 @@ public class MakeBodiesBlocks extends FEReplacer
                             func.getPushRate());
     }
 
-    public Object visitStmtDoWhile(StmtDoWhile stmt)
+    @Override
+	public Object visitStmtDoWhile(StmtDoWhile stmt)
     {
         Statement newBody = (Statement)stmt.getBody().accept(this);
         newBody = buildBlock(newBody);
@@ -70,7 +73,8 @@ public class MakeBodiesBlocks extends FEReplacer
         return new StmtDoWhile(stmt.getContext(), newBody, stmt.getCond());
     }
     
-    public Object visitStmtFor(StmtFor stmt)
+    @Override
+	public Object visitStmtFor(StmtFor stmt)
     {
         // Note that init and incr are statements, but we need to
         // deal specially with them; for purposes of converting to
@@ -83,7 +87,8 @@ public class MakeBodiesBlocks extends FEReplacer
                            stmt.getIncr(), newBody);
     }
 
-    public Object visitStmtIfThen(StmtIfThen stmt)
+    @Override
+	public Object visitStmtIfThen(StmtIfThen stmt)
     {
         Statement newCons = null;
         if (stmt.getCons() != null)
@@ -103,7 +108,8 @@ public class MakeBodiesBlocks extends FEReplacer
                               newCons, newAlt);
     }
 
-    public Object visitStmtWhile(StmtWhile stmt)
+    @Override
+	public Object visitStmtWhile(StmtWhile stmt)
     {
         Statement newBody = (Statement)stmt.getBody().accept(this);
         newBody = buildBlock(newBody);

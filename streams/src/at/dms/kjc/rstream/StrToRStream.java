@@ -237,7 +237,7 @@ public class StrToRStream {
         if (KjcOptions.steadymult > 1) {
             for (Iterator it = executionCounts[1].keySet().iterator(); it.hasNext(); ){
                 SIROperator obj = (SIROperator)it.next();
-                int val = KjcOptions.steadymult * ((int[])executionCounts[1].get(obj))[0];
+                int val = KjcOptions.steadymult * executionCounts[1].get(obj)[0];
                 int[] wrapper = { val };
                 executionCounts[1].put(obj, wrapper);
             }
@@ -300,7 +300,7 @@ public class StrToRStream {
             for (Iterator it = executionCounts[i].keySet().iterator();
                  it.hasNext(); ){
                 SIROperator obj = (SIROperator)it.next();
-                int val = ((int[])executionCounts[i].get(obj))[0];
+                int val = executionCounts[i].get(obj)[0];
                 //System.err.println("execution count for " + obj + ": " + val);
                 /* This bug doesn't show up in the new version of
                  * FM Radio - but leaving the comment here in case
@@ -333,14 +333,14 @@ public class StrToRStream {
                 if(initExecutionCounts.get(node.incoming[0])!=null)
                     initCount=initExecutionCounts.get(node.incoming[0]).intValue();
                 if((initCount==-1)&&(executionCounts[0].get(node.incoming[0].contents)!=null))
-                    initCount=((int[])executionCounts[0].get(node.incoming[0].contents))[0];
+                    initCount=executionCounts[0].get(node.incoming[0].contents)[0];
             }
             int steadyCount=-1;
             if(node.incoming.length>0) {
                 if(steadyExecutionCounts.get(node.incoming[0])!=null)
                     steadyCount=steadyExecutionCounts.get(node.incoming[0]).intValue();
                 if((steadyCount==-1)&&(executionCounts[1].get(node.incoming[0].contents)!=null))
-                    steadyCount=((int[])executionCounts[1].get(node.incoming[0].contents))[0];
+                    steadyCount=executionCounts[1].get(node.incoming[0].contents)[0];
             }
             if(node.contents instanceof SIRIdentity) {
                 if(initCount>=0)
@@ -367,9 +367,9 @@ public class StrToRStream {
             } else if(node.contents instanceof SIRJoiner) {
                 FlatNode oldNode=graphFlattener.getFlatNode(node.contents);
                 if(executionCounts[0].get(node.oldContents)!=null)
-                    result[0].put(node,new Integer(((int[])executionCounts[0].get(node.oldContents))[0]));
+                    result[0].put(node,new Integer(executionCounts[0].get(node.oldContents)[0]));
                 if(executionCounts[1].get(node.oldContents)!=null)
-                    result[1].put(node,new Integer(((int[])executionCounts[1].get(node.oldContents))[0]));
+                    result[1].put(node,new Integer(executionCounts[1].get(node.oldContents)[0]));
             }
         }
     
@@ -417,7 +417,8 @@ public class StrToRStream {
              * Find any CVector type in a JVariableDefinition and
              * update vectorTypeDefs.
              */
-            public void visitNode(FlatNode node) {
+            @Override
+			public void visitNode(FlatNode node) {
                 if (node.isFilter()) {
                     SIRFilter filter = (SIRFilter)node.contents;
                     for (JFieldDeclaration decl : filter.getFields()) {

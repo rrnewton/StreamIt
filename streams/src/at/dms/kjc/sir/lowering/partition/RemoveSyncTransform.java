@@ -14,14 +14,16 @@ public final class RemoveSyncTransform extends IdempotentTransform {
     /**
      * Perform the transform on <str> and return new stream.
      */
-    public SIRStream doMyTransform(SIRStream str) {
+    @Override
+	public SIRStream doMyTransform(SIRStream str) {
         assert str instanceof SIRPipeline;
         boolean ok = RefactorSplitJoin.removeMatchingSyncPoints((SIRPipeline)str);
         assert ok: "Remove matching sync failed.";
         return str;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Remove matching sync transform, #" + id;
     }
 }

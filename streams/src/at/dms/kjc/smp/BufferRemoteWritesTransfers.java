@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JAddExpression;
@@ -67,7 +68,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             //set up the tail pointer for reading
             readTailName = buf.getIdent() + "tail";
             readTailDefn = new JVariableDefinition(null,
-                    at.dms.kjc.Constants.ACC_STATIC,
+                    Constants.ACC_STATIC,
                     CStdType.Integer, readTailName, null);
             
             tail = new JFieldAccessExpression(readTailName);
@@ -83,7 +84,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
             //set up the head pointer for writing
             writeHeadName = buf.getIdent() + "head";
             writeHeadDefn = new JVariableDefinition(null,
-                    at.dms.kjc.Constants.ACC_STATIC,
+                    Constants.ACC_STATIC,
                     CStdType.Integer, writeHeadName, null);
             
             head = new JFieldAccessExpression(writeHeadName);
@@ -174,14 +175,16 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         return retval;
     }
     
-    public JStatement zeroOutTail(SchedulingPhase phase) {
+    @Override
+	public JStatement zeroOutTail(SchedulingPhase phase) {
     	assert (parent instanceof InputRotatingBuffer);
     	
         return new JExpressionStatement(
                 new JAssignmentExpression(tail, new JIntLiteral(0)));
     }
     
-    public JMethodDeclaration peekMethod() {
+    @Override
+	public JMethodDeclaration peekMethod() {
     	assert (parent instanceof InputRotatingBuffer);
     	//System.out.println(parent.getType().toString());
         String parameterName = "__offset";
@@ -192,7 +195,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 parent.getType(),
                 parent.peekMethodName(),
                 new JFormalParameter[]{offset},
@@ -204,13 +207,14 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         return retval;
     }
     
-    public JMethodDeclaration popMethod() {
+    @Override
+	public JMethodDeclaration popMethod() {
     	assert (parent instanceof InputRotatingBuffer);
     	
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 parent.getType(),
                 parent.popMethodName(),
                 new JFormalParameter[0],
@@ -387,7 +391,8 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         }
     }
 
-    public JStatement zeroOutHead(SchedulingPhase phase) {
+    @Override
+	public JStatement zeroOutHead(SchedulingPhase phase) {
     	assert (parent instanceof OutputRotatingBuffer);
     	
         int literal = getWriteOffset(phase);
@@ -398,7 +403,8 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
         return block;
     }
 
-    public JMethodDeclaration pushMethod() {
+    @Override
+	public JMethodDeclaration pushMethod() {
     	assert (parent instanceof OutputRotatingBuffer);
     	
         JBlock body = new JBlock();
@@ -435,7 +441,7 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
 
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
-                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ at.dms.kjc.Constants.ACC_INLINE,
+                /*at.dms.kjc.Constants.ACC_PUBLIC | at.dms.kjc.Constants.ACC_STATIC |*/ Constants.ACC_INLINE,
                 CStdType.Void,
                 parent.pushMethodName(),
                 new JFormalParameter[]{val},

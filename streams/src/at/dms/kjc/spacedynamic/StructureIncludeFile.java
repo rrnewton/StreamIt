@@ -262,7 +262,7 @@ public class StructureIncludeFile {
         Vector<CClass> passedStructs = new Vector<CClass>();
 
         for (int i = 0; i < streamGraph.getStaticSubGraphs().length; i++) {
-            StaticStreamGraph ssg = (StaticStreamGraph)streamGraph.getStaticSubGraphs()[i];
+            StaticStreamGraph ssg = streamGraph.getStaticSubGraphs()[i];
 
             Iterator flatNodes = ssg.getFlatNodes().iterator();
             while (flatNodes.hasNext()) {

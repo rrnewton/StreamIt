@@ -52,7 +52,8 @@ public class TestK2S extends Main
      *
      * @param     args            the command line arguments
      */
-    public boolean run(String[] args)
+    @Override
+	public boolean run(String[] args)
     {
         if (!parseArguments(args))
             return false;
@@ -62,7 +63,7 @@ public class TestK2S extends Main
         if (infiles.size() == 0)
             {
                 options.usage();
-                inform(KjcMessages.NO_INPUT_FILE);
+                inform(CompilerMessages.NO_INPUT_FILE);
                 return false;
             }
 

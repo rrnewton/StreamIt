@@ -55,7 +55,8 @@ public class FissionEdgeMemoizer {
             this(edge.getSrc(), edge.getDest());
         }
         
-        public boolean equals(Object obj) {
+        @Override
+		public boolean equals(Object obj) {
             if(obj instanceof EdgeDescriptor) {
                 EdgeDescriptor edge = (EdgeDescriptor)obj;
                 
@@ -69,7 +70,8 @@ public class FissionEdgeMemoizer {
             return false;
         }
         
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             return src.hashCode() + dest.hashCode();
         }
     }

@@ -75,12 +75,14 @@ public class FuseAll implements StreamVisitor {
      */
         
     /* visit a filter */
-    public void visitFilter(SIRFilter self,
+    @Override
+	public void visitFilter(SIRFilter self,
                             SIRFilterIter iter) {
     }
 
     /* visit a phased filter */
-    public void visitPhasedFilter(SIRPhasedFilter self,
+    @Override
+	public void visitPhasedFilter(SIRPhasedFilter self,
                                   SIRPhasedFilterIter iter) {
         // There's an argument to be made that this should flatten the
         // phases into a single work function, but this isn't necessarily
@@ -92,17 +94,20 @@ public class FuseAll implements StreamVisitor {
      */
         
     /* pre-visit a pipeline */
-    public void preVisitPipeline(SIRPipeline self,
+    @Override
+	public void preVisitPipeline(SIRPipeline self,
                                  SIRPipelineIter iter) {
     }
 
     /* pre-visit a splitjoin */
-    public void preVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void preVisitSplitJoin(SIRSplitJoin self,
                                   SIRSplitJoinIter iter) {
     }
 
     /* pre-visit a feedbackloop */
-    public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                      SIRFeedbackLoopIter iter) {
         // if we had to fuse things down, then fail if we can't
         if (strict) {
@@ -115,7 +120,8 @@ public class FuseAll implements StreamVisitor {
      */
 
     /* post-visit a pipeline */
-    public void postVisitPipeline(SIRPipeline self,
+    @Override
+	public void postVisitPipeline(SIRPipeline self,
                                   SIRPipelineIter iter) {
         int elim = FusePipe.fuse(self);
         // now fusion fuses as much as possible, but might leave a
@@ -126,7 +132,8 @@ public class FuseAll implements StreamVisitor {
     }
 
     /* post-visit a splitjoin */
-    public void postVisitSplitJoin(SIRSplitJoin self,
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self,
                                    SIRSplitJoinIter iter) {
         if (FuseSplit.isFusable(self)) {
             SIRStream result = FuseSplit.fuse(self);
@@ -136,7 +143,8 @@ public class FuseAll implements StreamVisitor {
     }
 
     /* post-visit a feedbackloop */
-    public void postVisitFeedbackLoop(SIRFeedbackLoop self,
+    @Override
+	public void postVisitFeedbackLoop(SIRFeedbackLoop self,
                                       SIRFeedbackLoopIter iter) {
     }
 

@@ -85,7 +85,8 @@ public abstract class ReferenceConstant extends PooledConstant {
     /**
      * Returns the associated literal: this constant type has none
      */
-    /*package*/ Object getLiteral() {
+    @Override
+	/*package*/ Object getLiteral() {
         return null;
     }
 
@@ -133,7 +134,8 @@ public abstract class ReferenceConstant extends PooledConstant {
      * CONVENTION: return XXXXXXXXXXXX &lt;&lt; 4 + Y
      * with Y = ident of the type of the pooled constant
      */
-    public final int hashCode() {
+    @Override
+	public final int hashCode() {
         // ADD is not perfect, but...
         // we know already that name is an ascii: &
         return ((clazz.hashCode() + nametype.hashCode()) * tag & 0xFFFFFFF0) + POO_REF_CONSTANT;
@@ -143,7 +145,8 @@ public abstract class ReferenceConstant extends PooledConstant {
      * equals (an exact comparison)
      * ASSERT: this.hashCode == o.hashCode ===&gt; cast
      */
-    public final boolean equals(Object o) {
+    @Override
+	public final boolean equals(Object o) {
         return (o instanceof ReferenceConstant) &&
             ((ReferenceConstant)o).clazz.equals(clazz) &&
             ((ReferenceConstant)o).nametype.equals(nametype);
@@ -158,7 +161,8 @@ public abstract class ReferenceConstant extends PooledConstant {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {
         cp.addItem(clazz);
         cp.addItem(nametype);
     }
@@ -169,7 +173,8 @@ public abstract class ReferenceConstant extends PooledConstant {
      * @param   pc      the already in pooled constant
      * ASSERT pc.getClass() == this.getClass()
      */
-    /*package*/ final void resolveConstants(PooledConstant pc) {
+    /*package*/ @Override
+	final void resolveConstants(PooledConstant pc) {
         setIndex(pc.getIndex());
         clazz.setIndex(((ReferenceConstant)pc).clazz.getIndex());
         nametype.setIndex(((ReferenceConstant)pc).nametype.getIndex());
@@ -184,7 +189,8 @@ public abstract class ReferenceConstant extends PooledConstant {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         out.writeByte(tag);
         out.writeShort(clazz.getIndex());
         out.writeShort(nametype.getIndex());

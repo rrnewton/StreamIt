@@ -34,7 +34,8 @@ public abstract class AbstractInstructionAccessor
      * @param   transformer     the transformer to be used
      * @param   container       the object which contains the accessor
      */
-    public InstructionAccessor transform(AccessorTransformer transformer,
+    @Override
+	public InstructionAccessor transform(AccessorTransformer transformer,
                                          AccessorContainer container)
         throws BadAccessorException
     {

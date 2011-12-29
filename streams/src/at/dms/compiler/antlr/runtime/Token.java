@@ -49,7 +49,8 @@ public class Token implements Cloneable {
     public void setLine(int l) {}
     public void setText(String t) {}
     public void setType(int t) { type = t; }
-    public String toString() {
+    @Override
+	public String toString() {
         return "[\""+getText()+"\",<"+type+">]";
     }
 }

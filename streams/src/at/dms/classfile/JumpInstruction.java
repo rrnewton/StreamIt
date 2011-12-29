@@ -66,14 +66,16 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
      * Returns true iff control flow can reach the next instruction
      * in textual order.
      */
-    public boolean canComplete() {
+    @Override
+	public boolean canComplete() {
         return getOpcode() != opc_goto && getOpcode() != opc_goto_w;
     }
 
     /**
      * Transforms targets (deferences to actual instructions).
      */
-    public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
+    @Override
+	public void transformAccessors(AccessorTransformer transformer) throws BadAccessorException {
         this.target = this.target.transform(transformer, this);
     }
 
@@ -95,7 +97,8 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
      * Returns the number of bytes used by the the instruction
      * in the code array.
      */
-    /*package*/ int getSize() {
+    @Override
+	/*package*/ int getSize() {
         return getSize(wide);
     }
 
@@ -133,7 +136,8 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
      *      and it can complete normally
      * @exception   ClassFileFormatException    a problem was detected
      */
-    /*package*/ void check(CodeEnv env, int curStack)
+    @Override
+	/*package*/ void check(CodeEnv env, int curStack)
         throws ClassFileFormatException
     {
         if (getOpcode() == opc_jsr_w || getOpcode() == opc_jsr) {
@@ -156,7 +160,8 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
      *              is changed to the minimum and maximum
      *              address of the end of this instruction.
      */
-    /*package*/ void computeEndAddress(CodePosition position) {
+    @Override
+	/*package*/ void computeEndAddress(CodePosition position) {
         CodePosition    target = ((InstructionHandle)this.target).getPosition();
 
         boolean     minWide;
@@ -202,7 +207,8 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
     /**
      * Returns the size of data pushed on the stack by this instruction
      */
-    public int getPushedOnStack() {
+    @Override
+	public int getPushedOnStack() {
         switch (getOpcode()) {
         case opc_jsr_w:
             return 2;
@@ -216,14 +222,16 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
     /**
      * Returns the type pushed on the stack
      */
-    public byte getReturnType() {
+    @Override
+	public byte getReturnType() {
         return TYP_VOID;
     }
 
     /**
      * Return the amount of stack (positive or negative) used by this instruction
      */
-    public int getStack() {
+    @Override
+	public int getStack() {
         switch (getOpcode()) {
         case opc_ifeq:
         case opc_ifne:
@@ -269,7 +277,8 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
      *
      * @param   cp      the constant pool for this class
      */
-    /*package*/ void resolveConstants(ConstantPool cp) {}
+    @Override
+	/*package*/ void resolveConstants(ConstantPool cp) {}
 
     /**
      * Write this instruction into a file
@@ -279,7 +288,8 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
      *
      * @exception   java.io.IOException an io problem has occured
      */
-    /*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
+    @Override
+	/*package*/ void write(ConstantPool cp, DataOutput out) throws IOException {
         Instruction     target = (Instruction)this.target;
 
         if (!wide) {
@@ -352,7 +362,8 @@ public class JumpInstruction extends Instruction implements AccessorContainer {
     // DEBUG
     // --------------------------------------------------------------------
 
-    public void dump() {
+    @Override
+	public void dump() {
         System.err.println("" + OpcodeNames.getName(getOpcode()) + " [" + this + "] ===> " + target);
     }
 

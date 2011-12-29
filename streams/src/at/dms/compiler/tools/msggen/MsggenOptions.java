@@ -14,14 +14,16 @@ public class MsggenOptions extends at.dms.compiler.tools.common.Options {
         this("Msggen");
     }
 
-    public boolean processOption(int code, Getopt g) {
+    @Override
+	public boolean processOption(int code, Getopt g) {
         switch (code) {
         default:
             return super.processOption(code, g);
         }
     }
 
-    public String[] getOptions() {
+    @Override
+	public String[] getOptions() {
         String[]    parent = super.getOptions();
         String[]    total = new String[parent.length + 0];
         System.arraycopy(parent, 0, total, 0, parent.length);
@@ -30,22 +32,26 @@ public class MsggenOptions extends at.dms.compiler.tools.common.Options {
     }
 
 
-    public String getShortOptions() {
+    @Override
+	public String getShortOptions() {
         return "" + super.getShortOptions();
     }
 
 
-    public void version() {
+    @Override
+	public void version() {
         System.out.println("Version 1.5B released 9 August 2001");
     }
 
 
-    public void usage() {
+    @Override
+	public void usage() {
         System.err.println("usage: at.dms.msggen <file>");
     }
 
 
-    public void help() {
+    @Override
+	public void help() {
         System.err.println("usage: at.dms.msggen <file>");
         printOptions();
         System.err.println();
@@ -55,7 +61,8 @@ public class MsggenOptions extends at.dms.compiler.tools.common.Options {
         System.err.println("For more info, please see: http://www.dms.at/kopi");
     }
 
-    public LongOpt[] getLongOptions() {
+    @Override
+	public LongOpt[] getLongOptions() {
         LongOpt[]   parent = super.getLongOptions();
         LongOpt[]   total = new LongOpt[parent.length + LONGOPTS.length];
     

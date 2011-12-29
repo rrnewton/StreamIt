@@ -31,7 +31,8 @@ class FusionCode {
     public static int mult = 1;
     
     private static Comparator<SIROperator> filterSorter = new Comparator<SIROperator>() {
-        public int compare(SIROperator o1, SIROperator o2) {
+        @Override
+		public int compare(SIROperator o1, SIROperator o2) {
             if (!(o1 instanceof SIRFilter && o2 instanceof SIRFilter)) {
                 return 0;
             }
@@ -284,7 +285,7 @@ class FusionCode {
         
         for (int i = 0; i < threadNumber; i++) {
             FlatNode node = NodeEnumerator.getFlatNode(i);
-            SIROperator oper = (SIROperator)node.contents;
+            SIROperator oper = node.contents;
 
             for (Tape stream : RegisterStreams.getNodeOutStreams(oper)) {
                 if (stream != null) {
@@ -835,7 +836,7 @@ class FusionCode {
         int id = NodeEnumerator.getSIROperatorId(oper);
 
         if (oper instanceof SIRFilter) {
-            return ClusterUtils.getWorkName((SIRFilter) oper, id);
+            return ClusterUtils.getWorkName(oper, id);
         }
 
         if (oper instanceof SIRSplitter) {

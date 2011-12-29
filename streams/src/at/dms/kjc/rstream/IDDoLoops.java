@@ -31,6 +31,7 @@ import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.flatgraph.FlatNode;
 import at.dms.kjc.flatgraph.FlatVisitor;
 import at.dms.kjc.sir.SIRFilter;
+import at.dms.util.Utils;
 
 /**
  * This pass identifies java-style for loops that can be converted to 
@@ -75,7 +76,8 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
      * @param node current flat node we are visiting
      *
      */
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.isFilter()) {
             visitFilter((SIRFilter)node.contents);
@@ -130,7 +132,8 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
     /**
      * See comments in method.
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -159,7 +162,7 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
         }
         if (cond != null && info.induction != null && info.init != null) {
             //get the condition statement and put it in the correct format
-            getDLCondExpression(Util.passThruParens(cond), info);
+            getDLCondExpression(Utils.passThruParens(cond), info);
             //check for method calls in condition
             if (info.cond != null && CheckForMethodCalls.check(info.cond))
                 info.cond = null;
@@ -278,18 +281,18 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
     private void getDLIncrExpression(JExpression incrExp, 
                                      DoLoopInformation info)
     {
-        if (Util.passThruParens(incrExp) instanceof JBinaryExpression) {
-            if (Util.passThruParens(incrExp) instanceof JCompoundAssignmentExpression) {
+        if (Utils.passThruParens(incrExp) instanceof JBinaryExpression) {
+            if (Utils.passThruParens(incrExp) instanceof JCompoundAssignmentExpression) {
                 //compound assignment expression of the form left (op=) right 
                 JCompoundAssignmentExpression comp = 
-                    (JCompoundAssignmentExpression)Util.passThruParens(incrExp);
+                    (JCompoundAssignmentExpression)Utils.passThruParens(incrExp);
                 //make sure left is the induction variable
-                if (Util.passThruParens(comp.getLeft()) instanceof JLocalVariableExpression &&
-                    ((JLocalVariableExpression)Util.passThruParens(comp.getLeft())).
+                if (Utils.passThruParens(comp.getLeft()) instanceof JLocalVariableExpression &&
+                    ((JLocalVariableExpression)Utils.passThruParens(comp.getLeft())).
                     getVariable().equals(info.induction)) {
                     //return right if plus
                     if (comp.getOperation() == OPE_PLUS) {
-                        info.incr = Util.passThruParens(comp.getRight());
+                        info.incr = Utils.passThruParens(comp.getRight());
                     } /*else if (comp.getOperation() == OPE_MINUS) {
                         info.incr = new JExpressionStatement(null, 
                         new JUnaryMinusExpression(null, comp.getRight()),
@@ -297,36 +300,36 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
                         }*/
                 }
             } //if an assignment expression of the form i = i + x or i = x + i, i is induction
-            else if (Util.passThruParens(incrExp) instanceof JAssignmentExpression &&
-                     (Util.passThruParens(((JAssignmentExpression)Util.passThruParens(incrExp)).getLeft()) 
+            else if (Utils.passThruParens(incrExp) instanceof JAssignmentExpression &&
+                     (Utils.passThruParens(((JAssignmentExpression)Utils.passThruParens(incrExp)).getLeft()) 
                       instanceof JLocalVariableExpression &&
-                      ((JLocalVariableExpression)Util.passThruParens(((JAssignmentExpression)Util.
+                      ((JLocalVariableExpression)Utils.passThruParens(((JAssignmentExpression)Utils.
                                                                       passThruParens(incrExp)).getLeft())).
                       getVariable().equals(info.induction))) {
                 //normal assignment expression left = right
-                JAssignmentExpression ass = (JAssignmentExpression)Util.passThruParens(incrExp);
+                JAssignmentExpression ass = (JAssignmentExpression)Utils.passThruParens(incrExp);
                 //only handle plus and minus 
-                if (Util.passThruParens(ass.getRight()) instanceof JAddExpression) {
+                if (Utils.passThruParens(ass.getRight()) instanceof JAddExpression) {
                     //Util.passThruParens(ass.getRight()) instanceof JMinusExpression) {
-                    JBinaryExpression bin = (JBinaryExpression)Util.passThruParens(ass.getRight());
+                    JBinaryExpression bin = (JBinaryExpression)Utils.passThruParens(ass.getRight());
                     //if left of binary is an access to the induction variable
-                    if (Util.passThruParens(bin.getLeft()) instanceof JLocalVariableExpression &&
-                        ((JLocalVariableExpression)Util.passThruParens(bin.getLeft())).
+                    if (Utils.passThruParens(bin.getLeft()) instanceof JLocalVariableExpression &&
+                        ((JLocalVariableExpression)Utils.passThruParens(bin.getLeft())).
                         getVariable().equals(info.induction)) {
                         //if plus return the right,
-                        if (Util.passThruParens(ass.getRight()) instanceof JAddExpression)
-                            info.incr = Util.passThruParens(bin.getRight());
+                        if (Utils.passThruParens(ass.getRight()) instanceof JAddExpression)
+                            info.incr = Utils.passThruParens(bin.getRight());
                         /*if (ass.getRight() instanceof JMinusExpression)
                           info.incr = new JExpressionStatement(null,
                           new JUnaryMinusExpression(null, bin.getRight()),
                           null);*/
                     }
                     //analogue of above...
-                    if (Util.passThruParens(bin.getRight()) instanceof JLocalVariableExpression &&
-                        ((JLocalVariableExpression)Util.passThruParens(bin.getRight())).
+                    if (Utils.passThruParens(bin.getRight()) instanceof JLocalVariableExpression &&
+                        ((JLocalVariableExpression)Utils.passThruParens(bin.getRight())).
                         getVariable().equals(info.induction)) {
-                        if (Util.passThruParens(ass.getRight()) instanceof JAddExpression)
-                            info.incr = Util.passThruParens(bin.getLeft());
+                        if (Utils.passThruParens(ass.getRight()) instanceof JAddExpression)
+                            info.incr = Utils.passThruParens(bin.getLeft());
                         /*if (Util.passThruParens(ass.getRight()) instanceof JMinusExpression)
                           info.incr = new JExpressionStatement(null, 
                           new JUnaryMinusExpression
@@ -336,11 +339,11 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
                 }
             }
         }
-        else if (Util.passThruParens(incrExp) instanceof JPrefixExpression) {  //prefix op expr 
-            JPrefixExpression pre = (JPrefixExpression)Util.passThruParens(incrExp);
+        else if (Utils.passThruParens(incrExp) instanceof JPrefixExpression) {  //prefix op expr 
+            JPrefixExpression pre = (JPrefixExpression)Utils.passThruParens(incrExp);
             //check that we assigning the induction variable
-            if (Util.passThruParens(pre.getExpr()) instanceof JLocalVariableExpression &&
-                ((JLocalVariableExpression)Util.passThruParens(pre.getExpr())).
+            if (Utils.passThruParens(pre.getExpr()) instanceof JLocalVariableExpression &&
+                ((JLocalVariableExpression)Utils.passThruParens(pre.getExpr())).
                 getVariable().equals(info.induction)) {
                 if (pre.getOper() == OPE_PREINC) {
                     info.incr = new JIntLiteral(1);
@@ -349,11 +352,11 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
                     }   */  
             }
         }
-        else if (Util.passThruParens(incrExp) instanceof JPostfixExpression) { //postfix expr op
-            JPostfixExpression post = (JPostfixExpression)Util.passThruParens(incrExp);
+        else if (Utils.passThruParens(incrExp) instanceof JPostfixExpression) { //postfix expr op
+            JPostfixExpression post = (JPostfixExpression)Utils.passThruParens(incrExp);
             //check that we assigning the induction variable
-            if (Util.passThruParens(post.getExpr()) instanceof JLocalVariableExpression &&
-                ((JLocalVariableExpression)Util.passThruParens(post.getExpr())).
+            if (Utils.passThruParens(post.getExpr()) instanceof JLocalVariableExpression &&
+                ((JLocalVariableExpression)Utils.passThruParens(post.getExpr())).
                 getVariable().equals(info.induction)) {
                 if (post.getOper() == OPE_POSTINC) {
                     info.incr = new JIntLiteral(1);
@@ -376,12 +379,12 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
                                      DoLoopInformation info) 
     {
         //only handle binary relational expressions
-        if (Util.passThruParens(condExp) instanceof JRelationalExpression) {
-            JRelationalExpression cond = (JRelationalExpression)Util.passThruParens(condExp);
+        if (Utils.passThruParens(condExp) instanceof JRelationalExpression) {
+            JRelationalExpression cond = (JRelationalExpression)Utils.passThruParens(condExp);
         
             //make sure that lhs is an access to the induction variable 
-            if (Util.passThruParens(cond.getLeft()) instanceof JLocalVariableExpression &&
-                ((JLocalVariableExpression)Util.passThruParens(cond.getLeft())).
+            if (Utils.passThruParens(cond.getLeft()) instanceof JLocalVariableExpression &&
+                ((JLocalVariableExpression)Utils.passThruParens(cond.getLeft())).
                 getVariable().equals(info.induction)) {
         
                 //rhs is of type int
@@ -390,8 +393,8 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
                     info.cond = cond.getRight();
                     break;
                 case OPE_LE:
-                    if (Util.passThruParens(cond.getRight()) instanceof JIntLiteral) {
-                        JIntLiteral right = (JIntLiteral)Util.passThruParens(cond.getRight());
+                    if (Utils.passThruParens(cond.getRight()) instanceof JIntLiteral) {
+                        JIntLiteral right = (JIntLiteral)Utils.passThruParens(cond.getRight());
                         info.cond = new JIntLiteral(right.intValue() + 1);
                     }
                     else
@@ -429,8 +432,8 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
     {
         //make sure it is an assignment expression 
         //remember that all var defs have been lifted...
-        if (Util.passThruParens(initExp) instanceof JAssignmentExpression) {
-            JAssignmentExpression ass = (JAssignmentExpression)Util.passThruParens(initExp);
+        if (Utils.passThruParens(initExp) instanceof JAssignmentExpression) {
+            JAssignmentExpression ass = (JAssignmentExpression)Utils.passThruParens(initExp);
         
             //check that we are dealing with integers 
             if (!(ass.getLeft().getType().isOrdinal() && 
@@ -438,10 +441,10 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
                 return;
         
             //check that the left is a variable expression
-            if (Util.passThruParens(ass.getLeft()) instanceof JLocalVariableExpression) {
+            if (Utils.passThruParens(ass.getLeft()) instanceof JLocalVariableExpression) {
                 //set the induction variable
                 info.induction = 
-                    ((JLocalVariableExpression)Util.passThruParens(ass.getLeft())).getVariable();
+                    ((JLocalVariableExpression)Utils.passThruParens(ass.getLeft())).getVariable();
             }
             else 
                 return;
@@ -468,12 +471,12 @@ public class IDDoLoops extends SLIRReplacingVisitor implements FlatVisitor, Cons
         if (orig instanceof JExpressionListStatement) {
             JExpressionListStatement els = (JExpressionListStatement)orig;
             if (els.getExpressions().length == 1)
-                return Util.passThruParens(els.getExpression(0));
+                return Utils.passThruParens(els.getExpression(0));
             else
                 return null;
         }
         else if (orig instanceof JExpressionStatement) {
-            return Util.passThruParens(((JExpressionStatement)orig).getExpression());
+            return Utils.passThruParens(((JExpressionStatement)orig).getExpression());
         }
         else 
             return null;

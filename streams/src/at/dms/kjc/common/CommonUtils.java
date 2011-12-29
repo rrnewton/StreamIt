@@ -7,6 +7,7 @@ import at.dms.kjc.CClassType;
 import at.dms.kjc.CEmittedTextType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.Constants;
 import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JClassExpression;
 import at.dms.kjc.JExpression;
@@ -78,7 +79,7 @@ public class CommonUtils {
         if (s instanceof CArrayType){
             // getElementType rather than getBaseType to go one dimension at a time.
             return CTypeToString(((CArrayType)s).getElementType(), hasBoolType)  + "*";
-        } else if (s.getTypeID() == CType.TID_BOOLEAN) {
+        } else if (s.getTypeID() == Constants.TID_BOOLEAN) {
             return hasBoolType ? "bool" : "int";
         } else if (s.toString().endsWith("Portal")) {
             // ignore the specific type of portal in the C library
@@ -245,7 +246,7 @@ public class CommonUtils {
                 || fexpr.getPrefix() instanceof JClassExpression) {
                 // field of named class or of 'this' class: is as
                 // far as we can go.
-                return (JExpression)fexpr;
+                return fexpr;
             } else {
                 return lhsBaseExpr(fexpr.getPrefix());
             }
@@ -378,7 +379,7 @@ public class CommonUtils {
     
         //return the var def..
         return new JVariableDefinition(null,
-                                       at.dms.kjc.Constants.ACC_FINAL,
+                                       at.dms.classfile.Constants.ACC_FINAL,
                                        bufferType,
                                        arrayName,
                                        null);

@@ -43,14 +43,16 @@ public class GetExprType extends FENullVisitor
         this.helpersByName = helpersByName;
     }
     
-    public Object visitExprArray(ExprArray exp)
+    @Override
+	public Object visitExprArray(ExprArray exp)
     {
         Type base = (Type)exp.getBase().accept(this);
         // ASSERT: base is a TypeArray.
         return ((TypeArray)base).getBase();
     }
 
-    public Object visitExprArrayInit(ExprArrayInit exp)
+    @Override
+	public Object visitExprArrayInit(ExprArrayInit exp)
     {
         // want to determine these about the array
         Type base;
@@ -76,7 +78,8 @@ public class GetExprType extends FENullVisitor
         return new TypeArray(base, new ExprConstInt(elems.size()));
     }
 
-    public Object visitExprBinary(ExprBinary exp)
+    @Override
+	public Object visitExprBinary(ExprBinary exp)
     {
         // Comparison operators always return a boolean value.
         switch(exp.getOp())
@@ -98,12 +101,14 @@ public class GetExprType extends FENullVisitor
         return tl.leastCommonPromotion(tr);
     }
 
-    public Object visitExprComplex(ExprComplex exp)
+    @Override
+	public Object visitExprComplex(ExprComplex exp)
     {
         return new TypePrimitive(TypePrimitive.TYPE_COMPLEX);
     }
 
-    public Object visitExprComposite(ExprComposite exp)
+    @Override
+	public Object visitExprComposite(ExprComposite exp)
     {
         int dim = exp.getDim();
         assert (dim >= 2 && dim <= 4); 
@@ -112,22 +117,26 @@ public class GetExprType extends FENullVisitor
         return new TypePrimitive(TypePrimitive.TYPE_FLOAT4);
     }
     
-    public Object visitExprConstBoolean(ExprConstBoolean exp)
+    @Override
+	public Object visitExprConstBoolean(ExprConstBoolean exp)
     {
         return new TypePrimitive(TypePrimitive.TYPE_BOOLEAN);
     }
 
-    public Object visitExprConstChar(ExprConstChar exp)
+    @Override
+	public Object visitExprConstChar(ExprConstChar exp)
     {
         return new TypePrimitive(TypePrimitive.TYPE_CHAR);
     }
     
-    public Object visitExprConstFloat(ExprConstFloat exp)
+    @Override
+	public Object visitExprConstFloat(ExprConstFloat exp)
     {
         return new TypePrimitive(TypePrimitive.TYPE_FLOAT);
     }
 
-    public Object visitExprConstInt(ExprConstInt exp)
+    @Override
+	public Object visitExprConstInt(ExprConstInt exp)
     {
         // return a bit type if the value is 0 or 1
         if (exp.getVal()==0 || exp.getVal()==1) {
@@ -137,17 +146,20 @@ public class GetExprType extends FENullVisitor
         }
     }
     
-    public Object visitExprConstStr(ExprConstStr exp)
+    @Override
+	public Object visitExprConstStr(ExprConstStr exp)
     {
         return new TypePrimitive(TypePrimitive.TYPE_STRING);
     }
     
-    public Object visitExprDynamicToken(ExprDynamicToken exp) 
+    @Override
+	public Object visitExprDynamicToken(ExprDynamicToken exp) 
     {
         return new TypePrimitive(TypePrimitive.TYPE_INT);
     }
 
-    public Object visitExprField(ExprField exp)
+    @Override
+	public Object visitExprField(ExprField exp)
     {
         if (exp.getLeft().toString().equals("TheGlobal") ||
             exp.getLeft().toString().equals("TheGlobal.__get_instance()")) {
@@ -176,7 +188,8 @@ public class GetExprType extends FENullVisitor
             }
     }
 
-    public Object visitExprHelperCall(ExprHelperCall helper)
+    @Override
+	public Object visitExprHelperCall(ExprHelperCall helper)
     {
 
         TypeHelper th = helpersByName.get(helper.getHelperPackage());
@@ -210,7 +223,8 @@ public class GetExprType extends FENullVisitor
     }    
 
 
-    public Object visitExprFunCall(ExprFunCall exp)
+    @Override
+	public Object visitExprFunCall(ExprFunCall exp)
     {
         // Has SymbolTable given us a function declaration?
         try
@@ -262,27 +276,32 @@ public class GetExprType extends FENullVisitor
         return ((Expression)params.get(0)).accept(this);
     }
     
-    public Object visitExprPeek(ExprPeek exp)
+    @Override
+	public Object visitExprPeek(ExprPeek exp)
     {
         return streamType.getIn();
     }
     
-    public Object visitExprPop(ExprPop exp)
+    @Override
+	public Object visitExprPop(ExprPop exp)
     {
         return streamType.getIn();
     }
 
-    public Object visitExprIter(ExprIter exp) 
+    @Override
+	public Object visitExprIter(ExprIter exp) 
     {
         return new TypePrimitive(TypePrimitive.TYPE_INT);
     }
     
-    public Object visitExprRange(ExprRange exp)
+    @Override
+	public Object visitExprRange(ExprRange exp)
     {
         return new TypePrimitive(TypePrimitive.TYPE_INT);
     }
 
-    public Object visitExprTernary(ExprTernary exp)
+    @Override
+	public Object visitExprTernary(ExprTernary exp)
     {
         // Do type unification on the two sides.
         // (Might not want to blindly assert ?:.)
@@ -291,12 +310,14 @@ public class GetExprType extends FENullVisitor
         return tb.leastCommonPromotion(tc);
     }
 
-    public Object visitExprTypeCast(ExprTypeCast exp)
+    @Override
+	public Object visitExprTypeCast(ExprTypeCast exp)
     {
         return exp.getType();
     }
 
-    public Object visitExprUnary(ExprUnary exp)
+    @Override
+	public Object visitExprUnary(ExprUnary exp)
     {
         // A little more solid ground here: the type of -foo and !foo
         // will be the same as type of foo, except for bits...
@@ -323,7 +344,8 @@ public class GetExprType extends FENullVisitor
     }
 
     
-    public Object visitExprVar(ExprVar exp)
+    @Override
+	public Object visitExprVar(ExprVar exp)
     {
         // Look this up in the symbol table.
         return symTab.lookupVar(exp.getName());

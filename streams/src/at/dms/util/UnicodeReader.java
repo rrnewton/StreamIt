@@ -52,7 +52,8 @@ public class UnicodeReader extends FilterReader {
      * @return  the character read, or -1 if the end of the stream has been reached
      * @throws  IOException if an I/O error occurs
      */
-    public int read() throws IOException {
+    @Override
+	public int read() throws IOException {
         if (lookahead != -2) {
             int     c;
 
@@ -115,7 +116,8 @@ public class UnicodeReader extends FilterReader {
      * @return  the number of characters read, or -1 if the end of the stream has been reached
      * @throws  IOException if an I/O error occurs
      */
-    public int read(char[] buf, int off, int len)
+    @Override
+	public int read(char[] buf, int off, int len)
         throws IOException
     {
         int     act = 0;    // # of characters actually read
@@ -133,7 +135,8 @@ public class UnicodeReader extends FilterReader {
      * Tell whether this stream supports the mark() operation.
      * @return  false: this stream does not support mark()
      */
-    public boolean markSupported() {
+    @Override
+	public boolean markSupported() {
         return false;
     }
 

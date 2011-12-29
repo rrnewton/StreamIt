@@ -58,7 +58,8 @@ public class WorkBasedSimulator extends Simulator  implements FlatVisitor
     
     private WorkEstimatesMap workEstimatesMap;
 
-    public void simulate(FlatNode top) 
+    @Override
+	public void simulate(FlatNode top) 
     {
         System.out.println("WorkBasedSimulator Running...");
     
@@ -1006,7 +1007,8 @@ public class WorkBasedSimulator extends Simulator  implements FlatVisitor
     }
 
 
-    public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts, 
+    @Override
+	public boolean canFire(FlatNode node, HashMap<FlatNode, Integer> executionCounts, 
                            SimulationCounter counters) 
     {
         if (node == null)
@@ -1073,7 +1075,8 @@ public class WorkBasedSimulator extends Simulator  implements FlatVisitor
     }
     
     //Just a debugging function, not used
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         System.out.println(node.contents.getName());
         if (node.contents instanceof SIRTwoStageFilter) {

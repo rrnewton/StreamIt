@@ -109,7 +109,8 @@ public class JVariableDeclarationStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         for (int i = 0; i < this.vars.length; i++) {
             try {
                 context.getBlockContext().addVariable(vars[i]);
@@ -132,7 +133,8 @@ public class JVariableDeclarationStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         super.accept(p);
         p.visitVariableDeclarationStatement(this, vars);
     }
@@ -140,7 +142,8 @@ public class JVariableDeclarationStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return p.visitVariableDeclarationStatement(this, vars);
     }
       
@@ -149,7 +152,8 @@ public class JVariableDeclarationStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         for (int i = 0; i < this.vars.length; i++) {
@@ -169,7 +173,8 @@ public class JVariableDeclarationStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JVariableDeclarationStatement other = new at.dms.kjc.JVariableDeclarationStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

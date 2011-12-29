@@ -97,7 +97,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * @param c Channel to add to our collection of channels. 
      */
     public static void addChannel(IntraSSGChannel c) {
-        bufferStore.put((IntraSSGEdge) c.edge, c);
+        bufferStore.put(c.edge, c);
     }
     
     /**
@@ -206,7 +206,8 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popMethodName()
      */
-    public String popMethodName() {
+    @Override
+	public String popMethodName() {
         return "__pop_" + unique_id;
     }
     /* (non-Javadoc)
@@ -220,7 +221,8 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#popManyMethodName()
      */
-    public String popManyMethodName() {
+    @Override
+	public String popManyMethodName() {
         return "__popN_" + unique_id;
     }
  
@@ -275,7 +277,8 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#peekMethodName()
      */
-    public String peekMethodName() {
+    @Override
+	public String peekMethodName() {
         return "__peek_" + unique_id;
     }
     /* (non-Javadoc)
@@ -301,7 +304,8 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
     /* (non-Javadoc)
      * @see at.dms.kjc.backendSupport.ChannelI#pushMethodName()
      */
-    public String pushMethodName() {
+    @Override
+	public String pushMethodName() {
         return "__push_" + unique_id;
     }
     /* (non-Javadoc)

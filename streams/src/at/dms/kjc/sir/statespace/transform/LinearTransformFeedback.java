@@ -41,7 +41,8 @@ public class LinearTransformFeedback extends LinearTransform {
     }
 
     /* converts a feedback loop to a filter rep. See writeup for combination rules */
-    public LinearFilterRepresentation transform() throws NoTransformPossibleException {
+    @Override
+	public LinearFilterRepresentation transform() throws NoTransformPossibleException {
     
         FilterMatrix A1, B1, C1, D1, A2, B2, C2, D2;
         FilterMatrix B2_1, B2_2, C2_1, C2_2, D2_11, D2_12, D2_21, D2_22;

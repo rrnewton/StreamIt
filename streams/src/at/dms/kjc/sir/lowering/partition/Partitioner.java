@@ -164,14 +164,16 @@ public class Partitioner {
         // them.
         final int[] count = { 0 };
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void preVisitFeedbackLoop(SIRFeedbackLoop self,
+                @Override
+				public void preVisitFeedbackLoop(SIRFeedbackLoop self,
                                                  SIRFeedbackLoopIter iter) {
                     // this is overly conservative -- if some of the
                     // children are not fusable, will count those
                     // results twice.
                     count[0]+=2;
                 }
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     if (!FusePipe.isFusable(self)) {
                         count[0]++;
@@ -190,7 +192,8 @@ public class Partitioner {
         // them.
         final int[] count = { 0 };
         IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                public void visitFilter(SIRFilter self,
+                @Override
+				public void visitFilter(SIRFilter self,
                                         SIRFilterIter iter) {
                     count[0]++;
                 }});

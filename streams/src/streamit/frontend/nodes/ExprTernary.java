@@ -58,7 +58,8 @@ public class ExprTernary extends Expression
     public Expression getC() { return c; }
 
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprTernary(this);
     }

@@ -73,7 +73,8 @@ public class JMethodCallExpression extends JExpression {
     // ACCESSORS
     // ----------------------------------------------------------------------
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer sb = new StringBuffer("MethodCallExpression (" + ident + ")");
         /* -- gets too big
            for (int i=0; i<args.length; i++) {
@@ -88,14 +89,16 @@ public class JMethodCallExpression extends JExpression {
     /**
      * @return the type of this expression
      */
-    public String getIdent() {
+    @Override
+	public String getIdent() {
         return ident;
     }
 
     /**
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         if(method!=null)
             return method.getReturnType();
         //ADDED BY GORDO, I need a way to 
@@ -110,7 +113,8 @@ public class JMethodCallExpression extends JExpression {
     /**
      * 
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         if (method != null) {
             method.setReturnType(type);
         } else {
@@ -123,7 +127,8 @@ public class JMethodCallExpression extends JExpression {
     /**
      * Returns true iff this expression can be used as a statement (JLS 14.8)
      */
-    public boolean isStatementExpression() {
+    @Override
+	public boolean isStatementExpression() {
         return true;
     }
 
@@ -137,7 +142,8 @@ public class JMethodCallExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         CType[] argTypes = new CType[args.length];
 
         for (int i = 0; i < argTypes.length; i++) {
@@ -257,7 +263,8 @@ public class JMethodCallExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitMethodCallExpression(this, prefix, ident, args);
     }
 
@@ -265,7 +272,8 @@ public class JMethodCallExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitMethodCallExpression(this, prefix, ident, args);
     }
 
@@ -287,7 +295,8 @@ public class JMethodCallExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         boolean     forceNonVirtual = false;
@@ -372,7 +381,8 @@ public class JMethodCallExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JMethodCallExpression other = new at.dms.kjc.JMethodCallExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

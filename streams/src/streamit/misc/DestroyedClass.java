@@ -56,7 +56,8 @@ public class DestroyedClass extends Misc
 
     // The finalizer checks that the class has already been Destroyed,
     // and if not, it Destroys it
-    final protected void finalize ()
+    @Override
+	final protected void finalize ()
     {
         if (!Destroyed) Destroy ();
         Destroyed = true;

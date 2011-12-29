@@ -76,7 +76,8 @@ public class JTryCatchStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         /*
          * Analyse the try clause.
          */
@@ -204,7 +205,8 @@ public class JTryCatchStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitTryCatchStatement(this, tryClause, catchClauses);
     }
 
@@ -212,7 +214,8 @@ public class JTryCatchStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitTryCatchStatement(this, tryClause, catchClauses);
     }
 
@@ -220,7 +223,8 @@ public class JTryCatchStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         CodeLabel       nextLabel = new CodeLabel();
@@ -246,7 +250,8 @@ public class JTryCatchStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JTryCatchStatement other = new at.dms.kjc.JTryCatchStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

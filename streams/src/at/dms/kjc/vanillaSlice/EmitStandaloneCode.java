@@ -51,7 +51,8 @@ public class EmitStandaloneCode extends EmitCode {
      * Standard code for front of a C file here.
      * 
      */
-    public void generateCHeader(CodegenPrintWriter p) {
+    @Override
+	public void generateCHeader(CodegenPrintWriter p) {
         p.println("#include <math.h>");     // in case math functions
         p.println("#include <stdio.h>");    // in case of FileReader / FileWriter
         p.println("#include \"structs.h\"");
@@ -64,7 +65,8 @@ public class EmitStandaloneCode extends EmitCode {
      * Generate a "main" function.
      * Override!
      */
-    public void generateMain(CodegenPrintWriter p) {
+    @Override
+	public void generateMain(CodegenPrintWriter p) {
         p.println();
         p.println();
         p.println("// main() Function Here");

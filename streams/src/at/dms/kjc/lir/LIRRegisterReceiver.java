@@ -39,7 +39,8 @@ public class LIRRegisterReceiver extends LIRNode
         this.itable = itable;
     }
     
-    public void accept(SLIRVisitor v)
+    @Override
+	public void accept(SLIRVisitor v)
     {
         v.visitRegisterReceiver(this,
                                 this.getStreamContext(),

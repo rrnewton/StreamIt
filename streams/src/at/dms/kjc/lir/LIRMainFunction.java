@@ -55,7 +55,8 @@ public class LIRMainFunction extends LIRNode {
         this.typeName = typeName;
     }
 
-    public void accept(SLIRVisitor v) {
+    @Override
+	public void accept(SLIRVisitor v) {
         v.visitMainFunction(this, 
                             this.typeName, 
                             this.init,

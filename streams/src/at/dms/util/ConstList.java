@@ -34,7 +34,8 @@ public class ConstList implements Serializable, Cloneable {
     }
     
     /** Compares the specified object with this list for equality. */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         return list.equals(o);
     }
 
@@ -44,7 +45,8 @@ public class ConstList implements Serializable, Cloneable {
     }
 
     /** Returns the hash code value for this list. */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return list.hashCode();
     }
 
@@ -112,7 +114,8 @@ public class ConstList implements Serializable, Cloneable {
         return list.toArray(a);
     }
 
-    public Object clone() {
+    @Override
+	public Object clone() {
         ConstList result = new ConstList();
         result.list = (LinkedList<Object>)list.clone();
         return result;

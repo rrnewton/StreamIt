@@ -50,7 +50,8 @@ public class ParallelizationGathering {
 
     //procedure that's called by Flattener.java
     public static void doit(SIRStream str, int processors) {
-	new ParallelWork().doit(str, processors);
+	new ParallelWork();
+	ParallelWork.doit(str, processors);
     }
 
     static class MutableInt {
@@ -560,13 +561,14 @@ public class ParallelizationGathering {
      *  filterWorkEstimates.  If the filter is stateless, put in statelessFilters vector
      *  also populates the communication cost hashmap, based on pushing, popping, and peeking
      */
-    public void visitFilter(SIRFilter self, SIRFilterIter iter) {	
+    @Override
+	public void visitFilter(SIRFilter self, SIRFilterIter iter) {	
 	int costperitem = 3;  //can be varied to see how it affects things!
 	//print debug info?
 
 	NumberGathering execNumbers = new NumberGathering();
-	execNumbers.doit(flatGraph.getFlatNode(self), executionCounts);
-	int printsperexec = execNumbers.printsPerSteady;
+	NumberGathering.doit(flatGraph.getFlatNode(self), executionCounts);
+	int printsperexec = NumberGathering.printsPerSteady;
 	long workestimate = work.getWork(self);
 	//System.err.println("Initial work of " + self.getName() + " is " + workestimate);
 	int numreps = work.getReps(self);  
@@ -597,7 +599,7 @@ public class ParallelizationGathering {
 	//end addition for constant communication cost
 
 	//System.err.println("Is filter " + self.getName() + " stateless?  " + nostate);
-	numFilters.mutint = numFilters.mutint + 1;
+	MutableInt.mutint = MutableInt.mutint + 1;
 	
 	return;
 	}
@@ -611,7 +613,8 @@ public class ParallelizationGathering {
      *  Also puts the work of the pipeline in streamsToWorkEstimates.
      */
 
-    public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter)
+    @Override
+	public void postVisitPipeline(SIRPipeline self, SIRPipelineIter iter)
     {
 	
 	return;
@@ -627,7 +630,8 @@ public class ParallelizationGathering {
      *  of its children (bottleneck path)
      */
 
-    public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter)
+    @Override
+	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter)
     {
 	
 	return;
@@ -683,11 +687,12 @@ public class ParallelizationGathering {
 	 * populates initial communication costs
 	 */
 	 
+	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) 
 	{
 	    NumberGathering execNumbers = new NumberGathering();
-	    execNumbers.doit(flatGraph.getFlatNode(self), executionCounts);
-	    int printsperexec = execNumbers.printsPerSteady;
+	    NumberGathering.doit(flatGraph.getFlatNode(self), executionCounts);
+	    int printsperexec = NumberGathering.printsPerSteady;
 	    //System.err.println("prints per exec in filter is " + printsperexec);
 	    //System.err.println("visiting filter " + self.getName());
 	    int costperitem = 3; //can be varied
@@ -741,6 +746,7 @@ public class ParallelizationGathering {
 	 * its current synchro cost.
 	 */
 
+	@Override
 	public void postVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter)
 	{
 	    
@@ -764,14 +770,14 @@ public class ParallelizationGathering {
 		   (splitterType == SIRSplitType.WEIGHTED_RR)) && 
 		   (synccost))//bill fix:  only add size when it's a RR!
 		{
-		    syncfactor.mutint = self.getParallelStreams().size();
+		    MutableInt.mutint = self.getParallelStreams().size();
 		    //StreamItDot.printGraph(self, "test.dot");
 		    int blah = self.size();
 		    //System.err.println("blah is " + blah);
 		}
 		else
 		{
-		    syncfactor.mutint = 1; //if duplicate, don't include the size in the cost
+		    MutableInt.mutint = 1; //if duplicate, don't include the size in the cost
 		}
 		//System.err.println("Bee!");
 		getSplitFactor(syncfactor, flatSplitter);   //recursion happens in this procedure   
@@ -782,8 +788,8 @@ public class ParallelizationGathering {
 			SIRFilter currentFilter = (SIRFilter)flatSplitter.getEdges()[i].contents;			
 			NumberGathering execNumbers = new NumberGathering();
 			int numreps = work.getReps(currentFilter);
-			execNumbers.doit(flatGraph.getFlatNode(currentFilter), executionCounts);
-			int printsperexec = execNumbers.printsPerSteady;
+			NumberGathering.doit(flatGraph.getFlatNode(currentFilter), executionCounts);
+			int printsperexec = NumberGathering.printsPerSteady;
 			//System.err.println("prints per exec here is " + printsperexec
 				//	   + " with " + numreps + " reps");
 			int oldCommCost = filterCommunicationCosts.get(currentFilter).intValue();
@@ -795,11 +801,11 @@ public class ParallelizationGathering {
 			//System.err.println("fancost is " + fancost + " with mutint " + syncfactor.mutint);
 			//System.err.println("printsperexec is " + printsperexec + " vs. " + currentFilter.getPopInt() + " pop rate");
 			//System.err.println("Old comm cost is " + oldCommCost);
-			int scost = fancost - (fancost/(syncfactor.mutint));
+			int scost = fancost - (fancost/(MutableInt.mutint));
 			//System.err.println("Sync cost is " + scost);
 			int newCommCost = oldCommCost;
-			if(syncfactor.mutint != 0)
-			    newCommCost = oldCommCost + fancost - (fancost/(syncfactor.mutint));
+			if(MutableInt.mutint != 0)
+			    newCommCost = oldCommCost + fancost - (fancost/(MutableInt.mutint));
 			
 			filterCommunicationCosts.put(currentFilter, new Integer(newCommCost));
 		    }
@@ -825,7 +831,7 @@ public class ParallelizationGathering {
 		if ((topSplitter.getType().equals(SIRSplitType.ROUND_ROBIN)) || (topSplitter.getType().equals(SIRSplitType.WEIGHTED_RR)))
 		{
 		    //System.err.println("gets here!");
-		    syncfactor.mutint += topSplitter.getWays();
+		    MutableInt.mutint += topSplitter.getWays();
 		    getSplitFactor(syncfactor, incomingNode);
 		}
 		if (topSplitter.getType().equals(SIRSplitType.DUPLICATE))
@@ -841,7 +847,7 @@ public class ParallelizationGathering {
 		if ((splitter.getType().equals(SIRSplitType.ROUND_ROBIN)) || (splitter.getType().equals(SIRSplitType.WEIGHTED_RR)))
 		{
 		    //System.err.println("gets here b!");
-		    syncfactor.mutint += splitter.getWays();		
+		    MutableInt.mutint += splitter.getWays();		
 		}
 
 	    }
@@ -865,6 +871,7 @@ public class ParallelizationGathering {
 	    filterTimesFizzed = fizzmapping;
 	}
 
+	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter)
 	{
 	    filterTimesFizzed.put(self, new Long(1));
@@ -903,13 +910,14 @@ public class ParallelizationGathering {
 	    filterTimesFizzed = fizzmapping;
 	}
 
+	@Override
 	public void visitFilter(SIRFilter self, SIRFilterIter iter) 
 	{
 	    filterTimesFizzed.put(self, new Long(1));
 
 	    NumberGathering execNumbers = new NumberGathering();
-	    execNumbers.doit(flatGraph.getFlatNode(self), executionCounts);
-	    int printsperexec = execNumbers.printsPerSteady;
+	    NumberGathering.doit(flatGraph.getFlatNode(self), executionCounts);
+	    int printsperexec = NumberGathering.printsPerSteady;
 	    //System.err.println("prints per exec in filter is " + printsperexec);
 	    //System.err.println("visiting filter " + self.getName());
 	    int costperitem = 3; //can be varied
@@ -935,7 +943,7 @@ public class ParallelizationGathering {
 	    //System.err.println("initcost is " + initcost + " with printsperexec of " + printsperexec);
 	    filterCommunicationCosts.put(self, new Integer(initcost));
 
-	    numFilters.mutint = numFilters.mutint + 1;
+	    MutableInt.mutint = MutableInt.mutint + 1;
 	}
 
 

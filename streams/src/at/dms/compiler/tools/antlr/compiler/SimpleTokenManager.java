@@ -56,7 +56,8 @@ class SimpleTokenManager implements TokenManager, Cloneable {
         vocabulary.setElementAt("NULL_TREE_LOOKAHEAD", Token.NULL_TREE_LOOKAHEAD);
     }
 
-    public Object clone() {
+    @Override
+	public Object clone() {
         SimpleTokenManager tm;
         try {
             tm = (SimpleTokenManager) super.clone();
@@ -74,7 +75,8 @@ class SimpleTokenManager implements TokenManager, Cloneable {
     /**
      * define a token
      */
-    public void define(TokenSymbol ts) {
+    @Override
+	public void define(TokenSymbol ts) {
         // Add the symbol to the vocabulary vector
         vocabulary.ensureCapacity(ts.getTokenType());
         vocabulary.setElementAt(ts.getId(), ts.getTokenType());
@@ -84,75 +86,89 @@ class SimpleTokenManager implements TokenManager, Cloneable {
     /**
      * Simple token manager doesn't have a name -- must be set externally
      */
-    public String getName() { return name; }
+    @Override
+	public String getName() { return name; }
     /**
      * Get a token symbol by index
      */
-    public String getTokenStringAt(int idx) {
+    @Override
+	public String getTokenStringAt(int idx) {
         return (String)vocabulary.elementAt(idx);
     }
     /**
      * Get the TokenSymbol for a string
      */
-    public TokenSymbol getTokenSymbol(String sym) {
+    @Override
+	public TokenSymbol getTokenSymbol(String sym) {
         return table.get(sym);
     }
     /**
      * Get a token symbol by index
      */
-    public TokenSymbol getTokenSymbolAt(int idx) {
+    @Override
+	public TokenSymbol getTokenSymbolAt(int idx) {
         return getTokenSymbol(getTokenStringAt(idx));
     }
     /**
      * Get an enumerator over the symbol table
      */
-    public Enumeration<TokenSymbol> getTokenSymbolElements() {
+    @Override
+	public Enumeration<TokenSymbol> getTokenSymbolElements() {
         return table.elements();
     }
-    public Enumeration<String> getTokenSymbolKeys() {
+    @Override
+	public Enumeration<String> getTokenSymbolKeys() {
         return table.keys();
     }
     /**
      * Get the token vocabulary (read-only).
      * @return A Vector of TokenSymbol
      */
-    public Vector getVocabulary() {
+    @Override
+	public Vector getVocabulary() {
         return vocabulary;
     }
     /**
      * Simple token manager is not read-only
      */
-    public boolean isReadOnly() { return false; }
+    @Override
+	public boolean isReadOnly() { return false; }
     /**
      * Map a label or string to an existing token symbol
      */
-    public void mapToTokenSymbol(String name, TokenSymbol sym) {
+    @Override
+	public void mapToTokenSymbol(String name, TokenSymbol sym) {
         table.put(name, sym);
     }
     /**
      * Get the highest token type in use
      */
-    public int maxTokenType() {
+    @Override
+	public int maxTokenType() {
         return maxToken-1;
     }
     /**
      * Get the next unused token type
      */
-    public int nextTokenType() {
+    @Override
+	public int nextTokenType() {
         return maxToken++;
     }
     /**
      * Set the name of the token manager
      */
-    public void setName(String name_) { name = name_; }
+    @Override
+	public void setName(String name_) { name = name_; }
 
-    public void setReadOnly(boolean ro) {
+    @Override
+	public void setReadOnly(boolean ro) {
         readOnly = ro;
     }
     /**
      * Is a token symbol defined?
      */
-    public boolean tokenDefined(String symbol) {
+    @Override
+	public boolean tokenDefined(String symbol) {
         return table.containsKey(symbol);
     }
 }

@@ -182,7 +182,7 @@ public class WorkNodeInfo {
                  System.out.println("Upstream: " + upstreamInitItems + " Ratio: " + 
                  incoming.getSrc().ratio(incoming));
                  */                
-                initItemsRec += (int) (((double) upstreamInitItems) * incoming
+                initItemsRec += (int) (upstreamInitItems * incoming
                                        .getSrc().ratio(incoming, SchedulingPhase.INIT));
             }
         }
@@ -288,14 +288,14 @@ public class WorkNodeInfo {
                 InterFilterEdge incoming = edges.next();
                 upStreamItems += 
                     (int) 
-                    ((double)WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
+                    (WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                             .initItemsSent() * incoming.getSrc().ratio(incoming, SchedulingPhase.INIT));
                 if (debug) {
                     System.out.println("   " + incoming + ": sends " + 
                             WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                             .initItemsSent() + ", at ratio " + incoming.getSrc().ratio(incoming, SchedulingPhase.INIT) + " = " +
                             (int) 
-                            ((double)WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
+                            (WorkNodeInfo.getFilterInfo((WorkNode)incoming.getSrc().getPrevious())
                                     .initItemsSent() * incoming.getSrc().ratio(incoming, SchedulingPhase.INIT)));
                 }
                             //((double) incoming.getSrc()
@@ -432,7 +432,8 @@ public class WorkNodeInfo {
     }
 
     /** A printable representation.  Not committed to format. */
-    public String toString() {
+    @Override
+	public String toString() {
         return sliceNode.toString();
     }
 

@@ -61,10 +61,12 @@ class LexerGrammar extends Grammar {
     /**
      * Top-level call to generate the code
      */
-    public void generate(JavaCodeGenerator generator) throws IOException {
+    @Override
+	public void generate(JavaCodeGenerator generator) throws IOException {
         generator.gen(this);
     }
-    public String getSuperClass() {
+    @Override
+	public String getSuperClass() {
         return "CharScanner";
     }
     // Get the testLiterals option value
@@ -80,7 +82,8 @@ class LexerGrammar extends Grammar {
     /**
      * Set lexer options
      */
-    public boolean setOption(String key, Token value) {
+    @Override
+	public boolean setOption(String key, Token value) {
         String s = value.getText();
 
         if (key.equals("testLiterals")) {

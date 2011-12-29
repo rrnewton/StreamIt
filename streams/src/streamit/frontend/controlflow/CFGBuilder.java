@@ -112,7 +112,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(node, node);
     }
     
-    public Object visitStmtBlock(StmtBlock block)
+    @Override
+	public Object visitStmtBlock(StmtBlock block)
     {
         // Create entry and exit nodes for the block.
         CFGNode entry = new CFGNode(block, true);
@@ -155,7 +156,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(entry, exit);
     }
 
-    public Object visitStmtFor(StmtFor stmt)
+    @Override
+	public Object visitStmtFor(StmtFor stmt)
     {
         // We need an exit node here, but not an explicit entry.
         CFGNodePair pairInit = visitStatement(stmt.getInit());
@@ -190,7 +192,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(entry, exit);
     }
 
-    public Object visitStmtIfThen(StmtIfThen stmt)
+    @Override
+	public Object visitStmtIfThen(StmtIfThen stmt)
     {
         // Entry node is the condition; exit is artificial.
         CFGNode entry = new CFGNode(stmt, stmt.getCond());
@@ -225,7 +228,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(entry, exit);
     }
 
-    public Object visitStmtWhile(StmtWhile stmt)
+    @Override
+	public Object visitStmtWhile(StmtWhile stmt)
     {
         // similarly.
         CFGNode entry = new CFGNode(stmt, stmt.getCond());
@@ -252,7 +256,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(entry, exit);        
     }
 
-    public Object visitStmtDoWhile(StmtDoWhile stmt)
+    @Override
+	public Object visitStmtDoWhile(StmtDoWhile stmt)
     {
         // A little different: artificial entry, save the condition
         // separately, since it's neither entry nor exit.
@@ -283,7 +288,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(entry, exit);        
     }
 
-    public Object visitStmtBreak(StmtBreak stmt)
+    @Override
+	public Object visitStmtBreak(StmtBreak stmt)
     {
         // Build a node,
         CFGNode node = new CFGNode(stmt);
@@ -294,7 +300,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(node, null);
     }
 
-    public Object visitStmtContinue(StmtContinue stmt)
+    @Override
+	public Object visitStmtContinue(StmtContinue stmt)
     {
         CFGNode node = new CFGNode(stmt);
         nodes.add(node);
@@ -302,7 +309,8 @@ public class CFGBuilder extends FENullVisitor
         return new CFGNodePair(node, null);
     }
 
-    public Object visitStmtReturn(StmtReturn stmt)
+    @Override
+	public Object visitStmtReturn(StmtReturn stmt)
     {
         CFGNode node = new CFGNode(stmt);
         nodes.add(node);

@@ -23,7 +23,8 @@ public final class VerticalCutTransform extends IdempotentTransform {
     /**
      * Perform the transform on <pre>str</pre> and return new stream.
      */
-    public SIRStream doMyTransform(SIRStream str) {
+    @Override
+	public SIRStream doMyTransform(SIRStream str) {
         if (str instanceof SIRSplitJoin) {
             SIRSplitJoin sj = (SIRSplitJoin)str;
             assert sj.size() - cutPos - 1 > 0:
@@ -32,7 +33,7 @@ public final class VerticalCutTransform extends IdempotentTransform {
             // add one because of indexing convention in partitiongroup
             int[] partitions = { cutPos + 1, sj.size() - cutPos - 1};
             PartitionGroup group = PartitionGroup.createFromArray(partitions);
-            SIRSplitJoin factored = RefactorSplitJoin.addHierarchicalChildren((SIRSplitJoin)sj, group);
+            SIRSplitJoin factored = RefactorSplitJoin.addHierarchicalChildren(sj, group);
             // now we have to add back any synchronization, since
             // that's the canonical form of the partitioner
             for (int i=0; i<factored.size(); i++) {
@@ -55,7 +56,8 @@ public final class VerticalCutTransform extends IdempotentTransform {
         }
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "Vertical Cut transform, #" + id + " (pos = " + cutPos + ")";
     }
 }

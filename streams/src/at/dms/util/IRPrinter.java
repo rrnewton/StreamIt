@@ -361,7 +361,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a compilation unit
      */
-    public void visitCompilationUnit(JCompilationUnit self,
+    @Override
+	public void visitCompilationUnit(JCompilationUnit self,
                                      JPackageName packageName,
                                      JPackageImport[] importedPackages,
                                      JClassImport[] importedClasses,
@@ -391,7 +392,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a class declaration
      */
-    public void visitClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitClassDeclaration(JClassDeclaration self,
                                       int modifiers,
                                       String ident,
                                       String superName,
@@ -416,7 +418,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a class body
      */
-    public void visitClassBody(JTypeDeclaration[] decls,
+    @Override
+	public void visitClassBody(JTypeDeclaration[] decls,
                                JFieldDeclaration[] fields,
                                JMethodDeclaration[] methods,
                                JPhylum[] body)
@@ -440,7 +443,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a class declaration
      */
-    public void visitInnerClassDeclaration(JClassDeclaration self,
+    @Override
+	public void visitInnerClassDeclaration(JClassDeclaration self,
                                            int modifiers,
                                            String ident,
                                            String superName,
@@ -466,7 +470,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an interface declaration
      */
-    public void visitInterfaceDeclaration(JInterfaceDeclaration self,
+    @Override
+	public void visitInterfaceDeclaration(JInterfaceDeclaration self,
                                           int modifiers,
                                           String ident,
                                           CClassType[] interfaces,
@@ -490,7 +495,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a field declaration
      */
-    public void visitFieldDeclaration(JFieldDeclaration self,
+    @Override
+	public void visitFieldDeclaration(JFieldDeclaration self,
                                       int modifiers,
                                       CType type,
                                       String ident,
@@ -507,7 +513,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a method declaration
      */
-    public void visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public void visitMethodDeclaration(JMethodDeclaration self,
                                        int modifiers,
                                        CType returnType,
                                        String ident,
@@ -532,7 +539,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a method declaration
      */
-    public void visitConstructorDeclaration(JConstructorDeclaration self,
+    @Override
+	public void visitConstructorDeclaration(JConstructorDeclaration self,
                                             int modifiers,
                                             String ident,
                                             JFormalParameter[] parameters,
@@ -558,7 +566,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a while statement
      */
-    public void visitWhileStatement(JWhileStatement self,
+    @Override
+	public void visitWhileStatement(JWhileStatement self,
                                     JExpression cond,
                                     JStatement body)
     {
@@ -571,7 +580,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a variable declaration statement
      */
-    public void visitVariableDeclarationStatement
+    @Override
+	public void visitVariableDeclarationStatement
         (JVariableDeclarationStatement self,
          JVariableDefinition[] vars)
     {
@@ -584,7 +594,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a variable declaration statement
      */
-    public void visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public void visitVariableDefinition(JVariableDefinition self,
                                         int modifiers,
                                         CType type,
                                         String ident,
@@ -601,7 +612,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a try-catch statement
      */
-    public void visitTryCatchStatement(JTryCatchStatement self,
+    @Override
+	public void visitTryCatchStatement(JTryCatchStatement self,
                                        JBlock tryClause,
                                        JCatchClause[] catchClauses)
     {
@@ -615,7 +627,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a try-finally statement
      */
-    public void visitTryFinallyStatement(JTryFinallyStatement self,
+    @Override
+	public void visitTryFinallyStatement(JTryFinallyStatement self,
                                          JBlock tryClause,
                                          JBlock finallyClause)
     {
@@ -628,7 +641,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a throw statement
      */
-    public void visitThrowStatement(JThrowStatement self,
+    @Override
+	public void visitThrowStatement(JThrowStatement self,
                                     JExpression expr)
     {
         blockStart("ThrowStatement");
@@ -639,7 +653,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a synchronized statement
      */
-    public void visitSynchronizedStatement(JSynchronizedStatement self,
+    @Override
+	public void visitSynchronizedStatement(JSynchronizedStatement self,
                                            JExpression cond,
                                            JStatement body)
     {
@@ -652,7 +667,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a switch statement
      */
-    public void visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public void visitSwitchStatement(JSwitchStatement self,
                                      JExpression expr,
                                      JSwitchGroup[] body)
     {
@@ -666,7 +682,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a return statement
      */
-    public void visitReturnStatement(JReturnStatement self,
+    @Override
+	public void visitReturnStatement(JReturnStatement self,
                                      JExpression expr)
     {
         blockStart("Return");
@@ -677,7 +694,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a labeled statement
      */
-    public void visitLabeledStatement(JLabeledStatement self,
+    @Override
+	public void visitLabeledStatement(JLabeledStatement self,
                                       String label,
                                       JStatement stmt)
     {
@@ -690,7 +708,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a if statement
      */
-    public void visitIfStatement(JIfStatement self,
+    @Override
+	public void visitIfStatement(JIfStatement self,
                                  JExpression cond,
                                  JStatement thenClause,
                                  JStatement elseClause)
@@ -705,7 +724,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a for statement
      */
-    public void visitForStatement(JForStatement self,
+    @Override
+	public void visitForStatement(JForStatement self,
                                   JStatement init,
                                   JExpression cond,
                                   JStatement incr,
@@ -722,7 +742,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a compound statement
      */
-    public void visitCompoundStatement(JCompoundStatement self,
+    @Override
+	public void visitCompoundStatement(JCompoundStatement self,
                                        JStatement[] body)
     {
         blockStart("CompoundStatement");
@@ -734,7 +755,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an expression statement
      */
-    public void visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public void visitExpressionStatement(JExpressionStatement self,
                                          JExpression expr)
     {
         blockStart("ExpressionStatement");
@@ -745,7 +767,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an expression list statement
      */
-    public void visitExpressionListStatement(JExpressionListStatement self,
+    @Override
+	public void visitExpressionListStatement(JExpressionListStatement self,
                                              JExpression[] expr)
     {
         blockStart("ExpressionListStatement");
@@ -757,7 +780,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a empty statement
      */
-    public void visitEmptyStatement(JEmptyStatement self)
+    @Override
+	public void visitEmptyStatement(JEmptyStatement self)
     {
         blockStart("EmptyStatement");
         blockEnd();
@@ -766,7 +790,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a do statement
      */
-    public void visitDoStatement(JDoStatement self,
+    @Override
+	public void visitDoStatement(JDoStatement self,
                                  JExpression cond,
                                  JStatement body)
     {
@@ -779,7 +804,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a continue statement
      */
-    public void visitContinueStatement(JContinueStatement self,
+    @Override
+	public void visitContinueStatement(JContinueStatement self,
                                        String label)
     {
         blockStart("ContinueStatement");
@@ -790,7 +816,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a break statement
      */
-    public void visitBreakStatement(JBreakStatement self,
+    @Override
+	public void visitBreakStatement(JBreakStatement self,
                                     String label)
     {
         blockStart("BreakStatement");
@@ -801,7 +828,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an expression statement
      */
-    public void visitBlockStatement(JBlock self,
+    @Override
+	public void visitBlockStatement(JBlock self,
                                     JavaStyleComment[] comments)
     {
         blockStart("BlockStatement");
@@ -815,7 +843,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a type declaration statement
      */
-    public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
+    @Override
+	public void visitTypeDeclarationStatement(JTypeDeclarationStatement self,
                                               JTypeDeclaration decl)
     {
         blockStart("TypeDeclarationStatement");
@@ -830,7 +859,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an unary plus expression
      */
-    public void visitUnaryPlusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryPlusExpression(JUnaryExpression self,
                                          JExpression expr)
     {
         blockStart("UnaryPlusExpression");
@@ -841,7 +871,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an unary minus expression
      */
-    public void visitUnaryMinusExpression(JUnaryExpression self,
+    @Override
+	public void visitUnaryMinusExpression(JUnaryExpression self,
                                           JExpression expr)
     {
         blockStart("UnaryMinusExpression");
@@ -852,7 +883,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a bitwise complement expression
      */
-    public void visitBitwiseComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitBitwiseComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         blockStart("BitwiseComplementExpression");
@@ -863,7 +895,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a logical complement expression
      */
-    public void visitLogicalComplementExpression(JUnaryExpression self,
+    @Override
+	public void visitLogicalComplementExpression(JUnaryExpression self,
                                                  JExpression expr)
     {
         blockStart("LogicalComplementExpression");
@@ -874,7 +907,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a type name expression
      */
-    public void visitTypeNameExpression(JTypeNameExpression self,
+    @Override
+	public void visitTypeNameExpression(JTypeNameExpression self,
                                         CType type)
     {
         blockStart("TypeNameExpression");
@@ -886,7 +920,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a this expression
      */
-    public void visitThisExpression(JThisExpression self,
+    @Override
+	public void visitThisExpression(JThisExpression self,
                                     JExpression prefix)
     {
         blockStart("ThisExpression");
@@ -897,7 +932,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a super expression
      */
-    public void visitSuperExpression(JSuperExpression self)
+    @Override
+	public void visitSuperExpression(JSuperExpression self)
     {
         blockStart("SuperExpression");
         blockEnd();
@@ -906,7 +942,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a shift expression
      */
-    public void visitShiftExpression(JShiftExpression self,
+    @Override
+	public void visitShiftExpression(JShiftExpression self,
                                      int oper,
                                      JExpression left,
                                      JExpression right)
@@ -921,7 +958,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a shift expressiona
      */
-    public void visitRelationalExpression(JRelationalExpression self,
+    @Override
+	public void visitRelationalExpression(JRelationalExpression self,
                                           int oper,
                                           JExpression left,
                                           JExpression right)
@@ -936,7 +974,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a prefix expression
      */
-    public void visitPrefixExpression(JPrefixExpression self,
+    @Override
+	public void visitPrefixExpression(JPrefixExpression self,
                                       int oper,
                                       JExpression expr)
     {
@@ -949,7 +988,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a postfix expression
      */
-    public void visitPostfixExpression(JPostfixExpression self,
+    @Override
+	public void visitPostfixExpression(JPostfixExpression self,
                                        int oper,
                                        JExpression expr)
     {
@@ -962,7 +1002,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a parenthesed expression
      */
-    public void visitParenthesedExpression(JParenthesedExpression self,
+    @Override
+	public void visitParenthesedExpression(JParenthesedExpression self,
                                            JExpression expr)
     {
         // Not parenthesized?
@@ -974,7 +1015,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an unqualified anonymous class instance creation expression.
      */
-    public void visitQualifiedAnonymousCreation
+    @Override
+	public void visitQualifiedAnonymousCreation
         (JQualifiedAnonymousCreation self,
          JExpression prefix,
          String ident,
@@ -995,7 +1037,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an unqualified instance creation expression.
      */
-    public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
+    @Override
+	public void visitQualifiedInstanceCreation(JQualifiedInstanceCreation self,
                                                JExpression prefix,
                                                String ident,
                                                JExpression[] params)
@@ -1013,7 +1056,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an unqualified anonymous class instance creation expression.
      */
-    public void visitUnqualifiedAnonymousCreation
+    @Override
+	public void visitUnqualifiedAnonymousCreation
         (JUnqualifiedAnonymousCreation self,
          CClassType type,
          JExpression[] params,
@@ -1032,7 +1076,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an unqualified instance creation expression.
      */
-    public void visitUnqualifiedInstanceCreation
+    @Override
+	public void visitUnqualifiedInstanceCreation
         (JUnqualifiedInstanceCreation self,
          CClassType type,
          JExpression[] params)
@@ -1049,7 +1094,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array allocator expression
      */
-    public void visitNewArrayExpression(JNewArrayExpression self,
+    @Override
+	public void visitNewArrayExpression(JNewArrayExpression self,
                                         CType type,
                                         JExpression[] dims,
                                         JArrayInitializer init)
@@ -1071,7 +1117,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a name expression
      */
-    public void visitNameExpression(JNameExpression self,
+    @Override
+	public void visitNameExpression(JNameExpression self,
                                     JExpression prefix,
                                     String ident)
     {
@@ -1084,7 +1131,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array allocator expression
      */
-    public void visitBinaryExpression(JBinaryExpression self,
+    @Override
+	public void visitBinaryExpression(JBinaryExpression self,
                                       String oper,
                                       JExpression left,
                                       JExpression right)
@@ -1100,7 +1148,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a method call expression
      */
-    public void visitMethodCallExpression(JMethodCallExpression self,
+    @Override
+	public void visitMethodCallExpression(JMethodCallExpression self,
                                           JExpression prefix,
                                           String ident,
                                           JExpression[] args)
@@ -1118,7 +1167,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a local variable expression
      */
-    public void visitLocalVariableExpression(JLocalVariableExpression self,
+    @Override
+	public void visitLocalVariableExpression(JLocalVariableExpression self,
                                              String ident)
     {
         blockStart("LocalVariableExpression");
@@ -1130,7 +1180,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an instanceof expression
      */
-    public void visitInstanceofExpression(JInstanceofExpression self,
+    @Override
+	public void visitInstanceofExpression(JInstanceofExpression self,
                                           JExpression expr,
                                           CType dest)
     {
@@ -1143,7 +1194,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an equality expression
      */
-    public void visitEqualityExpression(JEqualityExpression self,
+    @Override
+	public void visitEqualityExpression(JEqualityExpression self,
                                         boolean equal,
                                         JExpression left,
                                         JExpression right)
@@ -1158,7 +1210,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a conditional expression
      */
-    public void visitConditionalExpression(JConditionalExpression self,
+    @Override
+	public void visitConditionalExpression(JConditionalExpression self,
                                            JExpression cond,
                                            JExpression left,
                                            JExpression right)
@@ -1173,7 +1226,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a compound expression
      */
-    public void visitCompoundAssignmentExpression
+    @Override
+	public void visitCompoundAssignmentExpression
         (JCompoundAssignmentExpression self,
          int oper,
          JExpression left,
@@ -1189,7 +1243,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a field expression
      */
-    public void visitFieldExpression(JFieldAccessExpression self,
+    @Override
+	public void visitFieldExpression(JFieldAccessExpression self,
                                      JExpression left,
                                      String ident)
     {
@@ -1202,7 +1257,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a class expression
      */
-    public void visitClassExpression(JClassExpression self,
+    @Override
+	public void visitClassExpression(JClassExpression self,
                                      CType type)
     {
         blockStart("ClassExpression");
@@ -1214,7 +1270,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a cast expression
      */
-    public void visitCastExpression(JCastExpression self,
+    @Override
+	public void visitCastExpression(JCastExpression self,
                                     JExpression expr,
                                     CType type)
     {
@@ -1227,7 +1284,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a cast expression
      */
-    public void visitUnaryPromoteExpression(JUnaryPromote self,
+    @Override
+	public void visitUnaryPromoteExpression(JUnaryPromote self,
                                             JExpression expr,
                                             CType type)
     {
@@ -1240,7 +1298,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a compound assignment expression
      */
-    public void visitBitwiseExpression(JBitwiseExpression self,
+    @Override
+	public void visitBitwiseExpression(JBitwiseExpression self,
                                        int oper,
                                        JExpression left,
                                        JExpression right)
@@ -1255,7 +1314,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an assignment expression
      */
-    public void visitAssignmentExpression(JAssignmentExpression self,
+    @Override
+	public void visitAssignmentExpression(JAssignmentExpression self,
                                           JExpression left,
                                           JExpression right)
     {
@@ -1268,7 +1328,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitArrayLengthExpression(JArrayLengthExpression self,
+    @Override
+	public void visitArrayLengthExpression(JArrayLengthExpression self,
                                            JExpression prefix)
     {
         blockStart("ArrayLengthExpression");
@@ -1279,7 +1340,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public void visitArrayAccessExpression(JArrayAccessExpression self,
                                            JExpression prefix,
                                            JExpression accessor)
     {
@@ -1292,17 +1354,20 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitComments(JavaStyleComment[] comments) { }
+    @Override
+	public void visitComments(JavaStyleComment[] comments) { }
 
     /**
      * visits an array length expression
      */
-    public void visitComment(JavaStyleComment comment) { }
+    @Override
+	public void visitComment(JavaStyleComment comment) { }
 
     /**
      * visits an array length expression
      */
-    public void visitJavadoc(JavadocComment comment) { }
+    @Override
+	public void visitJavadoc(JavadocComment comment) { }
 
     // ----------------------------------------------------------------------
     // OTHERS
@@ -1311,7 +1376,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitSwitchLabel(JSwitchLabel self,
+    @Override
+	public void visitSwitchLabel(JSwitchLabel self,
                                  JExpression expr)
     {
         blockStart("SwitchLabel");
@@ -1322,7 +1388,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitSwitchGroup(JSwitchGroup self,
+    @Override
+	public void visitSwitchGroup(JSwitchGroup self,
                                  JSwitchLabel[] labels,
                                  JStatement[] stmts)
     {
@@ -1341,7 +1408,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitCatchClause(JCatchClause self,
+    @Override
+	public void visitCatchClause(JCatchClause self,
                                  JFormalParameter exception,
                                  JBlock body)
     {
@@ -1354,7 +1422,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitFormalParameters(JFormalParameter self,
+    @Override
+	public void visitFormalParameters(JFormalParameter self,
                                       boolean isFinal,
                                       CType type,
                                       String ident)
@@ -1369,7 +1438,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array length expression
      */
-    public void visitConstructorCall(JConstructorCall self,
+    @Override
+	public void visitConstructorCall(JConstructorCall self,
                                      boolean functorIsThis,
                                      JExpression[] params)
     {
@@ -1385,7 +1455,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits an array initializer expression
      */
-    public void visitArrayInitializer(JArrayInitializer self,
+    @Override
+	public void visitArrayInitializer(JArrayInitializer self,
                                       JExpression[] elems)
     {
         blockStart("ArrayInitializer");
@@ -1397,7 +1468,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a boolean literal
      */
-    public void visitBooleanLiteral(boolean value)
+    @Override
+	public void visitBooleanLiteral(boolean value)
     {
         blockStart("BooleanLiteral");
         if (value)
@@ -1410,7 +1482,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a byte literal
      */
-    public void visitByteLiteral(byte value)
+    @Override
+	public void visitByteLiteral(byte value)
     {
         blockStart("ByteLiteral");
         printData(' ');
@@ -1421,7 +1494,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a character literal
      */
-    public void visitCharLiteral(char value)
+    @Override
+	public void visitCharLiteral(char value)
     {
         blockStart("CharLiteral");
         printData(' ');
@@ -1432,7 +1506,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a double literal
      */
-    public void visitDoubleLiteral(double value)
+    @Override
+	public void visitDoubleLiteral(double value)
     {
         blockStart("DoubleLiteral");
         printData(' ');
@@ -1443,7 +1518,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a float literal
      */
-    public void visitFloatLiteral(float value)
+    @Override
+	public void visitFloatLiteral(float value)
     {
         blockStart("FloatLiteral");
         printData(' ');
@@ -1454,7 +1530,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a int literal
      */
-    public void visitIntLiteral(int value)
+    @Override
+	public void visitIntLiteral(int value)
     {
         blockStart("IntLiteral");
         printData(' ');
@@ -1465,7 +1542,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a long literal
      */
-    public void visitLongLiteral(long value)
+    @Override
+	public void visitLongLiteral(long value)
     {
         blockStart("LongLiteral");
         printData(' ');
@@ -1476,7 +1554,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a short literal
      */
-    public void visitShortLiteral(short value)
+    @Override
+	public void visitShortLiteral(short value)
     {
         blockStart("ShortLiteral");
         printData(' ');
@@ -1487,7 +1566,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a string literal
      */
-    public void visitStringLiteral(String value)
+    @Override
+	public void visitStringLiteral(String value)
     {
         blockStart("StringLiteral");
         printData(' ');
@@ -1500,7 +1580,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a null literal
      */
-    public void visitNullLiteral()
+    @Override
+	public void visitNullLiteral()
     {
         blockStart("NullLiteral");
         blockEnd();
@@ -1509,7 +1590,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a package name declaration
      */
-    public void visitPackageName(String name)
+    @Override
+	public void visitPackageName(String name)
     {
         blockStart("PackageName");
         printData(" ");
@@ -1520,7 +1602,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a package import declaration
      */
-    public void visitPackageImport(String name)
+    @Override
+	public void visitPackageImport(String name)
     {
         blockStart("PackageImport");
         printData(" ");
@@ -1531,7 +1614,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * visits a class import declaration
      */
-    public void visitClassImport(String name)
+    @Override
+	public void visitClassImport(String name)
     {
         blockStart("ClassImport");
         printData(" ");
@@ -1546,7 +1630,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an init statement.
      */
-    public void visitInitStatement(SIRInitStatement self,
+    @Override
+	public void visitInitStatement(SIRInitStatement self,
                                    SIRStream target) {
         blockStart("SIRInitStatement");
         attrPrint("target ", target.toString());
@@ -1562,7 +1647,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an interface table.
      */
-    public void visitInterfaceTable(SIRInterfaceTable self)
+    @Override
+	public void visitInterfaceTable(SIRInterfaceTable self)
     {
         blockStart("SIRInterfaceTable");
         attrPrint("interface", self.getIface().getIdent());
@@ -1576,7 +1662,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a latency.
      */
-    public void visitLatency(SIRLatency self) {
+    @Override
+	public void visitLatency(SIRLatency self) {
         blockStart("SIRLatency");
         if (self==SIRLatency.BEST_EFFORT) {
             printData("BEST EFFORT");
@@ -1588,7 +1675,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a max latency.
      */
-    public void visitLatencyMax(SIRLatencyMax self) {
+    @Override
+	public void visitLatencyMax(SIRLatencyMax self) {
         blockStart("SIRLatencyMax");
         attrPrint("max", String.valueOf(self.getMax()));
         blockEnd();
@@ -1598,7 +1686,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a latency range.
      */
-    public void visitLatencyRange(SIRLatencyRange self) {
+    @Override
+	public void visitLatencyRange(SIRLatencyRange self) {
         blockStart("SIRLatencyRange");
         attrPrint("max", String.valueOf(self.getMax()));
         attrPrint("min", String.valueOf(self.getMin()));
@@ -1609,7 +1698,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a latency set.
      */
-    public void visitLatencySet(SIRLatencySet self) {
+    @Override
+	public void visitLatencySet(SIRLatencySet self) {
         blockStart("SIRLatencySet");
         Utils.fail("Printing list of latencies not implemented yet.");
         blockEnd();
@@ -1619,7 +1709,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a message statement.
      */
-    public void visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public void visitMessageStatement(SIRMessageStatement self,
                                       JExpression portal,
                                       String iname,
                                       String ident,
@@ -1642,7 +1733,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     }
 
 
-    public void visitRangeExpression(SIRRangeExpression self) {
+    @Override
+	public void visitRangeExpression(SIRRangeExpression self) {
         blockStart("SIRRangeExpression");
 
         // min
@@ -1661,7 +1753,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
         blockEnd();
     }
 
-    public void visitDynamicToken(SIRDynamicToken self) {
+    @Override
+	public void visitDynamicToken(SIRDynamicToken self) {
         blockStart("DynamicToken");
         blockEnd();
     }
@@ -1669,7 +1762,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a peek expression.
      */
-    public void visitPeekExpression(SIRPeekExpression self,
+    @Override
+	public void visitPeekExpression(SIRPeekExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         blockStart("SIRPeekExpression");
@@ -1689,7 +1783,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a pop expression.
      */
-    public void visitPopExpression(SIRPopExpression self,
+    @Override
+	public void visitPopExpression(SIRPopExpression self,
                                    CType tapeType) {
         blockStart("SIRPopExpression");
         blockEnd();
@@ -1698,7 +1793,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a message-receiving portal.
      */
-    public void visitPortal(SIRPortal self)
+    @Override
+	public void visitPortal(SIRPortal self)
     {
         blockStart("SIRPortal");
         blockEnd();
@@ -1707,7 +1803,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a print statement.
      */
-    public void visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public void visitPrintStatement(SIRPrintStatement self,
                                     JExpression arg) {
         blockStart("SIRPrintStatement");
         attrStart("arg");
@@ -1716,7 +1813,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
         blockEnd();
     }
 
-    public void visitCreatePortalExpression(SIRCreatePortal self) {
+    @Override
+	public void visitCreatePortalExpression(SIRCreatePortal self) {
         blockStart("SIRCreatePortalExpression");
         blockEnd();
     }
@@ -1725,7 +1823,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a push expression.
      */
-    public void visitPushExpression(SIRPushExpression self,
+    @Override
+	public void visitPushExpression(SIRPushExpression self,
                                     CType tapeType,
                                     JExpression arg) {
         blockStart("SIRPushExpression");
@@ -1755,7 +1854,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a register-receiver statement.
      */
-    public void visitRegReceiverStatement(SIRRegReceiverStatement self,
+    @Override
+	public void visitRegReceiverStatement(SIRRegReceiverStatement self,
                                           JExpression portal,
                                           SIRStream receiver,
                                           JMethodDeclaration[] methods) {
@@ -1774,7 +1874,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a register-sender statement.
      */
-    public void visitRegSenderStatement(SIRRegSenderStatement self,
+    @Override
+	public void visitRegSenderStatement(SIRRegSenderStatement self,
                                         String portal,
                                         SIRLatency latency) {
         Utils.fail("Printing reg. sender statements unimplemented");
@@ -1783,7 +1884,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a marker statement.
      */
-    public void visitMarker(SIRMarker self) {
+    @Override
+	public void visitMarker(SIRMarker self) {
         blockStart("SIRMarker");
         blockEnd();
     }
@@ -1795,7 +1897,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a function pointer.
      */
-    public void visitFunctionPointer(LIRFunctionPointer self,
+    @Override
+	public void visitFunctionPointer(LIRFunctionPointer self,
                                      String name) {
         blockStart("LIRFunctionPointer");
         attrPrint("name", name);
@@ -1806,7 +1909,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an LIR node.
      */
-    public void visitNode(LIRNode self) {
+    @Override
+	public void visitNode(LIRNode self) {
         blockStart("LIRNode");
         blockEnd();
     }
@@ -1814,7 +1918,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an LIR register-receiver statement.
      */
-    public void visitRegisterReceiver(LIRRegisterReceiver self,
+    @Override
+	public void visitRegisterReceiver(LIRRegisterReceiver self,
                                       JExpression streamContext,
                                       SIRPortal portal,
                                       String childName,
@@ -1836,7 +1941,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a child registration node.
      */
-    public void visitSetChild(LIRSetChild self,
+    @Override
+	public void visitSetChild(LIRSetChild self,
                               JExpression streamContext,
                               String childType,
                               String childName) {
@@ -1853,7 +1959,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a decoder registration node.
      */
-    public void visitSetDecode(LIRSetDecode self,
+    @Override
+	public void visitSetDecode(LIRSetDecode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp) {
         blockStart("LIRSetDecode");
@@ -1870,7 +1977,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visit a feedback loop delay node.
      */
-    public void visitSetDelay(LIRSetDelay self,
+    @Override
+	public void visitSetDelay(LIRSetDelay self,
                               JExpression data,
                               JExpression streamContext,
                               int delay,
@@ -1892,7 +2000,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an encoder registration node.
      */
-    public void visitSetEncode(LIRSetEncode self,
+    @Override
+	public void visitSetEncode(LIRSetEncode self,
                                JExpression streamContext,
                                LIRFunctionPointer fp) {
         blockStart("LIRSetEncode");
@@ -1908,7 +2017,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a joiner-setting node.
      */
-    public void visitSetJoiner(LIRSetJoiner self,
+    @Override
+	public void visitSetJoiner(LIRSetJoiner self,
                                JExpression streamContext,
                                SIRJoinType type,
                                int ways,
@@ -1932,7 +2042,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a peek-rate-setting node.
      */
-    public void visitSetPeek(LIRSetPeek self,
+    @Override
+	public void visitSetPeek(LIRSetPeek self,
                              JExpression streamContext,
                              int peek) {
         blockStart("LIRSetPeek");
@@ -1947,7 +2058,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a pop-rate-setting node.
      */
-    public void visitSetPop(LIRSetPop self,
+    @Override
+	public void visitSetPop(LIRSetPop self,
                             JExpression streamContext,
                             int pop) {
         blockStart("LIRSetPop");
@@ -1962,7 +2074,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a push-rate-setting node.
      */
-    public void visitSetPush(LIRSetPush self,
+    @Override
+	public void visitSetPush(LIRSetPush self,
                              JExpression streamContext,
                              int push) {
         blockStart("LIRSetPush");
@@ -1976,7 +2089,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a splitter-setting node.
      */
-    public void visitSetSplitter(LIRSetSplitter self,
+    @Override
+	public void visitSetSplitter(LIRSetSplitter self,
                                  JExpression streamContext,
                                  SIRSplitType type,
                                  int ways,
@@ -2001,7 +2115,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a stream-type-setting node.
      */
-    public void visitSetStreamType(LIRSetStreamType self,
+    @Override
+	public void visitSetStreamType(LIRSetStreamType self,
                                    JExpression streamContext,
                                    LIRStreamType streamType) {
         blockStart("LIRSetStreamType");
@@ -2016,7 +2131,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a work-function-setting node.
      */
-    public void visitSetWork(LIRSetWork self,
+    @Override
+	public void visitSetWork(LIRSetWork self,
                              JExpression streamContext,
                              LIRFunctionPointer fn) {
         blockStart("LIRSetWork");
@@ -2032,7 +2148,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a tape-setter.
      */
-    public void visitSetTape(LIRSetTape self,
+    @Override
+	public void visitSetTape(LIRSetTape self,
                              JExpression streamContext,
                              JExpression srcStruct,
                              JExpression dstStruct,
@@ -2056,7 +2173,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a main function contents.
      */
-    public void visitMainFunction(LIRMainFunction self,
+    @Override
+	public void visitMainFunction(LIRMainFunction self,
                                   String typeName,
                                   LIRFunctionPointer init,
                                   List<JStatement> initStatements) {
@@ -2075,7 +2193,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a set body of feedback loop.
      */
-    public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
+    @Override
+	public void visitSetBodyOfFeedback(LIRSetBodyOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -2099,7 +2218,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a set loop of feedback loop.
      */
-    public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
+    @Override
+	public void visitSetLoopOfFeedback(LIRSetLoopOfFeedback self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        CType inputType,
@@ -2124,7 +2244,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a file reader.
      */
-    public void visitFileReader(LIRFileReader self) {
+    @Override
+	public void visitFileReader(LIRFileReader self) {
         blockStart("LIRFileReader");
         attrStart("streamContext");
         self.getStreamContext().accept(this);
@@ -2136,7 +2257,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a file writer.
      */
-    public void visitFileWriter(LIRFileWriter self) {
+    @Override
+	public void visitFileWriter(LIRFileWriter self) {
         blockStart("LIRFileWriter");
         attrStart("streamContext");
         self.getStreamContext().accept(this);
@@ -2148,7 +2270,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits an identity creator.
      */
-    public void visitIdentity(LIRIdentity self) {
+    @Override
+	public void visitIdentity(LIRIdentity self) {
         blockStart("LIRIdentity");
         attrStart("streamContext");
         self.getStreamContext().accept(this);
@@ -2159,7 +2282,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a set a parallel stream.
      */
-    public void visitSetParallelStream(LIRSetParallelStream self,
+    @Override
+	public void visitSetParallelStream(LIRSetParallelStream self,
                                        JExpression streamContext,
                                        JExpression childContext,
                                        int position,
@@ -2185,7 +2309,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a work function entry.
      */
-    public void visitWorkEntry(LIRWorkEntry self)
+    @Override
+	public void visitWorkEntry(LIRWorkEntry self)
     {
         blockStart("LIRWorkEntry");
         attrStart("streamContext");
@@ -2197,7 +2322,8 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a work function exit.
      */
-    public void visitWorkExit(LIRWorkExit self)
+    @Override
+	public void visitWorkExit(LIRWorkExit self)
     {
         blockStart("LIRWorkExit");
         attrStart("streamContext");
@@ -2209,13 +2335,15 @@ public class IRPrinter extends Utils implements SLIRVisitor
     /**
      * Visits a vector literal.
      */
-    public void visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
+    @Override
+	public void visitVectorLiteral(JVectorLiteral self, JLiteral scalar) {
         blockStart("VectorLiteral");
         scalar.accept(this);
         blockEnd();
     }
 
-    public void visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
+    @Override
+	public void visitEmittedTextExpression(JEmittedTextExpression self, Object[] parts) {
         blockStart("Text");
         for (Object part : parts) {
             if (part instanceof JExpression) {

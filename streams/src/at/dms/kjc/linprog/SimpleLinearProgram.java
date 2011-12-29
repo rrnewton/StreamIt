@@ -41,14 +41,16 @@ public class SimpleLinearProgram implements LinearProgram, Serializable {
      * linear program (which the client can then fill in with
      * coefficients before checking in as a new constraint.)
      */
-    public double[] getEmptyConstraint() {
+    @Override
+	public double[] getEmptyConstraint() {
         return new double[numVars];
     }
 
     /**
      * Sets the objective function to be <obj>.
      */
-    public void setObjective(double[] obj) {
+    @Override
+	public void setObjective(double[] obj) {
         this.obj = obj;
     }
 
@@ -56,7 +58,8 @@ public class SimpleLinearProgram implements LinearProgram, Serializable {
      * Constrains the n'th variable of this to be a boolean variable
      * (zero or one).
      */
-    public void setBoolVar(int n) {
+    @Override
+	public void setBoolVar(int n) {
         this.boolVar[n] = true;
     }
 
@@ -66,7 +69,8 @@ public class SimpleLinearProgram implements LinearProgram, Serializable {
      *
      * That is, <constraint> <dot> <variables> >= <rhs>. 
      */
-    public void addConstraintGE(double[] constraint, double rhs) {
+    @Override
+	public void addConstraintGE(double[] constraint, double rhs) {
         constraints.add(new Constraint(ConstraintType.GE, constraint, rhs));
     }
 
@@ -74,7 +78,8 @@ public class SimpleLinearProgram implements LinearProgram, Serializable {
      * Adds an equality constraint between the variables with
      * coefficients <constraint> and the right-hand-side <rhs>.
      */
-    public void addConstraintEQ(double[] constraint, double rhs) {
+    @Override
+	public void addConstraintEQ(double[] constraint, double rhs) {
         constraints.add(new Constraint(ConstraintType.EQ, constraint, rhs));
     }
 }

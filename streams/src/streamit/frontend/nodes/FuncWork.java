@@ -41,7 +41,8 @@ public class FuncWork extends Function
     }
 
     /** Accepts a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitFuncWork(this);
     }

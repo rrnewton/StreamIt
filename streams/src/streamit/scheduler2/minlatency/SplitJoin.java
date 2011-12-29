@@ -153,62 +153,74 @@ public class SplitJoin extends streamit.scheduler2.hierarchical.SplitJoin
             super(_sj);
         }
 
-        public void addSchedulePhase(PhasingSchedule phase)
+        @Override
+		public void addSchedulePhase(PhasingSchedule phase)
         {
             sj.addInitScheduleStage(phase);
         }
 
-        public void advanceChildSchedule(StreamInterface child, int nPhases)
+        @Override
+		public void advanceChildSchedule(StreamInterface child, int nPhases)
         {
             sj.advanceChildInitSchedule(child, nPhases);
         }
 
-        public PhasingSchedule getChildNextPhase(StreamInterface child)
+        @Override
+		public PhasingSchedule getChildNextPhase(StreamInterface child)
         {
             return sj.getChildNextInitStage(child);
         }
 
-        public PhasingSchedule getChildPhase(StreamInterface child, int stage)
+        @Override
+		public PhasingSchedule getChildPhase(StreamInterface child, int stage)
         {
             return sj.getChildInitStage(child, stage);
         }
 
-        public void advanceSplitSchedule()
+        @Override
+		public void advanceSplitSchedule()
         {
             sj.advanceSplitSchedule();
         }
 
-        public void advanceJoinSchedule()
+        @Override
+		public void advanceJoinSchedule()
         {
             sj.advanceJoinSchedule();
         }
 
-        public SplitFlow getNextSplitSteadyPhaseFlow()
+        @Override
+		public SplitFlow getNextSplitSteadyPhaseFlow()
         {
             return sj.getNextSplitSteadyPhaseFlow();
         }
 
-        public SplitFlow getSplitSteadyPhaseFlow(int phase)
+        @Override
+		public SplitFlow getSplitSteadyPhaseFlow(int phase)
         {
             return sj.getSplitSteadyPhaseFlow(phase);
         }
 
-        public PhasingSchedule getNextSplitSteadyPhase()
+        @Override
+		public PhasingSchedule getNextSplitSteadyPhase()
         {
             return sj.getNextSplitSteadyPhase();
         }
 
-        public JoinFlow getNextJoinSteadyPhaseFlow()
+        @Override
+		public JoinFlow getNextJoinSteadyPhaseFlow()
         {
             return sj.getNextJoinSteadyPhaseFlow();
         }
 
-        public JoinFlow getJoinSteadyPhaseFlow(int phase)
+        @Override
+		public JoinFlow getJoinSteadyPhaseFlow(int phase)
         {
             return sj.getJoinSteadyPhaseFlow(phase);
         }
 
-        public PhasingSchedule getNextJoinSteadyPhase()
+        @Override
+		public PhasingSchedule getNextJoinSteadyPhase()
         {
             return sj.getNextJoinSteadyPhase();
         }
@@ -221,62 +233,74 @@ public class SplitJoin extends streamit.scheduler2.hierarchical.SplitJoin
             super(_sj);
         }
 
-        public void addSchedulePhase(PhasingSchedule phase)
+        @Override
+		public void addSchedulePhase(PhasingSchedule phase)
         {
             sj.addSteadySchedulePhase(phase);
         }
 
-        public void advanceChildSchedule(StreamInterface child, int nPhases)
+        @Override
+		public void advanceChildSchedule(StreamInterface child, int nPhases)
         {
             sj.advanceChildSteadySchedule(child, nPhases);
         }
 
-        public PhasingSchedule getChildNextPhase(StreamInterface child)
+        @Override
+		public PhasingSchedule getChildNextPhase(StreamInterface child)
         {
             return sj.getChildNextSteadyPhase(child);
         }
 
-        public PhasingSchedule getChildPhase(StreamInterface child, int stage)
+        @Override
+		public PhasingSchedule getChildPhase(StreamInterface child, int stage)
         {
             return sj.getChildSteadyPhase(child, stage);
         }
 
-        public void advanceSplitSchedule()
+        @Override
+		public void advanceSplitSchedule()
         {
             sj.advanceSplitSchedule();
         }
 
-        public void advanceJoinSchedule()
+        @Override
+		public void advanceJoinSchedule()
         {
             sj.advanceJoinSchedule();
         }
 
-        public SplitFlow getNextSplitSteadyPhaseFlow()
+        @Override
+		public SplitFlow getNextSplitSteadyPhaseFlow()
         {
             return sj.getNextSplitSteadyPhaseFlow();
         }
 
-        public SplitFlow getSplitSteadyPhaseFlow(int phase)
+        @Override
+		public SplitFlow getSplitSteadyPhaseFlow(int phase)
         {
             return sj.getSplitSteadyPhaseFlow(phase);
         }
 
-        public PhasingSchedule getNextSplitSteadyPhase()
+        @Override
+		public PhasingSchedule getNextSplitSteadyPhase()
         {
             return sj.getNextSplitSteadyPhase();
         }
 
-        public JoinFlow getNextJoinSteadyPhaseFlow()
+        @Override
+		public JoinFlow getNextJoinSteadyPhaseFlow()
         {
             return sj.getNextJoinSteadyPhaseFlow();
         }
 
-        public JoinFlow getJoinSteadyPhaseFlow(int phase)
+        @Override
+		public JoinFlow getJoinSteadyPhaseFlow(int phase)
         {
             return sj.getJoinSteadyPhaseFlow(phase);
         }
 
-        public PhasingSchedule getNextJoinSteadyPhase()
+        @Override
+		public PhasingSchedule getNextJoinSteadyPhase()
         {
             return sj.getNextJoinSteadyPhase();
         }
@@ -507,7 +531,8 @@ public class SplitJoin extends streamit.scheduler2.hierarchical.SplitJoin
         }
     }
 
-    public void computeSchedule()
+    @Override
+	public void computeSchedule()
     {
         int steadyChildPhases[] = new int[getNumChildren()];
         int steadySplitPhases = getNumSplitPhases() * getSplitNumRounds();

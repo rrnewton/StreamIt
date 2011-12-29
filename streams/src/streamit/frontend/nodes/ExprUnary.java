@@ -53,12 +53,14 @@ public class ExprUnary extends Expression
     public Expression getExpr() { return expr; }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprUnary(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprUnary))
             return false;
@@ -70,12 +72,14 @@ public class ExprUnary extends Expression
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return new Integer(op).hashCode() ^ expr.hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         String preOp = "", postOp = "";
         switch(op)

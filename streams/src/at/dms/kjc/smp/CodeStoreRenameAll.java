@@ -171,6 +171,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 		}
 	}
 
+	@Override
 	public Object visitBlockStatement(JBlock self, JavaStyleComment[] comments) {
 		RASymbolTable ost = symtab;
 		symtab = new RASymbolTable(ost);
@@ -184,6 +185,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 		return new JBlock(self.getTokenReference(), newstmts, comments);
 	}
 
+	@Override
 	public Object visitFieldDeclaration(JFieldDeclaration self, int modifiers,
 			CType type, String ident, JExpression expr) {
 		JVariableDefinition vardef = (JVariableDefinition) self.getVariable()
@@ -192,6 +194,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 				null);
 	}
 
+	@Override
 	public Object visitFormalParameters(JFormalParameter self, boolean isFinal,
 			CType type, String ident) {
 		// have to mutate this instead of replacing it, since some
@@ -219,6 +222,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 	 * ().getIdent())); return self; }
 	 */
 
+	@Override
 	public Object visitVariableDefinition(JVariableDefinition self,
 			int modifiers, CType type, java.lang.String ident, JExpression expr) {
 		// need to mutate this instead of returning a new one, since
@@ -241,6 +245,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 		return self;
 	}
 
+	@Override
 	public Object visitForStatement(JForStatement self, JStatement init,
 			JExpression cond, JStatement incr, JStatement body) {
 
@@ -257,6 +262,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 
 	// Hmm. Are there anonymous creations at this point? Ignore for now.
 
+	@Override
 	public Object visitNameExpression(JNameExpression self, JExpression prefix,
 			String ident) {
 		if (prefix != null)
@@ -267,6 +273,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 					symtab.nameFor(ident));
 	}
 
+	@Override
 	public Object visitMethodCallExpression(JMethodCallExpression self,
 			JExpression prefix, String ident, JExpression[] args) {
 		JExpression[] newArgs = new JExpression[args.length];
@@ -287,6 +294,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 		return retval;
 	}
 
+	@Override
 	public Object visitMethodDeclaration(JMethodDeclaration self,
 			int modifiers, CType returnType, String ident,
 			JFormalParameter[] parameters, CClassType[] exceptions, JBlock body) {
@@ -311,6 +319,7 @@ public class CodeStoreRenameAll extends SLIRReplacingVisitor {
 		return newdecl;
 	}
 
+	@Override
 	public Object visitFieldExpression(JFieldAccessExpression self,
 			JExpression left, String ident) {
 		// visit the left expression

@@ -60,49 +60,56 @@ public class Iterator implements streamit.scheduler2.iriter.Iterator
         this.factory = _factory;
     }
 
-    public Object getObject ()
+    @Override
+	public Object getObject ()
     {
         return stream;
     }
     
     // members of streamit.scheduler2.iriter.Iterator
 
-    public streamit.scheduler2.iriter.FilterIter isFilter()
+    @Override
+	public streamit.scheduler2.iriter.FilterIter isFilter()
     {
         if (stream instanceof Filter)
             return factory.newFrom((Filter)stream);
         return null;
     }
 
-    public streamit.scheduler2.iriter.PipelineIter isPipeline()
+    @Override
+	public streamit.scheduler2.iriter.PipelineIter isPipeline()
     {
         if (stream instanceof Pipeline)
             return factory.newFrom((Pipeline)stream);
         return null;
     }
 
-    public streamit.scheduler2.iriter.SplitJoinIter isSplitJoin()
+    @Override
+	public streamit.scheduler2.iriter.SplitJoinIter isSplitJoin()
     {
         if (stream instanceof SplitJoin)
             return factory.newFrom((SplitJoin)stream);
         return null;
     }
 
-    public streamit.scheduler2.iriter.FeedbackLoopIter isFeedbackLoop()
+    @Override
+	public streamit.scheduler2.iriter.FeedbackLoopIter isFeedbackLoop()
     {
         if (stream instanceof FeedbackLoop)
             return factory.newFrom((FeedbackLoop)stream);
         return null;
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof Iterator)) return false;
         Iterator otherIter = (Iterator) other;
         return otherIter.getObject() == this.getObject();
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return stream.hashCode();
     }

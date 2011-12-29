@@ -36,12 +36,14 @@ public class LList implements List, Stack {
      * Add an object to the end of the list.
      * @param o the object to add
      */
-    public void add(Object o) { append(o); }
+    @Override
+	public void add(Object o) { append(o); }
     /**
      * Append an object to the end of the list.
      * @param o the object to append
      */
-    public void append(Object o) {
+    @Override
+	public void append(Object o) {
         LLCell n = new LLCell(o);
         if ( length==0 ) {
             head=tail=n;
@@ -72,7 +74,8 @@ public class LList implements List, Stack {
      * @return the object at index i
      * NoSuchElementException is thrown if i out of range
      */
-    public Object elementAt(int i) throws NoSuchElementException {
+    @Override
+	public Object elementAt(int i) throws NoSuchElementException {
         int j=0;
         for (LLCell p = head; p!=null; p=p.next) {
             if ( i==j ) {
@@ -85,17 +88,20 @@ public class LList implements List, Stack {
     /**
      * Return an enumeration of the list elements
      */
-    public Enumeration elements() { return new LLEnumeration(this); }
+    @Override
+	public Enumeration elements() { return new LLEnumeration(this); }
     /**
      * How high is the stack?
      */
-    public int height() { return length; }
+    @Override
+	public int height() { return length; }
     /**
      * Answers whether or not an object is contained in the list
      * @param o the object to test for inclusion.
      * @return true if object is contained else false.
      */
-    public boolean includes(Object o) {
+    @Override
+	public boolean includes(Object o) {
         for (LLCell p = head; p!=null; p=p.next) {
             if ( p.data.equals(o) ) {
                 return true;
@@ -121,13 +127,15 @@ public class LList implements List, Stack {
     /**
      * Return the length of the list.
      */
-    public int length() { return length; }
+    @Override
+	public int length() { return length; }
     /**
      * Pop the top element of the stack off.
      * @return the top of stack that was popped off.
      * @exception NoSuchElementException if the stack is empty.
      */
-    public Object pop() throws NoSuchElementException {
+    @Override
+	public Object pop() throws NoSuchElementException {
         Object o = deleteHead();
         return o;
     }
@@ -137,8 +145,10 @@ public class LList implements List, Stack {
      * Push an object onto the stack.
      * @param o the object to push
      */
-    public void push(Object o) { insertHead(o); }
-    public Object top() throws NoSuchElementException {
+    @Override
+	public void push(Object o) { insertHead(o); }
+    @Override
+	public Object top() throws NoSuchElementException {
         if ( head==null ) {
             throw new NoSuchElementException();
         }

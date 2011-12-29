@@ -1,5 +1,6 @@
 package at.dms.kjc.sir.linear.frequency;
 
+import at.dms.classfile.Constants;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
@@ -163,7 +164,8 @@ public class LEETFrequencyReplacer extends FrequencyReplacer{
      * Does the actual work of replacing something that computes a convolution
      * sum with something that does a FFT, multiply, and then IFFT.
      */
-    public boolean makeReplacement(SIRStream self) {
+    @Override
+	public boolean makeReplacement(SIRStream self) {
         LinearPrinter.println(" processing " + self.getIdent());
 
         // make sure we can replace "self" with a frequency version.
@@ -325,8 +327,7 @@ public class LEETFrequencyReplacer extends FrequencyReplacer{
                               new JExpressionStatement(null, new SIRPopExpression(type, freqPush*(freqPop-1)), null) };
     
         JMethodDeclaration work =  new JMethodDeclaration( /* tokref     */ null,
-                                                           /* modifiers  */ at.dms.kjc.
-                                                           Constants.ACC_PUBLIC,
+                                                           /* modifiers  */ Constants.ACC_PUBLIC,
                                                            /* returntype */ CStdType.Void,
                                                            /* identifier */ "work",
                                                            /* parameters */ JFormalParameter.EMPTY,

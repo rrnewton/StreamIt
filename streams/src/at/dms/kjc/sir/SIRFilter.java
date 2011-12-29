@@ -92,7 +92,8 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
     /**
      * Accepts attribute visitor <v> at this node.
      */
-    public Object accept(AttributeStreamVisitor v) {
+    @Override
+	public Object accept(AttributeStreamVisitor v) {
         return v.visitFilter(this,
                              fields,
                              methods,
@@ -136,10 +137,11 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
         return getPhases()[0].getPop();
     }
 
-    public int getPushForSchedule(Map<SIROperator, int[]>[] execCounts) {
+    @Override
+	public int getPushForSchedule(Map<SIROperator, int[]>[] execCounts) {
         assert execCounts[1].containsKey(this):
             "Execution count doesn't contain " + this;
-        int steadyCount = ((int[])execCounts[1].get(this))[0];
+        int steadyCount = execCounts[1].get(this)[0];
         return steadyCount * getPushInt();
     }
 
@@ -206,13 +208,15 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
     }
 
     /* Overridden from SIRStream: */
-    public JMethodDeclaration getWork() 
+    @Override
+	public JMethodDeclaration getWork() 
     {
         return getPhases()[0];
     }
     
     /* Overridden from SIRStream: */
-    public void setWork(JMethodDeclaration work) {
+    @Override
+	public void setWork(JMethodDeclaration work) {
         // if new work function has no I/O rates and old one does,
         // then transfer rates to new one.  This is an ugly remnant of
         // the old mode of operation, where I/O rates were stored
@@ -240,7 +244,8 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
     */
 
     /* Overridden from SIRPhasedFilter: */
-    public void setPhases(JMethodDeclaration[] phases)
+    @Override
+	public void setPhases(JMethodDeclaration[] phases)
     {
         if (phases.length != 1)
             throw new UnsupportedOperationException
@@ -248,7 +253,8 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
         super.setPhases(phases);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "SIRFilter name=" + getName();
     }
 
@@ -333,8 +339,7 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
                                        /* comments */ null);    
     
         JMethodDeclaration workfn =  new JMethodDeclaration( /* tokref     */ null,
-                                                             /* modifiers  */ at.dms.kjc.
-                                                             Constants.ACC_PUBLIC,
+                                                             /* modifiers  */ at.dms.classfile.Constants.ACC_PUBLIC,
                                                              /* returntype */ CStdType.Void,
                                                              /* identifier */ "work",
                                                              /* parameters */ JFormalParameter.EMPTY,
@@ -354,7 +359,8 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRFilter other = new at.dms.kjc.sir.SIRFilter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

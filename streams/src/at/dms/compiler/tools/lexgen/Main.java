@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import at.dms.compiler.tools.common.CompilerMessages;
 import at.dms.compiler.tools.common.Utils;
 import at.dms.compiler.tools.jperf.JPerf;
 
@@ -110,7 +111,7 @@ public class Main {
             return false;
         }
         if (options.nonOptions.length == 0) {
-            System.err.println(LexgenMessages.NO_INPUT_FILE.getFormat());
+            System.err.println(CompilerMessages.NO_INPUT_FILE.getFormat());
             options.usage();
             return false;
         }

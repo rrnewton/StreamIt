@@ -51,7 +51,8 @@ public class ByteBuffer extends InputBuffer {
     /**
      * Ensure that the character buffer is sufficiently full
      */
-    public void fill(int amount) throws CharStreamException {
+    @Override
+	public void fill(int amount) throws CharStreamException {
         try {
             syncConsume();
             // Fill the buffer sufficiently to hold needed characters

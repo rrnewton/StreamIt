@@ -49,7 +49,8 @@ public class CLabeledContext extends CBodyContext {
     /**
      * Verify everything is okay at the end of this context
      */
-    public void close(TokenReference ref) {
+    @Override
+	public void close(TokenReference ref) {
         if (!isUsed) {
             reportTrouble(new CWarning(stmt.getTokenReference(),
                                        KjcMessages.UNUSED_LABEL,
@@ -74,7 +75,8 @@ public class CLabeledContext extends CBodyContext {
     /**
      * Returns the statement with the specified label.
      */
-    public JStatement getLabeledStatement(String label) {
+    @Override
+	public JStatement getLabeledStatement(String label) {
         if (label.equals(stmt.getLabel())) {
             isUsed = true;
             return stmt.getTargetStatement();
@@ -86,7 +88,8 @@ public class CLabeledContext extends CBodyContext {
     /**
      *
      */
-    protected void addBreak(JStatement target,
+    @Override
+	protected void addBreak(JStatement target,
                             CBodyContext context)
     {
         if (stmt == target) {
@@ -112,7 +115,8 @@ public class CLabeledContext extends CBodyContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CLabeledContext other = new at.dms.kjc.CLabeledContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

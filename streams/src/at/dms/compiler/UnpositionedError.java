@@ -87,7 +87,8 @@ public class UnpositionedError extends Throwable {
     /**
      * Returns a string explaining the error.
      */
-    public String getMessage() {
+    @Override
+	public String getMessage() {
         return message.getMessage();
     }
 

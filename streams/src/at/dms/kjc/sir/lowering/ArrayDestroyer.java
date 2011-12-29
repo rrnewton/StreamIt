@@ -101,11 +101,12 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
                 str.getMethods()[i].accept(this);
             }
             if(KjcOptions.destroyfieldarray)
-                destroyFieldArrays((SIRFilter)str);
+                destroyFieldArrays(str);
         }
     }
     
-    public Object visitVariableDefinition(JVariableDefinition self,
+    @Override
+	public Object visitVariableDefinition(JVariableDefinition self,
             int modifiers,
             CType type,
             String ident,
@@ -118,7 +119,8 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
     }
     
     
-    public Object visitMethodDeclaration(JMethodDeclaration self,
+    @Override
+	public Object visitMethodDeclaration(JMethodDeclaration self,
                                          int modifiers,
                                          CType returnType,
                                          String ident,
@@ -145,7 +147,8 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
                      * Eliminate all multidimensional arrays from consideration since
                      * we can not deal with them.
                      */
-                    public Object visitVariableDefinition(JVariableDefinition self,
+                    @Override
+					public Object visitVariableDefinition(JVariableDefinition self,
                             int modifiers,
                             CType type,
                             String ident,
@@ -160,10 +163,11 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
                     /**
                      * If vars used in any way except in array access then remove from targets
                      */
-                    public Object visitLocalVariableExpression(JLocalVariableExpression self2,
+                    @Override
+					public Object visitLocalVariableExpression(JLocalVariableExpression self2,
                                                                String ident2) {
-                        targets.remove(((JLocalVariableExpression)self2).getVariable());
-                        unsafe.add(((JLocalVariableExpression)self2).getVariable().getIdent());
+                        targets.remove(self2.getVariable());
+                        unsafe.add(self2.getVariable().getIdent());
                         return self2;
                     }
 
@@ -171,7 +175,8 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
                      * If fields used in any way except in array access then remove from targets.
                      * Use of fields in array access checked below in visitArrayAccessExpression.
                      */
-                    public Object visitFieldExpression(JFieldAccessExpression self,
+                    @Override
+					public Object visitFieldExpression(JFieldAccessExpression self,
                                                        JExpression left,
                                                        String ident) {
                         if(!init) {
@@ -182,7 +187,8 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
                         return self;
                     }
            
-                    public Object visitAssignmentExpression(JAssignmentExpression self,
+                    @Override
+					public Object visitAssignmentExpression(JAssignmentExpression self,
                                                             JExpression left,
                                                             JExpression right) {
                         if((left instanceof JLocalVariableExpression)&&(right instanceof JNewArrayExpression)) {
@@ -211,7 +217,8 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
                         return super.visitAssignmentExpression(self,left,right);
                     }
 
-                    public Object visitMethodCallExpression(JMethodCallExpression self,
+                    @Override
+					public Object visitMethodCallExpression(JMethodCallExpression self,
                                                             JExpression prefix,
                                                             String ident,
                                                             JExpression[] args) {
@@ -231,7 +238,8 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
                     /**
                      * Considers target
                      */
-                    public Object visitArrayAccessExpression(JArrayAccessExpression self2,
+                    @Override
+					public Object visitArrayAccessExpression(JArrayAccessExpression self2,
                                                              JExpression prefix,
                                                              JExpression accessor) {
                         if(!deadend) {
@@ -423,7 +431,8 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
      * replacedFields set up in destroyFieldArrays, and then every method required to accetp(this) 
      * which will cause replacement to happen at correct time.
      */
-    public Object visitArrayAccessExpression(JArrayAccessExpression self,
+    @Override
+	public Object visitArrayAccessExpression(JArrayAccessExpression self,
                                              JExpression prefix,
                                              JExpression accessor) {
         JExpression newExp=(JExpression)accessor.accept(this);
@@ -431,12 +440,12 @@ public class ArrayDestroyer extends SLIRReplacingVisitor {
             self.setAccessor(newExp);
         }
         if((prefix instanceof JLocalVariableExpression)&&(accessor instanceof JIntLiteral)) {
-            JLocalVariable[] varArray=(JLocalVariable[])replaced.get(((JLocalVariableExpression)prefix).getVariable());
+            JLocalVariable[] varArray=replaced.get(((JLocalVariableExpression)prefix).getVariable());
             if(varArray!=null)
                 return new JLocalVariableExpression(null,varArray[((JIntLiteral)accessor).intValue()]);
         }
         if((prefix instanceof JFieldAccessExpression)&&(((JFieldAccessExpression)prefix).getPrefix() instanceof JThisExpression)&&(accessor instanceof JIntLiteral)) {
-            String[] fieldArray=(String[])replacedFields.get(((JFieldAccessExpression)prefix).getIdent());
+            String[] fieldArray=replacedFields.get(((JFieldAccessExpression)prefix).getIdent());
             if(fieldArray!=null)
                 return new JFieldAccessExpression(null,((JFieldAccessExpression)prefix).getPrefix(),fieldArray[((JIntLiteral)accessor).intValue()],null);
         }

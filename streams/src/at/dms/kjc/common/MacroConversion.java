@@ -120,7 +120,8 @@ public class MacroConversion {
         // wrap every variable reference in <expr> with parantheses,
         // to make macro safe
         expr.accept(new SLIRReplacingVisitor() {
-                public Object visitLocalVariableExpression(JLocalVariableExpression self,
+                @Override
+				public Object visitLocalVariableExpression(JLocalVariableExpression self,
                                                            String ident) {
                     return new JParenthesedExpression(self);
                 }
@@ -230,12 +231,14 @@ public class MacroConversion {
         // children instead of calling accept directly.
         // ---------------------------------------------------------------
     
-        public void visitParenthesedExpression(JParenthesedExpression self,
+        @Override
+		public void visitParenthesedExpression(JParenthesedExpression self,
                                                JExpression expr) {
             doVisit(expr);
         }
 
-        public void visitBinaryExpression(JBinaryExpression self,
+        @Override
+		public void visitBinaryExpression(JBinaryExpression self,
                                           String oper,
                                           JExpression left,
                                           JExpression right) {
@@ -243,7 +246,8 @@ public class MacroConversion {
             doVisit(right);
         }
 
-        public void visitConditionalExpression(JConditionalExpression self,
+        @Override
+		public void visitConditionalExpression(JConditionalExpression self,
                                                JExpression cond,
                                                JExpression left,
                                                JExpression right) {
@@ -252,7 +256,8 @@ public class MacroConversion {
             doVisit(right);
         }
     
-        public void visitEqualityExpression(JEqualityExpression self,
+        @Override
+		public void visitEqualityExpression(JEqualityExpression self,
                                             boolean equal,
                                             JExpression left,
                                             JExpression right) {
@@ -260,7 +265,8 @@ public class MacroConversion {
             doVisit(right);
         }
     
-        public void visitRelationalExpression(JRelationalExpression self,
+        @Override
+		public void visitRelationalExpression(JRelationalExpression self,
                                               int oper,
                                               JExpression left,
                                               JExpression right) {
@@ -268,21 +274,24 @@ public class MacroConversion {
             doVisit(right);
         }
 
-        public void visitArrayAccessExpression(JArrayAccessExpression self,
+        @Override
+		public void visitArrayAccessExpression(JArrayAccessExpression self,
                                                JExpression prefix,
                                                JExpression accessor) {
             doVisit(prefix);
             doVisit(accessor);
         }
 
-        public void visitFieldExpression(JFieldAccessExpression self,
+        @Override
+		public void visitFieldExpression(JFieldAccessExpression self,
                                          JExpression left,
                                          String ident)
         {
             doVisit(left);
         }
 
-        public void visitLocalVariableExpression(JLocalVariableExpression self,
+        @Override
+		public void visitLocalVariableExpression(JLocalVariableExpression self,
                                                  String ident) {
     
             JLocalVariable var = self.getVariable();
@@ -295,7 +304,8 @@ public class MacroConversion {
             }
         }
 
-        public void visitCastExpression(JCastExpression self,
+        @Override
+		public void visitCastExpression(JCastExpression self,
                                         JExpression expr,
                                         CType type)
         {

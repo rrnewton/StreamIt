@@ -40,6 +40,7 @@ class SIRToFilterNodes implements FlatVisitor {
 		top.accept(this, null, true);
 	}
 
+	@Override
 	public void visitNode(FlatNode node) {
 		OutputNode output = new OutputNode();
 		InputNode input = new InputNode();
@@ -80,15 +81,15 @@ class SIRToFilterNodes implements FlatVisitor {
 			System.out
 					.println("** setting init mult " + node.contents + " "
 							+ mult + " "
-							+ ((int[]) exeCounts[0].get(node.contents))[0]);
+							+ exeCounts[0].get(node.contents)[0]);
 			content.setInitMult(mult
-					* ((int[]) exeCounts[0].get(node.contents))[0]);
+					* exeCounts[0].get(node.contents)[0]);
 		} else {
 			content.setInitMult(0);
 		}
 		if (exeCounts[1].containsKey(node.contents)) {
 			content.setSteadyMult(mult
-					* ((int[]) exeCounts[1].get(node.contents))[0]);
+					* exeCounts[1].get(node.contents)[0]);
 		} else {
 			content.setSteadyMult(0);
 		}

@@ -71,12 +71,14 @@ public class TypeArray extends Type
         return length;
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return base + "[" + length + "]";
     }
     
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof TypeArray))
             return false;
@@ -88,7 +90,8 @@ public class TypeArray extends Type
         return true;
     }
     
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return base.hashCode() ^ length.hashCode();
     }

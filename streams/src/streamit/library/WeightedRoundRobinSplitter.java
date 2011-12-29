@@ -29,13 +29,15 @@ public class WeightedRoundRobinSplitter extends Splitter
         destWeight.add (weight);
     }
 
-    public boolean isOutputUsed (int index)
+    @Override
+	public boolean isOutputUsed (int index)
     {
         assert index < destWeight.size ();
         return destWeight.get(index).intValue () != 0;
     }
 
-    public void connectGraph ()
+    @Override
+	public void connectGraph ()
     {
         // do I even have anything to do?
         assert dest.size () == destWeight.size ();
@@ -64,7 +66,8 @@ public class WeightedRoundRobinSplitter extends Splitter
     }
     */
 
-    public int [] getWeights ()
+    @Override
+	public int [] getWeights ()
     {
         int numChildren = dest.size ();
         int [] weights = new int [numChildren];
@@ -81,7 +84,8 @@ public class WeightedRoundRobinSplitter extends Splitter
         return weights;
     }
 
-    public int getConsumption ()
+    @Override
+	public int getConsumption ()
     {
         int numChildren = dest.size ();
         int inputTotal = 0;
@@ -98,7 +102,8 @@ public class WeightedRoundRobinSplitter extends Splitter
         return inputTotal;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         int[] weights = getWeights();
         StringBuffer result = new StringBuffer("roundrobin(");
         for (int i=0; i<weights.length; i++) {

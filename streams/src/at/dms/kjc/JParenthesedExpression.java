@@ -53,14 +53,16 @@ public class JParenthesedExpression extends JExpression {
      * Compute the type of this expression (called after parsing)
      * @return the type of this expression
      */
-    public CType getType() {
+    @Override
+	public CType getType() {
         return expr.getType();
     }
 
     /**
      * 
      */
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         expr.setType(type);
     }
 
@@ -74,7 +76,8 @@ public class JParenthesedExpression extends JExpression {
     /**
      * Returns a string representation of this literal.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JParenthesedExpression[");
@@ -93,7 +96,8 @@ public class JParenthesedExpression extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         expr = expr.analyse(context);
 
         return expr;
@@ -107,7 +111,8 @@ public class JParenthesedExpression extends JExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitParenthesedExpression(this, expr);
     }
 
@@ -115,7 +120,8 @@ public class JParenthesedExpression extends JExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitParenthesedExpression(this, expr);
     }
 
@@ -137,7 +143,8 @@ public class JParenthesedExpression extends JExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         throw new InconsistencyException("should be unreachable");
     }
 
@@ -146,7 +153,8 @@ public class JParenthesedExpression extends JExpression {
      * This method helps to handle heavy optimizables conditions
      * @param   code        the code list
      */
-    public void genBranch(boolean cond, CodeSequence code, CodeLabel label) {
+    @Override
+	public void genBranch(boolean cond, CodeSequence code, CodeLabel label) {
         throw new InconsistencyException("should be unreachable");
     }
 
@@ -171,7 +179,8 @@ public class JParenthesedExpression extends JExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JParenthesedExpression other = new at.dms.kjc.JParenthesedExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

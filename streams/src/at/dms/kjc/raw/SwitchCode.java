@@ -38,9 +38,9 @@ public class SwitchCode extends at.dms.util.Utils {
     public static void dumpSchedules() {
         // get all the nodes that have either init switch code
         // or steady state switch code
-        HashSet<Object> tiles = new HashSet<Object>(RawBackend.simulator.initSchedules.keySet());
+        HashSet<Object> tiles = new HashSet<Object>(Simulator.initSchedules.keySet());
 
-        RawBackend.addAll(tiles, RawBackend.simulator.steadySchedules.keySet());
+        RawBackend.addAll(tiles, Simulator.steadySchedules.keySet());
         RawBackend.addAll(tiles, Layout.getTiles());
 
         // do not generate switchcode for Tiles assigned to file readers/writers
@@ -62,11 +62,11 @@ public class SwitchCode extends at.dms.util.Utils {
                 // get the code
                 String steadyCode = "";
                 String initCode = "";
-                if (RawBackend.simulator.initSchedules.get(tile) != null)
-                    initCode = RawBackend.simulator.initSchedules
+                if (Simulator.initSchedules.get(tile) != null)
+                    initCode = Simulator.initSchedules
                                 .get(tile).toString();
-                if (RawBackend.simulator.steadySchedules.get(tile) != null)
-                    steadyCode = RawBackend.simulator.steadySchedules
+                if (Simulator.steadySchedules.get(tile) != null)
+                    steadyCode = Simulator.steadySchedules
                                   .get(tile).toString();
 
                 // the sequences we are going to compress if compression is
@@ -115,7 +115,7 @@ public class SwitchCode extends at.dms.util.Utils {
 
                 fw.write("sw_loop:\n");
                 // print the steady state switch code
-                if (RawBackend.simulator.steadySchedules.get(tile) != null)
+                if (Simulator.steadySchedules.get(tile) != null)
                     toASM(steadyCode, "w", big3work, fw);
                 // print the jump ins
                 fw.write("\tj\tsw_loop\n\n");
@@ -472,7 +472,8 @@ public class SwitchCode extends at.dms.util.Utils {
             return lineToSize.containsKey(new Integer(l));
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             String ret = "reps: " + repetitions;
             Iterator<Integer> it = lineToSize.keySet().iterator();
             while (it.hasNext()) {

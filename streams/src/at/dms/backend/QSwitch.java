@@ -38,14 +38,16 @@ abstract class QSwitch extends QVoid {
     /**
      * isJump
      */
-    public boolean isSwitch() {
+    @Override
+	public boolean isSwitch() {
         return true;
     }
 
     /**
      * Returns this node a a jump
      */
-    public QSwitch getSwitch() {
+    @Override
+	public QSwitch getSwitch() {
         return this;
     }
 

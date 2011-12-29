@@ -41,7 +41,8 @@ final class LLEnumeration implements Enumeration {
      * Return true/false depending on whether there are more
      * elements to enumerate.
      */
-    public boolean hasMoreElements() {
+    @Override
+	public boolean hasMoreElements() {
         if ( cursor!=null ) {
             return true;
         } else {
@@ -54,7 +55,8 @@ final class LLEnumeration implements Enumeration {
      * does not affect the list itself.
      * @return the next object in the enumeration.
      */
-    public Object nextElement() {
+    @Override
+	public Object nextElement() {
         if ( !hasMoreElements() ) {
             throw new NoSuchElementException();
         }

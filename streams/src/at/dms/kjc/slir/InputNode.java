@@ -278,7 +278,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
     }
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.slir.InputNode other = new at.dms.kjc.slir.InputNode();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

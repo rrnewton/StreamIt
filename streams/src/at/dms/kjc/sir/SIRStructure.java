@@ -64,47 +64,60 @@ public class SIRStructure extends SIRStream
     }
     
     /* Things that can't be called: */
-    public void addMethod(JMethodDeclaration method)
+    @Override
+	public void addMethod(JMethodDeclaration method)
     {
         at.dms.util.Utils.fail(ident + ": attempt to add a method to a Structure");
     }
-    public void addMethods(JMethodDeclaration[] m)
+    @Override
+	public void addMethods(JMethodDeclaration[] m)
     {
         at.dms.util.Utils.fail(ident + ": attempt to add a method to a Structure");
     }
-    public void setMethods(JMethodDeclaration[] m)
+    @Override
+	public void setMethods(JMethodDeclaration[] m)
     {
         at.dms.util.Utils.fail(ident + ": attempt to add a method to a Structure");
     }
-    public void setWork(JMethodDeclaration newWork)
+    @Override
+	public void setWork(JMethodDeclaration newWork)
     {
         at.dms.util.Utils.fail(ident + ": attempt to add a work function to a Structure");
     }
-    public void setInit(JMethodDeclaration newInit)
+    @Override
+	public void setInit(JMethodDeclaration newInit)
     {
         at.dms.util.Utils.fail(ident + ": attempt to add an init function to a Structure");
     }
-    public void setInitWithoutReplacement(JMethodDeclaration newInit)
+    @Override
+	public void setInitWithoutReplacement(JMethodDeclaration newInit)
     {
         at.dms.util.Utils.fail(ident + ": attempt to add an init function to a Structure");
     }
-    public int getPushForSchedule(Map<SIROperator, int[]>[] counts)
+    @Override
+	public int getPushForSchedule(Map<SIROperator, int[]>[] counts)
     {
         at.dms.util.Utils.fail(ident + ": attempt to call getPushForSchedule for Structure");
         return -1;
     }
-    public int getPopForSchedule(Map<SIROperator, int[]>[] counts)
+    @Override
+	public int getPopForSchedule(Map<SIROperator, int[]>[] counts)
     {
         at.dms.util.Utils.fail(ident + ": attempt to call getPopForSchedule for Structure");
         return -1;
     }
 
     /* Things that we need to implement: */
-    public CType getOutputType() { return null; }
-    public LIRStreamType getStreamType() { return null; } // (implement?)
-    public CType getInputType() { return null; }
-    public boolean needsInit() { return false; }
-    public boolean needsWork() { return false; }
+    @Override
+	public CType getOutputType() { return null; }
+    @Override
+	public LIRStreamType getStreamType() { return null; } // (implement?)
+    @Override
+	public CType getInputType() { return null; }
+    @Override
+	public boolean needsInit() { return false; }
+    @Override
+	public boolean needsWork() { return false; }
 
     /*
       public Object clone() 
@@ -116,7 +129,8 @@ public class SIRStructure extends SIRStream
       }
     */
 
-    public Object accept(AttributeStreamVisitor v)
+    @Override
+	public Object accept(AttributeStreamVisitor v)
     {
         return v.visitStructure(this,
                                 fields);
@@ -125,7 +139,8 @@ public class SIRStructure extends SIRStream
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRStructure other = new at.dms.kjc.sir.SIRStructure();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

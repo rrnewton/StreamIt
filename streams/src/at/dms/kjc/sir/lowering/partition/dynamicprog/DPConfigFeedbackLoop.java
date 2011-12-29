@@ -9,7 +9,8 @@ class DPConfigFeedbackLoop extends DPConfigContainer {
         super(cont, partitioner, WIDTH, 2);
     }
 
-    protected DPConfig childConfig(int x, int y) {
+    @Override
+	protected DPConfig childConfig(int x, int y) {
         assert x==0;
         return partitioner.getConfig(cont.get(y));
     }

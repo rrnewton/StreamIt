@@ -30,13 +30,15 @@ public class WeightedRoundRobinJoiner extends Joiner
         srcsWeight.add(weight);
     }
 
-    public boolean isInputUsed(int index)
+    @Override
+	public boolean isInputUsed(int index)
     {
         assert index < srcsWeight.size();
         return srcsWeight.get(index).intValue() != 0;
     }
 
-    public void connectGraph()
+    @Override
+	public void connectGraph()
     {
         // do I even have anything to do?
         assert srcs.size() == srcsWeight.size();
@@ -68,7 +70,8 @@ public class WeightedRoundRobinJoiner extends Joiner
     }
     */
 
-    public int[] getWeights()
+    @Override
+	public int[] getWeights()
     {
         int numChildren = srcs.size();
         int[] weights = new int[numChildren];
@@ -85,7 +88,8 @@ public class WeightedRoundRobinJoiner extends Joiner
         return weights;
     }
 
-    public int getProduction()
+    @Override
+	public int getProduction()
     {
         int numChildren = srcs.size();
         int outputTotal = 0;
@@ -102,7 +106,8 @@ public class WeightedRoundRobinJoiner extends Joiner
         return outputTotal;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         int[] weights = getWeights();
         StringBuffer result = new StringBuffer("roundrobin(");
         for (int i=0; i<weights.length; i++) {

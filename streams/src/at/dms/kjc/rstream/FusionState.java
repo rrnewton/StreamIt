@@ -3,6 +3,7 @@ package at.dms.kjc.rstream;
 import java.util.HashMap;
 import java.util.Vector;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CArrayType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -236,7 +237,7 @@ public abstract class FusionState
     
         //return the var def..
         return new JVariableDefinition(null,
-                                       at.dms.kjc.Constants.ACC_FINAL,
+                                       Constants.ACC_FINAL,
                                        bufferType,
                                        bufferName,
                                        null);

@@ -178,7 +178,8 @@ public class SIRSplitter extends SIROperator {
     /**
      * Accepts attribute visitor <v> at this node.
      */
-    public Object accept(AttributeStreamVisitor v) {
+    @Override
+	public Object accept(AttributeStreamVisitor v) {
         return v.visitSplitter(this,
                                type,
                                weights);
@@ -201,11 +202,13 @@ public class SIRSplitter extends SIROperator {
     /**
      * See doc in SIROperator.
      */
-    public String getIdent() {
+    @Override
+	public String getIdent() {
         return type.toString() + "_Splitter";
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "SIRSplitter:"+getName();
     }
 
@@ -256,7 +259,8 @@ public class SIRSplitter extends SIROperator {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.sir.SIRSplitter other = new at.dms.kjc.sir.SIRSplitter();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

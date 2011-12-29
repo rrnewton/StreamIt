@@ -30,13 +30,16 @@ class OneOrMoreBlock extends BlockWithImpliedExitPath {
     public OneOrMoreBlock(Grammar g, int line) {
         super(g, line);
     }
-    public void generate(JavaCodeGenerator generator) {
+    @Override
+	public void generate(JavaCodeGenerator generator) {
         generator.gen(this);
     }
-    public Lookahead look(int k) {
+    @Override
+	public Lookahead look(int k) {
         return grammar.theLLkAnalyzer.look(k, this);
     }
-    public String toString() {
+    @Override
+	public String toString() {
         return super.toString() + "+";
     }
 }

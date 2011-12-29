@@ -56,7 +56,8 @@ public class CTryFinallyContext extends CBlockContext {
         clearThrowables();
     }
 
-    public void close(TokenReference ref) {
+    @Override
+	public void close(TokenReference ref) {
     }
 
     /**
@@ -86,7 +87,8 @@ public class CTryFinallyContext extends CBlockContext {
      * @param   target      the target of the break statement
      * @param   context     the context at the break statement
      */
-    protected void addBreak(JStatement target,
+    @Override
+	protected void addBreak(JStatement target,
                             CBodyContext context)
     {
         if (breaks == null) {
@@ -101,7 +103,8 @@ public class CTryFinallyContext extends CBlockContext {
      * @param   target      the target of the continue statement
      * @param   context     the context at the continue statement
      */
-    protected void addContinue(JStatement target,
+    @Override
+	protected void addContinue(JStatement target,
                                CBodyContext context)
     {
         if (continues == null) {
@@ -121,7 +124,8 @@ public class CTryFinallyContext extends CBlockContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.CTryFinallyContext other = new at.dms.kjc.CTryFinallyContext();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

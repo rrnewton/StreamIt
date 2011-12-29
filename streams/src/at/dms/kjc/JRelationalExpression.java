@@ -73,7 +73,8 @@ public class JRelationalExpression extends JBinaryExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         left = left.analyse(context);
         right = right.analyse(context);
 
@@ -102,7 +103,8 @@ public class JRelationalExpression extends JBinaryExpression {
      * Computes the result of the operation at compile-time (JLS 15.28).
      * @return  a literal resulting of an operation over two literals
      */
-    public JExpression constantFolding() {
+    @Override
+	public JExpression constantFolding() {
         boolean result;
 
         switch (left.getType().getTypeID()) {
@@ -264,7 +266,8 @@ public class JRelationalExpression extends JBinaryExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitRelationalExpression(this, oper, left, right);
     }
 
@@ -272,7 +275,8 @@ public class JRelationalExpression extends JBinaryExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitRelationalExpression(this, oper, left, right);
     }
 
@@ -294,14 +298,16 @@ public class JRelationalExpression extends JBinaryExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         genBooleanResultCode(code, discardValue);
     }
 
     /**
      * Optimize a bi-conditional expression
      */
-    protected void genBranch(JExpression left,
+    @Override
+	protected void genBranch(JExpression left,
                              JExpression right,
                              boolean cond,
                              CodeSequence code,
@@ -419,7 +425,8 @@ public class JRelationalExpression extends JBinaryExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JRelationalExpression other = new at.dms.kjc.JRelationalExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

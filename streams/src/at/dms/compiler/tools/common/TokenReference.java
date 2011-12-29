@@ -88,7 +88,8 @@ public class TokenReference {
     /*
      *
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return "[" + file + ":" + line + "]";
     }
 

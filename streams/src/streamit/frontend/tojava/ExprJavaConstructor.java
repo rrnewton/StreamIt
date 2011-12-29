@@ -46,7 +46,8 @@ public class ExprJavaConstructor extends Expression
         return type;
     }
     
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitOther(this);
     }

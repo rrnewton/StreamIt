@@ -77,7 +77,8 @@ public class JTryFinallyStatement extends JStatement {
      * @param   context     the analysis context
      * @exception   PositionedError the analysis detected an error
      */
-    public void analyse(CBodyContext context) throws PositionedError {
+    @Override
+	public void analyse(CBodyContext context) throws PositionedError {
         CBlockContext   self = new CBlockContext(context);
 
         /*
@@ -161,7 +162,8 @@ public class JTryFinallyStatement extends JStatement {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitTryFinallyStatement(this, tryClause, finallyClause);
     }
 
@@ -169,7 +171,8 @@ public class JTryFinallyStatement extends JStatement {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitTryFinallyStatement(this, tryClause, finallyClause);
     }
 
@@ -177,7 +180,8 @@ public class JTryFinallyStatement extends JStatement {
      * Generates a sequence of bytescodes
      * @param   code        the code list
      */
-    public void genCode(CodeSequence code) {
+    @Override
+	public void genCode(CodeSequence code) {
         setLineNumber(code);
 
         CodeLabel       nextLabel = new CodeLabel();
@@ -216,10 +220,10 @@ public class JTryFinallyStatement extends JStatement {
     public void genFinallyCall(CodeSequence code, JReturnStatement ret) {
         if (ret != null && ret.getType().getSize() > 0) {
             ret.store(code, returnVar);
-            code.plantJumpInstruction(Constants.opc_jsr, finallyLabel);
+            code.plantJumpInstruction(at.dms.classfile.Constants.opc_jsr, finallyLabel);
             ret.load(code, returnVar);
         } else {
-            code.plantJumpInstruction(Constants.opc_jsr, finallyLabel);
+            code.plantJumpInstruction(at.dms.classfile.Constants.opc_jsr, finallyLabel);
         }
     }
 
@@ -253,7 +257,8 @@ public class JTryFinallyStatement extends JStatement {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JTryFinallyStatement other = new at.dms.kjc.JTryFinallyStatement();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

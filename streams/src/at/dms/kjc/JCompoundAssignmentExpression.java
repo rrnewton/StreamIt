@@ -66,7 +66,8 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
     /**
      * Returns true iff this expression can be used as a statement (JLS 14.8)
      */
-    public boolean isStatementExpression() {
+    @Override
+	public boolean isStatementExpression() {
         return true;
     }
 
@@ -85,7 +86,8 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         // discardValue = false: check if initialized
         left = left.analyse(new CExpressionContext(context, true, false));
         check(context, left.isLValue(context), KjcMessages.ASSIGNMENT_NOTLVALUE);
@@ -181,7 +183,8 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
      * Accepts the specified visitor
      * @param   p       the visitor
      */
-    public void accept(KjcVisitor p) {
+    @Override
+	public void accept(KjcVisitor p) {
         p.visitCompoundAssignmentExpression(this, oper, left, right);
     }
 
@@ -189,7 +192,8 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
      * Accepts the specified attribute visitor
      * @param   p       the visitor
      */
-    public Object accept(AttributeVisitor p) {
+    @Override
+	public Object accept(AttributeVisitor p) {
         return    p.visitCompoundAssignmentExpression(this, oper, left, right);
     }
 
@@ -211,7 +215,8 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
      * @param   code        the bytecode sequence
      * @param   discardValue    discard the result of the evaluation ?
      */
-    public void genCode(CodeSequence code, boolean discardValue) {
+    @Override
+	public void genCode(CodeSequence code, boolean discardValue) {
         setLineNumber(code);
 
         left.genStartStoreCode(code);
@@ -278,7 +283,8 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
     /**
      * Returns a string representation of this object.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer    buffer = new StringBuffer();
 
         buffer.append("JCompoundAssignmentExpression[");
@@ -307,7 +313,8 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() {
+    @Override
+	public Object deepClone() {
         at.dms.kjc.JCompoundAssignmentExpression other = new at.dms.kjc.JCompoundAssignmentExpression();
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);

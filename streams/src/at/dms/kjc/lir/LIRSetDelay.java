@@ -47,7 +47,8 @@ public class LIRSetDelay extends LIRNode
         this.delayfn = delayfn;
     }
     
-    public void accept(SLIRVisitor v) 
+    @Override
+	public void accept(SLIRVisitor v) 
     {
         v.visitSetDelay(this, this.data, this.getStreamContext(),
                         this.delay, this.type, this.delayfn);

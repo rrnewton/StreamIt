@@ -36,67 +36,81 @@ public class SIRPhasedFilterIter extends SIRIterator implements FilterIter
         this.obj = obj;
     }
 
-    public FilterIter isFilter() {
+    @Override
+	public FilterIter isFilter() {
         return this;
     }
 
     /**
      * Return the stream pointed to by this.
      */
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         checkValidity();
         return obj;
     }
 
-    public int getNumInitStages() {
+    @Override
+	public int getNumInitStages() {
         if (obj.getInitPhases() == null) return 0;
         return obj.getInitPhases().length;
     }
 
-    public int getInitPeekStage(int phase) {
+    @Override
+	public int getInitPeekStage(int phase) {
         return obj.getInitPhases()[phase].getPeekInt();
     }
     
-    public int getInitPushStage(int phase) {
+    @Override
+	public int getInitPushStage(int phase) {
         return obj.getInitPhases()[phase].getPushInt();
     }
 
-    public int getInitPopStage(int phase) {
+    @Override
+	public int getInitPopStage(int phase) {
         return obj.getInitPhases()[phase].getPopInt();
     }
 
-    public Object getInitFunctionStage(int phase) {
+    @Override
+	public Object getInitFunctionStage(int phase) {
         return obj.getInitPhases()[phase];
     }
 
     // In particular, everything from here on down we had better be able
     // to straightforwardly implement.
-    public int getNumWorkPhases() {
+    @Override
+	public int getNumWorkPhases() {
         if (obj.getPhases() == null) return 0;
         return obj.getPhases().length;
     }
 
-    public int getPeekPhase(int phase) {
+    @Override
+	public int getPeekPhase(int phase) {
         return obj.getPhases()[phase].getPeekInt();
     }
     
-    public int getPopPhase(int phase) {
+    @Override
+	public int getPopPhase(int phase) {
         return obj.getPhases()[phase].getPopInt();
     }
 
-    public int getPushPhase(int phase) {
+    @Override
+	public int getPushPhase(int phase) {
         return obj.getPhases()[phase].getPushInt();
     }
     
-    public Object getWorkFunctionPhase(int phase) {
+    @Override
+	public Object getWorkFunctionPhase(int phase) {
         return obj.getPhases()[phase];
     }
     
-    public void accept(StreamVisitor v) {
+    @Override
+	public void accept(StreamVisitor v) {
         v.visitPhasedFilter(obj, this);
     }
 
-    public Iterator getUnspecializedIter() {
+    @Override
+	public Iterator getUnspecializedIter() {
         return this;
     }
 }

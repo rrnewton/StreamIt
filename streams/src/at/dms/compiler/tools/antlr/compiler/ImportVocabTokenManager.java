@@ -71,7 +71,8 @@ class ImportVocabTokenManager extends SimpleTokenManager implements Cloneable {
             Utils.panic("Error reading importVocab file '" + filename + "'");
         }
     }
-    public Object clone() {
+    @Override
+	public Object clone() {
         ImportVocabTokenManager tm;
         tm = (ImportVocabTokenManager)super.clone();
         tm.filename = this.filename;
@@ -81,7 +82,8 @@ class ImportVocabTokenManager extends SimpleTokenManager implements Cloneable {
     /**
      * define a token.
      */
-    public void define(TokenSymbol ts) {
+    @Override
+	public void define(TokenSymbol ts) {
         if (readOnly) {
             String  text = ts.getParaphrase();
             if (text == null) {
@@ -108,13 +110,15 @@ class ImportVocabTokenManager extends SimpleTokenManager implements Cloneable {
     /**
      * importVocab token manager is read-only if output would be same as input
      */
-    public boolean isReadOnly() {
+    @Override
+	public boolean isReadOnly() {
         return readOnly;
     }
     /**
      * Get the next unused token type.
      */
-    public int nextTokenType() {
+    @Override
+	public int nextTokenType() {
         return super.nextTokenType();
     }
 }

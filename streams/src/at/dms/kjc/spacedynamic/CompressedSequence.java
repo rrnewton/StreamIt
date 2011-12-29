@@ -36,7 +36,8 @@ public class CompressedSequence {
         seq.add(addMe);
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("\nCompressSeq " + hashCode() + "(Reps: " + reps + ") {");
         Iterator<Object> it = seq.iterator();
@@ -46,7 +47,8 @@ public class CompressedSequence {
         return buf.toString() + "}\n";
     }
     
-    public boolean equals(Object arg0) {
+    @Override
+	public boolean equals(Object arg0) {
         if (!(arg0 instanceof CompressedSequence))
             return false;
         CompressedSequence comp = (CompressedSequence)arg0;

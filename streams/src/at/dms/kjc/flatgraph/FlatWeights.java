@@ -43,7 +43,8 @@ public final class FlatWeights implements Iterable<FlatWeight>{
     * 
     * @return an iterator
     */ 
-   public Iterator<FlatWeight> iterator() {
+   @Override
+public Iterator<FlatWeight> iterator() {
         return new FlatWeightIterator();
     }
     
@@ -61,7 +62,8 @@ public final class FlatWeights implements Iterable<FlatWeight>{
             w = 0;
         }
         
-        public boolean hasNext() {
+        @Override
+		public boolean hasNext() {
             if (n >= nodesLen) { return false; }
             for (int i = w; i < weightsLen; i++) {
                 if (weights[i] != 0) {
@@ -71,7 +73,8 @@ public final class FlatWeights implements Iterable<FlatWeight>{
             return false;
         }
         
-        public FlatWeight next() {
+        @Override
+		public FlatWeight next() {
             do {
                 w++;
                 if (w >= weightsLen) { throw new java.util.NoSuchElementException(); }
@@ -81,7 +84,8 @@ public final class FlatWeights implements Iterable<FlatWeight>{
                 return new FlatNodeWeight(w,n);
         }
         
-        public void remove() {
+        @Override
+		public void remove() {
             throw new UnsupportedOperationException();
         }
     }
@@ -102,10 +106,14 @@ public final class FlatWeights implements Iterable<FlatWeight>{
             weightsPos = w;
             nodesPos = n;
         }
-        public int getWeight() { return weights[weightsPos]; }
-        public FlatNode getNode() {return nodes.elementAt(nodesPos); }
-        public int getWeightsOffset() { return weightsPos; }
-        public int getNodesOffset() { return nodesPos; }
+        @Override
+		public int getWeight() { return weights[weightsPos]; }
+        @Override
+		public FlatNode getNode() {return nodes.elementAt(nodesPos); }
+        @Override
+		public int getWeightsOffset() { return weightsPos; }
+        @Override
+		public int getNodesOffset() { return nodesPos; }
     }
 }
 

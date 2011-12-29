@@ -9,7 +9,8 @@ import at.dms.kjc.flatgraph.FlatNode;
 public class YXRouter implements Router {
     // returns a linked list of coordinates that gives the route
     // including source and dest
-    public LinkedList<ComputeNode> getRoute(SpdStaticStreamGraph ssg, ComputeNode src,
+    @Override
+	public LinkedList<ComputeNode> getRoute(SpdStaticStreamGraph ssg, ComputeNode src,
                                ComputeNode dst) {
         RawChip rawChip = ((SpdStreamGraph)ssg.getStreamGraph()).getRawChip();
         Layout layout = ((SpdStreamGraph)ssg.getStreamGraph()).getLayout();

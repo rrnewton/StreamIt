@@ -63,7 +63,8 @@ public class DumpGraph implements FlatVisitor
      * 
      * @param node The current node we are visiting.
      */
-    public void visitNode(FlatNode node) 
+    @Override
+	public void visitNode(FlatNode node) 
     {
         if (node.contents instanceof SIRFilter) {
             //we are visiting a filter

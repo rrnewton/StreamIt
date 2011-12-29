@@ -1,5 +1,6 @@
 package at.dms.kjc.backendSupport;
 
+import at.dms.classfile.Constants;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JBlock;
@@ -50,7 +51,7 @@ public class CodeStoreHelperJoiner extends CodeStoreHelper {
         }
         
         
-        return new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+        return new JMethodDeclaration(null, Constants.ACC_PUBLIC,
                 CStdType.Void,
                 initStage + uniqueID,
                 JFormalParameter.EMPTY,
@@ -93,7 +94,7 @@ public class CodeStoreHelperJoiner extends CodeStoreHelper {
 
         
         //return the method
-        primePumpMethod = new JMethodDeclaration(null, at.dms.kjc.Constants.ACC_PUBLIC,
+        primePumpMethod = new JMethodDeclaration(null, Constants.ACC_PUBLIC,
                                       CStdType.Void,
                                       primePumpStage + uniqueID,
                                       JFormalParameter.EMPTY,

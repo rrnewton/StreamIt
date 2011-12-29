@@ -143,7 +143,7 @@ public class CheckBuffering {
             InterFilterEdge edge = edges.next();
             
             double mult = 
-                (initItemsPushed(edge) / ((double)input.getWeight(edge, SchedulingPhase.INIT)));
+                (initItemsPushed(edge) / input.getWeight(edge, SchedulingPhase.INIT));
             
             mults.put(edge, new Double(mult));
             //remember the min, it will be the new multiplicity for all the edges
@@ -239,7 +239,7 @@ public class CheckBuffering {
         
         //calc the number of steady items
         int steadyItems = (int) 
-             (((double)(prev.getSteadyMult() * prev.getPushInt())) *  
+             ((prev.getSteadyMult() * prev.getPushInt()) *  
                 edge.getSrc().ratio(edge, SchedulingPhase.INIT));
         
         System.out.println("   with initMult: " + itemsToPassInit + 
@@ -274,9 +274,9 @@ public class CheckBuffering {
             InterFilterEdge edge = edges.next();
             WorkNodeInfo downstream = WorkNodeInfo.getFilterInfo(edge.getDest().getNextFilter());
             
-            int itemsRecOnEdge = (int) (((double)initItemsSent) *
+            int itemsRecOnEdge = (int) (initItemsSent *
                     output.ratio(edge, SchedulingPhase.INIT));
-            int itemsNeededOnEdge = (int) (((double)downstream.initItemsNeeded) * 
+            int itemsNeededOnEdge = (int) (downstream.initItemsNeeded * 
                     edge.getDest().ratio(edge, SchedulingPhase.INIT));
             
             if (itemsRecOnEdge < itemsNeededOnEdge) {
@@ -307,7 +307,7 @@ public class CheckBuffering {
         
         //the number of items that should now flow over this edge 
         //in the init stage
-        double edgeItems = (((double)inputMult) * ((double)input.getWeight(edge, SchedulingPhase.INIT)));
+        double edgeItems = (inputMult * input.getWeight(edge, SchedulingPhase.INIT));
 
         //System.out.println("  Edge Items = " + edgeItems + " = " + 
         //        inputMult +  " * " +  
@@ -321,7 +321,7 @@ public class CheckBuffering {
         //output slice node inorder for edgeItems to flow on edge
         return (int)(((double)output.totalWeights(SchedulingPhase.INIT) / 
                 ((double)output.getWeight(edge, SchedulingPhase.INIT))) *
-                ((double)edgeItems));
+                edgeItems);
     }
     
     
@@ -334,7 +334,7 @@ public class CheckBuffering {
      * stage.
      */
     private double initItemsPushed(InterFilterEdge edge) {
-        return ((double)edge.getSrc().getPrevFilter().getWorkNodeContent().initItemsPushed()) *
+        return edge.getSrc().getPrevFilter().getWorkNodeContent().initItemsPushed() *
         edge.getSrc().ratio(edge, SchedulingPhase.INIT);
     }
 }

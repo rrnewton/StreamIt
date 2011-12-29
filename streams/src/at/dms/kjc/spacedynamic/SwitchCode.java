@@ -79,7 +79,8 @@ public class SwitchCode extends at.dms.util.Utils {
          */
 
         ((SpdStaticStreamGraph)streamGraph.getTopLevel()).accept(new StreamGraphVisitor() {
-                public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
+                @Override
+				public void visitStaticStreamGraph(SpdStaticStreamGraph ssg) {
                     ssg.scheduleCommunication(sg.joinerSimulator);
                 }
 
@@ -607,7 +608,8 @@ public class SwitchCode extends at.dms.util.Utils {
             return lineToSize.containsKey(new Integer(l));
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             String ret = "reps: " + repetitions;
             Iterator<Integer> it = lineToSize.keySet().iterator();
             while (it.hasNext()) {

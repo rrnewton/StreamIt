@@ -26,7 +26,8 @@ class DPConfigFilter extends DPConfig {
         this.isFissable = StatelessDuplicate.isFissable(filter);
     }
 
-    public DPCost get(int tileLimit, int nextToJoiner) {
+    @Override
+	public DPCost get(int tileLimit, int nextToJoiner) {
         // consider ourselves to be next to a joiner if we don't care about joiners
         if (!partitioner.joinersNeedTiles()) {
             nextToJoiner = 1;
@@ -62,8 +63,8 @@ class DPConfigFilter extends DPConfig {
             // fuse with anyone else.  We don't want all containers of
             // this filter to have a high cost just because this guy
             // exceeded the icode limit.
-            if (iCodeSize>partitioner.ICODE_THRESHOLD) {
-                iCodeSize = partitioner.ICODE_THRESHOLD;
+            if (iCodeSize>DynamicProgPartitioner.ICODE_THRESHOLD) {
+                iCodeSize = DynamicProgPartitioner.ICODE_THRESHOLD;
             }
         } else {
             iCodeSize = 0;
@@ -77,14 +78,16 @@ class DPConfigFilter extends DPConfig {
         return Math.min(DynamicProgPartitioner.MAX_FISSION_FACTOR, nextToJoiner==1 ? tileLimit : tileLimit - 1);
     }
 
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         return filter;
     }
 
     /**
      * Requires <pre>str</pre> is a filter.
      */
-    protected void setStream(SIRStream str) {
+    @Override
+	protected void setStream(SIRStream str) {
         assert str instanceof SIRFilter;
         this.filter = (SIRFilter)str;
     }
@@ -92,7 +95,8 @@ class DPConfigFilter extends DPConfig {
     /**
      * Add this to the map and return.
      */
-    public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, int nextToJoiner, SIRStream str) {
+    @Override
+	public SIRStream traceback(LinkedList<PartitionRecord> partitions, PartitionRecord curPartition, int tileLimit, int nextToJoiner, SIRStream str) {
         if (DynamicProgPartitioner.pruningOnTraceback && partitioner.getWorkEstimate().getWork(filter)<partitioner.getBottleneck()) {
             // don't fiss if doesn't exceed bottleneck
             curPartition.add(filter, partitioner.getWorkEstimate().getWork(filter));

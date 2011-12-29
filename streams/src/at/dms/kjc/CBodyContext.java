@@ -423,7 +423,8 @@ public abstract class CBodyContext extends CContext {
      * We make it a local copy of this information and at the end of this context
      * we will transfert it to the parent context according to controlFlow
      */
-    public void setFieldInfo(int index, int info) {
+    @Override
+	public void setFieldInfo(int index, int info) {
         if (fieldInfo == null) {
             fieldInfo = (CVariableInfo)getFieldInfo().clone();
         }
@@ -434,7 +435,8 @@ public abstract class CBodyContext extends CContext {
      * @param   index     the definition of a field
      * @return  all informations we have about this field
      */
-    public int getFieldInfo(int index) {
+    @Override
+	public int getFieldInfo(int index) {
         if (fieldInfo == null) {
             return parent.getFieldInfo(index);
         } else {
@@ -445,7 +447,8 @@ public abstract class CBodyContext extends CContext {
     /**
      * Returns the field definition state.
      */
-    public CVariableInfo getFieldInfo() {
+    @Override
+	public CVariableInfo getFieldInfo() {
         if (fieldInfo != null) {
             return fieldInfo;
         } else {
@@ -507,7 +510,8 @@ public abstract class CBodyContext extends CContext {
     /**
      * Dumps this context to standard error stream.
      */
-    public void dumpContext(int level) {
+    @Override
+	public void dumpContext(int level) {
         dumpIndent(level);
         System.err.println(this + " " + getBlockContext().localsIndex());
         dumpIndent(level);
@@ -573,7 +577,8 @@ public abstract class CBodyContext extends CContext {
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.CBodyContext other) {

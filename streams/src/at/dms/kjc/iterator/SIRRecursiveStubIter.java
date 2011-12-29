@@ -39,7 +39,8 @@ public class SIRRecursiveStubIter extends SIRIterator implements IteratorBase {
     /**
      * Return the stream pointed to by this.
      */
-    public SIRStream getStream() {
+    @Override
+	public SIRStream getStream() {
         checkValidity();
         return obj;
     }
@@ -47,7 +48,8 @@ public class SIRRecursiveStubIter extends SIRIterator implements IteratorBase {
     /**
      * Do nothing at a RecursiveStub node.
      */
-    public void accept(StreamVisitor v) {
+    @Override
+	public void accept(StreamVisitor v) {
     }
 
     /**

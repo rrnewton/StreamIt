@@ -105,7 +105,8 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
      // STATEMENT VISITORS
      // ----------------------------------------------------------------------
      */
-    public Object visitWhileStatement(JWhileStatement self,
+    @Override
+	public Object visitWhileStatement(JWhileStatement self,
                                       JExpression cond,
                                       JStatement body) {
         // pending statements from <pre>cond</pre> go both at top of <pre>body</pre> and
@@ -124,7 +125,7 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
             body = new JBlock();
             for (int i=0; i<pendingStatements.size(); i++) {
                 // put a copy here; the actual statements will go at end clause
-                ((JBlock)body).addStatementFirst((JStatement)ObjectDeepCloner.deepCopy((JStatement)pendingStatements.get(i)));
+                ((JBlock)body).addStatementFirst((JStatement)ObjectDeepCloner.deepCopy(pendingStatements.get(i)));
             }
             ((JBlock)body).addStatement(oldBody);
         
@@ -150,13 +151,15 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
         return result;
     }
 
-    public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
+    @Override
+	public Object visitVariableDeclarationStatement(JVariableDeclarationStatement self,
                                                     JVariableDefinition[] vars) {
         JStatement old = (JStatement)super.visitVariableDeclarationStatement(self, vars);
         return appendPending(old);
     }
 
-    public Object visitSwitchStatement(JSwitchStatement self,
+    @Override
+	public Object visitSwitchStatement(JSwitchStatement self,
                                        JExpression expr,
                                        JSwitchGroup[] body) {
         // do not bother supporting in <pre>expr</pre>
@@ -176,7 +179,8 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
         return self;
     }
 
-    public Object visitIfStatement(JIfStatement self,
+    @Override
+	public Object visitIfStatement(JIfStatement self,
                                    JExpression cond,
                                    JStatement thenClause,
                                    JStatement elseClause) {
@@ -192,7 +196,7 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
             thenClause = new JBlock();
             for (int i=0; i<pendingStatements.size(); i++) {
                 // put a copy here; the actual statements will go in else clause
-                ((JBlock)thenClause).addStatementFirst((JStatement)ObjectDeepCloner.deepCopy((JStatement)pendingStatements.get(i)));
+                ((JBlock)thenClause).addStatementFirst((JStatement)ObjectDeepCloner.deepCopy(pendingStatements.get(i)));
             }
             ((JBlock)thenClause).addStatement(oldThen);
             // -- else clause:
@@ -218,7 +222,8 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
         return self;
     }
 
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -258,13 +263,15 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
 
     }
 
-    public Object visitExpressionStatement(JExpressionStatement self,
+    @Override
+	public Object visitExpressionStatement(JExpressionStatement self,
                                            JExpression expr) {
         JStatement old = (JStatement)super.visitExpressionStatement(self, expr);
         return appendPending(old);
     }
 
-    public Object visitExpressionListStatement(JExpressionListStatement self,
+    @Override
+	public Object visitExpressionListStatement(JExpressionListStatement self,
                                                JExpression[] expr) {
         JStatement old = (JStatement)super.visitExpressionListStatement(self, expr);
         // could maybe do something more precise here, like break into
@@ -275,7 +282,8 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
         return appendPending(old);
     }
 
-    public Object visitDoStatement(JDoStatement self,
+    @Override
+	public Object visitDoStatement(JDoStatement self,
                                    JExpression cond,
                                    JStatement body) {
         JExpression newExp = (JExpression)cond.accept(this);
@@ -300,7 +308,8 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
         return self;
     }
 
-    public Object visitMessageStatement(SIRMessageStatement self,
+    @Override
+	public Object visitMessageStatement(SIRMessageStatement self,
                                         JExpression portal,
                                         String iname,
                                         String ident,
@@ -310,7 +319,8 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
         return appendPending(old);
     }
 
-    public Object visitPrintStatement(SIRPrintStatement self,
+    @Override
+	public Object visitPrintStatement(SIRPrintStatement self,
                                       JExpression arg) {
         JStatement old = (JStatement)super.visitPrintStatement(self, arg);
         return appendPending(old);
@@ -318,7 +328,8 @@ public class StatementQueueVisitor extends SLIRReplacingVisitor {
 
     // UNSUPPORTED ---------------------------------------------------------
 
-    public Object visitReturnStatement(JReturnStatement self,
+    @Override
+	public Object visitReturnStatement(JReturnStatement self,
                                        JExpression expr) {
         // don't support return statements yet (would have to declare
         // temporary variable of appropriate type and assign to it)

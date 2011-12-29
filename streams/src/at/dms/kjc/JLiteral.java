@@ -91,14 +91,16 @@ public abstract class JLiteral extends JExpression {
      *
      * @return  true iff this expression is constant
      */
-    public boolean isConstant() {
+    @Override
+	public boolean isConstant() {
         return true;
     }
 
     /**
      * Returns the literal value of an expression
      */
-    public JLiteral getLiteral() {
+    @Override
+	public JLiteral getLiteral() {
         return this;
     }
 
@@ -106,7 +108,8 @@ public abstract class JLiteral extends JExpression {
      * Literals have manifest immutable types, setType should respect those.
      */
     
-    public void setType(CType type) {
+    @Override
+	public void setType(CType type) {
         assert type == getType();
     }
     
@@ -132,7 +135,8 @@ public abstract class JLiteral extends JExpression {
      * @return  an equivalent, analysed expression
      * @exception   PositionedError the analysis detected an error
      */
-    public JExpression analyse(CExpressionContext context) throws PositionedError {
+    @Override
+	public JExpression analyse(CExpressionContext context) throws PositionedError {
         return this;
     }
 
@@ -141,12 +145,14 @@ public abstract class JLiteral extends JExpression {
      * changes the type of this expression to an other
      * @param  dest the destination type
      */
-    public abstract JExpression convertType(CType dest, CExpressionContext context);
+    @Override
+	public abstract JExpression convertType(CType dest, CExpressionContext context);
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
     /** Returns a deep clone of this object. */
-    public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
+    @Override
+	public Object deepClone() { at.dms.util.Utils.fail("Error in auto-generated cloning methods - deepClone was called on an abstract class."); return null; }
 
     /** Clones all fields of this into <pre>other</pre> */
     protected void deepCloneInto(at.dms.kjc.JLiteral other) {

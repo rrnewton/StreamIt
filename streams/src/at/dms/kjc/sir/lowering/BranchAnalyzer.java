@@ -90,7 +90,8 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
     /**
      * Visits a if statement
      */
-    public Object visitIfStatement(JIfStatement self,
+    @Override
+	public Object visitIfStatement(JIfStatement self,
                                    JExpression cond,
                                    JStatement thenClause,
                                    JStatement elseClause) {
@@ -212,7 +213,7 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
         }
         index++;
         for(;index<size;index++) {
-            ((LinkedList)list).removeLast();
+            list.removeLast();
         }
         return new JBlock(null,body,null);
     }
@@ -220,7 +221,8 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
     /**
      * visits a for statement
      */
-    public Object visitForStatement(JForStatement self,
+    @Override
+	public Object visitForStatement(JForStatement self,
                                     JStatement init,
                                     JExpression cond,
                                     JStatement incr,
@@ -267,7 +269,8 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
         return out;
     }
     
-    public Object visitBlockStatement(JBlock self,
+    @Override
+	public Object visitBlockStatement(JBlock self,
                                       JavaStyleComment[] comments) {
         JBlock saveBlock=block;
         int saveIndex=index;
@@ -281,7 +284,7 @@ public class BranchAnalyzer extends SLIRReplacingVisitor {
             if (!(newBody instanceof JStatement))
                 continue;
             if (newBody!=null && newBody!=oldBody) {
-                statements.set(index,(JStatement)newBody);
+                statements.set(index,newBody);
             }
             /*if(split==true) {
               split=false;

@@ -52,12 +52,14 @@ public class ExprPeek extends Expression
     }
     
     /** Accept a front-end visitor. */
-    public Object accept(FEVisitor v)
+    @Override
+	public Object accept(FEVisitor v)
     {
         return v.visitExprPeek(this);
     }
 
-    public boolean equals(Object other)
+    @Override
+	public boolean equals(Object other)
     {
         if (!(other instanceof ExprPeek))
             return false;
@@ -67,12 +69,14 @@ public class ExprPeek extends Expression
         return true;
     }
 
-    public int hashCode()
+    @Override
+	public int hashCode()
     {
         return expr.hashCode();
     }
     
-    public String toString()
+    @Override
+	public String toString()
     {
         return "peek(" + expr + ")";
     }

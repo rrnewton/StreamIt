@@ -210,7 +210,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return contextToReference(node.getContext());
     }
 
-    public Object visitProgram(Program p) {
+    @Override
+	public Object visitProgram(Program p) {
         /* We visit each stream and each struct */
         List feirStreams;
         List feirStructs;
@@ -282,7 +283,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return null;
     }
 
-    public Object visitStreamSpec(StreamSpec spec) {
+    @Override
+	public Object visitStreamSpec(StreamSpec spec) {
         SIRStream oldParent = parent;
         SIRStream current = null;
         SymbolTable oldSymTab = symtab;
@@ -299,10 +301,10 @@ public class FEIRToSIR implements FEVisitor, Constants {
         switch (spec.getType())
             {
             case StreamSpec.STREAM_FILTER:
-                current = (SIRStream) visitFilterSpec(spec);
+                current = visitFilterSpec(spec);
                 break;
             case StreamSpec.STREAM_PIPELINE:
-                current = (SIRStream) visitPipelineSpec(spec);
+                current = visitPipelineSpec(spec);
                 break;
             case StreamSpec.STREAM_SPLITJOIN:
                 current = (SIRStream) visitSplitJoinSpec(spec);
@@ -363,7 +365,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
                                                        dims, null);
                     }
                 def = new JVariableDefinition(ref,
-                                              at.dms.kjc.Constants.ACC_PUBLIC,
+                                              at.dms.classfile.Constants.ACC_PUBLIC,
                                               feirTypeToSirType(decl.getType(i)),
                                               decl.getName(i), init);
                 JFieldDeclaration fDecl = new JFieldDeclaration(ref, def,
@@ -625,23 +627,26 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return struct;
     }
 
-    public Object visitExprArray(ExprArray exp) {
+    @Override
+	public Object visitExprArray(ExprArray exp) {
         debug("In visitExprArray\n");
         return new JArrayAccessExpression(null,
                                           (JExpression) exp.getBase().accept(this),
                                           (JExpression) exp.getOffset().accept(this));
     }
 
-    public Object visitExprArrayInit(ExprArrayInit exp) {
+    @Override
+	public Object visitExprArrayInit(ExprArrayInit exp) {
         debug("In visitExprArrayInit\n");
         JExpression[] elems = new JExpression[exp.getElements().size()];
         for (int i=0; i<elems.length; i++) {
-            elems[i] = (JExpression)((Expression)exp.getElements().get(i)).accept(this);
+            elems[i] = (JExpression)exp.getElements().get(i).accept(this);
         }
         return new JArrayInitializer(null, elems);
     }
 
-    public Object visitExprBinary(ExprBinary exp) {
+    @Override
+	public Object visitExprBinary(ExprBinary exp) {
         debug("In visitExprBinary\n");
         switch(exp.getOp()) {
         case ExprBinary.BINOP_ADD:
@@ -723,60 +728,70 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return null;
     }
 
-    public Object visitExprComplex(ExprComplex exp) {
+    @Override
+	public Object visitExprComplex(ExprComplex exp) {
         debug("In visitExprComplex\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitExprComposite(ExprComposite exp) {
+    @Override
+	public Object visitExprComposite(ExprComposite exp) {
         debug("In visitExprComposite\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitFieldDecl(FieldDecl decl) {
+    @Override
+	public Object visitFieldDecl(FieldDecl decl) {
         debug("In visitFieldDecl\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitExprConstBoolean(ExprConstBoolean exp) {
+    @Override
+	public Object visitExprConstBoolean(ExprConstBoolean exp) {
         debug("In visitExprConstBoolean\n");
         return new JBooleanLiteral(null, exp.getVal());
     }
 
-    public Object visitExprConstChar(ExprConstChar exp) {
+    @Override
+	public Object visitExprConstChar(ExprConstChar exp) {
         debug("In visitExprConstChar\n");
         return new JCharLiteral(null, exp.getVal());
     }
 
-    public Object visitExprConstFloat(ExprConstFloat exp) {
+    @Override
+	public Object visitExprConstFloat(ExprConstFloat exp) {
         debug("In visitExprConstFloat\n");
         return new JDoubleLiteral(null, exp.getVal());
     }
 
-    public Object visitExprConstInt(ExprConstInt exp) {
+    @Override
+	public Object visitExprConstInt(ExprConstInt exp) {
         debug("In visitExprConstInt\n");
         return new JIntLiteral(exp.getVal());
     }
 
-    public Object visitExprConstStr(ExprConstStr exp) {
+    @Override
+	public Object visitExprConstStr(ExprConstStr exp) {
         debug("In visitExprConstStr\n");
         return new JStringLiteral(null, exp.getVal());
     }
 
-    public Object visitExprDynamicToken(ExprDynamicToken exp) {
+    @Override
+	public Object visitExprDynamicToken(ExprDynamicToken exp) {
         debug("In visitFieldDecl\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitExprField(ExprField exp) {
+    @Override
+	public Object visitExprField(ExprField exp) {
         debug("In visitExprField\n");
         Type lhsType = getType(exp.getLeft());
         // ASSERT: this is a structure type.
@@ -788,7 +803,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
                                           exp.getName(), cf);
     }
 
-    public Object visitExprFunCall(ExprFunCall exp) {
+    @Override
+	public Object visitExprFunCall(ExprFunCall exp) {
         debug("In visitExprFunCall\n");
         List params = exp.getParams();
         JExpression[] args = new JExpression[params.size()];
@@ -805,36 +821,42 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return new JMethodCallExpression(null, exp.getName(), args);
     }
     
-    public Object visitExprHelperCall(ExprHelperCall exp) {
+    @Override
+	public Object visitExprHelperCall(ExprHelperCall exp) {
         debug("In visitExprHelperCall\n");
         /* unimplemented */
         return null;
     }
 
+	@Override
 	public Object visitExprIter(ExprIter exprIter) {
 		debug("In visitExprIter\n");
 		return new SIRIterationExpression();
 	}
 
-    public Object visitExprPeek(ExprPeek exp) {
+    @Override
+	public Object visitExprPeek(ExprPeek exp) {
         debug("In visitExprPeek\n");
         return new SIRPeekExpression((JExpression) exp.getExpr().accept(this),
                                      parent.getInputType());
     }
 
-    public Object visitExprPop(ExprPop exp) {
+    @Override
+	public Object visitExprPop(ExprPop exp) {
         debug("In visitExprPop\n");
         return new SIRPopExpression(parent.getInputType());
     }
 
-    public Object visitExprRange(ExprRange exp) {
+    @Override
+	public Object visitExprRange(ExprRange exp) {
         debug("In visitFieldDecl\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitExprTernary(ExprTernary exp) {
+    @Override
+	public Object visitExprTernary(ExprTernary exp) {
         debug("In visitExprTernary\n");
         return new JConditionalExpression(null,
                                           (JExpression) exp.getA().accept(this),
@@ -842,14 +864,16 @@ public class FEIRToSIR implements FEVisitor, Constants {
                                           (JExpression) exp.getC().accept(this));
     }
 
-    public Object visitExprTypeCast(ExprTypeCast exp) {
+    @Override
+	public Object visitExprTypeCast(ExprTypeCast exp) {
         debug("In visitExprTypeCast\n");
         return new JCastExpression(null,
                                    (JExpression) exp.getExpr().accept(this),
                                    feirTypeToSirType(exp.getType()));
     }
 
-    public Object visitExprUnary(ExprUnary exp) {
+    @Override
+	public Object visitExprUnary(ExprUnary exp) {
         debug("In visitExprUnary\n");
         switch (exp.getOp()) {
         case ExprUnary.UNOP_COMPLEMENT:
@@ -884,7 +908,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return null;
     }
 
-    public Object visitExprVar(ExprVar exp) {
+    @Override
+	public Object visitExprVar(ExprVar exp) {
         debug("In visitExprVar\n");
         int kind = symtab.lookupKind(exp.getName());
         if (kind == SymbolTable.KIND_LOCAL || kind == SymbolTable.KIND_FUNC_PARAM)
@@ -900,7 +925,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
                                           exp.getName());
     }
 
-    public Object visitFunction(Function func) {
+    @Override
+	public Object visitFunction(Function func) {
         debug("In visitFunction\n");
         int i = 0;
         List list;
@@ -1061,14 +1087,16 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return null;
     }
 
-    public Object visitFuncWork(FuncWork func) {
+    @Override
+	public Object visitFuncWork(FuncWork func) {
         debug("In visitFuncWork\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitSCAnon(SCAnon sc) {
+    @Override
+	public Object visitSCAnon(SCAnon sc) {
         debug("In visitSCAnon\n");
         SIRStream str = (SIRStream) visitStreamSpec(sc.getSpec());
         if (parent instanceof SIRContainer) {
@@ -1078,7 +1106,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return new SIRInitStatement(str);
     }
 
-    public Object visitSCSimple(SCSimple sc) {
+    @Override
+	public Object visitSCSimple(SCSimple sc) {
         debug("In visitSCSimple\n");
         /* Translate the arguments */
         int i;
@@ -1096,7 +1125,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return new SIRInitStatement(sirP, str);
     }
 
-    public Object visitSJDuplicate(SJDuplicate sj) {
+    @Override
+	public Object visitSJDuplicate(SJDuplicate sj) {
         debug("In visitSJDuplicate\n");
         if (wantSplitter)
             return SIRSplitter.create((SIRContainer) parent,
@@ -1106,7 +1136,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
             return null;
     }
 
-    public Object visitSJRoundRobin(SJRoundRobin sj) {
+    @Override
+	public Object visitSJRoundRobin(SJRoundRobin sj) {
         debug("In visitSJRoundRobin\n");
         Expression weight = sj.getWeight();
         JExpression jweight;
@@ -1121,7 +1152,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
             return SIRJoiner.createUniformRR((SIRContainer)parent, jweight);
     }
 
-    public Object visitSJWeightedRR(SJWeightedRR sj) { 
+    @Override
+	public Object visitSJWeightedRR(SJWeightedRR sj) { 
         debug("In visitSJWeightedRR\n");
         List weights = sj.getWeights();
         JExpression[] newWeights = new JExpression[weights.size()];
@@ -1137,12 +1169,14 @@ public class FEIRToSIR implements FEVisitor, Constants {
             return SIRJoiner.createWeightedRR((SIRContainer)parent, newWeights);
     }
 
-    public Object visitStmtAdd(StmtAdd stmt) {
+    @Override
+	public Object visitStmtAdd(StmtAdd stmt) {
         debug("In visitStmtAdd\n");
         return stmt.getCreator().accept(this);
     }
 
-    public Object visitStmtAssign(StmtAssign stmt) {
+    @Override
+	public Object visitStmtAssign(StmtAssign stmt) {
         debug("In visitStmtAssign\n");
         JExpression expr;
         if (stmt.getOp() == 0) {
@@ -1175,7 +1209,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return new JExpressionStatement(contextToReference(stmt), expr, null);
     }
 
-    public Object visitStmtBlock(StmtBlock stmt) {
+    @Override
+	public Object visitStmtBlock(StmtBlock stmt) {
         debug("In visitStmtBlock\n");
         SymbolTable oldSymTab = symtab;
         symtab = new SymbolTable(symtab);
@@ -1199,24 +1234,28 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return result;
     }
 
-    public Object visitStmtBody(StmtBody stmt) {
+    @Override
+	public Object visitStmtBody(StmtBody stmt) {
         debug("In visitStmtBody\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitStmtBreak(StmtBreak stmt) {
+    @Override
+	public Object visitStmtBreak(StmtBreak stmt) {
         debug("In visitStmtBreak\n");
         return new JBreakStatement(null, null, null);
     }
 
-    public Object visitStmtContinue(StmtContinue stmt) {
+    @Override
+	public Object visitStmtContinue(StmtContinue stmt) {
         debug("In visitStmtContinue\n");
         return new JContinueStatement(null, null, null);
     }
 
-    public Object visitStmtDoWhile(StmtDoWhile stmt) {
+    @Override
+	public Object visitStmtDoWhile(StmtDoWhile stmt) {
         debug("In visitStmtDoWhile\n");
         return new JDoStatement(null,
                                 (JExpression) stmt.getCond().accept(this),
@@ -1224,20 +1263,23 @@ public class FEIRToSIR implements FEVisitor, Constants {
                                 null);
     }
 
-    public Object visitStmtEmpty(StmtEmpty stmt) 
+    @Override
+	public Object visitStmtEmpty(StmtEmpty stmt) 
     {
         debug("In visitStmtEmpty\n");
         return new JEmptyStatement(null, null);
     }
 
-    public Object visitStmtEnqueue(StmtEnqueue stmt) {
+    @Override
+	public Object visitStmtEnqueue(StmtEnqueue stmt) {
         debug("In visitStmtEnqueue\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitStmtExpr(StmtExpr stmt) {
+    @Override
+	public Object visitStmtExpr(StmtExpr stmt) {
         debug("In visitStmtExpr\n");
         Object x = stmt.getExpression().accept(this);
         if (x instanceof JStatement) {
@@ -1251,7 +1293,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         }
     }
 
-    public Object visitStmtFor(StmtFor stmt) {
+    @Override
+	public Object visitStmtFor(StmtFor stmt) {
         debug("In visitStmtFor\n");
         JStatement init = null, incr = null, body = null;
         JExpression cond = null;
@@ -1270,7 +1313,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return new JForStatement(null, init, cond, incr, body, null);
     }
 
-    public Object visitStmtIfThen(StmtIfThen stmt) {
+    @Override
+	public Object visitStmtIfThen(StmtIfThen stmt) {
         debug("In visitStmtIfThen\n");
         JStatement cons = null;
         if (stmt.getCons() != null) {
@@ -1287,7 +1331,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
                                 null);
     }
 
-    public Object visitStmtJoin(StmtJoin stmt) {
+    @Override
+	public Object visitStmtJoin(StmtJoin stmt) {
         debug("In visitStmtJoin\n");
         wantSplitter = false;
         SIRJoiner joiner = (SIRJoiner)stmt.getJoiner().accept(this);
@@ -1299,7 +1344,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return joiner;
     }
 
-    public Object visitStmtLoop(StmtLoop stmt) {
+    @Override
+	public Object visitStmtLoop(StmtLoop stmt) {
         debug("In visitStmtLoop\n");
         if (parent instanceof SIRFeedbackLoop) {
             ((SIRFeedbackLoop) parent).setLoop((SIRStream) stmt.getCreator().accept(this));
@@ -1307,12 +1353,14 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return null;
     }
 
-    public Object visitStmtPush(StmtPush stmt) {
+    @Override
+	public Object visitStmtPush(StmtPush stmt) {
         return new SIRPushExpression((JExpression) stmt.getValue().accept(this),
                                      parent.getOutputType());
     }
 
-    public Object visitStmtReturn(StmtReturn stmt) {
+    @Override
+	public Object visitStmtReturn(StmtReturn stmt) {
         debug("In visitStmtReturn\n");
         if (stmt.getValue() == null) {
             return new JReturnStatement(null, null, null);
@@ -1321,21 +1369,24 @@ public class FEIRToSIR implements FEVisitor, Constants {
         }
     }
 
-    public Object visitStmtSendMessage(StmtSendMessage stmt) 
+    @Override
+	public Object visitStmtSendMessage(StmtSendMessage stmt) 
     {
         debug("In visitStmtSendMessage\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitStmtHelperCall(StmtHelperCall stmt) 
+    @Override
+	public Object visitStmtHelperCall(StmtHelperCall stmt) 
     {
         debug("In visitStmtHelperCall\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitStmtSplit(StmtSplit stmt) {
+    @Override
+	public Object visitStmtSplit(StmtSplit stmt) {
         debug("In visitStmtSplit\n");
         wantSplitter = true;
         SIRSplitter splitter = (SIRSplitter)stmt.getSplitter().accept(this);
@@ -1347,7 +1398,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
         return splitter;
     }
 
-    public Object visitStmtVarDecl(StmtVarDecl stmt) {
+    @Override
+	public Object visitStmtVarDecl(StmtVarDecl stmt) {
         debug("In visitStmtVarDecl\n");
         List<JVariableDefinition> defs = new ArrayList<JVariableDefinition>();
         for (int i = 0; i < stmt.getNumVars(); i++)
@@ -1360,7 +1412,7 @@ public class FEIRToSIR implements FEVisitor, Constants {
                     jinit = (JExpression)init.accept(this);
                 JVariableDefinition def =
                     new JVariableDefinition(null,
-                                            at.dms.kjc.Constants.ACC_PUBLIC,
+                                            at.dms.classfile.Constants.ACC_PUBLIC,
                                             feirTypeToSirType(stmt.getType(i)),
                                             stmt.getName(i),
                                             jinit);
@@ -1376,7 +1428,8 @@ public class FEIRToSIR implements FEVisitor, Constants {
              null); // comments
     }
 
-    public Object visitStmtWhile(StmtWhile stmt) {
+    @Override
+	public Object visitStmtWhile(StmtWhile stmt) {
         debug("In visitStmtWhile\n");
         return new JWhileStatement(null,
                                    (JExpression) stmt.getCond().accept(this),
@@ -1384,14 +1437,16 @@ public class FEIRToSIR implements FEVisitor, Constants {
                                    null);
     }
 
-    public Object visitStreamType(StreamType type) {
+    @Override
+	public Object visitStreamType(StreamType type) {
         debug("In visitStmtType\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
         return null;
     }
 
-    public Object visitOther(FENode node) {
+    @Override
+	public Object visitOther(FENode node) {
         debug("In visitStmtOther\n");
         debug("  UNIMPLEMENTED\n");
         /* unimplemented */
