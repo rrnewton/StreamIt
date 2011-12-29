@@ -45,7 +45,12 @@ public class CMethodContext extends CContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CMethodContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 146668658618596770L;
+
+	protected CMethodContext() {} // for cloner only
 
     /**
      * CMethodContext

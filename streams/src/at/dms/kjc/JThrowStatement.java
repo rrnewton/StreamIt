@@ -35,7 +35,12 @@ public class JThrowStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JThrowStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5472828884698799968L;
+
+	protected JThrowStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

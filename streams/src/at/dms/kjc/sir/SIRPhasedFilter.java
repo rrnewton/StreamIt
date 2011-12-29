@@ -22,6 +22,11 @@ import at.dms.util.Utils;
 public class SIRPhasedFilter extends SIRStream implements Cloneable
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3398549610544132067L;
+
+	/**
      * The input and output types.  Each type is void if and only if this
      * is a source or sink, respectively.  This means that *all* phases
      * must have a 0 (peek and pop) or (push) rate.

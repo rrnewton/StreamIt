@@ -32,7 +32,12 @@ public class JGeneratedLocalVariable extends JLocalVariable {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JGeneratedLocalVariable() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7713923272744611662L;
+
+	protected JGeneratedLocalVariable() {} // for cloner only
 
     /**
      * Constructs a local variable definition

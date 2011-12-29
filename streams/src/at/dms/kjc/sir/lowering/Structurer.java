@@ -47,6 +47,10 @@ import at.dms.kjc.sir.StreamVisitor;
  */
 public class Structurer extends at.dms.util.Utils implements StreamVisitor {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4644312858443431135L;
+	/**
      * List of the class declarations defined during traversal
      */
     private LinkedList<JTypeDeclaration> structs;

@@ -33,7 +33,12 @@ public class JQualifiedAnonymousCreation extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JQualifiedAnonymousCreation() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8641806172330368239L;
+
+	protected JQualifiedAnonymousCreation() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

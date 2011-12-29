@@ -36,7 +36,12 @@ public class JCharLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JCharLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 376115554625476517L;
+
+	protected JCharLiteral() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

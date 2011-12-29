@@ -31,7 +31,12 @@ public class JavaStyleComment implements Serializable, at.dms.kjc.DeepCloneable 
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JavaStyleComment() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6784190051125530349L;
+
+	protected JavaStyleComment() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

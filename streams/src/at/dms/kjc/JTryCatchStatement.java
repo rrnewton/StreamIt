@@ -48,7 +48,12 @@ public class JTryCatchStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JTryCatchStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3457459769894874092L;
+
+	protected JTryCatchStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

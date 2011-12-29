@@ -20,7 +20,12 @@ import at.dms.kjc.sir.lowering.FieldProp;
 public class SinkUnroller extends at.dms.util.Utils 
     implements FlatVisitor, Constants 
 {
-    public static void doit(FlatNode top) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -645318268060595108L;
+
+	public static void doit(FlatNode top) {
         top.accept((new SinkUnroller()), null, true);
     }
 

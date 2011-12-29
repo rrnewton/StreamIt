@@ -4,7 +4,11 @@ import at.dms.kjc.CLongType;
 
 final class CInt64Type extends CLongType {
 
-    public static CInt64Type Int64 = new CInt64Type();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4543256562027638512L;
+	public static CInt64Type Int64 = new CInt64Type();
 
     /**
      * Returns a string representation of this type.

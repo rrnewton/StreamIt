@@ -34,6 +34,11 @@ public class CShortType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7382021168228275052L;
+
+	/**
      * Constructs a new instance.
      */
     public CShortType() {

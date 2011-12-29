@@ -33,7 +33,12 @@ public class CBinaryField extends CField {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CBinaryField() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2795797384462732862L;
+
+	protected CBinaryField() {} // for cloner only
 
     /**
      * Constructs a field export

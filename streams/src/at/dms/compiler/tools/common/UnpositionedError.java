@@ -33,6 +33,11 @@ public class UnpositionedError extends Throwable {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6314050450443164600L;
+
+	/**
      * Creates an error with a formatted message as argument.
      * @param   message     the formatted message
      */

@@ -35,7 +35,12 @@ public class JQualifiedInstanceCreation extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JQualifiedInstanceCreation() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8824519461859735129L;
+
+	protected JQualifiedInstanceCreation() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -10,7 +10,12 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class CPLEXClient extends UnicastRemoteObject implements Remote {
-    public CPLEXClient() throws RemoteException {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1344554484708240888L;
+
+	public CPLEXClient() throws RemoteException {
         super();
     }
 

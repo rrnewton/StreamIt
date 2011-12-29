@@ -86,7 +86,12 @@ public class ImageDisplay extends Filter {
         BorderLayout borderlay = new BorderLayout();
         displayWindow.setContentPane(new JPanel(borderlay)
             {
-                @Override
+                /**
+				 * 
+				 */
+				private static final long serialVersionUID = -8298801906786984186L;
+
+				@Override
 				public void paint(Graphics g) {
                     if (imageList.size() == 0) {
                         g.drawImage(firstImage, 0, 0, this);

@@ -32,7 +32,12 @@ public class CSourceMethod extends CMethod {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CSourceMethod() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4910518795022499217L;
+
+	protected CSourceMethod() {} // for cloner only
 
     /**
      * Constructs a method export.

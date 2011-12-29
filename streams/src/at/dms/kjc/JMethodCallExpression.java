@@ -30,7 +30,12 @@ import at.dms.compiler.UnpositionedError;
  */
 public class JMethodCallExpression extends JExpression {
 
-    protected JMethodCallExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4749861343966351521L;
+
+	protected JMethodCallExpression() {} // for cloner only
 
     /**
      *

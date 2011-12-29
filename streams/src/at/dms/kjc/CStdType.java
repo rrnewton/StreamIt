@@ -31,7 +31,11 @@ public class CStdType extends at.dms.util.Utils implements Constants {
     // PRIMITIVE TYPES
     // ----------------------------------------------------------------------
 
-    public static final CVoidType   Void = new CVoidType();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5940914014577306128L;
+	public static final CVoidType   Void = new CVoidType();
     public static final CNullType   Null = new CNullType();
 
     public static final CBooleanType Boolean = new CBooleanType();

@@ -36,7 +36,12 @@ public class JNewArrayExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JNewArrayExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5017279824914049051L;
+
+	protected JNewArrayExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

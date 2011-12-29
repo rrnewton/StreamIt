@@ -18,6 +18,10 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRMessageStatement extends JStatement {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9192538302152817947L;
+	/**
      * The portal that is the target of the message.
      */
     private JExpression portal;

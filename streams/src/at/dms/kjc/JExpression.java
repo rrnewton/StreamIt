@@ -35,7 +35,12 @@ public abstract class JExpression extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4262260106893547307L;
+
+	protected JExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

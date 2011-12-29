@@ -14,7 +14,11 @@ import at.dms.util.Utils;
  */
 
 public class SwitchCode extends at.dms.util.Utils {
-    //use heavy-weight compression algorithm
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3700733409169634135L;
+	//use heavy-weight compression algorithm
     private static final boolean USE_BETTER_COMP = true;
     // the max-ahead is the maximum number of lines that this will
     // recognize as a pattern for folding into a loop

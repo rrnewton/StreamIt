@@ -38,7 +38,12 @@ public abstract class CClass extends CMember {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CClass() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4037993772936882318L;
+
+	protected CClass() {} // for cloner only
 
     /**
      * Constructs a class export from file

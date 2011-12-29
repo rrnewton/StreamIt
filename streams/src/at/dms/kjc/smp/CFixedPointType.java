@@ -9,7 +9,11 @@ import at.dms.kjc.CIntType;
  *
  */
 public class CFixedPointType extends CIntType {
-    public static CFixedPointType FixedPoint = new CFixedPointType();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -10402723410945803L;
+	public static CFixedPointType FixedPoint = new CFixedPointType();
     
     /**
      * Returns a string representation of this type.

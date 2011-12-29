@@ -34,7 +34,11 @@ import at.dms.kjc.SLIRVisitor;
  *
  */
 public class JVectorLiteral extends JExpression {
-    private JLiteral scalar;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 37326800366450836L;
+	private JLiteral scalar;
     private CVectorType type;
     
     private JVectorLiteral() {} // for cloner only.

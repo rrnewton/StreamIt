@@ -18,6 +18,11 @@ import at.dms.kjc.JStatement;
 public class SIRDummySink extends SIRPredefinedFilter implements Cloneable, Constants {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6606322438117430551L;
+
+	/**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */
     private SIRDummySink() {

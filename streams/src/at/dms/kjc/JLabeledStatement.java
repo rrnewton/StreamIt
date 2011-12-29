@@ -35,7 +35,12 @@ public class JLabeledStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JLabeledStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2894373003830259574L;
+
+	protected JLabeledStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

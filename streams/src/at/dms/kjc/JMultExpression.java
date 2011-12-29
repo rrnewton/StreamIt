@@ -34,7 +34,12 @@ public class JMultExpression extends JBinaryArithmeticExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JMultExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8592972899892220079L;
+
+	protected JMultExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

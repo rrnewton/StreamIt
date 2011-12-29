@@ -33,7 +33,12 @@ public class JStringLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    private JStringLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3666159235198068595L;
+
+	private JStringLiteral() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

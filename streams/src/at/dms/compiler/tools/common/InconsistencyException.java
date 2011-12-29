@@ -27,6 +27,11 @@ package at.dms.compiler.tools.common;
 public class InconsistencyException extends RuntimeException {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8747703785048279515L;
+
+	/**
      * Constructs am InconsistencyException with no specified detail message.
      */
     public InconsistencyException() {

@@ -21,7 +21,11 @@
 package at.dms.compiler.tools.antlr.runtime;
 
 public class MismatchedCharException extends RecognitionException {
-    // Types of chars
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2228974678786230265L;
+	// Types of chars
     public static final int CHAR = 1;
     public static final int NOT_CHAR = 2;
     public static final int RANGE = 3;

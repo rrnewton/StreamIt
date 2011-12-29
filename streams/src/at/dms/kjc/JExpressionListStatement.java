@@ -37,7 +37,12 @@ public class JExpressionListStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JExpressionListStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6318869835563107048L;
+
+	protected JExpressionListStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

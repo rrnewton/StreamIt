@@ -9,6 +9,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetPeek extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -105533352047803813L;
+	/**
      * The encode function.
      */
     private int peek;

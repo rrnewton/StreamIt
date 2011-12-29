@@ -35,6 +35,11 @@ class CodeLabel extends AbstractInstructionAccessor implements Serializable, Dee
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7482196905700824251L;
+
+	/**
      * Constructs a new code label.
      */
     public CodeLabel() {

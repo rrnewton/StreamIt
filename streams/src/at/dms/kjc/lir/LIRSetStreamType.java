@@ -9,6 +9,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetStreamType extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5711354921634272284L;
+	/**
      * The encode function.
      */
     private LIRStreamType streamType;

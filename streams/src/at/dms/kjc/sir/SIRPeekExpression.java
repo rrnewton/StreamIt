@@ -19,6 +19,11 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRPeekExpression extends JExpression {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4980692982732180607L;
+
+	/**
      * The argument to the peek expression--the index of the item to
      * peek.
      */

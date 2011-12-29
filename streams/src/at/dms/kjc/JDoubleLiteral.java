@@ -34,7 +34,12 @@ public class JDoubleLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JDoubleLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5301799856725953418L;
+
+	protected JDoubleLiteral() {} // for cloner only
 
     /**
      * Constructs a literal expression from a textual representation.

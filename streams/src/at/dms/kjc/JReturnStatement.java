@@ -35,7 +35,12 @@ public class JReturnStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JReturnStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5162546843099477573L;
+
+	protected JReturnStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

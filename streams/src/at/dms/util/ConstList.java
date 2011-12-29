@@ -13,7 +13,11 @@ import java.util.ListIterator;
  */
 public class ConstList implements Serializable, Cloneable {
 
-    protected LinkedList<Object> list;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7665590376203830865L;
+	protected LinkedList<Object> list;
 
     public ConstList() {
         list = new LinkedList<Object>();

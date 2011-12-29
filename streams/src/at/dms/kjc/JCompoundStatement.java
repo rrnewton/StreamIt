@@ -33,7 +33,12 @@ public class JCompoundStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JCompoundStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6038298447839972736L;
+
+	protected JCompoundStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

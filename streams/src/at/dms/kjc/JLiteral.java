@@ -32,7 +32,12 @@ public abstract class JLiteral extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5022670641134469664L;
+
+	protected JLiteral() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

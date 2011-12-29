@@ -34,6 +34,11 @@ public class OptgenError extends FormattedException {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1542440550684934434L;
+
+	/**
      * An exception with a formatted message as argument
      * @param   message     the formatted message
      */

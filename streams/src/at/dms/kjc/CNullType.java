@@ -30,6 +30,11 @@ public class CNullType extends CClassType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9123843487251356668L;
+
+	/**
      * Construct a class type
      */
     public CNullType() {

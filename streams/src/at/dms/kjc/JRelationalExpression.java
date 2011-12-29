@@ -34,7 +34,12 @@ public class JRelationalExpression extends JBinaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JRelationalExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7917019290033780103L;
+
+	protected JRelationalExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

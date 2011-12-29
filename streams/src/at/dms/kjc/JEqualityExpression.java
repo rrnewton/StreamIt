@@ -34,7 +34,12 @@ public class JEqualityExpression extends JBinaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JEqualityExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3250516564256703253L;
+
+	protected JEqualityExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

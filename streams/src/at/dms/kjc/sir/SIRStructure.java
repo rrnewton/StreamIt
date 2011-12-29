@@ -15,7 +15,11 @@ import at.dms.kjc.lir.LIRStreamType;
  */
 public class SIRStructure extends SIRStream
 {
-    private boolean isCUnion;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2485373031395264405L;
+	private boolean isCUnion;
     
 
     /**

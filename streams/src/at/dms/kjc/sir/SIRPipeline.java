@@ -16,6 +16,11 @@ import at.dms.kjc.lir.LIRStreamType;
  */
 public class SIRPipeline extends SIRContainer implements Cloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2777399058529155196L;
+
+	/**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */
     private SIRPipeline() {

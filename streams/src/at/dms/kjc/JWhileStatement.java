@@ -37,7 +37,12 @@ public class JWhileStatement extends JLoopStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JWhileStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4556000610236408898L;
+
+	protected JWhileStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

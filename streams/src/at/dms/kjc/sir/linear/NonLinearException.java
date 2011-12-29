@@ -6,7 +6,12 @@ package at.dms.kjc.sir.linear;
  * once we determine that they are non-linear.
  **/
 public class NonLinearException extends RuntimeException {
-    public NonLinearException(String m) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7130835326862439102L;
+
+	public NonLinearException(String m) {
         super(m);
     }
 }

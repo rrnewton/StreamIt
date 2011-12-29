@@ -17,6 +17,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRNode extends JStatement {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8752174774266736717L;
+	/**
      * The name of the stream context for this node.
      */
     private JExpression streamContext;

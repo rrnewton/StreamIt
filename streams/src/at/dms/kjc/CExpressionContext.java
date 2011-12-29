@@ -30,7 +30,12 @@ public class CExpressionContext extends CContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CExpressionContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6995978736688087908L;
+
+	protected CExpressionContext() {} // for cloner only
 
     /**
      * Constructs the context to analyse an expression semantically.

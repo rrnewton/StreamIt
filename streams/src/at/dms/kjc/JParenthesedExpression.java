@@ -29,7 +29,12 @@ import at.dms.util.InconsistencyException;
  */
 public class JParenthesedExpression extends JExpression {
 
-    protected JParenthesedExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -532366573299985074L;
+
+	protected JParenthesedExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

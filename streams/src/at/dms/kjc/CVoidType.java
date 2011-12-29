@@ -34,6 +34,11 @@ final class CVoidType extends CType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2522456766880424347L;
+
+	/**
      * Constructor
      */
     protected CVoidType() {

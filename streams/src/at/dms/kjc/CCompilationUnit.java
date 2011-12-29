@@ -33,7 +33,12 @@ public class CCompilationUnit implements java.io.Serializable, DeepCloneable {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    private CCompilationUnit() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5987502672131018233L;
+
+	private CCompilationUnit() {} // for cloner only
 
     /**
      * Construct a compilation unit context.

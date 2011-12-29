@@ -16,6 +16,10 @@ import at.dms.util.Utils;
  */
 public class SIRSplitter extends SIROperator {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2170248330999121130L;
+	/**
      * This is a dummy work function that is used to represent the
      * work of a splitter to the scheduling package.  In the future
      * this could be replaced with a custom, instance-wise work

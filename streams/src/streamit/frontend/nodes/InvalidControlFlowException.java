@@ -29,7 +29,12 @@ package streamit.frontend.nodes;
  */
 public class InvalidControlFlowException extends RuntimeException
 {
-    public InvalidControlFlowException() 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1323584001796087131L;
+
+	public InvalidControlFlowException() 
     {
         super();
     }

@@ -18,6 +18,10 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRPopExpression extends JExpression {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4411704542892469115L;
+	/**
      * Type of the item to peek.
      */
     protected CType tapeType;

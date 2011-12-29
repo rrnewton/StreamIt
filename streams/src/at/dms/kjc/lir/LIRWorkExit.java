@@ -8,7 +8,11 @@ import at.dms.kjc.SLIRVisitor;
  */
 public class LIRWorkExit extends LIRNode
 {
-    public LIRWorkExit(JExpression streamContext)
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3919943952564493893L;
+	public LIRWorkExit(JExpression streamContext)
     {
         super(streamContext);
     }

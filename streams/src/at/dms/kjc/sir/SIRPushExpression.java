@@ -18,6 +18,11 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRPushExpression extends JExpression {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 828754739858773718L;
+
+	/**
      * The argument to the push expression--the item to push.
      */
     protected JExpression arg;

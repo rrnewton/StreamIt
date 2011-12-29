@@ -27,6 +27,11 @@ package at.dms.util;
 public class NotImplementedException extends RuntimeException {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -57800318955670455L;
+
+	/**
      * Constructs am NotImplementedException with no specified detail message.
      */
     public NotImplementedException() {

@@ -29,7 +29,12 @@ public class JavadocComment extends JavaStyleComment {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JavadocComment() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5028501219599822711L;
+
+	protected JavadocComment() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

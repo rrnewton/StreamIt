@@ -9,6 +9,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetPop extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4940924552441756276L;
+	/**
      * The encode function.
      */
     private int pop;

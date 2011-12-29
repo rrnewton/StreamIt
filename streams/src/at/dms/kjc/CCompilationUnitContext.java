@@ -48,7 +48,12 @@ public class CCompilationUnitContext extends CContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CCompilationUnitContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8018009179068015488L;
+
+	protected CCompilationUnitContext() {} // for cloner only
 
     /**
      * Constructs a compilation unit context.

@@ -17,6 +17,10 @@ import at.dms.kjc.SLIRVisitor;
  */
 public class SIRLatency implements Serializable, DeepCloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8563057648973519312L;
+	/**
      * This signifies a best-effort latency.
      */
     public static final SIRLatency BEST_EFFORT = new SIRLatency();

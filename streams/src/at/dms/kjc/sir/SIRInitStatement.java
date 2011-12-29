@@ -24,6 +24,10 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRInitStatement extends JStatement {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4752243843546923319L;
+	/**
      * The arguments to the init function. (all are JExpressions)
      */
     protected List<JExpression> args;

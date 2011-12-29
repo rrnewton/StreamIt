@@ -30,7 +30,11 @@ import at.dms.util.Utils;
  */
 public class Layout extends at.dms.util.Utils implements FlatVisitor {
 
-    private  HashMap<SIROperator, Coordinate> SIRassignment;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3642926815168707340L;
+	private  HashMap<SIROperator, Coordinate> SIRassignment;
     /* coordinate -> flatnode */
     private  HashMap<Object, FlatNode> tileAssignment;
     private  HashSet<Object> assigned;

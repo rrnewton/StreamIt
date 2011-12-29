@@ -39,7 +39,12 @@ public class JCompilationUnit extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JCompilationUnit() {} // for cloning only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -582483577186017415L;
+
+	protected JCompilationUnit() {} // for cloning only
 
     /**
      * Constructs a CompilationUnit with the specified top level context

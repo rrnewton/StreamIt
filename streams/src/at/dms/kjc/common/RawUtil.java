@@ -16,7 +16,11 @@ import at.dms.util.Utils;
  * This class contains various function used by multiple passes
  */
 public class RawUtil extends at.dms.util.Utils {
-    public static String CSTOINTVAR = "__csto_integer__";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3557118165469406038L;
+	public static String CSTOINTVAR = "__csto_integer__";
     public static String CSTOFPVAR = "__csto_float__";
     public static String CSTIFPVAR = "__csti_float__";
     public static String CSTIINTVAR = "__csti_integer__";

@@ -36,7 +36,12 @@ public class JPackageImport extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JPackageImport() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7529456376804811835L;
+
+	protected JPackageImport() {} // for cloner only
 
     /**
      * construct a package name

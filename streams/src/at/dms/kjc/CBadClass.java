@@ -35,7 +35,12 @@ public class CBadClass extends CClass {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CBadClass() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5853584188715765970L;
+
+	protected CBadClass() {} // for cloner only
 
     /**
      * Constructs a class export from file

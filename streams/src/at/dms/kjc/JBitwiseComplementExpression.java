@@ -34,7 +34,12 @@ public class JBitwiseComplementExpression extends JUnaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JBitwiseComplementExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6398770623200900713L;
+
+	protected JBitwiseComplementExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

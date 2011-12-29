@@ -19,7 +19,11 @@ import at.dms.kjc.SLIRVisitor;
  */
 public class SIRRegReceiverStatement extends JStatement {
 
-    private JExpression portal;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7836853855465568949L;
+	private JExpression portal;
     private SIRStream receiver;
     private SIRInterfaceTable itable;
 

@@ -9,6 +9,10 @@ package streamit.library;
  */
 class NoPushPopException extends RuntimeException {
 
-    public NoPushPopException() { super(); }
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9013474033241154167L;
+	public NoPushPopException() { super(); }
     public NoPushPopException(String str) { super(str); }
 }

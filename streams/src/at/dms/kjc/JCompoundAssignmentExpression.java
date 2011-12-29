@@ -35,7 +35,12 @@ public class JCompoundAssignmentExpression extends JAssignmentExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JCompoundAssignmentExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8800956891796249212L;
+
+	protected JCompoundAssignmentExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

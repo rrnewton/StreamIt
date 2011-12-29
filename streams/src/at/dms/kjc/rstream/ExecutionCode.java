@@ -38,7 +38,12 @@ public class ExecutionCode extends at.dms.util.Utils
     implements Constants
 {
 
-    private ExecutionCode(){}
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1744819478449988694L;
+
+	private ExecutionCode(){}
     
     /**
      * This static method creates the main function as described 

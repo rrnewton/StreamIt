@@ -36,7 +36,11 @@ import at.dms.kjc.sir.SIRPopExpression;
 public class File_Writer extends SIRFilter  
 {
 
-    private static int uniqueID = 0;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 619952357023400929L;
+	private static int uniqueID = 0;
     
     public File_Writer(SIRFileWriter fw) 
     {

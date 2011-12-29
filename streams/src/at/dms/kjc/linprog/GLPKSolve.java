@@ -11,7 +11,11 @@ import at.dms.util.Utils;
  *
  */
 public class GLPKSolve extends MPSWriter implements LinearProgramSolver {
-    private static final String PROBLEM_FILE = "partitions.mps";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4157560246960052910L;
+	private static final String PROBLEM_FILE = "partitions.mps";
     private static final String SOLUTION_FILE = "partitions.sol";
 
     /**

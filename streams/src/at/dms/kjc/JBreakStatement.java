@@ -35,7 +35,12 @@ public class JBreakStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JBreakStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5186698994889660773L;
+
+	protected JBreakStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

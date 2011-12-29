@@ -34,6 +34,11 @@ public class CDoubleType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7600090441834138042L;
+
+	/**
      * Constructs a new instance.
      */
     public CDoubleType() {

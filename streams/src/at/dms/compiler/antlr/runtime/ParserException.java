@@ -22,7 +22,12 @@ package at.dms.compiler.antlr.runtime;
 
 public class ParserException extends ANTLRException {
 
-    public ParserException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4113365882103100817L;
+
+	public ParserException() {
         super("parsing error");
     }
 

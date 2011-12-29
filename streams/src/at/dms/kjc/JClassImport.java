@@ -37,7 +37,12 @@ public class JClassImport extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JClassImport() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3188985782002083122L;
+
+	protected JClassImport() {} // for cloner only
 
     /**
      * Constructs a single-type-import declaration node in the syntax tree.

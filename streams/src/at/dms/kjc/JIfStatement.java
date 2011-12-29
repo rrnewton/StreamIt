@@ -37,7 +37,12 @@ public class JIfStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JIfStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4943214491897651527L;
+
+	protected JIfStatement() {} // for cloner only
     /**
      * Construct a node in the parsing tree
      * @param   where       the line of this node in the source code

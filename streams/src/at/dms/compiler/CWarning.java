@@ -33,6 +33,11 @@ public class CWarning extends PositionedError {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2427149348607125446L;
+
+	/**
      * An error with a formatted message as argument
      * @param   where       the position in the source code
      * @param   message     the formatted message

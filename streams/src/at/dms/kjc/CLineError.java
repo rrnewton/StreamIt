@@ -33,6 +33,11 @@ public class CLineError extends CBlockError {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1018679107862758706L;
+
+	/**
      * An error with a formatted message as argument
      * @param   where       the position in the source code
      * @param   message     the formatted message

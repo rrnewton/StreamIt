@@ -34,6 +34,11 @@ public class CCharType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7081627520881064312L;
+
+	/**
      * Constructs a new instance.
      */
     public CCharType() {

@@ -32,7 +32,12 @@ public final class JCheckedExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JCheckedExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3367669717784752512L;
+
+	protected JCheckedExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

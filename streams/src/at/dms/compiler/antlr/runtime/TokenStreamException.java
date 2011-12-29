@@ -25,7 +25,12 @@ package at.dms.compiler.antlr.runtime;
  */
 public class TokenStreamException extends ParserException {
 
-    public TokenStreamException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2852069240131825975L;
+
+	public TokenStreamException() {
     }
 
     public TokenStreamException(String s) {

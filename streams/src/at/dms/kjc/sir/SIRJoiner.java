@@ -16,6 +16,10 @@ import at.dms.util.Utils;
  */
 public class SIRJoiner extends SIROperator {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3573597041489310000L;
+	/**
      * This is a dummy work function that is used to represent the
      * work of a joiner to the scheduling package.  In the future this
      * could be replaced with a custom, instance-wise work function.

@@ -47,7 +47,12 @@ public class JTryFinallyStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JTryFinallyStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1660165664744474526L;
+
+	protected JTryFinallyStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

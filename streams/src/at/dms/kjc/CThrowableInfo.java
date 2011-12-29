@@ -29,7 +29,12 @@ public class CThrowableInfo extends at.dms.util.Utils {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    private CThrowableInfo() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6562891503380130647L;
+
+	private CThrowableInfo() {} // for cloner only
 
     /**
      * Constructs an informztion handler

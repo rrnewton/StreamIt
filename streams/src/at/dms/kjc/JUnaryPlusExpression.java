@@ -32,7 +32,12 @@ public class JUnaryPlusExpression extends JUnaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JUnaryPlusExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6660115152201684817L;
+
+	protected JUnaryPlusExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

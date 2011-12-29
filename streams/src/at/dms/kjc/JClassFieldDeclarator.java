@@ -34,7 +34,12 @@ public class JClassFieldDeclarator extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JClassFieldDeclarator() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7108285548747066070L;
+
+	protected JClassFieldDeclarator() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

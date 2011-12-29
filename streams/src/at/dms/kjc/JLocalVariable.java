@@ -36,7 +36,12 @@ public abstract class JLocalVariable extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JLocalVariable() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1833319681123562208L;
+
+	protected JLocalVariable() {} // for cloner only
 
     /**
      * Constructs a local variable definition

@@ -32,7 +32,12 @@ public abstract class JBinaryExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JBinaryExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7102987553078695140L;
+
+	protected JBinaryExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

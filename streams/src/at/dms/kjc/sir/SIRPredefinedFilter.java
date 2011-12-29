@@ -13,7 +13,12 @@ import at.dms.kjc.sir.lowering.Propagator;
  */
 public class SIRPredefinedFilter extends SIRFilter implements Cloneable {
 
-    public SIRPredefinedFilter() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9200785367380035434L;
+
+	public SIRPredefinedFilter() {
         super();
     }
 

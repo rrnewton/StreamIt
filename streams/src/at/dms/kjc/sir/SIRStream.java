@@ -23,6 +23,10 @@ import at.dms.kjc.lir.LIRStreamType;
  */
 public abstract class SIRStream extends SIROperator implements Cloneable, SIRCodeUnit {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8579388984380783350L;
+	/**
      * The fields of this, not including the input and output channels.  */
     protected JFieldDeclaration[] fields;
     /**

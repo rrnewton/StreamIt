@@ -20,7 +20,12 @@ import at.dms.util.Utils;
  * on the tile number assigned 
  */
 public class TileCode extends at.dms.util.Utils implements FlatVisitor {
-    // the max-ahead is the maximum number of lines that this will
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5265458645632378141L;
+
+	// the max-ahead is the maximum number of lines that this will
     // recognize as a pattern for folding into a loop
     private static final int MAX_LOOKAHEAD = 20;
 

@@ -26,6 +26,11 @@ package at.dms.classfile;
 public class BadAccessorException extends Exception {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2765998427040076653L;
+
+	/**
      * Constructs a BadAccessorException object.
      */
     public BadAccessorException() {

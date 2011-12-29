@@ -34,7 +34,12 @@ public class JAddExpression extends JBinaryArithmeticExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JAddExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6135598647735376704L;
+
+	protected JAddExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

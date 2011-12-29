@@ -32,7 +32,12 @@ public class JPackageName extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JPackageName() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6760178724703919940L;
+
+	protected JPackageName() {} // for cloner only
 
     /**
      * construct a package name

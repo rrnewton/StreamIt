@@ -16,6 +16,10 @@ import at.dms.util.Utils;
  */
 public class SIRSplitJoin extends SIRContainer implements Cloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2862628379843753231L;
+	/**
      * The splitter at the top of this.
      */
     private SIRSplitter splitter;

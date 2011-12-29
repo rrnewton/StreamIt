@@ -32,7 +32,12 @@ public class JVariableDefinition extends JLocalVariable {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JVariableDefinition() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6049075797939717501L;
+
+	protected JVariableDefinition() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

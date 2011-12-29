@@ -12,7 +12,12 @@ import at.dms.kjc.lir.LIRStreamType;
 
 public class SIRGlobal extends SIRStream
 {
-    public SIRGlobal()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3443451193566669928L;
+
+	public SIRGlobal()
     {
         super();
     }

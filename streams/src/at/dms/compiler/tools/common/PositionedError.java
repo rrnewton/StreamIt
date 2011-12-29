@@ -33,6 +33,11 @@ public class PositionedError extends FormattedException {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4246498251868959079L;
+
+	/**
      * An error with a formatted message as argument
      * @param   where       the position in the source code
      * @param   message     the formatted message

@@ -17,6 +17,11 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRMarker extends JStatement {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6949560770017440699L;
+
+	/**
      * Create an SIRMarker.
      */
     public SIRMarker() {

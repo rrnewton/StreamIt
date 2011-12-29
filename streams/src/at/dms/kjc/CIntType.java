@@ -34,6 +34,11 @@ public class CIntType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1360536523438910056L;
+
+	/**
      * Constructs a new instance.
      */
     protected CIntType() {

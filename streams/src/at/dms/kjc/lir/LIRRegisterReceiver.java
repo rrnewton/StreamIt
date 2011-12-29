@@ -11,6 +11,11 @@ import at.dms.kjc.sir.SIRPortal;
 public class LIRRegisterReceiver extends LIRNode 
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2243032520247587368L;
+
+	/**
      * The (global) portal to register with.
      */
     private SIRPortal portal;

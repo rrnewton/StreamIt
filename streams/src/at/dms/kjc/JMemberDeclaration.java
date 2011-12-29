@@ -34,7 +34,12 @@ public abstract class JMemberDeclaration extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JMemberDeclaration() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2357300283733692802L;
+
+	protected JMemberDeclaration() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -37,6 +37,11 @@ public class KjcPrettyPrinter extends at.dms.util.Utils implements Constants, Kj
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2384958643750023561L;
+
+	/**
      * construct a pretty printer object for java code
      */
     public KjcPrettyPrinter() {

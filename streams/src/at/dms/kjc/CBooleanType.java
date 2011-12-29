@@ -34,6 +34,11 @@ public class CBooleanType extends CType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4874356316222089112L;
+
+	/**
      * Constructor
      */
     protected CBooleanType() {

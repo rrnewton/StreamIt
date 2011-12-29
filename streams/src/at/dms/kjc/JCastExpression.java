@@ -34,7 +34,12 @@ public class JCastExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JCastExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8707123833522282073L;
+
+	protected JCastExpression() {} // for cloner only
 
     /**
      * Constructs a node in the parsing tree.

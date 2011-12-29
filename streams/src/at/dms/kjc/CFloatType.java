@@ -34,6 +34,11 @@ public class CFloatType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3380112329931025893L;
+
+	/**
      * Constructs a new instance.
      */
     public CFloatType() {

@@ -16,6 +16,11 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetParallelStream extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2504366722349597917L;
+
+	/**
      * The child context to be used as the split/join body.
      */
     private JExpression childContext;

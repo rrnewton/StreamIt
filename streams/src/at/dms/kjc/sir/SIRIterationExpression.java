@@ -14,7 +14,12 @@ import at.dms.kjc.SLIRVisitor;
 
 public class SIRIterationExpression extends JExpression{
 
-        @Override
+        /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8382841803889581498L;
+
+		@Override
         public CType getType() {
             return CStdType.Integer;
         }

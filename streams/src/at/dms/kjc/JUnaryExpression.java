@@ -31,7 +31,12 @@ public abstract class JUnaryExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JUnaryExpression() {} // for cloning only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7869464398164875114L;
+
+	protected JUnaryExpression() {} // for cloning only
 
     /**
      * Construct a node in the parsing tree

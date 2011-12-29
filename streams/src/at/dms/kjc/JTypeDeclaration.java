@@ -39,7 +39,12 @@ public abstract class JTypeDeclaration extends JMemberDeclaration {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JTypeDeclaration() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4306020236896698701L;
+
+	protected JTypeDeclaration() {} // for cloner only
 
     /**
      * Constructs a type declaration node in the syntax tree.

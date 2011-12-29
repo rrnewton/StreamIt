@@ -26,6 +26,11 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRInterfaceTable extends JExpression
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1834731554394615294L;
+
+	/**
      * The interface that the class implements.
      */
     protected CClassType iface;

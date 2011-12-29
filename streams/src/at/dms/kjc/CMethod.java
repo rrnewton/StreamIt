@@ -37,7 +37,12 @@ public abstract class CMethod extends CMember {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CMethod() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4349852579482024129L;
+
+	protected CMethod() {} // for cloner only
 
     /**
      * Constructs a method member.

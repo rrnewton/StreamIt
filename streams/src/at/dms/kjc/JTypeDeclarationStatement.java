@@ -35,7 +35,12 @@ public class JTypeDeclarationStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JTypeDeclarationStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8578197852149471373L;
+
+	protected JTypeDeclarationStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

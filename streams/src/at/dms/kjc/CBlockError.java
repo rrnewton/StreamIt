@@ -35,6 +35,11 @@ public class CBlockError extends PositionedError {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2301920042657403822L;
+
+	/**
      * An error with a formatted message as argument
      * @param   where       the position in the source code
      * @param   message     the formatted message

@@ -32,7 +32,12 @@ public class JInitializerDeclaration extends JMethodDeclaration {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JInitializerDeclaration() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3685017038132992830L;
+
+	protected JInitializerDeclaration() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -36,7 +36,12 @@ public class JPostfixExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JPostfixExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1337987092452408833L;
+
+	protected JPostfixExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

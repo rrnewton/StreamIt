@@ -7,7 +7,11 @@ import java.io.Serializable;
  */
 
 class ConstraintType implements Serializable {
-    // for objective function only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5877401730468488287L;
+	// for objective function only
     public static final ConstraintType OBJ = new ConstraintType("OBJ");
     // for GE
     public static final ConstraintType GE = new ConstraintType("GE");

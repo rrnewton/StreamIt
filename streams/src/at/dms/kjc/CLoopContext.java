@@ -30,7 +30,12 @@ public class CLoopContext extends CBodyContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CLoopContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8680564299223236471L;
+
+	protected CLoopContext() {} // for cloner only
 
     /**
      * Constructs the context to analyse a loop statement semantically.

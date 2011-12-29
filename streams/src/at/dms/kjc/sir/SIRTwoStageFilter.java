@@ -31,7 +31,12 @@ public class SIRTwoStageFilter extends SIRFilter {
      * exactly one element.  This means we need to set up initPhases
      * and phases even where we wouldn't otherwise. */
 
-    public SIRTwoStageFilter()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2771549287390972571L;
+
+	public SIRTwoStageFilter()
     {
         this(null);
     }

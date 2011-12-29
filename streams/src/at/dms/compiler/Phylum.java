@@ -31,7 +31,12 @@ public abstract class Phylum extends Utils {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected Phylum() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2622629319648236608L;
+
+	protected Phylum() {} // for cloner only
     /**
      * construct an element of the parsing tree
      * @param where the token reference of this node

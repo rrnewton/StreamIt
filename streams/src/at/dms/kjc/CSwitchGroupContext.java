@@ -42,7 +42,12 @@ public class CSwitchGroupContext extends CBodyContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CSwitchGroupContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2510063015720328013L;
+
+	protected CSwitchGroupContext() {} // for cloner only
 
     /**
      * Construct a block context, it supports local variable allocation

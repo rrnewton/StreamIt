@@ -18,6 +18,10 @@ import at.dms.util.Utils;
  */
 public class CPLEXSolve extends SimpleLinearProgram implements LinearProgramSolver, Serializable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1493610888464688513L;
+	/**
      * The optimal and gap timeouts for this.
      */
     private long optTimeout;

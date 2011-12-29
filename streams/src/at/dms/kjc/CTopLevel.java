@@ -36,6 +36,11 @@ public final class CTopLevel extends at.dms.util.Utils {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6244944957491031701L;
+
+	/**
      * Loads class definition from .class file
      */
     public static CClass loadClass(String name) {

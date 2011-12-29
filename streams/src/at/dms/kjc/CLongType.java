@@ -34,6 +34,11 @@ public class CLongType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8160217200839367000L;
+
+	/**
      * Constructs a new instance.
      */
     public CLongType() {

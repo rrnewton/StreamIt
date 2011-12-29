@@ -27,7 +27,11 @@ import at.dms.util.SimpleStringBuffer;
 
 final class CVoidPtrType extends CType {
 
-    public static CVoidPtrType VoidPtr = new CVoidPtrType();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9132645444849024071L;
+	public static CVoidPtrType VoidPtr = new CVoidPtrType();
     
     // ----------------------------------------------------------------------
     // CONSTRUCTORS

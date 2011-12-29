@@ -9,7 +9,11 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class CPLEXServer extends UnicastRemoteObject implements RMISolver {
-    // base name of host
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5209641801741724408L;
+	// base name of host
     private static final String hostname = "//cagfarm-40.lcs.mit.edu/RMISolver";
     // next open port to connect to
     private static long openPort = 0;

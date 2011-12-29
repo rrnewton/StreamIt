@@ -21,7 +21,11 @@
 package at.dms.compiler.tools.antlr.runtime;
 
 public class SemanticException extends RecognitionException {
-    public SemanticException(String s) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8140723311788815307L;
+	public SemanticException(String s) {
         super(s);
     }
     public SemanticException(String s, String fileName, int line) {

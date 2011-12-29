@@ -32,7 +32,12 @@ public class JLocalVariableExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JLocalVariableExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7245894364445472562L;
+
+	protected JLocalVariableExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

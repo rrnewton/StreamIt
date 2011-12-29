@@ -16,7 +16,12 @@ import at.dms.kjc.JStatement;
  */
 public class Jrstream_pr extends JBlock
 {
-    public Jrstream_pr(TokenReference where,
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4379306873807742522L;
+
+	public Jrstream_pr(TokenReference where,
                        JStatement[] body,
                        JavaStyleComment[] comments)
     {

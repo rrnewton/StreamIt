@@ -94,6 +94,11 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	// ----------------------------------------------------------------------
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8208186176227752282L;
+
+	/**
 	 * Check if an assertion is valid
 	 *
 	 * @exception   RuntimeException    the entire token reference
@@ -1605,7 +1610,12 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	public static boolean hasPeeks(SIRCodeUnit filter) {
 		/** Extend Error here rather than Exception because overridden visitor
 		 *  can not declare it as an exception */
-		class BreakOutException extends Error{};
+		class BreakOutException extends Error{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -1728148906248766278L;};
 
 		try {
 			for (JMethodDeclaration meth : filter.getMethods()) {

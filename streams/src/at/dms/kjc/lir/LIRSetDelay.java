@@ -12,6 +12,11 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetDelay extends LIRNode 
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6382730602378978090L;
+
+	/**
      * The data structure corresponding to the current stream.
      */
     private JExpression data;

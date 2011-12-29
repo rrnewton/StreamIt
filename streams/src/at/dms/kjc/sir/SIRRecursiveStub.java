@@ -17,6 +17,10 @@ import at.dms.kjc.lir.LIRStreamType;
  */
 public class SIRRecursiveStub extends SIRStream implements Cloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3322638537971180227L;
+	/**
      * The name of the class that this should be expanded into.
      */
     private String className;

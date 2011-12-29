@@ -38,7 +38,12 @@ public class CMember extends at.dms.util.Utils implements Constants {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CMember() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3778917116903967672L;
+
+	protected CMember() {} // for cloner only
 
     /**
      * Constructs a field export

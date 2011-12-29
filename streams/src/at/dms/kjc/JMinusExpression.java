@@ -34,7 +34,12 @@ public class JMinusExpression extends JBinaryArithmeticExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JMinusExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7987002055181791015L;
+
+	protected JMinusExpression() {} // for cloner only
     /**
      * Construct a node in the parsing tree
      * This method is directly called by the parser

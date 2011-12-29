@@ -34,6 +34,11 @@ public class MsggenError extends FormattedException {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3913519425098567264L;
+
+	/**
      * An exception with a formatted message as argument
      * @param   message     the formatted message
      */

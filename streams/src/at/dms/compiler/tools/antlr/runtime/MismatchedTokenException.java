@@ -21,7 +21,11 @@
 package at.dms.compiler.tools.antlr.runtime;
 
 public class MismatchedTokenException extends RecognitionException {
-    // Token names array for formatting
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3636468195378427451L;
+	// Token names array for formatting
     String[] tokenNames;
     // The token that was encountered
     public Token token;

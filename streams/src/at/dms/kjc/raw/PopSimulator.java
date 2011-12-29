@@ -12,7 +12,11 @@ import at.dms.kjc.sir.SIRSplitter;
  */
 public class PopSimulator extends at.dms.util.Utils
 {
-    private static SimulationCounterPop counters;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -360532189182665959L;
+	private static SimulationCounterPop counters;
         
     /* Given a flatnode with a filter as its contents, 
        generate the switch schedule

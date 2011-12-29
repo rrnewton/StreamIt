@@ -19,7 +19,11 @@ package streamit.library;
 import java.io.Serializable;
 
 public class float3 extends Structure implements Serializable {
-    public float x;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 989035548231831492L;
+	public float x;
     public float y;
     public float z;
 }

@@ -32,7 +32,12 @@ public class JConditionalAndExpression extends JBinaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JConditionalAndExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7518888287289153173L;
+
+	protected JConditionalAndExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

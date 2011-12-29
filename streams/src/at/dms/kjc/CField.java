@@ -31,7 +31,12 @@ public abstract class CField extends CMember {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CField() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9132401882791423111L;
+
+	protected CField() {} // for cloner only
 
     /**
      * Constructs a field export

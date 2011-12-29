@@ -35,7 +35,12 @@ public class JFieldDeclaration extends JMemberDeclaration {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JFieldDeclaration() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8722285833945632366L;
+
+	protected JFieldDeclaration() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -33,6 +33,11 @@ public class JThisExpression extends JExpression {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4012960463040912536L;
+
+	/**
      * Construct a node in the parsing tree
      * @param where the line of this node in the source code
      */
@@ -137,6 +142,11 @@ public class JThisExpression extends JExpression {
                     if (context.getMethodContext() instanceof CConstructorContext) {
                         JGeneratedLocalVariable local = new JGeneratedLocalVariable(null, 0, getType(), "toto", null) {
                                 /**
+							 * 
+							 */
+							private static final long serialVersionUID = 8489205893728578627L;
+
+								/**
                                  * @return the local index in context variable table
                                  */
                                 @Override
@@ -146,7 +156,12 @@ public class JThisExpression extends JExpression {
                             };
 
                         return new JLocalVariableExpression(getTokenReference(), local) {
-                                @Override
+                                /**
+							 * 
+							 */
+							private static final long serialVersionUID = 1864361971777614956L;
+
+								@Override
 								public JExpression analyse(CExpressionContext ctxt) {
                                     // already checked
                                     return this;

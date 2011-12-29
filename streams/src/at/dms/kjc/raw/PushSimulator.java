@@ -12,7 +12,11 @@ import at.dms.kjc.sir.SIRSplitter;
  */
 public class PushSimulator extends at.dms.util.Utils
 {
-    private static SimulationCounterPush counters;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2393103587194980245L;
+	private static SimulationCounterPush counters;
         
     /* Given a flatnode with a filter as its contents, 
        generate the switch schedule

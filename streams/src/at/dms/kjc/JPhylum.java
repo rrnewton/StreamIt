@@ -47,7 +47,12 @@ public abstract class JPhylum extends at.dms.compiler.Phylum implements Constant
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JPhylum() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8837503515367705894L;
+
+	protected JPhylum() {} // for cloner only
 
     /**
      * construct an element of the parsing tree

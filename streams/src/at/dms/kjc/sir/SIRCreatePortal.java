@@ -18,7 +18,12 @@ import at.dms.kjc.SLIRVisitor;
  * This expression is a place holder for a particular portal
  */
 public class SIRCreatePortal extends JExpression {
-    public SIRCreatePortal() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6074199711875209934L;
+
+	public SIRCreatePortal() {
         super(null); 
     }
 

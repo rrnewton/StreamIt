@@ -32,7 +32,12 @@ public class JArrayLengthExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JArrayLengthExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6085474113331110688L;
+
+	protected JArrayLengthExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -20,6 +20,11 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRMainFunction extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6956339628837207230L;
+
+	/**
      * The name of the type of the struct required by the toplevel
      * init function.  
      */

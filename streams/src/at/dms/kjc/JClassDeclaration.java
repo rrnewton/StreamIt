@@ -39,7 +39,13 @@ public class JClassDeclaration extends JTypeDeclaration {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JClassDeclaration() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2676901196639870578L;
+
+
+	protected JClassDeclaration() {} // for cloner only
 
     /**
      * Constructs a class declaration node in the syntax tree.

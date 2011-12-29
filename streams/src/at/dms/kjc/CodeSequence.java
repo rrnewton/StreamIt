@@ -54,6 +54,11 @@ public final class CodeSequence extends at.dms.util.Utils implements Constants {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -961533287743293857L;
+
+	/**
      * Constructs a code attribute.
      */
     private CodeSequence() {

@@ -22,7 +22,11 @@ package at.dms.compiler.antlr.runtime;
 
 public class NoViableAltException extends RecognitionException {
 
-    public Token token;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5224044968222835744L;
+	public Token token;
 
     public NoViableAltException(Token t, String fileName) {
         super("NoViableAlt");

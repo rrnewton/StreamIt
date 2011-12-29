@@ -18,6 +18,10 @@ import at.dms.util.Utils;
  */
 public class SIRFeedbackLoop extends SIRContainer implements Cloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -43133638048137325L;
+	/**
      * These constants are used for addressing the children of a
      * feedback loop.
      */

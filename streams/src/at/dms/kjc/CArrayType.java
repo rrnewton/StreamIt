@@ -33,7 +33,12 @@ public class CArrayType extends CClassType {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    private CArrayType() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8217167795296206505L;
+
+	private CArrayType() {} // for cloner only
 
     /**
      * Constructs an array type

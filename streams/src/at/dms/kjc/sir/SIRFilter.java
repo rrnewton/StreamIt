@@ -38,7 +38,12 @@ public class SIRFilter extends SIRPhasedFilter implements Cloneable {
      * This means we need to set up initPhases and phases even where
      * we wouldn't otherwise. */
 
-    public SIRFilter() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1386105963887106072L;
+
+	public SIRFilter() {
         this(null);
     }
 

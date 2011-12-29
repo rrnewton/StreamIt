@@ -34,6 +34,11 @@ public class CByteType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5803494227905119835L;
+
+	/**
      * Constructs a new instance.
      */
     public CByteType() {

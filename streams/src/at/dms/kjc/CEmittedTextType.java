@@ -5,7 +5,11 @@ import at.dms.util.SimpleStringBuffer;
 
 public class CEmittedTextType extends CType {
 
-    Object[] parts;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4062237615405153888L;
+	Object[] parts;
     public Object[] getParts() {
         return parts;
     }

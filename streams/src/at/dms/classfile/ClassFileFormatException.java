@@ -26,6 +26,11 @@ package at.dms.classfile;
 public class ClassFileFormatException extends Exception {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4610596618246676353L;
+
+	/**
      * Constructs a class file read exception
      *
      * @param   message     the detail message

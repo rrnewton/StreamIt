@@ -31,7 +31,12 @@ public class CBinaryMethod extends CMethod {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CBinaryMethod() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6398822550245348075L;
+
+	protected CBinaryMethod() {} // for cloner only
 
     /**
      * Constructs method

@@ -36,7 +36,12 @@ public class CInitializerContext extends CMethodContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CInitializerContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3093801022692034911L;
+
+	protected CInitializerContext() {} // for cloner only
 
     /**
      * CInitializerContext

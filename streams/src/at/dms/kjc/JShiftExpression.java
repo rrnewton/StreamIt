@@ -35,7 +35,12 @@ public class JShiftExpression extends JBinaryArithmeticExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JShiftExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6505534503243436182L;
+
+	protected JShiftExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

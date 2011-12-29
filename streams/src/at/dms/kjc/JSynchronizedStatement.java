@@ -37,7 +37,12 @@ public class JSynchronizedStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JSynchronizedStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4565622962388977986L;
+
+	protected JSynchronizedStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

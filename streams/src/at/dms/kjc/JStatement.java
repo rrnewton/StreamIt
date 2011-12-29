@@ -36,7 +36,12 @@ public abstract class JStatement extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8351658739641605011L;
+
+	protected JStatement() {} // for cloner only
     /**
      * Construct a node in the parsing tree
      * @param where the line of this node in the source code

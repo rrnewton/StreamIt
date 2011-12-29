@@ -22,7 +22,11 @@ package at.dms.compiler.tools.antlr.runtime;
 
 public class ANTLRException extends Exception {
 
-    public ANTLRException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6815748332861874785L;
+	public ANTLRException() {
         super();
     }
     public ANTLRException(String s) {

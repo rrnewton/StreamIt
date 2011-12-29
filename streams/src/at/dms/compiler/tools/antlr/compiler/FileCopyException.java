@@ -21,7 +21,12 @@
 package at.dms.compiler.tools.antlr.compiler;
 
 class FileCopyException extends java.io.IOException {
-    public FileCopyException(String msg) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3365039575132216015L;
+
+	public FileCopyException(String msg) {
         super(msg);
     }
 }

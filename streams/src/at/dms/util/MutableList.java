@@ -12,7 +12,12 @@ import java.util.List;
  */
 public class MutableList extends ConstList implements List, Cloneable, Serializable {
 
-    /** Inserts the specified element at the specified position in
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6249241660177073762L;
+
+	/** Inserts the specified element at the specified position in
      * this list (optional operation). */
     @Override
 	public void add(int index, Object element) {

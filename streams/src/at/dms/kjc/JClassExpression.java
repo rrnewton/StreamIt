@@ -35,7 +35,12 @@ public class JClassExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JClassExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6704689153023949652L;
+
+	protected JClassExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

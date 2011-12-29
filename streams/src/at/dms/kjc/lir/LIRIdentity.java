@@ -14,6 +14,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRIdentity extends LIRNode 
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5624122818998666451L;
+	/**
      * The name of the child (e.g. child1)
      */
     private String childName;

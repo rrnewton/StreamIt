@@ -48,7 +48,12 @@ public abstract class CContext extends at.dms.util.Utils implements Constants {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2423426871179370997L;
+
+	protected CContext() {} // for cloner only
 
     /**
      * Construct a block context, it supports local variable allocation

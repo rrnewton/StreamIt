@@ -44,7 +44,12 @@ public class CSwitchBodyContext extends CBodyContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CSwitchBodyContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5566956914545344192L;
+
+	protected CSwitchBodyContext() {} // for cloner only
 
     /**
      * Construct a block context, it supports local variable allocation

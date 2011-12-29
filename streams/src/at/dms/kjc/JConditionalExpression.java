@@ -32,7 +32,12 @@ public class JConditionalExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JConditionalExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7950506950376197649L;
+
+	protected JConditionalExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

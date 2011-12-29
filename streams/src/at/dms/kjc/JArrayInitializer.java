@@ -30,7 +30,12 @@ import at.dms.compiler.TokenReference;
  */
 public class JArrayInitializer extends JExpression {
 
-    protected JArrayInitializer() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4166662208884128372L;
+
+	protected JArrayInitializer() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

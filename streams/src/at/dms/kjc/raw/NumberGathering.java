@@ -33,7 +33,11 @@ import at.dms.util.Utils;
 public class NumberGathering extends at.dms.util.Utils 
     implements Constants 
 {
-    //fields that are used by makefilegenerater
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -51650462237839299L;
+	//fields that are used by makefilegenerater
     //to produce the bC code...
     //true if we can generate code
     public static int printsPerSteady = 0;

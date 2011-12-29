@@ -60,6 +60,11 @@ import at.dms.util.Utils;
 
 public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6528648775329595640L;
+
+	/**
 	 * The clone generator looks at this array to see which fields it shouldn't
 	 * clone.
 	 */

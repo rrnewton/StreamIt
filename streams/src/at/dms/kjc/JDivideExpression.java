@@ -34,7 +34,12 @@ public class JDivideExpression extends JBinaryArithmeticExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JDivideExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2594692984712720973L;
+
+	protected JDivideExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

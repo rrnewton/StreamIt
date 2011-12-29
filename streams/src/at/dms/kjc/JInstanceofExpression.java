@@ -34,7 +34,12 @@ public class JInstanceofExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JInstanceofExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7896550168381459414L;
+
+	protected JInstanceofExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

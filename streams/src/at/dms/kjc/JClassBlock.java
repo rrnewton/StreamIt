@@ -34,7 +34,12 @@ public class JClassBlock extends JBlock {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    private JClassBlock() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6669093397848638683L;
+
+	private JClassBlock() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

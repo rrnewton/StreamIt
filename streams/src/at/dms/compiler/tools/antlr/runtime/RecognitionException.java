@@ -21,7 +21,11 @@
 package at.dms.compiler.tools.antlr.runtime;
 
 public class RecognitionException extends ParserException {
-    public String fileName;     // not used by treeparsers
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4984256140682322811L;
+	public String fileName;     // not used by treeparsers
     public int line;            // not used by treeparsers
     public int column;          // not used by treeparsers
 

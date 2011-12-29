@@ -37,7 +37,12 @@ public class CClassContext extends CContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CClassContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4220149176644212887L;
+
+	protected CClassContext() {} // for cloner only
 
     /**
      * @param   parent      the parent context or null at top level

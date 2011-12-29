@@ -39,7 +39,11 @@ import at.dms.util.Utils;
 public class RemoveGlobals extends at.dms.util.Utils 
     implements FlatVisitor, Constants 
 {
-    //these are calls that cannot be inlined but the 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4356000843922106507L;
+	//these are calls that cannot be inlined but the 
     //function does not need to be inlined because it
     //does not access any global vars
     public static HashSet<JMethodCallExpression> doNotInline;

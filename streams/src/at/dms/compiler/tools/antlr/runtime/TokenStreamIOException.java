@@ -26,7 +26,11 @@ import java.io.IOException;
  * Wraps an IOException in a TokenStreamException
  */
 public class TokenStreamIOException extends TokenStreamException {
-    public IOException io;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7434454682654794214L;
+	public IOException io;
     /**
      * TokenStreamIOException constructor comment.
      * @param io java.lang.String

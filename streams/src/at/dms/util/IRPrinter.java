@@ -143,6 +143,11 @@ import at.dms.kjc.sir.lowering.JVectorLiteral;
 public class IRPrinter extends Utils implements SLIRVisitor
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6037564323674828127L;
+
+	/**
      * Amount the current line of text should be indented by
      */
     protected int indent;

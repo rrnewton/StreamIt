@@ -13,6 +13,11 @@ import at.dms.kjc.sir.SIRSplitType;
 public class LIRSetSplitter extends LIRNode 
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4961274589857154718L;
+
+	/**
      * The type of the splitter.
      */
     private SIRSplitType type;

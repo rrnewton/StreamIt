@@ -30,6 +30,11 @@ public class FormattedException extends Exception {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 634107447016812799L;
+
+	/**
      * An exception with a formatted message as argument
      * @param   message     the formatted message
      */

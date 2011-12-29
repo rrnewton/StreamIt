@@ -20,7 +20,12 @@ package streamit.scheduler2.constrained;
 
 public class NoPathException extends Exception {
 
-    NoPathException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -109760389665991284L;
+
+	NoPathException() {
         super();
     }
 

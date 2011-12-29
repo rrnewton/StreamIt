@@ -9,6 +9,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetPush extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2300802551234837450L;
+	/**
      * The encode function.
      */
     private int push;

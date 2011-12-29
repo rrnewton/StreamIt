@@ -33,7 +33,12 @@ public class JLogicalComplementExpression extends JUnaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JLogicalComplementExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1219784046381097387L;
+
+	protected JLogicalComplementExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

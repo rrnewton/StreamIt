@@ -20,7 +20,11 @@ import at.dms.util.Utils;
  * @author jasperln
  */
 public class InlineAssembly extends JStatement {
-    private ArrayList<String> inst; //List of assembly instructions
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3734739086736500886L;
+	private ArrayList<String> inst; //List of assembly instructions
     private ArrayList<String> input; //List of input (for loading/storing to mem)
     private ArrayList<String> clobber; //Registers that this instruction clobbers
 

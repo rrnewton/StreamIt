@@ -32,7 +32,12 @@ public class JFormalParameter extends JLocalVariable {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JFormalParameter() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6080697638400486818L;
+
+	protected JFormalParameter() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

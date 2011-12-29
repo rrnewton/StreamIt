@@ -18,7 +18,11 @@ import at.dms.util.SimpleStringBuffer;
 
 public class CVectorTypeLow extends CType {
 
-    private CNumericType base_type;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8543201843095317600L;
+	private CNumericType base_type;
     private int width; //vector width in bytes
     //private int width_in_base;
 

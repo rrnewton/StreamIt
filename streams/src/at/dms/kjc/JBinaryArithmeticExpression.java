@@ -34,7 +34,12 @@ public abstract class JBinaryArithmeticExpression extends JBinaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JBinaryArithmeticExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5419414892063046865L;
+
+	protected JBinaryArithmeticExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

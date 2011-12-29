@@ -21,7 +21,11 @@
 package at.dms.compiler.tools.antlr.runtime;
 
 public class NoViableAltForCharException extends RecognitionException {
-    public char foundChar;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1898148690756191720L;
+	public char foundChar;
 
     public NoViableAltForCharException(char c, CharScanner scanner) {
         super("NoViableAlt");

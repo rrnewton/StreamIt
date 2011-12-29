@@ -29,7 +29,12 @@ public class CSourceField extends CField {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CSourceField() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8578928890654527479L;
+
+	protected CSourceField() {} // for cloner only
 
     /**
      * Constructs a field export

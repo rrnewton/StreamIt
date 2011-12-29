@@ -25,6 +25,11 @@ package at.dms.compiler.tools.antlr.runtime;
  */
 public class CharStreamException extends ANTLRException {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1764900840298260588L;
+
+	/**
      * CharStreamException constructor comment.
      * @param s java.lang.String
      */

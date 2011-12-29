@@ -37,6 +37,11 @@ public class CClassType extends CType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6484736929651201384L;
+
+	/**
      * Construct a class type
      */
     protected CClassType() {

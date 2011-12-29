@@ -32,7 +32,12 @@ public class JConditionalOrExpression extends JBinaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JConditionalOrExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4392586704025607144L;
+
+	protected JConditionalOrExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

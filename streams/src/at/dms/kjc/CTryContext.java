@@ -41,7 +41,12 @@ public class CTryContext extends CBodyContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CTryContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7139840496954268740L;
+
+	protected CTryContext() {} // for cloner only
 
     /**
      * Construct a block context, it supports local variable allocation

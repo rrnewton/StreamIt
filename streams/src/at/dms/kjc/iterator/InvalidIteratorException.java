@@ -8,7 +8,11 @@ package at.dms.kjc.iterator;
 
 class InvalidIteratorException extends RuntimeException {
 
-    public InvalidIteratorException() { super(); }
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1211476414297891142L;
+	public InvalidIteratorException() { super(); }
     public InvalidIteratorException(String str) { super(str); }
     
 }

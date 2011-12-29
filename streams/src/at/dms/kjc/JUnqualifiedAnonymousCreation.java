@@ -33,7 +33,12 @@ public class JUnqualifiedAnonymousCreation extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JUnqualifiedAnonymousCreation() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 852457281586369548L;
+
+	protected JUnqualifiedAnonymousCreation() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

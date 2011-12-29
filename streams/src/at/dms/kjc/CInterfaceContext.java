@@ -31,7 +31,12 @@ public class CInterfaceContext extends CClassContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CInterfaceContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 320976055058568490L;
+
+	protected CInterfaceContext() {} // for cloner only
 
     /**
      * @param   parent      the parent context or null at top level

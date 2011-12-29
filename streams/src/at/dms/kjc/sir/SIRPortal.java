@@ -26,7 +26,12 @@ import at.dms.util.InconsistencyException;
  */
 public class SIRPortal extends JLiteral /*JExpression*/ {
 
-    protected static LinkedList<SIRPortal> portals = new LinkedList<SIRPortal>();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2980528564261677265L;
+
+	protected static LinkedList<SIRPortal> portals = new LinkedList<SIRPortal>();
 
     protected LinkedList<SIRStream> receivers;
     protected LinkedList<SIRPortalSender> senders;

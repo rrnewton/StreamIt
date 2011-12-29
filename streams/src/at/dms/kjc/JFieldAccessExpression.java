@@ -36,7 +36,12 @@ public class JFieldAccessExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JFieldAccessExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8871199955999776926L;
+
+	protected JFieldAccessExpression() {} // for cloner only
 
     /**
      * You usually don't know the cfield--this is mostly for

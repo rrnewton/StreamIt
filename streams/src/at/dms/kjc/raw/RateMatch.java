@@ -11,7 +11,11 @@ import at.dms.kjc.sir.SIRFilter;
 public class RateMatch extends at.dms.util.Utils 
     implements FlatVisitor, Constants 
 {
-    //To test that there are no crossed routes, 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8774721545201802461L;
+	//To test that there are no crossed routes, 
     //keep this hashset of all tiles that are used to 
     //route items (excluding the source/dest of a route)
     HashSet<Coordinate> routerTiles;

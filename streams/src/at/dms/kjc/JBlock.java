@@ -41,6 +41,11 @@ public class JBlock extends JStatement {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2215889475880608893L;
+
+	/**
      * Construct a node in the parsing tree
      * @param   where       the line of this node in the source code
      * @param   body        the statements contained in the block

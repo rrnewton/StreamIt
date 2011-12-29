@@ -26,7 +26,11 @@ import java.io.IOException;
  * Wrap an IOException in a CharStreamException
  */
 public class CharStreamIOException extends CharStreamException {
-    public IOException io;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4572688645323755589L;
+	public IOException io;
 
     public CharStreamIOException(IOException io) {
         super(io.getMessage());

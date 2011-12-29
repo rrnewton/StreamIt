@@ -47,7 +47,11 @@ import at.dms.util.Utils;
  */
 public class GraphFlattener extends at.dms.util.Utils 
 {
-    /** When creating the flat graph, this is really the previous 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7650893522337287180L;
+	/** When creating the flat graph, this is really the previous 
      * node we created.  When we are creating a node we connect 
      * previousNode to it.
      */

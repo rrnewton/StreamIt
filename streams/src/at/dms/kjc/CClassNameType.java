@@ -32,7 +32,12 @@ public class CClassNameType extends CClassType {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CClassNameType() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7185317869274751222L;
+
+	protected CClassNameType() {} // for cloner only
 
     /**
      * Construct a class type

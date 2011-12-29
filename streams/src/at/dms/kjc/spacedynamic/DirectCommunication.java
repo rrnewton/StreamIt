@@ -47,7 +47,12 @@ import at.dms.util.Utils;
 //all pops before pushe
 
 public class DirectCommunication extends at.dms.util.Utils implements Constants {
-    private SIRFilter filter;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5347905045918925483L;
+
+	private SIRFilter filter;
 
     private FlatNode node;
 

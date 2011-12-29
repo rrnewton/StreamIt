@@ -37,7 +37,12 @@ public class CBinaryClass extends CClass {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CBinaryClass() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7112093932133849377L;
+
+	protected CBinaryClass() {} // for cloner only
 
     /**
      * Constructs a class export from file

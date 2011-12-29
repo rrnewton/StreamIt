@@ -25,7 +25,12 @@ package streamit.frontend.nodes;
  */
 public class UnrecognizedVariableException extends RuntimeException
 {
-    public UnrecognizedVariableException(FENode node, String var)
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 912078282024596620L;
+
+	public UnrecognizedVariableException(FENode node, String var)
     {
         this("Unrecognized variable: " + var + " at " + node.getContext());
     }

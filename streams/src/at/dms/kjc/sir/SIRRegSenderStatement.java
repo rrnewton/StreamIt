@@ -20,6 +20,10 @@ import at.dms.kjc.SLIRVisitor;
 public class SIRRegSenderStatement extends JStatement {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6969750771181875240L;
+	/**
      * The name of the portal to register with.
      */
     private String portal;

@@ -13,6 +13,10 @@ import at.dms.kjc.sir.lowering.Propagator;
  */
 public class SIRFileReader extends SIRPredefinedFilter implements Cloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4807299936088797395L;
+	/**
      * The filename of the data source.
      */
     private JExpression fileName;

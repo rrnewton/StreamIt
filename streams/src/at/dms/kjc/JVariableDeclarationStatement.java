@@ -36,7 +36,12 @@ public class JVariableDeclarationStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JVariableDeclarationStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2167390334975453564L;
+
+	protected JVariableDeclarationStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -34,6 +34,11 @@ public class IncludeError extends FormattedException {
     // --------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1862011533310014610L;
+
+	/**
      * An exception with a formatted message as argument
      * @param   message     the formatted message
      */

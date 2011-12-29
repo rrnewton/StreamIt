@@ -32,7 +32,12 @@ public class CCatchContext extends CBodyContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CCatchContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3239945987836487729L;
+
+	protected CCatchContext() {} // for cloner only
 
     /**
      * Construct a context for the semantic analysis of a catch clause.

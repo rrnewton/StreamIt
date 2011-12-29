@@ -37,7 +37,12 @@ public class JSwitchStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JSwitchStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6543647101902589306L;
+
+	protected JSwitchStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

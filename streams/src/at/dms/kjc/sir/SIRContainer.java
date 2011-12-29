@@ -14,6 +14,10 @@ import at.dms.util.MutableList;
  */
 public abstract class SIRContainer extends SIRStream {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6928254653213540478L;
+	/**
      * These are two consistent lists of children and parameters.  The
      * i'th element of children corresponds to the i'th element of
      * parameters.  The two lists are guaranteed to be consistent

@@ -34,7 +34,12 @@ public class JModuloExpression extends JBinaryArithmeticExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JModuloExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8648081914207083616L;
+
+	protected JModuloExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

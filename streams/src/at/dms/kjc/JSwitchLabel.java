@@ -31,7 +31,12 @@ import at.dms.util.MessageDescription;
  */
 public class JSwitchLabel extends JPhylum {
 
-    // ----------------------------------------------------------------------
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4935859692179201116L;
+
+	// ----------------------------------------------------------------------
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
     protected JSwitchLabel() {} // for cloner only

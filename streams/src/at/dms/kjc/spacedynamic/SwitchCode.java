@@ -17,6 +17,11 @@ import at.dms.util.Utils;
 
 public class SwitchCode extends at.dms.util.Utils {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 539891323017925274L;
+
+	/**
      * if there are few overlapping routes, we can try to generate more compact
      * switch code, if this var is true, then try to produce compact switch
      * code, ignoring the output of the communication scheduler.

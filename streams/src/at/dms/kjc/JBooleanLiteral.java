@@ -33,7 +33,12 @@ public class JBooleanLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JBooleanLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8576823787274503688L;
+
+	protected JBooleanLiteral() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

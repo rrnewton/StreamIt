@@ -35,7 +35,12 @@ public class JConstructorDeclaration extends JMethodDeclaration {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JConstructorDeclaration() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2754279542642096361L;
+
+	protected JConstructorDeclaration() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

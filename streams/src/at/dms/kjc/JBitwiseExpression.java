@@ -35,7 +35,12 @@ public class JBitwiseExpression extends JBinaryArithmeticExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JBitwiseExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 258873065918014629L;
+
+	protected JBitwiseExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -11,6 +11,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetEncode extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1579396912722284683L;
+	/**
      * The encode function.
      */
     private LIRFunctionPointer encode;

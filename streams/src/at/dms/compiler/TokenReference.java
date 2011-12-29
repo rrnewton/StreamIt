@@ -35,7 +35,12 @@ public class TokenReference implements Serializable, at.dms.kjc.DeepCloneable {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    private TokenReference() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 945166131753745368L;
+
+	private TokenReference() {} // for cloner only
 
     /**
      * Construct a file and line reference

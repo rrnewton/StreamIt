@@ -52,7 +52,11 @@ public class DirectCommunication extends at.dms.util.Utils
     implements Constants 
 {
 
-    //the multiplicity of the filter in the init stage
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -205558963658052075L;
+	//the multiplicity of the filter in the init stage
     private static int initMult = 0;
     
     public static boolean doit(SIRFilter filter) 

@@ -34,6 +34,11 @@ public class CBitType extends CNumericType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7119880437272073848L;
+
+	/**
      * Constructs a new instance.
      */
     public CBitType() {

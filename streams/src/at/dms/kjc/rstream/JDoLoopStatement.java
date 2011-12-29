@@ -46,7 +46,11 @@ import at.dms.util.Utils;
  */
 public class JDoLoopStatement extends JForStatement
 {
-    //the inductin var of the loop
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4796026137677937336L;
+	//the inductin var of the loop
     private JLocalVariable induction;
     //the value the induction var is initialized to 
     private JExpression initValue;

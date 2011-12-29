@@ -34,7 +34,12 @@ public class JByteLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JByteLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1014567702489354638L;
+
+	protected JByteLiteral() {} // for cloner only
 
     /**
      * Constructs a literal expression from a constant value.

@@ -33,7 +33,12 @@ public class JUnaryMinusExpression extends JUnaryExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JUnaryMinusExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2965874622728909892L;
+
+	protected JUnaryMinusExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

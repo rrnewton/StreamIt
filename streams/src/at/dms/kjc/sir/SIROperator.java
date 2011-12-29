@@ -20,6 +20,10 @@ import at.dms.kjc.sir.lowering.LoweringConstants;
  */
 public abstract class SIROperator implements Finalizable, Serializable, DeepCloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6119775435691097219L;
+	/**
      * The stream structure containing this, or NULL if this is the
      * toplevel stream.
      */

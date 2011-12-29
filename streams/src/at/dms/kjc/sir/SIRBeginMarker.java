@@ -7,6 +7,10 @@ package at.dms.kjc.sir;
  */
 public class SIRBeginMarker extends SIRMarker {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6896854215001400861L;
+	/**
      * The name of the stream, function, etc. that is beginning at
      * this statement.
      */

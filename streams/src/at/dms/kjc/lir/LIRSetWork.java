@@ -9,6 +9,10 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetWork extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4133980656629336026L;
+	/**
      * The work function.
      */
     private LIRFunctionPointer work;

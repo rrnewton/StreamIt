@@ -37,7 +37,12 @@ public class JContinueStatement extends JStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JContinueStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1678749251144177974L;
+
+	protected JContinueStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

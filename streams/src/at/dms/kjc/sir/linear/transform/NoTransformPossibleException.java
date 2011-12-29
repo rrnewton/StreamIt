@@ -10,7 +10,12 @@ package at.dms.kjc.sir.linear.transform;
  * $Id: NoTransformPossibleException.java,v 1.4 2006-01-25 17:02:01 thies Exp $
  **/
 public class NoTransformPossibleException extends Exception {
-    public NoTransformPossibleException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3289284877356922027L;
+
+	public NoTransformPossibleException(String message) {
         super(message);
     }
 }

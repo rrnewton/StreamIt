@@ -38,7 +38,12 @@ public class CConstructorContext extends CMethodContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CConstructorContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7469362059146949210L;
+
+	protected CConstructorContext() {} // for cloner only
     /**
      * CConstructorContext
      * @param   parent      the parent context

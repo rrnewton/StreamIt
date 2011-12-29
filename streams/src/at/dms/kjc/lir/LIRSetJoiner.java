@@ -13,6 +13,11 @@ import at.dms.kjc.sir.SIRJoinType;
 public class LIRSetJoiner extends LIRNode 
 {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 522750453539663374L;
+
+	/**
      * The type of the joiner.
      */
     private SIRJoinType type;

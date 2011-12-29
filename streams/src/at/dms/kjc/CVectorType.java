@@ -29,6 +29,11 @@ public class CVectorType extends CType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6951103954151464249L;
+
+	/**
      * For cloner only.
      */
     private CVectorType() {}

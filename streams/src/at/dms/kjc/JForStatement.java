@@ -31,7 +31,11 @@ import at.dms.compiler.TokenReference;
  * until the value of the expression is false.
  */
 public class JForStatement extends JLoopStatement {
-    private boolean unrolled; //To not unroll the same loop several times
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -57101966932713701L;
+	private boolean unrolled; //To not unroll the same loop several times
     // ----------------------------------------------------------------------
     // CONSTRUCTORS
     // ----------------------------------------------------------------------

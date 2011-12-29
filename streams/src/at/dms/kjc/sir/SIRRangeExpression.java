@@ -20,6 +20,10 @@ import at.dms.util.Utils;
  */
 public class SIRRangeExpression extends JExpression {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8630591803212791499L;
+	/**
      * The minimum of the range.
      */
     private JExpression min;

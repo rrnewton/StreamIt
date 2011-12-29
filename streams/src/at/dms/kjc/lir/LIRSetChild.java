@@ -15,6 +15,11 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetChild extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3561426844909078600L;
+
+	/**
      * The type of data that needs to be allocated for the child. 
      * (e.g. HelloWorld6_1_data)
      */

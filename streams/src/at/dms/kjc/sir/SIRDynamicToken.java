@@ -20,7 +20,12 @@ import at.dms.kjc.SLIRVisitor;
  */
 public class SIRDynamicToken extends JExpression {
 
-    public SIRDynamicToken() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2826925165846886928L;
+
+	public SIRDynamicToken() {
         super();
     }
 

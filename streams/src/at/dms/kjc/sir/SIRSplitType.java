@@ -9,6 +9,10 @@ import at.dms.kjc.DeepCloneable;
  */
 public class SIRSplitType implements Serializable, DeepCloneable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1797652533207074672L;
+	/**
      * A duplicating splitter.
      */
     public static final SIRSplitType DUPLICATE 

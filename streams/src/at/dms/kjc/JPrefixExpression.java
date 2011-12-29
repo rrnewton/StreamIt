@@ -36,7 +36,12 @@ public class JPrefixExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JPrefixExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5724047990841085327L;
+
+	protected JPrefixExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

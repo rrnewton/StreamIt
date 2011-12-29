@@ -34,7 +34,12 @@ public class JShortLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JShortLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3213356322960872280L;
+
+	protected JShortLiteral() {} // for cloner only
 
     /**
      * Constructs a literal expression from a constant value.

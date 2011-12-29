@@ -36,7 +36,12 @@ public abstract class CType extends at.dms.util.Utils implements Constants {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
  
-    protected CType() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -970514783563591280L;
+
+	protected CType() {} // for cloner only
 
     /**
      * Constructs a type signature

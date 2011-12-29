@@ -43,7 +43,12 @@ public class JMethodDeclaration extends JMemberDeclaration {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    // Only for cloner.  Should not be used as a real method decl.
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6404145697836733637L;
+
+	// Only for cloner.  Should not be used as a real method decl.
     // If you need a placeholder Method declaration, use
     // JMethodDeclaration(String) below.
     protected JMethodDeclaration() {

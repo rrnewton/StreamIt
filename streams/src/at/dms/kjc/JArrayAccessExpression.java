@@ -34,7 +34,12 @@ public class JArrayAccessExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JArrayAccessExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1915175610167972699L;
+
+	protected JArrayAccessExpression() {} // for cloner only
     /**
      * This version is the original kopi one; tries to resolve type
      * automatically.  If you know the type, use the other constructor

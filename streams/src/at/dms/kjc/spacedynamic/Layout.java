@@ -29,7 +29,12 @@ import at.dms.kjc.sir.SIROperator;
  */
 public class Layout extends at.dms.util.Utils implements StreamGraphVisitor,
                                                          FlatVisitor {
-    public Router router;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8993119793409592174L;
+
+	public Router router;
 
     /** SIRStream -> RawTile * */
     private HashMap<SIROperator, ComputeNode> SIRassignment;

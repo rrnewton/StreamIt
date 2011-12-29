@@ -34,6 +34,11 @@ public abstract class CNumericType extends CType {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5876403644115323926L;
+
+	/**
      * Constructor
      * @param   typeID      the ident (int value) of this type
      */

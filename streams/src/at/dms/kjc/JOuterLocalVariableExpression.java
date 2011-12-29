@@ -32,7 +32,12 @@ public class JOuterLocalVariableExpression extends JLocalVariableExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JOuterLocalVariableExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9025641402467105458L;
+
+	protected JOuterLocalVariableExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

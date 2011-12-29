@@ -30,7 +30,11 @@ import at.dms.compiler.UnpositionedError;
  */
 public class JAssignmentExpression extends JBinaryExpression {
 
-    private JLocalVariableExpression copyVar;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5929192851622988623L;
+	private JLocalVariableExpression copyVar;
 
     // ----------------------------------------------------------------------
     // CONSTRUCTORS

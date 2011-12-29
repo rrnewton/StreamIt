@@ -32,7 +32,12 @@ package at.dms.kjc;
 
 public class CSimpleBodyContext extends CBodyContext {
 
-    protected CSimpleBodyContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7628356486937680034L;
+
+	protected CSimpleBodyContext() {} // for cloner only
 
     /**
      * Constructs a simple body context from a source context.

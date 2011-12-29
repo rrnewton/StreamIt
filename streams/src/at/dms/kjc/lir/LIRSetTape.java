@@ -14,6 +14,11 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetTape extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2830739165471953084L;
+
+	/**
      * The source structure (containing fields, children, tapes, streamContext)
      */
     private JExpression srcStruct;

@@ -45,7 +45,12 @@ public class CSourceClass extends CClass {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CSourceClass() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 996796682066998397L;
+
+	protected CSourceClass() {} // for cloner only
 
     /**
      * Constructs a class export from source

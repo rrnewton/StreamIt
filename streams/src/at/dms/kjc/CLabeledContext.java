@@ -33,7 +33,12 @@ public class CLabeledContext extends CBodyContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CLabeledContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 689056109061924768L;
+
+	protected CLabeledContext() {} // for cloner only
 
     /**
      * Constructs the context to analyse a labeled statement semantically.

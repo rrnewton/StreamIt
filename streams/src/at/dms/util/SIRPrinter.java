@@ -55,6 +55,11 @@ public class SIRPrinter extends IRPrinter implements StreamVisitor {
     */
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -348426370111685180L;
+
+	/**
      * Build an IRPrinter for a particular file.
      *
      * @param filename  Name of the file to write IR to

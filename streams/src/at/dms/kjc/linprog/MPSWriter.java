@@ -14,6 +14,11 @@ import java.util.LinkedList;
 public class MPSWriter extends SimpleLinearProgram {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6004651581979401403L;
+
+	/**
      * Create one of these with <numVars> variables.
      */
     public MPSWriter(int numVars) {

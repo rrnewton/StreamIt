@@ -15,6 +15,11 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetBodyOfFeedback extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3005139666580175122L;
+
+	/**
      * The child context to be used as the feedback loop body.
      */
     private JExpression childContext;

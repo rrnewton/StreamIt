@@ -62,7 +62,12 @@ import at.dms.util.Utils;
  */
 public class BufferedStaticCommunication extends at.dms.util.Utils implements
                                                                        Constants {
-    /** the layout object for the flatnode * */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6392408792758821116L;
+
+	/** the layout object for the flatnode * */
     private Layout layout;
 
     /** the ssg of this flat node * */

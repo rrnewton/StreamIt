@@ -35,7 +35,12 @@ public class JIntLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JIntLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5167085210218325648L;
+
+	protected JIntLiteral() {} // for cloner only
 
     /**
      * Constructs a literal expression from a textual representation.

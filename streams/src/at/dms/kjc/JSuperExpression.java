@@ -32,7 +32,12 @@ public class JSuperExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JSuperExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -279343402242354139L;
+
+	protected JSuperExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

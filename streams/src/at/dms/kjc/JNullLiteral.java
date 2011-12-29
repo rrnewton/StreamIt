@@ -32,7 +32,12 @@ public class JNullLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JNullLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1491825953994903190L;
+
+	protected JNullLiteral() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

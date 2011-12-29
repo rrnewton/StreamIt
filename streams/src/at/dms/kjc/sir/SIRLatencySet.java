@@ -14,6 +14,10 @@ import at.dms.kjc.SLIRVisitor;
  */
 public class SIRLatencySet extends SIRLatency {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1573181438723842128L;
+	/**
      * The entries in the set.
      */
     private TreeSet<Integer> entries;

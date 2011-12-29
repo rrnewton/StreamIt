@@ -25,7 +25,11 @@ package at.dms.compiler.tools.antlr.runtime;
  * can pass it along.
  */
 public class TokenStreamRecognitionException extends TokenStreamException {
-    public RecognitionException recog;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3955982166771305431L;
+	public RecognitionException recog;
     public TokenStreamRecognitionException(RecognitionException re) {
         super(re.getMessage());
         this.recog = re;

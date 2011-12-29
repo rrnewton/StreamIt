@@ -29,7 +29,12 @@ import at.dms.compiler.UnpositionedError;
  */
 public class JConstructorCall extends JExpression {
 
-    protected JConstructorCall() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2616811958451310946L;
+
+	protected JConstructorCall() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

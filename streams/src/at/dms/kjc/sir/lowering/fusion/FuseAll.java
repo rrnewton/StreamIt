@@ -155,7 +155,11 @@ public class FuseAll implements StreamVisitor {
      * top; fusing within the visitor doesn't quite do the right thing.
      */
     static class SuccessfulFuseException extends RuntimeException {
-        public SuccessfulFuseException() { super(); }
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -905665867311508257L;
+		public SuccessfulFuseException() { super(); }
         public SuccessfulFuseException(String str) { super(str); }
     }
 }

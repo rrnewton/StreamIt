@@ -10,6 +10,10 @@ import java.util.List;
  */
 public class SimpleLinearProgram implements LinearProgram, Serializable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 269032886737548215L;
+	/**
      * Number of variables.
      */
     protected int numVars;

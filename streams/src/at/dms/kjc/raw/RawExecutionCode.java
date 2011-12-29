@@ -65,7 +65,11 @@ import at.dms.util.Utils;
 public class RawExecutionCode extends at.dms.util.Utils 
     implements FlatVisitor, Constants
 {
-    /*** fields for the var names we introduce ***/
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6338582658774632552L;
+	/*** fields for the var names we introduce ***/
     public static String recvBuffer = "__RECVBUFFER__";
     public static String recvBufferSize = "__RECVBUFFERSIZE__";
     public static String recvBufferBits = "__RECVBUFFERBITS__";

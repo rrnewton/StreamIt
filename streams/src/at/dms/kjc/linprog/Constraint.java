@@ -7,7 +7,11 @@ import java.io.Serializable;
  */
 
 class Constraint implements Serializable {
-    public final ConstraintType type;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2852904105718400798L;
+	public final ConstraintType type;
     public final double[] lhs;
     public final double rhs;
 

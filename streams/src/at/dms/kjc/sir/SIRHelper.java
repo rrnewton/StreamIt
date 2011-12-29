@@ -12,7 +12,11 @@ import at.dms.kjc.lir.LIRStreamType;
 
 public class SIRHelper extends SIRStream
 {
-    private boolean _native;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7147107219881195037L;
+	private boolean _native;
     public SIRHelper(boolean _native)
     {
         super();

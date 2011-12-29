@@ -17,7 +17,12 @@ import at.dms.kjc.sir.SIRStream;
  */
 public class WorkList extends java.util.LinkedList {
 
-    public WorkList(Collection c) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2171955258277822457L;
+
+	public WorkList(Collection c) {
         super(c);
     }
 

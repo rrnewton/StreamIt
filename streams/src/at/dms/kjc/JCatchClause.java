@@ -33,7 +33,12 @@ public class JCatchClause extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JCatchClause() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5183075868238604516L;
+
+	protected JCatchClause() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

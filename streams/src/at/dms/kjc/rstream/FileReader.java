@@ -36,7 +36,11 @@ import at.dms.kjc.sir.SIRPushExpression;
 public class FileReader extends SIRFilter 
 {
 
-    private static int uniqueID = 0;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2283404931519035571L;
+	private static int uniqueID = 0;
 
     //be careful about names clashing...
     /**

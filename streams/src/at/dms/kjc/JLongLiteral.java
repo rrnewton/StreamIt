@@ -35,7 +35,12 @@ public class JLongLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JLongLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5526935835378426597L;
+
+	protected JLongLiteral() {} // for cloner only
 
     /**
      * Constructs a literal expression from a textual representation.

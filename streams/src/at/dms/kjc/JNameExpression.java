@@ -34,7 +34,12 @@ public class JNameExpression extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JNameExpression() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5910903791606467781L;
+
+	protected JNameExpression() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

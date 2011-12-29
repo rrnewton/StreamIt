@@ -37,7 +37,12 @@ public class JDoStatement extends JLoopStatement {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JDoStatement() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9178644958406477530L;
+
+	protected JDoStatement() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -35,6 +35,11 @@ public class JEmptyStatement extends JStatement {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6644356366931320760L;
+
+	/**
      * Construct a node in the parsing tree
      * @param   where       the line of this node in the source code
      */

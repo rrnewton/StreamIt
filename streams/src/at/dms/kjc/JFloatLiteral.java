@@ -34,7 +34,12 @@ public class JFloatLiteral extends JLiteral {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JFloatLiteral() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3139700531054203682L;
+
+	protected JFloatLiteral() {} // for cloner only
 
     /**
      * Constructs a literal expression from a textual representation.

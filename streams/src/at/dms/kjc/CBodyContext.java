@@ -42,7 +42,12 @@ public abstract class CBodyContext extends CContext {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected CBodyContext() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7281719433861153805L;
+
+	protected CBodyContext() {} // for cloner only
 
     /**
      * Construct a block context, it supports local variable allocation

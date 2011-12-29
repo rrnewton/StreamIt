@@ -33,6 +33,11 @@ public class CMethodNotFoundError extends PositionedError {
     // ----------------------------------------------------------------------
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3300735652849107610L;
+
+	/**
      * An error with two parameters
      * @param   where       the reference to token where error happen
      * @param   caller      the location of method invocation

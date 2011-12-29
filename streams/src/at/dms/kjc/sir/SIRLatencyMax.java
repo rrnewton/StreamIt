@@ -12,6 +12,10 @@ import at.dms.kjc.SLIRVisitor;
  */
 public class SIRLatencyMax extends SIRLatency implements Comparable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4011010089130308597L;
+	/**
      * The maximum latency.
      */
     protected JExpression max;

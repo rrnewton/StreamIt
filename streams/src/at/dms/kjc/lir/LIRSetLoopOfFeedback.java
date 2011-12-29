@@ -15,6 +15,11 @@ import at.dms.kjc.SLIRVisitor;
 public class LIRSetLoopOfFeedback extends LIRNode {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4263507217001252839L;
+
+	/**
      * The child context to be used as the feedback loop loop part.
      */
     private JExpression childContext;

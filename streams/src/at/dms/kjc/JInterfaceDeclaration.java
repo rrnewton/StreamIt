@@ -37,7 +37,12 @@ public class JInterfaceDeclaration extends JTypeDeclaration {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JInterfaceDeclaration() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8865472155797395409L;
+
+	protected JInterfaceDeclaration() {} // for cloner only
 
     /**
      * Constructs an interface declaration node in the syntax tree.

@@ -34,7 +34,12 @@ public class JSwitchGroup extends JPhylum {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JSwitchGroup() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4901218562019896331L;
+
+	protected JSwitchGroup() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -31,7 +31,12 @@ public class JUnaryPromote extends JExpression {
     // CONSTRUCTORS
     // ----------------------------------------------------------------------
 
-    protected JUnaryPromote() {} // for cloner only
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 754156101847961760L;
+
+	protected JUnaryPromote() {} // for cloner only
 
     /**
      * Construct a node in the parsing tree

@@ -13,7 +13,11 @@ import at.dms.kjc.sir.lowering.Propagator;
  */
 public class SIRIdentity extends SIRPredefinedFilter implements Cloneable, Constants {
 
-    private JExpression rate;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8352249622678009224L;
+	private JExpression rate;
 
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
