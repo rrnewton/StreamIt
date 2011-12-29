@@ -72,13 +72,21 @@ public class ThreadMapper {
 					threadIdToType.put(threadId, type.toString());
 					Filter[] filterGraph = ssg.getFilterGraph();
 					for (Filter filter : filterGraph) {
+						// Don't dominate yourself
 						if (dynamicReader.getWorkNodeContent().getName()
 								.equals(filter.getWorkNodeContent().getName()))
 							continue;
+						// Don't dominate a FileWriter, because its
+						// not really a filter
+						if (filter.getWorkNode().isFileOutput()) {
+							continue;
+						}
+						
 						if (isDynamicInput) {
 							dominated
 									.add(filter.getWorkNodeContent().getName());
 						}
+						
 						dominators.put(dynamicReader.getWorkNodeContent()
 								.getName(), filter.getWorkNodeContent()
 								.getName());
