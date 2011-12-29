@@ -317,7 +317,7 @@ public class CloneGenerator {
      * For testing.
      */
     private static final String[] classes1 = {
-        "at.dms.kjc.slir.WorkNodeContent"
+        "at.dms.kjc.sir.SIRWriter"
     };
 
     /**
@@ -589,6 +589,7 @@ public class CloneGenerator {
         "at.dms.kjc.sir.SIRStream",
         "at.dms.kjc.sir.SIRStructure",
         "at.dms.kjc.sir.SIRTwoStageFilter",
+        "at.dms.kjc.sir.SIRWriter",
         //"at.dms.kjc.sir.StreamVisitor"  -- shouldn't have references to this,
         "at.dms.kjc.rstream.JDoLoopStatement",
         "at.dms.kjc.slir.Edge",
