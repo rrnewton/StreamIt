@@ -1,0 +1,16 @@
+
+void->int stateful filter Source {
+  int count;
+  init {
+     count = 0;
+  }
+  work push 1 {
+    push(count++);
+  }
+}
+
+void->void pipeline test11 {
+    add Source();
+    add Writer<int>();
+}
+
