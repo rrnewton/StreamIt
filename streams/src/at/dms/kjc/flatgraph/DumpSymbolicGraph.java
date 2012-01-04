@@ -19,6 +19,7 @@ import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRSplitType;
 import at.dms.kjc.sir.SIRSplitter;
 import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 
@@ -156,7 +157,7 @@ public class DumpSymbolicGraph implements FlatVisitor
             int codeSize = CodeEstimate.estimateCode(filter);
             // the amount read or written to a file
             int input = 0, output = 0;
-            if (filter instanceof SIRFileWriter) {
+            if (filter instanceof SIRFileWriter || filter instanceof SIRWriter) {
                 output = mult;
                 stateful = true;
             }

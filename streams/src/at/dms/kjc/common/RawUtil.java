@@ -10,6 +10,7 @@ import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRIdentity;
 import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.util.Utils;
 
 /**
@@ -30,6 +31,7 @@ public class RawUtil extends at.dms.util.Utils {
     public static boolean countMe(SIRFilter filter) {
         return !(filter instanceof SIRIdentity ||
                  filter instanceof SIRFileWriter ||
+                 filter instanceof SIRWriter ||
                  filter instanceof SIRFileReader);
     }
         

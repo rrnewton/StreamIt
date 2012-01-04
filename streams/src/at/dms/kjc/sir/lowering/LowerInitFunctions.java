@@ -53,6 +53,7 @@ import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRSplitter;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.SIRTwoStageFilter;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.StreamVisitor;
 import at.dms.util.Utils;
 
@@ -103,6 +104,15 @@ public class LowerInitFunctions implements StreamVisitor {
                 // get writer
                 SIRFileWriter writer = (SIRFileWriter)child;
                 // register it
+                prologue.add(new LIRFileWriter(LoweringConstants.
+                                               getStreamContext(),
+                                               child.getRelativeName(),
+                                               writer.getFileName()));
+            } else if (child instanceof SIRWriter) {
+                // get writer
+                SIRWriter writer = (SIRWriter)child;
+                // register it
+                System.out.println("LowerInitFunctions.registerChildren child instanceof SIRWriter add new LIRFileWriter(?)");
                 prologue.add(new LIRFileWriter(LoweringConstants.
                                                getStreamContext(),
                                                child.getRelativeName(),

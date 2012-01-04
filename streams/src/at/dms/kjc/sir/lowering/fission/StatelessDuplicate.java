@@ -129,6 +129,10 @@ public class StatelessDuplicate {
       //Hack to prevent fissing file writers
         if(filter.getIdent().startsWith("FileWriter"))
             return false;
+        
+        //Hack to prevent fissing file writers
+        if(filter.getIdent().startsWith("Writer"))
+            return false;
 
         //Don't fiss identities
         if(filter instanceof SIRIdentity)
@@ -172,10 +176,8 @@ public class StatelessDuplicate {
     }
     
     public static HashSet<String> getMutableState(final SIRFilter filter) {
-        
         // visit all methods except <init>
-        List<JMethodDeclaration> methods = GetSteadyMethods.getSteadyMethods(filter);
-        
+        List<JMethodDeclaration> methods = GetSteadyMethods.getSteadyMethods(filter);        
         return doGetMutableState(methods);
     }
     

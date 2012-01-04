@@ -5,6 +5,7 @@ import java.util.Random;
 
 import at.dms.kjc.sir.SIRFileReader;
 import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRWriter;
 
 public class LevelMap {
     
@@ -46,7 +47,7 @@ public class LevelMap {
         
         if (node.isJoiner() || node.isSplitter()) 
             return "grey";
-        if (node.contents instanceof SIRFileReader || node.contents instanceof SIRFileWriter)
+        if (node.contents instanceof SIRFileReader || node.contents instanceof SIRFileWriter || node.contents instanceof SIRWriter)
             return "white";
         
         return getLevelColor(getLevel(node));

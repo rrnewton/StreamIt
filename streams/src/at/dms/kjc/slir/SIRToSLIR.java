@@ -56,7 +56,7 @@ public class SIRToSLIR {
 		}
 
 		/* Set up all the connections */
-		System.out.println("StreamGraph.translate\n\n");
+//		System.out.println("StreamGraph.translate\n\n");
 //		Map<SIRStream, List<SIRStream>> connections = segmentedGraph
 //				.getConnections();
 //		for (SIRStream src : connections.keySet()) {
@@ -84,7 +84,7 @@ public class SIRToSLIR {
 		for (Integer src : connections.keySet()) {
 			List<Integer> links = connections.get(src);
 			for (Integer dst : links) {
-				System.out.println(src + " --> " + dst);
+			    //System.out.println(src + " --> " + dst);
 				StaticSubGraph ssgSrc = indexToSSG.get(src);
 				StaticSubGraph ssgDst = indexToSSG.get(dst);
 
@@ -95,12 +95,12 @@ public class SIRToSLIR {
 				OutputPort outputPort = ssgSrc.getOutputPort();
 				InputPort inputPort = ssgDst.getInputPort();
 				InterSSGEdge edge = new InterSSGEdge(outputPort, inputPort);
-				System.out.println("StreamGraph.translate edge=" + edge);
+				//System.out.println("StreamGraph.translate edge=" + edge);
 				inputPort.addLink(edge);
 				outputPort.addLink(edge);
 			}
 		}
-		System.out.println("\n\n");
+		//System.out.println("\n\n");
 
 		
 		return streamGraph;

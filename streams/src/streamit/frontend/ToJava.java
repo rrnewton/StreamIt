@@ -372,8 +372,7 @@ public class ToJava
     }
     
     public static void main(String[] args)
-    {
-    	System.out.println("ToJava.main(args)");
+    {    
         try {
             int result = new ToJava().run(args);
             System.exit(result); }

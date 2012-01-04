@@ -34,6 +34,7 @@ import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
 import at.dms.kjc.sir.SIRSplitter;
 import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.lowering.RenameAll;
 
 // need to get parameters for file readers / file writers
@@ -108,7 +109,7 @@ public class SafeFileReaderWriterPositions {
                         && outgoing[0].contents instanceof SIRSplitter) {
                     readerBeforeSplitter.add(node.contents);
                 }
-            } else if (node.contents instanceof SIRFileWriter) {
+            } else if (node.contents instanceof SIRFileWriter || node.contents instanceof SIRWriter) {
                 FlatNode[] incoming = node.incoming;
                 if (incoming.length == 1
                         && incoming[0].contents instanceof SIRJoiner) {
@@ -149,7 +150,7 @@ public class SafeFileReaderWriterPositions {
                 pipeChildren.add(self);
                 pipeChildren.add(id);
                 makePipeline(self,parent,pipeChildren);
-            } else if (self instanceof SIRFileWriter
+            } else if (self instanceof SIRFileWriter || self instanceof SIRFileWriter
                     && writerAfterJoiner.contains(self)) {
                 CType inputType = self.getInputType();
                 SIRContainer parent = (SIRContainer)iter.getParent().getStream();

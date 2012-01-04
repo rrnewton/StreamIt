@@ -29,13 +29,12 @@ public class GetSteadyMethods {
      * @param filter : a filter.
      * @returns a list of methods that may execute in the steady state.
      */
-    public static List<JMethodDeclaration> getSteadyMethods(SIRFilter filter) {
+    public static List<JMethodDeclaration> getSteadyMethods(SIRFilter filter) {       
         // I'm not sure how to find who is a message handler.  So,
         // count as "steady" any method that is reachable from work or
         // NOT reachable from init (idea being that init functions
         // should not call their own method handlers).
         JMethodDeclaration[] methods = filter.getMethods();
-
         List<String> initReachable = getMethodsReachableFrom(methods, filter.getInit());
         List<String> workReachable = getMethodsReachableFrom(methods, filter.getWork());
         List<String> preReachable = new ArrayList<String>();
@@ -108,7 +107,7 @@ public class GetSteadyMethods {
      * @param base : base case for reachability test.
      * @return a list of names of methods in 'methods' as reflexive transitive closure of method calls from 'base'
      */
-    public static List<String> getMethodsReachableFrom(JMethodDeclaration[] methods, JMethodDeclaration base) {
+    private static List<String> getMethodsReachableFrom(JMethodDeclaration[] methods, JMethodDeclaration base) {
         // names of reachable methods
         final HashSet<String> reachable = new HashSet<String>();
         // iterate to steady state

@@ -46,6 +46,7 @@ public class Writer<T> extends Filter {
 	}
 
 	public Writer(String fileName, Class<T> type, boolean TREAT_AS_BITS) {
+	    System.out.println("Writer(String fileName, Class<T> type, boolean TREAT_AS_BITS)");
 		allWriters.add(this);
 		// This is part of the hack to make FileReader/Writer&lt;bit:gt; work
 		if (TREAT_AS_BITS)

@@ -1217,9 +1217,7 @@ public class NodesToJava implements FEVisitor {
     }
 
     @Override
-    public Object visitSCSimple(SCSimple creator) {
-        System.out.println("NodesToJava.visitSCSimple(creator)");
-
+    public Object visitSCSimple(SCSimple creator) {   
         // Hacked to make FileReader/Writer<bit> work
         boolean hardcoded_BitFileFlag = (creator.getName().equals(
                 "FileReader") || creator.getName().equals(
@@ -1264,9 +1262,7 @@ public class NodesToJava implements FEVisitor {
             }
             first = false;           
         }        
-        result += ")";
-        System.out.println("NodesToJava.visitSCSimple(creator) result="
-                + result);
+        result += ")";       
         return result;
     }
 

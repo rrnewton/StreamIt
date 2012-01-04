@@ -43,6 +43,7 @@ import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRSplitType;
 import at.dms.kjc.sir.SIRSplitter;
 import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.lowering.partition.PartitionDot;
 import at.dms.util.Utils;
 
@@ -415,6 +416,8 @@ public class SIRScheduler implements Constants {
             if (str instanceof SIRFileReader) {
                 return LoweringConstants.FILE_READER_WORK_NAME;
             } else if (str instanceof SIRFileWriter) {
+                return LoweringConstants.FILE_WRITER_WORK_NAME;
+            } else if (str instanceof SIRWriter) {
                 return LoweringConstants.FILE_WRITER_WORK_NAME;
             } else if (str instanceof SIRIdentity) {
                 return LoweringConstants.IDENTITY_WORK_NAME;

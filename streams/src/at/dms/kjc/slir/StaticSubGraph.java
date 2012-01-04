@@ -20,6 +20,7 @@ import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.lowering.SIRScheduler;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 
@@ -388,7 +389,9 @@ public class StaticSubGraph {
 			filter.finish();
 
 			if (node.contents instanceof SIRFileReader
-					|| node.contents instanceof SIRFileWriter) {
+			        || node.contents instanceof SIRFileWriter
+			        || node.contents instanceof SIRWriter
+			        ) {
 				// System.out.println("Found io " + node.contents);
 				ioList.add(filter);
 			}

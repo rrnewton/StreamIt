@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import at.dms.kjc.cluster.DataEstimate;
 import at.dms.kjc.sir.SIRFileReader;
 import at.dms.kjc.sir.SIRFileWriter;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.lowering.partition.PartitionRecord;
@@ -31,7 +32,8 @@ class CConfigFilter extends CConfig {
 	int penalty = 0;
 
 	if (filter instanceof SIRFileReader ||
-	    filter instanceof SIRFileWriter) {
+	    filter instanceof SIRFileWriter ||
+	    filter instanceof SIRWriter ) {
 	    penalty += 100;
 	}
 	

@@ -19,6 +19,7 @@ import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPredefinedFilter;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.sir.lowering.partition.WorkList;
@@ -77,7 +78,7 @@ public class DuplicateBottleneck {
         }
         //update the comm and comp numbers...
         if (str instanceof SIRFilter) {
-            if (str instanceof SIRFileWriter)
+            if (str instanceof SIRFileWriter || str instanceof SIRWriter)
                 return map.get(str)[0];
             else
                 return 0;

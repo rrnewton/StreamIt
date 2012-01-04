@@ -24,6 +24,7 @@ import at.dms.kjc.sir.SIRPredefinedFilter;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRSplitType;
 import at.dms.kjc.sir.SIRSplitter;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.util.Utils;
 
 /**
@@ -858,6 +859,7 @@ public class GraphFlattener extends at.dms.util.Utils
         return !(filter instanceof SIRIdentity ||
                  filter instanceof SIRFileWriter ||
                  filter instanceof SIRFileReader ||
+                 filter instanceof SIRWriter ||
                  filter instanceof SIRPredefinedFilter);
     }
     

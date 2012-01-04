@@ -25,6 +25,7 @@ import at.dms.kjc.KjcOptions;
 import at.dms.kjc.common.ALocalVariable;
 import at.dms.kjc.sir.SIRFileWriter;
 import at.dms.kjc.sir.SIRPopExpression;
+import at.dms.kjc.sir.SIRWriter;
 
 /**
  * Predefined FilterContent for file output, expands to implement a FileWriter.
@@ -53,10 +54,21 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
 
     /**
      * Construct FileInputContent from SIRFileWriter.
-     * @param filter The SIRFileWriter used to contruct the FileInputContent.
+     * @param filter The SIRFileWriter used to contruct the FileOutputContent.
      */
     public FileOutputContent(SIRFileWriter filter) {
         super(filter);
+        outputs = -1;
+        filename=filter.getFileName();
+    }
+    
+    /**
+     * Construct FileInputContent from SIRWriter.
+     * @param filter The SIRWriter used to contruct the FileOutputContent.
+     */
+    public FileOutputContent(SIRWriter filter) {
+        super(filter);
+        System.out.println("**TODO** FileOutputContent(SIRWriter)");
         outputs = -1;
         filename=filter.getFileName();
     }

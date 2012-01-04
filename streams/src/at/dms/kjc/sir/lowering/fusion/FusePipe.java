@@ -11,6 +11,7 @@ import at.dms.kjc.sir.SIRIdentity;
 import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPortal;
 import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.kjc.sir.lowering.RenameAll;
 import at.dms.kjc.sir.lowering.partition.PartitionGroup;
 import at.dms.kjc.sir.lowering.partition.RefactorPipeline;
@@ -342,7 +343,7 @@ public class FusePipe {
 		}
 
 		// don't fuse file readers or file writers
-		if (filter instanceof SIRFileReader || filter instanceof SIRFileWriter) {
+		if (filter instanceof SIRFileReader || filter instanceof SIRFileWriter || filter instanceof SIRWriter) {
 			if (debugging) {
 				System.err.println("filter " + filter.getName()
 						+ " is not fusable because has file I/O");

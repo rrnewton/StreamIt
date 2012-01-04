@@ -203,7 +203,7 @@ public class Kopi2SIR extends Utils implements AttributeVisitor<Object>, Cloneab
 		addVisitedOp("FileWriter", fw);
 
 		SIRWriter w = new SIRWriter();
-		fw.setInit(SIRStream.makeEmptyInit());
+		w.setInit(SIRStream.makeEmptyInit());
 		addVisitedOp("Writer", w);
 		
 		// Give SIRIdentity some type so does not barf,
@@ -600,6 +600,22 @@ public class Kopi2SIR extends Utils implements AttributeVisitor<Object>, Cloneab
 							.stringValue()));
 			((SIRFileWriter) stream).setOutputType(CStdType.Void);
 			return;
+		} else if (stream instanceof SIRWriter) {
+            if (args.length != 2 && args.length != 3) // can be 3 args with Bit
+                                                        // hack
+                at.dms.util.Utils.fail(lineNumber
+                        + ": 2 or 3 args required for Writer");
+            ((SIRWriter) stream).setFileName(args[0]);
+            // the second arg will be turned into string by visitFieldExpression
+            // because it is a type
+            if (!(args[1] instanceof JStringLiteral))
+                at.dms.util.Utils.fail(lineNumber
+                        + ": Second argument to SIRWriter must be a type");
+            ((SIRWriter) stream)
+                    .setInputType(getType(((JStringLiteral) args[1])
+                            .stringValue()));
+            ((SIRWriter) stream).setOutputType(CStdType.Void);
+            return;
 		} else if (stream instanceof SIRIdentity) {
 			if (args.length != 1 && args.length != 2)
 				at.dms.util.Utils.fail(lineNumber

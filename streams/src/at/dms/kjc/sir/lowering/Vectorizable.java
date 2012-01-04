@@ -57,6 +57,7 @@ import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPrintStatement;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
+import at.dms.kjc.sir.SIRWriter;
 import at.dms.util.GetSteadyMethods;
 
 /**
@@ -192,7 +193,7 @@ public class Vectorizable {
      * @return  true if no side effects, and no messages.
      */
     public static boolean hasSideEffects (SIRFilter f) {
-        if (f instanceof SIRFileReader || f instanceof SIRFileWriter) {
+        if (f instanceof SIRFileReader || f instanceof SIRFileWriter || f instanceof SIRWriter ) {
             return true;
         }
         final boolean[] tf = {false};
