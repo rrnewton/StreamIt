@@ -57,6 +57,7 @@ public class Main extends Compiler {
      * @param   args        the command line arguments
      */
     public static void main(String[] args) {
+    	System.out.println("Main.main(args)");
         boolean success = false;
 
         try {
@@ -87,6 +88,7 @@ public class Main extends Compiler {
      */
     @Override
 	public boolean run(String[] args) {
+    	System.err.println("Main.run(args)");
         if (!parseArguments(args)) {
             return false;
         }

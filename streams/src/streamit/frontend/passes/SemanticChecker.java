@@ -146,6 +146,7 @@ public class SemanticChecker
         names.put("FileReader", ctx);
         names.put("FileWriter", ctx);
         names.put("ImageDisplay", ctx);
+        names.put("Writer", ctx);
 
         for (Iterator<StreamSpec> iter = prog.getStreams().iterator(); iter.hasNext(); )
             {

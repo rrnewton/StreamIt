@@ -58,7 +58,7 @@ import at.dms.kjc.sir.SIRTwoStageFilter;
 import at.dms.kjc.sir.SIRWriter;
 import at.dms.util.Utils;
 
-public class Kopi2SIR extends Utils implements AttributeVisitor, Cloneable {
+public class Kopi2SIR extends Utils implements AttributeVisitor<Object>, Cloneable {
 	/**
 	 * 
 	 */

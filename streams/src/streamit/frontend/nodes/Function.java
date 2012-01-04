@@ -46,7 +46,7 @@ public class Function extends FENode
     private int cls;
     private String name; // or null
     private Type returnType;
-    private List params;
+    private List<Parameter> params;
     private Statement body;
     private Expression peekRate, popRate, pushRate;
     
@@ -57,7 +57,7 @@ public class Function extends FENode
      * The I/O rates may be null if declarations are omitted from the
      * original source. */
     public Function(FEContext context, int cls, String name,
-                    Type returnType, List params, Statement body,
+                    Type returnType, List<Parameter> params, Statement body,
                     Expression peek, Expression pop, Expression push)
     {
         super(context);
@@ -77,14 +77,14 @@ public class Function extends FENode
     {
         return new Function(context, FUNC_INIT, null,
                             new TypePrimitive(TypePrimitive.TYPE_VOID),
-                            Collections.EMPTY_LIST, body,
+                            Collections.<Parameter> emptyList(), body,
                             null, null, null);
     }
 
     /** Create a new message handler given its name (not null), parameters,
      * and body.  A message handler may not do I/O on the tapes.  */
     public static Function newHandler(FEContext context, String name,
-                                      List params, Statement body)
+                                      List<Parameter> params, Statement body)
     {
         return new Function(context, FUNC_HANDLER, name,
                             new TypePrimitive(TypePrimitive.TYPE_VOID),
@@ -94,7 +94,7 @@ public class Function extends FENode
     
     /** Create a new helper function given its parts. */
     public static Function newHelper(FEContext context, String name,
-                                     Type returnType, List params,
+                                     Type returnType, List<Parameter> params,
                                      Statement body, Expression peek,
                                      Expression pop, Expression push)
     {
@@ -116,7 +116,7 @@ public class Function extends FENode
     
     /** Returns the parameters of this function, as a List of Parameter
      * objects. */
-    public List getParams()
+    public List<Parameter> getParams()
     {
         return params;
     }
@@ -157,8 +157,7 @@ public class Function extends FENode
         // for now, detect I/O rates as 0 if they are null or equal to
         // the constant int of 0.  This might miss a few parameterized
         // cases where the I/O rate is a parameter to the filter that
-        // happens to be zero.
-        ExprConstInt zero = new ExprConstInt(0);
+        // happens to be zero.        
         boolean noPeek = peekRate==null || peekRate.equals(0);
         boolean noPop = popRate==null || popRate.equals(0);
         boolean noPush = pushRate==null || pushRate.equals(0);
