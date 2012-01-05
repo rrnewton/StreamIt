@@ -307,6 +307,8 @@ Usage: strc [options] file.str ...
 + --loopcount         Loop iteration count to assume during work estimation
 + --noloopinput       Do not loop through input file, terminate at end
 + --nobind            No binding of threads to cores
++ --outputs n         Run application until it produces n outputs.
++ --regtest           Indicate that a test is going to be run. Don't parallelize print statements.
 
  Options specific to Raw backend:
   --asciifileio       Use ascii format for file I/O (also works on -simpleC)
@@ -452,6 +454,7 @@ sub get_options
 			    "norun",
 			    "nosched",
 			    "numbers|N=i",
+                            "outputs=i",
 			    "partition|p",
 			    "partition-dp|pdp",
 			    "partition-greedy|pgreedy",
@@ -961,6 +964,7 @@ sub get_compiler_opts
     $opts{sharedbufs} && ($copts .= " --sharedbufs");
     $opts{sharedheap} && ($copts .= " --sharedheap");
     $opts{regtest} && ($copts .= " --regtest");
+    $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");
     $opts{loopcount} && ($copts .= " --loopcount ". $opts{loopcount});
     $opts{noloopinput} && ($copts .= " --noloopinput");
