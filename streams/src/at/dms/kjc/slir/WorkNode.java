@@ -72,7 +72,7 @@ public class WorkNode extends InternalFilterNode implements at.dms.kjc.DeepClone
     
     public boolean isFileOutput() 
     {
-        return (workNodeContent instanceof FileOutputContent);
+        return (workNodeContent instanceof OutputContent);
     }
     
     public boolean hasIO() {

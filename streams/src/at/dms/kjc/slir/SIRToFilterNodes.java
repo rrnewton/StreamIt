@@ -53,7 +53,7 @@ class SIRToFilterNodes implements FlatVisitor {
 				content = new FileOutputContent((SIRFileWriter) node.contents);
 			} else if (node.contents instanceof SIRWriter) {
 			    System.out.println("**TODO** SIRToFilterNodes.visitNode node.contents instanceof SIRWriter");
-                content = new FileOutputContent((SIRWriter) node.contents);
+                content = new WriterOutputContent((SIRWriter) node.contents);
             } else if (node.contents instanceof SIRFileReader) {
 				content = new FileInputContent((SIRFileReader) node.contents);
 			} else if (node.contents instanceof SIRIdentity) {

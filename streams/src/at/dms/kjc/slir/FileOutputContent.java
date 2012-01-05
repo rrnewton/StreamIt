@@ -38,7 +38,7 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
      */
-    private FileOutputContent() {
+    protected FileOutputContent() {
         super();
     }
 

@@ -28,7 +28,7 @@ import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
 import at.dms.kjc.sir.SIRBeginMarker;
-import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
@@ -187,9 +187,9 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 
 			InputRotatingBuffer buf = RotatingBuffer.getInputBuffer(fileW);
 			int outputs = filterInfo.totalItemsSent(SchedulingPhase.INIT);
-			String type = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
+			String type = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
 					: "%f";
-			String cast = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
+			String cast = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
 					: "(float)";
 			String bufferName = buf.getAddressRotation(filterNode).currentWriteBufName;
 			// create the loop

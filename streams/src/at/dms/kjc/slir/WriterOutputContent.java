@@ -30,7 +30,7 @@ import at.dms.kjc.sir.SIRWriter;
 public class WriterOutputContent extends OutputContent implements DeepCloneable {
 
     private String filename; // The filename
-
+    private int outputs; //Expected number of outputs    
     private JMethodDeclaration closeMethod;
 
     /**
@@ -48,6 +48,7 @@ public class WriterOutputContent extends OutputContent implements DeepCloneable 
      */
     public WriterOutputContent(SIRWriter filter) {
         super(filter);
+        outputs = -1;
         System.out.println("**TODO** WriterOutputContent(SIRWriter)");
         filename = filter.getFileName();
     }
@@ -60,6 +61,7 @@ public class WriterOutputContent extends OutputContent implements DeepCloneable 
      */
     public WriterOutputContent(WriterOutputContent content) {
         super(content);
+        outputs = -1;
         filename = content.filename;
     }
 
@@ -90,9 +92,9 @@ public class WriterOutputContent extends OutputContent implements DeepCloneable 
         // bogus work function exists
         // methods set to the two bogus functions.
 
-        System.out.println("**TODO** FileOutputContent.createContent()");
+        System.out.println("**TODO** WriterOutputContent.createContent()");
         System.out
-                .println("**TODO** FileOutputContent.createContent() KjcOptions.outputs="
+                .println("**TODO** WriterOutputContent.createContent() KjcOptions.outputs="
                         + KjcOptions.outputs);
 
         String fileVar = "_fileWriter_" + my_unique_ID;
@@ -265,4 +267,23 @@ public class WriterOutputContent extends OutputContent implements DeepCloneable 
         return getInputType().isFloatingPoint();
     }
 
+
+    /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
+
+    /** Returns a deep clone of this object. */
+    public Object deepClone() {
+        at.dms.kjc.slir.WriterOutputContent other = new at.dms.kjc.slir.WriterOutputContent();
+        at.dms.kjc.AutoCloner.register(this, other);
+        deepCloneInto(other);
+        return other;
+    }
+
+    /** Clones all fields of this into <pre>other</pre> */
+    protected void deepCloneInto(at.dms.kjc.slir.WriterOutputContent other) {
+        super.deepCloneInto(other);
+        other.filename = (java.lang.String)at.dms.kjc.AutoCloner.cloneToplevel(this.filename);
+        other.closeMethod = (at.dms.kjc.JMethodDeclaration)at.dms.kjc.AutoCloner.cloneToplevel(this.closeMethod);
+    }
+
+    /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

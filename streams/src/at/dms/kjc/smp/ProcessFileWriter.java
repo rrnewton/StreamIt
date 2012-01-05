@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
 
@@ -14,7 +14,7 @@ public class ProcessFileWriter {
     protected SchedulingPhase phase;
     protected SMPBackEndFactory factory;
     protected SMPComputeCodeStore codeStore;
-    protected FileOutputContent fileOutput;
+    protected OutputContent fileOutput;
     protected static HashMap<WorkNode, Core> allocatingCores;
     protected Core allocatingCore; 
 
@@ -24,7 +24,7 @@ public class ProcessFileWriter {
     
     public ProcessFileWriter (WorkNode filter, SchedulingPhase phase, SMPBackEndFactory factory) {
         this.filterNode = filter;
-        this.fileOutput = (FileOutputContent)filter.getWorkNodeContent();
+        this.fileOutput = (OutputContent)filter.getWorkNodeContent();
         this.phase = phase;
         this.factory = factory;
     }

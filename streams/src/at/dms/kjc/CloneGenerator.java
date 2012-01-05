@@ -317,7 +317,7 @@ public class CloneGenerator {
      * For testing.
      */
     private static final String[] classes1 = {
-        "at.dms.kjc.sir.SIRWriter"
+        "at.dms.kjc.slir.WriterOutputContent"        
     };
 
     /**
@@ -595,6 +595,7 @@ public class CloneGenerator {
         "at.dms.kjc.slir.Edge",
         "at.dms.kjc.slir.FileInputContent",
         "at.dms.kjc.slir.FileOutputContent",
+        "at.dms.kjc.slir.WriterOutputContent",
         "at.dms.kjc.slir.WorkNodeContent",
         "at.dms.kjc.slir.WorkNode",
         "at.dms.kjc.slir.InputContent",

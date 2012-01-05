@@ -21,7 +21,7 @@ import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.common.ALocalVariable;
-import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.util.Utils;
@@ -140,7 +140,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
 			SMPComputeCodeStore codeStore = core.getComputeCode();
 
-			FileOutputContent fileOutput = (FileOutputContent) fileW
+			OutputContent fileOutput = (OutputContent) fileW
 					.getWorkNodeContent();
 
 			codeStore.addPrintOutputCode(buf, firstInputFilter);
@@ -279,9 +279,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		 * edge.getSrc().getParent()); }
 		 */
 		int outputs = fileW.getWorkNodeContent().getSteadyMult();
-		String type = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
+		String type = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
 				: "%f";
-		String cast = ((FileOutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
+		String cast = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
 				: "(float)";
 		String bufferName = buf.getAddressRotation(filter).currentWriteBufName;
 		// create the loop

@@ -22,7 +22,7 @@ import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.slir.FileOutputContent;
+import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
@@ -463,8 +463,8 @@ public class ProcessFilterWorkNode {
 		if (!basicCodeWritten.containsKey(filterNode)) {
 			codeStore.addFields(filterCode.getFields());
 			codeStore.addMethods(filterCode.getUsefulMethods());
-			if (filterNode.getWorkNodeContent() instanceof FileOutputContent) {
-				codeStore.addCleanupStatement(((FileOutputContent) filterNode
+			if (filterNode.getWorkNodeContent() instanceof OutputContent) {
+				codeStore.addCleanupStatement(((OutputContent) filterNode
 						.getWorkNodeContent()).closeFile());
 			}
 			basicCodeWritten.put(filterNode, true);

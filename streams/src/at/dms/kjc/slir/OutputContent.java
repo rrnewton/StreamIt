@@ -1,5 +1,7 @@
 package at.dms.kjc.slir;
 
+import at.dms.kjc.CType;
+import at.dms.kjc.JStatement;
 import at.dms.kjc.sir.SIRPredefinedFilter;
 
 /**
@@ -32,8 +34,31 @@ public abstract class OutputContent extends PredefinedContent implements at.dms.
         super(filter);
     }
     
+    
     @Override
 	public abstract void createContent();
+    
+    /**
+     * Returns filename of OutputContent.
+     *
+     * @return The filename
+     */
+    public abstract String getFileName();
+    
+    /**
+     * Return a statement closing the file. Only valid after calling
+     * {@link #createContent()}.
+     * 
+     * @return statement to put in cleanup section of code.
+     */
+    public abstract JStatement closeFile();
+    
+    /**
+     * Get the type of the file writer .
+     * 
+     * @return The type.
+     */
+    public abstract CType getType();
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
