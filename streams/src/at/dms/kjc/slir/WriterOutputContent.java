@@ -160,7 +160,7 @@ public class WriterOutputContent extends OutputContent implements DeepCloneable 
             fprintfParams[1] = new JStringLiteral(null, getInputType()
                     .isFloatingPoint() ? "%f\\n" : "%d\\n");
             fprintfParams[2] = tmp.getRef();
-
+                        
             JMethodCallExpression fprintf = new JMethodCallExpression(null,
                     new JThisExpression(null), "fprintf", fprintfParams);
             fileio = fprintf;
@@ -213,7 +213,7 @@ public class WriterOutputContent extends OutputContent implements DeepCloneable 
         }
 
         workBlock.addStatement(new JExpressionStatement(null, fileio, null));
-
+                               
         JMethodDeclaration workMethod = new JMethodDeclaration(null,
                 Constants.ACC_PUBLIC, CStdType.Void, "work_filewrite"
                         + my_unique_ID, JFormalParameter.EMPTY,

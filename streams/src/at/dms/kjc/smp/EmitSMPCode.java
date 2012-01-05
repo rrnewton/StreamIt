@@ -431,6 +431,12 @@ public class EmitSMPCode extends EmitCode {
 			p.println("extern int maxSteadyIter;");
 			p.println();
 		}
+		
+		if (KjcOptions.outputs != -1) {
+		    p.println("// Number of steady-state outputs");
+            p.println("extern int maxOutputs;");
+            p.println();
+		}
 
 		p.println("// Global barrier");
 		p.println("extern barrier_t barrier;");
@@ -568,6 +574,12 @@ public class EmitSMPCode extends EmitCode {
 			p.println("int maxSteadyIter = " + KjcOptions.iterations + ";");
 			p.println();
 		}
+		
+		  if (KjcOptions.outputs != -1) {
+	            p.println("// Number of steady-state outputs");
+	            p.println("int maxOutputs = " + KjcOptions.outputs + ";");
+	            p.println();
+	        }
 
 		if (isDynamic) {
 			int numDynamicReaders = threadIdToType.keySet().size();

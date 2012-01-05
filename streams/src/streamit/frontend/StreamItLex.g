@@ -65,6 +65,8 @@ tokens {
 	"continue"; "return"; "do";
 	// Intrinsic values:
 	"pi"; "true"; "false";
+    // File pointers
+    "stdout"; "stderr";
 }
 
 ARROW :	"->" ;

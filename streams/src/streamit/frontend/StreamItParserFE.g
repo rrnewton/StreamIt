@@ -812,6 +812,10 @@ constantExpr returns [Expression x] { x = null; }
 			{ x = new ExprConstBoolean(getContext(t), true); }
 	|	f:TK_false
 			{ x = new ExprConstBoolean(getContext(f), false); }
+	|	out:TK_stdout
+			{ x = new ExprConstStr(getContext(out), "\"stdout\""); }
+	|	err:TK_stderr
+			{ x = new ExprConstStr(getContext(err), "\"stderr\""); }
 	;
 
 struct_decl returns [TypeStruct ts]

@@ -145,9 +145,21 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
 			codeStore.addPrintOutputCode(buf, firstInputFilter);
 			codeStore.appendTxtToGlobal("FILE *output;\n");
-			codeStore.addStatementFirstToBufferInit(Util
+			
+			// Special case for strings "stdout" and "stderr"
+			// which are treated as keywords in the StreamIt 
+			// front end, but as converted to string when parsed
+			if ("stdout".equals(fileOutput.getFileName())) {
+                codeStore.addStatementFirstToBufferInit(Util
+                        .toStmt("output = stdout"));                			    
+			} else if ("stderr".equals(fileOutput.getFileName())) {
+                codeStore.addStatementFirstToBufferInit(Util
+                    .toStmt("output = stderr"));                
+			} else {			
+			    codeStore.addStatementFirstToBufferInit(Util
 					.toStmt("output = fopen(\"" + fileOutput.getFileName()
 							+ "\", \"w\")"));
+			}
 
 		}
 	}
@@ -285,9 +297,23 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 				: "(float)";
 		String bufferName = buf.getAddressRotation(filter).currentWriteBufName;
 		// create the loop
-		addSteadyLoopStatement(Util.toStmt("for (int _i_ = 0; _i_ < " + outputs
-				+ "; _i_++) fprintf(output, \"" + type + "\\n\", " + cast
-				+ bufferName + "[_i_])"));
+		
+		
+		String stmt = "";
+		if (KjcOptions.outputs < 0) {
+		    stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+                    +    "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "       
+                    + "}";
+            
+		} else {
+		    stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+                    +    "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "
+                    +    "if (--maxOutputs == 0) {  exit(0); } "
+		            + "}";
+		}
+						
+		addSteadyLoopStatement(Util.toStmt(stmt));
+						
 	}	
 
 	/**
