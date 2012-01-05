@@ -144,6 +144,8 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 * @param schedule
 	 */
 	protected static void communicateAddresses(BasicSpaceTimeSchedule schedule) {
+	    System.out.println("RotatingBuffer.communicateAddresses");
+
 		// handle all the filters that are mapped to compute cores
 		// this will handle all filters except file writers and file readers
 
@@ -269,7 +271,8 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 * Allocate the constituent buffers of this rotating buffer structure
 	 */
 	protected void allocBuffers() {
-		for (int i = 0; i < rotationLength; i++) {
+	    System.out.println("RotatingBuffer.allocBuffers");
+	    for (int i = 0; i < rotationLength; i++) {
 			SMPComputeCodeStore cs;
 
 			// if we have a file writer then the code has to be put on the

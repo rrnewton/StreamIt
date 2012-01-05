@@ -42,11 +42,13 @@ public class ProcessFileWriter {
      * @param fo  The file writer
      */
     public static Core getAllocatingCore(WorkNode fo) {
+        System.out.println("ProcessFileWriter.getAllocatingCore fo=" + fo);
+        
         assert fo.isFileOutput();
         
         if (!allocatingCores.containsKey(fo)) {
             Core allocatingCore = nextAllocatingCore(fo);
-            System.out.println(fo + " assigne to Core " + allocatingCore.getCoreID());
+            System.out.println("ProcessFileWriter.getAllocatingCore fo=" + fo + " assigned to Core " + allocatingCore.getCoreID());
             allocatingCores.put(fo, allocatingCore);
         }
         
@@ -81,6 +83,10 @@ public class ProcessFileWriter {
      * if there is more than one file reader, one reader per core.
      */
     private static Core nextAllocatingCore(WorkNode fo) {
+        
+        System.out.println("ProcessFileWriter.nextAllocatingCore fo=" + fo);
+        
+        
         List<Core> reverseOrder = SMPBackend.chip.getCores(); 
         //Collections.reverse(reverseOrder);
         

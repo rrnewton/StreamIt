@@ -263,6 +263,8 @@ public class SMPBackEndFactory extends
 				(new ProcessFileReader(filter, whichPhase, this))
 						.processFileReader();
 			} else if (filter.isFileOutput()) {
+			    System.out
+                .println("SMPBackEndFactory.processFilterWorkNode filter=" + filter + " filter.isFileOutput()=true");
 				(new ProcessFileWriter(filter, whichPhase, this))
 						.processFileWriter();
 			}

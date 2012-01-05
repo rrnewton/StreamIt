@@ -760,6 +760,8 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	 */
 	@Override
 	protected void setupRotation() {
+	    System.out.println("RotatingBuffer.setupRotation");
+
 		String temp = "__temp__";
 		SMPComputeCodeStore cs;
 

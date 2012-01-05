@@ -263,7 +263,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	 * Add code to print the output written to the file writer mapped to this
 	 * core.
 	 */
-	private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode filter) {
+	private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode workNode) {
+	    
+	    
 		// We print the address buffer after it has been rotated, so that it
 		// points to the section
 		// of the filewriter buffer that is about to be written to, but was
@@ -273,7 +275,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		WorkNode fileW = buf.filterNode;
 
 		System.out.println("SMPComputeCodeStore.addPrintOutputCode filter="
-				+ filter.toString() + " fileW.isFileOutput()="
+				+ workNode.toString() + " fileW.isFileOutput()="
 				+ fileW.isFileOutput() + " buf=" + buf.toString()
 				+ " buf.getRotationLength()=" + buf.getRotationLength());
 
@@ -295,7 +297,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 				: "%f";
 		String cast = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
 				: "(float)";
-		String bufferName = buf.getAddressRotation(filter).currentWriteBufName;
+		String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
 		// create the loop
 		
 		

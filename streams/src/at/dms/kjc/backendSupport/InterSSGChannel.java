@@ -20,6 +20,8 @@ import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.smp.Core;
+import at.dms.kjc.smp.InputRotatingBuffer;
+import at.dms.kjc.smp.ProcessFileWriter;
 import at.dms.kjc.smp.SMPBackend;
 
 /**
@@ -30,7 +32,15 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 
 	/** a set of all the buffer types in the application */
 	protected static HashSet<String> types;
-
+	
+	/* return all the input buffers of the file writers of this application */
+    public static Set<InterSSGChannel> getFileWriterBuffers() {
+        return fileWriterBuffers;
+    }
+    
+    /** stores InputRotatingBuffers for file writers */
+    protected static HashSet<InterSSGChannel> fileWriterBuffers;
+ 	
 	/** maps each WorkNode to Input/OutputRotatingBuffers */
 	protected static HashMap<WorkNode, InterSSGChannel> inputBuffers;
 	protected static HashMap<WorkNode, InterSSGChannel> outputBuffers;
@@ -42,6 +52,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		types = new HashSet<String>();
 		inputBuffers = new HashMap<WorkNode, InterSSGChannel>();
 		outputBuffers = new HashMap<WorkNode, InterSSGChannel>();
+		fileWriterBuffers = new HashSet<InterSSGChannel>(); 
 	}
 
 	/**
@@ -83,6 +94,11 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				types.add(bufType.toString());
 				Filter top = edge.getDest().getSSG().getTopFilters()[0];
 				inputBuffers.put(top.getWorkNode(), channel);
+				
+				if (top.getWorkNode().isFileOutput()) {
+				    ProcessFileWriter.getAllocatingCore(top.getWorkNode());
+				}				
+				
 			}
 		}
 	}
@@ -106,6 +122,12 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				types.add(bufType.toString());
 				Filter top = srcSSG.getTopFilters()[0];
 				outputBuffers.put(top.getWorkNode(), channel);
+				
+                if (top.getWorkNode().isFileOutput()) {
+                    ProcessFileWriter.getAllocatingCore(top.getWorkNode());
+                }               
+
+				
 			}
 		}
 	}
