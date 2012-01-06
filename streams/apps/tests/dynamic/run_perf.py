@@ -23,7 +23,7 @@ def print_result(f, cost, sta_avg, dyn_avg):
 def compile(num_cores, num_iters, n, test):
     target = os.path.join(test_cases, test)
     exe = os.path.join(test_root, 'smp' + str(num_cores))
-    cmd = [strc, '-smp', str(num_cores), '-N', str(1), '-i', str(num_iters), target ]
+    cmd = [strc, '-smp', str(num_cores), '-N', str(1), '--outputs', str(num_iters), target ]
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
 

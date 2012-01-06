@@ -52,6 +52,6 @@ void->void pipeline test5 {
     add A();
     add B();
     add C();
-    add D();
+    add Writer<float>(stdout);
 }
 

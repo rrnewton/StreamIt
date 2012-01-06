@@ -11,6 +11,6 @@ void->int stateful filter Source {
 
 void->void pipeline test11 {
     add Source();
-    add Writer<int>("foo.txt");
+    add Writer<int>(stdout);
 }
 

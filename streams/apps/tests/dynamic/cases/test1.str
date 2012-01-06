@@ -17,6 +17,6 @@ int->void filter Sink {
 
 void->void pipeline test1 {
     add Source();
-    add Sink();
+    add Writer<int>(stdout);
 }
 
