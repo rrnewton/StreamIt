@@ -119,7 +119,7 @@ public class SMPBackend {
 			Map<Integer, String> threadIdToType) {
 
 		// generate code for file writer
-		SMPComputeCodeStore.generatePrintOutputCode();
+		SMPComputeCodeStore.generatePrintOutputCode(backEndFactory);
 
 		if (KjcOptions.numbers > 0)
 			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();

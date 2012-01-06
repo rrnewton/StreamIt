@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import at.dms.kjc.CStdType;
+import at.dms.kjc.CType;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JBooleanLiteral;
 import at.dms.kjc.JEmittedTextExpression;
@@ -13,15 +14,22 @@ import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.KjcOptions;
+import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
+import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.common.ALocalVariable;
+import at.dms.kjc.slir.Filter;
+import at.dms.kjc.slir.InputPort;
+import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.OutputContent;
+import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.util.Utils;
@@ -110,59 +118,101 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	 * steady state. This is somewhat limited right now, so there are lots of
 	 * asserts.
 	 */
-	public static void generatePrintOutputCode() {
-		Set<InputRotatingBuffer> fwb = InputRotatingBuffer
-				.getFileWriterBuffers();
-		if (fwb.size() == 0)
-			return;
-		// for now asser that we only have one file writer
-		assert fwb.size() == 1;
-		// for each of the file writer input buffers, so for each of the file
-		// writers,
-		// find one of its sources, and add code to the source's core to print
-		// the outputs
-		// at the end of each steady state
-		for (InputRotatingBuffer buf : fwb) {
-			WorkNode fileW = buf.filterNode;
-
-			// find the core of the first input to the file writer
-			WorkNode firstInputFilter = fileW.getParent().getInputNode()
-					.getSources(SchedulingPhase.STEADY)[0].getSrc().getParent()
-					.getWorkNode();
-
-			if (KjcOptions.sharedbufs
-					&& FissionGroupStore.isFizzed(firstInputFilter.getParent()))
-				firstInputFilter = FissionGroupStore
-						.getFizzedSlices(firstInputFilter.getParent())[0]
-						.getWorkNode();
-
-			Core core = SMPBackend.scheduler.getComputeNode(firstInputFilter);
-
-			SMPComputeCodeStore codeStore = core.getComputeCode();
-
-			OutputContent fileOutput = (OutputContent) fileW
-					.getWorkNodeContent();
-
-			codeStore.addPrintOutputCode(buf, firstInputFilter);
-			codeStore.appendTxtToGlobal("FILE *output;\n");
-			
-			// Special case for strings "stdout" and "stderr"
-			// which are treated as keywords in the StreamIt 
-			// front end, but as converted to string when parsed
-			if ("stdout".equals(fileOutput.getFileName())) {
-                codeStore.addStatementFirstToBufferInit(Util
-                        .toStmt("output = stdout"));                			    
-			} else if ("stderr".equals(fileOutput.getFileName())) {
-                codeStore.addStatementFirstToBufferInit(Util
-                    .toStmt("output = stderr"));                
-			} else {			
-			    codeStore.addStatementFirstToBufferInit(Util
-					.toStmt("output = fopen(\"" + fileOutput.getFileName()
-							+ "\", \"w\")"));
-			}
-
-		}
+	public static void generatePrintOutputCode(SMPBackEndFactory backEndFactory) {
+	    // Generate code for the static communication channels
+	    Set<InputRotatingBuffer> fwb = InputRotatingBuffer
+                .getFileWriterBuffers();        
+	    //assert fwb.size() == 1;
+	    // for each of the file writer input buffers, so for each of the file
+        // writers, find one of its sources, and add code to the source's 
+	    // core to print the outputs at the end of each steady state
+	    for (InputRotatingBuffer buf : fwb) {	        
+	        generatePrintOutputCodeStatic(buf); 
+	    }
+	    
+	    // Generate code for the dynamic communication channels
+	    Set<InterSSGChannel> buffers = InterSSGChannel.getFileWriterBuffers();
+	    //assert buffers.size() != 1;
+	    for (InterSSGChannel buf : buffers) {
+	        generatePrintOutputCodeDynamic(buf, backEndFactory);
+	    }
 	}
+	
+	/**
+	 * Generate the print output code for the dynamic communication channel.
+	 * @param buf the dynamic communication channel.
+	 */
+	private static void generatePrintOutputCodeDynamic(InterSSGChannel buf, SMPBackEndFactory backEndFactory) {
+      InterSSGEdge edge = buf.getEdge();
+      InputPort inputPort = edge.getDest();
+      OutputPort outputPort = edge.getSrc();
+      Filter destFilter = inputPort.getSSG().getTopFilters()[0];
+      Filter srcFilter = outputPort.getSSG().getFilterGraph()[outputPort.getSSG().getFilterGraph().length - 1];                 
+      
+      Core destCore = SMPBackend.scheduler.getComputeNode(destFilter.getWorkNode());
+      Core srcCore = SMPBackend.scheduler.getComputeNode(srcFilter.getWorkNode());
+      
+      System.out.println("SMPComputeCodeStore.generatePrintOutputCodeDynamic destFilter.getWorkNode()=" + destFilter.getWorkNode() + " is on core " + destCore);
+      System.out.println("SMPComputeCodeStore.generatePrintOutputCodeDynamic srcFilter.getWorkNode()=" + srcFilter.getWorkNode() + " is on core " + srcCore);
+      
+      SMPComputeCodeStore codeStore = srcCore.getComputeCode();
+      OutputContent fileOutput = (OutputContent) destFilter
+              .getWorkNodeContent();      
+
+      codeStore.addPrintOutputCode(buf, srcFilter.getWorkNode(), backEndFactory);
+      addOpen( codeStore,  fileOutput);
+    }
+	
+  
+    
+	/**
+	 * Generate the print output code for the static communication channel;
+	 * @param buf the static communication channel
+	 */
+    private static void generatePrintOutputCodeStatic(InputRotatingBuffer buf) {
+	
+        WorkNode fileW = buf.filterNode;
+
+        // find the core of the first input to the file writer
+        WorkNode firstInputFilter = fileW.getParent().getInputNode()
+                .getSources(SchedulingPhase.STEADY)[0].getSrc().getParent()
+                .getWorkNode();
+
+        if (KjcOptions.sharedbufs
+                && FissionGroupStore.isFizzed(firstInputFilter.getParent()))
+            firstInputFilter = FissionGroupStore
+            .getFizzedSlices(firstInputFilter.getParent())[0]
+                    .getWorkNode();
+
+        Core core = SMPBackend.scheduler.getComputeNode(firstInputFilter);
+
+        SMPComputeCodeStore codeStore = core.getComputeCode();
+
+        OutputContent fileOutput = (OutputContent) fileW
+                .getWorkNodeContent();
+
+        codeStore.addPrintOutputCode(buf, firstInputFilter);
+        addOpen( codeStore,  fileOutput);
+		
+	}
+    
+    private static void addOpen(SMPComputeCodeStore codeStore, OutputContent fileOutput) {
+        codeStore.appendTxtToGlobal("FILE *output;\n");
+        // Special case for strings "stdout" and "stderr"
+        // which are treated as keywords in the StreamIt 
+        // front end, but as converted to string when parsed
+        if ("stdout".equals(fileOutput.getFileName())) {
+            codeStore.addStatementFirstToBufferInit(Util
+                    .toStmt("output = stdout"));                                
+        } else if ("stderr".equals(fileOutput.getFileName())) {
+            codeStore.addStatementFirstToBufferInit(Util
+                    .toStmt("output = stderr"));                
+        } else {            
+            codeStore.addStatementFirstToBufferInit(Util
+                    .toStmt("output = fopen(\"" + fileOutput.getFileName()
+                            + "\", \"w\")"));
+        }
+    }
 
 	/** True if this CoreCodeStore has code appended to it */
 	private boolean hasCode = false;
@@ -263,22 +313,19 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	 * Add code to print the output written to the file writer mapped to this
 	 * core.
 	 */
-	private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode workNode) {
-	    
-	    
+    private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode workNode) {
+        	   	    
 		// We print the address buffer after it has been rotated, so that it
 		// points to the section
 		// of the filewriter buffer that is about to be written to, but was
-		// written to 2 steady-states
-		// ago
+		// written to 2 steady-states ago
 
-		WorkNode fileW = buf.filterNode;
-
+		WorkNode fileW = buf.filterNode;		
+		System.out.println("SMPComputeCodeStore.addPrintOutputCode workNode=" + workNode.toString() + " fileW=" + fileW.toString());
 		System.out.println("SMPComputeCodeStore.addPrintOutputCode filter="
 				+ workNode.toString() + " fileW.isFileOutput()="
 				+ fileW.isFileOutput() + " buf=" + buf.toString()
 				+ " buf.getRotationLength()=" + buf.getRotationLength());
-
 		assert fileW.isFileOutput();
 		// because of this scene we need a rotation length of 2
 		// assert buf.getRotationLength() == 2: buf.getRotationLength();
@@ -298,9 +345,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		String cast = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
 				: "(float)";
 		String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
-		// create the loop
-		
-		
+		// create the loop				
 		String stmt = "";
 		if (KjcOptions.outputs < 0) {
 		    stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
@@ -312,11 +357,64 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                     +    "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "
                     +    "if (--maxOutputs == 0) {  exit(0); } "
 		            + "}";
-		}
-						
-		addSteadyLoopStatement(Util.toStmt(stmt));
-						
+		}						
+		addSteadyLoopStatement(Util.toStmt(stmt));						
 	}	
+    
+    private void addPrintOutputCode(InterSSGChannel buf, WorkNode workNode, SMPBackEndFactory backEndFactory) {
+        
+        
+        InterSSGEdge edge = buf.getEdge();
+        InputPort inputPort = edge.getDest();
+
+        Filter destFilter = inputPort.getSSG().getTopFilters()[0];
+        
+        WorkNode fileW = destFilter.getWorkNode();   
+        System.out.println("SMPComputeCodeStore.addPrintOutputCode workNode=" + workNode.toString() + " fileW=" + fileW.toString());
+             
+        assert fileW.isFileOutput();
+        int outputs = fileW.getWorkNodeContent().getSteadyMult();
+        
+        
+        CType tapeType = ((OutputContent) fileW.getWorkNodeContent()).getType();
+        
+        String type = tapeType == CStdType.Integer ? "%d" : "%f";
+        String cast = tapeType == CStdType.Integer ? "(int)" : "(float)";
+        //String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
+      
+        // create the loop              
+        String stmt = "";
+        
+        String popName = buf.popMethodName();
+
+        Map<Filter, Integer> filterToThreadId = backEndFactory
+                .getFilterToThreadId();
+        
+        String threadId = filterToThreadId.get(
+                inputPort.getSSG().getTopFilters()[0]).toString();
+
+        String buffer = "dyn_buf_" + threadId;        
+        String multiplier = "dummy_multiplier";              
+        String popCall = popName + "(" + buffer + ", "+ threadId + ", &"+ multiplier + ")";
+        
+        if (KjcOptions.outputs < 0) {            
+            stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+                    +    "if (" + buffer + "->size > 0) {"       
+                    +      "fprintf(output, \"" + type + "\\n\", " + cast + popCall + "); "       
+                    +   "}"
+                    + "}";
+            
+        } else {
+            stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+                    +    "if (" + buffer + "->size > 0) {"       
+                    +      "fprintf(output, \"" + type + "\\n\", " + cast + popCall + "); "
+                    +      "if (--maxOutputs == 0) {  exit(0); } "
+                    +   "}"
+                    + "}";
+        }                       
+        addSteadyLoopStatement(Util.toStmt(stmt));                      
+    }
+    
 
 	/**
 	 * Add stmt to the beginning of the method that will perform the allocation

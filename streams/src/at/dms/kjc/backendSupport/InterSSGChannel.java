@@ -20,7 +20,6 @@ import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.smp.Core;
-import at.dms.kjc.smp.InputRotatingBuffer;
 import at.dms.kjc.smp.ProcessFileWriter;
 import at.dms.kjc.smp.SMPBackend;
 
@@ -94,6 +93,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				types.add(bufType.toString());
 				Filter top = edge.getDest().getSSG().getTopFilters()[0];
 				inputBuffers.put(top.getWorkNode(), channel);
+				
+				if (top.getWorkNode().isFileOutput()) {
+				    fileWriterBuffers.add(channel);
+				}
 				
 				if (top.getWorkNode().isFileOutput()) {
 				    ProcessFileWriter.getAllocatingCore(top.getWorkNode());
