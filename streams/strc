@@ -502,6 +502,7 @@ sub get_options
 			    "sharedbufs",
 			    "sharedheap",
 			    "regtest",
+			    "perftest",
 			    "loadbalance",
 			    "loopcount=i",
 			    "noloopinput",
@@ -964,6 +965,7 @@ sub get_compiler_opts
     $opts{sharedbufs} && ($copts .= " --sharedbufs");
     $opts{sharedheap} && ($copts .= " --sharedheap");
     $opts{regtest} && ($copts .= " --regtest");
+    $opts{perftest} && ($copts .= " --perftest");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");
     $opts{loopcount} && ($copts .= " --loopcount ". $opts{loopcount});
