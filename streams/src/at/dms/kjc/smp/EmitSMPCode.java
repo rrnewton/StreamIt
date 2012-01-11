@@ -507,9 +507,14 @@ public class EmitSMPCode extends EmitCode {
 			}
 		}
 
-		p.println("extern int dummy_multiplier;");
+        p.println("extern int dummy_multiplier;");
+        p.println();
+        
+        if (KjcOptions.perftest) {
+            p.println("extern int input_count;");
+            p.println();
+        }        
 
-		p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
 			p.println("extern volatile int " + str + ";");
@@ -605,9 +610,13 @@ public class EmitSMPCode extends EmitCode {
 		}
 
 		p.println("int dummy_multiplier;");
+        p.println();
 
-		p.println();
-
+        if (KjcOptions.perftest) {
+            p.println("int input_count;");
+            p.println();
+        }
+		
 		p.println("// Global barrier");
 		p.println("barrier_t barrier;");
 		p.println();
@@ -687,8 +696,13 @@ public class EmitSMPCode extends EmitCode {
 			}
 		}
 		p.println("dummy_multiplier = 1;");
-
 		p.println();
+		
+		if (KjcOptions.perftest) {
+		    p.println("input_count = 0;");
+		    p.println();
+		}
+		
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
 			p.println(str + " = 0;");

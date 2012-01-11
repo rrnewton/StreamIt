@@ -749,3 +749,8 @@ longname		"regtest"
 	type		boolean
 	default		"false"
 	help		"Tell the compiler that we are compiling a test, might change decisions, like don't parallelize print statements."
+
+longname		"perftest"
+	type		boolean
+	default		"false"
+	help		"Tell the compiler to add code for running a performance test."
