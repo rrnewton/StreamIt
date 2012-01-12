@@ -87,15 +87,16 @@ public class ProcessFilterWorkNode {
 			} else {
 				multiplier = dominators.get(filter.toString()) + "_multiplier";
 			}
+			JExpression num_dominated = new JIntLiteral(1);
 			JExpression dominated = new JEmittedTextExpression("&" + multiplier);
 
 			if (self.getNumPop() > 1) {
 				return new JMethodCallExpression(popManyName,
-						new JExpression[] { dyn_queue, index, dominated,
+						new JExpression[] { dyn_queue, index, num_dominated, dominated,
 								new JIntLiteral(self.getNumPop()) });
 			} else {
 				JExpression methodCall = new JMethodCallExpression(popName,
-						new JExpression[] { dyn_queue, index, dominated });
+						new JExpression[] { dyn_queue, index, num_dominated, dominated });
 				methodCall.setType(tapeType);
 				return methodCall;
 			}
@@ -141,8 +142,9 @@ public class ProcessFilterWorkNode {
 					multiplier = dominators.get(filter.toString()) + "_multiplier";
 				}
 				JExpression dominated = new JEmittedTextExpression("&" + multiplier);
+				JExpression num_dominated = new JIntLiteral(1);
 				JExpression methodCall = new JMethodCallExpression(peekName,
-						new JExpression[] { dyn_queue, index, dominated, newArg});
+						new JExpression[] { dyn_queue, index, num_dominated, dominated, newArg});
 				methodCall.setType(tapeType);
 				return methodCall;
 

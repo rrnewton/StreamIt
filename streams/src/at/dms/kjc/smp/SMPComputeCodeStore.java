@@ -395,7 +395,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
         String buffer = "dyn_buf_" + threadId;        
         String multiplier = "dummy_multiplier";              
-        String popCall = popName + "(" + buffer + ", "+ threadId + ", &"+ multiplier + ")";
+        String popCall = popName + "(" + buffer + ", "+ threadId + ", 1, &"+ multiplier + ")";
         
         if (KjcOptions.outputs < 0) {            
             stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
