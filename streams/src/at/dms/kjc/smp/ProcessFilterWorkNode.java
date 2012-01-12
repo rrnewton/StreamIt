@@ -23,14 +23,18 @@ import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
+import at.dms.kjc.slir.InputContent;
+import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
@@ -234,6 +238,18 @@ public class ProcessFilterWorkNode {
 		return uid++;
 	}
 
+	
+	@SuppressWarnings("rawtypes")
+    private static boolean isSourceEdge(Channel inputChannel) {
+	    Object edgeObj = inputChannel.getEdge();        
+	    // I don't believe we need to check for the case of if (edgeObj instanceof InterSSGEdge), 
+	    // since we don't have dynamic rates from a FileReader        
+        if (edgeObj instanceof IntraSSGEdge) {
+            return ((InternalFilterNode) ((IntraSSGEdge) edgeObj).getSrc()).isInputSlice();                        
+        }
+        return false;
+	}
+	
 	/**
 	 * Take a code unit (here a FilterContent) and return one with all push,
 	 * peek, pop replaced with calls to channel routines. Clones the input
@@ -261,6 +277,8 @@ public class ProcessFilterWorkNode {
 		final String popName;
 		final String pushName;
 		final String popManyName;
+		
+		isSourceEdge(inputChannel);
 
 		if (inputChannel != null) {
 			peekName = inputChannel.peekMethodName();

@@ -8,6 +8,7 @@ import java.util.List;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFormalParameter;
@@ -16,6 +17,7 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.SchedulingPhase;
@@ -233,6 +235,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * Default method generated here to call popMethod() repeatedly.
      */
     public JMethodDeclaration popManyMethod() {
+
         if (popManyCode != null) {
             return popManyCode;
         }
@@ -252,8 +255,9 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
                 new JMethodCallExpression(popMethodName(),new JExpression[0]));
         
         JBlock body = new JBlock();
-        body.addStatement(Utils.makeForLoop(popOne, nPops, loopIndex));
         
+        body.addStatement(Utils.makeForLoop(popOne, nPops, loopIndex));
+
         popManyCode = new JMethodDeclaration(CStdType.Void,
                 popManyMethodName(),
                 new JFormalParameter[]{new JFormalParameter(formalParamType, formalParamName)},

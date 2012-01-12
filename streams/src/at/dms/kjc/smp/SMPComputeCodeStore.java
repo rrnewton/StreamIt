@@ -351,7 +351,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		} else {
 		    stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
                     +    "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "
-                    +    "if (--maxOutputs == 0) {  exit(0); } "
+                    +    "if (--maxOutputs == 0) {  streamit_exit(0); } "
 		            + "}";
 		}						
 		addSteadyLoopStatement(Util.toStmt(stmt));						

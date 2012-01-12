@@ -152,6 +152,9 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	 */
 	private InputRotatingBuffer(WorkNode filterNode, Core parent) {
 		super(filterNode.getEdgeToPrev(), filterNode, parent);
+		
+		
+		
 
 		bufType = filterNode.getWorkNodeContent().getInputType();
 		types.add(bufType.toString());
@@ -538,6 +541,10 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	 */
 	@Override
 	public JMethodDeclaration popManyMethod() {
+	    
+	    System.out.println("InputRotatingBuffer.popManyMethod() called");
+	    boolean addInputCounter = edge.getSrc().isInputSlice() && KjcOptions.perftest;
+	    
 		if (popManyCode != null) {
 			return popManyCode;
 		}
@@ -558,8 +565,16 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		JStatement popOne = new JExpressionStatement(new JMethodCallExpression(
 				popMethodName(), new JExpression[0]));
 
+		JBlock loopBody = new JBlock();
+		loopBody.addStatement(popOne);
+
+		if (addInputCounter) {
+		    loopBody.addStatement(new JExpressionStatement(
+		            new JEmittedTextExpression("perfTestNumInputs++")));
+		}
+		
 		JBlock body = new JBlock();
-		body.addStatement(Utils.makeForLoop(popOne, nPops, loopIndex));
+		body.addStatement(Utils.makeForLoop(loopBody, nPops, loopIndex));
 
 		popManyCode = new JMethodDeclaration(CStdType.Void,
 				popManyMethodName(),

@@ -442,6 +442,12 @@ public class EmitSMPCode extends EmitCode {
 		p.println("extern barrier_t barrier;");
 		p.println();
 
+		p.println("// exit function");
+		p.println("extern void streamit_exit(int n);");
+		p.println();
+		
+		
+		
 		if (isDynamic) {
 			int numDynamicReaders = threadIdToType.keySet().size();
 			System.out.println("EmitSMPCode.generateGlobalsHeader numDynamicReaders=" + numDynamicReaders);
@@ -508,15 +514,16 @@ public class EmitSMPCode extends EmitCode {
 		}
            
         if (KjcOptions.perftest) {
-            p.println("extern int input_count;");
             p.println();
+            p.println("extern int perfTestNumInputs;");
         }        
 
+        p.println();
 		p.println("// Intra-SSG synchronization tokens");
 		for (String str : SMPComputeCodeStore.getTokenNames()) {
 			p.println("extern volatile int " + str + ";");
 		}
-
+		
 		p.println("#endif");
 		p.close();
 	}
@@ -609,7 +616,7 @@ public class EmitSMPCode extends EmitCode {
         p.println();
 
         if (KjcOptions.perftest) {
-            p.println("int input_count;");
+            p.println("int perfTestNumInputs;");
             p.println();
         }
 		
@@ -626,6 +633,17 @@ public class EmitSMPCode extends EmitCode {
 
 		generateSetAffinity(p);
 
+		
+		p.println();
+		p.println("void streamit_exit(int n) {");
+		if (KjcOptions.perftest) {
+		    p.println("  printf (\"perfTestNumInputs = %d\\n\", perfTestNumInputs);");
+		}               
+		p.println("  exit(n);");
+		p.println("}");
+		p.println();
+	        
+		
 		if (KjcOptions.profile) {
 			Profiler.emitProfilerGlobals(p);
 			Profiler.generateProfilerOutputCode(p);
@@ -695,7 +713,7 @@ public class EmitSMPCode extends EmitCode {
 		p.println();
 		
 		if (KjcOptions.perftest) {
-		    p.println("input_count = 0;");
+		    p.println("perfTestNumInputs = 0;");
 		    p.println();
 		}
 		
