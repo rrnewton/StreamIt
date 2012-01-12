@@ -33,12 +33,12 @@ public class EmitSMPCode extends EmitCode {
 	private boolean isDynamic = false;
 	private Map<Filter, Integer> filterToThreadId = null;
 	private Set<String> dominated = null;
-	private Map<String, String> dominators = null;
+	private Map<String, List<String>> dominators = null;
 	Map<Integer, String> threadIdToType = null;
 
 	public EmitSMPCode(SMPBackEndFactory backEndFactory, boolean isDynamic,
 			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
-			Map<String, String> dominators, Map<Integer, String> threadIdToType) {
+			Map<String, List<String>> dominators, Map<Integer, String> threadIdToType) {
 		super(backEndFactory);
 		this.isDynamic = isDynamic;
 		this.filterToThreadId = filterToThreadId;
@@ -506,10 +506,7 @@ public class EmitSMPCode extends EmitCode {
 						+ fieldDecl.getVariable().getIdent() + ";");
 			}
 		}
-
-        p.println("extern int dummy_multiplier;");
-        p.println();
-        
+           
         if (KjcOptions.perftest) {
             p.println("extern int input_count;");
             p.println();
@@ -609,7 +606,6 @@ public class EmitSMPCode extends EmitCode {
 			}
 		}
 
-		p.println("int dummy_multiplier;");
         p.println();
 
         if (KjcOptions.perftest) {
@@ -695,7 +691,7 @@ public class EmitSMPCode extends EmitCode {
 				}
 			}
 		}
-		p.println("dummy_multiplier = 1;");
+		
 		p.println();
 		
 		if (KjcOptions.perftest) {

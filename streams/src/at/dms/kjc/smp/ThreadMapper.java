@@ -1,5 +1,7 @@
 package at.dms.kjc.smp;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,7 +43,7 @@ public class ThreadMapper {
 	 */
 	public void assignThreads(StaticSubGraph ssg,
 			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
-			Map<String, String> dominators, Map<Integer, String> threadIdToType) {
+			Map<String, List<String>> dominators, Map<Integer, String> threadIdToType) {
 
 		boolean isDynamicInput = ssg.hasDynamicInput();
 		Filter f = ssg.getTopFilters()[0];
@@ -87,9 +89,14 @@ public class ThreadMapper {
 									.add(filter.getWorkNodeContent().getName());
 						}
 						
-						dominators.put(dynamicReader.getWorkNodeContent()
-								.getName(), filter.getWorkNodeContent()
-								.getName());
+						if (!dominators.containsKey(dynamicReader.getWorkNodeContent()
+                                .getName())) {
+						    dominators.put(dynamicReader.getWorkNodeContent()
+	                                .getName(), new ArrayList<String>());
+						}
+						dominators.get(dynamicReader.getWorkNodeContent()
+                                .getName()).add(filter.getWorkNodeContent()
+                                .getName());
 					}
 
 				}

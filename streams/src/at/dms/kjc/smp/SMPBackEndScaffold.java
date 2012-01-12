@@ -3,6 +3,7 @@
  */
 package at.dms.kjc.smp;
 
+import java.util.List;
 import java.util.Map;
 
 import at.dms.kjc.backendSupport.BackEndFactory;
@@ -19,9 +20,9 @@ import at.dms.kjc.slir.SchedulingPhase;
  */
 public class SMPBackEndScaffold extends BackEndScaffold {
 	
-	private Map<String, String> dominators;
+	private Map<String, List<String>> dominators;
 	
-	public SMPBackEndScaffold(Map<String, String> dominators) {
+	public SMPBackEndScaffold(Map<String, List<String>> dominators) {
 		this.dominators = dominators;
 	}
 	

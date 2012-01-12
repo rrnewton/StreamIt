@@ -14,14 +14,12 @@ import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.KjcOptions;
-import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
 import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.common.ALocalVariable;
@@ -93,8 +91,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 			cs.setHasCode();
 		}
 	}
-
-	private static boolean addBufferInitBarrierFlag = false;
 
 	/**
 	 * Append a barrier instruction to all of the cores in the buffer init
@@ -394,9 +390,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 inputPort.getSSG().getTopFilters()[0]).toString();
 
         String buffer = "dyn_buf_" + threadId;        
-        String multiplier = "dummy_multiplier";              
-        String popCall = popName + "(" + buffer + ", "+ threadId + ", 1, &"+ multiplier + ")";
-        
+        String popCall = popName + "(" + buffer + ", "+ threadId + ", 0, NULL)";       
         if (KjcOptions.outputs < 0) {            
             stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
                     +    "if (" + buffer + "->size > 0) {"       

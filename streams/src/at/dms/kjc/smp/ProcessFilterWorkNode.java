@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -58,7 +59,7 @@ public class ProcessFilterWorkNode {
 		boolean isDynamicPop;
 		boolean isDynamicPush;
 		WorkNode filter;
-		Map<String, String> dominators;
+		Map<String, List<String>> dominators;
 
 		private JExpression staticPop(SIRPopExpression self, CType tapeType) {			
 			if (self.getNumPop() > 1) {
@@ -81,15 +82,9 @@ public class ProcessFilterWorkNode {
 			String buffer = "dyn_buf_" + threadId;
 			JExpression dyn_queue = new JEmittedTextExpression(buffer);
 			JExpression index = new JEmittedTextExpression(threadId);
-			String multiplier;
-			if (dominators.get(filter.toString()) == null) {
-				multiplier = "dummy_multiplier";
-			} else {
-				multiplier = dominators.get(filter.toString()) + "_multiplier";
-			}
-			JExpression num_dominated = new JIntLiteral(1);
-			JExpression dominated = new JEmittedTextExpression("&" + multiplier);
-
+			int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : 1;
+			JExpression num_dominated = new JIntLiteral(num_multipliers);			
+			JExpression dominated = new JEmittedTextExpression("multipliers");
 			if (self.getNumPop() > 1) {
 				return new JMethodCallExpression(popManyName,
 						new JExpression[] { dyn_queue, index, num_dominated, dominated,
@@ -107,7 +102,7 @@ public class ProcessFilterWorkNode {
 				Channel outputChannel, String peekName, String popManyName,
 				String popName, String pushName,
 				Map<Filter, Integer> filterToThreadId,
-				Map<String, String> dominators, boolean isDynamicPop,
+				Map<String, List<String>> dominators, boolean isDynamicPop,
 				boolean isDynamicPush) {
 			this.filter = filter;
 			this.peekName = peekName;
@@ -130,19 +125,13 @@ public class ProcessFilterWorkNode {
 						.getEdge().getDest();
 				String threadId = filterToThreadId.get(
 						inputPort.getSSG().getTopFilters()[0]).toString();
-
 				String buffer = "dyn_buf_" + threadId;
 				JExpression dyn_queue = new JEmittedTextExpression(buffer);
 				JExpression index = new JEmittedTextExpression(threadId);
 				JExpression newArg = (JExpression) arg.accept(this);
-				String multiplier;
-				if (dominators.get(filter.toString()) == null) {
-					multiplier = "dummy_multiplier";
-				} else {
-					multiplier = dominators.get(filter.toString()) + "_multiplier";
-				}
-				JExpression dominated = new JEmittedTextExpression("&" + multiplier);
-				JExpression num_dominated = new JIntLiteral(1);
+                JExpression dominated = new JEmittedTextExpression("multipliers");				
+                int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : 1;                
+				JExpression num_dominated = new JIntLiteral(num_multipliers);
 				JExpression methodCall = new JMethodCallExpression(peekName,
 						new JExpression[] { dyn_queue, index, num_dominated, dominated, newArg});
 				methodCall.setType(tapeType);
@@ -294,13 +283,30 @@ public class ProcessFilterWorkNode {
 
 		Map<Filter, Integer> filterToThreadId = backEndFactory
 				.getFilterToThreadId();
-		Map<String, String> dominators = backEndFactory.getDominators();
+		Map<String, List<String>> dominators = backEndFactory.getDominators();
 
 		pushPopReplacingVisitor.init(filter, inputChannel, outputChannel,
 				peekName, popManyName, popName, pushName, filterToThreadId,
 				dominators, isDynamicPop, isDynamicPush);
 
 		for (JMethodDeclaration method : methods) {
+		    int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : 1;		    		    
+		    String call = "int* multipliers[" + num_multipliers + "] = {";		    		    
+		    if (dominators.get(filter.toString()) != null) {
+		      int j = 0;
+		      for (String d : dominators.get(filter.toString())) {
+		          if (j != 0) {
+		              call += ", ";
+		          }
+		          call += "&" + d;
+		          j++;
+		      }		        		        
+		    }
+            call += "}";
+		    		    
+		    method.addStatementFirst(new JExpressionStatement(
+		                new JEmittedTextExpression(call)));
+		    
 			method.accept(pushPopReplacingVisitor);
 			// Add markers to code for debugging of emitted code:
 			String methodName = "filter "

@@ -3,6 +3,7 @@ package at.dms.kjc.smp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -115,7 +116,7 @@ public class SMPBackend {
 	}
 
 	private static void emitCode(Map<Filter, Integer> threadMap,
-			Set<String> dominated, Map<String, String> dominators,
+			Set<String> dominated, Map<String, List<String>> dominators,
 			Map<Integer, String> threadIdToType) {
 
 		// generate code for file writer
@@ -202,7 +203,7 @@ public class SMPBackend {
 
 		Map<Filter, Integer> filterToThreadId = new HashMap<Filter, Integer>();
 		Set<String> dominated = new HashSet<String>();
-		Map<String, String> dominators = new HashMap<String, String>();
+		Map<String, List<String>> dominators = new HashMap<String, List<String>>();
 		Map<Integer, String> threadIdToType = new HashMap<Integer, String>();
 
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
@@ -228,7 +229,7 @@ public class SMPBackend {
 	
 	private static void runSSG(StaticSubGraph ssg, int ssgNum,
 			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
-			Map<String, String> dominators, Map<Integer, String> threadIdToType) {
+			Map<String, List<String>> dominators, Map<Integer, String> threadIdToType) {
 				
 		// dump slice graph to dot file
 		ssg.dumpGraph("traces.dot", null);

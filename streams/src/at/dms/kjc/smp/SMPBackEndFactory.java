@@ -4,6 +4,7 @@
 package at.dms.kjc.smp;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import at.dms.kjc.KjcOptions;
@@ -44,7 +45,7 @@ public class SMPBackEndFactory extends
 	/** splits the slicegraph into levels */
 	private static LevelizeSSG lsg;
 
-	private Map<String, String> dominators;
+	private Map<String, List<String>> dominators;
 	private Map<Filter, Integer> filterToThreadId;
 	/**
 	 * the number of filters that we have yet to process from a level the init
@@ -59,7 +60,7 @@ public class SMPBackEndFactory extends
 	private static HashMap<Integer, Integer> levelLeftToProcessPP;
 
 	public SMPBackEndFactory(SMPMachine chip, Scheduler scheduler,
-			Map<String, String> dominators,
+			Map<String, List<String>> dominators,
 			Map<Filter, Integer> filterToThreadId) {
 		this.chip = chip;
 		SMPBackEndFactory.scheduler = scheduler;
@@ -199,7 +200,7 @@ public class SMPBackEndFactory extends
 	@Override
 	public void processFilterInputNode(InputNode input,
 			SchedulingPhase whichPhase, SMPMachine chip) {
-		// TODO Auto-generated method stub
+		// Nothing to do
 	}
 
 	/*
@@ -313,11 +314,11 @@ public class SMPBackEndFactory extends
 		}
 	}
 
-	public Map<String, String> getDominators() {
+	public Map<String, List<String>> getDominators() {
 		return dominators;
 	}
 
-	public void setDominators(Map<String, String> dominators) {
+	public void setDominators(Map<String, List<String>> dominators) {
 		this.dominators = dominators;
 	}
 
