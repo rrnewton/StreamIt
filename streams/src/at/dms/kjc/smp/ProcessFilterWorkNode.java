@@ -240,8 +240,8 @@ public class ProcessFilterWorkNode {
 
 	
 	@SuppressWarnings("rawtypes")
-    private static boolean isSourceEdge(Channel inputChannel) {
-	    Object edgeObj = inputChannel.getEdge();        
+    private static boolean isSourceEdge(Channel inputChannel) {    	  
+        Object edgeObj = inputChannel.getEdge();
 	    // I don't believe we need to check for the case of if (edgeObj instanceof InterSSGEdge), 
 	    // since we don't have dynamic rates from a FileReader        
         if (edgeObj instanceof IntraSSGEdge) {
@@ -278,7 +278,9 @@ public class ProcessFilterWorkNode {
 		final String pushName;
 		final String popManyName;
 		
-		isSourceEdge(inputChannel);
+		if (inputChannel != null) {
+		    isSourceEdge(inputChannel);
+		}
 
 		if (inputChannel != null) {
 			peekName = inputChannel.peekMethodName();
