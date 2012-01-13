@@ -622,7 +622,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 			loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
 					loopBody, null);
 		}
-		methodBody.addStatement(loop);
+					 
+        methodBody.addStatement(loop);
 		methodBody.addStatement(new JExpressionStatement(
 				new JEmittedTextExpression("pthread_exit(NULL)")));
 		JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");

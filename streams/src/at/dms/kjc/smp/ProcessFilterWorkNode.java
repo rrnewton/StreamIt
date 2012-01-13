@@ -520,7 +520,7 @@ public class ProcessFilterWorkNode {
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
 			codeStore.addSteadyThreadCall(threadIndex);
 
-		} else {
+		} else {		    
 			codeStore.addSteadyLoopStatement(steadyBlock);
 		}
 		if (debug) {
