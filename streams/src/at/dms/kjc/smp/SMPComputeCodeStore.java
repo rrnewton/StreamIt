@@ -383,7 +383,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         
         String popName = buf.popMethodName();
 
-        Map<Filter, Integer> filterToThreadId = backEndFactory
+        Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                 .getFilterToThreadId();
         
         String threadId = filterToThreadId.get(

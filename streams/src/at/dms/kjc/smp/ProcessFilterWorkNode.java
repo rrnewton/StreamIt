@@ -86,7 +86,9 @@ public class ProcessFilterWorkNode {
 			String buffer = "dyn_buf_" + threadId;
 			JExpression dyn_queue = new JEmittedTextExpression(buffer);
 			JExpression index = new JEmittedTextExpression(threadId);
-			int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : 1;
+						
+			int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : dominators.get(filter.toString()).size();   
+			
 			JExpression num_dominated = new JIntLiteral(num_multipliers);			
 			JExpression dominated = new JEmittedTextExpression("multipliers");
 			if (self.getNumPop() > 1) {
@@ -133,9 +135,9 @@ public class ProcessFilterWorkNode {
 				JExpression dyn_queue = new JEmittedTextExpression(buffer);
 				JExpression index = new JEmittedTextExpression(threadId);
 				JExpression newArg = (JExpression) arg.accept(this);
-                JExpression dominated = new JEmittedTextExpression("multipliers");				
-                int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : 1;                
-				JExpression num_dominated = new JIntLiteral(num_multipliers);
+                JExpression dominated = new JEmittedTextExpression("multipliers");				                
+                int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : dominators.get(filter.toString()).size();   
+                JExpression num_dominated = new JIntLiteral(num_multipliers);
 				JExpression methodCall = new JMethodCallExpression(peekName,
 						new JExpression[] { dyn_queue, index, num_dominated, dominated, newArg});
 				methodCall.setType(tapeType);
@@ -165,17 +167,8 @@ public class ProcessFilterWorkNode {
 			JExpression newArg = (JExpression) arg.accept(this);
 			if (isDynamicPush) {
 
-				System.out
-						.println("ProcessFilterWorkNode.PushPopReplacingVisitor.visitPushExpression filter="
-								+ filter);
-
 				InterSSGEdge edge = ((InterSSGChannel) outputChannel).getEdge();
 				InputPort inputPort = edge.getDest();
-
-				System.out
-						.println("ProcessFilterWorkNode.PushPopReplacingVisitor.visitPushExpression inputPort.getSSG().getTopFilters()[0]="
-								+ inputPort.getSSG().getTopFilters()[0]
-										.getWorkNode());
 
 				String threadId = filterToThreadId.get(
 						inputPort.getSSG().getTopFilters()[0]).toString();
@@ -301,16 +294,17 @@ public class ProcessFilterWorkNode {
 		CodeStoreHelper helper = backEndFactory.getCodeStoreHelper(filter);
 		JMethodDeclaration[] methods = helper.getMethods();
 
-		Map<Filter, Integer> filterToThreadId = backEndFactory
-				.getFilterToThreadId();
-		Map<String, List<String>> dominators = backEndFactory.getDominators();
+		Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper().getFilterToThreadId();		        
+		Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
 
 		pushPopReplacingVisitor.init(filter, inputChannel, outputChannel,
 				peekName, popManyName, popName, pushName, filterToThreadId,
 				dominators, isDynamicPop, isDynamicPush);
 
 		for (JMethodDeclaration method : methods) {
-		    int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : 1;		    		    
+
+		    int num_multipliers = (dominators.get(filter.toString()) == null) ? 0 : dominators.get(filter.toString()).size();   
+		    
 		    String call = "int* multipliers[" + num_multipliers + "] = {";		    		    
 		    if (dominators.get(filter.toString()) != null) {
 		      int j = 0;
@@ -318,7 +312,7 @@ public class ProcessFilterWorkNode {
 		          if (j != 0) {
 		              call += ", ";
 		          }
-		          call += "&" + d;
+		          call += "&" + d + "_multiplier";
 		          j++;
 		      }		        		        
 		    }
@@ -499,23 +493,12 @@ public class ProcessFilterWorkNode {
 		}
 
 		if (isDynamicPop) {
-
-			System.out
-					.println("ProcessFilterWorkNode.standardStreadyProcessing filter="
-							+ filterNode.getWorkNodeContent()
-							+ " isDynamicPop=");
-
-			Map<Filter, Integer> filterToThreadId = backEndFactory
+			
+			Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
 					.getFilterToThreadId();
 			String threadId = filterToThreadId.get(filterNode.getParent())
 					.toString();
-
-			System.out
-					.println("ProcessFilterWorkNode.standardStreadyProcessing filter="
-							+ filterNode.getWorkNodeContent()
-							+ " thread="
-							+ threadId);
-
+		
 			int threadIndex = Integer.parseInt(threadId);
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
 			codeStore.addSteadyThreadCall(threadIndex);

@@ -2,6 +2,8 @@ package at.dms.kjc.slir.fission;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import at.dms.kjc.CClassType;
@@ -27,8 +29,10 @@ import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.MutableStateExtractor;
 import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeInfo;
+import at.dms.kjc.smp.ThreadMapper;
 
 public class PipelineFissioner {
 
@@ -395,9 +399,11 @@ public class PipelineFissioner {
 
         // Give each Slice clone a unique name
         String origName = sliceClones[0].getWorkNode().getWorkNodeContent().getName();
-        for(int x = 0 ; x < fizzAmount ; x++)
+        for(int x = 0 ; x < fizzAmount ; x++) {
             sliceClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + x);
-
+        }
+               
+        
         /**********************************************************************
          *                   Setup initialization schedule                    *
          **********************************************************************/

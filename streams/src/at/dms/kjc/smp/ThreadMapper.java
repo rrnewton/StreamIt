@@ -1,6 +1,8 @@
 package at.dms.kjc.smp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,12 +19,6 @@ public class ThreadMapper {
 	private static int threadId = 0;
 
 	/**
-	 * Private constructor for singleton
-	 */
-	private ThreadMapper() {/* do nothing */
-	}
-
-	/**
 	 * Provides access to the singleton class
 	 * @return the single thread mapper
 	 */
@@ -31,9 +27,32 @@ public class ThreadMapper {
 			mapper = new ThreadMapper();
 		}
 		return mapper;
+	} 
+
+	/** a mapping from filter to thread id */
+	private Map<Filter, Integer> filterToThreadId;
+		
+    /** the set of dominated filters */
+	private Set<String> dominated;
+    
+    /** a mapping of dominator filter to dominated filter */
+	private Map<String, List<String>> dominators;
+    
+    /**  a mapping of thread to its input type */
+	private Map<Integer, String> threadIdToType;
+    
+    /**
+	 * Private constructor for singleton
+	 */
+	private ThreadMapper() {
+	    filterToThreadId = new HashMap<Filter, Integer>();
+	    dominated = new HashSet<String>();
+	    dominators = new HashMap<String, List<String>>();
+	    threadIdToType = new HashMap<Integer, String>();
 	}
 
-	/**
+    
+    /**
 	 * Assign a unique id to each thread for dynamic readers
 	 * @param ssg The ssg that contains the dyamic reader
 	 * @param filterToThreadId a mapping from filter to thread id
@@ -41,10 +60,8 @@ public class ThreadMapper {
 	 * @param dominators a mapping of dominator filter to dominated filter
 	 * @param threadIdToType a mapping of thread to its input type
 	 */
-	public void assignThreads(StaticSubGraph ssg,
-			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
-			Map<String, List<String>> dominators, Map<Integer, String> threadIdToType) {
-
+	public void assignThreads(StaticSubGraph ssg) {
+			
 		boolean isDynamicInput = ssg.hasDynamicInput();
 		Filter f = ssg.getTopFilters()[0];
 
@@ -106,4 +123,40 @@ public class ThreadMapper {
 		}
 
 	}
+
+    
+    public Set<String> getDominated() {
+        return dominated;
+    }
+
+    
+    public Map<String, List<String>> getDominators() {
+        return dominators;
+    }
+
+    
+    public Map<Filter, Integer> getFilterToThreadId() {
+        return filterToThreadId;
+    }
+
+    public Map<Integer, String> getThreadIdToType() {
+        return threadIdToType;
+    }
+	
+	public void setDominated(Set<String> dominated) {
+        this.dominated = dominated;
+    }
+	
+	
+	public void setDominators(Map<String, List<String>> dominators) {
+        this.dominators = dominators;
+    }
+
+	public void setFilterToThreadId(Map<Filter, Integer> filterToThreadId) {
+        this.filterToThreadId = filterToThreadId;
+    }
+
+	public void setThreadIdToType(Map<Integer, String> threadIdToType) {
+        this.threadIdToType = threadIdToType;
+    }
 }

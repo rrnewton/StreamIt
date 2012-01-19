@@ -1,5 +1,7 @@
 package at.dms.kjc.smp;
 
+import java.util.List;
+import java.util.Map;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.slir.Filter;
@@ -14,26 +16,26 @@ import at.dms.kjc.slir.fission.Fissioner;
 public class StatelessFissioner {
 
     /** the slice we are fissing */
-    private Filter slice;
+    private Filter filter;
     /** the amount we are fizzing slice by */
     private int fizzAmount;
     /** the filter of the slice we are fissing */
-    private WorkNode filter;
+    private WorkNode workNode;
     /** the filter info of the filter of the slice we are fissing */
     private WorkNodeInfo fInfo;
 
     private int sliceSteadyMult;
     /** the fission products of the slice */
-    private Filter[] sliceClones;
+    private Filter[] filterClones;
 
-    public static FissionGroup doit(Filter slice, StaticSubGraph ssg, int fissAmount) {
+    public static FissionGroup doit(Filter filter, StaticSubGraph ssg, int fissAmount) {
         if(!KjcOptions.sharedbufs) {
-            return Fissioner.doit(slice, ssg, fissAmount);
+            return Fissioner.doit(filter, ssg, fissAmount);
         }
         else {
-            System.out.println("Performing fission on: " + slice.getWorkNode() + ", fizzAmount: " + fissAmount);
-            StatelessFissioner fissioner = new StatelessFissioner(slice, fissAmount);
-            if(canFizz(slice, false))
+            System.out.println("Performing fission on: " + filter.getWorkNode() + ", fizzAmount: " + fissAmount);
+            StatelessFissioner fissioner = new StatelessFissioner(filter, fissAmount);
+            if(canFizz(filter, false))
                 return fissioner.fizz();
             return null;
         }
@@ -88,10 +90,10 @@ public class StatelessFissioner {
     }
 
     private StatelessFissioner(Filter slice, int fizzAmount) {
-        this.slice = slice;
+        this.filter = slice;
         this.fizzAmount = fizzAmount;
-        this.filter = slice.getWorkNode();
-        this.fInfo = WorkNodeInfo.getFilterInfo(filter);
+        this.workNode = slice.getWorkNode();
+        this.fInfo = WorkNodeInfo.getFilterInfo(workNode);
 
         sliceSteadyMult = fInfo.steadyMult;
     }
@@ -111,33 +113,36 @@ public class StatelessFissioner {
             return null;
         */
 
-        createFissedSlices();
+        createFissedFilters();
         setupInitPhase();
 
-        return new FissionGroup(slice, fInfo, sliceClones);
+        return new FissionGroup(filter, fInfo, filterClones);
     }
 
-    private void createFissedSlices() {        
+    private void createFissedFilters() {        
         // Fill array with clones of Slice
-        sliceClones = new Filter[fizzAmount];
+        filterClones = new Filter[fizzAmount];
         for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
+            filterClones[x] = (Filter)ObjectDeepCloner.deepCopy(filter);
         
         // Give each Slice clone a unique name
-        String origName = slice.getWorkNode().getWorkNodeContent().getName();
-        for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount + "_clone" + x);
+        String origName = filter.getWorkNode().getWorkNodeContent().getName();
+        for(int x = 0 ; x < fizzAmount ; x++) {
+            filterClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount + "_clone" + x);
+        }
+        
 
         // Modify name of original Slice
-        slice.getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount);
+        filter.getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount);
         
         // Calculate new steady-state multiplicity based upon fizzAmount.  
         // Because work is equally shared among all Slice clones, steady-state 
         // multiplicity is divided by fizzAmount for each Slice clone
         int newSteadyMult = sliceSteadyMult / fizzAmount;
 
-        for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getWorkNode().getWorkNodeContent().setSteadyMult(newSteadyMult);
+        for(int x = 0 ; x < fizzAmount ; x++) {
+            filterClones[x].getWorkNode().getWorkNodeContent().setSteadyMult(newSteadyMult);
+        }
     }
 
     private void setupInitPhase() {
@@ -155,8 +160,8 @@ public class StatelessFissioner {
         // disabling prework and seting initialization multiplicty to 0
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getWorkNode().getWorkNodeContent().setPrework(null);
-            sliceClones[x].getWorkNode().getWorkNodeContent().setInitMult(0);
+            filterClones[x].getWorkNode().getWorkNodeContent().setPrework(null);
+            filterClones[x].getWorkNode().getWorkNodeContent().setInitMult(0);
         }
 
         // Since only the first Slice clone executes, it will be the only Slice
@@ -173,12 +178,12 @@ public class StatelessFissioner {
         // clones' init dests to null
 
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getInputNode().setInitWeights(new int[0]);
-            sliceClones[x].getInputNode().setInitSources(new InterFilterEdge[0]);
+            filterClones[x].getInputNode().setInitWeights(new int[0]);
+            filterClones[x].getInputNode().setInitSources(new InterFilterEdge[0]);
         }
         for(int x = 1 ; x < fizzAmount ; x++) {
-            sliceClones[x].getOutputNode().setInitWeights(new int[0]);
-            sliceClones[x].getOutputNode().setInitDests(new InterFilterEdge[0][0]);
+            filterClones[x].getOutputNode().setInitWeights(new int[0]);
+            filterClones[x].getOutputNode().setInitDests(new InterFilterEdge[0][0]);
         }
     }
 }

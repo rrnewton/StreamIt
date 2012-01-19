@@ -45,8 +45,7 @@ public class SMPBackEndFactory extends
 	/** splits the slicegraph into levels */
 	private static LevelizeSSG lsg;
 
-	private Map<String, List<String>> dominators;
-	private Map<Filter, Integer> filterToThreadId;
+
 	/**
 	 * the number of filters that we have yet to process from a level the init
 	 * stage
@@ -59,15 +58,13 @@ public class SMPBackEndFactory extends
 	 */
 	private static HashMap<Integer, Integer> levelLeftToProcessPP;
 
-	public SMPBackEndFactory(SMPMachine chip, Scheduler scheduler,
-			Map<String, List<String>> dominators,
-			Map<Filter, Integer> filterToThreadId) {
+	public SMPBackEndFactory(SMPMachine chip, Scheduler scheduler) {
+			//Map<String, List<String>> dominators,
+			//Map<Filter, Integer> filterToThreadId) {
 		this.chip = chip;
 		SMPBackEndFactory.scheduler = scheduler;
 		this.setLayout(scheduler);
-		this.dominators = dominators;
-		this.filterToThreadId = filterToThreadId;
-		
+	
 	
 		if (scheduler.isTMD()) {
 			// levelize the slicegraph
@@ -86,7 +83,7 @@ public class SMPBackEndFactory extends
 			}
 		}
 
-		scaffold = new SMPBackEndScaffold(dominators);
+		scaffold = new SMPBackEndScaffold();
 	}
 
 	/*
@@ -313,20 +310,5 @@ public class SMPBackEndFactory extends
 			}		
 		}
 	}
-
-	public Map<String, List<String>> getDominators() {
-		return dominators;
-	}
-
-	public void setDominators(Map<String, List<String>> dominators) {
-		this.dominators = dominators;
-	}
-
-	public Map<Filter, Integer> getFilterToThreadId() {
-		return filterToThreadId;
-	}
-
-	public void setFilterToThreadId(Map<Filter, Integer> filterToThreadId) {
-		this.filterToThreadId = filterToThreadId;
-	}
+	
 }

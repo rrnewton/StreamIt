@@ -1,5 +1,7 @@
 package at.dms.kjc.slir.fission;
 
+import java.util.List;
+import java.util.Map;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -28,6 +30,7 @@ import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeInfo;
+import at.dms.kjc.smp.ThreadMapper;
 
 public class Fissioner {
     private static int uniqueID;
@@ -740,12 +743,36 @@ public class Fissioner {
             for(int x = 0 ; x < fizzAmount ; x++)
                 slicer.addTopSlice(sliceClones[x]);
         }
-        
+
         // Give each Slice clone a unique name
         String origName = slice.getWorkNode().getWorkNodeContent().getName();
-        for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + x);
         
+        StaticSubGraph ssg = sliceClones[0].getStaticSubGraph();
+        Filter dominator = ssg.getFilterGraph()[0];
+        Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();        
+        List<String> dominated = dominators.get(dominator.getWorkNode().toString());
+        System.out.println("Fissioner.createFissedSlices dominator=" + dominator.getWorkNode().toString());
+        if (dominated != null) {            
+            for (String str : dominated) {
+                System.out.println("  ==> Fissioner.createFissedSlices dominated=" + str);
+            }
+            dominated.remove(origName);        
+        }
+                
+        
+        String newName;
+        for(int x = 0 ; x < fizzAmount ; x++) {
+            newName = origName + "_fizz" + x;
+            sliceClones[x].getWorkNode().getWorkNodeContent().setName(newName);
+            if (dominated != null) {
+                dominated.add(newName); 
+            }
+        }
+        
+        if (dominated != null) {
+            dominators.put(dominator.getWorkNode().toString(), dominated);
+            ThreadMapper.getMapper().setDominators(dominators);
+        }
         // Calculate new steady-state multiplicity based upon fizzAmount.  
         // Because work is equally shared among all Slice clones, steady-state 
         // multiplicity is divided by fizzAmount for each Slice clone

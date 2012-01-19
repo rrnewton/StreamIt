@@ -201,19 +201,18 @@ public class SMPBackend {
 		
 		InterSSGChannel.createBuffers(streamGraph);
 
-		Map<Filter, Integer> filterToThreadId = new HashMap<Filter, Integer>();
-		Set<String> dominated = new HashSet<String>();
-		Map<String, List<String>> dominators = new HashMap<String, List<String>>();
-		Map<Integer, String> threadIdToType = new HashMap<Integer, String>();
-
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			ThreadMapper.getMapper().assignThreads(ssg, filterToThreadId,
-					dominated, dominators, threadIdToType);
+			ThreadMapper.getMapper().assignThreads(ssg);
 		}
 
-		int i = 0;
+		Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper().getFilterToThreadId();		        
+        Set<String> dominated = ThreadMapper.getMapper().getDominated();
+        Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
+        Map<Integer, String> threadIdToType =  ThreadMapper.getMapper().getThreadIdToType();
+
+        int i = 0;
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			runSSG(ssg, i, filterToThreadId, dominated, dominators, threadIdToType);
+			runSSG(ssg, i); // , filterToThreadId, dominated, dominators, threadIdToType);
 			i++;
 		}
 
@@ -227,10 +226,13 @@ public class SMPBackend {
 
 	}
 	
-	private static void runSSG(StaticSubGraph ssg, int ssgNum,
-			Map<Filter, Integer> filterToThreadId, Set<String> dominated,
-			Map<String, List<String>> dominators, Map<Integer, String> threadIdToType) {
-				
+	private static void runSSG(StaticSubGraph ssg, int ssgNum) {
+	    
+        Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper().getFilterToThreadId();             
+        Set<String> dominated = ThreadMapper.getMapper().getDominated();
+        Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
+        Map<Integer, String> threadIdToType =  ThreadMapper.getMapper().getThreadIdToType();
+	    
 		// dump slice graph to dot file
 		ssg.dumpGraph("traces.dot", null);
 
@@ -259,8 +261,9 @@ public class SMPBackend {
 		RotatingBuffer.createBuffers(graphSchedule);
 
 		// now convert to Kopi code plus communication commands
-		backEndFactory = new SMPBackEndFactory(chip, scheduler, dominators,
-				filterToThreadId);
+		backEndFactory = new SMPBackEndFactory(chip, scheduler);
+		//, dominators,
+	//			filterToThreadId);
 		backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
 
 		// calculate computation to communication ratio

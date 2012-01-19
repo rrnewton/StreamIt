@@ -1,6 +1,9 @@
 package at.dms.kjc.smp;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.Layout;

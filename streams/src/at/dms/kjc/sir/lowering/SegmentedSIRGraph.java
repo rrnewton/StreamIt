@@ -20,6 +20,7 @@ import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRPhasedFilter;
 import at.dms.kjc.sir.SIRPipeline;
+import at.dms.kjc.sir.SIRPredefinedFilter;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.StreamVisitor;
@@ -205,6 +206,23 @@ public class SegmentedSIRGraph implements StreamVisitor {
 					"Illegal graph! A container cannot be preceded by a dynamic push rate.";					
 			}
 
+			 if ((allChildren.get(i) instanceof SIRFilter) &&
+	                    (allChildren.get(i+1) instanceof SIRFilter) ) {
+			     if ((allChildren.get(i) instanceof SIRPredefinedFilter) ) {
+	                assert !isDynamicPop((SIRFilter)allChildren.get(i+1)) : 
+	                    "Illegal graph! A SIRPredefinedFilter cannot be followed by a dynamic pop rate."
+	                    + allChildren.get(i) + " --> " + (SIRFilter)allChildren.get(i+1) ;                 
+	            }
+			 }
+			
+			 if ((allChildren.get(i) instanceof SIRFilter) &&
+                     (allChildren.get(i+1) instanceof SIRFilter) ) {
+              if ((allChildren.get(i+1) instanceof SIRPredefinedFilter) ) {
+                 assert !isDynamicPush((SIRFilter)allChildren.get(i)) : 
+                     "Illegal graph! A SIRPredefinedFilter cannot be preceded by a dynamic push rate."
+                     + allChildren.get(i) + " --> " + (SIRFilter)allChildren.get(i+1) ;                 
+             }
+          }
 			
 			currentPipeline.add((SIRStream)allChildren.get(i));
 			

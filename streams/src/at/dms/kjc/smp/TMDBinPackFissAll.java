@@ -3,6 +3,9 @@ package at.dms.kjc.smp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
@@ -185,7 +188,7 @@ public class TMDBinPackFissAll extends TMD {
      */
     @Override
 	public void run(int tiles) {
-    	
+    	              
         //if we are using the SIR data parallelism pass, then don't run TMD
         if (KjcOptions.dup == 1 || KjcOptions.optfile != null) {
         	System.out.println("***** Not using TMD scheduler since an SIR partitioner was used *****!");
