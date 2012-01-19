@@ -214,15 +214,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
 	                    + allChildren.get(i) + " --> " + (SIRFilter)allChildren.get(i+1) ;                 
 	            }
 			 }
-			
-			 if ((allChildren.get(i) instanceof SIRFilter) &&
-                     (allChildren.get(i+1) instanceof SIRFilter) ) {
-              if ((allChildren.get(i+1) instanceof SIRPredefinedFilter) ) {
-                 assert !isDynamicPush((SIRFilter)allChildren.get(i)) : 
-                     "Illegal graph! A SIRPredefinedFilter cannot be preceded by a dynamic push rate."
-                     + allChildren.get(i) + " --> " + (SIRFilter)allChildren.get(i+1) ;                 
-             }
-          }
+						
 			
 			currentPipeline.add((SIRStream)allChildren.get(i));
 			
