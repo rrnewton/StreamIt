@@ -288,7 +288,7 @@ public class FusePipe {
 			return false;
 		}
 		SIRFilter filter = (SIRFilter) str;
-
+			
 		if (filter.hasIO() && KjcOptions.regtest) {
 			System.err.println("filter " + filter.getName()
 					+ " is not fusable because it has IO.");
@@ -301,7 +301,6 @@ public class FusePipe {
 					+ " is not fusable because it is a dummy");
 			return false;
 		}		
-
 		
 		
 		// special case: identity filters are fusable (even though
@@ -319,6 +318,13 @@ public class FusePipe {
 			return false;
 		}
 
+		
+		if (filter.getDynamic()) {
+		    System.err.println("FusePipe.isFusable filter " + filter.getName()
+                    + " is not fusable because has dynamic rates");
+		    return false;
+		}
+		
 		// must have static rates
 		if (filter.getPeek().isDynamic() || filter.getPop().isDynamic()
 				|| filter.getPush().isDynamic()) {
