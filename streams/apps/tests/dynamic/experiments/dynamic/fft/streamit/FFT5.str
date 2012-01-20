@@ -6,9 +6,9 @@ void->void pipeline FFT5() {
     //add FFTTestSource(N);
     add FileReader<float>("../input/FFT5.in");
     add FFTReorder(N);
-   // for(int j=2; j<=N; j*=2)
-//	add CombineDFT(j);
-    add CombineDFT(2);
+    for(int j=2; j<=N; j*=2)
+	add CombineDFT(j);
+//    add CombineDFT(2);
     //add FileWriter<float>("FFT5.out");
     add FileWriter<float>(stdout);
     //add FloatPrinter();
@@ -79,7 +79,7 @@ float->float filter FFTReorderSimpleStatic(int n) {
     totalData = 2*n; 
   }
 
-  work push * pop 2*n {
+  work push 2*n pop 2*n {
         int i;
         
         for (i = 0; i < totalData; i+=4)
@@ -139,11 +139,11 @@ float->float filter FFTReorderSimpleDynamic(int n) {
 float->float pipeline FFTReorder(int n) {
 
     add FFTReorderSimpleStatic(n/1);   
-    add FFTReorderSimpleDynamic(n/2);
-    add FFTReorderSimpleDynamic(n/4);
+//    add FFTReorderSimpleDynamic(n/2);
+//    add FFTReorderSimpleDynamic(n/4);
 
-//  for(int i=2; i<(n/2); i*= 2)
-//    add FFTReorderSimpleDynamic(n/i);
+  for(int i=2; i<(n/2); i*= 2)
+    add FFTReorderSimpleDynamic(n/i);
 
 }
 
