@@ -1,5 +1,6 @@
 package at.dms.kjc.slir;
 
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +108,56 @@ public class StreamGraph {
 		return ssg;
 	}
 
+	/**
+	 * Print the entire stream graph as a dot file
+	 * @param filename the output file name
+	 */
+	public void dumpGraph(String filename) {
+	    StringBuffer buf = new StringBuffer();
+        buf.append("digraph Flattend {\n");
+        buf.append("size = \"8, 10.5\";\n");        
+        for (int i = 0; i < ssgs.size(); i++) {
+            buf = dumpSingle(buf, ssgs.get(i));            
+            if (i < ssgs.size()-1) {
+                StaticSubGraph srcSSG = ssgs.get(i);
+                StaticSubGraph dstSSG = ssgs.get(i+1);
+                Filter src = srcSSG.getFilterGraph()[srcSSG.getFilterGraph().length-1];
+                Filter dst = dstSSG.getFilterGraph()[0];
+                assert src != null;
+                assert dst != null;
+                buf.append(src.hashCode() + " [ " + srcSSG.filterName(src) + "\" ];\n");
+                buf.append(src.hashCode() + " -> " + dst.hashCode() + ";\n");                
+            }
+            
+        }        	    
+        buf.append("}\n");	    	    	    
+	    try {
+	        FileWriter fw = new FileWriter(filename);
+	        fw.write(buf.toString());
+	        fw.close();
+	    } catch (Exception e) {
+	        System.err.println("Could not print extracted slices");
+	    }
+	}
+	
+
+	private StringBuffer dumpSingle( StringBuffer buf, StaticSubGraph ssg) {
+	    Filter[] filterGraph = ssg.getFilterGraph();
+	 	    for (int i = 0; i < filterGraph.length; i++) {
+	        Filter filter = filterGraph[i];
+	        assert filter != null;
+	        buf.append(filter.hashCode() + " [ " + ssg.filterName(filter) + "\" ];\n");
+	        Filter[] next = ssg.getNext(filter/* ,parent */);
+	        for (int j = 0; j < next.length; j++) {
+	            assert next[j] != null;
+	            buf.append(filter.hashCode() + " -> " + next[j].hashCode()
+	                    + ";\n");
+	        }
+	    }
+	    return buf;
+	    // write the file
+
+	}
 
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
@@ -124,6 +175,8 @@ public class StreamGraph {
         other.steadyMult = this.steadyMult;
         other.ssgs = (java.util.List)at.dms.kjc.AutoCloner.cloneToplevel(this.ssgs);
     }
+
+ 
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

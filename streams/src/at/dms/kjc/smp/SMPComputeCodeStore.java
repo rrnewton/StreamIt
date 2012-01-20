@@ -18,6 +18,7 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeCodeStore;
@@ -343,16 +344,27 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
 		// create the loop				
 		String stmt = "";
+		String multiplierName = fileW.getWorkNodeContent().getName() + "_multiplier";
+		
+		JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
+                CStdType.Integer, multiplierName, null);
+		
+		this.addExternField(new JFieldDeclaration(multiplierVar));
+		
 		if (KjcOptions.outputs < 0) {
-		    stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
-                    +    "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "       
-                    + "}";
+            stmt = "if (" + multiplierName + ") {"
+                 + "  for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+                 +      "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "       
+                 + "  }"
+                 + "}";
             
 		} else {
-		    stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
-                    +    "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "
-                    +    "if (--maxOutputs == 0) {  streamit_exit(0); } "
-		            + "}";
+	          stmt = "if (" + multiplierName + ") {"   
+	               + "  for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+                   +    "  fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "
+                   +    "  if (--maxOutputs == 0) {  streamit_exit(0); } "
+		           + "  }"
+	               + "}";
 		}						
 		addSteadyLoopStatement(Util.toStmt(stmt));						
 	}	

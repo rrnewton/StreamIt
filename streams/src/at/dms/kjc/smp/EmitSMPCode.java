@@ -513,6 +513,13 @@ public class EmitSMPCode extends EmitCode {
                         + fieldDecl.getVariable().getIdent() + ";");
             }
         }
+        
+//        for (String key : ThreadMapper.getMapper().getDominators().keySet()) {
+//            p.println("extern int " + key + "_multiplier;");
+//            for (String val : ThreadMapper.getMapper().getDominators().get(key))
+//            p.println("extern int " + val + "_multiplier;");            
+//        }
+//        
 
         if (KjcOptions.perftest) {
             p.println();
@@ -667,6 +674,13 @@ public class EmitSMPCode extends EmitCode {
             }
         }
 
+//        for (String key : ThreadMapper.getMapper().getDominators().keySet()) {
+//            p.println("int " + key + "_multiplier;");
+//            for (String val : ThreadMapper.getMapper().getDominators().get(key))
+//            p.println("int " + val + "_multiplier;");            
+//        }
+        
+        
         p.println();
 
         if (KjcOptions.perftest) {
@@ -767,6 +781,12 @@ public class EmitSMPCode extends EmitCode {
             }
         }
 
+//        for (String key : ThreadMapper.getMapper().getDominators().keySet()) {
+//            p.println(key + "_multiplier" + " = 1;");
+//            for (String val : ThreadMapper.getMapper().getDominators().get(key))
+//            p.println(val + "_multiplier" + " = 0;");            
+//        }
+        
         p.println();
 
         if (KjcOptions.perftest) {

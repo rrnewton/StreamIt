@@ -211,8 +211,12 @@ public class StaticSubGraph {
 		while (node != null) {
 			if (node.isWorkNode()) {
 				WorkNodeContent f = node.getAsFilter().getWorkNodeContent();
-				out.append("\\n" + node.toString() + "{" + getWorkEstimate(f)
-						+ "}");
+				try {
+				    out.append("\\n" + node.toString() + "{" + getWorkEstimate(f)
+				            + "}");
+				} catch (java.lang.AssertionError e) {
+                    out.append("\\n" + node.toString() + "{N/A}");				    
+				}
 				if (f.isTwoStage())
 					out.append("\\npre:(peek, pop, push): ("
 							+ f.getPreworkPeek() + ", " + f.getPreworkPop()

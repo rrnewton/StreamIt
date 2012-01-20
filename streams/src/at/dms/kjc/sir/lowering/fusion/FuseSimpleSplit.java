@@ -94,7 +94,7 @@ public class FuseSimpleSplit {
         if (!childrenAreIdentities(sj)) {
             // only need to perform normal fusion if some child filter
             // is not an identity
-            newFilter = new SIRFilter(sj.getParent(), "Fused_" + sj.getIdent(),
+            newFilter = new SIRFilter(sj.getParent(), "FusedRJS_" + sj.getIdent(),
                                       newFields, newMethods, new JIntLiteral(rate.peek),
                                       new JIntLiteral(rate.pop), new JIntLiteral(rate.push),
                                       newWork, sj.getInputType(), sj.getOutputType());

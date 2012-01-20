@@ -196,8 +196,6 @@ public class SMPBackend {
 		if (streamGraph.getSSGs().size() > 1) {
 			isDynamic = true;
 		}
-
-
 		
 		InterSSGChannel.createBuffers(streamGraph);
 
@@ -212,9 +210,11 @@ public class SMPBackend {
 
         int i = 0;
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			runSSG(ssg, i); // , filterToThreadId, dominated, dominators, threadIdToType);
+			runSSG(ssg, i); 
 			i++;
 		}
+		
+		streamGraph.dumpGraph("final_graph.dot");
 
 		RotatingBuffer.rotTypeDefs();
 
@@ -226,15 +226,10 @@ public class SMPBackend {
 
 	}
 	
-	private static void runSSG(StaticSubGraph ssg, int ssgNum) {
-	    
-        Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper().getFilterToThreadId();             
-        Set<String> dominated = ThreadMapper.getMapper().getDominated();
-        Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
-        Map<Integer, String> threadIdToType =  ThreadMapper.getMapper().getThreadIdToType();
+	private static void runSSG(StaticSubGraph ssg, int ssgNum) {	          
 	    
 		// dump slice graph to dot file
-		ssg.dumpGraph("traces.dot", null);
+		ssg.dumpGraph("traces_ssg" + ssgNum +".dot", null);
 
 		// partition the slice graph based on the scheduling policy
 		BasicSpaceTimeSchedule graphSchedule = new BasicSpaceTimeSchedule(ssg);
@@ -250,7 +245,7 @@ public class SMPBackend {
 		// dump final slice graph to dot file
 		graphSchedule.getSSG()
 				.dumpGraph("after_slice_partition_ssg"+ ssgNum + ".dot", scheduler);
-		graphSchedule.getSSG().dumpGraph("slice_graph.dot", scheduler, false);
+		graphSchedule.getSSG().dumpGraph("slice_graph_ssg" + ssgNum +".dot", scheduler, false);
 		// if load balancing, find candidiate fission groups to load balance
 		if (KjcOptions.loadbalance) {
 			LoadBalancer.findCandidates();
@@ -262,8 +257,6 @@ public class SMPBackend {
 
 		// now convert to Kopi code plus communication commands
 		backEndFactory = new SMPBackEndFactory(chip, scheduler);
-		//, dominators,
-	//			filterToThreadId);
 		backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
 
 		// calculate computation to communication ratio
