@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -463,4 +464,8 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 
 	/** Create an array reference given an offset */
 	public abstract JFieldAccessExpression writeBufRef();
+
+    public List<JStatement> getTokenWrites() {        
+        return new ArrayList<JStatement>();
+    }
 }

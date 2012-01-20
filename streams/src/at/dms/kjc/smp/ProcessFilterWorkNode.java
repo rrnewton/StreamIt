@@ -6,6 +6,7 @@ import java.util.WeakHashMap;
 
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.JBlock;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
@@ -480,7 +481,8 @@ public class ProcessFilterWorkNode {
 	}
 
 	protected void standardSteadyProcessing(boolean isDynamicPop) {
-		JStatement steadyBlock = filterCode.getSteadyBlock();
+	    JBlock steadyBlock = filterCode.getSteadyBlock();
+		List<JStatement> tokenWrites = filterCode.getTokenWrite();
 
 		if (!basicCodeWritten.containsKey(filterNode)) {
 			codeStore.addFields(filterCode.getFields());
@@ -502,9 +504,16 @@ public class ProcessFilterWorkNode {
 			int threadIndex = Integer.parseInt(threadId);
 			codeStore.addThreadHelper(threadIndex, steadyBlock);
 			codeStore.addSteadyThreadCall(threadIndex);
-
-		} else {		    
-			codeStore.addSteadyLoopStatement(steadyBlock);
+			for (JStatement stmt : tokenWrites ) {
+			    codeStore.addSteadyLoopStatement(stmt);
+			}			
+			
+		} else {		 
+		    for (JStatement stmt : tokenWrites ) {
+		        steadyBlock.addStatement(stmt);
+            }   
+		    codeStore.addSteadyLoopStatement(steadyBlock);
+		
 		}
 		if (debug) {
 			// debug info only: expected splitter and joiner firings.

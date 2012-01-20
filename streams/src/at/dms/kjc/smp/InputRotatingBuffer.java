@@ -223,14 +223,15 @@ public class InputRotatingBuffer extends RotatingBuffer {
 			Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
 			
 			// We don't need a token wait if the downstream filter is "dominated"
-			boolean dominatorRelationship = false;
-			if ( null != dominators.get(src.toString())) {
-			    if (dominators.get(src.toString()).contains(filter.toString())) {
-			        dominatorRelationship = true;
-			    }
-			}
+//			boolean dominatorRelationship = false;
+//			if ( null != dominators.get(src.toString())) {
+//			    if (dominators.get(src.toString()).contains(filter.toString())) {
+//			        dominatorRelationship = true;
+//			    }
+//			}
+//			 if (!srcCore.equals(filterCore) && (!dominatorRelationship)) {
 					
-			if (!srcCore.equals(filterCore) && (!dominatorRelationship)) {
+			if (!srcCore.equals(filterCore) ) {
 				String tokenName = src + "_to_" + filter + "_token";
 				list.add(Util.toStmt("while (" + tokenName
 						+ " == 0)"));
@@ -371,7 +372,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		List<JStatement> list = new LinkedList<JStatement>();
 		//list.add(new SIRBeginMarker("beginSteadyRead"));
 		list.add(transferCommands.zeroOutTail(SchedulingPhase.STEADY));
-		list = addTokenWait(filterNode, SchedulingPhase.STEADY, list);
+		list = addTokenWait(filterNode, SchedulingPhase.STEADY, list);		
 		return list;
 	}
 

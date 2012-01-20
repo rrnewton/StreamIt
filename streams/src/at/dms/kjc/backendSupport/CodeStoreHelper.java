@@ -348,6 +348,10 @@ public abstract class CodeStoreHelper {
 		return null;
 	}
 	
+	public List<JStatement> getTokenWrite() {
+	    return new ArrayList<JStatement>();
+	}   
+
 	/********** TODO Refactoring all of this code! ************/
 	
 	protected List<JFieldDeclaration> fields ; //= new ArrayList<JFieldDeclaration>();
@@ -386,7 +390,9 @@ public abstract class CodeStoreHelper {
 	 */
 	public JFieldDeclaration[] getFields() {
 		return fields.toArray(new JFieldDeclaration[fields.size()]);	
-	}	
+	}
+
+   
 	
 
 	

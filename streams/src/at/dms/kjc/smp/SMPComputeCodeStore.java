@@ -645,6 +645,10 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		addMethod(threadHelper);
 	}
 
+	public void addStatementToSteadyLoop(JStatement statement) {
+	    steadyLoop.addStatementFirst(statement);
+	}
+	
 	public void addSteadyThreadCall(int threadIndex) {
 		Utils.addSetFlag(steadyLoop, threadIndex, "MASTER", "MASTER", "ASLEEP");
 		Utils.addSetFlag(steadyLoop, threadIndex, "DYN_READER", "DYN_READER",

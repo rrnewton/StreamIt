@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -144,8 +145,9 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	 * @param phase The phase of the schedule that is executing.
 	 * @return 
 	 */
-	private List<JStatement> addTokenWrite(WorkNode filter, SchedulingPhase phase, List<JStatement> list) {
-		Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);					
+	private List<JStatement> getTokenWrite(WorkNode filter, SchedulingPhase phase) {
+	    List<JStatement> list = new ArrayList<JStatement>();
+	    Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);					
 		Set<InterFilterEdge> destEdges = filter.getParent()
 				.getOutputNode().getDestSet(phase);						
 		for (InterFilterEdge e : destEdges) {			
@@ -495,8 +497,8 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 			list.addAll(addrRot.rotateStatements());
 		}
 		
-		list = addTokenWrite(filterNode, SchedulingPhase.PRIMEPUMP, list);
-		
+		list.addAll(getTokenWrite(filterNode, SchedulingPhase.PRIMEPUMP));
+				
 		return list;
 	}
 
@@ -521,11 +523,20 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 			list.addAll(addrRot.rotateStatements());
 		}
 
-		// Add synchronization for non-pipelined filters
-		list = addTokenWrite(filterNode, SchedulingPhase.STEADY, list);
+		// Add synchronization for non-pipelined filters				
+		//list.addAll(getTokenWrite(filterNode, SchedulingPhase.STEADY));
 		
 		return list;
 	}
+	
+	/**
+	 * Return synchronization for non-pipelined filters
+	 */
+	@Override
+	public List<JStatement> getTokenWrites() {        
+	    return getTokenWrite(filterNode, SchedulingPhase.STEADY);	      
+	}
+	
 
 	/**
 	 * Return the address rotation that this output rotation uses for the given
