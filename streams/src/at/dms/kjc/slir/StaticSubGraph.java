@@ -102,8 +102,6 @@ public class StaticSubGraph {
 		}
 
 	}
-
-
 	
 	/**
 	 * Dump the the completed partition to a dot file

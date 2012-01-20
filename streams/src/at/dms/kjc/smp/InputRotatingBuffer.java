@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import at.dms.classfile.Constants;
@@ -217,8 +218,19 @@ public class InputRotatingBuffer extends RotatingBuffer {
 			if (src.isFileInput()) {
 				continue;
 			}
-			Core srcCore = SMPBackend.scheduler.getComputeNode(src);
-			if (!srcCore.equals(filterCore)) {
+			Core srcCore = SMPBackend.scheduler.getComputeNode(src);						
+
+			Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
+			
+			// We don't need a token wait if the downstream filter is "dominated"
+			boolean dominatorRelationship = false;
+			if ( null != dominators.get(src.toString())) {
+			    if (dominators.get(src.toString()).contains(filter.toString())) {
+			        dominatorRelationship = true;
+			    }
+			}
+					
+			if (!srcCore.equals(filterCore) && (!dominatorRelationship)) {
 				String tokenName = src + "_to_" + filter + "_token";
 				list.add(Util.toStmt("while (" + tokenName
 						+ " == 0)"));

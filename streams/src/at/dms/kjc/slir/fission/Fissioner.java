@@ -2,6 +2,7 @@ package at.dms.kjc.slir.fission;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -750,13 +751,15 @@ public class Fissioner {
         StaticSubGraph ssg = sliceClones[0].getStaticSubGraph();
         Filter dominator = ssg.getFilterGraph()[0];
         Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();        
-        List<String> dominated = dominators.get(dominator.getWorkNode().toString());
+        Set<String> dominated = ThreadMapper.getMapper().getDominated();
+        List<String> multipliers = dominators.get(dominator.getWorkNode().toString());
         System.out.println("Fissioner.createFissedSlices dominator=" + dominator.getWorkNode().toString());
-        if (dominated != null) {            
-            for (String str : dominated) {
+        if (multipliers != null) {            
+            for (String str : multipliers) {
                 System.out.println("  ==> Fissioner.createFissedSlices dominated=" + str);
             }
-            dominated.remove(origName);        
+            multipliers.remove(origName);        
+            dominated.remove(origName);
         }
                 
         
@@ -764,13 +767,14 @@ public class Fissioner {
         for(int x = 0 ; x < fizzAmount ; x++) {
             newName = origName + "_fizz" + x;
             sliceClones[x].getWorkNode().getWorkNodeContent().setName(newName);
-            if (dominated != null) {
-                dominated.add(newName); 
+            if (multipliers != null) {
+                multipliers.add(newName); 
+                dominated.add(newName);
             }
         }
         
-        if (dominated != null) {
-            dominators.put(dominator.getWorkNode().toString(), dominated);
+        if (multipliers != null) {
+            dominators.put(dominator.getWorkNode().toString(), multipliers);
             ThreadMapper.getMapper().setDominators(dominators);
         }
         // Calculate new steady-state multiplicity based upon fizzAmount.  
