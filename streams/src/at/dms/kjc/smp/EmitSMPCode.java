@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodDeclaration;
@@ -20,7 +18,6 @@ import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRCodeUnit;
-import at.dms.kjc.slir.Filter;
 
 /**
  * Emit c code for tiles
@@ -33,19 +30,15 @@ public class EmitSMPCode extends EmitCode {
     public final String MAIN_FILE = "main.c";
 
     private boolean isDynamic = false;
-    private Map<Filter, Integer> filterToThreadId = null;
     private Set<String> dominated = null;
-    private Map<String, List<String>> dominators = null;
     Map<Integer, String> threadIdToType = null;
 
     public EmitSMPCode(SMPBackEndFactory backEndFactory, boolean isDynamic,
-            Map<Filter, Integer> filterToThreadId, Set<String> dominated,
-            Map<String, List<String>> dominators, Map<Integer, String> threadIdToType) {
+             Set<String> dominated,
+             Map<Integer, String> threadIdToType) {
         super(backEndFactory);
         this.isDynamic = isDynamic;
-        this.filterToThreadId = filterToThreadId;
         this.dominated = dominated;
-        this.dominators = dominators;
         this.threadIdToType = threadIdToType;
     }
 
@@ -561,6 +554,10 @@ public class EmitSMPCode extends EmitCode {
         p.println("#include \"barrier.h\"");
         p.println("#include \"rdtsc.h\"");
         p.println("#include \"structs.h\"");
+        
+        if (KjcOptions.perftest) {
+            p.println("#include <time.h>");
+        }
 
         if (isDynamic) {
             p.println("#include \"dynamic_queue.h\"");

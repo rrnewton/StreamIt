@@ -126,8 +126,8 @@ public class SMPBackend {
 			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
 
 		// emit c code for all cores
-		new EmitSMPCode(backEndFactory, isDynamic, threadMap, dominated,
-				dominators, threadIdToType).doit();
+		new EmitSMPCode(backEndFactory, isDynamic, dominated,
+				 threadIdToType).doit();
 
 		// dump structs.h file
 		structs_h.writeToFile();
