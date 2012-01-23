@@ -24,7 +24,7 @@ def compile(num_cores, output, root, test):
     exe = 'smp' + str(num_cores)
     os.chdir(root)
     cmd = [strc, '-smp', str(num_cores), '--perftest', '--outputs', str(output), test ]
-    #print cmd
+    print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
     os.chdir(test_root)
