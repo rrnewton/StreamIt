@@ -1,6 +1,7 @@
 package at.dms.kjc;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,6 +107,7 @@ public class AutoCloner {
         // not sure what toBeCloned should be in this case... for now
         // make it empty.
         toBeCloned = new HashSet<DeepCloneable>();
+        toBeCloned.addAll(Arrays.asList(slice.getWorkNode().getWorkNodeContent().getFields()));
 
         registry = new HashMap<RegistryWrapper, Object>();
         Object result = cloneToplevel(slice);
@@ -293,6 +295,7 @@ public class AutoCloner {
      * @return
      */
     static private Object cloneFilter(at.dms.kjc.slir.Filter slice) {
+        toBeCloned.addAll(Arrays.asList(slice.getWorkNode().getWorkNodeContent().getFields()));
         Object newSlice = slice.deepClone();
         ((Filter)newSlice).finishClone();
         return newSlice;
