@@ -15,6 +15,8 @@ public abstract class Edge<S,T> {
 	protected T dst;
 	protected CType type;
 	
+	public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "src", "dst" };
+	
 	/**
 	 * @return
 	 */

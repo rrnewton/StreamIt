@@ -9,6 +9,8 @@ public abstract class InputPort {
 	
 	private StaticSubGraph ssg;
 	
+	public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "ssg" };
+	
 	/**
 	 * Create a new InputPort
 	 * @param ssg 

@@ -6,7 +6,7 @@ package at.dms.kjc.slir;
  * They can be specialized into {@link InputNode}, {@link WorkNode}, or {@link OutputNode}. 
  */
 public class InternalFilterNode implements at.dms.kjc.DeepCloneable      {
-    public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "toNext", "toPrev" };
+    public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "toNext", "toPrev" , "parent"};
 
     private IntraFilterEdge toNext = null;  // internal to slice: remains null for OutputSliceNode
     private IntraFilterEdge toPrev = null;  // internal to slice: remains null for InputSliceNode

@@ -7,6 +7,8 @@ public abstract class OutputPort {
 	protected List<InterSSGEdge> links;
 	private StaticSubGraph ssg;
 	
+	public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "ssg", "links" };
+	
 	protected OutputPort(StaticSubGraph ssg) {
 		this.setSSG(ssg);
 		links = new LinkedList<InterSSGEdge>();

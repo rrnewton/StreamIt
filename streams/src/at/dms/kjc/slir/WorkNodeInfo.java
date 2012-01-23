@@ -53,6 +53,8 @@ public class WorkNodeInfo {
     // because once a filter info is created you cannot
     // change the underlying filter...
     private static boolean canuse;
+    
+    public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "sliceNode", "filter" };
 
     static {
         filterInfos = new HashMap<WorkNode, WorkNodeInfo>();

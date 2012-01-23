@@ -24,12 +24,16 @@ public class Link {
 	/** defined on the destination InputPort */
 	private Rate peekRate;
 
+	public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "inputPort", "outputPort" };
+	
 	/** Create a new Link */
 	public Link(InputPort inputPort, OutputPort outputPort) {
 		this.inputPort = inputPort;
 		this.outputPort = outputPort;
 	}
-		
+	
+	
+	
 	public Link() {
 		// TODO Auto-generated constructor stub
 	}

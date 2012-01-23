@@ -15,6 +15,8 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     protected WorkNode workNode;
     protected StaticSubGraph parent;
     
+    public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "parent" };
+    
     /*
      * public Slice (Slice[] edges, Slice[] depends, InputSliceNode head) { if
      * (edges == null) this.edges = new Slice[0]; else this.edges = edges;
