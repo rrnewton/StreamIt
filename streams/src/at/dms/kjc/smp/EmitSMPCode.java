@@ -911,11 +911,14 @@ public class EmitSMPCode extends EmitCode {
 
         p.println("UNAME := $(shell uname)");
         p.println("CC = g++");
+        p.println("CFLAGS = -O2 -lrt");
+        p.println("ifeq ($(UNAME), Darwin)");
         p.println("CFLAGS = -O2 -vec-report0");
+        p.println("endif");
         p.println("INCLUDES = ");
 
         if (KjcOptions.perftest) {        
-            p.println("LIBS = -pthread -lstdc++ -rt");
+            p.println("LIBS = -pthread -lstdc++ -lrt");
             p.println("ifeq ($(UNAME), Darwin)");
             p.println("# do something for OSX");
             p.println("LIBS = -pthread -lstdc++");
