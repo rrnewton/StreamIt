@@ -24,7 +24,7 @@ def compile(num_cores, output, root, test):
     exe = 'smp' + str(num_cores)
     os.chdir(root)
     cmd = [strc, '-smp', str(num_cores), '--perftest', '--outputs', str(output), test ]
-    print cmd
+    #print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
     os.chdir(test_root)
@@ -79,12 +79,16 @@ def main():
             for (subdir, streamit_file) in tests:
                 static_test = os.path.join(test_root, 'static', subdir, 'streamit')
                 dynamic_test = os.path.join(test_root, 'dynamic', subdir, 'streamit')
+                dynamic_pop_test = os.path.join(test_root, 'dynamic_pop', subdir, 'streamit')
                 compile(num_cores, output, static_test, streamit_file)
                 compile(num_cores, output, dynamic_test, streamit_file)
+                compile(num_cores, output, dynamic_pop_test, streamit_file)
                 print '=========================='
                 results = get_result(num_cores, static_test, output, 'static')
                 pr(results)
-                results = get_result(num_cores, dynamic_test, output, 'dynamic')
+                results = get_result(num_cores, dynamic_test, output, 'dynamic push')
+                pr(results)
+                results = get_result(num_cores, dynamic_pop_test, output, 'dynamic pop')
                 pr(results)
 
 
