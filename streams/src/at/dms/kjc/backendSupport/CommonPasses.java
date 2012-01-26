@@ -14,6 +14,8 @@ import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.StreamItDot;
 import at.dms.kjc.common.CheckStatefulFilters;
 import at.dms.kjc.common.ConvertLocalsToFields;
+import at.dms.kjc.common.LowerIterationExpression;
+import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRDummySink;
 import at.dms.kjc.sir.SIRDummySource;
@@ -505,6 +507,8 @@ public class CommonPasses {
 
         // VarDecl Raise to move array assignments up
         new VarDeclRaiser().raiseVars(str);
+
+		LowerIterationExpression.doIt(str);
 
         // do constant propagation on fields
         System.out.println("Running Constant Field Propagation...");

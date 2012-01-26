@@ -40,6 +40,16 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     private boolean stateful;
 
     /**
+     * Indicates whether the filter uses an iteration count.
+     */
+    private boolean isIterationFilter;
+    
+    /**
+     * Indicates whether the filter is a product of fission.
+     */
+    private boolean isFissed;
+    
+    /**
      * Array of phases run by the filter.
      */
     private JMethodDeclaration[] initPhases, phases;
@@ -108,6 +118,8 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         this.phases = other.phases;
         this.ident = other.ident;
         this.stateful = other.stateful;
+        this.isFissed = other.isFissed;
+        this.isIterationFilter = other.isIterationFilter;
         this.hasIO = other.hasIO;
     }
     
@@ -159,6 +171,20 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     	return hasIO;
     }
 
+    public boolean isIterationFilter() {
+        return isIterationFilter;
+    }
+    public void setIterationFilter(boolean isIterationFilter) {
+        this.isIterationFilter = isIterationFilter;
+    }
+
+    public boolean isFissed() {
+        return isFissed;
+    }
+    public void setFissed(boolean isFissed) {
+        this.isFissed = isFissed;
+    }
+
     /**
      * Set the filters flag for determining if it has a print statement.
      * @param hasIO
@@ -167,7 +193,6 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
     	this.hasIO = hasIO;
     }
 
-    
     public JMethodDeclaration[] getInitPhases() {
         return initPhases;
     }
@@ -224,6 +249,8 @@ public class SIRPhasedFilter extends SIRStream implements Cloneable
         other.inputType = (at.dms.kjc.CType)at.dms.kjc.AutoCloner.cloneToplevel(this.inputType);
         other.outputType = (at.dms.kjc.CType)at.dms.kjc.AutoCloner.cloneToplevel(this.outputType);
         other.stateful = this.stateful;
+        other.isFissed = this.isFissed;
+        other.isIterationFilter = this.isIterationFilter;
         other.hasIO = this.hasIO;
         other.initPhases = (at.dms.kjc.JMethodDeclaration[])at.dms.kjc.AutoCloner.cloneToplevel(this.initPhases);
         other.phases = (at.dms.kjc.JMethodDeclaration[])at.dms.kjc.AutoCloner.cloneToplevel(this.phases);

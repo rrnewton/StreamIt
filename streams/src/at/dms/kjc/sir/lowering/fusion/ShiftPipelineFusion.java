@@ -728,6 +728,12 @@ class ShiftPipelineFusion {
         // get the first and last filters' info
         FilterInfo first = filterInfo.get(0);
         FilterInfo last = filterInfo.get(filterInfo.size()-1);
+        
+        // get the iteration state of all filters to be fused
+        boolean containsIterationFilter = false;
+        for (FilterInfo f : filterInfo) {
+            containsIterationFilter |= f.filter.isIterationFilter();
+        }
 
         // calculate the peek, pop, and push count for the fused
         // filter in the STEADY state
@@ -793,6 +799,9 @@ class ShiftPipelineFusion {
     
         // set init function of fused filter
         result.setInit(init);
+        
+        // set the iteration status of the filter
+        result.setIterationFilter(containsIterationFilter);
         return result;
     }
 

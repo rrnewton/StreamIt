@@ -13,6 +13,7 @@ import at.dms.kjc.JPostfixExpression;
 import at.dms.kjc.JPrefixExpression;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.SLIREmptyVisitor;
+import at.dms.kjc.common.LowerIterationExpression;
 import at.dms.util.GetSteadyMethods;
 
 /**
@@ -20,6 +21,8 @@ import at.dms.util.GetSteadyMethods;
  * methods were pulled out of at.dms.kjc.sir.lowering.fission.StatelessDuplicate
  */
 public class MutableStateExtractor {
+    private static final String ITERATION_COUNT_FIELD_PATTERN = 
+        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)?";
 
     /**
      * Returns whether or not <filter> has mutable state.  This is
@@ -28,7 +31,14 @@ public class MutableStateExtractor {
      */
 
     public static boolean hasMutableState(final WorkNodeContent filter) {
+        if (filter.isIterating()) { 
+            return hasMutableNonIterationState(filter);
+        }
         return sizeOfMutableState(filter) > 0;
+    }
+    
+    public static boolean hasMutableNonIterationState(final WorkNodeContent filter) {
+        return sizeOfMutableNonIterationState(filter) > 0;
     }
 
     public static HashSet<String> getMutableState(final WorkNodeContent filter) {
@@ -115,6 +125,35 @@ public class MutableStateExtractor {
         JFieldDeclaration fields[] = filter.getFields();
         for (int i=0; i<fields.length; i++) {
             JVariableDefinition var = fields[i].getVariable();
+            if (mutatedFields.contains(var.getIdent())) {
+                if (var.getType() == null) {
+                    // this should never happen
+                    System.err.println("Warning: found null type of variable in JFieldDeclaration.");
+                    mutableSizeInC++;  // increment size just in case
+                } else {
+                    int size = var.getType().getSizeInC();
+                    // fields should always have non-zero size
+                    assert size > 0;
+                    mutableSizeInC += size;
+                }
+            }
+        }
+
+        return mutableSizeInC;
+    }    
+    
+    public static int sizeOfMutableNonIterationState(final WorkNodeContent filter) {
+        HashSet<String> mutatedFields = getMutableState(filter);
+        // tally up the size of all the fields found
+        int mutableSizeInC = 0;
+        JFieldDeclaration fields[] = filter.getFields();
+        for (int i=0; i<fields.length; i++) {
+            JVariableDefinition var = fields[i].getVariable();
+            
+            if (var.getIdent().matches(ITERATION_COUNT_FIELD_PATTERN)) {
+                continue;
+            }
+            
             if (mutatedFields.contains(var.getIdent())) {
                 if (var.getType() == null) {
                     // this should never happen

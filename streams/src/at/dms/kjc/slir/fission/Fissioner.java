@@ -1,8 +1,10 @@
 package at.dms.kjc.slir.fission;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -11,16 +13,24 @@ import at.dms.kjc.JAddExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JEqualityExpression;
 import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.JFieldAccessExpression;
+import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JForStatement;
 import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIfStatement;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JMinusExpression;
+import at.dms.kjc.JModuloExpression;
 import at.dms.kjc.JRelationalExpression;
+import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
+import at.dms.kjc.common.LowerIterationExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.IDFilterContent;
@@ -30,10 +40,24 @@ import at.dms.kjc.slir.MutableStateExtractor;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
+import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.smp.ThreadMapper;
 
 public class Fissioner {
+    /** Iteration count variable name */
+    private static final String ITERATION_COUNT_VARNAME =
+        LowerIterationExpression.ITER_VAR_NAME;
+    /** Iteration count start for the individual fissed filter */
+    private static final String ITERATION_COUNT_START_VARNAME =
+        "__iteration_countStart";
+    /** Iteration count total increment (i.e. sum of work of all filters) */
+    private static final String ITERATION_COUNT_TOTAL_VARNAME =
+        "__iteration_countStepIncr";
+    /** Iteration count reps for the individual fissed filter */
+    private static final String ITERATION_COUNT_REPS_VARNAME =
+        "__iteration_countReps";
+    
     private static int uniqueID;
     /** the slice we are fissing */
     private Filter slice;
@@ -732,11 +756,13 @@ public class Fissioner {
     }
     
     private void createFissedSlices() {
-        
+
         // Fill array with clones of Slice, put original copy first in array
         sliceClones = new Filter[fizzAmount];
-        for(int x = 0 ; x < fizzAmount ; x++)
-            sliceClones[x] = (Filter)ObjectDeepCloner.deepCopy(slice);
+        for(int x = 0 ; x < fizzAmount ; x++) {
+            Filter clone = (Filter)ObjectDeepCloner.deepCopy(slice);
+            sliceClones[x] = clone;
+        }
 
         //if this was a top slice, we need to remove it and add the clones
         if (isSourceSlice) {
@@ -782,10 +808,16 @@ public class Fissioner {
         // multiplicity is divided by fizzAmount for each Slice clone
 
         int newSteadyMult = sliceSteadyMult / fizzAmount;
+        int runningStartValue = slice.getWorkNodeContent().getInitMult();
 
-        for(int x = 0 ; x < fizzAmount ; x++)
+        for(int x = 0 ; x < fizzAmount ; x++) {
             sliceClones[x].getWorkNode().getWorkNodeContent().setSteadyMult(newSteadyMult);
+            runningStartValue += sliceClones[x].getWorkNode().getWorkNodeContent().getSteadyMult();
 
+            if (slice.getWorkNodeContent().isIterating()) {
+                wrapFilterWithIterationCountUpdate(sliceClones[x].getWorkNodeContent(), runningStartValue);
+            }
+        }
 
         /**********************************************************************
          *               Roll steady-state multiplicity into loop             *
@@ -909,4 +941,66 @@ public class Fissioner {
         }
     }
     
+    private WorkNodeContent wrapFilterWithIterationCountUpdate(WorkNodeContent filter, int i) {
+        // the iteration count field may have been renamed.  this variable stores the name of the iteration
+        // variable.  When we come across its actual name, it will be updated.
+        String iterationCountVarname = ITERATION_COUNT_VARNAME;
+        
+        int startValue = i;
+        int reps = filter.getSteadyMult();
+        int totalWork = sliceSteadyMult;
+        
+        for (JFieldDeclaration field : filter.getFields()) {
+            if (field.getVariable().getIdent().startsWith(iterationCountVarname)) {
+                field.setValue(new JIntLiteral(startValue));
+                
+                // We have found the actual field for the iteration count variable.
+                iterationCountVarname = field.getVariable().getIdent();
+                break;
+            }
+        }
+        // add the incr value field.  This will be the same for all filters (sum of all work ratio).
+        JMethodDeclaration work = filter.getWork();
+
+        // ((i - START - REPS) % TOT) == 0
+        JFieldAccessExpression iterCount = new JFieldAccessExpression(iterationCountVarname);
+        JIntLiteral iterStart = new JIntLiteral(startValue);
+        JIntLiteral iterReps = new JIntLiteral(reps);
+        JIntLiteral iterTot = new JIntLiteral(totalWork);
+        iterCount.setType(CStdType.Integer);
+        JEqualityExpression condExpr = 
+            new JEqualityExpression(null, 
+                true,
+                new JModuloExpression(null, 
+                    new JMinusExpression(null, 
+                        new JMinusExpression(null, 
+                            iterCount,
+                            iterStart),
+                        iterReps),
+                    iterTot),
+                new JIntLiteral(0));
+
+        // (i = i + TOT - REPS)
+        JStatement thenExpr = new JExpressionStatement(
+            new JAssignmentExpression(
+                iterCount,
+                new JAddExpression(
+                    iterCount,
+                    new JMinusExpression(null,
+                        iterTot,
+                        iterReps))));
+        
+        // empty
+        JStatement elseStmt = new JEmptyStatement(null, null);
+        
+        
+        work.addStatement(new JIfStatement(null, 
+                condExpr,
+                thenExpr,
+                elseStmt, 
+                null));
+        
+        return filter;
+    }
+
 }

@@ -295,7 +295,9 @@ public class AutoCloner {
      * @return
      */
     static private Object cloneFilter(at.dms.kjc.slir.Filter slice) {
-        toBeCloned.addAll(Arrays.asList(slice.getWorkNode().getWorkNodeContent().getFields()));
+        for (JFieldDeclaration field : Arrays.asList(slice.getWorkNode().getWorkNodeContent().getFields())) {
+            toBeCloned.add(field.getVariable());
+        }
         Object newSlice = slice.deepClone();
         ((Filter)newSlice).finishClone();
         return newSlice;

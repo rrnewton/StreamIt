@@ -1,6 +1,5 @@
 package at.dms.kjc.sir.lowering.fusion;
 
-//import at.dms.util.IRPrinter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -531,6 +530,12 @@ class ModuloPipelineFusion {
         // get the first and last filters' info
         FilterInfo first = filterInfo.get(0);
         FilterInfo last = filterInfo.get(filterInfo.size()-1);
+        
+        // get the iteration state of all filters to be fused
+        boolean containsIterationFilter = false;
+        for (FilterInfo f : filterInfo) {
+            containsIterationFilter |= f.filter.isIterationFilter();
+        }
 
         // calculate the peek, pop, and push count for the fused
         // filter in the STEADY state
@@ -596,6 +601,9 @@ class ModuloPipelineFusion {
     
         // set init function of fused filter
         result.setInit(init);
+
+        // set the iteration status of the filter
+        result.setIterationFilter(containsIterationFilter);
         return result;
     }
 

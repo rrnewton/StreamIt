@@ -5,7 +5,7 @@ import java.util.Set;
 
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fission.StatelessDuplicate;
+import at.dms.kjc.sir.lowering.fission.IterationStatelessDuplicate;
 import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.sir.lowering.partition.WorkList;
 
@@ -20,7 +20,7 @@ public class CheckStatefulFilters {
 
         for (int i = 0; i < workList.size(); i++) {
             SIRFilter filter = workList.getFilter(i);
-            boolean hasMutableState = StatelessDuplicate.hasMutableState(filter);
+            boolean hasMutableState = IterationStatelessDuplicate.hasMutableState(filter);
             boolean declaredStateful = filter.isStateful();
             if (hasMutableState && !declaredStateful) {
               undeclared_stateful_filter_names.add(filter.getIdent());
@@ -28,7 +28,7 @@ public class CheckStatefulFilters {
               declared_stateless_filter_names.add(filter.getIdent());
             }
         }
-
+        
         if (declared_stateless_filter_names.size() > 0) {
             System.out.println("Warning: stateless filter(s) declared stateful: "
                                + declared_stateless_filter_names);
@@ -41,5 +41,6 @@ public class CheckStatefulFilters {
                 "Error: stateful filter(s) not declared stateful: "
                 + undeclared_stateful_filter_names);
         }
+        
     }
 }

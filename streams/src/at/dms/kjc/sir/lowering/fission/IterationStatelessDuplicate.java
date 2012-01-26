@@ -5,22 +5,27 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import at.dms.kjc.CStdType;
+import at.dms.kjc.Constants;
+import at.dms.kjc.JAddExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
-import at.dms.kjc.JCompoundAssignmentExpression;
+import at.dms.kjc.JEmptyStatement;
+import at.dms.kjc.JEqualityExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldAccessExpression;
 import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JIfStatement;
 import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JPrefixExpression;
+import at.dms.kjc.JMinusExpression;
+import at.dms.kjc.JModuloExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.ObjectDeepCloner;
-import at.dms.kjc.SLIREmptyVisitor;
 import at.dms.kjc.common.LowerIterationExpression;
+import at.dms.kjc.iterator.IterFactory;
 import at.dms.kjc.sir.SIRContainer;
 import at.dms.kjc.sir.SIRFeedbackLoop;
 import at.dms.kjc.sir.SIRFilter;
@@ -33,15 +38,29 @@ import at.dms.kjc.sir.SIRSplitType;
 import at.dms.kjc.sir.SIRSplitter;
 import at.dms.kjc.sir.SIRTwoStageFilter;
 import at.dms.kjc.slir.WorkNodeContent;
-import at.dms.util.GetSteadyMethods;
+import at.dms.util.SIRPrinter;
 import at.dms.util.Utils;
 
 /**
- * This class splits a stateless filter with arbitrary push/pop/peek
- * ratios into a duplicate/round-robin split-join of a user-specified
- * width.
+ * This class splits a filter that uses the iteration count feature 
+ * into a duplicate/round-robin split-join of a user-specified width.
  */
-public class StatelessDuplicate {
+public class IterationStatelessDuplicate {
+    private static final String ITERATION_COUNT_FIELD_PATTERN = 
+        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)?";
+    /** Iteration count variable name */
+    private static final String ITERATION_COUNT_VARNAME =
+        LowerIterationExpression.ITER_VAR_NAME;
+    /** Iteration count start for the individual fissed filter */
+    private static final String ITERATION_COUNT_START_VARNAME =
+        "__iteration_countStart";
+    /** Iteration count total increment (i.e. sum of work of all filters) */
+    private static final String ITERATION_COUNT_TOTAL_VARNAME =
+        "__iteration_countStepIncr";
+    /** Iteration count reps for the individual fissed filter */
+    private static final String ITERATION_COUNT_REPS_VARNAME =
+        "__iteration_countReps";
+    
     /**
      * Toggle that indicates whether a round-robing splitter should be
      * used in the resulting splitjoin if pop==peek for the filter
@@ -50,10 +69,6 @@ public class StatelessDuplicate {
      * decimate at the nodes.
      */
     private static final boolean USE_ROUNDROBIN_SPLITTER = true;
-
-    private static final String ITERATION_COUNT_FIELD_PATTERN = 
-        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)?";
-    
     
     /**
      * The filter we're duplicating.
@@ -76,13 +91,13 @@ public class StatelessDuplicate {
      */
     private LinkedList<SIRFilter> newFilters;
     
-    private StatelessDuplicate(SIRFilter origFilter, int reps, int[] workRatio) {
+    private IterationStatelessDuplicate(SIRFilter origFilter, int reps, int[] workRatio) {
         this.origFilter = origFilter;
         this.reps = reps;
         this.workRatio = workRatio;
         this.newFilters = new LinkedList<SIRFilter>();
     }
-
+    
     /**
      * Duplicates <filter> into a <reps>-way SplitJoin and replaces
      * the filter with the new construct in the parent.  The new
@@ -93,12 +108,8 @@ public class StatelessDuplicate {
      * Requires workRatio.length == reps.
      */
     public static SIRSplitJoin doit(SIRFilter origFilter, int reps, int[] workRatio) {
-        if (origFilter.isIterationFilter()) {
-            return IterationStatelessDuplicate.doit(origFilter, reps, workRatio);
-        }
-        
         if (isFissable(origFilter)) {
-            return new StatelessDuplicate(origFilter, reps, workRatio).doit();
+            return new IterationStatelessDuplicate(origFilter, reps, workRatio).doIt();
         } else {
             Utils.fail("Trying to split an un-fissable filter: " + origFilter);
             return null;
@@ -110,10 +121,6 @@ public class StatelessDuplicate {
      * children will all do the same amount of work.
      */
     public static SIRSplitJoin doit(SIRFilter origFilter, int reps) {
-        if (origFilter.isIterationFilter()) {
-            return IterationStatelessDuplicate.doit(origFilter, reps);
-        }
-        
         // init workRatio to {1, 1, ..., 1}
         int[] workRatio = new int[reps];
         for (int i=0; i<reps; i++) {
@@ -121,9 +128,9 @@ public class StatelessDuplicate {
         }
         return doit(origFilter, reps, workRatio);
     }
-
+    
     /**
-     * Checks whether or not <filter> can be fissed.
+     * Checks whether or not <filter> can be fissed.  
      */
     public static boolean isFissable(SIRFilter filter) {
         //do not fiss sinks
@@ -132,7 +139,7 @@ public class StatelessDuplicate {
 
         // check that it does not have mutable state
         if (hasMutableState(filter)) {
-        	return false;
+            return false;
         }
     
       //Hack to prevent fissing file writers
@@ -141,10 +148,6 @@ public class StatelessDuplicate {
         
       //Hack to prevent fissing file writers
         if(filter.getIdent().startsWith("FileWriter"))
-            return false;
-        
-        //Hack to prevent fissing file writers
-        if(filter.getIdent().startsWith("Writer"))
             return false;
 
         //Don't fiss identities
@@ -179,6 +182,8 @@ public class StatelessDuplicate {
      * Returns whether or not <filter> has mutable state.  This is
      * equivalent to checking if there are any assignments to fields
      * outside of the init function.
+     * 
+     * Ignores any variables that are products of using iteration counts.
      */
     public static boolean hasMutableState(final SIRFilter filter) {
         return sizeOfMutableState(filter) > 0;
@@ -188,105 +193,21 @@ public class StatelessDuplicate {
         return sizeOfMutableState(filter) > 0;
     }
     
-    public static HashSet<String> getMutableState(final SIRFilter filter) {
-        // visit all methods except <init>
-        List<JMethodDeclaration> methods = GetSteadyMethods.getSteadyMethods(filter);        
-        return doGetMutableState(methods);
-    }
-    
-    public static HashSet<String> getMutableState(final WorkNodeContent filter) {
-        // visit all methods except <init>
-        List<JMethodDeclaration> methods = GetSteadyMethods.getSteadyMethods(filter);
-        
-        return doGetMutableState(methods);
-    }
-    
-    private static HashSet<String> doGetMutableState(List<JMethodDeclaration> methods) {
-        
-        // whether or not we are on the LHS of an assignment
-        final boolean[] inAssignment = { false };
-        // names of fields that are mutatable state
-        final HashSet<String> mutatedFields = new HashSet<String>();
-        
-        for (JMethodDeclaration method : methods)
-            method.accept(new SLIREmptyVisitor() {
-                    // wrap visit to <left> with some book-keeping
-                    // to indicate that it is on the LHS of an assignment
-                    private void wrapVisit(JExpression left) {
-                        // in case of nested assignment
-                        // expressions, remember the old value of <inAssignment>
-                        boolean old = inAssignment[0];
-                        inAssignment[0] = true;
-                        left.accept(this);
-                        inAssignment[0] = old;
-                    }
-
-                    @Override
-					public void visitCompoundAssignmentExpression(JCompoundAssignmentExpression self,
-                                                                  int oper,
-                                                                  JExpression left,
-                                                                  JExpression right) {
-                        wrapVisit(left);
-                        right.accept(this);
-                    }
-
-                    @Override
-					public void visitAssignmentExpression(JAssignmentExpression self,
-                                                          JExpression left,
-                                                          JExpression right) {
-                        wrapVisit(left);
-                        right.accept(this);
-                    }
-
-                    // need to count i++ as mutated state if i is a field
-                    @Override
-					public void visitPostfixExpression(JPostfixExpression self,
-                                                       int oper,
-                                                       JExpression expr) {
-                        wrapVisit(expr);
-                    }
-
-                    // need to count ++i as mutated state if i is a field
-                    @Override
-					public void visitPrefixExpression(JPrefixExpression self,
-                                                      int oper,
-                                                      JExpression expr) {
-                        wrapVisit(expr);
-                    }
-
-
-
-                    @Override
-					public void visitFieldExpression(JFieldAccessExpression self,
-                                                     JExpression left,
-                                                     String ident) {
-                        // if we are in assignment, mark that there is mutable state
-                        if (inAssignment[0]) {
-                            mutatedFields.add(self.getIdent());
-                        }
-
-                        super.visitFieldExpression(self, left, ident);
-                    }
-                        
-                });
-        
-        return mutatedFields;
-
-    }
-
     /**
      * Returns the number of bytes of mutable state (using C types)
      * for filter <filter>.  Conservatively assumes that if a single
      * location in an array is mutable state, then the entire array is
      * mutable state.
+     * 
+     * Ignores any variables that are products of using iteration counts.
      */
-    public static int sizeOfMutableState(final SIRFilter filter) {
-        HashSet<String> mutatedFields = getMutableState(filter);
+    private static int sizeOfMutableState(final SIRFilter filter) {
+        HashSet<String> mutatedFields = StatelessDuplicate.getMutableState(filter);
         // tally up the size of all the fields found
         int mutableSizeInC = 0;
         JFieldDeclaration fields[] = filter.getFields();
-        for (int i=0; i<fields.length; i++) {
-            JVariableDefinition var = fields[i].getVariable();            
+        for (int i=0; i<fields.length; i++) {            
+            JVariableDefinition var = fields[i].getVariable();
             
             if (var.getIdent().matches(ITERATION_COUNT_FIELD_PATTERN)) {
                 continue;
@@ -309,16 +230,16 @@ public class StatelessDuplicate {
         return mutableSizeInC;
     }
     
-    public static int sizeOfMutableState(final WorkNodeContent filter) {
-        HashSet<String> mutatedFields = getMutableState(filter);
+    private static int sizeOfMutableState(final WorkNodeContent filter) {
+        HashSet<String> mutatedFields = StatelessDuplicate.getMutableState(filter);
         // tally up the size of all the fields found
         int mutableSizeInC = 0;
         JFieldDeclaration fields[] = filter.getFields();
         for (int i=0; i<fields.length; i++) {
-            JVariableDefinition var = fields[i].getVariable();            
+            JVariableDefinition var = fields[i].getVariable();
             
             if (var.getIdent().matches(ITERATION_COUNT_FIELD_PATTERN)) {
-                continue;
+                continue;                
             }
             
             if (mutatedFields.contains(var.getIdent())) {
@@ -339,10 +260,19 @@ public class StatelessDuplicate {
     }
 
 
+    
     /**
-     * Carry out the duplication on this instance.
+     * @return new SIRSplitJoin pointing to the fissed SIRFilters
      */
-    private SIRSplitJoin doit() {
+    private SIRSplitJoin doIt() {
+        System.out.println("calling iterationStatelessDuplicate.");
+        
+        /* TODO(ewong): remove Debugging printer */ 
+        SIRPrinter printer = new SIRPrinter("IterationStatelessDuplicate_origFilter_" + origFilter.getIdent() + ".sir");
+        IterFactory.createFactory().createIter(origFilter).accept(printer);
+        printer.close();
+        
+        
         // make new filters
         for (int i=0; i<reps; i++) {
             newFilters.add(makeDuplicate(i));
@@ -356,7 +286,7 @@ public class StatelessDuplicate {
 
         // make an init function
         JMethodDeclaration init = makeSJInit(result);
-
+        
         // create the splitter
         if (USE_ROUNDROBIN_SPLITTER && origFilter.getPeekInt()==origFilter.getPopInt()) {
             // without peeking, it's a round-robin..
@@ -371,7 +301,7 @@ public class StatelessDuplicate {
             result.setSplitter(SIRSplitter.
                                create(result, SIRSplitType.DUPLICATE, reps));
         }
-
+        
         // create the joiner
         if (origFilter.getPushInt() > 0) {
             // assign join weights according to workRatio and push rate of filter
@@ -390,22 +320,20 @@ public class StatelessDuplicate {
 
         // set the init function
         result.setInit(init);
-
-        /*
-        // propagate constants through the new stream, to resolve
-        // arguments to init functions
-        SIRContainer toplevel = result.getParent();
-        while (toplevel.getParent()!=null) {
-        toplevel = toplevel.getParent();
-        }
-        ConstantProp.propagateAndUnroll(toplevel);
-        */
-        return result;
+        
+        
+        /* TODO(ewong): remove Debugging printer */ 
+        printer = new SIRPrinter("IterationStatelessDuplicate_newSplitJoin_" + origFilter.getIdent() + ".sir");
+        IterFactory.createFactory().createIter(result).accept(printer);
+        printer.close();
+        
+        return result;       
     }
-
+    
     /**
      * Returns an init function for the containing splitjoin.
      */
+    @SuppressWarnings("unchecked")
     private JMethodDeclaration makeSJInit(SIRSplitJoin sj) {
         // start by cloning the original init function, so we can get
         // the signature right
@@ -419,7 +347,7 @@ public class StatelessDuplicate {
             // build up the argument list
             LinkedList args = new LinkedList();
             for (ListIterator pit = params.listIterator(); pit.hasNext(); ) {
-                args.add(pit.next());
+                args.add((JExpression)pit.next());
             }
             // add the child and the argument to the parent
             sj.add(it.next(), args);
@@ -430,6 +358,7 @@ public class StatelessDuplicate {
         // return result
         return result;
     }
+    
 
     /**
      * Makes the <i>'th duplicate filter in this.
@@ -438,17 +367,116 @@ public class StatelessDuplicate {
         // start by cloning the original filter, and copying the state
         // into a new filter.
         SIRFilter cloned = (SIRFilter)ObjectDeepCloner.deepCopy(origFilter);
+        // set cloned isFiss to true
+        cloned.setFissed(true);
+        
+        // wrap the filter with iteration count updates
+        wrapFilterWithIterationCountUpdate(cloned, i);
+        
         // if there is no peeking, then we can returned <cloned>.
         if (USE_ROUNDROBIN_SPLITTER && origFilter.getPeekInt()==origFilter.getPopInt()) {
             return cloned;
         } else {
             // wrap work function with pop statements for extra items
             wrapWorkFunction(cloned, i);
-            // return result
             return cloned;
         }
     }
+    
+    private void wrapFilterWithIterationCountUpdate(SIRFilter filter, int i) {
+        // the iteration count field may have been renamed.  this variable stores the name of the iteration
+        // variable.  When we come across its actual name, it will be updated.
+        String iterationCountVarname = ITERATION_COUNT_VARNAME;
+        
+        // add the appropriate fields to the Filter
+        // add the work value field.  This will differ from filter to filter because of the number of reps:
+        filter.addField(
+                new JFieldDeclaration(
+                        new JVariableDefinition(
+                                Constants.ACC_PRIVATE,
+                                CStdType.Integer,
+                                ITERATION_COUNT_REPS_VARNAME,
+                                new JIntLiteral(workRatio[i]))));
+        // add the start value field.  This will differ from filter to filter because of where it needs to start:
+        int startValue = 0;
+        for (int j=0; j != i; j++) {
+            startValue += workRatio[j];
+        }
+        filter.addField(
+                new JFieldDeclaration(
+                        new JVariableDefinition(
+                                Constants.ACC_PRIVATE,
+                                CStdType.Integer,
+                                ITERATION_COUNT_START_VARNAME,
+                                new JIntLiteral(startValue))));
+        for (JFieldDeclaration field : filter.getFields()) {
+            if (field.getVariable().getIdent().startsWith(iterationCountVarname)) {
+                field.setValue(new JIntLiteral(startValue));
+                
+                // We have found the actual field for the iteration count variable.
+                iterationCountVarname = field.getVariable().getIdent();
+                break;
+            }
+        }
+        // add the incr value field.  This will be the same for all filters (sum of all work ratio).
+        int totalWork = 0;
+        for (int work : workRatio) {
+            totalWork += work;
+        }
+        filter.addField(
+                new JFieldDeclaration(
+                        new JVariableDefinition(
+                                Constants.ACC_PRIVATE,
+                                CStdType.Integer,
+                                ITERATION_COUNT_TOTAL_VARNAME,
+                                new JIntLiteral(totalWork))));
+        
+        // set the appropriate update at the end of the work function (after iterationCount is incremented)
+        JMethodDeclaration work = filter.getWork();
 
+        // ((i - START - REPS) % TOT) == 0
+        JFieldAccessExpression iterCount = new JFieldAccessExpression(iterationCountVarname);
+        JFieldAccessExpression iterStart = new JFieldAccessExpression(ITERATION_COUNT_START_VARNAME);
+        JFieldAccessExpression iterReps = new JFieldAccessExpression(ITERATION_COUNT_REPS_VARNAME);
+        JFieldAccessExpression iterTot = new JFieldAccessExpression(ITERATION_COUNT_TOTAL_VARNAME);
+        iterCount.setType(CStdType.Integer);
+        iterStart.setType(CStdType.Integer);
+        iterReps.setType(CStdType.Integer);
+        iterTot.setType(CStdType.Integer);
+        JEqualityExpression condExpr = 
+            new JEqualityExpression(null, 
+                true,
+                new JModuloExpression(null, 
+                    new JMinusExpression(null, 
+                        new JMinusExpression(null, 
+                            iterCount,
+                            iterStart),
+                        iterReps),
+                    iterTot),
+                new JIntLiteral(0));
+
+        // (i = i + TOT - REPS)
+        JStatement thenExpr = new JExpressionStatement(
+            new JAssignmentExpression(
+                iterCount,
+                new JAddExpression(
+                    iterCount,
+                    new JMinusExpression(null,
+                        iterTot,
+                        iterReps))));
+        
+        // empty
+        JStatement elseStmt = new JEmptyStatement(null, null);
+        
+        
+        work.addStatement(new JIfStatement(null, 
+                condExpr,
+                thenExpr,
+                elseStmt, 
+                null));
+        
+    }
+    
     // For the i'th child in the fissed splitjoin, does two things:
     // 
     // 1. wraps the work function in a loop corresponding to the

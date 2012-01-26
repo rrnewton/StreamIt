@@ -277,6 +277,8 @@ public class RenameAll extends SLIRReplacingVisitor
         
         nf.setStateful(str.isStateful());
         nf.setIO(str.hasIO());
+        nf.setIterationFilter(str.isIterationFilter());
+        nf.setFissed(str.isFissed());
         
         nf.setInit(newInit);
         symtab = ost;
