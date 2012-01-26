@@ -555,7 +555,7 @@ public class EmitSMPCode extends EmitCode {
         p.println("#include \"rdtsc.h\"");
         p.println("#include \"structs.h\"");
         
-        p.println("#ifdef __MACH_");
+        p.println("#ifdef __MACH__");
         p.println("#include <mach/thread_policy.h>");
         p.println("#endif");
         
@@ -916,7 +916,7 @@ public class EmitSMPCode extends EmitCode {
         // p.println("CC = icc");
 
         p.println("UNAME := $(shell uname)");
-        p.println("CC = g++");
+        p.println("CC = gcc");
         p.println("CFLAGS = -O2 -lrt");
         p.println("ifeq ($(UNAME), Darwin)");
         p.println("CFLAGS = -O2 -vec-report0");

@@ -3,7 +3,6 @@ package at.dms.kjc.smp;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.JBlock;
@@ -24,18 +23,16 @@ import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.sir.SIRPeekExpression;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
-import at.dms.kjc.slir.InputContent;
-import at.dms.kjc.slir.IntraSSGEdge;
-import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.InternalFilterNode;
+import at.dms.kjc.slir.IntraSSGEdge;
+import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
-import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.WorkNodeInfo;
 
 /**
@@ -54,7 +51,7 @@ public class ProcessFilterWorkNode {
 
 		String peekName;
 		String popManyName;
-		String popName;
+		String popName;  
 		String pushName;
 		@SuppressWarnings("rawtypes")
 		Channel inputChannel;
@@ -77,7 +74,7 @@ public class ProcessFilterWorkNode {
 				return methodCall;
 			}
 		}
-		
+					
 		private JExpression dynamicPop(SIRPopExpression self, CType tapeType) {
 			InputPort inputPort = ((InterSSGChannel) inputChannel).getEdge()
 					.getDest();
@@ -107,14 +104,14 @@ public class ProcessFilterWorkNode {
 		@SuppressWarnings("rawtypes")
 		public void init(WorkNode filter, Channel inputChannel,
 				Channel outputChannel, String peekName, String popManyName,
-				String popName, String pushName,
+				String popName, String pushName,			
 				Map<Filter, Integer> filterToThreadId,
 				Map<String, List<String>> dominators, boolean isDynamicPop,
 				boolean isDynamicPush) {
 			this.filter = filter;
 			this.peekName = peekName;
 			this.popManyName = popManyName;
-			this.popName = popName;
+			this.popName = popName;		
 			this.pushName = pushName;
 			this.inputChannel = inputChannel;
 			this.outputChannel = outputChannel;
@@ -155,6 +152,37 @@ public class ProcessFilterWorkNode {
 
 		@Override
 		public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
+		    
+		    System.out.println("ProcessFilterWorkNode.visitPopExpression filter=" 
+		            + filter.getWorkNodeContent()
+		            + " filter.getPrevious()=" 
+		            + filter.getPrevious().getParent().getWorkNode());
+
+		    // We have to special case when there is a dynamic pop rate 
+		    // that follows a FileReader. First we check if this is the 
+		    // first filter in the ssg.
+		    StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
+		    if (ssg.getFilterGraph()[0].equals(filter.getParent())) {
+		        System.out.println("ProcessFilterWorkNode.visitPopExpression filter=" 
+	                    + filter.getWorkNodeContent()
+	                    + " is first in SSG"); 
+		        // If it is, then check what SSG it is connected to. 
+		        // If that SSG has only 1 filter, and that filter is a
+		        // FileReader, then we should have a static pop instead
+		        // of a dynamic pop
+		        List<InterSSGEdge> edges = ssg.getInputPort().getLinks();
+	            for (InterSSGEdge edge : edges) {
+	                OutputPort outputPort = edge.getSrc();
+	                StaticSubGraph outputSSG = outputPort.getSSG();
+	                Filter[] filterGraph = outputSSG.getFilterGraph();
+	                if (filterGraph.length == 1) {
+	                    System.out.println("ProcessFilterWorkNode.visitPopExpression filterGraph[0]=" + filterGraph[0].getWorkNode().isFileInput());   
+	                    if (filterGraph[0].getWorkNode().isFileInput()) {
+	                      return staticPop(self, tapeType);
+	                  }	                    	                    	                    
+	                }	                
+	            }		        		       		       
+		    }
 			if (isDynamicPop) {
 				return dynamicPop(self, tapeType);
 			} else {

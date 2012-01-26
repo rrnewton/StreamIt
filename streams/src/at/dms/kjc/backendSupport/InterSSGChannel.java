@@ -37,8 +37,16 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
         return fileWriterBuffers;
     }
     
+    /* return all the input buffers of the file readers of this application */
+    public static Set<InterSSGChannel> getFileReaderBuffers() {
+        return fileReaderBuffers;
+    }
+    
     /** stores InputRotatingBuffers for file writers */
     protected static HashSet<InterSSGChannel> fileWriterBuffers;
+    
+    /** stores InputRotatingBuffers for file readers */
+    protected static HashSet<InterSSGChannel> fileReaderBuffers;
  	
 	/** maps each WorkNode to Input/OutputRotatingBuffers */
 	protected static HashMap<WorkNode, InterSSGChannel> inputBuffers;
@@ -52,6 +60,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		inputBuffers = new HashMap<WorkNode, InterSSGChannel>();
 		outputBuffers = new HashMap<WorkNode, InterSSGChannel>();
 		fileWriterBuffers = new HashSet<InterSSGChannel>(); 
+		fileReaderBuffers = new HashSet<InterSSGChannel>(); 
 	}
 
 	/**
@@ -69,6 +78,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		for (String type : types) {
 			SMPBackend.dynamicQueueCodeGenerator.addQueueType(type);
 		}
+		for (InterSSGChannel channel : fileReaderBuffers) {		    
+		    String type = channel.getEdge().getType().toString();
+		    SMPBackend.dynamicQueueCodeGenerator.addPopSource(type);
+		};
 	}
 
 	/**
@@ -91,15 +104,16 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				InterSSGChannel channel = new InterSSGChannel(edge);
 				CType bufType = edge.getType();
 				types.add(bufType.toString());
-				Filter top = edge.getDest().getSSG().getTopFilters()[0];
-				inputBuffers.put(top.getWorkNode(), channel);
-				
-				if (top.getWorkNode().isFileOutput()) {
+				Filter dstTop = edge.getDest().getSSG().getTopFilters()[0];
+				inputBuffers.put(dstTop.getWorkNode(), channel);
+								
+				if (dstTop.getWorkNode().isFileOutput()) {
 				    fileWriterBuffers.add(channel);
 				}
+								
 				
-				if (top.getWorkNode().isFileOutput()) {
-				    ProcessFileWriter.getAllocatingCore(top.getWorkNode());
+				if (dstTop.getWorkNode().isFileOutput()) {
+				    ProcessFileWriter.getAllocatingCore(dstTop.getWorkNode());
 				}				
 				
 			}
@@ -112,8 +126,8 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 */
 	private static void createOutputBuffers(StreamGraph streamGraph) {
 
-		for (StaticSubGraph srcSSG : streamGraph.getSSGs()) {
-			InputPort inputPort = srcSSG.getInputPort();
+		for (StaticSubGraph dstSSG : streamGraph.getSSGs()) {
+			InputPort inputPort = dstSSG.getInputPort();
 			if (inputPort == null) {
 				continue;
 			}
@@ -123,11 +137,26 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 				InterSSGChannel channel = new InterSSGChannel(edge);
 				CType bufType = edge.getType();
 				types.add(bufType.toString());
-				Filter top = srcSSG.getTopFilters()[0];
-				outputBuffers.put(top.getWorkNode(), channel);
+				Filter dstTop = dstSSG.getTopFilters()[0];
+				outputBuffers.put(dstTop.getWorkNode(), channel);
+				Filter srcTop = edge.getSrc().getSSG().getTopFilters()[0];
+
+                System.out.println("InterSSGChannel.createOutputBuffers srcTop="
+                        + dstTop.getWorkNode().toString());
+
+                if (dstTop.getWorkNode().isFileOutput()) {
+                    System.out.println("InterSSGChannel.createOutputBuffers srcTop="
+                            + dstTop.getWorkNode().toString() + " isFileOutput");
+                }
 				
-                if (top.getWorkNode().isFileOutput()) {
-                    ProcessFileWriter.getAllocatingCore(top.getWorkNode());
+				if (srcTop.getWorkNode().isFileInput()) {
+				    System.out.println("InterSSGChannel.createOutputBuffers adding srcTop="
+	                        + srcTop.getWorkNode().toString() + " to fileReaderBuffers");
+				    fileReaderBuffers.add(channel);
+				}
+				
+                if (dstTop.getWorkNode().isFileOutput()) {
+                    ProcessFileWriter.getAllocatingCore(dstTop.getWorkNode());
                 }               
 
 				
@@ -266,8 +295,17 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	 */
 	@Override
 	public String popMethodName() {
-		String type = edge.getType().toString();
-		return type + "_queue_pop";
+	    String type = edge.getType().toString();
+	    OutputPort outputPort = edge.getSrc();
+        StaticSubGraph outputSSG = outputPort.getSSG();
+        Filter[] filterGraph = outputSSG.getFilterGraph();
+        if (filterGraph.length == 1) {
+            System.out.println("InterSSGChannel.popMethodName");
+            if (filterGraph[0].getWorkNode().isFileInput()) {
+                return type + "_queue_pop_source";                                     
+          }                                                                     
+        }                 	    	   
+        return type + "_queue_pop";
 	}
 
 	@Override

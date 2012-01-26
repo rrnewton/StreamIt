@@ -353,14 +353,16 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		
 		if (KjcOptions.outputs < 0) {
             stmt = "if (" + multiplierName + ") {"
-                 + "  for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+                    + "  int _i_ = 0;"
+                    + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { " 
                  +      "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "       
                  + "  }"
                  + "}";
             
 		} else {
 	          stmt = "if (" + multiplierName + ") {"   
-	               + "  for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+	               + "  int _i_ = 0;" 
+	               + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { " 
                    +    "  fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "
                    +    "  if (--maxOutputs == 0) {  streamit_exit(0); } "
 		           + "  }"
@@ -404,14 +406,16 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         String buffer = "dyn_buf_" + threadId;        
         String popCall = popName + "(" + buffer + ", "+ threadId + ", 0, NULL)";       
         if (KjcOptions.outputs < 0) {            
-            stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+            stmt = "int _i_ = 0;"
+                    + "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
                     +    "if (" + buffer + "->size > 0) {"       
                     +      "fprintf(output, \"" + type + "\\n\", " + cast + popCall + "); "       
                     +   "}"
                     + "}";
             
         } else {
-            stmt = "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
+            stmt = "int _i_ = 0;"
+                    + "for (_i_ = 0; _i_ < " + outputs + "; _i_++) { " 
                     +    "if (" + buffer + "->size > 0) {"       
                     +      "fprintf(output, \"" + type + "\\n\", " + cast + popCall + "); "
                     +      "if (--maxOutputs == 0) {  exit(0); } "

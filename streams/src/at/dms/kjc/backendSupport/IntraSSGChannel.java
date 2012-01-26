@@ -8,7 +8,6 @@ import java.util.List;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.JBlock;
-import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFormalParameter;
@@ -17,7 +16,6 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.SchedulingPhase;
@@ -80,6 +78,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * @param src
      * @param dst
      */
+    @SuppressWarnings("unchecked")
     protected IntraSSGChannel(InternalFilterNode src, InternalFilterNode dst) {
         this(Util.srcDstToEdge(src, dst, SchedulingPhase.STEADY));
     }
@@ -90,6 +89,7 @@ public class IntraSSGChannel extends Channel<IntraSSGEdge<InternalFilterNode, In
      * @param edge  Edge that the channel should implement
      * @return an existing channel if there is one, else null.
      */
+    @SuppressWarnings("rawtypes")
     public static IntraSSGChannel findChannel(IntraSSGEdge edge) {
         return bufferStore.get(edge);
     }
