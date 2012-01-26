@@ -1001,15 +1001,15 @@ public class EmitSMPCode extends EmitCode {
         p.indent();
         
         p.println("#ifdef __MACH__");
-        p.println("//thread_affinity_policy ap;");
-        p.println("//ap.affinity_tag =core; ");
-        p.println("//if ((thread_policy_set(pthread_mach_thread_np(pthread_self()),");
-        p.println("//                      THREAD_AFFINITY_POLICY,");
-        p.println("//                      (integer_t*) &ap,");
-        p.println("//                      THREAD_AFFINITY_POLICY_COUNT)) != KERN_SUCCESS) {");
-        p.println("//  printf(\"Error setting pthread affinity\\n\");");
-        p.println("//  exit(-1);");
-        p.println("//}");
+        p.println("thread_affinity_policy_data_t ap;");
+        p.println("ap.affinity_tag =core; ");
+        p.println("if ((thread_policy_set(pthread_mach_thread_np(pthread_self()),");
+        p.println("                      THREAD_AFFINITY_POLICY,");
+        p.println("                      (integer_t*) &ap,");
+        p.println("                      THREAD_AFFINITY_POLICY_COUNT)) != KERN_SUCCESS) {");
+        p.println("  printf(\"Error setting pthread affinity\\n\");");
+        p.println("  exit(-1);");
+        p.println("}");
         p.println("#else");                
         p.println("cpu_set_t cpu_set;");
         p.println("CPU_ZERO(&cpu_set);");
