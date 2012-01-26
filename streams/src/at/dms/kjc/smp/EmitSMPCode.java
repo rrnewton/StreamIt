@@ -555,6 +555,10 @@ public class EmitSMPCode extends EmitCode {
         p.println("#include \"rdtsc.h\"");
         p.println("#include \"structs.h\"");
         
+        p.println("#ifdef __MACH_");
+        p.println("#include <mach/thread_policy.h>");
+        p.println("#endif");
+        
         if (KjcOptions.perftest) {
             p.println("#include <time.h>");
         }
@@ -587,6 +591,8 @@ public class EmitSMPCode extends EmitCode {
         p.println("#ifdef __MACH__");
         p.println("#include <mach/clock.h>");
         p.println("#include <mach/mach.h>");
+        p.println("#include <mach/mach_init.h>");
+        p.println("#include <mach/thread_policy.h>");
         p.println("#endif");
         p.println();
         p.println();
@@ -993,8 +999,18 @@ public class EmitSMPCode extends EmitCode {
         p.println("// Set CPU affinity for thread");
         p.println("void setCPUAffinity(int core) {");
         p.indent();
-
-        p.println("#ifndef __APPLE__");
+        
+        p.println("#ifdef __MACH__");
+        p.println("//thread_affinity_policy ap;");
+        p.println("//ap.affinity_tag =core; ");
+        p.println("//if ((thread_policy_set(pthread_mach_thread_np(pthread_self()),");
+        p.println("//                      THREAD_AFFINITY_POLICY,");
+        p.println("//                      (integer_t*) &ap,");
+        p.println("//                      THREAD_AFFINITY_POLICY_COUNT)) != KERN_SUCCESS) {");
+        p.println("//  printf(\"Error setting pthread affinity\\n\");");
+        p.println("//  exit(-1);");
+        p.println("//}");
+        p.println("#else");                
         p.println("cpu_set_t cpu_set;");
         p.println("CPU_ZERO(&cpu_set);");
         p.println("CPU_SET(core, &cpu_set);");
