@@ -283,9 +283,15 @@ public class FusePipe {
 	 * FuseSplit are suspect.
 	 */
 	public static boolean isFusable(SIRStream str) {
-		// must be a filter to fuse
+
+	    if (KjcOptions.nofuse) {
+	        System.out.println("FusePipe.isFusable is true!");
+	        return false;   
+	    }
+	    
+	    // must be a filter to fuse
 		if (!(str instanceof SIRFilter)) {
-			return false;
+            return false;
 		}
 		SIRFilter filter = (SIRFilter) str;
 			

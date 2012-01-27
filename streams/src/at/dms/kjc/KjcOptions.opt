@@ -758,5 +758,10 @@ longname		"perftest"
 longname		"nofizz"
 	type		boolean
 	default		"false"
+	help		"Disable fission optimization"
+
+longname		"nofuse"
+	type		boolean
+	default		"false"
 	help		"Disable fusion optimization"
 

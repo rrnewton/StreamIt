@@ -504,6 +504,7 @@ sub get_options
 			    "regtest",
 			    "perftest",
 			    "nofizz",
+			    "nofuse",
 			    "loadbalance",
 			    "loopcount=i",
 			    "noloopinput",
@@ -968,6 +969,7 @@ sub get_compiler_opts
     $opts{regtest} && ($copts .= " --regtest");
     $opts{perftest} && ($copts .= " --perftest");
     $opts{nofizz} && ($copts .= " --nofizz");
+    $opts{nofuse} && ($copts .= " --nofuse");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");
     $opts{loopcount} && ($copts .= " --loopcount ". $opts{loopcount});
