@@ -1,6 +1,8 @@
 package at.dms.kjc.common;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import at.dms.kjc.CStdType;
@@ -16,29 +18,13 @@ import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.iterator.IterFactory;
+import at.dms.kjc.iterator.SIRFilterIter;
+import at.dms.kjc.iterator.SIRIterator;
+import at.dms.kjc.sir.EmptyStreamVisitor;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRIterationExpression;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.fission.IterationStatelessDuplicate;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.sir.lowering.partition.WorkList;
 import at.dms.util.SIRPrinter;
-import at.dms.kjc.CStdType;
-import at.dms.kjc.Constants;
-import at.dms.kjc.JExpression;
-import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldAccessExpression;
-import at.dms.kjc.JFieldDeclaration;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDefinition;
-import at.dms.kjc.SLIRReplacingVisitor;
-import at.dms.kjc.sir.SIRFilter;
-import at.dms.kjc.sir.SIRIterationExpression;
-import at.dms.kjc.sir.SIRStream;
-import at.dms.kjc.sir.lowering.partition.WorkEstimate;
-import at.dms.kjc.sir.lowering.partition.WorkList;
 
 
 public class LowerIterationExpression extends SLIRReplacingVisitor {
@@ -48,18 +34,27 @@ public class LowerIterationExpression extends SLIRReplacingVisitor {
     private boolean found;
 
     public static Set<SIRFilter> doIt(SIRStream str) {
-        WorkEstimate work = WorkEstimate.getWorkEstimate(str);
-        WorkList workList = work.getSortedFilterWork();
+        SIRIterator it = IterFactory.createFactory().createIter(str);
+        final List<SIRFilter> filters = new ArrayList<SIRFilter>();
+        it.accept(new EmptyStreamVisitor() {
 
+            @Override
+            public void visitFilter(SIRFilter self,
+                                    SIRFilterIter iter) {
+                filters.add(self);
+            }
+            
+        });
+
+        
         Set<SIRFilter> iterFilters = new HashSet<SIRFilter>();
         
         /* Debugging printer */ 
-        SIRPrinter printer = new SIRPrinter("SIR_sugar.sir");
-        IterFactory.createFactory().createIter(str).accept(printer);
-        printer.close();
+//        SIRPrinter printer = new SIRPrinter("SIR_sugar.sir");
+//        IterFactory.createFactory().createIter(str).accept(printer);
+//        printer.close();
 
-        for (int j = 0; j < workList.size(); j++) {
-            SIRFilter filter = workList.getFilter(j);
+        for (SIRFilter filter : filters) {
             JMethodDeclaration prework = null;
             
             for (int i = 0; i < filter.getMethods().length; i++) {
@@ -96,9 +91,9 @@ public class LowerIterationExpression extends SLIRReplacingVisitor {
         }
 
         /* Debugging printer */
-        printer = new SIRPrinter("SIR_desugar.sir");
-        IterFactory.createFactory().createIter(str).accept(printer);
-        printer.close();
+//        printer = new SIRPrinter("SIR_desugar.sir");
+//        IterFactory.createFactory().createIter(str).accept(printer);
+//        printer.close();
 
         return iterFilters;
     }
