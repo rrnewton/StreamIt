@@ -555,9 +555,6 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	@Override
 	public JMethodDeclaration popManyMethod() {
 	    
-	    System.out.println("InputRotatingBuffer.popManyMethod() called");
-	    boolean addInputCounter = edge.getSrc().isInputSlice() && KjcOptions.perftest;
-	    
 		if (popManyCode != null) {
 			return popManyCode;
 		}
@@ -580,12 +577,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 		JBlock loopBody = new JBlock();
 		loopBody.addStatement(popOne);
-
-		if (addInputCounter) {
-		    loopBody.addStatement(new JExpressionStatement(
-		            new JEmittedTextExpression("perfTestNumInputs++")));
-		}
-		
+				
 		JBlock body = new JBlock();
 		body.addStatement(Utils.makeForLoop(loopBody, nPops, loopIndex));
 
@@ -604,7 +596,6 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	@Override
 	public String popManyMethodName() {
 		return "__popN_" + unique_id;
-		// return "__popN" + this.getIdent();
 	}
 
 	/*

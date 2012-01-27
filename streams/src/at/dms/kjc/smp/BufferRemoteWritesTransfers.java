@@ -12,6 +12,7 @@ import at.dms.kjc.JAddExpression;
 import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
+import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldAccessExpression;
@@ -25,6 +26,7 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
 import at.dms.kjc.slir.OutputNode;
@@ -211,6 +213,17 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
 	public JMethodDeclaration popMethod() {
     	assert (parent instanceof InputRotatingBuffer);
     	
+        System.out.println("BufferRemoteWritesTransfers.popMethod()");
+        boolean addInputCounter = parent.getEdge().getSrc().isInputSlice() && KjcOptions.perftest; 
+        System.out.println("BufferRemoteWritesTransfers.popMethod() edge=" +
+        parent.getEdge().getSrc() + " --> " + 
+        parent.getEdge().getDest() );
+        
+    	if (addInputCounter) {
+    	       System.out.println("BufferRemoteWritesTransfers.popMethod() should add a counter!");
+    	}
+    	
+    	
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
@@ -220,6 +233,12 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
                 new JFormalParameter[0],
                 CClassType.EMPTY,
                 body, null, null);
+        if (addInputCounter) {
+            body.addStatement(
+                    new JExpressionStatement(
+                            new JEmittedTextExpression("perfTestNumInputs++")));
+        }
+        
         body.addStatement(
         		new JReturnStatement(null,
         				parent.readBufRef(new JPostfixExpression(at.dms.kjc.Constants.OPE_POSTINC, tail)),null));

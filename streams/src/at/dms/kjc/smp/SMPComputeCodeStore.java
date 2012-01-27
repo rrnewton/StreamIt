@@ -418,7 +418,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                     + "for (_i_ = 0; _i_ < " + outputs + "; _i_++) { " 
                     +    "if (" + buffer + "->size > 0) {"       
                     +      "fprintf(output, \"" + type + "\\n\", " + cast + popCall + "); "
-                    +      "if (--maxOutputs == 0) {  exit(0); } "
+                    +      "if (--maxOutputs == 0) {  streamit_exit(0); } "
                     +   "}"
                     + "}";
         }                       

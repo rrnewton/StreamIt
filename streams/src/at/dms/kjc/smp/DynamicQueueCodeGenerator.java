@@ -2,6 +2,9 @@ package at.dms.kjc.smp;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import at.dms.kjc.JEmittedTextExpression;
+import at.dms.kjc.JExpressionStatement;
+import at.dms.kjc.KjcOptions;
 
 public class DynamicQueueCodeGenerator {
 
@@ -151,6 +154,9 @@ public class DynamicQueueCodeGenerator {
         cBuffer.append(type + " " + type + "_queue_pop_source() {\n");           
         cBuffer.append("  " + type + " elem = fileReadBuffer[fileReadIndex__0];\n");
         cBuffer.append("  fileReadIndex__0++;\n");
+        if (KjcOptions.perftest) {
+            cBuffer.append("  perfTestNumInputs++;\n");        
+        }
         cBuffer.append("  if(fileReadIndex__0 + 1 >= num_inputs) fileReadIndex__0 = 0;\n");
         cBuffer.append("  return elem;\n");
         cBuffer.append("}\n");

@@ -279,6 +279,9 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
     @Override
 	public JMethodDeclaration popMethod() {
     	assert (parent instanceof InputRotatingBuffer);
+
+    	System.out.println("SharedBufferRemoteWritesTransfers.popMethod()");
+    	
     	
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
