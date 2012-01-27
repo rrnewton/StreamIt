@@ -42,7 +42,7 @@ void->bit pipeline PlainTextSource(int vector)
                        {0xFFFFFFFF, 0xFFFFFFFF}}; // 0xFFFFFFFFFFFFFFFF
 
     add void->int filter {
-        work push 2 {
+        work push * {
             push(TEXT[vector][1]); // LSW
             push(TEXT[vector][0]); // MSW
         }

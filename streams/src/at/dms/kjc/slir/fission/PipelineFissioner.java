@@ -23,6 +23,7 @@ import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JRelationalExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.ObjectDeepCloner;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.slir.Filter;
@@ -160,7 +161,7 @@ public class PipelineFissioner {
     }
 
     public static boolean canFizz(Filter slice, boolean debug) {
-
+              
         // Get information on Slice rates
         WorkNodeInfo.reset();
 
@@ -317,6 +318,11 @@ public class PipelineFissioner {
      * above assumptions are met.
      */
     public static boolean fizzSlice(Filter slice, int fizzAmount) {
+        
+        if (!KjcOptions.nofizz) {
+            return false;
+        }
+
 
         if(!canFizz(slice, fizzAmount, false))
             return false;

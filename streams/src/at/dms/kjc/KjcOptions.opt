@@ -754,3 +754,9 @@ longname		"perftest"
 	type		boolean
 	default		"false"
 	help		"Tell the compiler to add code for running a performance test."
+
+longname		"nofizz"
+	type		boolean
+	default		"false"
+	help		"Disable fusion optimization"
+

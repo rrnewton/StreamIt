@@ -1,4 +1,4 @@
-#!/usr/uns/bin/perl
+#!/usr/bin/perl
 #
 # bin2dat.pl: convert binary to formatted data
 # $Id: bin2dat.pl,v 1.3 2007-01-04 18:51:41 dimock Exp $

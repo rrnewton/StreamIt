@@ -35,7 +35,7 @@ public class StatelessFissioner {
         else {
             System.out.println("Performing fission on: " + filter.getWorkNode() + ", fizzAmount: " + fissAmount);
             StatelessFissioner fissioner = new StatelessFissioner(filter, fissAmount);
-            if(canFizz(filter, false))
+            if(canFizz(filter, false) && (!KjcOptions.nofizz))
                 return fissioner.fizz();
             return null;
         }

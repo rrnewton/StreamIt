@@ -2,11 +2,12 @@
  * This tests parameterized filewriters.
  */
 
+float->void stateful filter Sink {
+    work pop 1 { println(pop()); }
+}
+
 void->void pipeline FileReaderTest1 {
-    add FileReader< int >( "./test.in" );
+    add FileReader< float >( "./test.in" );
     add Sink();
 }
 
-int->void stateful filter Sink {
-    work pop 1 { println(pop()); }
-}

@@ -78,7 +78,7 @@ float->float filter FFTReorderSimple(int n) {
     totalData = 2*n; 
   }
 
-  work push 2*n pop 2*n {
+  work push * pop 2*n {
         int i;
         
         for (i = 0; i < totalData; i+=4)
