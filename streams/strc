@@ -505,6 +505,8 @@ sub get_options
 			    "perftest",
 			    "nofizz",
 			    "nofuse",
+			    "noiter",
+                            "preoutputs=i",
 			    "loadbalance",
 			    "loopcount=i",
 			    "noloopinput",
@@ -970,7 +972,9 @@ sub get_compiler_opts
     $opts{perftest} && ($copts .= " --perftest");
     $opts{nofizz} && ($copts .= " --nofizz");
     $opts{nofuse} && ($copts .= " --nofuse");
+    $opts{noiter} && ($copts .= " --noiter");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
+    $opts{preoutputs} && ($copts .= " --preoutputs " . $opts{preoutputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");
     $opts{loopcount} && ($copts .= " --loopcount ". $opts{loopcount});
     $opts{noloopinput} && ($copts .= " --noloopinput");

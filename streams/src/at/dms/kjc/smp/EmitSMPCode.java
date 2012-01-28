@@ -893,7 +893,10 @@ public class EmitSMPCode extends EmitCode {
 
     private void generatePrintResults(CodegenPrintWriter p) {    
         p.println("  curr_time(&endTime);");                
-        p.println("  printf (\"input=%d delta=%ld:%ld\\n\", perfTestNumInputs, diff(startTime,endTime).tv_sec, diff(startTime,endTime).tv_nsec);");            
+        p.println("  printf (\"input=%d start=%ld:%ld end=%ld:%ld delta=%ld:%ld\\n\", "+ 
+                "perfTestNumInputs, startTime.tv_sec, startTime.tv_nsec, " +
+                "endTime.tv_sec, endTime.tv_nsec, " +
+                "diff(startTime,endTime).tv_sec, diff(startTime,endTime).tv_nsec);");            
     }
     
     private void generateStartTime(CodegenPrintWriter p) {

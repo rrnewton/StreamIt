@@ -765,3 +765,14 @@ longname		"nofuse"
 	default		"false"
 	help		"Disable fusion optimization"
 
+longname		"noiter"
+	type		boolean
+	default		"false"
+	help		"Disable iteration optimization"
+
+longname 		"preoutputs"
+	type		int
+	default 	"-1"
+	requireArgument
+	help		"Only start counting outputs after <n> outputs (for performance tests)."
+
