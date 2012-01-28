@@ -964,7 +964,7 @@ public class EmitSMPCode extends EmitCode {
 
         p.println();
         p.println("realclean:");
-        p.println("\trm *.o *.dot *.c *.h *.java *.sir"
+        p.println("\trm *.o *.dot *.c *.h *.java *.sir "
                 + (KjcOptions.output == null ? "smp" + KjcOptions.smp
                         : KjcOptions.output));
         p.println();

@@ -63,7 +63,14 @@ public class ProcessFilterWorkNode {
 		WorkNode filter;
 		Map<String, List<String>> dominators;
 
-		private JExpression staticPop(SIRPopExpression self, CType tapeType) {			
+		private JExpression staticPop(SIRPopExpression self, CType tapeType) {	
+		    
+		    System.out.println("ProcessFilterWorkNode.visitPopExpression filter=" 
+                    + filter.getWorkNodeContent()
+                    + "popName=" +  popName
+                    + "popManyName=" +  popManyName);
+                    
+		    
 			if (self.getNumPop() > 1) {
 				return new JMethodCallExpression(popManyName,
 						new JExpression[] { new JIntLiteral(self.getNumPop()) });

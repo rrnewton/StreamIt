@@ -147,6 +147,15 @@ public class DynamicQueueCodeGenerator {
 		cBuffer.append("}\n\n");		
 	}
 			
+	public void addPopManySource(String type) {
+	    hBuffer.append("void " + type + "_queue_pop_many_source(int amount);\n");          
+        cBuffer.append("void " + type + "_queue_pop_many_source(int amount) {\n");             
+        cBuffer.append("  int i = 0;\n");
+        cBuffer.append("  for (i = 0; i < amount; i++) {\n");
+        cBuffer.append("    " + type + "_queue_pop_source();\n");              
+        cBuffer.append("  }\n");        
+        cBuffer.append("}\n\n");        
+	}
 	
 	public void addPopSource(String type) {
         hBuffer.append(type + " " + type + "_queue_pop_source();\n");          

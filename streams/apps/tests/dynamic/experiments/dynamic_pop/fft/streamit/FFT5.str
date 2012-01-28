@@ -9,8 +9,8 @@ void->void pipeline FFT5() {
     for(int j=2; j<=N; j*=2)
 	add CombineDFT(j);
 //    add CombineDFT(2);
-    add FileWriter<float>("FFT5.out");
-    // add FileWriter<float>(stdout);
+    //add FileWriter<float>("FFT5.out");
+     add FileWriter<float>(stdout);
     //add FloatPrinter();
 }
 

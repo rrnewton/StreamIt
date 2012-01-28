@@ -81,6 +81,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 		for (InterSSGChannel channel : fileReaderBuffers) {		    
 		    String type = channel.getEdge().getType().toString();
 		    SMPBackend.dynamicQueueCodeGenerator.addPopSource(type);
+		    SMPBackend.dynamicQueueCodeGenerator.addPopManySource(type);
 		};
 	}
 
@@ -287,6 +288,15 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 	public String popManyMethodName() {
 		//return "dynamic_buffer_pop_many";
 		String type = edge.getType().toString();
+		 OutputPort outputPort = edge.getSrc();
+	        StaticSubGraph outputSSG = outputPort.getSSG();
+	        Filter[] filterGraph = outputSSG.getFilterGraph();
+	        if (filterGraph.length == 1) {
+	            System.out.println("InterSSGChannel.popMethodName");
+	            if (filterGraph[0].getWorkNode().isFileInput()) {
+	                return type + "_queue_pop_many_source";                                     
+	          }                                                                     
+	        }         
 		return type + "_queue_pop_many";
 	}
 
