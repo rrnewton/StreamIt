@@ -34,7 +34,7 @@ def run_one(num_cores, test_dir, output, test_type):
     exe = './smp' + str(num_cores)
     #print 'run_one test_dir=' + test_dir + ' exe=' + exe  
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    regex = re.compile('input=(\d+) delta=(\d+):(\d+)')
+    regex = re.compile('input=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
     results = []
     #print 'run_one in =' + test_dir
     for m in regex.finditer(stdout):
