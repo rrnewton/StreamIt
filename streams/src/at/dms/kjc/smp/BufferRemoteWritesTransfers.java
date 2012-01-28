@@ -213,16 +213,18 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
 	public JMethodDeclaration popMethod() {
     	assert (parent instanceof InputRotatingBuffer);
     	
-        System.out.println("BufferRemoteWritesTransfers.popMethod()");
-        boolean addInputCounter = parent.getEdge().getSrc().isInputSlice() && KjcOptions.perftest; 
-        System.out.println("BufferRemoteWritesTransfers.popMethod() edge=" +
-        parent.getEdge().getSrc() + " --> " + 
-        parent.getEdge().getDest() );
-        
-    	if (addInputCounter) {
-    	       System.out.println("BufferRemoteWritesTransfers.popMethod() should add a counter!");
-    	}
-    	
+//        System.out.println("BufferRemoteWritesTransfers.popMethod()");
+//        
+//        boolean addInputCounter = parent.getEdge().getSrc().getParent().getWorkNode().isFileInput() && KjcOptions.perftest; 
+//            
+//        System.out.println("BufferRemoteWritesTransfers.popMethod() filterNode=" + parent.filterNode + " edge=" +
+//                parent.getEdge().getSrc().getParent().getWorkNode() + " --> " + 
+//        parent.getEdge().getDest() );
+//        
+//    	if (addInputCounter) {
+//    	       System.out.println("BufferRemoteWritesTransfers.popMethod() should add a counter!");
+//    	}
+//    	
     	
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
@@ -233,11 +235,11 @@ public class BufferRemoteWritesTransfers extends BufferTransfers {
                 new JFormalParameter[0],
                 CClassType.EMPTY,
                 body, null, null);
-        if (addInputCounter) {
-            body.addStatement(
-                    new JExpressionStatement(
-                            new JEmittedTextExpression("perfTestNumInputs++")));
-        }
+//        if (addInputCounter) {
+//            body.addStatement(
+//                    new JExpressionStatement(
+//                            new JEmittedTextExpression("perfTestNumInputs++")));
+//        }
         
         body.addStatement(
         		new JReturnStatement(null,

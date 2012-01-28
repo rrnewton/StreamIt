@@ -150,6 +150,12 @@ public class FileReaderRemoteReads extends FileReaderCode {
         //every filter that reads from this file must increment the index of items read
         //in a phase, even if the filter does not read during the current phase 
         statements.add(Util.toStmt("fileReadIndex__" + id + " += " + srcInfo.totalItemsSent(phase)));
+
+        
+        if (KjcOptions.perftest) {  
+            statements.add(Util.toStmt("perfTestNumInputs += " + srcInfo.totalItemsSent(phase)));
+        }
+                
         if(!KjcOptions.noloopinput)
             statements.add(Util.toStmt("if(fileReadIndex__" + id + " + " + srcInfo.totalItemsSent(phase) + " >= num_inputs) fileReadIndex__" + id + " = 0"));
         

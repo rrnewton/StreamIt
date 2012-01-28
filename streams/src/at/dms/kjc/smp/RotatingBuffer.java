@@ -216,6 +216,9 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 */
 
 	public static void createBuffers(BasicSpaceTimeSchedule schedule) {
+	    
+	    System.out.println("RotatingBuffer.createBuffers");
+	    
 		// have to create input buffers first because when we have a lack of a
 		// shared input buffer, we create an output buffer
 		InputRotatingBuffer.createInputBuffers(schedule);

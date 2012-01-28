@@ -30,6 +30,7 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputNode;
 import at.dms.kjc.slir.InterFilterEdge;
@@ -279,10 +280,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
     @Override
 	public JMethodDeclaration popMethod() {
     	assert (parent instanceof InputRotatingBuffer);
-
-    	System.out.println("SharedBufferRemoteWritesTransfers.popMethod()");
-    	
-    	
+        	
         JBlock body = new JBlock();
         JMethodDeclaration retval = new JMethodDeclaration(
                 null,
