@@ -131,7 +131,7 @@ public class ProcessFilterWorkNode {
 		@Override
 		public Object visitPeekExpression(SIRPeekExpression self,
 				CType tapeType, JExpression arg) {
-			if (isDynamicPop) {
+			if (isDynamicPop && !isSource()) {
 				InputPort inputPort = ((InterSSGChannel) inputChannel)
 						.getEdge().getDest();
 				String threadId = filterToThreadId.get(
@@ -156,6 +156,32 @@ public class ProcessFilterWorkNode {
 				return methodCall;
 			}
 		}
+		
+		private boolean isSource() {
+		      StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
+	            if (ssg.getFilterGraph()[0].equals(filter.getParent())) {
+	                System.out.println("ProcessFilterWorkNode.isSource filter=" 
+	                        + filter.getWorkNodeContent()
+	                        + " is first in SSG"); 
+	                // If it is, then check what SSG it is connected to. 
+	                // If that SSG has only 1 filter, and that filter is a
+	                // FileReader, then we should have a static pop instead
+	                // of a dynamic pop
+	                List<InterSSGEdge> edges = ssg.getInputPort().getLinks();
+	                for (InterSSGEdge edge : edges) {
+	                    OutputPort outputPort = edge.getSrc();
+	                    StaticSubGraph outputSSG = outputPort.getSSG();
+	                    Filter[] filterGraph = outputSSG.getFilterGraph();
+	                    if (filterGraph.length == 1) {
+	                        System.out.println("ProcessFilterWorkNode.visitPopExpression filterGraph[0]=" + filterGraph[0].getWorkNode().isFileInput());   
+	                        if (filterGraph[0].getWorkNode().isFileInput()) {
+	                          return true;
+	                      }                                                                     
+	                    }                   
+	                }                                          
+	            }
+	            return false;
+		}
 
 		@Override
 		public Object visitPopExpression(SIRPopExpression self, CType tapeType) {
@@ -168,28 +194,9 @@ public class ProcessFilterWorkNode {
 		    // We have to special case when there is a dynamic pop rate 
 		    // that follows a FileReader. First we check if this is the 
 		    // first filter in the ssg.
-		    StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
-		    if (ssg.getFilterGraph()[0].equals(filter.getParent())) {
-		        System.out.println("ProcessFilterWorkNode.visitPopExpression filter=" 
-	                    + filter.getWorkNodeContent()
-	                    + " is first in SSG"); 
-		        // If it is, then check what SSG it is connected to. 
-		        // If that SSG has only 1 filter, and that filter is a
-		        // FileReader, then we should have a static pop instead
-		        // of a dynamic pop
-		        List<InterSSGEdge> edges = ssg.getInputPort().getLinks();
-	            for (InterSSGEdge edge : edges) {
-	                OutputPort outputPort = edge.getSrc();
-	                StaticSubGraph outputSSG = outputPort.getSSG();
-	                Filter[] filterGraph = outputSSG.getFilterGraph();
-	                if (filterGraph.length == 1) {
-	                    System.out.println("ProcessFilterWorkNode.visitPopExpression filterGraph[0]=" + filterGraph[0].getWorkNode().isFileInput());   
-	                    if (filterGraph[0].getWorkNode().isFileInput()) {
-	                      return staticPop(self, tapeType);
-	                  }	                    	                    	                    
-	                }	                
-	            }		        		       		       
-		    }
+		    if (isSource()) {
+		        return staticPop(self, tapeType);
+		    }		   
 			if (isDynamicPop) {
 				return dynamicPop(self, tapeType);
 			} else {

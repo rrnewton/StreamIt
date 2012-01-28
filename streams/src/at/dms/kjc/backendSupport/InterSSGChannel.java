@@ -29,118 +29,117 @@ import at.dms.kjc.smp.SMPBackend;
  */
 public class InterSSGChannel extends Channel<InterSSGEdge> {
 
-	/** a set of all the buffer types in the application */
-	protected static HashSet<String> types;
-	
-	/* return all the input buffers of the file writers of this application */
+    /** a set of all the buffer types in the application */
+    protected static HashSet<String> types;
+
+    /* return all the input buffers of the file writers of this application */
     public static Set<InterSSGChannel> getFileWriterBuffers() {
         return fileWriterBuffers;
     }
-    
+
     /* return all the input buffers of the file readers of this application */
     public static Set<InterSSGChannel> getFileReaderBuffers() {
         return fileReaderBuffers;
     }
-    
+
     /** stores InputRotatingBuffers for file writers */
     protected static HashSet<InterSSGChannel> fileWriterBuffers;
-    
+
     /** stores InputRotatingBuffers for file readers */
     protected static HashSet<InterSSGChannel> fileReaderBuffers;
- 	
-	/** maps each WorkNode to Input/OutputRotatingBuffers */
-	protected static HashMap<WorkNode, InterSSGChannel> inputBuffers;
-	protected static HashMap<WorkNode, InterSSGChannel> outputBuffers;
 
-	protected static HashMap<String, String> bufferVariables;
-	protected static HashMap<String, String> createMethods;
+    /** maps each WorkNode to Input/OutputRotatingBuffers */
+    protected static HashMap<WorkNode, InterSSGChannel> inputBuffers;
+    protected static HashMap<WorkNode, InterSSGChannel> outputBuffers;
 
-	static {
-		types = new HashSet<String>();
-		inputBuffers = new HashMap<WorkNode, InterSSGChannel>();
-		outputBuffers = new HashMap<WorkNode, InterSSGChannel>();
-		fileWriterBuffers = new HashSet<InterSSGChannel>(); 
-		fileReaderBuffers = new HashSet<InterSSGChannel>(); 
-	}
+    protected static HashMap<String, String> bufferVariables;
+    protected static HashMap<String, String> createMethods;
 
-	/**
-	 * @param streamGraph
-	 */
-	public static void createBuffers(StreamGraph streamGraph) {
-		createInputBuffers(streamGraph);
-		createOutputBuffers(streamGraph);
-	}
+    static {
+        types = new HashSet<String>();
+        inputBuffers = new HashMap<WorkNode, InterSSGChannel>();
+        outputBuffers = new HashMap<WorkNode, InterSSGChannel>();
+        fileWriterBuffers = new HashSet<InterSSGChannel>(); 
+        fileReaderBuffers = new HashSet<InterSSGChannel>(); 
+    }
 
-	/**
-	 * Create the implementation for queues of different types
-	 */
-	public static void createDynamicQueues() {
-		for (String type : types) {
-			SMPBackend.dynamicQueueCodeGenerator.addQueueType(type);
-		}
-		for (InterSSGChannel channel : fileReaderBuffers) {		    
-		    String type = channel.getEdge().getType().toString();
-		    SMPBackend.dynamicQueueCodeGenerator.addPopSource(type);
-		    SMPBackend.dynamicQueueCodeGenerator.addPopManySource(type);
-		};
-	}
+    /**
+     * @param streamGraph
+     */
+    public static void createBuffers(StreamGraph streamGraph) {
+        createInputBuffers(streamGraph);
+        createOutputBuffers(streamGraph);
+    }
 
-	/**
-	 * 
-	 * @param streamGraph
-	 */
-	private static void createInputBuffers(StreamGraph streamGraph) {
-		System.out
-				.println("InterSSGChannel.createInputBuffers streamGraph.getSSGs().size()="
-						+ streamGraph.getSSGs().size());
+    /**
+     * Create the implementation for queues of different types
+     */
+    public static void createDynamicQueues() {
+        for (String type : types) {
+            SMPBackend.dynamicQueueCodeGenerator.addQueueType(type);
+        }
+        for (InterSSGChannel channel : fileReaderBuffers) {		    
+            String type = channel.getEdge().getType().toString();
+            SMPBackend.dynamicQueueCodeGenerator.addSource(type);
+        };
+    }
 
-		for (StaticSubGraph srcSSG : streamGraph.getSSGs()) {
-			OutputPort outputPort = srcSSG.getOutputPort();
-			if (outputPort == null) {
-				continue;
-			}
-			for (InterSSGEdge edge : outputPort.getLinks()) {
-				System.out.println("InterSSGChannel.createInputBuffers edge="
-						+ edge.toString());
-				InterSSGChannel channel = new InterSSGChannel(edge);
-				CType bufType = edge.getType();
-				types.add(bufType.toString());
-				Filter dstTop = edge.getDest().getSSG().getTopFilters()[0];
-				inputBuffers.put(dstTop.getWorkNode(), channel);
-								
-				if (dstTop.getWorkNode().isFileOutput()) {
-				    fileWriterBuffers.add(channel);
-				}
-								
-				
-				if (dstTop.getWorkNode().isFileOutput()) {
-				    ProcessFileWriter.getAllocatingCore(dstTop.getWorkNode());
-				}				
-				
-			}
-		}
-	}
+    /**
+     * 
+     * @param streamGraph
+     */
+    private static void createInputBuffers(StreamGraph streamGraph) {
+        System.out
+        .println("InterSSGChannel.createInputBuffers streamGraph.getSSGs().size()="
+                + streamGraph.getSSGs().size());
 
-	/**
-	 * 
-	 * @param streamGraph
-	 */
-	private static void createOutputBuffers(StreamGraph streamGraph) {
+        for (StaticSubGraph srcSSG : streamGraph.getSSGs()) {
+            OutputPort outputPort = srcSSG.getOutputPort();
+            if (outputPort == null) {
+                continue;
+            }
+            for (InterSSGEdge edge : outputPort.getLinks()) {
+                System.out.println("InterSSGChannel.createInputBuffers edge="
+                        + edge.toString());
+                InterSSGChannel channel = new InterSSGChannel(edge);
+                CType bufType = edge.getType();
+                types.add(bufType.toString());
+                Filter dstTop = edge.getDest().getSSG().getTopFilters()[0];
+                inputBuffers.put(dstTop.getWorkNode(), channel);
 
-		for (StaticSubGraph dstSSG : streamGraph.getSSGs()) {
-			InputPort inputPort = dstSSG.getInputPort();
-			if (inputPort == null) {
-				continue;
-			}
-			for (InterSSGEdge edge : inputPort.getLinks()) {
-				System.out.println("InterSSGChannel.createOutputBuffers edge="
-						+ edge.toString());
-				InterSSGChannel channel = new InterSSGChannel(edge);
-				CType bufType = edge.getType();
-				types.add(bufType.toString());
-				Filter dstTop = dstSSG.getTopFilters()[0];
-				outputBuffers.put(dstTop.getWorkNode(), channel);
-				Filter srcTop = edge.getSrc().getSSG().getTopFilters()[0];
+                if (dstTop.getWorkNode().isFileOutput()) {
+                    fileWriterBuffers.add(channel);
+                }
+
+
+                if (dstTop.getWorkNode().isFileOutput()) {
+                    ProcessFileWriter.getAllocatingCore(dstTop.getWorkNode());
+                }				
+
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param streamGraph
+     */
+    private static void createOutputBuffers(StreamGraph streamGraph) {
+
+        for (StaticSubGraph dstSSG : streamGraph.getSSGs()) {
+            InputPort inputPort = dstSSG.getInputPort();
+            if (inputPort == null) {
+                continue;
+            }
+            for (InterSSGEdge edge : inputPort.getLinks()) {
+                System.out.println("InterSSGChannel.createOutputBuffers edge="
+                        + edge.toString());
+                InterSSGChannel channel = new InterSSGChannel(edge);
+                CType bufType = edge.getType();
+                types.add(bufType.toString());
+                Filter dstTop = dstSSG.getTopFilters()[0];
+                outputBuffers.put(dstTop.getWorkNode(), channel);
+                Filter srcTop = edge.getSrc().getSSG().getTopFilters()[0];
 
                 System.out.println("InterSSGChannel.createOutputBuffers srcTop="
                         + dstTop.getWorkNode().toString());
@@ -149,179 +148,183 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
                     System.out.println("InterSSGChannel.createOutputBuffers srcTop="
                             + dstTop.getWorkNode().toString() + " isFileOutput");
                 }
-				
-				if (srcTop.getWorkNode().isFileInput()) {
-				    System.out.println("InterSSGChannel.createOutputBuffers adding srcTop="
-	                        + srcTop.getWorkNode().toString() + " to fileReaderBuffers");
-				    fileReaderBuffers.add(channel);
-				}
-				
+
+                if (srcTop.getWorkNode().isFileInput()) {
+                    System.out.println("InterSSGChannel.createOutputBuffers adding srcTop="
+                            + srcTop.getWorkNode().toString() + " to fileReaderBuffers");
+                    fileReaderBuffers.add(channel);
+                }
+
                 if (dstTop.getWorkNode().isFileOutput()) {
                     ProcessFileWriter.getAllocatingCore(dstTop.getWorkNode());
                 }               
 
-				
-			}
-		}
-	}
 
-	public static Collection<InterSSGChannel> getInterSSGChannels() {
-		return inputBuffers.values();
-	}
+            }
+        }
+    }
 
-	/**
-	 * Return the input buffer associated with the filter node.
-	 * 
-	 * @param fsn
-	 *            The filter node in question.
-	 * @return The input buffer of the filter node.
-	 */
-	public static InterSSGChannel getInputBuffer(WorkNode fsn) {
-		return inputBuffers.get(fsn);
-	}
+    public static Collection<InterSSGChannel> getInterSSGChannels() {
+        return inputBuffers.values();
+    }
 
-	/**
-	 * 
-	 * @param t
-	 * @return
-	 */
-	public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
-		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
-		for (InterSSGChannel b : inputBuffers.values()) {
+    /**
+     * Return the input buffer associated with the filter node.
+     * 
+     * @param fsn
+     *            The filter node in question.
+     * @return The input buffer of the filter node.
+     */
+    public static InterSSGChannel getInputBuffer(WorkNode fsn) {
+        return inputBuffers.get(fsn);
+    }
 
-			InterSSGEdge edge = b.getEdge();
-			OutputPort iport = edge.getSrc();
-			StaticSubGraph ssg = iport.getSSG();
+    /**
+     * 
+     * @param t
+     * @return
+     */
+    public static Set<InterSSGChannel> getInputBuffersOnCore(Core t) {
+        HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
+        for (InterSSGChannel b : inputBuffers.values()) {
 
-			Filter top[] = ssg.getTopFilters();
+            InterSSGEdge edge = b.getEdge();
+            OutputPort iport = edge.getSrc();
+            StaticSubGraph ssg = iport.getSSG();
 
-			for (Filter f : top) {
+            Filter top[] = ssg.getTopFilters();
 
-				System.out
-						.println("InterSSGChannel.getInputBuffersOnCore core="
-								+ t.getCoreID() + " filter="
-								+ f.getWorkNode().toString());
+            for (Filter f : top) {
 
-				System.out
-						.println("InterSSGChannel.getInputBuffersOnCore computeNode="
-								+ SMPBackend.scheduler.getComputeNode(
-										f.getWorkNode()).getCoreID());
+                System.out
+                .println("InterSSGChannel.getInputBuffersOnCore core="
+                        + t.getCoreID() + " filter="
+                        + f.getWorkNode().toString());
 
-				if (SMPBackend.scheduler.getComputeNode(f.getWorkNode())
-						.equals(t)) {
-					System.out
-							.println("InterSSGChannel.getInputBuffersOnCore adding b");
-					set.add(b);
-				}
+                System.out
+                .println("InterSSGChannel.getInputBuffersOnCore computeNode="
+                        + SMPBackend.scheduler.getComputeNode(
+                                f.getWorkNode()).getCoreID());
 
-			}
-		}
-		return set;
-	}
+                if (SMPBackend.scheduler.getComputeNode(f.getWorkNode())
+                        .equals(t)) {
+                    System.out
+                    .println("InterSSGChannel.getInputBuffersOnCore adding b");
+                    set.add(b);
+                }
 
-	/**
-	 * @param filterNode
-	 * @param ssg
-	 * @return
-	 */
-	public static Channel<InterSSGEdge> getOutputBuffer(WorkNode filterNode,
-			StaticSubGraph ssg) {
-		if (ssg.getOutputPort() == null) {
-			return null;
-		}
-		if (ssg.getOutputPort().getLinks().size() == 0) {
-			return null;
-		}
-		InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
-		return new InterSSGChannel(edge);
-	}
+            }
+        }
+        return set;
+    }
 
-	/**
-	 * 
-	 * @param n
-	 * @return
-	 */
-	public static Set<InterSSGChannel> getOutputBuffersOnCore(Core t) {
-		HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
-		for (InterSSGChannel b : outputBuffers.values()) {
+    /**
+     * @param filterNode
+     * @param ssg
+     * @return
+     */
+    public static Channel<InterSSGEdge> getOutputBuffer(WorkNode filterNode,
+            StaticSubGraph ssg) {
+        if (ssg.getOutputPort() == null) {
+            return null;
+        }
+        if (ssg.getOutputPort().getLinks().size() == 0) {
+            return null;
+        }
+        InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
+        return new InterSSGChannel(edge);
+    }
 
-			InterSSGEdge edge = b.getEdge();
-			OutputPort port = edge.getSrc();
-			StaticSubGraph ssg = port.getSSG();
-			Filter top[] = ssg.getFilterGraph();
+    /**
+     * 
+     * @param n
+     * @return
+     */
+    public static Set<InterSSGChannel> getOutputBuffersOnCore(Core t) {
+        HashSet<InterSSGChannel> set = new HashSet<InterSSGChannel>();
+        for (InterSSGChannel b : outputBuffers.values()) {
 
-			if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
-					.equals(t))
-				set.add(b);
-		}
-		return set;
-	}
+            InterSSGEdge edge = b.getEdge();
+            OutputPort port = edge.getSrc();
+            StaticSubGraph ssg = port.getSSG();
+            Filter top[] = ssg.getFilterGraph();
 
-	/**
-	 * @param edge
-	 */
-	protected InterSSGChannel(InterSSGEdge edge) {
-		super(edge);
-	}
+            if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
+                    .equals(t))
+                set.add(b);
+        }
+        return set;
+    }
 
-	/**
-	 * @return
-	 */
-	public List<JStatement> dataDecls() {
-		return new LinkedList<JStatement>();
-	}
+    /**
+     * @param edge
+     */
+    protected InterSSGChannel(InterSSGEdge edge) {
+        super(edge);
+    }
 
-	/**
-	 * @return
-	 */
-	@Override
-	public String peekMethodName() {
-		//return "dynamic_buffer_peek";
-		String type = edge.getType().toString();
-		return type + "_queue_peek";
-	}
+    /**
+     * @return
+     */
+    public List<JStatement> dataDecls() {
+        return new LinkedList<JStatement>();
+    }
 
-	/**
-	 * @return
-	 */
-	@Override
-	public String popManyMethodName() {
-		//return "dynamic_buffer_pop_many";
-		String type = edge.getType().toString();
-		 OutputPort outputPort = edge.getSrc();
-	        StaticSubGraph outputSSG = outputPort.getSSG();
-	        Filter[] filterGraph = outputSSG.getFilterGraph();
-	        if (filterGraph.length == 1) {
-	            System.out.println("InterSSGChannel.popMethodName");
-	            if (filterGraph[0].getWorkNode().isFileInput()) {
-	                return type + "_queue_pop_many_source";                                     
-	          }                                                                     
-	        }         
-		return type + "_queue_pop_many";
-	}
+    /**
+     * @return
+     */
+    @Override
+    public String peekMethodName() {
+        //return "dynamic_buffer_peek";
+        String type = edge.getType().toString();
+        if (isSource()) { 
+            return type + "_queue_peek_source";  
+        }       
+        return type + "_queue_peek";
+    }
 
-	/**
-	 * @return
-	 */
-	@Override
-	public String popMethodName() {
-	    String type = edge.getType().toString();
-	    OutputPort outputPort = edge.getSrc();
+    /**
+     * @return
+     */
+    @Override
+    public String popManyMethodName() {
+        //return "dynamic_buffer_pop_many";
+        String type = edge.getType().toString();
+        if (isSource()) { 
+            return type + "_queue_pop_many_source";  
+        }       
+        return type + "_queue_pop_many";
+    }
+
+    private boolean isSource() {
+        OutputPort outputPort = edge.getSrc();
         StaticSubGraph outputSSG = outputPort.getSSG();
         Filter[] filterGraph = outputSSG.getFilterGraph();
         if (filterGraph.length == 1) {
             System.out.println("InterSSGChannel.popMethodName");
             if (filterGraph[0].getWorkNode().isFileInput()) {
-                return type + "_queue_pop_source";                                     
-          }                                                                     
-        }                 	    	   
-        return type + "_queue_pop";
-	}
+                return true;
+            }                                                                     
+        }          
+        return false;
+    }
 
-	@Override
-	public String pushMethodName() {
-		String type = edge.getType().toString();
-		return type + "_queue_push";
-	}
+    /**
+     * @return
+     */
+    @Override
+    public String popMethodName() {
+        String type = edge.getType().toString();
+        if (isSource()) { 
+            return type + "_queue_pop_source"; 
+        }
+        return type + "_queue_pop";
+    }
+
+    @Override
+    public String pushMethodName() {
+        String type = edge.getType().toString();
+        return type + "_queue_push";
+    }
 
 }

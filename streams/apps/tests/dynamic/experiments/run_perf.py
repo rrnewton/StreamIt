@@ -79,17 +79,17 @@ def main():
             for (subdir, streamit_file) in tests:
                 static_test = os.path.join(test_root, 'static', subdir, 'streamit')
                 dynamic_test = os.path.join(test_root, 'dynamic', subdir, 'streamit')
-                dynamic_pop_test = os.path.join(test_root, 'dynamic_pop', subdir, 'streamit')
+                #dynamic_pop_test = os.path.join(test_root, 'dynamic_pop', subdir, 'streamit')
                 compile(num_cores, output, static_test, streamit_file)
                 compile(num_cores, output, dynamic_test, streamit_file)
-                compile(num_cores, output, dynamic_pop_test, streamit_file)
+                #compile(num_cores, output, dynamic_pop_test, streamit_file)
                 print '=========================='
                 results = get_result(num_cores, static_test, output, 'static')
                 pr(results)
                 results = get_result(num_cores, dynamic_test, output, 'dynamic push')
                 pr(results)
-                results = get_result(num_cores, dynamic_pop_test, output, 'dynamic pop')
-                pr(results)
+                #results = get_result(num_cores, dynamic_pop_test, output, 'dynamic pop')
+                #pr(results)
 
 
     #cores = [2]

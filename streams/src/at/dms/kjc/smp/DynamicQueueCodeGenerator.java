@@ -157,6 +157,12 @@ public class DynamicQueueCodeGenerator {
         cBuffer.append("}\n\n");        
 	}
 	
+	public void addSource(String type) {
+	    addPopSource(type);
+	    addPopManySource(type);
+	    addPeekSource(type);
+	}
+	       
 	public void addPopSource(String type) {
         hBuffer.append(type + " " + type + "_queue_pop_source();\n");          
         cBuffer.append("static int fileReadIndex__0 = 0;\n");
@@ -171,6 +177,13 @@ public class DynamicQueueCodeGenerator {
         cBuffer.append("}\n");
 	}
 	
+	public void addPeekSource(String type) {
+	    hBuffer.append(type + " " + type + "_queue_peek_source(int index);\n");          	    
+	    cBuffer.append(type + " " + type + "_queue_peek_source(int index) {\n");           
+	    cBuffer.append("  return fileReadBuffer[(fileReadIndex__0 + index) % num_inputs];\n");
+	    cBuffer.append("}\n");
+	}
+
 	private void addPop(String type) {
 		hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers);\n");			
 		cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers) {\n");		
