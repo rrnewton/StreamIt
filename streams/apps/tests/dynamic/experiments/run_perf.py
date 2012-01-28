@@ -48,7 +48,7 @@ def run_one(num_cores, test_dir, output, test_type):
 
 def get_result(num_cores, test, output, test_type):
     results = []
-    for run in range(3):
+    for run in range(5):
         results.append(run_one(num_cores, test, output, test_type))
         #avg = reduce(lambda x, y: float(x) + float(y), results) / len(results)
         #return avg
