@@ -19,11 +19,11 @@ def print_result(f, cost, sta_avg, dyn_avg):
     print('%d\t%f\t%f' % (cost, sta_avg, dyn_avg))
     f.write('%d\t%f\t%f\n' % (cost, sta_avg, dyn_avg))
 
-def compile(num_cores, output, root, test):
+def compile(num_cores, output, ignore, root, test):
     #exe = os.path.join(test_root, 'smp' + str(num_cores))
     exe = 'smp' + str(num_cores)
     os.chdir(root)
-    cmd = [strc, '-smp', str(num_cores), '--perftest', '--outputs', str(output), test ]
+    cmd = [strc, '-smp', str(num_cores), '--perftest', '--outputs', str(output), '--preoutputs', str(ignore), '--noiter', test ]
     #print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
@@ -34,12 +34,12 @@ def run_one(num_cores, test_dir, output, test_type):
     exe = './smp' + str(num_cores)
     #print 'run_one test_dir=' + test_dir + ' exe=' + exe  
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    regex = re.compile('input=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
+    regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
     results = []
     #print 'run_one in =' + test_dir
     for m in regex.finditer(stdout):
         #print 'inputs=' + m.group(1) + ' seconds=' + m.group(2) + ' nanoseconds=' + m.group(3)
-        results.append(test_type + ' inputs=' + m.group(1) + ' outputs=' + str(output) + ' seconds=' + m.group(2) + ' nanoseconds=' + m.group(3))
+        results.append(test_type + ' inputs=' + m.group(1) +  ' outputs=' + m.group(2) + ' ignored=' + m.group(3) + ' seconds=' + m.group(4) + ' nanoseconds=' + m.group(5))
         #results.append(m.group(1));
         #avg = reduce(lambda x, y: float(x) + float(y), results) / len(results)  
         #return avg
@@ -74,22 +74,24 @@ def pr(results):
 def main():
     cores = [2]
     outputs = [1000]
+    ignores = [1000]
     for num_cores in cores:
-        for output in outputs:
-            for (subdir, streamit_file) in tests:
-                static_test = os.path.join(test_root, 'static', subdir, 'streamit')
-                dynamic_test = os.path.join(test_root, 'dynamic', subdir, 'streamit')
-                dynamic_pop_test = os.path.join(test_root, 'dynamic_pop', subdir, 'streamit')
-                compile(num_cores, output, static_test, streamit_file)
-                compile(num_cores, output, dynamic_test, streamit_file)
-                compile(num_cores, output, dynamic_pop_test, streamit_file)
-                print '=========================='
-                results = get_result(num_cores, static_test, output, 'static')
-                pr(results)
-                results = get_result(num_cores, dynamic_test, output, 'dynamic push')
-                pr(results)
-                results = get_result(num_cores, dynamic_pop_test, output, 'dynamic pop')
-                pr(results)
+        for ignore in ignores:
+            for output in outputs:
+                for (subdir, streamit_file) in tests:
+                    static_test = os.path.join(test_root, 'static', subdir, 'streamit')
+                    dynamic_test = os.path.join(test_root, 'dynamic', subdir, 'streamit')
+                    dynamic_pop_test = os.path.join(test_root, 'dynamic_pop', subdir, 'streamit')
+                    compile(num_cores, output, ignore, static_test, streamit_file)
+                    compile(num_cores, output, ignore, dynamic_test, streamit_file)
+                    compile(num_cores, output, ignore, dynamic_pop_test, streamit_file)
+                    print '=========================='
+                    results = get_result(num_cores, static_test, output, 'static')
+                    pr(results)
+                    results = get_result(num_cores, dynamic_test, output, 'dynamic push')
+                    pr(results)
+                    results = get_result(num_cores, dynamic_pop_test, output, 'dynamic pop')
+                    pr(results)
 
 
     #cores = [2]

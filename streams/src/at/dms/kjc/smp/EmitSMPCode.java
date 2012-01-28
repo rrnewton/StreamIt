@@ -429,6 +429,8 @@ public class EmitSMPCode extends EmitCode {
         if (KjcOptions.outputs != -1) {
             p.println("// Number of steady-state outputs");
             p.println("extern int maxOutputs;");
+            p.println("extern int maxIgnored;");
+            p.println("extern int currOutputs;");
             p.println();
         }
 
@@ -454,10 +456,7 @@ public class EmitSMPCode extends EmitCode {
             p.println("#define MASTER          1");
 
             for (Integer threadId : threadIdToType.keySet()) {
-                String type = threadIdToType.get(threadId);
-                // System.out.println("EmitSMPCode.generateGlobalHeader " +
-                // "extern " + type + "_queue_ctx_ptr   dyn_buf_" + threadId +
-                // ";");
+                String type = threadIdToType.get(threadId);              
                 p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_"
                         + threadId + ";");
             }
@@ -507,13 +506,6 @@ public class EmitSMPCode extends EmitCode {
             }
         }
         
-//        for (String key : ThreadMapper.getMapper().getDominators().keySet()) {
-//            p.println("extern int " + key + "_multiplier;");
-//            for (String val : ThreadMapper.getMapper().getDominators().get(key))
-//            p.println("extern int " + val + "_multiplier;");            
-//        }
-//        
-
         if (KjcOptions.perftest) {
             p.println();
             p.println("extern int perfTestNumInputs;");
@@ -648,9 +640,10 @@ public class EmitSMPCode extends EmitCode {
             p.println();
         }
 
-        if (KjcOptions.outputs != -1) {
+        if (KjcOptions.outputs != -1) {            
             p.println("// Number of steady-state outputs");
-            p.println("int maxOutputs = " + KjcOptions.outputs + ";");
+            p.println("int maxOutputs = " + (KjcOptions.outputs + KjcOptions.preoutputs) + ";");
+            p.println("int maxIgnored= " + KjcOptions.preoutputs + ";");
             p.println();
         }
 
@@ -678,13 +671,6 @@ public class EmitSMPCode extends EmitCode {
             }
         }
 
-//        for (String key : ThreadMapper.getMapper().getDominators().keySet()) {
-//            p.println("int " + key + "_multiplier;");
-//            for (String val : ThreadMapper.getMapper().getDominators().get(key))
-//            p.println("int " + val + "_multiplier;");            
-//        }
-        
-        
         p.println();
 
         if (KjcOptions.perftest) {
@@ -692,6 +678,7 @@ public class EmitSMPCode extends EmitCode {
             p.println("timespec endTime;");
             p.println("timespec startTime;");
             p.println("int startedTiming;");
+            p.println("int currOutputs = 0;");
             p.println();
         }
 
@@ -894,8 +881,9 @@ public class EmitSMPCode extends EmitCode {
 
     private void generatePrintResults(CodegenPrintWriter p) {    
         p.println("  curr_time(&endTime);");                
-        p.println("  printf (\"input=%d start=%ld:%ld end=%ld:%ld delta=%ld:%ld\\n\", "+ 
-                "perfTestNumInputs, startTime.tv_sec, startTime.tv_nsec, " +
+        p.println("  printf (\"input=%d outputs=%d ignored=%d start=%ld:%ld end=%ld:%ld delta=%ld:%ld\\n\", "+ 
+                "perfTestNumInputs, maxOutputs, maxIgnored, " +
+                "startTime.tv_sec, startTime.tv_nsec, " +
                 "endTime.tv_sec, endTime.tv_nsec, " +
                 "diff(startTime,endTime).tv_sec, diff(startTime,endTime).tv_nsec);");            
     }
@@ -905,8 +893,11 @@ public class EmitSMPCode extends EmitCode {
             p.println();
             p.println("void start_time() {");
             p.println("  if (startedTiming == 0) {");
-            p.println("    curr_time(&startTime);");
-            p.println("    startedTiming = 1;");
+            p.println("    if (currOutputs == maxIgnored) {");
+            p.println("      currOutputs == maxIgnored;");
+            p.println("      curr_time(&startTime);");
+            p.println("      startedTiming = 1;");
+            p.println("    }");
             p.println("  }");
             p.println("}");
             p.println();

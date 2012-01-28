@@ -179,8 +179,8 @@ public class DynamicQueueCodeGenerator {
 	
 	public void addPeekSource(String type) {
 	    hBuffer.append(type + " " + type + "_queue_peek_source(int index);\n");          	    
-	    cBuffer.append(type + " " + type + "_queue_peek_source(int index) {\n");           
-	    cBuffer.append("  return fileReadBuffer[(fileReadIndex__0 + index) % num_inputs];\n");
+	    cBuffer.append(type + " " + type + "_queue_peek_source(int index) {\n");    
+	    cBuffer.append("  return fileReadBuffer[(fileReadIndex__0 + index) & num_inputs];\n");
 	    cBuffer.append("}\n");
 	}
 

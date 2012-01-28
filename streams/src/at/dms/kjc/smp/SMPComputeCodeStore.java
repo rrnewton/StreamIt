@@ -352,21 +352,23 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 		this.addExternField(new JFieldDeclaration(multiplierVar));
 		
 		if (KjcOptions.outputs < 0) {
-            stmt = "if (" + multiplierName + ") {"
-                    + "  int _i_ = 0;"
-                    + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { " 
-                 +      "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "       
-                 + "  }"
-                 + "}";
+            stmt = "if (" + multiplierName + ") {\n"
+                    + "  int _i_ = 0;\n"
+                    + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { \n" 
+                 +      "fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); \n"       
+                 + "  }\n"
+                 + "}\n";
             
 		} else {
-	          stmt = "if (" + multiplierName + ") {"   
-	               + "  int _i_ = 0;" 
-	               + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { " 
-                   +    "  fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); "
-                   +    "  if (--maxOutputs == 0) {  streamit_exit(0); } "
-		           + "  }"
-	               + "}";
+	          stmt = "if (" + multiplierName + ") {\n"   
+	               + "  int _i_ = 0;\n" 
+	               + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { \n" 
+                   +    "  fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); \n"
+                   +    "  if (currOutputs == maxIgnored) {  start_time(); } \n"
+                   +    "  currOutputs++;\n"                   
+                   +    "  if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+		           + "  }\n"
+	               + "}\n";
 		}						
 		addSteadyLoopStatement(Util.toStmt(stmt));						
 	}	
@@ -406,21 +408,23 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         String buffer = "dyn_buf_" + threadId;        
         String popCall = popName + "(" + buffer + ", "+ threadId + ", 0, NULL)";       
         if (KjcOptions.outputs < 0) {            
-            stmt = "int _i_ = 0;"
-                    + "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { " 
-                    +    "if (" + buffer + "->size > 0) {"       
-                    +      "fprintf(output, \"" + type + "\\n\", " + cast + popCall + "); "       
-                    +   "}"
-                    + "}";
+            stmt = "int _i_ = 0;\n"
+                    + "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { \n" 
+                    + "    if (" + buffer + "->size > 0) {\n"       
+                    + "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n "       
+                    + "    }\n"
+                    + "}\n";
             
         } else {
-            stmt = "int _i_ = 0;"
-                    + "for (_i_ = 0; _i_ < " + outputs + "; _i_++) { " 
-                    +    "if (" + buffer + "->size > 0) {"       
-                    +      "fprintf(output, \"" + type + "\\n\", " + cast + popCall + "); "
-                    +      "if (--maxOutputs == 0) {  streamit_exit(0); } "
-                    +   "}"
-                    + "}";
+            stmt = "int _i_ = 0;\n"
+                    + "for (_i_ = 0; _i_ < " + outputs + "; _i_++) {\n" 
+                    + "    if (" + buffer + "->size > 0) {\n"       
+                    + "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n"
+                    + "        if (currOutputs == maxIgnored) {  start_time(); } \n"
+                    + "        currOutputs++;\n"
+                    + "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+                    + "    }\n"
+                    + "}\n";
         }                       
         addSteadyLoopStatement(Util.toStmt(stmt));                      
     }

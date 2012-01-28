@@ -311,10 +311,10 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 					new JEmittedTextExpression("profiler_clear()")));
 		}
 		
-		if (KjcOptions.smp > 0 && KjcOptions.perftest) {
-		    mainMethod.addStatement(new JExpressionStatement(
-                    new JEmittedTextExpression("start_time()")));
-		}
+//		if (KjcOptions.smp > 0 && KjcOptions.perftest) {
+//		    mainMethod.addStatement(new JExpressionStatement(
+//                    new JEmittedTextExpression("start_time()")));
+//		}
 		
 		// add it to the while statement
 		mainMethod.addStatement(new JWhileStatement(null, new JBooleanLiteral(

@@ -772,7 +772,7 @@ longname		"noiter"
 
 longname 		"preoutputs"
 	type		int
-	default 	"-1"
+	default 	"0"
 	requireArgument
 	help		"Only start counting outputs after <n> outputs (for performance tests)."
 
