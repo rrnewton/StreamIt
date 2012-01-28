@@ -598,7 +598,8 @@ public class EmitSMPCode extends EmitCode {
         p.println("  ts->tv_sec = mts.tv_sec;");
         p.println("  ts->tv_nsec = mts.tv_nsec;");
         p.println(" #else");
-        p.println("  clock_gettime(CLOCK_REALTIME, ts);");
+        p.println("  clock_gettime(CLOCK_MONOTONIC, ts);");
+        //p.println("  clock_gettime(CLOCK_REALTIME, ts);");
         p.println("  //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, ts);");
         p.println(" #endif");
         p.println(" }");
