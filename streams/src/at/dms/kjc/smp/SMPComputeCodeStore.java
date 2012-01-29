@@ -363,9 +363,11 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 	          stmt = "if (" + multiplierName + ") {\n"   
 	               + "  int _i_ = 0;\n" 
 	               + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { \n" 
-                   +    "  fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); \n"
-                   +    "  if (currOutputs == maxIgnored) {  start_time(); } \n"
-                   +    "  currOutputs++;\n"                   
+                   +    "  fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); \n";
+	          if (KjcOptions.perftest) {
+	          stmt +=    "  if (currOutputs == maxIgnored) {  start_time(); } \n";
+	          }
+              stmt +=    "  currOutputs++;\n"                   
                    +    "  if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
 		           + "  }\n"
 	               + "}\n";
@@ -419,9 +421,11 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
             stmt = "int _i_ = 0;\n"
                     + "for (_i_ = 0; _i_ < " + outputs + "; _i_++) {\n" 
                     + "    if (" + buffer + "->size > 0) {\n"       
-                    + "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n"
-                    + "        if (currOutputs == maxIgnored) {  start_time(); } \n"
-                    + "        currOutputs++;\n"
+                    + "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n";  
+            if (KjcOptions.perftest) {
+               stmt +=    "  if (currOutputs == maxIgnored) {  start_time(); } \n";
+            }
+               stmt +=    "  currOutputs++;\n"                               
                     + "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
                     + "    }\n"
                     + "}\n";

@@ -27,6 +27,7 @@ FNULL = open('/dev/null', 'w')
 
 def run_strc(filename):
     cmd = ["strc", "-smp", "2", "--outputs", "10", "-regtest", filename]
+    # print cmd
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
 def run_make(filename):

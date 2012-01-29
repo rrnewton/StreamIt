@@ -646,6 +646,7 @@ public class EmitSMPCode extends EmitCode {
             p.println("// Number of steady-state outputs");
             p.println("int maxOutputs = " + (KjcOptions.outputs + KjcOptions.preoutputs) + ";");
             p.println("int maxIgnored= " + KjcOptions.preoutputs + ";");
+            p.println("int currOutputs = 0;");
             p.println();
         }
 
@@ -679,11 +680,10 @@ public class EmitSMPCode extends EmitCode {
             p.println("int perfTestNumInputs;");
             p.println("timespec endTime;");
             p.println("timespec startTime;");
-            p.println("int startedTiming;");
-            p.println("int currOutputs = 0;");
+            p.println("int startedTiming;");           
             p.println();
         }
-
+               
         p.println("// Global barrier");
         p.println("barrier_t barrier;");
         p.println();
