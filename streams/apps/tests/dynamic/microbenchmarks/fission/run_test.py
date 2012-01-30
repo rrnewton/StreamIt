@@ -19,13 +19,8 @@ tests        = [
 def generate(test, num_filters, work):
     op = 'void->void pipeline test {\n';
     op += '    add FileReader<float>(\"../input/floats.in\");\n'
-    op += '    for(int i=1; i<=' + str(num_filters) + '; i++)\n'
-    if test[0] == Configs.nofusion:
-        op += '        add Fstatic();\n'
-    if test[0] == Configs.fusion:
-        op += '        add Fstatic();\n'
-    if test[0] == Configs.dynamic:        
-        op += '        add Fdynamic();\n'
+    op += '    add Fdynamic();\n'
+    op += '    add Fstatic();\n'
     op += '    add FileWriter<float>(stdout);\n'
     op += '}\n'
     op += '\n'
