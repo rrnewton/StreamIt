@@ -16,13 +16,13 @@ tests        = [
     (Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
     ]
 
-def generate(test, num_filters, work):
+def generate(work, ratio):
     op = 'void->void pipeline test {\n';
     op += '    add FileReader<float>(\"../input/floats.in\");\n'
     op += '    add Fdynamic();\n'
     op += '    add Fdummy();\n'
     op += '    add Fstatic();\n'
-    op += '    add FileWriter<float>(stdout);\n'
+    op += '    add FileWriter<float>(\"test.out\");\n'
     op += '}\n'
     op += '\n'
     op += 'float->float filter Fstatic() {\n'
@@ -30,70 +30,58 @@ def generate(test, num_filters, work):
     op += '        int i;\n'
     op += '        float x;\n'
     op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(work/num_filters) + '; i++) {\n'
+    op += '        for (i = 0; i < ' + str(int(ratio * work)) + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
     op += '        }\n'
     op += '        push(x);\n'
     op += '    }\n'
     op += '}\n'
     op += '\n'
-    op += 'float->float filter Fdummy() {'
-    op += '    work pop 1 push 1 {'
-    op += '        push(pop());'
-    op += '    }'
-    op += '}'
+    op += 'float->float filter Fdummy() {\n'
+    op += '    work pop 1 push 1 {\n'
+    op += '        push(pop())\n;'
+    op += '    }\n'
+    op += '}\n'
     op += '\n'    
     op += 'float->float filter Fdynamic() {\n'
     op += '    work pop * push * {\n'
     op += '        int i;\n'
     op += '        float x;\n'
     op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(work/num_filters) + '; i++) {\n'
+    op += '        for (i = 0; i < ' + str(int(ratio * work)) + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
     op += '        }\n'
     op += '        push(x);\n'
     op += '    }\n'
     op += '}\n'
-
+    print op;
     with open("test.str", 'w') as f:
         f.write(op)      
 
-def compile(test, work, ignore):
-    flags = test[1]
-    exe = test[2]
-    cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
+def compile(outputs, ignore, core):
+    exe = './smp' + str(core)
+    cmd = [strc, '--perftest', '--noiter', '--nofuse',
+           '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
+    print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
 
 
-def run_one(test):
+def run_one(core):
     print 'run_one'
-    exe = test[2]
+    exe = './smp' + str(core)
     results = []
-    if test[0] == Configs.nofusion:
-        test_type = 'no-fusion'
-    elif test[0] == Configs.fusion:
-        test_type = 'fusion'
-    elif test[0] == Configs.dynamic:
-        test_type = 'dynamic'    
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
-    #                        input=20 outputs=20 ignored=10 start=1327947510:94511000 end=1327947510:94718000 delta=0:207000
     for m in regex.finditer(stdout):
-        results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
+        results = ([core] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
     return results
 
-def doit(x):
-    print 'x[4]=%f' % float(x[4]) * 1000000000
-    print 'x[5]=%f' % float(x[5])
-    return x[5]
-
-def run(test, attempts):
+def run(core, attempts):
     results = []
     for num in range(attempts):
-         result = run_one(test)
+         result = run_one(core)
          results.append(result)
-         #for result in results:
          print result
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x: x[5], results)
@@ -101,26 +89,27 @@ def run(test, attempts):
     avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
 
-def print_all(work, nofusion_results, fusion_results, dynamic_results):
-    file = 'work' + str(work) + '.dat'
+def print_all(ratio, results):
+    file = 'fission' + str(int(ratio * 100)) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'fusion', 'dynamic')
+        s = '#%s\t%s\t%s' % ( 'ratio', 'cores', 'avg')
         print s
         f.write(s + '\n')  
-        for x, y, z in zip(nofusion_results, fusion_results, dynamic_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], y[3], z[3])
+        for r in results:
+            print r
+            s = '%0.2f\t%d\t%0.2f' % (r[0], r[1], r[2])
             print s
             f.write(s + '\n')  
 
-def plot(work):
-    data = 'work' + str(work) + '.dat'
-    output = 'work' + str(work) + '.ps'
-    cmd = "plot \"" + data + "\" u 1:3 t \'nofusion\' w linespoints, \"" + data + "\" u 1:4 t \'fusion\' w linespoints, \"" + data + "\" u 1:5 t \'dynamic\' w linespoints"
+def plot(ratio):
+    data = 'fission' + str(int(ratio * 100)) + '.dat'
+    output = 'fission' + str(int(ratio * 100)) + '.ps'
+    cmd = "plot \"" + data + "\" u 2:3 w linespoints"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         #f.write('set title \"Static vs Dynamic, Iterations=1000, Cost=%d,\"\n' % cost)
-        f.write('set xlabel \"Filters\"\n');
+        f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
@@ -128,31 +117,21 @@ def plot(work):
 def main():
     attempts = 3
     ignore = 10
-    filters = [1, 2, 4, 8, 16, 32]
+    outputs = 1000
+    cores = [1, 2]
+    ratios = [0.50]
     total_work = [100]   
     for work in total_work:
-        nofusion_results = []
-        fusion_results = []
-        dynamic_results = []
-        for num_filters in filters:
-            for test in tests:
-                generate(test, num_filters, work)
-                compile(test, work, ignore)
-                avg =  run(test, attempts)
-                if test[0] == Configs.nofusion:
-                    x = ('no-fusion', work, num_filters, avg)
-                    print x
-                    nofusion_results.append(('no-fusion', work, num_filters, avg))
-                elif test[0] == Configs.fusion:
-                    fusion_results.append(('fusion', work, num_filters, avg))
-                    x = ('fusion', work, num_filters, avg)
-                    print x
-                elif test[0] == Configs.dynamic:
-                    dynamic_results.append(('dynamic', work, num_filters, avg))
-                    x = ('dynamic', work, num_filters, avg)
-                    print x
-        print_all(work, nofusion_results, fusion_results, dynamic_results)
-        plot(work)
+        for ratio in ratios:
+            results = []
+            for core in cores:
+                generate(work, ratio)
+                compile(outputs, ignore, core)
+                avg =  run(core, attempts)
+                print 'avg=' + str(avg)
+                results.append((ratio, core, avg))
+            print_all(ratio, results);
+            plot(ratio)
                     
 if __name__ == "__main__":
     main()
