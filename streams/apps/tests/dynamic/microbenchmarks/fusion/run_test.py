@@ -60,12 +60,12 @@ def compile(test, work, ignore):
     flags = test[1]
     exe = test[2]
     cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
-    print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
 
 
 def run_one(test):
+    print 'run_one'
     exe = test[2]
     results = []
     if test[0] == Configs.nofusion:
@@ -76,34 +76,39 @@ def run_one(test):
         test_type = 'dynamic'    
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
+    #                        input=20 outputs=20 ignored=10 start=1327947510:94511000 end=1327947510:94718000 delta=0:207000
     for m in regex.finditer(stdout):
         results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
     return results
 
+def doit(x):
+    print 'x[4]=%f' % float(x[4]) * 1000000000
+    print 'x[5]=%f' % float(x[5])
+    return x[5]
+
 def run(test, attempts):
     results = []
     for num in range(attempts):
-         results.append(run_one(test))
-    for result in results:
-        print result
-    times = map(lambda x: x[5], results)
-    avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)
-    print 'avg=' + str(avg)
-    print '-----'
+         result = run_one(test)
+         results.append(result)
+         #for result in results:
+         print result
+    # 1000000000 nanoseconds in 1 second    
+    #times = map(lambda x: x[5], results)
+    times = map(doit, results)
+    avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
+#return 0.0
 
 def print_all(nofusion_results, fusion_results, dynamic_results):
-    print 'filters' + '\t\t' + 'work' + '\t\t' + 'nofusion' + '\t\t' + 'fusion' + '\t\t' + 'dynamic'
-    for i in range(len(nofusion_results)):
-        nofusion_result = nofusion_results[i-1]
-        fusion_result = fusion_results[i-1]
-        dynamic_result = dynamic_results[i-1]
-        print str(nofusion_result[2]) + '\t\t' + str(nofusion_result[1]) + '\t\t' + str(nofusion_result[3]) + '\t\t' + str(fusion_result[3]) + '\t\t' + str(dynamic_result[3]) 
+    print '%s\t\t%s\t\t%s\t\t%s\t\t%s' % ( 'filters', 'work', 'nofusion', 'fusion', 'dynamic')
+    for x, y, z in zip(nofusion_results, fusion_results, dynamic_results):
+        print '%d\t\t%d\t\t%0.2f\t\t%0.2f\t\t%0.2f' % (x[2], x[1], x[3], y[3], z[3])
 
 def main():
     attempts = 3
     ignore = 10
-    filters = [1, 2, 4, 8]
+    filters = [1]
     total_work = [10]
     nofusion_results = []
     fusion_results = []
@@ -115,11 +120,17 @@ def main():
                 compile(test, work, ignore)
                 avg =  run(test, attempts)
                 if test[0] == Configs.nofusion:
+                    x = ('no-fusion', work, num_filters, avg)
+                    print x
                     nofusion_results.append(('no-fusion', work, num_filters, avg))
                 elif test[0] == Configs.fusion:
-                   fusion_results.append(('fusion', work, num_filters, avg))
+                    fusion_results.append(('fusion', work, num_filters, avg))
+                    x = ('fusion', work, num_filters, avg)
+                    print x
                 elif test[0] == Configs.dynamic:
                     dynamic_results.append(('dynamic', work, num_filters, avg))
+                    x = ('dynamic', work, num_filters, avg)
+                    print x
     print_all(nofusion_results, fusion_results, dynamic_results)
                     
 if __name__ == "__main__":
