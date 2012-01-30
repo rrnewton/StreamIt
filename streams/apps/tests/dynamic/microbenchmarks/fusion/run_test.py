@@ -4,85 +4,123 @@ import subprocess
 import time
 import re
 
+class Configs:
+    nofusion, fusion, dynamic = range(3)
+
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-# void->void pipeline test1 {
-#     add FileReader<float>("../input/floats.in");
-#     add F1(100);
-#     add FileWriter<float>(stdout);
-# }
+tests        = [
+    (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse'], './smp1' ),
+    (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
+    (Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
+    ]
 
-# float->float filter F1 {
-#   work pop 1 push * {
-#     push(pop());
-#   }
-# }
+def generate(test, num_filters, work):
+    op = 'void->void pipeline test {\n';
+    op += '    add FileReader<float>(\"../input/floats.in\");\n'
+    op += '    for(int i=1; i<=' + str(num_filters) + '; i++)\n'
+    if test[0] == Configs.nofusion:
+        op += '        add Fstatic();\n'
+    if test[0] == Configs.fusion:
+        op += '        add Fstatic();\n'
+    if test[0] == Configs.dynamic:        
+        op += '        add Fdynamic();\n'
+    op += '    add FileWriter<float>(stdout);\n'
+    op += '}\n'
+    op += '\n'
+    op += 'float->float filter Fstatic() {\n'
+    op += '    work pop 1 push 1 {\n'
+    op += '        int i;\n'
+    op += '        float x;\n'
+    op += '        x = pop();\n'
+    op += '        for (i = 0; i < ' + str(work/num_filters) + '; i++) {\n'
+    op += '            x += i * 3.0 - 1.0;\n'
+    op += '        }\n'
+    op += '        push(x);\n'
+    op += '    }\n'
+    op += '}\n'
+    op += '\n'
+    op += 'float->float filter Fdynamic() {\n'
+    op += '    work pop * push * {\n'
+    op += '        int i;\n'
+    op += '        float x;\n'
+    op += '        x = pop();\n'
+    op += '        for (i = 0; i < ' + str(work/num_filters) + '; i++) {\n'
+    op += '            x += i * 3.0 - 1.0;\n'
+    op += '        }\n'
+    op += '        push(x);\n'
+    op += '    }\n'
+    op += '}\n'
 
-# float->float filter F2 {
-#   work pop * push 1 {
-#     push(pop());
-#   }
-# }
+    with open("test.str", 'w') as f:
+        f.write(op)      
 
-# float->float filter F(int n) {
-#   work pop 1 push * {
-#     int i;
-#     float x;
-#     x = pop();
-#     for (i = 0; i < n; i++) {
-#       x += i * 3.0 - 1.0;
-#     }
-#     push(x);
-#   }
-# }
-
-def compile(outputs):
-    exe = './smp1' 
-    cmd = [strc, '-smp', '1', '--perftest', '--outputs', str(outputs), 'test.str' ]
+def compile(test, work, ignore):
+    flags = test[1]
+    exe = test[2]
+    cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
     print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
 
 
-def make_streamit_app():
-    with open("test.str", 'w') as f:
-        f.write('void->void pipeline test {\n')
-        f.write('    add FileReader<float>(\"../input/floats.in\");\n')
-        f.write('    add Fstatic(100);\n')
-        f.write('    add FileWriter<float>(stdout);\n')
-        f.write('}\n')
-        f.write('\n')
-        f.write('float->float filter Fstatic(int n) {\n')
-        f.write('    work pop 1 push 1 {\n')
-        f.write('        int i;\n')
-        f.write('        float x;\n')
-        f.write('        x = pop();\n')
-        f.write('        for (i = 0; i < n; i++) {\n')
-        f.write('            x += i * 3.0 - 1.0;\n')
-        f.write('        }\n')
-        f.write('        push(x);\n')
-        f.write('    }\n')
-        f.write('}\n')
-        f.write('\n')
-        f.write('float->float filter Fdynamic(int n) {\n')
-        f.write('    work pop 1 push * {\n')
-        f.write('        int i;\n')
-        f.write('        float x;\n')
-        f.write('        x = pop();\n')
-        f.write('        for (i = 0; i < n; i++) {\n')
-        f.write('            x += i * 3.0 - 1.0;\n')
-        f.write('        }\n')
-        f.write('        push(x);\n')
-        f.write('    }\n')
-        f.write('}\n')
+def run_one(test):
+    exe = test[2]
+    results = []
+    if test[0] == Configs.nofusion:
+        test_type = 'no-fusion'
+    elif test[0] == Configs.fusion:
+        test_type = 'fusion'
+    elif test[0] == Configs.dynamic:
+        test_type = 'dynamic'    
+    (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
+    for m in regex.finditer(stdout):
+        results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
+    return results
 
+def run(test, attempts):
+    results = []
+    for num in range(attempts):
+         results.append(run_one(test))
+    for result in results:
+        print result
+    times = map(lambda x: x[5], results)
+    avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)
+    print 'avg=' + str(avg)
+    print '-----'
+    return avg
 
-        
+def print_all(nofusion_results, fusion_results, dynamic_results):
+    print 'filters' + '\t\t' + 'work' + '\t\t' + 'nofusion' + '\t\t' + 'fusion' + '\t\t' + 'dynamic'
+    for i in range(len(nofusion_results)):
+        nofusion_result = nofusion_results[i-1]
+        fusion_result = fusion_results[i-1]
+        dynamic_result = dynamic_results[i-1]
+        print str(nofusion_result[2]) + '\t\t' + str(nofusion_result[1]) + '\t\t' + str(nofusion_result[3]) + '\t\t' + str(fusion_result[3]) + '\t\t' + str(dynamic_result[3]) 
 
 def main():
-    make_streamit_app()
-    compile(100)
+    attempts = 3
+    ignore = 10
+    filters = [1, 2, 4, 8]
+    total_work = [10]
+    nofusion_results = []
+    fusion_results = []
+    dynamic_results = []
+    for work in total_work:
+        for num_filters in filters:
+            for test in tests:
+                generate(test, num_filters, work)
+                compile(test, work, ignore)
+                avg =  run(test, attempts)
+                if test[0] == Configs.nofusion:
+                    nofusion_results.append(('no-fusion', work, num_filters, avg))
+                elif test[0] == Configs.fusion:
+                   fusion_results.append(('fusion', work, num_filters, avg))
+                elif test[0] == Configs.dynamic:
+                    dynamic_results.append(('dynamic', work, num_filters, avg))
+    print_all(nofusion_results, fusion_results, dynamic_results)
                     
 if __name__ == "__main__":
     main()
