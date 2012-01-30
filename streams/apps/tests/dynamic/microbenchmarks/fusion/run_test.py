@@ -98,22 +98,40 @@ def run(test, attempts):
     #times = map(doit, results)
     avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
-#return 0.0
 
-def print_all(nofusion_results, fusion_results, dynamic_results):
-    print '%s\t\t%s\t\t%s\t\t%s\t\t%s' % ( 'filters', 'work', 'nofusion', 'fusion', 'dynamic')
-    for x, y, z in zip(nofusion_results, fusion_results, dynamic_results):
-        print '%d\t\t%d\t\t%0.2f\t\t%0.2f\t\t%0.2f' % (x[2], x[1], x[3], y[3], z[3])
+def print_all(work, nofusion_results, fusion_results, dynamic_results):
+    file = 'work' + str(work) + '.dat'
+    with open(file, 'w') as f:
+        s = '#%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'fusion', 'dynamic')
+        print s
+        f.write(s + '\n')  
+        for x, y, z in zip(nofusion_results, fusion_results, dynamic_results):
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], y[3], z[3])
+            print s
+            f.write(s + '\n')  
+
+def plot(work):
+    data = 'work' + str(work) + '.dat'
+    output = 'work' + str(work) + '.ps'
+    cmd = "plot \"" + data + "\" u 1:3 t \'nofusion\' w linespoints, \"" + data + "\" u 1:4 t \'fusion\' w linespoints, \"" + data + "\" u 1:5 t \'dynamic\' w linespoints"
+    with open('./tmp.gnu', 'w') as f:        
+        f.write('set terminal postscript\n')
+        f.write('set output \"' + output + '\"\n')
+        #f.write('set title \"Static vs Dynamic, Iterations=1000, Cost=%d,\"\n' % cost)
+        f.write('set xlabel \"Filters\"\n');
+        f.write('set ylabel \"Nanoseconds\"\n');
+        f.write(cmd)
+    os.system('gnuplot ./tmp.gnu')
 
 def main():
     attempts = 3
     ignore = 10
-    filters = [1]
-    total_work = [10]
-    nofusion_results = []
-    fusion_results = []
-    dynamic_results = []
+    filters = [1, 2, 4, 8, 16, 32]
+    total_work = [1000]   
     for work in total_work:
+        nofusion_results = []
+        fusion_results = []
+        dynamic_results = []
         for num_filters in filters:
             for test in tests:
                 generate(test, num_filters, work)
@@ -131,7 +149,8 @@ def main():
                     dynamic_results.append(('dynamic', work, num_filters, avg))
                     x = ('dynamic', work, num_filters, avg)
                     print x
-    print_all(nofusion_results, fusion_results, dynamic_results)
+        print_all(work, nofusion_results, fusion_results, dynamic_results)
+        plot(work)
                     
 if __name__ == "__main__":
     main()
