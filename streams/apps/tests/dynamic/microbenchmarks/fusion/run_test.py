@@ -94,8 +94,8 @@ def run(test, attempts):
          #for result in results:
          print result
     # 1000000000 nanoseconds in 1 second    
-    #times = map(lambda x: x[5], results)
-    times = map(doit, results)
+    times = map(lambda x: x[5], results)
+    #times = map(doit, results)
     avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
 #return 0.0
