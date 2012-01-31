@@ -96,9 +96,8 @@ def run(core, attempts):
          result = run_one(core)
          results.append(result)
          print result
-    # 1000000000 nanoseconds in 1 second    
-    times = map(lambda x: x[5], results)
-    #times = map(doit, results)
+   # 1000000000 nanoseconds in 1 second    
+    times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)    
     avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
 

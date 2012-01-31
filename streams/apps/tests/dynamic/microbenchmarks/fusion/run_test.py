@@ -81,21 +81,15 @@ def run_one(test):
         results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
     return results
 
-def doit(x):
-    print 'x[4]=%f' % float(x[4]) * 1000000000
-    print 'x[5]=%f' % float(x[5])
-    return x[5]
-
 def run(test, attempts):
     results = []
     for num in range(attempts):
          result = run_one(test)
          results.append(result)
          #for result in results:
-         print result
+         print result         
     # 1000000000 nanoseconds in 1 second    
-    times = map(lambda x: x[5], results)
-    #times = map(doit, results)
+    times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
     avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
 
