@@ -5,21 +5,18 @@ import time
 import re
 
 class Configs:
-    nofusion, fusion, dynamic = range(3)
+    static, dynamic = range(2)
 
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-tests        = [
-    (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse'], './smp1' ),
-    (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    ]
-
-def generate(work, ratio):
+def generate(test, work, ratio):
     op = 'void->void pipeline test {\n';
     op += '    add FileReader<float>(\"../input/floats.in\");\n'
-    op += '    add Fdynamic();\n'
+    if test == Configs.static:
+        op += '    add FstaticX();\n'
+    else:
+        op += '    add Fdynamic();\n'
     op += '    add Fdummy();\n'
     op += '    add Fstatic();\n'
     op += '    add FileWriter<float>(\"test.out\");\n'
@@ -37,6 +34,18 @@ def generate(work, ratio):
     op += '    }\n'
     op += '}\n'
     op += '\n'
+    op += 'float->float filter FstaticX() {\n'
+    op += '    work pop 1 push 1 {\n'
+    op += '        int i;\n'
+    op += '        float x;\n'
+    op += '        x = pop();\n'
+    op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
+    op += '            x += i * 3.0 - 1.0;\n'
+    op += '        }\n'
+    op += '        push(x);\n'
+    op += '    }\n'
+    op += '}\n'
+    op += '\n'
     op += 'float->float filter Fdummy() {\n'
     op += '    work pop 1 push 1 {\n'
     op += '        push(pop())\n;'
@@ -48,7 +57,7 @@ def generate(work, ratio):
     op += '        int i;\n'
     op += '        float x;\n'
     op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(int(ratio * work)) + '; i++) {\n'
+    op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
     op += '        }\n'
     op += '        push(x);\n'
@@ -58,10 +67,14 @@ def generate(work, ratio):
     with open("test.str", 'w') as f:
         f.write(op)      
 
-def compile(outputs, ignore, core):
+def compile(test, outputs, ignore, core):
     exe = './smp' + str(core)
-    cmd = [strc, '--perftest', '--noiter', '--nofuse',
-           '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
+    if test == Configs.static:
+        cmd = [strc, '--perftest', '--noiter',
+               '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
+    else:
+        cmd = [strc, '--perftest', '--noiter', '--nofuse',
+               '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
     print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
@@ -89,22 +102,30 @@ def run(core, attempts):
     avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
 
-def print_all(ratio, results):
+def print_all(ratio, static_results, dynamic_results):
     file = 'fission' + str(int(ratio * 100)) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s' % ( 'ratio', 'cores', 'avg')
+        # s = '#%s\t%s\t%s' % ( 'ratio', 'cores', 'avg')
+        # print s
+        # f.write(s + '\n')  
+        # for r in dynamic_results:
+        #     print r
+        #     s = '%0.2f\t%d\t%0.2f' % (r[0], r[1], r[2])
+        #     print s
+        #     f.write(s + '\n')
+        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'dynamic')
         print s
         f.write(s + '\n')  
-        for r in results:
-            print r
-            s = '%0.2f\t%d\t%0.2f' % (r[0], r[1], r[2])
+        for x, y in zip(static_results, dynamic_results):
+            s = '%0.2f\t%d\t%0.2f\t%0.2f' % (x[0], x[1], x[2], y[2])
             print s
-            f.write(s + '\n')  
+            f.write(s + '\n')
 
 def plot(ratio):
     data = 'fission' + str(int(ratio * 100)) + '.dat'
     output = 'fission' + str(int(ratio * 100)) + '.ps'
-    cmd = "plot \"" + data + "\" u 2:3 w linespoints"
+    # cmd = "plot \"" + data + "\" u 2:3 w linespoints"
+    cmd = "plot \"" + data + "\" u 2:3 t \'static\' w linespoints, \"" + data + "\" u 2:4 t \'dynamic\' w linespoints, \"" + data + "\""    
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
@@ -114,23 +135,28 @@ def plot(ratio):
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
 
-def main():
+def main():         
     attempts = 3
     ignore = 10
     outputs = 1000
-    cores = [1, 2]
-    ratios = [0.50]
+    cores = [1, 2, 4, 8, 16, 32]
+    ratios = [0.10, 0.50, 0.90]
     total_work = [100]   
     for work in total_work:
         for ratio in ratios:
-            results = []
-            for core in cores:
-                generate(work, ratio)
-                compile(outputs, ignore, core)
-                avg =  run(core, attempts)
-                print 'avg=' + str(avg)
-                results.append((ratio, core, avg))
-            print_all(ratio, results);
+            static_results = []
+            dynamic_results = []
+            for test in [Configs.static, Configs.dynamic]:
+                for core in cores:
+                    generate(test, work, ratio)
+                    compile(test, outputs, ignore, core)
+                    avg =  run(core, attempts)
+                    print 'avg=' + str(avg)
+                    if test == Configs.static:
+                        static_results.append((ratio, core, avg))
+                    else:
+                        dynamic_results.append((ratio, core, avg))
+                    print_all(ratio, static_results, dynamic_results);
             plot(ratio)
                     
 if __name__ == "__main__":
