@@ -22,7 +22,7 @@ import at.dms.util.GetSteadyMethods;
  */
 public class MutableStateExtractor {
     private static final String ITERATION_COUNT_FIELD_PATTERN = 
-        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)?";
+        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)*";
 
     /**
      * Returns whether or not <filter> has mutable state.  This is

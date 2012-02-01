@@ -52,7 +52,7 @@ public class StatelessDuplicate {
     private static final boolean USE_ROUNDROBIN_SPLITTER = true;
 
     private static final String ITERATION_COUNT_FIELD_PATTERN = 
-        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)?";
+        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)*";
     
     
     /**

@@ -47,7 +47,7 @@ import at.dms.util.Utils;
  */
 public class IterationStatelessDuplicate {
     private static final String ITERATION_COUNT_FIELD_PATTERN = 
-        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)?";
+        LowerIterationExpression.ITER_VAR_NAME + "(__(\\d)+)*";
     /** Iteration count variable name */
     private static final String ITERATION_COUNT_VARNAME =
         LowerIterationExpression.ITER_VAR_NAME;

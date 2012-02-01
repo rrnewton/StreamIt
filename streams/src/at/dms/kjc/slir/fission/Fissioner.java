@@ -1,6 +1,5 @@
 package at.dms.kjc.slir.fission;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,15 +48,6 @@ public class Fissioner {
     /** Iteration count variable name */
     private static final String ITERATION_COUNT_VARNAME =
         LowerIterationExpression.ITER_VAR_NAME;
-    /** Iteration count start for the individual fissed filter */
-    private static final String ITERATION_COUNT_START_VARNAME =
-        "__iteration_countStart";
-    /** Iteration count total increment (i.e. sum of work of all filters) */
-    private static final String ITERATION_COUNT_TOTAL_VARNAME =
-        "__iteration_countStepIncr";
-    /** Iteration count reps for the individual fissed filter */
-    private static final String ITERATION_COUNT_REPS_VARNAME =
-        "__iteration_countReps";
     
     private static int uniqueID;
     /** the slice we are fissing */
