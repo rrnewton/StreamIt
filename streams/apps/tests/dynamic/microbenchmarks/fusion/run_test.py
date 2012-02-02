@@ -111,12 +111,13 @@ def print_all(work, nofusion_results, fusion_results, dynamic_results):
 def plot(work):
     data = 'work' + str(work) + '.dat'
     output = 'work' + str(work) + '.ps'
-    cmd = "plot \"" + data + "\" u 1:3 t \'nofusion\' w linespoints, \""
+    cmd = "plot \""
+    cmd += data + "\" u 1:3 t \'nofusion\' w linespoints, \""
+    cmd += "\" u 1:3:4 notitle w yerrorbars, \""
     cmd += data + "\" u 1:5 t \'fusion\' w linespoints, \""
+    cmd += "\" u 1:5:6 notitle w yerrorbars, \""
     cmd += data + "\" u 1:7 t \'dynamic\' w linespoints, \""
-    cmd += data + "\" u 1:3:4 t \'nofusion-dev\' w yerrorbars, \""
-    cmd += data + "\" u 1:5:6 t \'fusion-dev\' w yerrorbars, \""
-    cmd += data + "\" u 1:7:8 t \'dynamic-dev\' w yerrorbars"
+    cmd += "\" u 1:7:8 notitle w yerrorbars"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')

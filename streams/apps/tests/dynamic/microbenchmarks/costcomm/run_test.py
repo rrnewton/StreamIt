@@ -138,9 +138,9 @@ def plot(work):
     output = 'costcomm' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 1:3 t \'static\' w linespoints, \""
+    cmd += "\" u 1:3:4 notitle w yerrorbars, \"" 
     cmd += data + "\" u 1:5 t \'dynamic\' w linespoints, \"" 
-    cmd += data + "\" u 1:3:4 t \'dynamic-dev\' w yerrorbars, \"" 
-    cmd += data + "\" u 1:5:6 t \'dynamic-dev\' w yerrorbars"
+    cmd += "\" u 1:5:6 notitle w yerrorbars"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')

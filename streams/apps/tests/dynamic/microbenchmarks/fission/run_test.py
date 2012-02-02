@@ -120,9 +120,9 @@ def plot(ratio):
     output = 'fission' + str(int(ratio * 100)) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
+    cmd += "\" u 2:3:4 notitle w yerrorbars, \""
     cmd += data + "\" u 2:5 t \'dynamic\' w linespoints, \""
-    cmd += data + "\" u 2:3:4 t \'static-dev\' w yerrorbars, \""
-    cmd += data + "\" u 2:5:6 t \'dynamic-dev\' w yerrorbars"
+    cmd += "\" u 2:5:6 t notitle w yerrorbars"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
