@@ -129,8 +129,9 @@ def plot(work):
 def main():
     attempts = 3
     ignore = 1000
+    outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    total_work = [100000]   
+    total_work = [1000]   
     for work in total_work:
         nofusion_results = []
         fusion_results = []
@@ -138,7 +139,7 @@ def main():
         for num_filters in filters:
             for test in tests:
                 generate(test, num_filters, work)
-                compile(test, work, ignore)
+                compile(test, outputs, ignore)
                 (avg, dev) =  run(test, attempts)
                 if test[0] == Configs.nofusion:
                     x = ('no-fusion', work, num_filters, avg, dev)

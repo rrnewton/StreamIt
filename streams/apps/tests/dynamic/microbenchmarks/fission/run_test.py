@@ -120,10 +120,10 @@ def plot(ratio):
     data = 'fission' + str(int(ratio * 100)) + '.dat'
     output = 'fission' + str(int(ratio * 100)) + '.ps'
     cmd = "plot \""
-    cmd += data + "\" u 2:3:4 t \'static-dev\' w yerrorbars, \""
-    cmd += data + "\" u 2:5:6 t \'dynamic-dev\' w yerrorbars, \""
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
-    cmd += data + "\" u 2:5 t \'dynamic\' w linespoints"
+    cmd += data + "\" u 2:5 t \'dynamic\' w linespoints,"
+    cmd += data + "\" u 2:3:4 t \'static-dev\' w yerrorbars, \""
+    cmd += data + "\" u 2:5:6 t \'dynamic-dev\' w yerrorbars \""
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
@@ -139,7 +139,7 @@ def main():
     outputs = 100000
     cores = [1, 2, 4, 8, 16, 32]
     ratios = [0.10, 0.50, 0.90]
-    total_work = [100]   
+    total_work = [1000]   
     for work in total_work:
         for ratio in ratios:
             static_results = []

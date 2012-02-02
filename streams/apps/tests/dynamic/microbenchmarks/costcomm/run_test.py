@@ -125,23 +125,26 @@ def run(core, attempts):
 def print_all(work, static_results, dynamic_results):
     file = 'costcomm' + str(work) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'work', 'static', 'dynamic')
+        s = '#%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'work', 'static', 'dev', 'dynamic', 'dev')
         print s
         f.write(s + '\n')  
         for x, y in zip(static_results, dynamic_results):
-            s = '%0.2f\t%d\t%0.2f\t%0.2f' % (x[0], x[1], x[2], y[2])
+            s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], y[3])
             print s
             f.write(s + '\n')
 
 def plot(work):
     data = 'costcomm' + str(work) + '.dat'
     output = 'costcomm' + str(work) + '.ps'
-    # cmd = "plot \"" + data + "\" u 2:3 w linespoints"
-    cmd = "plot \"" + data + "\" u 1:3 t \'static\' w linespoints, \"" + data + "\" u 1:4 t \'dynamic\' w linespoints, \"" + data + "\""    
+    cmd = "plot \""
+    cmd += data + "\" u 1:3 t \'static\' w linespoints, \""
+    cmd += data + "\" u 1:5 t \'dynamic\' w linespoints, \"" 
+    cmd += data + "\" u 1:3:4 t \'dynamic-dev\' w yerrorbars, \"" 
+    cmd += data + "\" u 1:5:6 t \'dynamic-dev\' w yerrorbars"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set title \"Static vs Dynamic, Outputs=' + str(work) + '\n') 
+        f.write('set title \"Cost/Communication Ratio, Outputs=' + str(work) + '\n') 
         f.write('set xlabel \"Ratio\"\n')
         f.write('set ylabel \"Nanoseconds\"\n')
         f.write(cmd)
@@ -150,12 +153,10 @@ def plot(work):
 def main():         
     attempts = 3
     ignore = 1000
-    outputs = 1000
-    #ratios = [0.10, 0.25, 0.50, 0.75, 0.90]
-    ratios = [0.10, 0.25]
-    total_work = [10000]
+    outputs = 100000
+    ratios = [0.10, 0.25, 0.50, 0.75, 0.90]
+    total_work = [1000]
     num_cores = 1
-
     for work in total_work:
         static_results = []
         dynamic_results = []
@@ -166,9 +167,9 @@ def main():
                 (avg, dev) =  run(num_cores, attempts)
                 print 'avg=' + str(avg)
                 if test == Configs.static:
-                    static_results.append((ratio, work, avg))
+                    static_results.append((ratio, work, avg, dev))
                 else:
-                    dynamic_results.append((ratio, work, avg))
+                    dynamic_results.append((ratio, work, avg, dev))
         print_all(work, static_results, dynamic_results);
         plot(work)
                     
