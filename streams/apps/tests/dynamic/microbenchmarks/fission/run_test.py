@@ -123,7 +123,7 @@ def plot(ratio):
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
     cmd += data + "\" u 2:5 t \'dynamic\' w linespoints, \""
     cmd += data + "\" u 2:3:4 t \'static-dev\' w yerrorbars, \""
-    cmd += data + "\" u 2:5:6 t \'dynamic-dev\' w yerrorbars 
+    cmd += data + "\" u 2:5:6 t \'dynamic-dev\' w yerrorbars"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
