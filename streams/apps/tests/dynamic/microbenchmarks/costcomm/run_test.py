@@ -14,55 +14,72 @@ def generate(test, work, ratio):
     op = 'void->void pipeline test {\n';
     op += '    add FileReader<float>(\"../input/floats.in\");\n'
     if test == Configs.static:
-        op += '    add FstaticX();\n'
+        op += '    add FstaticPush();\n'
+        op += '    add FstaticPop();\n'
     else:
-        op += '    add Fdynamic();\n'
-    op += '    add Fdummy();\n'
-    op += '    add Fstatic();\n'
+        op += '    add FdynamicPush();\n'
+        op += '    add FdynamicPop();\n'
     op += '    add FileWriter<float>(\"test.out\");\n'
     op += '}\n'
     op += '\n'
-    op += 'float->float filter Fstatic() {\n'
-    op += '    work pop 1 push 1 {\n'
+    op += 'float->float filter FstaticPush() {\n'
+    op += '    work pop 1 push ' + str(int(ratio * work)) + ' {\n'
     op += '        int i;\n'
     op += '        float x;\n'
     op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(int(ratio * work)) + '; i++) {\n'
+    op += '        for (i = 0; i < ' + str(int(work/2)) + '; i++) {\n'
+    op += '            x += i * 3.0 - 1.0;\n'
+    op += '        }\n'
+    op += '        for (i = 0; i < ' + str(int((work/2) * ratio)) + '; i++) {\n'
+    op += '            push(x);\n'
+    op += '        }\n'
+    op += '    }\n'
+    op += '}\n'
+    op += '\n'
+    op += 'float->float filter FstaticPop() {\n'
+    op += '    work pop ' + str(int(ratio * work)) + ' push 1 {\n'
+    op += '        int i;\n'
+    op += '        float x;\n'
+    op += '        x = 1;\n'
+    op += '        for (i = 0; i < ' + str(int((work/2) * ratio)) + '; i++) {\n'
+    op += '            pop();\n'
+    op += '        }\n'
+    op += '        for (i = 0; i < ' + str(int(work/2)) + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
     op += '        }\n'
     op += '        push(x);\n'
     op += '    }\n'
     op += '}\n'
     op += '\n'
-    op += 'float->float filter FstaticX() {\n'
-    op += '    work pop 1 push 1 {\n'
+    op += 'float->float filter FdynamicPush() {\n'
+    op += '    work pop 1 push * {\n'
     op += '        int i;\n'
     op += '        float x;\n'
     op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
+    op += '        for (i = 0; i < ' + str(int(work/2)) + '; i++) {\n'
+    op += '            x += i * 3.0 - 1.0;\n'
+    op += '        }\n'
+    op += '        for (i = 0; i < ' + str(int((work/2) * ratio)) + '; i++) {\n'
+    op += '            push(x);\n'
+    op += '        }\n'
+    op += '    }\n'
+    op += '}\n'
+    op += '\n'
+    op += 'float->float filter FdynamicPop() {\n'
+    op += '    work pop * push 1 {\n'
+    op += '        int i;\n'
+    op += '        float x;\n'
+    op += '        x = 1;\n'
+    op += '        for (i = 0; i < ' + str(int((work/2) * ratio)) + '; i++) {\n'
+    op += '            pop();\n'
+    op += '        }\n'
+    op += '        for (i = 0; i < ' + str(int(work/2)) + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
     op += '        }\n'
     op += '        push(x);\n'
     op += '    }\n'
     op += '}\n'
     op += '\n'
-    op += 'float->float filter Fdummy() {\n'
-    op += '    work pop 1 push 1 {\n'
-    op += '        push(pop())\n;'
-    op += '    }\n'
-    op += '}\n'
-    op += '\n'    
-    op += 'float->float filter Fdynamic() {\n'
-    op += '    work pop * push * {\n'
-    op += '        int i;\n'
-    op += '        float x;\n'
-    op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
-    op += '            x += i * 3.0 - 1.0;\n'
-    op += '        }\n'
-    op += '        push(x);\n'
-    op += '    }\n'
-    op += '}\n'
     print op;
     with open("test.str", 'w') as f:
         f.write(op)      
@@ -101,18 +118,10 @@ def run(core, attempts):
     avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
     return avg
 
-def print_all(ratio, static_results, dynamic_results):
-    file = 'fission' + str(int(ratio * 100)) + '.dat'
+def print_all(work, static_results, dynamic_results):
+    file = 'costcomm' + str(work) + '.dat'
     with open(file, 'w') as f:
-        # s = '#%s\t%s\t%s' % ( 'ratio', 'cores', 'avg')
-        # print s
-        # f.write(s + '\n')  
-        # for r in dynamic_results:
-        #     print r
-        #     s = '%0.2f\t%d\t%0.2f' % (r[0], r[1], r[2])
-        #     print s
-        #     f.write(s + '\n')
-        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'dynamic')
+        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'work', 'static', 'dynamic')
         print s
         f.write(s + '\n')  
         for x, y in zip(static_results, dynamic_results):
@@ -120,43 +129,43 @@ def print_all(ratio, static_results, dynamic_results):
             print s
             f.write(s + '\n')
 
-def plot(ratio):
-    data = 'fission' + str(int(ratio * 100)) + '.dat'
-    output = 'fission' + str(int(ratio * 100)) + '.ps'
+def plot(work):
+    data = 'costcomm' + str(work) + '.dat'
+    output = 'costcomm' + str(work) + '.ps'
     # cmd = "plot \"" + data + "\" u 2:3 w linespoints"
-    cmd = "plot \"" + data + "\" u 2:3 t \'static\' w linespoints, \"" + data + "\" u 2:4 t \'dynamic\' w linespoints, \"" + data + "\""    
+    cmd = "plot \"" + data + "\" u 1:3 t \'static\' w linespoints, \"" + data + "\" u 1:4 t \'dynamic\' w linespoints, \"" + data + "\""    
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        #f.write('set title \"Static vs Dynamic, Iterations=1000, Cost=%d,\"\n' % cost)
-        f.write('set xlabel \"Cores\"\n');
-        f.write('set ylabel \"Nanoseconds\"\n');
+        f.write('set title \"Static vs Dynamic, Outputs=' + str(work) + '\n') 
+        f.write('set xlabel \"Ratio\"\n')
+        f.write('set ylabel \"Nanoseconds\"\n')
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
 
 def main():         
     attempts = 3
-    ignore = 10
+    ignore = 1000
     outputs = 1000
-    cores = [1, 2, 4, 8, 16, 32]
-    ratios = [0.10, 0.50, 0.90]
-    total_work = [100]   
+    ratios = [0.10, 0.25, 0.50, 0.75, 0.90]
+    total_work = [10000]
+    num_cores = 1
+
     for work in total_work:
+        static_results = []
+        dynamic_results = []
         for ratio in ratios:
-            static_results = []
-            dynamic_results = []
             for test in [Configs.static, Configs.dynamic]:
-                for core in cores:
-                    generate(test, work, ratio)
-                    compile(test, outputs, ignore, core)
-                    avg =  run(core, attempts)
-                    print 'avg=' + str(avg)
-                    if test == Configs.static:
-                        static_results.append((ratio, core, avg))
-                    else:
-                        dynamic_results.append((ratio, core, avg))
-                    print_all(ratio, static_results, dynamic_results);
-            plot(ratio)
+                generate(test, work, ratio)
+                compile(test, outputs, ignore, num_cores)
+                avg =  run(num_cores, attempts)
+                print 'avg=' + str(avg)
+                if test == Configs.static:
+                    static_results.append((ratio, work, avg))
+                else:
+                    dynamic_results.append((ratio, work, avg))
+        print_all(work, static_results, dynamic_results);
+        plot(work)
                     
 if __name__ == "__main__":
     main()
