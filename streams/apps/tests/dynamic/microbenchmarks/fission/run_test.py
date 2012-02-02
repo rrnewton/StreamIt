@@ -108,31 +108,26 @@ def run(core, attempts):
 def print_all(ratio, static_results, dynamic_results):
     file = 'fission' + str(int(ratio * 100)) + '.dat'
     with open(file, 'w') as f:
-        # s = '#%s\t%s\t%s' % ( 'ratio', 'cores', 'avg')
-        # print s
-        # f.write(s + '\n')  
-        # for r in dynamic_results:
-        #     print r
-        #     s = '%0.2f\t%d\t%0.2f' % (r[0], r[1], r[2])
-        #     print s
-        #     f.write(s + '\n')
-        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'dynamic')
+        s = '#%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'static-dev', 'dynamic', 'dynamic-dev' )
         print s
         f.write(s + '\n')  
         for x, y in zip(static_results, dynamic_results):
-            s = '%0.2f\t%d\t%0.2f\t%0.2f' % (x[0], x[1], x[2], y[2])
+            s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], x[3])
             print s
             f.write(s + '\n')
 
 def plot(ratio):
     data = 'fission' + str(int(ratio * 100)) + '.dat'
     output = 'fission' + str(int(ratio * 100)) + '.ps'
-    # cmd = "plot \"" + data + "\" u 2:3 w linespoints"
-    cmd = "plot \"" + data + "\" u 2:3 t \'static\' w linespoints, \"" + data + "\" u 2:4 t \'dynamic\' w linespoints, \"" + data + "\""    
+    cmd = "plot \""
+    cmd += data + "\" u 2:3:4 t \'static-dev\' w yerrorbars, \""
+    cmd += data + "\" u 2:5:6 t \'dynamic-dev\' w yerrorbars, \""
+    cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
+    cmd += data + "\" u 2:5 t \'dynamic\' w linespoints"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        #f.write('set title \"Static vs Dynamic, Iterations=1000, Cost=%d,\"\n' % cost)
+        f.write('set title \"Fission Experiment, Ratio=%f static,\"\n' % ratio)
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
@@ -140,10 +135,9 @@ def plot(ratio):
 
 def main():         
     attempts = 3
-    ignore = 10
-    outputs = 1000
-    #cores = [1, 2, 4, 8, 16, 32]
-    cores = [1, 2]
+    ignore = 1000
+    outputs = 100000
+    cores = [1, 2, 4, 8, 16, 32]
     ratios = [0.10, 0.50, 0.90]
     total_work = [100]   
     for work in total_work:
@@ -157,9 +151,9 @@ def main():
                     (avg, dev) = run(core, attempts)
                     print 'avg=' + str(avg)
                     if test == Configs.static:
-                        static_results.append((ratio, core, avg))
+                        static_results.append((ratio, core, avg, dev))
                     else:
-                        dynamic_results.append((ratio, core, avg))
+                        dynamic_results.append((ratio, core, avg, dev))
                     print_all(ratio, static_results, dynamic_results);
             plot(ratio)
                     

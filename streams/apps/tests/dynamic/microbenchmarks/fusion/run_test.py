@@ -100,22 +100,27 @@ def run(test, attempts):
 def print_all(work, nofusion_results, fusion_results, dynamic_results):
     file = 'work' + str(work) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'fusion', 'dynamic')
+        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'dynamic', 'dev')
         print s
         f.write(s + '\n')  
         for x, y, z in zip(nofusion_results, fusion_results, dynamic_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], y[3], z[3])
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], z[3], z[4])
             print s
             f.write(s + '\n')  
 
 def plot(work):
     data = 'work' + str(work) + '.dat'
     output = 'work' + str(work) + '.ps'
-    cmd = "plot \"" + data + "\" u 1:3 t \'nofusion\' w linespoints, \"" + data + "\" u 1:4 t \'fusion\' w linespoints, \"" + data + "\" u 1:5 t \'dynamic\' w linespoints"
+    cmd = "plot \"" + data + "\" u 1:3 t \'nofusion\' w linespoints, \""
+    cmd += data + "\" u 1:5 t \'fusion\' w linespoints, \""
+    cmd += data + "\" u 1:7 t \'dynamic\' w linespoints, \""
+    cmd += data + "\" u 1:3:4 t \'nofusion-dev\' w yerrorbars, \""
+    cmd += data + "\" u 1:5:6 t \'fusion-dev\' w yerrorbars, \""
+    cmd += data + "\" u 1:7:8 t \'dynamic-dev\' w yerrorbars"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        #f.write('set title \"Static vs Dynamic, Iterations=1000, Cost=%d,\"\n' % cost)
+        f.write('set title \"Fusion Experiment, Work=%d,\"\n' % work)
         f.write('set xlabel \"Filters\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
@@ -123,10 +128,9 @@ def plot(work):
 
 def main():
     attempts = 3
-    ignore = 10
-    #filters = [1, 2, 4, 8, 16, 32]
-    filters = [1, 2]
-    total_work = [100]   
+    ignore = 1000
+    filters = [1, 2, 4, 8, 16, 32]
+    total_work = [100000]   
     for work in total_work:
         nofusion_results = []
         fusion_results = []
@@ -137,16 +141,16 @@ def main():
                 compile(test, work, ignore)
                 (avg, dev) =  run(test, attempts)
                 if test[0] == Configs.nofusion:
-                    x = ('no-fusion', work, num_filters, avg)
+                    x = ('no-fusion', work, num_filters, avg, dev)
                     print x
-                    nofusion_results.append(('no-fusion', work, num_filters, avg))
+                    nofusion_results.append(('no-fusion', work, num_filters, avg, dev))
                 elif test[0] == Configs.fusion:
-                    fusion_results.append(('fusion', work, num_filters, avg))
-                    x = ('fusion', work, num_filters, avg)
+                    fusion_results.append(('fusion', work, num_filters, avg, dev))
+                    x = ('fusion', work, num_filters, avg, dev)
                     print x
                 elif test[0] == Configs.dynamic:
-                    dynamic_results.append(('dynamic', work, num_filters, avg))
-                    x = ('dynamic', work, num_filters, avg)
+                    dynamic_results.append(('dynamic', work, num_filters, avg, dev))
+                    x = ('dynamic', work, num_filters, avg, dev)
                     print x
         print_all(work, nofusion_results, fusion_results, dynamic_results)
         plot(work)
