@@ -66,7 +66,6 @@ def compile(test, work, ignore):
 
 
 def run_one(test):
-    print 'run_one'
     exe = test[2]
     results = []
     if test[0] == Configs.nofusion:
