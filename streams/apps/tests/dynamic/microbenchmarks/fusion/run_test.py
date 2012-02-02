@@ -3,6 +3,7 @@ import os
 import subprocess
 import time
 import re
+import math
 
 class Configs:
     nofusion, fusion, dynamic = range(3)
@@ -90,8 +91,11 @@ def run(test, attempts):
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-    return avg
+    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
+    deviations = map(lambda x: x - mean, times)
+    squares = map(lambda x: x * x, deviations)
+    dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
+    return (mean, dev)
 
 def print_all(work, nofusion_results, fusion_results, dynamic_results):
     file = 'work' + str(work) + '.dat'
@@ -120,7 +124,8 @@ def plot(work):
 def main():
     attempts = 3
     ignore = 10
-    filters = [1, 2, 4, 8, 16, 32]
+    #filters = [1, 2, 4, 8, 16, 32]
+    filters = [1, 2]
     total_work = [100]   
     for work in total_work:
         nofusion_results = []
@@ -130,7 +135,7 @@ def main():
             for test in tests:
                 generate(test, num_filters, work)
                 compile(test, work, ignore)
-                avg =  run(test, attempts)
+                (avg, dev) =  run(test, attempts)
                 if test[0] == Configs.nofusion:
                     x = ('no-fusion', work, num_filters, avg)
                     print x

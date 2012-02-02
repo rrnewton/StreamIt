@@ -3,6 +3,7 @@ import os
 import subprocess
 import time
 import re
+import math
 
 class Configs:
     static, dynamic = range(2)
@@ -115,8 +116,11 @@ def run(core, attempts):
          print result
    # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)    
-    avg = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-    return avg
+    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
+    deviations = map(lambda x: x - mean, times)
+    squares = map(lambda x: x * x, deviations)
+    dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
+    return (mean, dev)
 
 def print_all(work, static_results, dynamic_results):
     file = 'costcomm' + str(work) + '.dat'
@@ -147,7 +151,8 @@ def main():
     attempts = 3
     ignore = 1000
     outputs = 1000
-    ratios = [0.10, 0.25, 0.50, 0.75, 0.90]
+    #ratios = [0.10, 0.25, 0.50, 0.75, 0.90]
+    ratios = [0.10, 0.25]
     total_work = [10000]
     num_cores = 1
 
@@ -158,7 +163,7 @@ def main():
             for test in [Configs.static, Configs.dynamic]:
                 generate(test, work, ratio)
                 compile(test, outputs, ignore, num_cores)
-                avg =  run(num_cores, attempts)
+                (avg, dev) =  run(num_cores, attempts)
                 print 'avg=' + str(avg)
                 if test == Configs.static:
                     static_results.append((ratio, work, avg))
