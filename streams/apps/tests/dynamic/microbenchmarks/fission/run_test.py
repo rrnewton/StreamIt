@@ -64,7 +64,7 @@ def generate(test, work, ratio):
     op += '        push(x);\n'
     op += '    }\n'
     op += '}\n'
-    print op;
+    # print op;
     with open("test.str", 'w') as f:
         f.write(op)      
 
@@ -82,7 +82,6 @@ def compile(test, outputs, ignore, core):
 
 
 def run_one(core):
-    print 'run_one'
     exe = './smp' + str(core)
     results = []
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
