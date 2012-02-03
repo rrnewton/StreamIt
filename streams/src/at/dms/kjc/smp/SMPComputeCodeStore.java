@@ -622,6 +622,17 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
 		JBlock methodBody = new JBlock();
 		JBlock loopBody = new JBlock();
+
+		if (!KjcOptions.nobind) {
+			WorkNode[] filterArray = new WorkNode[filters.size()];
+			filters.toArray(filterArray);
+		    Core core = SMPBackend.scheduler.getComputeNode(filterArray[0]);		
+		    int coreNum = core.getCoreID();
+			methodBody.addStatement(new JExpressionStatement(
+					new JEmittedTextExpression("setCPUAffinity(" + coreNum + ")")));
+
+		}	
+		
 		Utils.addCondWait(
 				loopBody,
 				threadIndex,
