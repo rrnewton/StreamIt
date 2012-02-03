@@ -117,7 +117,7 @@ def print_all(ratio, static_results, dynamic_results):
     file = 'fission-normalized' + str(int(ratio * 100)) + '.dat'
     base = static_results[0]
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'fusion','dynamic')
+        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static','dynamic')
         print s
         f.write(s + '\n')
         for static, dynamic in zip(static_results, dynamic_results):
