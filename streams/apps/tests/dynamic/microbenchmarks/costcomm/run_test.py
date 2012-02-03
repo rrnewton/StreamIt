@@ -131,8 +131,18 @@ def print_all(work, static_results, dynamic_results):
             s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], y[3])
             print s
             f.write(s + '\n')
+    file = 'costcomm-normalized' + str(work) + '.dat'
+    base = static_results[0]
+    with open(file, 'w') as f:
+        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static','dynamic')
+        print s
+        f.write(s + '\n')
+        for static, dynamic in zip(static_results, dynamic_results):
+            s = '%0.2f\t%d\t%0.2f\t%0.2f' % (static[0], static[1], (static[2]/base[2]), (dynamic[2]/base[2]))
+            print s
+            f.write(s + '\n')
 
-def plot(work, outputs):
+def plot(ratio, work, outputs):
     data = 'costcomm' + str(work) + '.dat'
     output = 'costcomm' + str(work) + '.ps'
     cmd = "plot \""
@@ -143,9 +153,24 @@ def plot(work, outputs):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set title \"Cost/Communication Ratio, Outputs=' + str(outputs) + '\n') 
+        f.write('set title \"Cost/Communication, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
         f.write('set xlabel \"Ratio\"\n')
         f.write('set ylabel \"Nanoseconds\"\n')
+        f.write(cmd)
+    os.system('gnuplot ./tmp.gnu')
+
+def plot_normalized(ratio, work, outputs):
+    data = 'costcomm-normalized' + str(work) + '.dat'
+    output = 'costcomm-normalized' + str(work) + '.ps'    
+    cmd = "plot \""
+    cmd += data + "\" u 1:3 t \'static\' w linespoints, \""
+    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints"
+    with open('./tmp.gnu', 'w') as f:        
+        f.write('set terminal postscript\n')
+        f.write('set output \"' + output + '\"\n')
+        f.write('set title \"Cost/Communication Normalized, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
+        f.write('set xlabel \"Ratio\"\n');
+        f.write('set ylabel \"Times Static\"\n');
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
 
@@ -170,7 +195,9 @@ def main():
                 else:
                     dynamic_results.append((ratio, work, avg, dev))
         print_all(work, static_results, dynamic_results);
-        plot(work, outputs)
+        plot(ratio, work, outputs)
+        plot_normalized(ratio, work, outputs)
+        
                     
 if __name__ == "__main__":
     main()
