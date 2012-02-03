@@ -76,7 +76,6 @@ def run_one(test):
         test_type = 'dynamic'    
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
-    #                        input=20 outputs=20 ignored=10 start=1327947510:94511000 end=1327947510:94718000 delta=0:207000
     for m in regex.finditer(stdout):
         results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
     return results
@@ -105,9 +104,20 @@ def print_all(work, nofusion_results, fusion_results, dynamic_results):
         for x, y, z in zip(nofusion_results, fusion_results, dynamic_results):
             s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], z[3], z[4])
             print s
-            f.write(s + '\n')  
+            f.write(s + '\n')
+    file = 'fusion-normalized' + str(work) + '.dat'
+    nofusion = nofusion_results[0]
+    with open(file, 'w') as f:
+        s = '#%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion','dynamic')
+        print s
+        f.write(s + '\n')
+        for fusion, dynamic in zip(fusion_results, dynamic_results):
+            s = '%d\t%d\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (dynamic[3]/nofusion[3]))
+            print s
+            f.write(s + '\n')
 
-def plot(work):
+
+def plot(work, outputs):
     data = 'fusion' + str(work) + '.dat'
     output = 'fusion' + str(work) + '.ps'
     cmd = "plot \""
@@ -120,18 +130,37 @@ def plot(work):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set title \"Fusion Experiment, Work=%d,\"\n' % work)
+        f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Filters\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
 
+def plot_normalized(work, outputs):
+    data = 'fusion-normalized' + str(work) + '.dat'
+    output = 'fusion-normalized' + str(work) + '.ps'
+    cmd = "plot \""
+    cmd += data + "\" u 1:3 t \'fusion\' w linespoints, \""
+    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints"
+    with open('./tmp.gnu', 'w') as f:        
+        f.write('set terminal postscript\n')
+        f.write('set output \"' + output + '\"\n')
+        f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
+        f.write('set xlabel \"Filters\"\n');
+        f.write('set ylabel \"Times Non-Fusion\"\n');
+        f.write(cmd)
+    os.system('gnuplot ./tmp.gnu')
+    
 def main():
     attempts = 3
     ignore = 1000
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    total_work = [100, 1000]   
+    total_work = [100, 1000]
+    #ignore = 10
+    #outputs = 1000
+    #filters = [1, 2, 4]
+    #total_work = [100]   
     for work in total_work:
         nofusion_results = []
         fusion_results = []
@@ -154,7 +183,8 @@ def main():
                     x = ('dynamic', work, num_filters, avg, dev)
                     print x
         print_all(work, nofusion_results, fusion_results, dynamic_results)
-        plot(work)
+        plot(work, outputs)
+        plot_normalized(work, outputs)
                     
 if __name__ == "__main__":
     main()
