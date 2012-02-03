@@ -97,7 +97,7 @@ def run(test, attempts):
     return (mean, dev)
 
 def print_all(work, nofusion_results, fusion_results, dynamic_results):
-    file = 'work' + str(work) + '.dat'
+    file = 'fusion' + str(work) + '.dat'
     with open(file, 'w') as f:
         s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'dynamic', 'dev')
         print s
@@ -108,8 +108,8 @@ def print_all(work, nofusion_results, fusion_results, dynamic_results):
             f.write(s + '\n')  
 
 def plot(work):
-    data = 'work' + str(work) + '.dat'
-    output = 'work' + str(work) + '.ps'
+    data = 'fusion' + str(work) + '.dat'
+    output = 'fusion' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 1:3 t \'nofusion\' w linespoints, \""
     cmd += "\" u 1:3:4 notitle w yerrorbars, \""

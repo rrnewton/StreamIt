@@ -81,7 +81,7 @@ def generate(test, work, ratio):
     op += '    }\n'
     op += '}\n'
     op += '\n'
-    print op;
+    #print op;
     with open("test.str", 'w') as f:
         f.write(op)      
 
@@ -99,7 +99,6 @@ def compile(test, outputs, ignore, core):
 
 
 def run_one(core):
-    print 'run_one'
     exe = './smp' + str(core)
     results = []
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
@@ -133,7 +132,7 @@ def print_all(work, static_results, dynamic_results):
             print s
             f.write(s + '\n')
 
-def plot(work):
+def plot(work, outputs):
     data = 'costcomm' + str(work) + '.dat'
     output = 'costcomm' + str(work) + '.ps'
     cmd = "plot \""
@@ -144,7 +143,7 @@ def plot(work):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set title \"Cost/Communication Ratio, Outputs=' + str(work) + '\n') 
+        f.write('set title \"Cost/Communication Ratio, Outputs=' + str(outputs) + '\n') 
         f.write('set xlabel \"Ratio\"\n')
         f.write('set ylabel \"Nanoseconds\"\n')
         f.write(cmd)
@@ -171,7 +170,7 @@ def main():
                 else:
                     dynamic_results.append((ratio, work, avg, dev))
         print_all(work, static_results, dynamic_results);
-        plot(work)
+        plot(work, outputs)
                     
 if __name__ == "__main__":
     main()
