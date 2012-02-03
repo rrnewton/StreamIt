@@ -36,6 +36,7 @@ import at.dms.kjc.sir.SIRIdentity;
 import at.dms.kjc.sir.SIRJoiner;
 import at.dms.kjc.sir.SIROperator;
 import at.dms.kjc.sir.SIRPeekExpression;
+import at.dms.kjc.sir.SIRPhasedFilter;
 import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRPopExpression;
 import at.dms.kjc.sir.SIRPushExpression;
@@ -98,8 +99,17 @@ public class FuseSimpleSplit {
                                       newFields, newMethods, new JIntLiteral(rate.peek),
                                       new JIntLiteral(rate.pop), new JIntLiteral(rate.push),
                                       newWork, sj.getInputType(), sj.getOutputType());
+            
             // Use the new init function
             newFilter.setInit(newInit);
+            
+            // Check if children are iteration type.  Resulting filter must also be iteration.
+            for (SIRStream c : children) {
+                if ((c instanceof SIRPhasedFilter) && ((SIRPhasedFilter) c).isIterationFilter()) {
+                    newFilter.setIterationFilter(true);
+                    break;
+                }
+            }
         } else {
             // if all children identities, need an expander in the
             // case of a duplicate splitter and nothing otherwise (of
