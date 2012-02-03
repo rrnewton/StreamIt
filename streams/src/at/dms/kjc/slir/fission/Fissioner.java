@@ -803,11 +803,13 @@ public class Fissioner {
 
         for(int x = 0 ; x < fizzAmount ; x++) {
             sliceClones[x].getWorkNode().getWorkNodeContent().setSteadyMult(newSteadyMult);
-            runningStartValue += sliceClones[x].getWorkNode().getWorkNodeContent().getSteadyMult();
 
             if (slice.getWorkNodeContent().isIterating()) {
+                System.out.println("   RunningStartValue " + runningStartValue);
                 wrapFilterWithIterationCountUpdate(sliceClones[x].getWorkNodeContent(), runningStartValue);
             }
+
+            runningStartValue += sliceClones[x].getWorkNode().getWorkNodeContent().getSteadyMult();
         }
 
         /**********************************************************************
