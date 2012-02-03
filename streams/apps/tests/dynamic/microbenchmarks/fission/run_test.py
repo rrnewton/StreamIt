@@ -114,8 +114,19 @@ def print_all(ratio, static_results, dynamic_results):
             s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], x[3])
             print s
             f.write(s + '\n')
+    file = 'fission-normalized' + str(int(ratio * 100)) + '.dat'
+    base = static_results[0]
+    with open(file, 'w') as f:
+        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'fusion','dynamic')
+        print s
+        f.write(s + '\n')
+        for static, dynamic in zip(static_results, dynamic_results):
+            s = '%d\t%d\t%0.2f\t%0.2f' % (static[0], static[1], (static[2]/base[2]), (dynamic[2]/base[2]))
+            print s
+            f.write(s + '\n')
 
-def plot(ratio):
+
+def plot(ratio, work, outputs):
     data = 'fission' + str(int(ratio * 100)) + '.dat'
     output = 'fission' + str(int(ratio * 100)) + '.ps'
     cmd = "plot \""
@@ -126,11 +137,28 @@ def plot(ratio):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set title \"Fission Experiment, Ratio=%f static,\"\n' % ratio)
+        f.write('set title \"Fission Experiment, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
+
+
+def plot_normalized(ratio, work, outputs):
+    data = 'fission-normalized' + str(int(ratio * 100)) + '.dat'
+    output = 'fission-normalized' + str(int(ratio * 100)) + '.ps'
+    cmd = "plot \""
+    cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
+    cmd += data + "\" u 2:4 t \'dynamic\' w linespoints"
+    with open('./tmp.gnu', 'w') as f:        
+        f.write('set terminal postscript\n')
+        f.write('set output \"' + output + '\"\n')
+        f.write('set title \"Fission Experiment Normalized, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
+        f.write('set xlabel \"Cores\"\n');
+        f.write('set ylabel \"Times Static\"\n');
+        f.write(cmd)
+    os.system('gnuplot ./tmp.gnu')
+
 
 def main():         
     attempts = 3
@@ -138,7 +166,12 @@ def main():
     outputs = 100000
     cores = [1, 2, 4, 8, 16, 32]
     ratios = [0.10, 0.50, 0.90]
-    total_work = [1000]   
+    total_work = [100, 1000]
+    #ignore = 10
+    #outputs = 100
+    #cores = [1, 2, 4]
+    #ratios = [0.10, 0.50, 0.90]
+    #total_work = [100]    
     for work in total_work:
         for ratio in ratios:
             static_results = []
@@ -149,12 +182,14 @@ def main():
                     compile(test, outputs, ignore, core)
                     (avg, dev) = run(core, attempts)
                     print 'avg=' + str(avg)
+                    print 'dev=' + str(dev)
                     if test == Configs.static:
                         static_results.append((ratio, core, avg, dev))
                     else:
                         dynamic_results.append((ratio, core, avg, dev))
                     print_all(ratio, static_results, dynamic_results);
-            plot(ratio)
+            plot(ratio, work, outputs)
+            plot_normalized(ratio, work, outputs)
                     
 if __name__ == "__main__":
     main()
