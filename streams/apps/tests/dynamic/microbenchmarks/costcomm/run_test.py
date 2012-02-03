@@ -154,7 +154,7 @@ def main():
     ignore = 1000
     outputs = 100000
     ratios = [0.10, 0.25, 0.50, 0.75, 0.90]
-    total_work = [1000]
+    total_work = [100, 1000]
     num_cores = 1
     for work in total_work:
         static_results = []
