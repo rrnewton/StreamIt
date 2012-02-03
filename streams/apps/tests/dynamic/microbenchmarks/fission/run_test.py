@@ -121,7 +121,7 @@ def print_all(ratio, static_results, dynamic_results):
         print s
         f.write(s + '\n')
         for static, dynamic in zip(static_results, dynamic_results):
-            s = '%d\t%d\t%0.2f\t%0.2f' % (static[0], static[1], (static[2]/base[2]), (dynamic[2]/base[2]))
+            s = '%0.2f\t%d\t%0.2f\t%0.2f' % (static[0], static[1], (static[2]/base[2]), (dynamic[2]/base[2]))
             print s
             f.write(s + '\n')
 
