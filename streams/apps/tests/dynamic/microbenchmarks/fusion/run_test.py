@@ -141,7 +141,9 @@ def plot_normalized(work, outputs):
     output = 'fusion-normalized' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 1:3 t \'fusion\' w linespoints, \""
-    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints"
+    cmd += "\" u 1:3:(sprintf(\"[%.0f,%.0f]\",$1,$3)) notitle with labels, \""
+    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
+    cmd += "\" u 1:4:(sprintf(\"[%.0f,%.0f]\",$1,$4)) notitle with labels"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
@@ -157,10 +159,10 @@ def main():
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
     total_work = [100, 1000]
-    #ignore = 10
-    #outputs = 1000
-    #filters = [1, 2, 4]
-    #total_work = [100]   
+    # ignore = 10
+    # outputs = 1000
+    # filters = [1, 2, 4]
+    # total_work = [100]   
     for work in total_work:
         nofusion_results = []
         fusion_results = []
