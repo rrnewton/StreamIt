@@ -758,17 +758,22 @@ longname		"perftest"
 longname		"nofizz"
 	type		boolean
 	default		"false"
-	help		"Disable fission optimization"
+	help		"Disable fission optimization."
 
 longname		"nofuse"
 	type		boolean
 	default		"false"
-	help		"Disable fusion optimization"
+	help		"Disable fusion optimization."
 
 longname		"noiter"
 	type		boolean
 	default		"false"
-	help		"Disable iteration optimization"
+	help		"Disable iteration optimization."
+
+longname		"lockfree"
+	type		boolean
+	default		"false"
+	help		"Use a lock-free queue for dynamic queues."
 
 longname 		"preoutputs"
 	type		int

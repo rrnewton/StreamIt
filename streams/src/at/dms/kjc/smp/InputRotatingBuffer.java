@@ -220,16 +220,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 			}
 			Core srcCore = SMPBackend.scheduler.getComputeNode(src);						
 
-			Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
-			
-			// We don't need a token wait if the downstream filter is "dominated"
-//			boolean dominatorRelationship = false;
-//			if ( null != dominators.get(src.toString())) {
-//			    if (dominators.get(src.toString()).contains(filter.toString())) {
-//			        dominatorRelationship = true;
-//			    }
-//			}
-//			 if (!srcCore.equals(filterCore) && (!dominatorRelationship)) {
+	
 					
 			if (!srcCore.equals(filterCore) ) {
 				String tokenName = src + "_to_" + filter + "_token";
