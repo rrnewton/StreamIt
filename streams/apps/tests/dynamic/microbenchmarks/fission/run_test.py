@@ -105,17 +105,21 @@ def run(core, attempts):
     return (mean, dev)
 
 def print_all(ratio, static_results, dynamic_results):
+    base = static_results[0]
+    total_work = base[2]
+    dynamic_work = total_work * ratio
+    static_work = total_work - dynamic_work
     file = 'fission' + str(int(ratio * 100)) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'static-dev', 'dynamic', 'dynamic-dev' )
+        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'static-dev', 'dynamic', 'dynamic-dev', 'ideal' )
         print s
         f.write(s + '\n')  
         for x, y in zip(static_results, dynamic_results):
-            s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], x[3])
+            ideal = dynamic_work + ( static_work /  x[1])
+            s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], x[3], ideal)
             print s
             f.write(s + '\n')
     file = 'fission-normalized' + str(int(ratio * 100)) + '.dat'
-    base = static_results[0]
     with open(file, 'w') as f:
         s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static','dynamic')
         print s
@@ -133,7 +137,8 @@ def plot(ratio, work, outputs):
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
     cmd += "\" u 2:3:4 notitle w yerrorbars, \""
     cmd += data + "\" u 2:5 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 2:5:6 notitle w yerrorbars"
+    cmd += "\" u 2:5:6 notitle w yerrorbars, \""
+    cmd += data + "\" u 2:7 t \'ideal\' w linespoints"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
@@ -169,11 +174,11 @@ def main():
     cores = [1, 2, 4, 8, 16, 32]
     ratios = [0.10, 0.50, 0.90]
     total_work = [100, 1000]
-    #ignore = 10
-    #outputs = 100
-    #cores = [1, 2, 4]
-    #ratios = [0.10, 0.50, 0.90]
-    #total_work = [100]    
+    # ignore = 10
+    # outputs = 100
+    # cores = [1, 2, 4]
+    # ratios = [0.10, 0.50, 0.90]
+    # total_work = [100]     
     for work in total_work:
         for ratio in ratios:
             static_results = []
