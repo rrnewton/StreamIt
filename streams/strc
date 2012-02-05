@@ -506,6 +506,7 @@ sub get_options
 			    "nofizz",
 			    "nofuse",
 			    "noiter",
+			    "lockfree",
                             "preoutputs=i",
 			    "loadbalance",
 			    "loopcount=i",
@@ -973,6 +974,7 @@ sub get_compiler_opts
     $opts{nofizz} && ($copts .= " --nofizz");
     $opts{nofuse} && ($copts .= " --nofuse");
     $opts{noiter} && ($copts .= " --noiter");
+    $opts{lockfree} && ($copts .= " --lockfree");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
     $opts{preoutputs} && ($copts .= " --preoutputs " . $opts{preoutputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");
