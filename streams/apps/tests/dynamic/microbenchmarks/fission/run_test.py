@@ -107,7 +107,7 @@ def run(core, attempts):
 def print_all(ratio, static_results, dynamic_results):
     base = static_results[0]
     total_work = base[2]
-    dynamic_work = total_work * ratio
+    dynamic_work = total_work * (1 - ratio)
     static_work = total_work - dynamic_work
     file = 'fission' + str(int(ratio * 100)) + '.dat'
     with open(file, 'w') as f:
