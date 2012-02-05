@@ -154,9 +154,9 @@ def plot_normalized(ratio, work, outputs):
     output = 'fission-normalized' + str(int(ratio * 100)) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
-    cmd += "\" u 2:3:(sprintf(\"[%.1f,%.1f]\",$2,$3)) notitle with labels, \""
+    cmd += "\" u 2:3:(sprintf(\"[%.0f,%.1f]\",$2,$3)) notitle with labels, \""
     cmd += data + "\" u 2:4 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 2:4:(sprintf(\"[%.1f,%.1f]\",$2,$4)) notitle with labels"
+    cmd += "\" u 2:4:(sprintf(\"[%.0f,%.1f]\",$2,$4)) notitle with labels"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
@@ -171,7 +171,8 @@ def main():
     attempts = 3
     ignore = 1000
     outputs = 100000
-    cores = [1, 2, 4, 8, 16, 32]
+    #cores = [1, 2, 4, 8, 16, 32]
+    cores = [1, 2, 4, 8, 16]
     ratios = [0.10, 0.50, 0.90]
     total_work = [100, 1000]
     # ignore = 10
