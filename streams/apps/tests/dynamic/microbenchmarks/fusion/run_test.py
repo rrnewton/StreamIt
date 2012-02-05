@@ -141,9 +141,9 @@ def plot_normalized(work, outputs):
     output = 'fusion-normalized' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 1:3 t \'fusion\' w linespoints, \""
-    cmd += "\" u 1:3:(sprintf(\"[%.1f,%.1f]\",$1,$3)) notitle with labels, \""
+    # cmd += "\" u 1:3:(sprintf(\"[%.1f,%.1f]\",$1,$3)) notitle with labels, \""
     cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 1:4:(sprintf(\"[%.1f,%.1f]\",$1,$4)) notitle with labels"
+    cmd += "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
