@@ -4,7 +4,7 @@
 
 
 
-void->void pipeline CoarseSerializedBeamFormer {
+void->void pipeline CoarseSerializedBeamFormerIter {
     int numChannels           = 12; 
     int numSamples            = 64;//1024; 
     int numBeams              = 4; 
@@ -176,7 +176,8 @@ void->void pipeline CoarseSerializedBeamFormer {
 
     }
     //add FloatPrinter();
-    add FileWriter<float>("output3");
+	add FileWriter<float>("output3");
+
 }
 
 void->float stateful filter InputGenerate (int myChannel, int numberOfSamples, int tarBeam, int targetSample, float thresh) {
@@ -184,7 +185,7 @@ void->float stateful filter InputGenerate (int myChannel, int numberOfSamples, i
     boolean holdsTarget;
 
     init {
-	curSample = 0;
+    curSample = 0;
 	holdsTarget = (tarBeam == myChannel);
     }
 
@@ -205,12 +206,12 @@ void->float stateful filter InputGenerate (int myChannel, int numberOfSamples, i
 
 	}
 
-	 
-	curSample++;
+    curSample++;
 
-	if (curSample >= numberOfSamples) {
-	    curSample = 0;
-	}
+    if (curSample >= numberOfSamples) {
+        curSample = 0;
+    }
+
     }
 }
 
@@ -224,8 +225,6 @@ float->float filter BeamFirFilter (int numTaps, int inputLength, int decimationR
     int numTapsMinusOne;
     float[numTaps] realBuffer;
     float[numTaps] imagBuffer;
-     
-    int count;
      
     int pos;
 
@@ -268,6 +267,8 @@ float->float filter BeamFirFilter (int numTaps, int inputLength, int decimationR
     }
 
     work pop 2*decimationRatio push 2 {
+        int count = (iter() * decimationRatio) % inputLength;
+
 	float real_curr = 0;
 	float imag_curr = 0;
 	int i;
@@ -458,14 +459,12 @@ float->float filter Magnitude {
 float->float
 
 
-    stateful filter Detector (int _myBeam, int numSamples, int targetBeam, int targetSample, float cfarThreshold) {
-    int curSample;
+    filter Detector (int _myBeam, int numSamples, int targetBeam, int targetSample, float cfarThreshold) {
     int myBeam;
     boolean holdsTarget;
     float thresh;
     
     init {
-	curSample = 0;
 	holdsTarget = (_myBeam == targetBeam);
 	myBeam = _myBeam+1;
 	thresh = 0.1;
@@ -476,7 +475,8 @@ float->float
 	push 1
 
 	{
-	    float inputVal = pop();
+            int curSample = iter() % numSamples;
+ 	    float inputVal = pop();
 	    float outputVal;
 	    if(holdsTarget && targetSample == curSample) {
 		if( !(inputVal >= thresh) ) {
@@ -497,11 +497,5 @@ float->float
 
 	    push (outputVal);
 
-
-
-	    curSample++;
-	    
-	    if( curSample >= numSamples )
-		curSample = 0;
 	}
 }
