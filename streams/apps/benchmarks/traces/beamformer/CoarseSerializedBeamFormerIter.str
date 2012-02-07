@@ -468,7 +468,7 @@ float->float
 	push 1
 
 	{
-            int curSample = iter() % numberOfSamples;
+            int curSample = iter() % numSamples;
  	    float inputVal = pop();
 	    float outputVal;
 	    if(holdsTarget && targetSample == curSample) {
