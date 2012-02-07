@@ -452,7 +452,7 @@ float->float filter Magnitude {
 float->float
 
 
-    stateful filter Detector (int _myBeam, int numSamples, int targetBeam, int targetSample, float cfarThreshold) {
+    filter Detector (int _myBeam, int numSamples, int targetBeam, int targetSample, float cfarThreshold) {
     int myBeam;
     boolean holdsTarget;
     float thresh;
