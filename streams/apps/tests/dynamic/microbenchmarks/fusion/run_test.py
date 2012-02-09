@@ -6,15 +6,16 @@ import re
 import math
 
 class Configs:
-    nofusion, fusion, dynamic = range(3)
+    nofusion, fusion, dynamic, lockfree = range(4)
 
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
 tests        = [
+    (Configs.lockfree, [strc, '-smp', '1', '--perftest', '--noiter', '--lockfree'], './smp1' ),
     (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse'], './smp1' ),
     (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
+    (Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' )
     ]
 
 def generate(test, num_filters, work):
@@ -23,9 +24,11 @@ def generate(test, num_filters, work):
     op += '    for(int i=1; i<=' + str(num_filters) + '; i++)\n'
     if test[0] == Configs.nofusion:
         op += '        add Fstatic();\n'
-    if test[0] == Configs.fusion:
+    elif test[0] == Configs.fusion:
         op += '        add Fstatic();\n'
-    if test[0] == Configs.dynamic:        
+    elif test[0] == Configs.dynamic:        
+        op += '        add Fdynamic();\n'
+    elif test[0] == Configs.lockfree:        
         op += '        add Fdynamic();\n'
     op += '    add FileWriter<float>(stdout);\n'
     op += '}\n'
@@ -61,6 +64,7 @@ def compile(test, work, ignore):
     flags = test[1]
     exe = test[2]
     cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
+    print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
 
@@ -74,6 +78,8 @@ def run_one(test):
         test_type = 'fusion'
     elif test[0] == Configs.dynamic:
         test_type = 'dynamic'    
+    elif test[0] == Configs.lockfree:
+        test_type = 'lockfree'    
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
     for m in regex.finditer(stdout):
@@ -95,24 +101,24 @@ def run(test, attempts):
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
 
-def print_all(work, nofusion_results, fusion_results, dynamic_results):
+def print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results):
     file = 'fusion' + str(work) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'dynamic', 'dev')
+        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'dynamic', 'dev', 'lockfree', 'dev')
         print s
         f.write(s + '\n')  
-        for x, y, z in zip(nofusion_results, fusion_results, dynamic_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], z[3], z[4])
+        for x, y, z, l in zip(nofusion_results, fusion_results, dynamic_results, lockfree_results):
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], z[3], z[4], l[3], l[4])
             print s
             f.write(s + '\n')
     file = 'fusion-normalized' + str(work) + '.dat'
     nofusion = nofusion_results[0]
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion','dynamic')
+        s = '#%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion','dynamic', 'lockfree')
         print s
         f.write(s + '\n')
-        for fusion, dynamic in zip(fusion_results, dynamic_results):
-            s = '%d\t%d\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (dynamic[3]/nofusion[3]))
+        for fusion, dynamic, lockfree in zip(fusion_results, dynamic_results, lockfree_results):
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (dynamic[3]/nofusion[3]), (lockfree[3]/nofusion[3]))
             print s
             f.write(s + '\n')
 
@@ -126,7 +132,9 @@ def plot(work, outputs):
     cmd += data + "\" u 1:5 t \'fusion\' w linespoints, \""
     cmd += "\" u 1:5:6 notitle w yerrorbars, \""
     cmd += data + "\" u 1:7 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 1:7:8 notitle w yerrorbars"
+    cmd += "\" u 1:7:8 notitle w yerrorbars, \""
+    cmd += data + "\" u 1:9 t \'lockfree\' w linespoints, \""
+    cmd += "\" u 1:9:10 notitle w yerrorbars"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
@@ -141,8 +149,8 @@ def plot_normalized(work, outputs):
     output = 'fusion-normalized' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 1:3 t \'fusion\' w linespoints, \""
-    # cmd += "\" u 1:3:(sprintf(\"[%.1f,%.1f]\",$1,$3)) notitle with labels, \""
     cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
+    cmd += data + "\" u 1:5 t \'lockfree\' w linespoints, \""
     cmd += "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
@@ -155,18 +163,19 @@ def plot_normalized(work, outputs):
     
 def main():
     attempts = 3
-    ignore = 1000
-    outputs = 100000
-    filters = [1, 2, 4, 8, 16, 32]
-    total_work = [100, 1000]
-    # ignore = 10
-    # outputs = 1000
-    # filters = [1, 2, 4]
-    # total_work = [100]   
+    # ignore = 1000
+    # outputs = 100000
+    # filters = [1, 2, 4, 8, 16, 32]
+    # total_work = [100, 1000]
+    ignore = 10
+    outputs = 1000
+    filters = [1, 2, 4]
+    total_work = [100]   
     for work in total_work:
         nofusion_results = []
         fusion_results = []
         dynamic_results = []
+        lockfree_results = []
         for num_filters in filters:
             for test in tests:
                 generate(test, num_filters, work)
@@ -184,7 +193,11 @@ def main():
                     dynamic_results.append(('dynamic', work, num_filters, avg, dev))
                     x = ('dynamic', work, num_filters, avg, dev)
                     print x
-        print_all(work, nofusion_results, fusion_results, dynamic_results)
+                elif test[0] == Configs.lockfree:
+                    lockfree_results.append(('lockfree', work, num_filters, avg, dev))
+                    x = ('lockfree', work, num_filters, avg, dev)
+                    print x
+        print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results)
         plot(work, outputs)
         plot_normalized(work, outputs)
                     
