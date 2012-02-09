@@ -248,17 +248,50 @@ public class DynamicQueueCodeGenerator {
      *
      */
     public class LockFreeGenerator implements Generator {
+
         public void addCreate(String type)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addCreate()");
+            hBuffer.append(type + "_queue_ctx_ptr " + type +"_queue_create();\n");              
+            cBuffer.append(type + "_queue_ctx_ptr\n");
+            cBuffer.append(type +"_queue_create() {\n");
+            cBuffer.append("    " + type + "_queue_ctx_ptr q;\n");
+            cBuffer.append("    q = (" + type + "_queue_ctx_ptr)malloc(sizeof(struct " + type + "_queue_ctx));\n");
+            cBuffer.append("    assert (q != NULL);\n");
+            cBuffer.append("    q->capacity = SIZE+1;\n");
+            cBuffer.append("    q->tail = 0;\n");
+            cBuffer.append("    q->head = 0;\n");
+            cBuffer.append("    q->array = (float*)malloc(sizeof(" + type + ") * q->capacity);\n");
+            cBuffer.append("    return q;\n");
+            cBuffer.append("    }\n");
         }
+        
         public void addCtx(String type) { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addCtx()");
+            hBuffer.append("struct " + type + "_queue_ctx {\n");
+            hBuffer.append("    volatile unsigned int tail;\n"); 
+            hBuffer.append("    " + type + " * array;\n");
+            hBuffer.append("    unsigned int capacity;\n");
+            hBuffer.append("    volatile unsigned int head;\n");            
+            hBuffer.append("};\n\n");
+            hBuffer.append("typedef struct " + type +"_queue_ctx * "+ type +"_queue_ctx_ptr;\n\n");
         }
+
         public void addGrow(String type) { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addGrow()");
         }
+        
         public void addIncludes() {
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addIncludes()");
+            hBuffer.append("#ifndef DYNAMIC_QUEUE_H\n");
+            hBuffer.append("#define DYNAMIC_QUEUE_H\n\n");
+            hBuffer.append("#include <pthread.h>\n\n");
+            cBuffer.append("#include \"dynamic_queue.h\"\n");
+            cBuffer.append("#include \"globals.h\"\n");
+            cBuffer.append("#include <stdlib.h>\n");
+            cBuffer.append("#include <stdio.h>\n");
+            cBuffer.append("#include <assert.h>\n");
+            cBuffer.append("#include <string.h>\n\n");
+            cBuffer.append("#define SIZE 1023\n\n");
         }
         public void addPeek(String type)   { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPeek()");
@@ -268,6 +301,24 @@ public class DynamicQueueCodeGenerator {
         }
         public void addPop(String type)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPop()");
+            hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers);\n");            
+            cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers) {\n");       
+            cBuffer.append("    while(q->head == q->tail) {\n");            
+            cBuffer.append("    int i = 0;");
+            cBuffer.append("    for (i = 0; i < num_multipliers; i++) {\n");
+            cBuffer.append("       *multipliers[i] = 0;\n");
+            cBuffer.append("    }\n");
+            cBuffer.append("    pthread_mutex_lock(&thread_mutexes[threadIndex][MASTER]);\n");
+            cBuffer.append("    thread_to_sleep[threadIndex][MASTER] = AWAKE;\n");
+            cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[threadIndex][MASTER]);\n");
+            cBuffer.append("    pthread_cond_signal(&thread_conds[threadIndex][MASTER]);\n");
+            cBuffer.append("    pthread_cond_wait(&thread_conds[threadIndex][DYN_READER], &thread_mutexes[threadIndex][DYN_READER]);\n");
+            cBuffer.append("  }\n");
+            cBuffer.append("  pthread_mutex_unlock(&thread_mutexes[threadIndex][DYN_READER]);\n");
+            cBuffer.append("    float item_ = q->array[q->head];\n");
+            cBuffer.append("    q->head = (q->head+1) % q->capacity;\n");
+            cBuffer.append("    return item_;\n");
+            cBuffer.append("}\n");
         }    
         public void addPopMany(String type)   { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPopMany()");
@@ -277,9 +328,33 @@ public class DynamicQueueCodeGenerator {
         }
         public void addPopSource(String type)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPopSource()");
+            hBuffer.append(type + " " + type + "_queue_pop_source();\n");          
+            cBuffer.append("static int fileReadIndex__0 = 0;\n");
+            cBuffer.append(type + " " + type + "_queue_pop_source() {\n");           
+            cBuffer.append("  " + type + " elem = fileReadBuffer[fileReadIndex__0];\n");
+            cBuffer.append("  fileReadIndex__0++;\n");
+            if (KjcOptions.perftest) {
+                cBuffer.append("  perfTestNumInputs++;\n");        
+            }
+            cBuffer.append("  if(fileReadIndex__0 + 1 >= num_inputs) fileReadIndex__0 = 0;\n");
+            cBuffer.append("  return elem;\n");
+            cBuffer.append("}\n");
         }
         public void addPush(String type)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPush()");
+            hBuffer.append("void " + type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem);\n");
+            cBuffer.append("void\n");
+            cBuffer.append(type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem) {\n");
+            cBuffer.append("    int nextTail = (q->tail+1) % q->capacity;\n");
+            cBuffer.append("    if(nextTail != q->head) {\n");
+            cBuffer.append("        q->array[q->tail] = elem;\n");
+            cBuffer.append("        q->tail = nextTail;\n");
+            cBuffer.append("    } else {\n");
+            cBuffer.append("        // queue was full\n");
+            cBuffer.append("        // return false;\n");
+            cBuffer.append("        assert(false);\n");
+            cBuffer.append("    }\n");
+            cBuffer.append("}\n");
         }
     }  
 
