@@ -271,6 +271,7 @@ public class DynamicQueueCodeGenerator {
             hBuffer.append("    volatile unsigned int tail;\n"); 
             hBuffer.append("    " + type + " * array;\n");
             hBuffer.append("    unsigned int capacity;\n");
+            hBuffer.append("    int    max;\n");
             hBuffer.append("    volatile unsigned int head;\n");            
             hBuffer.append("};\n\n");
             hBuffer.append("typedef struct " + type +"_queue_ctx * "+ type +"_queue_ctx_ptr;\n\n");
@@ -316,7 +317,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  }\n");
             cBuffer.append("  pthread_mutex_unlock(&thread_mutexes[threadIndex][DYN_READER]);\n");
             cBuffer.append("    float item_ = q->array[q->head];\n");
-            cBuffer.append("    q->head = (q->head+1) % q->capacity;\n");
+            cBuffer.append("    q->head = (q->head+1) & SIZE ;\n");            
             cBuffer.append("    return item_;\n");
             cBuffer.append("}\n");
         }    
@@ -344,8 +345,8 @@ public class DynamicQueueCodeGenerator {
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPush()");
             hBuffer.append("void " + type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem);\n");
             cBuffer.append("void\n");
-            cBuffer.append(type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem) {\n");
-            cBuffer.append("    int nextTail = (q->tail+1) % q->capacity;\n");
+            cBuffer.append(type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem) {\n");           
+            cBuffer.append("    int nextTail = (q->tail+1) & SIZE ;\n");                       
             cBuffer.append("    if(nextTail != q->head) {\n");
             cBuffer.append("        q->array[q->tail] = elem;\n");
             cBuffer.append("        q->tail = nextTail;\n");
