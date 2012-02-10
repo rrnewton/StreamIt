@@ -1,5 +1,5 @@
-void->void pipeline static {
-    add FileReader<float>("../input/floats.in");
+void->void pipeline staticp {
+    add FileReader<float>("../microbenchmarks/input/floats.in");
     for(int i=1; i<=2; i++)
         add Fstatic();
     add FileWriter<float>("./test.out");
