@@ -1,0 +1,30 @@
+void->void pipeline dynamic {
+    add FileReader<float>("../input/floats.in");
+    for(int i=1; i<=2; i++)
+        add Fdynamic();
+    add FileWriter<float>("./test.out");
+}
+
+float->float filter Fstatic() {
+    work pop 1 push 1 {
+        int i;
+        float x;
+        x = pop();
+        for (i = 0; i < 500; i++) {
+            x += i * 3.0 - 1.0;
+        }
+        push(x);
+    }
+}
+
+float->float filter Fdynamic() {
+    work pop * push * {
+        int i;
+        float x;
+        x = pop();
+        for (i = 0; i < 500; i++) {
+            x += i * 3.0 - 1.0;
+        }
+        push(x);
+    }
+}
