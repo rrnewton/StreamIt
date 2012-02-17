@@ -447,9 +447,14 @@ public class EmitSMPCode extends EmitCode {
         if (isDynamic) {
             int numDynamicReaders = threadIdToType.keySet().size();
             System.out.println("EmitSMPCode.generateGlobalsHeader numDynamicReaders=" + numDynamicReaders);
-
             p.println();
-            p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
+            
+            if (KjcOptions.threadopt) {
+                int numThreads = threadIdToType.keySet().size() + KjcOptions.smp - 1;
+                p.println("#define NUM_THREADS  " + numThreads);
+            } else {
+                p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
+            }
             p.println("#define ASLEEP          0");
             p.println("#define AWAKE           1");
             p.println("#define DYN_READER      0");
@@ -461,9 +466,16 @@ public class EmitSMPCode extends EmitCode {
                         + threadId + ";");
             }
 
-            p.println("extern pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");
-            p.println("extern pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
-            p.println("extern int                   thread_to_sleep [DYNAMIC_READERS][2];");
+            if (KjcOptions.threadopt) {
+                p.println("extern pthread_cond_t        thread_conds    [NUM_THREADS];");
+                p.println("extern pthread_mutex_t       thread_mutexes  [NUM_THREADS];");
+                p.println("extern int                   thread_to_sleep [NUM_THREADS];");
+            } else {
+                p.println("extern pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");
+                p.println("extern pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
+                p.println("extern int                   thread_to_sleep [DYNAMIC_READERS][2];");
+
+            }
         }
 
         p.println("// Shared buffers");
@@ -657,11 +669,16 @@ public class EmitSMPCode extends EmitCode {
                 String type = threadIdToType.get(threadId);
                 p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");
             }
-
-            p.println();			
-            p.println("pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");
-            p.println("pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
-            p.println("int                   thread_to_sleep [DYNAMIC_READERS][2];");
+            p.println();            
+            if (KjcOptions.threadopt) {
+                p.println("pthread_cond_t        thread_conds    [NUM_THREADS];");
+                p.println("pthread_mutex_t       thread_mutexes  [NUM_THREADS];");
+                p.println("int                   thread_to_sleep [NUM_THREADS];");
+            } else {
+                p.println("pthread_cond_t        thread_conds    [DYNAMIC_READERS][2];");
+                p.println("pthread_mutex_t       thread_mutexes  [DYNAMIC_READERS][2];");
+                p.println("int                   thread_to_sleep [DYNAMIC_READERS][2];");
+            }
         }
 
         p.println();
@@ -741,24 +758,38 @@ public class EmitSMPCode extends EmitCode {
                 p.println("dyn_buf_" + threadId + " = " + type
                         + "_queue_create();");
             }
-
-            p.println();
-            p.println("// Initialize mutexes and condition variables");
-            p.println();
-            p.println("int i, j = 0;");
-            p.println("for (i = 0; i < DYNAMIC_READERS; i++) {");
-            p.indent();
-            p.println("for (j = 0; j < 2; j++) {");
-            p.indent();
-
-            p.println("pthread_cond_init(&thread_conds[i][j], NULL);");
-            p.println("pthread_mutex_init(&thread_mutexes[i][j], NULL);");
-            p.println("thread_to_sleep[i][j] = ASLEEP; /* 1 is asleep */");
-            p.outdent();
-            p.println("}");
-            p.outdent();
-            p.println("}");
-            p.println();
+            
+            if (KjcOptions.threadopt) {
+                p.println();
+                p.println("// Initialize mutexes and condition variables");
+                p.println();
+                p.println("int i = 0;");
+                p.println("for (i = 0; i < NUM_THREADS; i++) {");
+                p.indent();
+                p.println("pthread_cond_init(&thread_conds[i], NULL);");
+                p.println("pthread_mutex_init(&thread_mutexes[i], NULL);");
+                p.println("thread_to_sleep[i] = ASLEEP; /* 1 is asleep */");
+                p.outdent();
+                p.println("}");
+                p.println();                           
+            } else {
+                p.println();
+                p.println("// Initialize mutexes and condition variables");
+                p.println();
+                p.println("int i, j = 0;");
+                p.println("for (i = 0; i < DYNAMIC_READERS; i++) {");
+                p.indent();
+                p.println("for (j = 0; j < 2; j++) {");
+                p.indent();
+                p.println("pthread_cond_init(&thread_conds[i][j], NULL);");
+                p.println("pthread_mutex_init(&thread_mutexes[i][j], NULL);");
+                p.println("thread_to_sleep[i][j] = ASLEEP; /* 1 is asleep */");
+                p.outdent();
+                p.println("}");
+                p.outdent();
+                p.println("}");
+                p.println();
+            }
         }
 
         for (Core core : SMPBackend.chip.getCores()) {

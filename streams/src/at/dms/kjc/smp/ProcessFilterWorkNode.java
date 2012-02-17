@@ -14,6 +14,7 @@ import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.SLIRReplacingVisitor;
 import at.dms.kjc.backendSupport.Channel;
 import at.dms.kjc.backendSupport.CodeStoreHelper;
@@ -97,14 +98,31 @@ public class ProcessFilterWorkNode {
 			JExpression num_dominated = new JIntLiteral(num_multipliers);			
 			JExpression dominated = new JEmittedTextExpression("multipliers");
 			if (self.getNumPop() > 1) {
-				return new JMethodCallExpression(popManyName,
-						new JExpression[] { dyn_queue, index, num_dominated, dominated,
-								new JIntLiteral(self.getNumPop()) });
+			    if (KjcOptions.threadopt) {
+			        int next = -1;
+			        JExpression nextThread = new JIntLiteral(next);			       
+			        return new JMethodCallExpression(popManyName,
+			                new JExpression[] { dyn_queue, index, nextThread, num_dominated, dominated,
+			                new JIntLiteral(self.getNumPop()) });
+			    } else {
+			        return new JMethodCallExpression(popManyName,
+			                new JExpression[] { dyn_queue, index, num_dominated, dominated,
+			                new JIntLiteral(self.getNumPop()) });
+			    }			   
 			} else {
-				JExpression methodCall = new JMethodCallExpression(popName,
-						new JExpression[] { dyn_queue, index, num_dominated, dominated });
-				methodCall.setType(tapeType);
-				return methodCall;
+			    if (KjcOptions.threadopt) {
+			        int next = -1;
+                    JExpression nextThread = new JIntLiteral(next);     
+                    JExpression methodCall = new JMethodCallExpression(popName,
+                            new JExpression[] { dyn_queue, index, nextThread, num_dominated, dominated });
+                    methodCall.setType(tapeType);
+                    return methodCall;
+			    } else {
+			        JExpression methodCall = new JMethodCallExpression(popName,
+			                new JExpression[] { dyn_queue, index, num_dominated, dominated });
+			        methodCall.setType(tapeType);
+			        return methodCall;
+			    }
 			}
 		}
 
@@ -544,8 +562,15 @@ public class ProcessFilterWorkNode {
 					.toString();
 		
 			int threadIndex = Integer.parseInt(threadId);
-			codeStore.addThreadHelper(threadIndex, steadyBlock);
-			codeStore.addSteadyThreadCall(threadIndex);
+            if (KjcOptions.threadopt) {
+                int nextThread = -1;
+                codeStore.addThreadHelper(threadIndex, nextThread, steadyBlock);
+                codeStore.addSteadyThreadCall(threadIndex, nextThread);                
+            } else {
+                codeStore.addThreadHelper(threadIndex, steadyBlock);
+                codeStore.addSteadyThreadCall(threadIndex);
+            }
+			
 			for (JStatement stmt : tokenWrites ) {
 			    codeStore.addSteadyLoopStatement(stmt);
 			}			

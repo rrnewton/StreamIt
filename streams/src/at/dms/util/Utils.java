@@ -1668,6 +1668,27 @@ public abstract class Utils implements Serializable, DeepCloneable {
 		block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
 		return block;
 	}
+	
+	
+	/**
+     * Adds a sequence of statments to block that acquire a lock, wait on a condition variable, 
+     * and release the lock.
+     * @param block the block of code to add the statements to
+     * @param cond The condition to check in the condition wait statement
+     * @return the modified block
+     */
+    public static JBlock addCondWait(JBlock block, int index, JExpression cond) {     
+        JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + index + "]");       
+        JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + index + "]");                       
+        block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock}))); 
+        JBlock loopBody = new JBlock();
+        loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{condVar, lock})));       
+        JWhileStatement whileStmt = new JWhileStatement(null, cond, loopBody, new JavaStyleComment[0]);     
+        block.addStatement(whileStmt);  
+        block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
+        return block;
+    }
+	
 
 	/**
 	 * 
@@ -1691,6 +1712,30 @@ public abstract class Utils implements Serializable, DeepCloneable {
 		return block;
 	}
 
+	
+	/**
+     * 
+     * @param block
+     * @param lockName
+     * @param flagName
+     * @param state
+     */
+    public static JBlock addSetFlag(JBlock block, int threadIndex, String state) {    
+        JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + threadIndex + "]");
+        JEmittedTextExpression flag = new JEmittedTextExpression("thread_to_sleep[" + threadIndex + "]");
+        block.addStatement(new JExpressionStatement(
+                new JMethodCallExpression("pthread_mutex_lock", 
+                        new JExpression[]{lock})));             
+        block.addStatement(new JExpressionStatement(
+                new JAssignmentExpression(null,     
+                        flag,
+                        new JFieldAccessExpression(state))));                               
+        block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", 
+                new JExpression[]{lock})));
+        return block;
+    }
+	
+	
 	/**
 	 * Add a call to block to pthread_cond_signal
 	 * @param block The block to add to
@@ -1705,6 +1750,19 @@ public abstract class Utils implements Serializable, DeepCloneable {
 		return block;
 	}
 
+	/**
+     * Add a call to block to pthread_cond_signal
+     * @param block The block to add to
+     * @param threadIndex     
+     * @return the modified block
+     */
+    public static JBlock addSignal(JBlock block, int threadIndex) {    
+        JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + threadIndex + "]");                                
+        block.addStatement(new JExpressionStatement(
+                new JMethodCallExpression("pthread_cond_signal", new JExpression[]{condVar})));
+        return block;
+    }
+	
 
 	public static JIfStatement makeIfStatement(JExpression cond, JBlock body) {    	
 		return new JIfStatement(null,

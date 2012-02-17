@@ -17,7 +17,10 @@ public class ThreadMapper {
 
     private static ThreadMapper mapper = null;
 
-    private static int threadId = 0;
+    /* threads 0-KjcOptions.smp-1 are for the main threads */
+    private static int threadId = KjcOptions.smp;
+
+    private static final int MAIN_THREAD = -1;
 
     /**
      * Provides access to the singleton class
@@ -52,9 +55,6 @@ public class ThreadMapper {
         threadIdToType = new HashMap<Integer, String>();
     }
 
-    
-    
-
     /**
      * Assign a unique id to each thread for dynamic readers
      * @param ssg The static subgraph that contains the dynamic reader
@@ -65,7 +65,7 @@ public class ThreadMapper {
         } else {
             assignThreadsNonOpt(ssg);
         }
-        
+
     }
 
     /**
@@ -74,8 +74,61 @@ public class ThreadMapper {
      */
     private void assignThreadsOpt(StaticSubGraph ssg) {
         System.out.println("ThreadMapper.assignThreadsOpt");
+        boolean isDynamicInput = ssg.hasDynamicInput();
+        Filter f = ssg.getTopFilters()[0];
+        boolean isStateful = f.getWorkNodeContent().isStateful();
+
+        if (!isDynamicInput && !isStateful) {
+            filterToThreadId.put(f, MAIN_THREAD);
+        } else {
+            Filter[] topFilters = ssg.getTopFilters();
+            for (int i = 0; i < topFilters.length; i++) {
+                Filter dynamicReader = topFilters[i];
+                System.out.println("ThreadMapper.assignThreads filter = "
+                        + dynamicReader.getWorkNode().toString()
+                        + " has threadId=" + threadId + " and type="
+                        + dynamicReader.getInputNode().getType().toString());
+                if (CStdType.Void == dynamicReader.getInputNode().getType()) {
+                    Filter[] filterGraph = ssg.getFilterGraph();
+                    for (Filter filter : filterGraph) {
+                        if (!dynamicReader.getWorkNodeContent().getName()
+                                .equals(filter.getWorkNodeContent().getName())) {   
+                            dominators.put(filter.getWorkNodeContent()
+                                    .getName(), new ArrayList<String>());
+                        }
+                    }                    
+                    continue;
+                }
+
+                CType type = dynamicReader.getWorkNodeContent().getInputType();
+                System.out.println("ThreadMapper.assignThreads filter = "
+                        + dynamicReader.getWorkNode().toString()
+                        + " has threadId=" + threadId + " and type="
+                        + type.toString());
+                filterToThreadId.put(dynamicReader, threadId);
+                if (type != CStdType.Void && type != null) {
+                    threadIdToType.put(threadId, type.toString());
+                    Filter[] filterGraph = ssg.getFilterGraph();
+                    for (Filter filter : filterGraph) {
+                        if (!dominators.containsKey(dynamicReader.getWorkNodeContent()
+                                .getName())) {
+                            dominators.put(dynamicReader.getWorkNodeContent()
+                                    .getName(), new ArrayList<String>());
+                        }
+                        // Don't dominate yourself                      
+                        if (!dynamicReader.getWorkNodeContent().getName()
+                                .equals(filter.getWorkNodeContent().getName())) {                                   
+                            dominators.get(dynamicReader.getWorkNodeContent()
+                                    .getName()).add(filter.getWorkNodeContent()
+                                            .getName());
+                        }
+                    }
+                }
+                threadId++;
+            }
+        }
     }
-    
+
     /**
      * Assign thread ids only to dynamic readers
      * @param ssg The static subgraph that contains the dynamic reader
@@ -98,8 +151,8 @@ public class ThreadMapper {
                         + " has threadId=" + threadId + " and type="
                         + dynamicReader.getInputNode().getType().toString());
 
-                
-                
+
+
                 if (CStdType.Void == dynamicReader.getInputNode().getType()) {
                     Filter[] filterGraph = ssg.getFilterGraph();
                     for (Filter filter : filterGraph) {

@@ -367,7 +367,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
             if (KjcOptions.perftest) {
                 stmt +=    "  if (currOutputs == maxIgnored) {  start_time(); } \n";
             }
-            stmt +=    "  currOutputs++;\n"                   
+            stmt +=    "        currOutputs++;\n"                   
                     +    "  if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
                     + "  }\n"
                     + "}\n";
@@ -408,7 +408,15 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 inputPort.getSSG().getTopFilters()[0]).toString();
 
         String buffer = "dyn_buf_" + threadId;        
-        String popCall = popName + "(" + buffer + ", "+ threadId + ", 0, NULL)";       
+        String popCall; 
+        
+        if (KjcOptions.threadopt) {
+            int nextThread = -1;
+            popCall = popName + "(" + buffer + ", "+ threadId + ", "+ nextThread + ", 0,  NULL)";     
+        } else {
+            popCall = popName + "(" + buffer + ", "+ threadId + ", 0, NULL)";     
+        }
+        
         if (KjcOptions.outputs < 0) {            
             stmt = "int _i_ = 0;\n"
                     + "for (int _i_ = 0; _i_ < " + outputs + "; _i_++) { \n";
@@ -433,7 +441,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
             if (KjcOptions.perftest) {
                 stmt +=    "  if (currOutputs == maxIgnored) {  start_time(); } \n";
             }
-            stmt +=    "  currOutputs++;\n"                               
+            stmt +=    "        currOutputs++;\n"                               
                     + "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
                     + "    }\n"
                     + "}\n";
@@ -619,7 +627,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     public boolean shouldGenerateCode() {
         return hasCode;
     }
-
+      
     /**
      * 
      * @param steadyBlock
@@ -683,6 +691,66 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         addHelperThreadMethod(threadHelper);
     }
 
+    /**
+     * 
+     * @param steadyBlock
+     */
+    public void addThreadHelper(int threadIndex, int nextIndex, JStatement steadyBlock) {
+
+        System.out.println("SMPComputeCodeStore.addThreadHelper optimized called()");
+
+        JBlock methodBody = new JBlock();
+        JBlock loopBody = new JBlock();
+
+        if (!KjcOptions.nobind) {
+            WorkNode[] filterArray = new WorkNode[filters.size()];
+            filters.toArray(filterArray);
+            Core core = SMPBackend.scheduler.getComputeNode(filterArray[0]);        
+            int coreNum = core.getCoreID();
+            methodBody.addStatement(new JExpressionStatement(
+                    new JEmittedTextExpression("setCPUAffinity(" + coreNum + ")")));
+
+        }   
+
+        Utils.addCondWait(
+                loopBody,
+                threadIndex,               
+                Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep["
+                        + threadIndex + "]"));
+        loopBody.addStatement(steadyBlock);
+        Utils.addSetFlag(loopBody, threadIndex, "ASLEEP");
+        Utils.addSetFlag(loopBody, nextIndex, "AWAKE");
+        Utils.addSignal(loopBody, nextIndex);
+
+        JStatement loop = null;
+        if (KjcOptions.iterations != -1) {
+            // addSteadyLoop(iterationBound);
+            ALocalVariable var = ALocalVariable.makeVar(CStdType.Integer,
+                    "maxSteadyIter");
+            loop = at.dms.util.Utils.makeForLoop(loopBody, var.getRef());
+
+        } else {
+            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
+                    loopBody, null);
+        }
+
+        methodBody.addStatement(loop);
+        methodBody.addStatement(new JExpressionStatement(
+                new JEmittedTextExpression("pthread_exit(NULL)")));
+        JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
+
+        String threadName = "helper_" + threadIndex;
+
+        System.out
+        .println("SMPComputeCodeStore.addThreadHelper creating JMethodDeclaration="
+                + threadName);
+
+        JMethodDeclaration threadHelper = new JMethodDeclaration(
+                CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
+                methodBody);
+        addHelperThreadMethod(threadHelper);
+    }
+    
     private void addHelperThreadMethod(JMethodDeclaration threadHelper) {
         helperThreadMethods.add(threadHelper);
         addMethod(threadHelper);
@@ -706,6 +774,17 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                         + threadIndex + "][MASTER]"));
     }
 
+    public void addSteadyThreadCall(int threadIndex, int nextIndex) {
+        Utils.addSetFlag(steadyLoop, nextIndex, "ASLEEP");
+        Utils.addSetFlag(steadyLoop, threadIndex,"AWAKE");
+        Utils.addSignal(steadyLoop, threadIndex);
+        Utils.addCondWait(
+                steadyLoop,
+                nextIndex,           
+                Utils.makeEqualityCondition("ASLEEP", "thread_to_sleep["
+                        + nextIndex + "]"));
+    }
+        
     public void addExternField(JFieldDeclaration jFieldDeclaration) {
         // There is a problem with this code. We do not want to store
         // duplicates of the same jFieldDeclaration. However, the
