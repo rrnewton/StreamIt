@@ -770,6 +770,12 @@ longname		"noiter"
 	default		"false"
 	help		"Disable iteration optimization."
 
+
+longname		"threadopt"
+	type		boolean
+	default		"false"
+	help		"Threads call the next thread directly, instead of the main thread."
+
 longname		"lockfree"
 	type		boolean
 	default		"false"

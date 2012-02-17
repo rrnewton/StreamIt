@@ -24,7 +24,8 @@ void->void pipeline FIRBankPipeline {
     /* transpose only to test correctness with column-major output */
     //add Transpose(M, N);
 
-    add Printer();
+    add FileWriter<float>(stdout);
+    //add Printer();
 }
 
 float->float splitjoin Transpose(int M, int N) {

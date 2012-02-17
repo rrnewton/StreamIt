@@ -9,6 +9,7 @@ import java.util.Set;
 
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.StaticSubGraph;
 
@@ -51,17 +52,35 @@ public class ThreadMapper {
         threadIdToType = new HashMap<Integer, String>();
     }
 
+    
+    
 
     /**
      * Assign a unique id to each thread for dynamic readers
-     * @param ssg The ssg that contains the dyamic reader
-     * @param filterToThreadId a mapping from filter to thread id
-     * @param dominated the set of dominated filters
-     * @param dominators a mapping of dominator filter to dominated filter
-     * @param threadIdToType a mapping of thread to its input type
+     * @param ssg The static subgraph that contains the dynamic reader
      */
     public void assignThreads(StaticSubGraph ssg) {
+        if (KjcOptions.threadopt) {
+            assignThreadsOpt(ssg);
+        } else {
+            assignThreadsNonOpt(ssg);
+        }
+        
+    }
 
+    /**
+     * Assign thread ids to all filters
+     * @param ssg
+     */
+    private void assignThreadsOpt(StaticSubGraph ssg) {
+        System.out.println("ThreadMapper.assignThreadsOpt");
+    }
+    
+    /**
+     * Assign thread ids only to dynamic readers
+     * @param ssg The static subgraph that contains the dynamic reader
+     */   
+    private void assignThreadsNonOpt(StaticSubGraph ssg) {
         boolean isDynamicInput = ssg.hasDynamicInput();
         Filter f = ssg.getTopFilters()[0];
 
