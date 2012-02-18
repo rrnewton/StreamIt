@@ -9,7 +9,13 @@ void->int stateful filter Source {
   }
 }
 
-int->int filter F {
+int->int filter F1 {
+   work pop * push * {
+     push(pop());
+   }
+}
+
+int->int filter F2 {
    work pop * push * {
      push(pop());
    }
@@ -17,8 +23,8 @@ int->int filter F {
 
 void->void pipeline test2 {
     add Source();
-    add F();
-    add F();
+    add F1();
+    add F2();
     add Writer<int>(stdout);
 }
 

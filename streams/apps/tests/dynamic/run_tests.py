@@ -26,7 +26,7 @@ class Command(object):
 FNULL = open('/dev/null', 'w')
 
 def run_strc(filename):
-    cmd = ["strc", "-smp", "2", "--outputs", "10", "-regtest", filename]
+    cmd = ["strc", "-smp", "2", "--outputs", "10", "-regtest", "--threadopt", filename]
     # print cmd
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 

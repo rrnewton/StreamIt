@@ -73,8 +73,8 @@ def pr(results):
 
 def main():
     cores = [2]
-    outputs = [1000]
-    ignores = [1000]
+    outputs = [100]
+    ignores = [10]
     for num_cores in cores:
         for ignore in ignores:
             for output in outputs:
