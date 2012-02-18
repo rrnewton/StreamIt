@@ -855,21 +855,25 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     public void addSteadyThreadCall(int threadIndex, int nextIndex) {
         Utils.addSetFlag(
                 steadyLoop,
-                nextIndex,
+                threadIndex,
                 "ASLEEP");
         Utils.addSetFlag(
                 steadyLoop,
-                threadIndex,
+                nextIndex,
                 "AWAKE");
         Utils.addSignal(
                 steadyLoop,
-                threadIndex);
+                nextIndex);
+      
+    }
+    
+    public void addSteadyThreadWait(int threadIndex) {
         Utils.addCondWait(
                 steadyLoop,
-                nextIndex,
+                threadIndex,
                 Utils.makeEqualityCondition(
                         "ASLEEP",
-                        "thread_to_sleep[" + nextIndex + "]"));
+                        "thread_to_sleep[" + threadIndex + "]"));
     }
 
     public void addExternField(JFieldDeclaration jFieldDeclaration) {

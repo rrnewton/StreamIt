@@ -106,22 +106,10 @@ public class ThreadMapper {
         return threadIdToType;
     }
 
-    public void setDominated(Set<String> dominated) {
-        this.dominated = dominated;
-    }
-
     public void setDominators(Map<String, List<String>> dominators) {
         this.dominators = dominators;
     }
-
-    public void setFilterToThreadId(Map<Filter, Integer> filterToThreadId) {
-        this.filterToThreadId = filterToThreadId;
-    }
-
-    public void setThreadIdToType(Map<Integer, String> threadIdToType) {
-        this.threadIdToType = threadIdToType;
-    }
-
+   
     /**
      * Assign thread ids only to dynamic readers
      * 
@@ -137,8 +125,7 @@ public class ThreadMapper {
         if (isDynamicInput || isStateful) {
             Filter[] topFilters = ssg.getTopFilters();
 
-            for (int i = 0; i < topFilters.length; i++) {
-                Filter dynamicReader = topFilters[i];
+            for (Filter dynamicReader : topFilters) {              
                 Filter[] filterGraph = ssg.getFilterGraph();
 
                 if (isVoidType(dynamicReader)) {
@@ -179,28 +166,21 @@ public class ThreadMapper {
 
         Filter f = ssg.getTopFilters()[0];
         boolean isDynamicInput = ssg.hasDynamicInput();
-        boolean isStateful = f.getWorkNodeContent().isStateful();
         boolean isFileOutput = f.getWorkNode().isFileOutput();
 
-       
         if (!isDynamicInput) {
-            filterToThreadId.put(
-                    f,
-                    MAIN_THREAD);
+            filterToThreadId.put(f, MAIN_THREAD);
             System.out.println("ThreadMapper.assignThreadsOpt filter=" + getFilterName(f) + " thread=" + MAIN_THREAD);
-        }
-        /* Check if it has a dynamic pop rate */
-        else {
-            Filter[] topFilters = ssg.getTopFilters();
-
-            for (int i = 0; i < topFilters.length; i++) {
-                Filter dynamicReader = topFilters[i];
+        } else {
+            /* Check if it has a dynamic pop rate */               
+            for (Filter topFilter : ssg.getTopFilters()) {              
+                
                 Filter[] filterGraph = ssg.getFilterGraph();
 
-                if (isVoidType(dynamicReader)) {
+                if (isVoidType(topFilter)) {
                     for (Filter filter : filterGraph) {
                         dominatorsInitEmptyIfNotEqual(
-                                dynamicReader,
+                                topFilter,
                                 filter);
                         filterToThreadId.put(
                                 filter,
@@ -212,17 +192,17 @@ public class ThreadMapper {
                     if (isFileOutput) {
                         thread = MAIN_THREAD;
                     } 
-                    filterToThreadId.put(dynamicReader,thread);
-                    System.out.println("ThreadMapper.assignThreadsOpt filter=" + getFilterName(dynamicReader) + " thread=" + thread);                    
-                    if (!isVoidType(dynamicReader)
-                            && !isNullType(dynamicReader)) {
+                    filterToThreadId.put(topFilter,thread);
+                    System.out.println("ThreadMapper.assignThreadsOpt filter=" + getFilterName(topFilter) + " thread=" + thread);                    
+                    if (!isVoidType(topFilter)
+                            && !isNullType(topFilter)) {
                         threadIdToType.put(
                                 threadId,
                                 getFilterInputType(
-                                        dynamicReader).toString());
+                                        topFilter).toString());
                         for (Filter filter : filterGraph) {
                             dominatorsAdd(
-                                    dynamicReader,
+                                    topFilter,
                                     filter);
                         }
                     }
