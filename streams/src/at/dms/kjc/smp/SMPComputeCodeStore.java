@@ -428,12 +428,20 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                 .getFilterToThreadId();
 
-        String threadId = filterToThreadId.get(
-                inputPort.getSSG().getTopFilters()[0]).toString();
-
+        int threadIndex = filterToThreadId.get(
+                inputPort.getSSG().getTopFilters()[0]);
+        
+     
+        String threadId = Integer.toString(threadIndex);
+        
         String buffer = "dyn_buf_" + threadId;
 
         if (KjcOptions.threadopt) {
+            if (threadIndex == -1) {         
+                Filter prevFilter = ProcessFilterWorkNode.getPreviousFilter(inputPort.getSSG().getTopFilters()[0].getWorkNode());                 
+                Core core = SMPBackend.scheduler.getComputeNode(prevFilter.getWorkNode()); 
+                threadIndex = ThreadMapper.coreToThread(core.coreID);                
+            }
             buffer = "dyn_buf_" + buf.getId();
         }
 

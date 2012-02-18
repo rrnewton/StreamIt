@@ -170,7 +170,7 @@ public class ThreadMapper {
 
         if (!isDynamicInput) {
             filterToThreadId.put(f, MAIN_THREAD);
-            System.out.println("ThreadMapper.assignThreadsOpt filter=" + getFilterName(f) + " thread=" + MAIN_THREAD);
+            System.out.println("ThreadMapper.assignThreadsOpt 1 filter=" + getFilterName(f) + " thread=" + MAIN_THREAD);
         } else {
             /* Check if it has a dynamic pop rate */               
             for (Filter topFilter : ssg.getTopFilters()) {              
@@ -185,7 +185,7 @@ public class ThreadMapper {
                         filterToThreadId.put(
                                 filter,
                                 MAIN_THREAD);
-                        System.out.println("ThreadMapper.assignThreadsOpt filter=" + getFilterName(filter) + " thread=" + MAIN_THREAD);                    
+                        System.out.println("ThreadMapper.assignThreadsOpt 2 filter=" + getFilterName(filter) + " thread=" + MAIN_THREAD);                    
                     }
                 } else {
                     int thread = threadId;  

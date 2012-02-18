@@ -340,7 +340,7 @@ public class ProcessFilterWorkNode {
         return null;
     }
     
-    private static Filter getPreviousFilter(WorkNode filter) {
+    static Filter getPreviousFilter(WorkNode filter) {
         StaticSubGraph ssg = filter.getParent().getStaticSubGraph();  
         if (filter == ssg.getFilterGraph()[0].getWorkNode()) {
             InputPort inputPort = ssg.getInputPort();
