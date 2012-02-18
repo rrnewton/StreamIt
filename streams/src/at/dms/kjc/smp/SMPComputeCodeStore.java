@@ -430,26 +430,29 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
         int threadIndex = filterToThreadId.get(
                 inputPort.getSSG().getTopFilters()[0]);
-        
-     
+             
+       
         String threadId = Integer.toString(threadIndex);
-        
+
         String buffer = "dyn_buf_" + threadId;
 
+        System.out.println("SMPComputeCodeStore threadId=" + threadId);
+        
         if (KjcOptions.threadopt) {
-            if (threadIndex == -1) {         
+            if (threadIndex == -1) {                                        
                 Filter prevFilter = ProcessFilterWorkNode.getPreviousFilter(inputPort.getSSG().getTopFilters()[0].getWorkNode());                 
                 Core core = SMPBackend.scheduler.getComputeNode(prevFilter.getWorkNode()); 
                 threadIndex = ThreadMapper.coreToThread(core.coreID);                
             }
             buffer = "dyn_buf_" + buf.getId();
         }
+        
+        
 
         String popCall;
-        if (KjcOptions.threadopt) {
-            int nextThread = -1;
-            popCall = popName + "(" + buffer + ", " + threadId + ", "
-                    + nextThread + ", 0,  NULL)";
+        if (KjcOptions.threadopt) {            
+            popCall = popName + "(" + buffer + ", " + threadIndex + ", "
+                    + threadIndex + ", 0,  NULL)";
         } else {
             popCall = popName + "(" + buffer + ", " + threadId + ", 0, NULL)";
         }
