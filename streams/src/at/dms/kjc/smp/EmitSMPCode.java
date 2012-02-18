@@ -3,11 +3,11 @@ package at.dms.kjc.smp;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JIntLiteral;
@@ -16,8 +16,10 @@ import at.dms.kjc.JStatement;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.backendSupport.EmitCode;
+import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.common.CodegenPrintWriter;
 import at.dms.kjc.sir.SIRCodeUnit;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * Emit c code for tiles
@@ -33,13 +35,11 @@ public class EmitSMPCode extends EmitCode {
     private Set<String> dominated = null;
     Map<Integer, String> threadIdToType = null;
 
-    public EmitSMPCode(SMPBackEndFactory backEndFactory, boolean isDynamic,
-             Set<String> dominated,
-             Map<Integer, String> threadIdToType) {
+    public EmitSMPCode(SMPBackEndFactory backEndFactory, boolean isDynamic) {
         super(backEndFactory);
-        this.isDynamic = isDynamic;
-        this.dominated = dominated;
-        this.threadIdToType = threadIdToType;
+        this.isDynamic = isDynamic;        
+        this.dominated = ThreadMapper.getMapper().getDominated();              
+        this.threadIdToType =  ThreadMapper.getMapper().getThreadIdToType();
     }
 
     public EmitSMPCode() {
@@ -181,6 +181,7 @@ public class EmitSMPCode extends EmitCode {
      * @param p
      *            The CodegenPrintWriter (left open on return).
      */
+    @SuppressWarnings("rawtypes")
     @Override
     public void emitCodeForComputeStore(SIRCodeUnit fieldsAndMethods,
             ComputeNode n, CodegenPrintWriter p, CodeGen codegen) {
@@ -460,10 +461,21 @@ public class EmitSMPCode extends EmitCode {
             p.println("#define DYN_READER      0");
             p.println("#define MASTER          1");
 
-            for (Integer threadId : threadIdToType.keySet()) {
-                String type = threadIdToType.get(threadId);              
-                p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_"
-                        + threadId + ";");
+            if (KjcOptions.threadopt) {
+                for (WorkNode key1 : InterSSGChannel.buffers.keySet()) {
+                    for (WorkNode key2 : InterSSGChannel.buffers.get(key1).keySet()) {
+                        InterSSGChannel value = InterSSGChannel.buffers.get(key1).get(key2);
+                        String type = value.getEdge().getType().toString();
+                        p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_"
+                                + value.getId() + ";");
+                    }
+                }
+            } else {                                  
+                for (Integer threadId : threadIdToType.keySet()) {
+                    String type = threadIdToType.get(threadId);              
+                    p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_"
+                            + threadId + ";");
+                }
             }
 
             if (KjcOptions.threadopt) {
@@ -664,10 +676,21 @@ public class EmitSMPCode extends EmitCode {
 
           
 
-        if (isDynamic) {
-            for (Integer threadId : threadIdToType.keySet()) {
-                String type = threadIdToType.get(threadId);
-                p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");
+        if (isDynamic) {            
+            if (KjcOptions.threadopt) {
+                for (WorkNode key1 : InterSSGChannel.buffers.keySet()) {
+                    for (WorkNode key2 : InterSSGChannel.buffers.get(key1).keySet()) {
+                        InterSSGChannel value = InterSSGChannel.buffers.get(key1).get(key2);
+                        String type = value.getEdge().getType().toString();
+                        p.println(type + "_queue_ctx_ptr   dyn_buf_"
+                                + value.getId() + ";");
+                    }
+                }
+            } else {            
+                for (Integer threadId : threadIdToType.keySet()) {
+                    String type = threadIdToType.get(threadId);
+                    p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");
+                }
             }
             p.println();            
             if (KjcOptions.threadopt) {
@@ -753,10 +776,21 @@ public class EmitSMPCode extends EmitCode {
             p.println();
             p.println("// Initialize dynamic queues");
 
-            for (Integer threadId : threadIdToType.keySet()) {
-                String type = threadIdToType.get(threadId);
-                p.println("dyn_buf_" + threadId + " = " + type
-                        + "_queue_create();");
+            if (KjcOptions.threadopt) {
+                for (WorkNode key1 : InterSSGChannel.buffers.keySet()) {
+                    for (WorkNode key2 : InterSSGChannel.buffers.get(key1).keySet()) {
+                        InterSSGChannel value = InterSSGChannel.buffers.get(key1).get(key2);
+                        String type = value.getEdge().getType().toString();                        
+                        p.println("dyn_buf_" + value.getId() + " = " + type
+                                + "_queue_create();");                                               
+                    }
+                }
+            } else {
+                for (Integer threadId : threadIdToType.keySet()) {
+                    String type = threadIdToType.get(threadId);
+                    p.println("dyn_buf_" + threadId + " = " + type
+                            + "_queue_create();");
+                }
             }
             
             if (KjcOptions.threadopt) {

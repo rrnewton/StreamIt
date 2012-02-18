@@ -113,9 +113,7 @@ public class SMPBackend {
 		}
 	}
 
-	private static void emitCode(Map<Filter, Integer> threadMap,
-			Set<String> dominated, Map<String, List<String>> dominators,
-			Map<Integer, String> threadIdToType) {
+	private static void emitCode() {
 
 		// generate code for file writer
 		SMPComputeCodeStore.generatePrintOutputCode(backEndFactory);
@@ -124,8 +122,7 @@ public class SMPBackend {
 			chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
 
 		// emit c code for all cores
-		new EmitSMPCode(backEndFactory, isDynamic, dominated,
-				 threadIdToType).doit();
+		new EmitSMPCode(backEndFactory, isDynamic).doit();
 
 		// dump structs.h file
 		structs_h.writeToFile();
@@ -201,11 +198,6 @@ public class SMPBackend {
 			ThreadMapper.getMapper().assignThreads(ssg);
 		}
 
-		Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper().getFilterToThreadId();		        
-        Set<String> dominated = ThreadMapper.getMapper().getDominated();
-        Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();
-        Map<Integer, String> threadIdToType =  ThreadMapper.getMapper().getThreadIdToType();
-
         int i = 0;
 		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
 			runSSG(ssg, i); 
@@ -218,9 +210,7 @@ public class SMPBackend {
 
 		InterSSGChannel.createDynamicQueues();
 
-		chip.setThreadMap(filterToThreadId);
-
-		emitCode(filterToThreadId, dominated, dominators, threadIdToType);
+		emitCode();
 
 	}
 	

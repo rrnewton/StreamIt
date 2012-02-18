@@ -1737,7 +1737,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	
 	
 	/**
-	 * Add a call to block to pthread_cond_signal
+	 * Add a a pthread_cond_signal call to the code block
 	 * @param block The block to add to
 	 * @param threadIndex 
 	 * @param condName the name of the condition variable
@@ -1751,7 +1751,7 @@ public abstract class Utils implements Serializable, DeepCloneable {
 	}
 
 	/**
-     * Add a call to block to pthread_cond_signal
+     * Add a a pthread_cond_signal call to the code block
      * @param block The block to add to
      * @param threadIndex     
      * @return the modified block

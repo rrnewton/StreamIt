@@ -12,6 +12,7 @@ import java.util.Set;
 
 import at.dms.kjc.CType;
 import at.dms.kjc.JStatement;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
@@ -55,8 +56,12 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
     protected static HashMap<String, String> bufferVariables;
     protected static HashMap<String, String> createMethods;
 
+    /* src -> dst -> InterSSGChannel */
+    public static HashMap<WorkNode, HashMap<WorkNode, InterSSGChannel>> buffers;
+    
     static {
-        types = new HashSet<String>();
+        types = new HashSet<String>();        
+        buffers = new HashMap<WorkNode, HashMap<WorkNode, InterSSGChannel>>();        
         inputBuffers = new HashMap<WorkNode, InterSSGChannel>();
         outputBuffers = new HashMap<WorkNode, InterSSGChannel>();
         fileWriterBuffers = new HashSet<InterSSGChannel>(); 
@@ -84,6 +89,32 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
         };
     }
 
+    private static InterSSGChannel addChannelToBuffers(Filter src, Filter dst, InterSSGChannel channel) {
+        HashMap<WorkNode, InterSSGChannel> key2;
+        key2 = new HashMap<WorkNode, InterSSGChannel>();
+        key2.put(dst.getWorkNode(), channel);
+        buffers.put(src.getWorkNode(), key2);
+        return channel;
+    }
+    
+    private static InterSSGChannel addChannelIfNew(InterSSGEdge edge) {
+        Filter src = edge.getSrc().getSSG().getLastFilter();
+        Filter dst = edge.getDest().getSSG().getTopFilters()[0];
+        System.out.println("InterSSGChannel.addChannelIfNew: " + src.getWorkNode() + "->" + dst.getWorkNode());
+        
+        
+        HashMap<WorkNode, InterSSGChannel> key2 = buffers.get(src.getWorkNode());                
+        if (key2 == null) {
+            return addChannelToBuffers(src, dst, new InterSSGChannel(edge));
+        }        
+        InterSSGChannel value = key2.get(dst.getWorkNode());
+        if (value == null) {
+            return addChannelToBuffers(src, dst, new InterSSGChannel(edge));             
+        }                    
+        System.out.println("InterSSGChannel.addChannelIfNew is not new!");
+        return value;
+    }
+    
     /**
      * 
      * @param streamGraph
@@ -101,12 +132,19 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
             for (InterSSGEdge edge : outputPort.getLinks()) {
                 System.out.println("InterSSGChannel.createInputBuffers edge="
                         + edge.toString());
-                InterSSGChannel channel = new InterSSGChannel(edge);
-                CType bufType = edge.getType();
-                types.add(bufType.toString());
+                
                 Filter dstTop = edge.getDest().getSSG().getTopFilters()[0];
-                inputBuffers.put(dstTop.getWorkNode(), channel);
-
+               
+                InterSSGChannel channel;                
+                if (KjcOptions.threadopt) {
+                    channel = addChannelIfNew(edge);
+                } else {
+                    channel = new InterSSGChannel(edge);
+                }
+                                
+                CType bufType = edge.getType();
+                types.add(bufType.toString());               
+                inputBuffers.put(dstTop.getWorkNode(), channel);                                                
                 if (dstTop.getWorkNode().isFileOutput()) {
                     fileWriterBuffers.add(channel);
                 }
@@ -134,7 +172,15 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
             for (InterSSGEdge edge : inputPort.getLinks()) {
                 System.out.println("InterSSGChannel.createOutputBuffers edge="
                         + edge.toString());
-                InterSSGChannel channel = new InterSSGChannel(edge);
+               
+                InterSSGChannel channel;                
+                if (KjcOptions.threadopt) {
+                    channel = addChannelIfNew(edge);
+                } else {
+                    channel = new InterSSGChannel(edge);
+                }
+                                
+                
                 CType bufType = edge.getType();
                 types.add(bufType.toString());
                 Filter dstTop = dstSSG.getTopFilters()[0];
@@ -232,6 +278,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
             return null;
         }
         InterSSGEdge edge = ssg.getOutputPort().getLinks().get(0);
+        
+        if (KjcOptions.threadopt) {
+            return addChannelIfNew(edge);
+        }         
         return new InterSSGChannel(edge);
     }
 
@@ -256,13 +306,29 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
         return set;
     }
 
+    /** A unique identifier for each channel */
+    private final int id;
+    
+    /** A static counter for providing the ids */
+    private static int ChannelId = 0;
+    
     /**
      * @param edge
      */
     protected InterSSGChannel(InterSSGEdge edge) {
         super(edge);
+        id = ChannelId;
+        ChannelId++;
     }
 
+    /**
+     * Get this channel
+     * @return
+     */
+    public int getId() {
+        return id;
+    }
+    
     /**
      * @return
      */

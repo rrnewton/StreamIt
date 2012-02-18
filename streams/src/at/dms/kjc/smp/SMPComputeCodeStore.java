@@ -407,9 +407,18 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         String threadId = filterToThreadId.get(
                 inputPort.getSSG().getTopFilters()[0]).toString();
 
-        String buffer = "dyn_buf_" + threadId;        
-        String popCall; 
         
+        
+        
+        String buffer = "dyn_buf_" + threadId;        
+        
+        
+        if (KjcOptions.threadopt) {            
+             buffer = "dyn_buf_" + buf.getId();
+        }
+                
+        
+        String popCall;         
         if (KjcOptions.threadopt) {
             int nextThread = -1;
             popCall = popName + "(" + buffer + ", "+ threadId + ", "+ nextThread + ", 0,  NULL)";     

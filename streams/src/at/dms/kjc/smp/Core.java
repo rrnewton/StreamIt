@@ -13,7 +13,6 @@ public class Core extends ComputeNode<SMPComputeCodeStore> {
     protected int coreID;
     /** the parent machine */
     protected SMPMachine machine;
-	private Map<Filter, Integer> threadMap;
 
     /**
      * Construct a new ComputeNode of chip. 
@@ -58,9 +57,4 @@ public class Core extends ComputeNode<SMPComputeCodeStore> {
     public boolean isComputeNode() {
         return true;
     }
-
-	public void setThreadMap(Map<Filter, Integer> threadMap) {
-		// TODO Auto-generated method stub
-		this.threadMap = threadMap;
-	}
 }

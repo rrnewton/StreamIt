@@ -67,21 +67,29 @@ public class ProcessFilterWorkNode {
         WorkNode workNode;
         Map<String, List<String>> dominators;
 
+        private int getCoreID(InputPort inputPort) {
+            Core core = SMPBackend.scheduler.getComputeNode(inputPort.getSSG().getTopFilters()[0]
+                    .getWorkNode());    
+            return core.coreID;
+        }
+        
         private JExpression dynamicPop(SIRPopExpression self, CType tapeType) {
             InputPort inputPort = ((InterSSGChannel) inputChannel).getEdge()
-                    .getDest();
-            String threadId = filterToThreadId.get(
-                    inputPort.getSSG().getTopFilters()[0]).toString();
-
+                    .getDest();                        
+                                  
+            int threadIndex = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]);                                              
+            String threadId = Integer.toString(threadIndex);            
+            String buffer = "dyn_buf_" + threadId;           
             int next = -1;
             if (KjcOptions.threadopt) {
+                int channelId = ((InterSSGChannel) inputChannel).getId();
                 Filter nextFilter = getNextFilter(workNode);
                 assert nextFilter != null : "ERROR: ProcessFilterWorkNode: Next Filter after dynamic pop is null!";
                 next = filterToThreadId.get(nextFilter);
                 System.out.println("ProcessFilterWorkNode.getNextFilter nextThread is=" + next);
+                buffer = "dyn_buf_" + channelId;
             }
 
-            String buffer = "dyn_buf_" + threadId;
             JExpression dyn_queue = new JEmittedTextExpression(buffer);
             JExpression index = new JEmittedTextExpression(threadId);
 
@@ -241,11 +249,17 @@ public class ProcessFilterWorkNode {
 
                 InterSSGEdge edge = ((InterSSGChannel) outputChannel).getEdge();
                 InputPort inputPort = edge.getDest();
-
-                String threadId = filterToThreadId.get(
-                        inputPort.getSSG().getTopFilters()[0]).toString();
-
+                       
+                int threadIndex = filterToThreadId.get(inputPort.getSSG().getTopFilters()[0]);                                                   
+                String threadId = Integer.toString(threadIndex);
+                
                 String buffer = "dyn_buf_" + threadId;
+
+                if (KjcOptions.threadopt) {
+                    int channelId = ((InterSSGChannel) outputChannel).getId();
+                    buffer = "dyn_buf_" + channelId;
+                }
+                
                 JExpression dyn_queue = new JEmittedTextExpression(buffer);
                 return new JMethodCallExpression(pushName, new JExpression[] {
                         dyn_queue, newArg });
@@ -602,10 +616,14 @@ public class ProcessFilterWorkNode {
 
             Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                     .getFilterToThreadId();
-            String threadId = filterToThreadId.get(filterNode.getParent())
-                    .toString();
-
-            int threadIndex = Integer.parseInt(threadId);
+            
+            int threadIndex = filterToThreadId.get(filterNode.getParent());                                           
+//            if (threadIndex == -1) {                
+//                threadIndex = ThreadMapper.coreToThread(location.coreID);                
+//            }
+            String threadId = Integer.toString(threadIndex);
+            System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" + filterNode.getParent() + " threadId=" + threadId);
+            
             if (KjcOptions.threadopt) {
                 int nextThread = -1;               
                 Filter nextFilter = getNextFilter(filterNode);

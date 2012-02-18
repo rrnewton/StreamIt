@@ -447,6 +447,14 @@ public class StaticSubGraph {
 	}
 
 	/**
+	 * Get the last node in the Filter graph
+	 * @return the last node in the Filter graph
+	 */
+    public Filter getLastFilter() {
+        return getFilterGraph()[getFilterGraph().length -1];        
+    }
+	
+	/**
 	 * @param node
 	 *            The Filter
 	 * @return The work estimation for the filter slice node for one
@@ -568,7 +576,7 @@ public class StaticSubGraph {
 		assert topFilters != null;
 		return topFilters.toArray(new Filter[topFilters.size()]);
 	}
-
+	
 	/**
 	 * 
 	 * @param fc
@@ -850,6 +858,8 @@ public class StaticSubGraph {
 		other.workEstimation = (java.util.HashMap) at.dms.kjc.AutoCloner
 				.cloneToplevel(this.workEstimation);
 	}
+
+   
 
 	
 	/** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */

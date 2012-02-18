@@ -119,10 +119,4 @@ public class SMPMachine implements ComputeNodesI<SMPComputeCodeStore> {
         return null;
     }
 
-	public void setThreadMap(Map<Filter, Integer> threadMap) {
-		// TODO Auto-generated method stub
-		  for (Core core : getCores()) {
-			  core.setThreadMap(threadMap);
-		  }	
-	}
 }
