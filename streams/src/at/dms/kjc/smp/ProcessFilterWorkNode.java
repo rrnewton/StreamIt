@@ -618,17 +618,32 @@ public class ProcessFilterWorkNode {
                     .getFilterToThreadId();
             
             int threadIndex = filterToThreadId.get(filterNode.getParent());                                           
-//            if (threadIndex == -1) {                
-//                threadIndex = ThreadMapper.coreToThread(location.coreID);                
-//            }
+
+            if (threadIndex == -1) {                
+                threadIndex = ThreadMapper.coreToThread(location.coreID);                
+            }
+            
+            
             String threadId = Integer.toString(threadIndex);
             System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" + filterNode.getParent() + " threadId=" + threadId);
             
             if (KjcOptions.threadopt) {
                 int nextThread = -1;               
                 Filter nextFilter = getNextFilter(filterNode);
-                assert nextFilter != null : "ERROR: ProcessFilterWorkNode.standardSteadyProcessing: Next Filter after dynamic pop is null!";
+                assert nextFilter != null : "ERROR: ProcessFilterWorkNode.standardSteadyProcessing: Next Filter after dynamic pop is null!";                                
                 nextThread = filterToThreadId.get(nextFilter);                             
+                
+                if (nextThread == -1) {                
+                    System.out.println("ProcessFilterWorkNode.standardSteadyProcessing nextFilter=" + nextFilter.getWorkNode());
+                    // Special case for FileWriters. They are always on the same thread as the upstream filter.
+                    if (nextFilter.getWorkNode().isFileOutput()) {
+                        nextThread = threadIndex;
+                    } else {
+                        Core core = SMPBackend.scheduler.getComputeNode(nextFilter.getWorkNode());  
+                        nextThread = ThreadMapper.coreToThread(core.coreID);  
+                    }                                                                        
+                }
+                
                 codeStore.addThreadHelper(threadIndex, nextThread, steadyBlock);
                 codeStore.addSteadyThreadCall(threadIndex, nextThread);                
             } else {
