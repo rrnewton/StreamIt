@@ -233,7 +233,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	public void addInitFunctionCall(JMethodDeclaration init) {
 		// JMethodDeclaration init = filterInfo.filter.getInit();
 		if (init != null)
-			mainMethod.addStatementFirst(new JExpressionStatement(null,
+			getMainFunction().addStatementFirst(new JExpressionStatement(null,
 					new JMethodCallExpression(null, new JThisExpression(null),
 							init.getName(), new JExpression[0]), null));
 		else
@@ -305,19 +305,14 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	public void addSteadyLoop() {
 		// enable the profiler right before the steady loop on tilera
 		if (KjcOptions.tilera > 0 && KjcOptions.profile) {
-			mainMethod.addStatement(new JExpressionStatement(
+			getMainFunction().addStatement(new JExpressionStatement(
 					new JEmittedTextExpression("profiler_enable()")));
-			mainMethod.addStatement(new JExpressionStatement(
+			getMainFunction().addStatement(new JExpressionStatement(
 					new JEmittedTextExpression("profiler_clear()")));
 		}
-		
-//		if (KjcOptions.smp > 0 && KjcOptions.perftest) {
-//		    mainMethod.addStatement(new JExpressionStatement(
-//                    new JEmittedTextExpression("start_time()")));
-//		}
-		
+				
 		// add it to the while statement
-		mainMethod.addStatement(new JWhileStatement(null, new JBooleanLiteral(
+		getMainFunction().addStatement(new JWhileStatement(null, new JBooleanLiteral(
 				null, true), steadyLoop, null));
 	}
 
@@ -332,7 +327,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	 *            the local variable that will hold the iteration count.
 	 */
 	public void addSteadyLoop(ALocalVariable iterationBound) {
-		mainMethod.addStatement(at.dms.util.Utils.makeForLoop(steadyLoop,
+		getMainFunction().addStatement(at.dms.util.Utils.makeForLoop(steadyLoop,
 				iterationBound.getRef()));
 	}
 

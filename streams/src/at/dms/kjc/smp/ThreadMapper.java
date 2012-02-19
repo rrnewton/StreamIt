@@ -56,8 +56,7 @@ public class ThreadMapper {
     /** a mapping from filter to thread id */
     private Map<Filter, Integer>      filterToThreadId;
 
-    /** the set of dominated filters */
-    private Set<String>               dominated;
+   
 
     /** a mapping of dominator filter to dominated filter */
     private Map<String, List<String>> dominators;
@@ -69,8 +68,7 @@ public class ThreadMapper {
      * Private constructor for singleton
      */
     private ThreadMapper() {
-        filterToThreadId = new HashMap<Filter, Integer>();
-        dominated = new HashSet<String>();
+        filterToThreadId = new HashMap<Filter, Integer>();     
         dominators = new HashMap<String, List<String>>();
         threadIdToType = new HashMap<Integer, String>();
     }
@@ -88,10 +86,6 @@ public class ThreadMapper {
             assignThreadsNonOpt(ssg);
         }
 
-    }
-
-    public Set<String> getDominated() {
-        return dominated;
     }
 
     public Map<String, List<String>> getDominators() {

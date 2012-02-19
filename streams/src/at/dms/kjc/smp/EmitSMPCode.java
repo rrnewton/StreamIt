@@ -3,7 +3,6 @@ package at.dms.kjc.smp;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,17 +28,15 @@ import at.dms.kjc.slir.WorkNode;
  */
 public class EmitSMPCode extends EmitCode {
 
-    public final String MAIN_FILE = "main.c";
+    public final String  MAIN_FILE      = "main.c";
 
-    private boolean isDynamic = false;
-    private Set<String> dominated = null;
+    private boolean      isDynamic      = false;   
     Map<Integer, String> threadIdToType = null;
 
     public EmitSMPCode(SMPBackEndFactory backEndFactory, boolean isDynamic) {
         super(backEndFactory);
-        this.isDynamic = isDynamic;        
-        this.dominated = ThreadMapper.getMapper().getDominated();              
-        this.threadIdToType =  ThreadMapper.getMapper().getThreadIdToType();
+        this.isDynamic = isDynamic;   
+        this.threadIdToType = ThreadMapper.getMapper().getThreadIdToType();
     }
 
     public EmitSMPCode() {
@@ -48,7 +45,7 @@ public class EmitSMPCode extends EmitCode {
     }
 
     public void doit() {
-        try {               
+        try {
             // if load balancing, instrument steady-state loop before
             // steady-state barrier
             if (KjcOptions.loadbalance) {
@@ -99,7 +96,8 @@ public class EmitSMPCode extends EmitCode {
                     JExpression[] setAffinityArgs = new JExpression[1];
                     setAffinityArgs[0] = new JIntLiteral(core.getCoreID());
                     core.getComputeCode().addFunctionCallFirst(
-                            "setCPUAffinity", setAffinityArgs);
+                            "setCPUAffinity",
+                            setAffinityArgs);
                 }
             }
 
@@ -141,7 +139,9 @@ public class EmitSMPCode extends EmitCode {
 
                 generateIncludes(p);
 
-                this.emitCodeForComputeNode(core, p);
+                this.emitCodeForComputeNode(
+                        core,
+                        p);
 
                 p.close();
             }
@@ -189,14 +189,10 @@ public class EmitSMPCode extends EmitCode {
         p.println("// code for core " + n.getUniqueId());
         p.println(((Core) n).getComputeCode().getGlobalText());
 
-        // System.out.println("EmitSMPCode.emitCodeForComputeStore, code for core="
-        // + n.getUniqueId());
-
         // generate function prototypes for methods so that they can call each
-        // other
-        // in C.
+        // other in C.
         codegen.setDeclOnly(true);
-        for (JMethodDeclaration method : fieldsAndMethods.getMethods()) {
+        for (JMethodDeclaration method : fieldsAndMethods.getMethods()) {           
             method.accept(codegen);
         }
         p.println("");
@@ -263,7 +259,8 @@ public class EmitSMPCode extends EmitCode {
                 }
             }
             if (c.pushMethod() != null) {
-                c.pushMethod().accept(codegen);
+                c.pushMethod().accept(
+                        codegen);
             }
         }
 
@@ -277,19 +274,24 @@ public class EmitSMPCode extends EmitCode {
                 }
             }
             if (c.peekMethod() != null) {
-                c.peekMethod().accept(codegen);
+                c.peekMethod().accept(
+                        codegen);
             }
             if (c.assignFromPeekMethod() != null) {
-                c.assignFromPeekMethod().accept(codegen);
+                c.assignFromPeekMethod().accept(
+                        codegen);
             }
             if (c.popMethod() != null) {
-                c.popMethod().accept(codegen);
+                c.popMethod().accept(
+                        codegen);
             }
             if (c.assignFromPopMethod() != null) {
-                c.assignFromPopMethod().accept(codegen);
+                c.assignFromPopMethod().accept(
+                        codegen);
             }
             if (c.popManyMethod() != null) {
-                c.popManyMethod().accept(codegen);
+                c.popManyMethod().accept(
+                        codegen);
             }
         }
         p.println("");
@@ -307,7 +309,8 @@ public class EmitSMPCode extends EmitCode {
         // handle the buffer initialization method separately because we do not
         // want it
         // optimized (it is not in the methods list of the code store
-        ((Core) n).getComputeCode().getBufferInitMethod().accept(codegen);
+        ((Core) n).getComputeCode().getBufferInitMethod().accept(
+                codegen);
 
         // generate functions for methods
         codegen.setDeclOnly(false);
@@ -443,15 +446,16 @@ public class EmitSMPCode extends EmitCode {
         p.println("extern void streamit_exit(int n);");
         p.println();
 
-
-
         if (isDynamic) {
             int numDynamicReaders = threadIdToType.keySet().size();
-            System.out.println("EmitSMPCode.generateGlobalsHeader numDynamicReaders=" + numDynamicReaders);
+            System.out
+                    .println("EmitSMPCode.generateGlobalsHeader numDynamicReaders="
+                            + numDynamicReaders);
             p.println();
-            
+
             if (KjcOptions.threadopt) {
-                int numThreads = threadIdToType.keySet().size() + KjcOptions.smp - 1;
+                int numThreads = threadIdToType.keySet().size()
+                        + KjcOptions.smp - 1;
                 p.println("#define NUM_THREADS  " + numThreads);
             } else {
                 p.println("#define DYNAMIC_READERS  " + numDynamicReaders);
@@ -463,16 +467,20 @@ public class EmitSMPCode extends EmitCode {
 
             if (KjcOptions.threadopt) {
                 for (WorkNode key1 : InterSSGChannel.buffers.keySet()) {
-                    for (WorkNode key2 : InterSSGChannel.buffers.get(key1).keySet()) {
-                        InterSSGChannel value = InterSSGChannel.buffers.get(key1).get(key2);
+                    for (WorkNode key2 : InterSSGChannel.buffers.get(
+                            key1).keySet()) {
+                        InterSSGChannel value = InterSSGChannel.buffers.get(
+                                key1).get(
+                                key2);
                         String type = value.getEdge().getType().toString();
-                        p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_"
-                                + value.getId() + ";");
+                        p.println("extern " + type
+                                + "_queue_ctx_ptr   dyn_buf_" + value.getId()
+                                + ";");
                     }
                 }
-            } else {                                  
+            } else {
                 for (Integer threadId : threadIdToType.keySet()) {
-                    String type = threadIdToType.get(threadId);              
+                    String type = threadIdToType.get(threadId);
                     p.println("extern " + type + "_queue_ctx_ptr   dyn_buf_"
                             + threadId + ";");
                 }
@@ -529,14 +537,14 @@ public class EmitSMPCode extends EmitCode {
                         + fieldDecl.getVariable().getIdent() + ";");
             }
         }
-        
+
         if (KjcOptions.perftest) {
             p.println();
             p.println("extern int perfTestNumInputs;");
             p.println("extern timespec endTime;");
             p.println("extern timespec startTime;");
             p.println("extern void start_time();");
-        }        
+        }
 
         p.println();
         p.println("// Intra-SSG synchronization tokens");
@@ -548,7 +556,7 @@ public class EmitSMPCode extends EmitCode {
         p.close();
     }
 
-    public void generateIncludes(CodegenPrintWriter p) {
+    private void generateIncludes(CodegenPrintWriter p) {
         p.println("#ifndef _GNU_SOURCE");
         p.println("#define _GNU_SOURCE");
         p.println("#endif");
@@ -570,11 +578,11 @@ public class EmitSMPCode extends EmitCode {
         p.println("#include \"barrier.h\"");
         p.println("#include \"rdtsc.h\"");
         p.println("#include \"structs.h\"");
-        
+
         p.println("#ifdef __MACH__");
         p.println("#include <mach/thread_policy.h>");
         p.println("#endif");
-        
+
         if (KjcOptions.perftest) {
             p.println("#include <time.h>");
         }
@@ -622,16 +630,13 @@ public class EmitSMPCode extends EmitCode {
         p.println("  ts->tv_sec = mts.tv_sec;");
         p.println("  ts->tv_nsec = mts.tv_nsec;");
         p.println(" #else");
-        p.println("  clock_gettime(CLOCK_MONOTONIC, ts);");
-        //p.println("  clock_gettime(CLOCK_MONOTONIC_RAW, ts);");
-        //p.println("  clock_gettime(CLOCK_REALTIME, ts);");
-        //p.println("  //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, ts);");
+        p.println("  clock_gettime(CLOCK_MONOTONIC, ts);");      
         p.println(" #endif");
         p.println(" }");
 
         p.println();
         p.println();
-        
+
         p.println("timespec diff(timespec start, timespec end) {");
         p.println("  timespec temp;");
         p.println("  if ((end.tv_nsec-start.tv_nsec)<0) {");
@@ -643,13 +648,12 @@ public class EmitSMPCode extends EmitCode {
         p.println("  }");
         p.println("  return temp;");
         p.println("}");
-        
+
         p.println();
         p.println();
 
     }
-    
-    
+
     private void generateMainFile() throws IOException {
         CodegenPrintWriter p = new CodegenPrintWriter(new BufferedWriter(
                 new FileWriter(MAIN_FILE, false)));
@@ -666,33 +670,36 @@ public class EmitSMPCode extends EmitCode {
             p.println();
         }
 
-        if (KjcOptions.outputs != -1) {            
+        if (KjcOptions.outputs != -1) {
             p.println("// Number of steady-state outputs");
-            p.println("int maxOutputs = " + (KjcOptions.outputs + KjcOptions.preoutputs) + ";");
+            p.println("int maxOutputs = "
+                    + (KjcOptions.outputs + KjcOptions.preoutputs) + ";");
             p.println("int maxIgnored= " + KjcOptions.preoutputs + ";");
             p.println("int currOutputs = 0;");
             p.println();
         }
 
-          
-
-        if (isDynamic) {            
+        if (isDynamic) {
             if (KjcOptions.threadopt) {
                 for (WorkNode key1 : InterSSGChannel.buffers.keySet()) {
-                    for (WorkNode key2 : InterSSGChannel.buffers.get(key1).keySet()) {
-                        InterSSGChannel value = InterSSGChannel.buffers.get(key1).get(key2);
+                    for (WorkNode key2 : InterSSGChannel.buffers.get(
+                            key1).keySet()) {
+                        InterSSGChannel value = InterSSGChannel.buffers.get(
+                                key1).get(
+                                key2);
                         String type = value.getEdge().getType().toString();
                         p.println(type + "_queue_ctx_ptr   dyn_buf_"
                                 + value.getId() + ";");
                     }
                 }
-            } else {            
+            } else {
                 for (Integer threadId : threadIdToType.keySet()) {
                     String type = threadIdToType.get(threadId);
-                    p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId + ";");
+                    p.println(type + "_queue_ctx_ptr   dyn_buf_" + threadId
+                            + ";");
                 }
             }
-            p.println();            
+            p.println();
             if (KjcOptions.threadopt) {
                 p.println("pthread_cond_t        thread_conds    [NUM_THREADS];");
                 p.println("pthread_mutex_t       thread_mutexes  [NUM_THREADS];");
@@ -720,10 +727,10 @@ public class EmitSMPCode extends EmitCode {
             p.println("int perfTestNumInputs;");
             p.println("timespec endTime;");
             p.println("timespec startTime;");
-            p.println("int startedTiming;");           
+            p.println("int startedTiming;");
             p.println();
         }
-               
+
         p.println("// Global barrier");
         p.println("barrier_t barrier;");
         p.println();
@@ -740,7 +747,7 @@ public class EmitSMPCode extends EmitCode {
         generateExit(p);
 
         generateStartTime(p);
-        
+
         if (KjcOptions.profile) {
             Profiler.emitProfilerGlobals(p);
             Profiler.generateProfilerOutputCode(p);
@@ -765,24 +772,26 @@ public class EmitSMPCode extends EmitCode {
         p.println("// Initialize barrier");
         p.println("barrier_init(&barrier, " + barrier_count + ");");
 
-        
         if (KjcOptions.perftest) {
             p.println();
             p.println("startedTiming = 0;");
             p.println();
-        }     
-        
+        }
+
         if (isDynamic) {
             p.println();
             p.println("// Initialize dynamic queues");
 
             if (KjcOptions.threadopt) {
                 for (WorkNode key1 : InterSSGChannel.buffers.keySet()) {
-                    for (WorkNode key2 : InterSSGChannel.buffers.get(key1).keySet()) {
-                        InterSSGChannel value = InterSSGChannel.buffers.get(key1).get(key2);
-                        String type = value.getEdge().getType().toString();                        
+                    for (WorkNode key2 : InterSSGChannel.buffers.get(
+                            key1).keySet()) {
+                        InterSSGChannel value = InterSSGChannel.buffers.get(
+                                key1).get(
+                                key2);
+                        String type = value.getEdge().getType().toString();
                         p.println("dyn_buf_" + value.getId() + " = " + type
-                                + "_queue_create();");                                               
+                                + "_queue_create();");
                     }
                 }
             } else {
@@ -792,7 +801,7 @@ public class EmitSMPCode extends EmitCode {
                             + "_queue_create();");
                 }
             }
-            
+
             if (KjcOptions.threadopt) {
                 p.println();
                 p.println("// Initialize mutexes and condition variables");
@@ -805,7 +814,7 @@ public class EmitSMPCode extends EmitCode {
                 p.println("thread_to_sleep[i] = ASLEEP; /* 1 is asleep */");
                 p.outdent();
                 p.println("}");
-                p.println();                           
+                p.println();
             } else {
                 p.println();
                 p.println("// Initialize mutexes and condition variables");
@@ -829,22 +838,11 @@ public class EmitSMPCode extends EmitCode {
         for (Core core : SMPBackend.chip.getCores()) {
             for (JFieldDeclaration fieldDecl : core.getComputeCode()
                     .getExternFields().values()) {
-                String ident = fieldDecl.getVariable().getIdent();
-                if (dominated.contains(ident.substring(0, ident.length()
-                        - "_multiplier".length()))) {
-                    p.println(ident + " = 0;");
-                } else {
-                    p.println(ident + " = 1;");
-                }
+                String ident = fieldDecl.getVariable().getIdent();             
+                p.println(ident + " = 1;");             
             }
         }
 
-//        for (String key : ThreadMapper.getMapper().getDominators().keySet()) {
-//            p.println(key + "_multiplier" + " = 1;");
-//            for (String val : ThreadMapper.getMapper().getDominators().get(key))
-//            p.println(val + "_multiplier" + " = 0;");            
-//        }
-        
         p.println();
 
         if (KjcOptions.perftest) {
@@ -898,7 +896,9 @@ public class EmitSMPCode extends EmitCode {
                     p.println();
                     String varName = "thread_" + decl.getName();
                     p.println("pthread_t " + varName + ";");
-                    p.println("if ((rc = pthread_create(&" + varName + ", NULL, " + decl.getName() + ", (void *)NULL)) < 0)");
+                    p.println("if ((rc = pthread_create(&" + varName
+                            + ", NULL, " + decl.getName()
+                            + ", (void *)NULL)) < 0)");
                     p.indent();
                     p.println("printf(\"Error creating helper "
                             + ": %d\\n\", rc);");
@@ -939,22 +939,22 @@ public class EmitSMPCode extends EmitCode {
         p.println("void streamit_exit(int n) {");
         if (KjcOptions.perftest) {
             generatePrintResults(p);
-        }               
+        }
         p.println("  exit(n);");
         p.println("}");
         p.println();
 
     }
 
-    private void generatePrintResults(CodegenPrintWriter p) {    
-        p.println("  curr_time(&endTime);");                
-        p.println("  printf (\"input=%d outputs=%d ignored=%d start=%ld:%ld end=%ld:%ld delta=%ld:%ld\\n\", "+ 
-                "perfTestNumInputs, maxOutputs, maxIgnored, " +
-                "startTime.tv_sec, startTime.tv_nsec, " +
-                "endTime.tv_sec, endTime.tv_nsec, " +
-                "diff(startTime,endTime).tv_sec, diff(startTime,endTime).tv_nsec);");            
+    private void generatePrintResults(CodegenPrintWriter p) {
+        p.println("  curr_time(&endTime);");
+        p.println("  printf (\"input=%d outputs=%d ignored=%d start=%ld:%ld end=%ld:%ld delta=%ld:%ld\\n\", "
+                + "perfTestNumInputs, maxOutputs, maxIgnored, "
+                + "startTime.tv_sec, startTime.tv_nsec, "
+                + "endTime.tv_sec, endTime.tv_nsec, "
+                + "diff(startTime,endTime).tv_sec, diff(startTime,endTime).tv_nsec);");
     }
-    
+
     private void generateStartTime(CodegenPrintWriter p) {
         if (KjcOptions.perftest) {
             p.println();
@@ -968,7 +968,7 @@ public class EmitSMPCode extends EmitCode {
             p.println("  }");
             p.println("}");
             p.println();
-        }               
+        }
     }
 
     private void generateMakefile() throws IOException {
@@ -985,7 +985,7 @@ public class EmitSMPCode extends EmitCode {
         p.println("endif");
         p.println("INCLUDES = ");
 
-        if (KjcOptions.perftest) {        
+        if (KjcOptions.perftest) {
             p.println("LIBS = -pthread -lstdc++ -lrt");
             p.println("ifeq ($(UNAME), Darwin)");
             p.println("# do something for OSX");
@@ -994,7 +994,7 @@ public class EmitSMPCode extends EmitCode {
         } else {
             p.println("LIBS = -pthread -lstdc++");
         }
-        
+
         p.print("OBJS = main.o barrier.o ");
         if (isDynamic) {
             p.print("dynamic_queue.o ");
@@ -1061,7 +1061,7 @@ public class EmitSMPCode extends EmitCode {
         p.println("// Set CPU affinity for thread");
         p.println("void setCPUAffinity(int core) {");
         p.indent();
-        
+
         p.println("#ifdef __MACH__");
         p.println("//thread_affinity_policy_data_t ap;");
         p.println("//ap.affinity_tag =core; ");
@@ -1072,7 +1072,7 @@ public class EmitSMPCode extends EmitCode {
         p.println("//  printf(\"Error setting pthread affinity\\n\");");
         p.println("//  exit(-1);");
         p.println("//}");
-        p.println("#else");                
+        p.println("#else");
         p.println("cpu_set_t cpu_set;");
         p.println("CPU_ZERO(&cpu_set);");
         p.println("CPU_SET(core, &cpu_set);");

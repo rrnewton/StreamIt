@@ -769,7 +769,6 @@ public class Fissioner {
         Filter dominator = ssg.getFilterGraph()[0];
         Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();        
         
-        Set<String> dominated = ThreadMapper.getMapper().getDominated();
         List<String> multipliers = dominators.get(dominator.getWorkNode().toString());
 
         System.out.println("Fissioner.createFissedSlices dominator=" + dominator.getWorkNode().toString());
@@ -777,8 +776,7 @@ public class Fissioner {
             for (String str : multipliers) {
                 System.out.println("  ==> Fissioner.createFissedSlices dominated=" + str);
             }
-            multipliers.remove(origName);        
-            dominated.remove(origName);
+            multipliers.remove(origName);                 
         }
                 
         
