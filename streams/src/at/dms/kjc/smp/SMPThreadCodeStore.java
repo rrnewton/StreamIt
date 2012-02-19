@@ -204,7 +204,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
     public void addPrintOutputCode(InterSSGChannel buf, WorkNode workNode,
             SMPBackEndFactory backEndFactory) {
-
+              
+        
         InterSSGEdge edge = buf.getEdge();
         InputPort inputPort = edge.getDest();
 
@@ -239,7 +240,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
         String buffer = "dyn_buf_" + threadId;
 
-        System.out.println("SMPThreadCodeStore threadId=" + threadId);
+        System.out.println("SMPThreadCodeStore.addPrintOutputCode threadId=" + threadId);
 
         if (KjcOptions.threadopt) {
             if (threadIndex == -1) {
@@ -336,6 +337,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
      * 
      */
     public void addSteadyLoopStatement(JStatement stmt) {
+        System.out.println("SMPThreadCodeStore.addSteadyLoopStatement stmt=" + stmt.toString());
         if (stmt != null)
             steadyLoop.addStatement(stmt);
     }

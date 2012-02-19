@@ -72,7 +72,7 @@ public class ProcessFilterWorkNode {
                     .getWorkNode());    
             return core.coreID;
         }
-
+              
         private JExpression dynamicPop(SIRPopExpression self, CType tapeType) {
             InputPort inputPort = ((InterSSGChannel) inputChannel).getEdge()
                     .getDest();                        
@@ -87,6 +87,17 @@ public class ProcessFilterWorkNode {
                 assert nextFilter != null : "ERROR: ProcessFilterWorkNode: Next Filter after dynamic pop is null!";
                 next = filterToThreadId.get(nextFilter);          
                 buffer = "dyn_buf_" + channelId;
+                
+                System.out.println("PushPopReplacing workNode=" + workNode.toString() + "next=" + next);
+                
+                if (next == -1) {
+                    System.out.println("PushPopReplacing workNode=" + workNode.toString() + " codeID=" + getCoreID(inputPort));                    
+                    next = ThreadMapper.coreToThread(getCoreID(inputPort)); 
+                }
+                
+                
+                
+                
             }
 
             JExpression dyn_queue = new JEmittedTextExpression(buffer);
@@ -688,7 +699,10 @@ public class ProcessFilterWorkNode {
                         );
 
                 Filter prevFilter = getPreviousFilter(workNode);    
-
+                Core prevCore = SMPBackend.scheduler.getComputeNode(prevFilter.getWorkNode());  
+                
+                Core core = SMPBackend.scheduler.getComputeNode(workNode);  
+                
                 System.out.println("ProcessFilterWorkNode.standardSteadyProcessing filter=" 
                         + workNode.getParent().getWorkNode()
                         + "(" + threadId + ")"
@@ -701,13 +715,21 @@ public class ProcessFilterWorkNode {
 
                 codeStore.addThreadHelper(threadIndex, nextThread, steadyBlock);
 
-                if (prevThread == -1) {
-                    Core core = SMPBackend.scheduler.getComputeNode(workNode);  
+                // If the previous filter is on a different core, 
+                 // Then the main thread should call this thread.                 
+                if (prevCore.coreID != core.coreID) {
+                    int mainThread = ThreadMapper.coreToThread(core.coreID); 
+                    codeStore.addSteadyThreadCall(mainThread, threadIndex);
+                }
+                
+              
+                // If the previous thread is on a main, then lookup what the core is
+                if (prevThread == -1) {                   
                     prevThread = ThreadMapper.coreToThread(core.coreID); 
                     codeStore.addSteadyThreadCall(prevThread, threadIndex);                
-                }
+                }             
 
-                if (filterToThreadId.get(nextFilter) == -1) {
+                if (filterToThreadId.get(nextFilter) == -1) {                                                         
                     codeStore.addSteadyThreadWait(nextThread);           
                 }                                    
 
