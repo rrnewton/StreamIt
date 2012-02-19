@@ -21,7 +21,7 @@ public class UniComputeCodeStore extends ComputeCodeStore<UniProcessor> {
      * We always use an iteration bound, so override version in superclass. 
      */
     @Override
-    protected void addSteadyLoop() {
+    public void addSteadyLoop() {
         ALocalVariable bound = ALocalVariable.makeVar(CStdType.Integer, UniBackEndFactory.iterationBound);
         super.addSteadyLoop(bound);
     }
@@ -32,7 +32,7 @@ public class UniComputeCodeStore extends ComputeCodeStore<UniProcessor> {
      * same scope without having to worry about name clashes.
      */
     @Override
-    protected void setMyMainName(String baseName) {
+    public void setMyMainName(String baseName) {
         myMainName = baseName + "_" + parent.getUniqueId();
     }
     

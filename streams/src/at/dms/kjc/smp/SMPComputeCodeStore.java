@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import at.dms.classfile.Constants;
+import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.JBlock;
@@ -39,26 +41,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * non-pipelined filters.
      */
     private static Set<String> tokenNames = new HashSet<String>();
-
-    /**
-     * Get the set of token names used for intra-SSG synchronization.
-     * 
-     * @return the set of token names.
-     */
-    public static Set<String> getTokenNames() {
-        return tokenNames;
-    }
-
-    /**
-     * Add a new name to the set of token names used for intra-SSG
-     * synchronization.
-     * 
-     * @param token
-     *            the token name.
-     */
-    public static void addTokenName(String token) {
-        tokenNames.add(token);
-    }
 
     /**
      * Append a barrier instruction to all of the cores in the init/primepump
@@ -113,6 +95,17 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     }
 
     /**
+     * Add a new name to the set of token names used for intra-SSG
+     * synchronization.
+     * 
+     * @param token
+     *            the token name.
+     */
+    public static void addTokenName(String token) {
+        tokenNames.add(token);
+    }
+
+    /**
      * For each of the file writers generate code to print the output for each
      * steady state. This is somewhat limited right now, so there are lots of
      * asserts.
@@ -140,6 +133,34 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     }
 
     /**
+     * Get the set of token names used for intra-SSG synchronization.
+     * 
+     * @return the set of token names.
+     */
+    public static Set<String> getTokenNames() {
+        return tokenNames;
+    }
+
+    private static void addOpen(SMPComputeCodeStore codeStore,
+            OutputContent fileOutput) {
+        codeStore.appendTxtToGlobal("FILE *output;\n");
+        // Special case for strings "stdout" and "stderr"
+        // which are treated as keywords in the StreamIt
+        // front end, but as converted to string when parsed
+        if ("stdout".equals(fileOutput.getFileName())) {
+            codeStore.addStatementFirstToBufferInit(Util
+                    .toStmt("output = stdout"));
+        } else if ("stderr".equals(fileOutput.getFileName())) {
+            codeStore.addStatementFirstToBufferInit(Util
+                    .toStmt("output = stderr"));
+        } else {
+            codeStore.addStatementFirstToBufferInit(Util
+                    .toStmt("output = fopen(\"" + fileOutput.getFileName()
+                            + "\", \"w\")"));
+        }
+    }
+
+    /**
      * Generate the print output code for the dynamic communication channel.
      * 
      * @param buf
@@ -152,7 +173,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         OutputPort outputPort = edge.getSrc();
         Filter destFilter = inputPort.getSSG().getTopFilters()[0];
         Filter srcFilter = outputPort.getSSG().getFilterGraph()[outputPort
-                .getSSG().getFilterGraph().length - 1];
+                                                                .getSSG().getFilterGraph().length - 1];
 
         Core destCore = SMPBackend.scheduler.getComputeNode(destFilter
                 .getWorkNode());
@@ -160,13 +181,15 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 .getWorkNode());
 
         System.out
-                .println("SMPComputeCodeStore.generatePrintOutputCodeDynamic destFilter.getWorkNode()="
-                        + destFilter.getWorkNode() + " is on core " + destCore);
+        .println("SMPComputeCodeStore.generatePrintOutputCodeDynamic destFilter.getWorkNode()="
+                + destFilter.getWorkNode() + " is on core " + destCore);
         System.out
-                .println("SMPComputeCodeStore.generatePrintOutputCodeDynamic srcFilter.getWorkNode()="
-                        + srcFilter.getWorkNode() + " is on core " + srcCore);
+        .println("SMPComputeCodeStore.generatePrintOutputCodeDynamic srcFilter.getWorkNode()="
+                + srcFilter.getWorkNode() + " is on core " + srcCore);
 
         SMPComputeCodeStore codeStore = srcCore.getComputeCode();
+
+
         OutputContent fileOutput = (OutputContent) destFilter
                 .getWorkNodeContent();
 
@@ -193,12 +216,12 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         WorkNode firstInputFilter = fileW.getParent().getInputNode()
                 .getSources(
                         SchedulingPhase.STEADY)[0].getSrc().getParent()
-                .getWorkNode();
+                        .getWorkNode();
 
         if (KjcOptions.sharedbufs
                 && FissionGroupStore.isFizzed(firstInputFilter.getParent()))
             firstInputFilter = FissionGroupStore
-                    .getFizzedSlices(firstInputFilter.getParent())[0]
+            .getFizzedSlices(firstInputFilter.getParent())[0]
                     .getWorkNode();
 
         Core core = SMPBackend.scheduler.getComputeNode(firstInputFilter);
@@ -216,75 +239,23 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     }
 
-    private static void addOpen(SMPComputeCodeStore codeStore,
-            OutputContent fileOutput) {
-        codeStore.appendTxtToGlobal("FILE *output;\n");
-        // Special case for strings "stdout" and "stderr"
-        // which are treated as keywords in the StreamIt
-        // front end, but as converted to string when parsed
-        if ("stdout".equals(fileOutput.getFileName())) {
-            codeStore.addStatementFirstToBufferInit(Util
-                    .toStmt("output = stdout"));
-        } else if ("stderr".equals(fileOutput.getFileName())) {
-            codeStore.addStatementFirstToBufferInit(Util
-                    .toStmt("output = stderr"));
-        } else {
-            codeStore.addStatementFirstToBufferInit(Util
-                    .toStmt("output = fopen(\"" + fileOutput.getFileName()
-                            + "\", \"w\")"));
-        }
-    }
 
-    /** True if this CoreCodeStore has code appended to it */
-    private boolean                          hasCode             = false;
-    /** Code block containing declarations of all buffers */
-    protected JBlock                         bufferDecls         = new JBlock();
-
-    /**
-     * The method that will malloc the buffers and receive addresses from
-     * downstream cores
-     */
-    protected JMethodDeclaration             bufferInit;
-
-    /** The name of the bufferInit method */
-    public static final String               bufferInitMethName  = "buffer_and_address_init";
-
-    /** Any text that should appear outside a function declaration in the c code */
-    private StringBuffer                     globalTxt           = new StringBuffer();
-
-    /** set of FilterSliceNodes that are mapped to this core */
-    protected Set<WorkNode>                  filters;
-
-    /** set of JMethodDeclaration for the helper thread on this core */
-    protected Set<JMethodDeclaration>        helperThreadMethods = new HashSet<JMethodDeclaration>();
-
-    /**
-     * Set of fields that should be externally defined on this core. I am using
-     * a Map to store values because JFieldDeclaration does not define equals
-     * and hashCode, so storing in a Set does not prevent duplicates correctly.
-     */
-    protected Map<String, JFieldDeclaration> externFields        = new HashMap<String, JFieldDeclaration>();
+    protected Map<Integer, SMPThreadCodeStore> threads = new HashMap<Integer, SMPThreadCodeStore>();
 
     /**
      * Constructor: steady state loops indefinitely, no pointer back to compute
      * node.
      */
     public SMPComputeCodeStore() {
-        super();
-        setMyMainName("__main__");
+        super();        
+        threads.put(1, new SMPThreadCodeStore());
+        threads.get(1).setMainName("__main__");    
     }
 
     public SMPComputeCodeStore(Core nodeType) {
-        super(nodeType);
-        setMyMainName("__main__");
-        filters = new HashSet<WorkNode>();
-        helperThreadMethods = new HashSet<JMethodDeclaration>();
-
-        createBufferInitMethod();
-
-        mainMethod.addParameter(new JFormalParameter(CVoidPtrType.VoidPtr,
-                "arg"));
-        mainMethod.setReturnType(CVoidPtrType.VoidPtr);
+        super(nodeType);        
+        threads.put(1, new SMPThreadCodeStore(nodeType));
+        threads.get(1).setMainName("__main__");                       
     }
 
     /**
@@ -298,13 +269,16 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      */
     public SMPComputeCodeStore(Core parent, ALocalVariable iterationBound) {
         super(parent, iterationBound);
-        setMyMainName("__main__");
-        filters = new HashSet<WorkNode>();
-        createBufferInitMethod();
+        threads.put(1, new SMPThreadCodeStore(parent, iterationBound));
+        threads.get(1).setMainName("__main__");                      
+    }
 
-        mainMethod.addParameter(new JFormalParameter(CVoidPtrType.VoidPtr,
-                "arg"));
-        mainMethod.setReturnType(CVoidPtrType.VoidPtr);
+    public void addExpressionFirst(JExpression expr) {
+        threads.get(1).addExpressionFirst(expr);      
+    }
+
+    public void addExternField(JFieldDeclaration jFieldDeclaration) {
+        threads.get(1).addExternField( jFieldDeclaration);           
     }
 
     /**
@@ -314,180 +288,28 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      *            The filter we are mapping to this core.
      */
     public void addFilter(WorkNode filter) {
-        filters.add(filter);
-        this.setHasCode();
+        threads.get(1).addFilter(filter);       
     }
 
+
     public void addFunctionCallFirst(JMethodDeclaration func, JExpression[] args) {
-        mainMethod.addStatementFirst(new JExpressionStatement(null,
-                new JMethodCallExpression(null, new JThisExpression(null), func
-                        .getName(), args), null));
+        threads.get(1).addFunctionCallFirst(func, args);    
     }
 
     public void addFunctionCallFirst(String funcName, JExpression[] args) {
-        mainMethod.addStatementFirst(new JExpressionStatement(null,
-                new JMethodCallExpression(null, new JThisExpression(null),
-                        funcName, args), null));
+        threads.get(1).addFunctionCallFirst(funcName, args);    
     }
 
-    /**
-     * Add code to print the output written to the file writer mapped to this
-     * core.
-     */
-    private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode workNode) {
 
-        // We print the address buffer after it has been rotated, so that it
-        // points to the section
-        // of the filewriter buffer that is about to be written to, but was
-        // written to 2 steady-states ago
-
-        WorkNode fileW = buf.filterNode;
-        System.out.println("SMPComputeCodeStore.addPrintOutputCode workNode="
-                + workNode.toString() + " fileW=" + fileW.toString());
-        System.out.println("SMPComputeCodeStore.addPrintOutputCode filter="
-                + workNode.toString() + " fileW.isFileOutput()="
-                + fileW.isFileOutput() + " buf=" + buf.toString()
-                + " buf.getRotationLength()=" + buf.getRotationLength());
-        assert fileW.isFileOutput();
-        // because of this scene we need a rotation length of 2
-        // assert buf.getRotationLength() == 2: buf.getRotationLength();
-        // make sure that each of the inputs wrote to the file writer in the
-        // primepump stage
-        /*
-         * for (InterFilterEdge edge : fileW.getParent().getInputNode()
-         * .getSourceSet(SchedulingPhase.STEADY)) { //assert
-         * SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult( //
-         * edge.getSrc().getParent()) == 1:
-         * SMPBackend.scheduler.getGraphSchedule().getPrimePumpMult( //
-         * edge.getSrc().getParent()); }
-         */
-        int outputs = fileW.getWorkNodeContent().getSteadyMult();
-        String type = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
-                : "%f";
-        String cast = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
-                : "(float)";
-        String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
-        // create the loop
-        String stmt = "";
-        String multiplierName = fileW.getWorkNodeContent().getName()
-                + "_multiplier";
-
-        JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
-                CStdType.Integer, multiplierName, null);
-
-        this.addExternField(new JFieldDeclaration(multiplierVar));
-
-        if (KjcOptions.outputs < 0) {
-            stmt = "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-                    + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { \n"
-                    + "fprintf(output, \"" + type + "\\n\", " + cast
-                    + bufferName + "[_i_]); \n" + "  }\n" + "}\n";
-
-        } else {
-            stmt = "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-                    + "  for (_i_ = 0; _i_ < " + outputs + "; _i_++) { \n"
-                    + "  fprintf(output, \"" + type + "\\n\", " + cast
-                    + bufferName + "[_i_]); \n";
-            if (KjcOptions.perftest) {
-                stmt += "  if (currOutputs == maxIgnored) {  start_time(); } \n";
-            }
-            stmt += "        currOutputs++;\n"
-                    + "  if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
-                    + "  }\n" + "}\n";
-        }
-        addSteadyLoopStatement(Util.toStmt(stmt));
+    public void addPrintOutputCode(InputRotatingBuffer buf, WorkNode workNode) {
+        threads.get(1).addPrintOutputCode( buf,  workNode);
     }
 
-    private void addPrintOutputCode(InterSSGChannel buf, WorkNode workNode,
-            SMPBackEndFactory backEndFactory) {
-
-        InterSSGEdge edge = buf.getEdge();
-        InputPort inputPort = edge.getDest();
-
-        Filter destFilter = inputPort.getSSG().getTopFilters()[0];
-
-        WorkNode fileW = destFilter.getWorkNode();
-        System.out.println("SMPComputeCodeStore.addPrintOutputCode workNode="
-                + workNode.toString() + " fileW=" + fileW.toString());
-
-        assert fileW.isFileOutput();
-        int outputs = fileW.getWorkNodeContent().getSteadyMult();
-
-        CType tapeType = ((OutputContent) fileW.getWorkNodeContent()).getType();
-
-        String type = tapeType == CStdType.Integer ? "%d" : "%f";
-        String cast = tapeType == CStdType.Integer ? "(int)" : "(float)";
-        // String bufferName =
-        // buf.getAddressRotation(workNode).currentWriteBufName;
-
-        // create the loop
-        String stmt = "";
-
-        String popName = buf.popMethodName();
-
-        Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
-                .getFilterToThreadId();
-
-        int threadIndex = filterToThreadId.get(
-                inputPort.getSSG().getTopFilters()[0]);
-             
-       
-        String threadId = Integer.toString(threadIndex);
-
-        String buffer = "dyn_buf_" + threadId;
-
-        System.out.println("SMPComputeCodeStore threadId=" + threadId);
-        
-        if (KjcOptions.threadopt) {
-            if (threadIndex == -1) {                                        
-                Filter prevFilter = ProcessFilterWorkNode.getPreviousFilter(inputPort.getSSG().getTopFilters()[0].getWorkNode());                 
-                Core core = SMPBackend.scheduler.getComputeNode(prevFilter.getWorkNode()); 
-                threadIndex = ThreadMapper.coreToThread(core.coreID);                
-            }
-            buffer = "dyn_buf_" + buf.getId();
-        }
-        
-        
-
-        String popCall;
-        if (KjcOptions.threadopt) {            
-            popCall = popName + "(" + buffer + ", " + threadIndex + ", "
-                    + threadIndex + ", 0,  NULL)";
-        } else {
-            popCall = popName + "(" + buffer + ", " + threadId + ", 0, NULL)";
-        }
-
-        if (KjcOptions.outputs < 0) {
-            stmt = "int _i_ = 0;\n" + "for (int _i_ = 0; _i_ < " + outputs
-                    + "; _i_++) { \n";
-            if (KjcOptions.lockfree) {
-                stmt += "    if (" + buffer + "->head != " + buffer
-                        + "->tail) {\n";
-            } else {
-                stmt += "    if (" + buffer + "->size > 0) {\n";
-            }
-            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
-                    + popCall + ");\n " + "    }\n" + "}\n";
-
-        } else {
-            stmt = "int _i_ = 0;\n" + "for (_i_ = 0; _i_ < " + outputs
-                    + "; _i_++) {\n";
-            if (KjcOptions.lockfree) {
-                stmt += "    if (" + buffer + "->head != " + buffer
-                        + "->tail) {\n";
-            } else {
-                stmt += "    if (" + buffer + "->size > 0) {\n";
-            }
-            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
-                    + popCall + ");\n";
-            if (KjcOptions.perftest) {
-                stmt += "  if (currOutputs == maxIgnored) {  start_time(); } \n";
-            }
-            stmt += "        currOutputs++;\n"
-                    + "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
-                    + "    }\n" + "}\n";
-        }
-        addSteadyLoopStatement(Util.toStmt(stmt));
+    public void addPrintOutputCode(InterSSGChannel buf, WorkNode workNode, SMPBackEndFactory backEndFactory) {
+        threads.get(1).addPrintOutputCode(
+                buf,
+                workNode,
+                backEndFactory);
     }
 
     /**
@@ -498,13 +320,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      *            The statement to add to the end of the method
      */
     public void addStatementFirstToBufferInit(JStatement stmt) {
-        bufferInit.getBody().addStatementFirst(
-                stmt);
-        this.setHasCode();
-    }
-
-    public void addExpressionFirst(JExpression expr) {
-        mainMethod.addStatementFirst(new JExpressionStatement(expr));
+        threads.get(1).addStatementFirstToBufferInit(stmt);
     }
 
     /**
@@ -515,12 +331,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * @param txt
      *            The statement to add to the end of the method
      */
-    public void addStatementFirstToBufferInit(String txt) {
-        JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-                txt));
-        bufferInit.getBody().addStatementFirst(
-                stmt);
-        this.setHasCode();
+    public void addStatementFirstToBufferInit(String txt) {        
+        threads.get(1).addStatementFirstToBufferInit(txt);     
     }
 
     /**
@@ -530,7 +342,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      *            The statement to add to the end of the code block
      */
     public void addStatementToBufferDecls(JStatement stmt) {
-        bufferDecls.addStatement(stmt);
+        threads.get(1).addStatementToBufferDecls(stmt);           
     }
 
     /**
@@ -540,10 +352,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * @param stmt
      *            The statement to add to the end of the method
      */
-    public void addStatementToBufferInit(JStatement stmt) {
-        bufferInit.getBody().addStatement(
-                stmt);
-        this.setHasCode();
+    public void addStatementToBufferInit(JStatement stmt) {        
+        threads.get(1).addStatementToBufferInit(stmt);
     }
 
     /**
@@ -555,11 +365,42 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      *            The statement to add to the end of the method
      */
     public void addStatementToBufferInit(String txt) {
-        JStatement stmt = new JExpressionStatement(new JEmittedTextExpression(
-                txt));
-        bufferInit.getBody().addStatement(
-                stmt);
-        this.setHasCode();
+        threads.get(1).addStatementToBufferInit(txt); 
+    }
+
+
+    public void addStatementToSteadyLoop(JStatement statement) {
+        threads.get(1).addStatementToSteadyLoop(statement);
+    }
+
+    public void addSteadyThreadCall(int threadIndex) {
+        threads.get(1).addSteadyThreadCall( threadIndex);        
+    }
+
+    public void addSteadyThreadCall(int threadIndex, int nextIndex) {
+        threads.get(1).addSteadyThreadCall( threadIndex, nextIndex);            
+    }
+
+    public void addSteadyThreadWait(int threadIndex) {       
+        threads.get(1).addSteadyThreadWait( threadIndex);
+    }
+
+    /**
+     * 
+     * @param steadyBlock
+     */
+    public void addThreadHelper(int threadIndex, int nextIndex,
+            JStatement steadyBlock) {
+        threads.get(1).addThreadHelper( threadIndex,  nextIndex,
+                steadyBlock);              
+    }
+
+    /**
+     * 
+     * @param steadyBlock
+     */
+    public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
+        threads.get(1).addThreadHelper(threadIndex, steadyBlock);                
     }
 
     /**
@@ -570,43 +411,11 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      *            The string to add
      */
     public void appendTxtToGlobal(String str) {
-        globalTxt.append(str);
-        this.setHasCode();
-    }
-
-    private void createBufferInitMethod() {
-        // create the method that will malloc the buffers and receive the
-        // addresses from downstream cores
-        bufferInit = new JMethodDeclaration(CStdType.Void, bufferInitMethName
-                + "__n" + parent.getCoreID(), new JFormalParameter[0],
-                new JBlock());
-        // addMethod(bufferInit);
+        threads.get(1).appendTxtToGlobal(str);
     }
 
     public void generateNumbersCode() {
-        appendTxtToGlobal("uint64_t __last_cycle__ = 0;\n");
-        appendTxtToGlobal("int __iteration__ = ITERATIONS;\n");
-
-        appendTxtToGlobal("void __printSSCycleAvg() {\n");
-        appendTxtToGlobal("  uint64_t __cur_cycle__ = rdtsc();\n");
-        appendTxtToGlobal("  if(__last_cycle__ != 0) {\n");
-        if (ProcessFileWriter.getTotalOutputs() > 0) {
-            appendTxtToGlobal("    printf(\"Average cycles per SS for %d iterations: %llu, avg cycles per output: %llu\\n\", \n"
-                    + "      ITERATIONS, (__cur_cycle__ - __last_cycle__) / ITERATIONS, \n"
-                    + "      (((__cur_cycle__ - __last_cycle__) / ITERATIONS) / ((uint64_t)"
-                    + ProcessFileWriter.getTotalOutputs() + ")));\n");
-        } else {
-            appendTxtToGlobal("    printf(\"Average cycles per SS for %d iterations: %llu \\n\", ITERATIONS, (__cur_cycle__ - __last_cycle__) / ITERATIONS);\n");
-        }
-        appendTxtToGlobal("    fflush(stdout);\n");
-        appendTxtToGlobal("  }\n");
-        appendTxtToGlobal("  __last_cycle__ = rdtsc();\n");
-        appendTxtToGlobal("  __iteration__ = 0;\n");
-        appendTxtToGlobal("}\n");
-
-        addSteadyLoopStatement(Util.toStmt("__iteration__++"));
-        addSteadyLoopStatement(Util
-                .toStmt("if (__iteration__ >= ITERATIONS) __printSSCycleAvg()"));
+        threads.get(1).generateNumbersCode();                
     }
 
     /**
@@ -617,7 +426,20 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      *         addresses.
      */
     public JMethodDeclaration getBufferInitMethod() {
-        return bufferInit;
+        return threads.get(1).getBufferInitMethod();
+    }
+
+    /**
+     * Return the helper thread methods in this store;
+     * 
+     * @return the helper thread methods in this store;
+     */
+    public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {        
+        return threads.get(1).getDynamicThreadHelperMethods();
+    }
+
+    public Map<String, JFieldDeclaration> getExternFields() {
+        return threads.get(1).getExternFields();
     }
 
     /**
@@ -626,7 +448,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * @return all of the filters that are mapped to this core.
      */
     public Set<WorkNode> getFilters() {
-        return filters;
+        return threads.get(1).getFilters();
     }
 
     /**
@@ -635,282 +457,23 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * @return the string to add to the global portion of the c file
      */
     public String getGlobalText() {
-        return globalTxt.toString();
+        return threads.get(1).getGlobalText();        
+    }
+
+    /**
+     * get name for MAIN method in this code store.
+     * 
+     * @return name from a JMethodDeclaration
+     */
+    public String getMyMainName() {
+        if (threads == null || threads.get(1) == null) {
+            return "";
+        }        
+        return threads.get(1).getMyMainName();
     }
 
     public Core getParent() {
-        return parent;
-    }
-
-    /**
-     * Set that this core (code store) has code written to it and thus it needs
-     * to be considered during code generation.
-     */
-    public void setHasCode() {
-        hasCode = true;
-    }
-
-    /**
-     * Set name of main function
-     * 
-     * @param main
-     *            The new name of the main function
-     */
-    public void setMainName(String mainName) {
-        assert (mainName != null && mainName != "");
-        setMyMainName(mainName);
-    }
-
-    /**
-     * Return true if we should generate code for this core, false if no code
-     * was ever generated for this core.
-     * 
-     * @return true if we should generate code for this core, false if no code
-     *         was ever generated for this core.
-     */
-    public boolean shouldGenerateCode() {
-        return hasCode;
-    }
-
-    /**
-     * 
-     * @param steadyBlock
-     */
-    public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
-
-        System.out.println("SMPComputeCodeStore.addThreadHelper called()");
-
-        JBlock methodBody = new JBlock();
-        JBlock loopBody = new JBlock();
-
-        if (!KjcOptions.nobind) {
-            WorkNode[] filterArray = new WorkNode[filters.size()];
-            filters.toArray(filterArray);
-            Core core = SMPBackend.scheduler.getComputeNode(filterArray[0]);
-            int coreNum = core.getCoreID();
-            methodBody.addStatement(new JExpressionStatement(
-                    new JEmittedTextExpression("setCPUAffinity(" + coreNum
-                            + ")")));
-
-        }
-
-        Utils.addCondWait(
-                loopBody,
-                threadIndex,
-                "DYN_READER",
-                "DYN_READER",
-                Utils.makeEqualityCondition(
-                        "ASLEEP",
-                        "thread_to_sleep[" + threadIndex + "][DYN_READER]"));
-        loopBody.addStatement(steadyBlock);
-        Utils.addSetFlag(
-                loopBody,
-                threadIndex,
-                "DYN_READER",
-                "DYN_READER",
-                "ASLEEP");
-        Utils.addSetFlag(
-                loopBody,
-                threadIndex,
-                "MASTER",
-                "MASTER",
-                "AWAKE");
-        Utils.addSignal(
-                loopBody,
-                threadIndex,
-                "MASTER");
-
-        JStatement loop = null;
-        if (KjcOptions.iterations != -1) {
-            // addSteadyLoop(iterationBound);
-            ALocalVariable var = ALocalVariable.makeVar(
-                    CStdType.Integer,
-                    "maxSteadyIter");
-            loop = at.dms.util.Utils.makeForLoop(
-                    loopBody,
-                    var.getRef());
-
-        } else {
-            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
-                    loopBody, null);
-        }
-
-        methodBody.addStatement(loop);
-        methodBody.addStatement(new JExpressionStatement(
-                new JEmittedTextExpression("pthread_exit(NULL)")));
-        JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
-
-        String threadName = "helper_" + threadIndex;
-
-        System.out
-                .println("SMPComputeCodeStore.addThreadHelper creating JMethodDeclaration="
-                        + threadName);
-
-        JMethodDeclaration threadHelper = new JMethodDeclaration(
-                CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
-                methodBody);
-        addHelperThreadMethod(threadHelper);
-    }
-
-    /**
-     * 
-     * @param steadyBlock
-     */
-    public void addThreadHelper(int threadIndex, int nextIndex,
-            JStatement steadyBlock) {
-
-        System.out
-                .println("SMPComputeCodeStore.addThreadHelper optimized called()");
-
-        JBlock methodBody = new JBlock();
-        JBlock loopBody = new JBlock();
-
-        if (!KjcOptions.nobind) {
-            WorkNode[] filterArray = new WorkNode[filters.size()];
-            filters.toArray(filterArray);
-            Core core = SMPBackend.scheduler.getComputeNode(filterArray[0]);
-            int coreNum = core.getCoreID();
-            methodBody.addStatement(new JExpressionStatement(
-                    new JEmittedTextExpression("setCPUAffinity(" + coreNum
-                            + ")")));
-
-        }
-
-        Utils.addCondWait(
-                loopBody,
-                threadIndex,
-                Utils.makeEqualityCondition(
-                        "ASLEEP",
-                        "thread_to_sleep[" + threadIndex + "]"));
-        loopBody.addStatement(steadyBlock);
-        Utils.addSetFlag(
-                loopBody,
-                threadIndex,
-                "ASLEEP");
-        Utils.addSetFlag(
-                loopBody,
-                nextIndex,
-                "AWAKE");
-        Utils.addSignal(
-                loopBody,
-                nextIndex);
-
-        JStatement loop = null;
-        if (KjcOptions.iterations != -1) {
-            // addSteadyLoop(iterationBound);
-            ALocalVariable var = ALocalVariable.makeVar(
-                    CStdType.Integer,
-                    "maxSteadyIter");
-            loop = at.dms.util.Utils.makeForLoop(
-                    loopBody,
-                    var.getRef());
-
-        } else {
-            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
-                    loopBody, null);
-        }
-
-        methodBody.addStatement(loop);
-        methodBody.addStatement(new JExpressionStatement(
-                new JEmittedTextExpression("pthread_exit(NULL)")));
-        JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
-
-        String threadName = "helper_" + threadIndex;
-
-        System.out
-                .println("SMPComputeCodeStore.addThreadHelper creating JMethodDeclaration="
-                        + threadName);
-
-        JMethodDeclaration threadHelper = new JMethodDeclaration(
-                CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
-                methodBody);
-        addHelperThreadMethod(threadHelper);
-    }
-
-    private void addHelperThreadMethod(JMethodDeclaration threadHelper) {
-        helperThreadMethods.add(threadHelper);
-        addMethod(threadHelper);
-    }
-
-    public void addStatementToSteadyLoop(JStatement statement) {
-        steadyLoop.addStatementFirst(statement);
-    }
-
-    public void addSteadyThreadCall(int threadIndex) {
-        Utils.addSetFlag(
-                steadyLoop,
-                threadIndex,
-                "MASTER",
-                "MASTER",
-                "ASLEEP");
-        Utils.addSetFlag(
-                steadyLoop,
-                threadIndex,
-                "DYN_READER",
-                "DYN_READER",
-                "AWAKE");
-        Utils.addSignal(
-                steadyLoop,
-                threadIndex,
-                "DYN_READER");
-        Utils.addCondWait(
-                steadyLoop,
-                threadIndex,
-                "MASTER",
-                "MASTER",
-                Utils.makeEqualityCondition(
-                        "ASLEEP",
-                        "thread_to_sleep[" + threadIndex + "][MASTER]"));
-    }
-
-    public void addSteadyThreadCall(int threadIndex, int nextIndex) {
-        Utils.addSetFlag(
-                steadyLoop,
-                threadIndex,
-                "ASLEEP");
-        Utils.addSetFlag(
-                steadyLoop,
-                nextIndex,
-                "AWAKE");
-        Utils.addSignal(
-                steadyLoop,
-                nextIndex);
-      
-    }
-    
-    public void addSteadyThreadWait(int threadIndex) {
-        Utils.addCondWait(
-                steadyLoop,
-                threadIndex,
-                Utils.makeEqualityCondition(
-                        "ASLEEP",
-                        "thread_to_sleep[" + threadIndex + "]"));
-    }
-
-    public void addExternField(JFieldDeclaration jFieldDeclaration) {
-        // There is a problem with this code. We do not want to store
-        // duplicates of the same jFieldDeclaration. However, the
-        // JFieldDeclaration
-        // class does not define equals and hashCode, so the Set implementation
-        // does not know about duplicate entries. Rather than changing the
-        // Kopi compiler, I'm going to check for equality here by comparing
-        // the names and types.
-        externFields.put(
-                jFieldDeclaration.getVariable().getIdent(),
-                jFieldDeclaration);
-    }
-
-    public Map<String, JFieldDeclaration> getExternFields() {
-        return externFields;
-    }
-
-    /**
-     * Return the helper thread methods in this store;
-     * 
-     * @return the helper thread methods in this store;
-     */
-    public Set<JMethodDeclaration> getDynamicThreadHelperMethods() {
-        return helperThreadMethods;
+        return threads.get(1).getParent(); 
     }
 
     /**
@@ -920,7 +483,171 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      *            the helper thread methods in this store;
      */
     public void setDynamicThreadHelperMethods(Set<JMethodDeclaration> methods) {
-        helperThreadMethods = methods;
+        threads.get(1).setDynamicThreadHelperMethods(methods);
     }
+
+    /**
+     * Set that this core (code store) has code written to it and thus it needs
+     * to be considered during code generation.
+     */
+    public void setHasCode() {
+        threads.get(1).setHasCode();
+    }
+
+    /**
+     * Set name of main function
+     * 
+     * @param main
+     *            The new name of the main function
+     */
+    public void setMainName(String mainName) {
+        threads.get(1).setMainName(mainName);       
+    }
+
+    /**
+     * Return true if we should generate code for this core, false if no code
+     * was ever generated for this core.
+     * 
+     * @return true if we should generate code for this core, false if no code
+     *         was ever generated for this core.
+     */
+    public boolean shouldGenerateCode() {        
+        return threads.get(1).shouldGenerateCode();
+    }
+
+
+    /////////////////////////// BEGIN INTERFACE ////////////////////////////
+
+
+
+    public void addCleanupStatement(JStatement stmt) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addCleanupStatement(stmt);
+        }
+    }
+
+    public void addField(JFieldDeclaration field) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addField(field);
+        }
+    }
+
+    @Override
+    public void addFields(JFieldDeclaration[] f) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addFields(f);
+        }
+    }
+
+    public void addInitFunctionCall(JMethodDeclaration init) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addInitFunctionCall(init);
+        }
+    }
+
+    public void addInitStatement(JStatement stmt) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addInitStatement(stmt);
+        }
+    }
+
+    public void addInitStatementFirst(JStatement stmt) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addInitStatementFirst(stmt);
+        }
+    }
+
+    @Override
+    public void addMethod(JMethodDeclaration method) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addMethod(method);
+        }
+    }
+
+    @Override
+    public void addMethods(JMethodDeclaration[] m) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addMethods(m);
+        }
+    }
+
+    public void addSteadyLoop() {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addSteadyLoop();
+        }
+    }
+
+    public void addSteadyLoop(ALocalVariable iterationBound) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addSteadyLoop(iterationBound);
+        }
+    }
+
+    public void addSteadyLoopStatement(JStatement stmt) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addSteadyLoopStatement(stmt);
+        }
+    }
+
+    public void addSteadyLoopStatementFirst(JStatement stmt) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).addSteadyLoopStatementFirst(stmt);
+        }
+    }
+
+    @Override
+    public JFieldDeclaration[] getFields() {
+        if (threads != null && threads.get(1) != null) {
+            return threads.get(1).getFields();
+        }
+        return fields;
+    }
+
+    public JMethodDeclaration getMainFunction() {
+        if (threads != null && threads.get(1) != null) {
+            return threads.get(1).getMainFunction();
+        }
+        return mainMethod;
+    }
+
+    @Override
+    public JMethodDeclaration[] getMethods() {
+        if (threads != null && threads.get(1) != null) {
+            return threads.get(1).getMethods();
+        }
+        return methods;
+    }
+
+    public boolean hasMethod(JMethodDeclaration meth) {
+        if (threads != null && threads.get(1) != null) {
+            return threads.get(1).hasMethod(meth);
+        }
+        return false;
+    }
+
+    public void setFields(JFieldDeclaration[] f) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).setFields(f);
+        }
+    }
+
+    public void setMainFunction(JMethodDeclaration mainMethod) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).setMainFunction(mainMethod);
+        }
+    }
+
+    public void setMethods(JMethodDeclaration[] m) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).setMethods(m);
+        }
+    }
+
+    public void setMyMainName(String mainName) {
+        if (threads != null && threads.get(1) != null) {
+            threads.get(1).setMyMainName(mainName);
+        }
+    }
+
 
 }

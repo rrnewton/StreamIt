@@ -1640,7 +1640,7 @@ public class CellComputeCodeStore extends ComputeCodeStore<CellPU> {
     }
     
     @Override
-    protected void addSteadyLoop() {
+    public void addSteadyLoop() {
         mainMethod.addStatement(steadyLoop);
     }
     

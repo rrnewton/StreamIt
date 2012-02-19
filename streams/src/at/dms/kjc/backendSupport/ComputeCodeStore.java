@@ -76,7 +76,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	 * end. You are generally better off calling {@link #setMyMainName(String)}
 	 * in your constructor and ignoring this field.
 	 */
-	public static String mainName = "";
+	protected static String mainName = "";
 
 	/** name that may be unique per processor. */
 	protected String myMainName;
@@ -113,7 +113,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	 * node.
 	 */
 	public ComputeCodeStore() {		
-		constructorCommon();
+	    constructorCommon();
 		addSteadyLoop();
 		getMainFunction().addStatement(cleanupBlock);
 	}
@@ -302,7 +302,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	 * Add a way of iterating steadyLoop to the main method. If you do not want
 	 * the steady state to loop infinitely then you should override this method.
 	 */
-	protected void addSteadyLoop() {
+	public void addSteadyLoop() {
 		// enable the profiler right before the steady loop on tilera
 		if (KjcOptions.tilera > 0 && KjcOptions.profile) {
 			mainMethod.addStatement(new JExpressionStatement(
@@ -331,7 +331,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	 * @param iterationBound
 	 *            the local variable that will hold the iteration count.
 	 */
-	protected void addSteadyLoop(ALocalVariable iterationBound) {
+	public void addSteadyLoop(ALocalVariable iterationBound) {
 		mainMethod.addStatement(at.dms.util.Utils.makeForLoop(steadyLoop,
 				iterationBound.getRef()));
 	}
@@ -458,7 +458,7 @@ public class ComputeCodeStore<ComputeNodeType extends ComputeNode<?>>
 	}
 
 	/** Override to get different MAIN names on different ComputeNode's */
-	protected void setMyMainName(String mainName) {
+	public void setMyMainName(String mainName) {
 		myMainName = mainName;
 		if (mainMethod != null) {
 			mainMethod.setName(mainName);

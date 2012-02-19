@@ -315,16 +315,14 @@ public class TileCodeStore extends ComputeCodeStore<Tile> {
      * @param iterationBound a variable that will be defined locally by <code>getMainFunction().addAllStatments(0,stmts);</code>
      */
     public TileCodeStore(ALocalVariable iterationBound) {
-        super(iterationBound);
-        setMyMainName("__main__");
+        super(iterationBound);      
     }
     
     /**
      * Constructor: steady state loops indefinitely, no pointer back to compute node.
      */
     public TileCodeStore() {
-        super();
-        setMyMainName("__main__");
+        super();      
     }
     
     /**

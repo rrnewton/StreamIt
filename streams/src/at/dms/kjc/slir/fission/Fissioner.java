@@ -768,8 +768,10 @@ public class Fissioner {
         StaticSubGraph ssg = sliceClones[0].getStaticSubGraph();
         Filter dominator = ssg.getFilterGraph()[0];
         Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();        
+        
         Set<String> dominated = ThreadMapper.getMapper().getDominated();
         List<String> multipliers = dominators.get(dominator.getWorkNode().toString());
+
         System.out.println("Fissioner.createFissedSlices dominator=" + dominator.getWorkNode().toString());
         if (multipliers != null) {            
             for (String str : multipliers) {
@@ -786,7 +788,7 @@ public class Fissioner {
             sliceClones[x].getWorkNode().getWorkNodeContent().setName(newName);
             if (multipliers != null) {
                 multipliers.add(newName); 
-                dominated.add(newName);
+                //dominated.add(newName);
             }
         }
         
