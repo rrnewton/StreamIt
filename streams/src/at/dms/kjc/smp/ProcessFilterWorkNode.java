@@ -350,6 +350,30 @@ public class ProcessFilterWorkNode {
         }
         return filterCode;
     }
+            
+    static public boolean isFirstAfterFileInput(Filter filter) {
+        if (isProgramSource(filter)) {
+            return false;
+        }
+        Filter prev = ProcessFilterWorkNode.getPreviousFilter(filter.getWorkNode());        
+        return prev.getWorkNode().isFileInput();        
+    }
+
+    static public boolean isLastBeforeFileOutput(Filter filter) {
+        if (isProgramSink(filter)) {
+            return false;
+        }
+        Filter next = ProcessFilterWorkNode.getNextFilter(filter.getWorkNode());
+        return next.getWorkNode().isFileOutput();
+    }
+
+    static public boolean isProgramSink(Filter f) {
+        return f.getWorkNode().isFileOutput() || (f.getWorkNodeContent().getOutputType() == CStdType.Void);
+    }
+    
+    static public boolean isProgramSource(Filter f) {
+       return f.getWorkNode().isFileInput() || (f.getWorkNodeContent().getInputType() == CStdType.Void);
+    }
 
     static Filter getNextFilter(WorkNode filter) {
         StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
@@ -788,14 +812,25 @@ public class ProcessFilterWorkNode {
                         nextThread,
                         steadyBlock);
 
+                
+                boolean addCall = false;
                 // If the previous filter is on a different core,
                 // Then the main thread should call this thread.
-                if (prevCore.coreID != core.coreID || KjcOptions.smp == 1) {
+                if (prevCore.coreID != core.coreID) {
+                    addCall = true;
+                }
+                // If there is only one core,
+                // Then we also want to call
+                if (KjcOptions.smp == 1 && isFirstAfterFileInput(workNode.getParent())) {
+                    addCall = true;
+                }                
+             
+                if (addCall) {
                     int mainThread = ThreadMapper.coreToThread(core.coreID);
                     codeStore.addSteadyThreadCall(
                             mainThread,
                             threadIndex);
-                }
+                }                              
 
                 // If the previous thread is on a main, then lookup what the
                 // core is

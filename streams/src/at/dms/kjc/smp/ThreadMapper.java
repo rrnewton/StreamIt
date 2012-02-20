@@ -30,6 +30,16 @@ public class ThreadMapper {
         }
     }
 
+    public static int coreToThread(int core) {
+        int index = 0;
+        for (int c : SMPBackend.coreOrder) {
+            if (c == core) return index;
+            index++;
+        }
+        assert (false) : "Core " + core +" not mapped to a thread!";
+        return -1;
+    }
+
     /**
      * Provides access to the singleton class
      * 
@@ -40,16 +50,6 @@ public class ThreadMapper {
             mapper = new ThreadMapper();
         }
         return mapper;
-    }
-
-    public static int coreToThread(int core) {
-        int index = 0;
-        for (int c : SMPBackend.coreOrder) {
-            if (c == core) return index;
-            index++;
-        }
-        assert (false) : "Core " + core +" not mapped to a thread!";
-        return -1;
     }
     
     
@@ -104,22 +104,6 @@ public class ThreadMapper {
         this.dominators = dominators;
     }
     
-    private boolean isFirstAfterFileInput(Filter filter) {
-        if (isProgramSource(filter)) {
-            return false;
-        }
-        Filter prev = ProcessFilterWorkNode.getPreviousFilter(filter.getWorkNode());        
-        return prev.getWorkNode().isFileInput();        
-    }
-   
-    private boolean isLastBeforeFileOutput(Filter filter) {
-        if (isProgramSink(filter)) {
-            return false;
-        }
-        Filter next = ProcessFilterWorkNode.getNextFilter(filter.getWorkNode());
-        return next.getWorkNode().isFileOutput();
-    }
-    
     /**
      * Assign thread ids only to dynamic readers
      * 
@@ -165,7 +149,7 @@ public class ThreadMapper {
             } // end for loop
         }
     }
-
+   
     /**
      * Assign thread ids to all filters
      * 
@@ -274,7 +258,7 @@ public class ThreadMapper {
 //            } // end for loop
 //        }
 //    }
-
+    
     private void dominatorsAdd(Filter f1, Filter f2) {
         if (!dominators.containsKey(getFilterName(f1))) {
             dominatorsInitEmpty(f1);
@@ -320,29 +304,33 @@ public class ThreadMapper {
     private CType getFilterInputType(Filter f) {
         return f.getWorkNodeContent().getInputType();
     }
-    
-    private CType getFilterOutputType(Filter f) {
-        return f.getWorkNodeContent().getOutputType();
-    }
 
     private String getFilterName(Filter f) {
         return f.getWorkNodeContent().getName();
+    }
+  
+    private boolean isFirstAfterFileInput(Filter filter) {      
+        return ProcessFilterWorkNode.isFirstAfterFileInput(filter);                   
+    }
+
+    private boolean isLastBeforeFileOutput(Filter filter) {
+        return ProcessFilterWorkNode.isLastBeforeFileOutput(filter);       
     }
 
     private boolean isNullType(Filter f) {
         return (getFilterInputType(f) == null);
     }
 
-    private boolean isVoidInputType(Filter f) {
-        return (getFilterInputType(f) == CStdType.Void);
+    private boolean isProgramSink(Filter f) {
+        return ProcessFilterWorkNode.isProgramSink(f);              
     }
     
     private boolean isProgramSource(Filter f) {
-       return f.getWorkNode().isFileInput() || (getFilterInputType(f) == CStdType.Void);
+        return ProcessFilterWorkNode.isProgramSource(f);          
     }
     
-    private boolean isProgramSink(Filter f) {
-        return f.getWorkNode().isFileOutput() || (getFilterOutputType(f) == CStdType.Void);
+    private boolean isVoidInputType(Filter f) {
+        return (getFilterInputType(f) == CStdType.Void);
     }
     
 }
