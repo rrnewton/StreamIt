@@ -1,4 +1,4 @@
-void->void pipeline test3 {
+void->void pipeline test4 {
     add FileReader<float>("./cases/floats.in");
     for(int i=1; i<=2; i++)
         add Fdynamic();
