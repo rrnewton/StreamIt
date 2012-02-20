@@ -25,18 +25,18 @@ class Command(object):
 
 FNULL = open('/dev/null', 'w')
 
-def run_strc(filename):
-    cmd = ["strc", "-smp", "2", "--outputs", "10", "-regtest", "--threadopt", filename]
-    # print cmd
+def run_strc(filename, cores):
+    cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", filename]    
+    print ' '.join(cmd)
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
 def run_make(filename):
     cmd = ["make"]
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
-def run_exe(filename):
+def run_exe(filename, core):
     output = filename + '.out'
-    cmd = './smp2 > ' + output
+    cmd = './smp' + str(core) + ' > ' + output
     command = Command(cmd)
     command.run(timeout=10)
 
@@ -51,24 +51,24 @@ def compare(f1, f2):
     else:
         return "FAIL"
 
-def run_one(infile):
+def run_one(infile, cores):
     print "current file is: " + infile
     print "Compile StreamIt code."
-    p = run_strc(infile)
+    p = run_strc(infile, cores)
     p.wait()
     print "Compile C code."
     p = run_make(infile)
     p.wait()
 
-def run_test(infile):
+def run_test(infile, cores):
     print "Testing with input file: " + infile + "."
     #print "Compile StreamIt code."
-    p = run_strc(infile)
+    p = run_strc(infile, cores)
     p.wait()
     #print "Compile C code."
     p = run_make(infile)
     p.wait()
-    run_exe(infile)        
+    run_exe(infile, cores)        
     ret = infile + ' : ' + compare(infile + '.out', infile + '.exp')
     cleanup()
     return ret
@@ -76,8 +76,10 @@ def run_test(infile):
 def run_all():
     path = 'cases/'
     results = []
-    for infile in glob.glob( os.path.join(path, '*.str') ):
-        results.append(run_test(infile))
+    cores = [1,2]
+    for core in cores:
+        for infile in glob.glob( os.path.join(path, '*.str') ):
+            results.append(run_test(infile, core))
     t = '\n'
     return t.join(results)
 
@@ -86,7 +88,7 @@ def main():
         if (sys.argv[1] == 'clean'):
             cleanup()
         else:
-            run_one(sys.argv[1])
+            run_one(sys.argv[1], 2)
     else:
         ret = run_all();
         print "\nRESULTS:"
