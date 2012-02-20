@@ -7,6 +7,9 @@ import glob
 import filecmp
 import sys
 
+class Configs:
+    threadopt, dynamic = range(2)
+
 class Command(object):
     def __init__(self, cmd):
         self.cmd = cmd
@@ -25,8 +28,10 @@ class Command(object):
 
 FNULL = open('/dev/null', 'w')
 
-def run_strc(filename, cores):
-    cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", filename]    
+def run_strc(filename, cores, test):
+    cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", filename]    
+    if test == Configs.threadopt:
+        cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", filename]    
     print ' '.join(cmd)
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
@@ -51,25 +56,28 @@ def compare(f1, f2):
     else:
         return "FAIL"
 
-def run_one(infile, cores):
+def run_one(infile, cores, test):
     print "current file is: " + infile
     print "Compile StreamIt code."
-    p = run_strc(infile, cores)
+    p = run_strc(infile, cores, test)
     p.wait()
     print "Compile C code."
     p = run_make(infile)
     p.wait()
 
-def run_test(infile, cores):
-    print "Testing with input file: " + infile + "."
+def run_test(infile, cores, test):
+    #print "Testing with input file: " + infile + "."
     #print "Compile StreamIt code."
-    p = run_strc(infile, cores)
+    p = run_strc(infile, cores, test)
     p.wait()
     #print "Compile C code."
     p = run_make(infile)
     p.wait()
     run_exe(infile, cores)        
-    ret = infile + ' : ' + compare(infile + '.out', infile + '.exp')
+    cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", filename]    
+    if test == Configs.threadopt:
+        cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", filename]    
+    ret = ' '.join(cmd) + ' : ' + compare(infile + '.out', infile + '.exp')
     cleanup()
     return ret
 
@@ -77,9 +85,10 @@ def run_all():
     path = 'cases/'
     results = []
     cores = [1,2]
-    for core in cores:
-        for infile in glob.glob( os.path.join(path, '*.str') ):
-            results.append(run_test(infile, core))
+    for test in [Configs.threadopt, Configs.dynamic]:
+        for core in cores:
+            for infile in glob.glob( os.path.join(path, '*.str') ):
+                results.append(run_test(infile, core, test))
     t = '\n'
     return t.join(results)
 
@@ -88,7 +97,7 @@ def main():
         if (sys.argv[1] == 'clean'):
             cleanup()
         else:
-            run_one(sys.argv[1], 2)
+            run_one(sys.argv[1], 2, Config.dynamic)
     else:
         ret = run_all();
         print "\nRESULTS:"

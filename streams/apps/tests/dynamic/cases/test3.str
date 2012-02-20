@@ -10,7 +10,7 @@ float->float filter Fstatic() {
         int i;
         float x;
         x = pop();
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < 50; i++) {
             x += i * 3.0 - 1.0;
         }
         push(x);
@@ -22,7 +22,7 @@ float->float filter Fdynamic() {
         int i;
         float x;
         x = pop();
-        for (i = 0; i < 1000; i++) {
+        for (i = 0; i < 50; i++) {
             x += i * 3.0 - 1.0;
         }
         push(x);
