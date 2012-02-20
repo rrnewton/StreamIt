@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import signal
 import threading
 import glob
 import filecmp
@@ -17,13 +18,13 @@ class Command(object):
 
     def run(self, timeout):
         def target():
-            self.process = subprocess.Popen(self.cmd, shell=True)
+            self.process = subprocess.Popen(self.cmd, shell=True, stdout=subprocess.PIPE, preexec_fn=os.setsid)
             self.process.communicate()
         thread = threading.Thread(target=target)
         thread.start()
         thread.join(timeout)
         if thread.is_alive():
-            self.process.terminate()
+            os.killpg(self.process.pid, signal.SIGTERM)
             thread.join()
 
 FNULL = open('/dev/null', 'w')
