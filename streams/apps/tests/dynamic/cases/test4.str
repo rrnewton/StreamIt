@@ -1,5 +1,5 @@
-void->void pipeline dynamic {
-    add FileReader<float>("./floats.in");
+void->void pipeline test4 {
+    add FileReader<float>("./cases/floats.in");
     for(int i=1; i<=2; i++)
         add Fdynamic();
     add FileWriter<float>(stdout);
