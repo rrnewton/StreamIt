@@ -32,7 +32,7 @@ def run_strc(filename, cores, test):
     cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", filename]    
     if test == Configs.threadopt:
         cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", filename]    
-    #print ' '.join(cmd)
+    print ' '.join(cmd)
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
 def run_make(filename):
