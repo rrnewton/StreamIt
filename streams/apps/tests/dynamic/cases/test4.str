@@ -1,10 +1,30 @@
-7250.000000
-7251.000000
-7252.000000
-7253.000000
-7254.000000
-7255.000000
-7256.000000
-7257.000000
-7258.000000
-7259.000000
+void->void pipeline test3 {
+    add FileReader<float>("./cases/floats.in");
+    for(int i=1; i<=2; i++)
+        add Fdynamic();
+    add FileWriter<float>(stdout);
+}
+
+float->float filter Fstatic() {
+    work pop 1 push 1 {
+        int i;
+        float x;
+        x = pop();
+        for (i = 0; i < 50; i++) {
+            x += i * 3.0 - 1.0;
+        }
+        push(x);
+    }
+}
+
+float->float filter Fdynamic() {
+    work pop * push * {
+        int i;
+        float x;
+        x = pop();
+        for (i = 0; i < 50; i++) {
+            x += i * 3.0 - 1.0;
+        }
+        push(x);
+    }
+}
