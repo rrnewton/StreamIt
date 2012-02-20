@@ -47,7 +47,7 @@ def run_exe(filename, core):
     command.run(timeout=10)
 
 def cleanup():
-    cmd = 'rm -f *.c *.h *.dot *.java *.o smp2 Makefile cases/*.java'
+    cmd = 'rm -f *.c *.h *.dot *.java *.o smp2 smp1 Makefile cases/*.java'
     # print cmd + '\n'
     os.system(cmd)
 
