@@ -351,7 +351,7 @@ public class ProcessFilterWorkNode {
         return filterCode;
     }
 
-    private static Filter getNextFilter(WorkNode filter) {
+    static Filter getNextFilter(WorkNode filter) {
         StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
         if (filter == ssg.getFilterGraph()[ssg.getFilterGraph().length - 1]
                 .getWorkNode()) {

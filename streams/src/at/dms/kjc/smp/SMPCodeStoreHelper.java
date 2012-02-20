@@ -414,8 +414,18 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	 */
 	@Override
 	protected JBlock getWorkFunctionBlock(int mult) {
-		if (getWorkMethod() == null) {
-			return null;
+
+        System.out
+        .println("SMPCodeStoreHelper.getWorkFunctionBlock: filter=" + filterNode);
+
+	    if (getWorkMethod() == null) {
+		    
+
+	        System.out
+	                .println("SMPCodeStoreHelper.getWorkFunctionBlock: filter=" + filterNode + "  getWorkMethod=null");
+
+		    
+
 		}
 		JBlock block = new JBlock();
 		JStatement workStmt = getWorkFunctionCall();
@@ -423,9 +433,10 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 				CStdType.Integer, workCounter, null);
 
 		String multiplierName = filterNode.toString() + "_multiplier";
-//		System.out
-//				.println("SMPCodeStoreHelper.getWorkFunctionBlock: addField multiplier "
-//						+ multiplierName);
+
+		System.out
+				.println("SMPCodeStoreHelper.getWorkFunctionBlock: addField multiplier "
+						+ multiplierName);
 
 		JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
 				CStdType.Integer, multiplierName, null);
