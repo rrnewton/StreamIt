@@ -240,19 +240,7 @@ public class SMPBackEndFactory extends
 	 */
 	@Override
 	public void processFilterWorkNode(WorkNode filter,
-			SchedulingPhase whichPhase, SMPMachine chip) {
-		
-		// switch (whichPhase) {
-		// case PRIMEPUMP:
-		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PRIMEPUMP");
-		// case INIT:
-		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = INIT");
-		// case STEADY:
-		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = STEADY");
-		// case PREINIT:
-		// System.out.println("SMPBackEndFactory.processFilterWorkNode() whichPhase = PREINIT");
-		//
-		// }
+			SchedulingPhase whichPhase, SMPMachine chip) {	    	   		
 
 		if (filter.isPredefined()) {
 			if (filter.isFileInput()) {

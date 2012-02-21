@@ -19,7 +19,7 @@ import at.dms.kjc.slir.StaticSubGraph;
  */
 public class ThreadMapper {
 
-    private static final int    MAIN_THREAD = -1;
+    public static final int    MAIN_THREAD = -1;
     private static ThreadMapper mapper      = null;
     private static int          threadId;
     static {

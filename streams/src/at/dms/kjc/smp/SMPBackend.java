@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -198,10 +199,36 @@ public class SMPBackend {
 			ThreadMapper.getMapper().assignThreads(ssg);
 		}
 
-        int i = 0;
-		for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-			runSSG(ssg, i); 
-			i++;
+			
+		if (KjcOptions.threadopt) {
+		    List<BasicSpaceTimeSchedule> graphSchedules = 
+	                new ArrayList<BasicSpaceTimeSchedule>();
+	        
+	        List<TMDBinPackFissAll> schedulers = 
+	                new ArrayList<TMDBinPackFissAll>();
+	        
+		    int i = 0;
+		    for (StaticSubGraph ssg : streamGraph.getSSGs()) {		    
+		        schedulers.add(new TMDBinPackFissAll());
+		        scheduler = schedulers.get(i);
+		        graphSchedules.add(runSSG1(ssg, i)); 
+		        System.out.println("SMPBackend.run after runSSG");
+		        i++;
+		    }
+
+		    i = 0;    
+		    for (BasicSpaceTimeSchedule graphSchedule : graphSchedules) {
+		        scheduler = schedulers.get(i);
+		        runSSG2(graphSchedule);       
+		        i++;
+		    }
+
+		} else {
+		    int i = 0;
+            for (StaticSubGraph ssg : streamGraph.getSSGs()) {          
+                runSSG(ssg, i); 
+                i++;
+            }
 		}
 		
 		streamGraph.dumpGraph("final_graph.dot");
@@ -214,8 +241,46 @@ public class SMPBackend {
 
 	}
 	
-	private static void runSSG(StaticSubGraph ssg, int ssgNum) {	          
+	private static void runSSG(StaticSubGraph ssg, int ssgNum) {              
 	    
+        // dump slice graph to dot file
+        ssg.dumpGraph("traces_ssg" + ssgNum +".dot", null);
+
+        // partition the slice graph based on the scheduling policy
+        BasicSpaceTimeSchedule graphSchedule = new BasicSpaceTimeSchedule(ssg);
+        scheduler.setGraphSchedule(graphSchedule);
+        scheduler.run(chip.size());
+        WorkNodeInfo.reset();
+
+        // generate schedules for initialization, primepump and steady-state
+        scheduleSlices(graphSchedule);
+
+        // generate layout for filters
+        scheduler.runLayout();
+
+        // if load balancing, find candidiate fission groups to load balance
+        if (KjcOptions.loadbalance) {
+            LoadBalancer.findCandidates();
+            LoadBalancer.instrumentMainMethods();
+        }
+
+        // create all buffers and set the rotation lengths
+        RotatingBuffer.createBuffers(graphSchedule);
+        
+        // now convert to Kopi code plus communication commands
+        backEndFactory = new SMPBackEndFactory(chip, scheduler);
+        backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
+
+        // calculate computation to communication ratio
+        if (KjcOptions.sharedbufs && KjcOptions.numbers > 0) {
+            calculateCompCommRatio(graphSchedule);
+        }
+
+    }
+
+	
+	private static BasicSpaceTimeSchedule runSSG1(StaticSubGraph ssg, int ssgNum) {	          
+	
 		// dump slice graph to dot file
 		ssg.dumpGraph("traces_ssg" + ssgNum +".dot", null);
 
@@ -230,19 +295,21 @@ public class SMPBackend {
 
 		// generate layout for filters
 		scheduler.runLayout();
-		// dump final slice graph to dot file
-		graphSchedule.getSSG()
-				.dumpGraph("after_slice_partition_ssg"+ ssgNum + ".dot", scheduler);
-		graphSchedule.getSSG().dumpGraph("slice_graph_ssg" + ssgNum +".dot", scheduler, false);
+
 		// if load balancing, find candidiate fission groups to load balance
 		if (KjcOptions.loadbalance) {
 			LoadBalancer.findCandidates();
 			LoadBalancer.instrumentMainMethods();
 		}
 
-		// create all buffers and set the rotation lengths
-		RotatingBuffer.createBuffers(graphSchedule);
+		return graphSchedule;
+	}
+	
+	private static void runSSG2(BasicSpaceTimeSchedule graphSchedule) {     
 
+        // create all buffers and set the rotation lengths
+        RotatingBuffer.createBuffers(graphSchedule);
+	    
 		// now convert to Kopi code plus communication commands
 		backEndFactory = new SMPBackEndFactory(chip, scheduler);
 		backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);

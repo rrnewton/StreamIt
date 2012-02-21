@@ -38,6 +38,10 @@ public class TMDBinPackFissAll extends TMD {
      */
     @Override
     public Core getComputeNode(InternalFilterNode node) {
+//        System.out.println("TMDBinPackFissAll.getComputeNode node=" + node + " ====");
+//        for (InternalFilterNode key : layoutMap.keySet()) {
+//            System.out.println("  TMDBinPackFissAll.getComputeNode key=" + key);
+//        }
         assert layoutMap.keySet().contains(node);
         return layoutMap.get(node);
     }

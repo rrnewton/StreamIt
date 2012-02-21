@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BasicSpaceTimeSchedule;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.sir.SIRStream;
@@ -21,11 +22,13 @@ import at.dms.kjc.slir.InternalFilterNode;
 public abstract class Scheduler implements Layout<Core> {
     
     protected BasicSpaceTimeSchedule graphSchedule;
-    protected HashMap<InternalFilterNode, Core> layoutMap;
+    protected static HashMap<InternalFilterNode, Core> layoutMap = new HashMap<InternalFilterNode, Core>();
     
     public Scheduler() {
         graphSchedule = null;
-        layoutMap = new HashMap<InternalFilterNode, Core>();
+        if (!KjcOptions.threadopt) {
+            layoutMap = new HashMap<InternalFilterNode, Core>();
+        }
     }
 
     public boolean isSMD() {
