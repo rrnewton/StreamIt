@@ -200,7 +200,13 @@ public class SMPBackend {
 		}
 
 			
-		if (KjcOptions.threadopt) {
+		/***
+		 * TODO: HERE IS THE PROBLEMTIC CODE:
+		 * I am trying to have the layout assigned for all 
+		 * filters before generating the code in ProcessFilterWorkNode.
+		 * This version puts all filters on the same core.
+		 */
+		if (KjcOptions.threadopt) {		    		   
 		    List<BasicSpaceTimeSchedule> graphSchedules = 
 	                new ArrayList<BasicSpaceTimeSchedule>();
 	        
