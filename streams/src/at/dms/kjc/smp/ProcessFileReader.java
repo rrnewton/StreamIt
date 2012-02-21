@@ -91,7 +91,7 @@ public class ProcessFileReader {
             fileReaderCodeStore.put(frcKey, fileReaderCode);
         }
         
-        SMPComputeCodeStore codeStore = SMPBackend.scheduler.getComputeNode(dsFilter).getComputeCode();
+        SMPComputeCodeStore codeStore = SMPBackend.getComputeNode(dsFilter).getComputeCode();
         
         switch (phase) {
         case INIT : generateInitCode(fileReaderCode, codeStore, destBuf); break;

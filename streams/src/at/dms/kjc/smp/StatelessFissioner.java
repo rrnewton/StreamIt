@@ -33,7 +33,7 @@ public class StatelessFissioner {
             return Fissioner.doit(filter, ssg, fissAmount);
         }
         else {
-            System.out.println("Performing fission on: " + filter.getWorkNode() + ", fizzAmount: " + fissAmount);
+            System.out.println("StatelessFissioner Performing fission on: " + filter.getWorkNode() + ", fizzAmount: " + fissAmount);
             StatelessFissioner fissioner = new StatelessFissioner(filter, fissAmount);
             if(canFizz(filter, false) && (!KjcOptions.nofizz))
                 return fissioner.fizz();
@@ -128,11 +128,13 @@ public class StatelessFissioner {
         // Give each Slice clone a unique name
         String origName = filter.getWorkNode().getWorkNodeContent().getName();
         for(int x = 0 ; x < fizzAmount ; x++) {
+            System.out.println("StatelessFissioner.createFissedFilters (1) " + origName + "_fizz");
             filterClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount + "_clone" + x);
         }
         
 
         // Modify name of original Slice
+        System.out.println("StatelessFissioner.createFissedFilters (2) " + origName + "_fizz");
         filter.getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + fizzAmount);
         
         // Calculate new steady-state multiplicity based upon fizzAmount.  

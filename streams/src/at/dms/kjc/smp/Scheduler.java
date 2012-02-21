@@ -19,16 +19,13 @@ import at.dms.kjc.slir.InternalFilterNode;
  * @author mgordon
  *
  */
-public abstract class Scheduler implements Layout<Core> {
+public abstract class Scheduler { // implements Layout<Core> {
     
     protected BasicSpaceTimeSchedule graphSchedule;
-    protected static HashMap<InternalFilterNode, Core> layoutMap = new HashMap<InternalFilterNode, Core>();
+    protected  HashMap<InternalFilterNode, Core> layoutMap = new HashMap<InternalFilterNode, Core>();
     
     public Scheduler() {
         graphSchedule = null;
-        if (!KjcOptions.threadopt) {
-            layoutMap = new HashMap<InternalFilterNode, Core>();
-        }
     }
 
     public boolean isSMD() {
@@ -50,4 +47,5 @@ public abstract class Scheduler implements Layout<Core> {
     public BasicSpaceTimeSchedule getGraphSchedule() {
         return graphSchedule;
     }
+
 }

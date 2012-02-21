@@ -38,14 +38,144 @@ import at.dms.kjc.slir.fission.Fissioner;
  */
 public class TMD extends Scheduler {
 
+    /**
+     * Check to see that all filters in the SIR graph have fewer cousins than there 
+     * are tiles of the chip.
+     * 
+     * @param str The stream graph
+     * @param tiles The number of cores of the target machine
+     */
+    public static boolean allLevelsFit(SIRStream str, int tiles) {
+                
+        WorkEstimate work = WorkEstimate.getWorkEstimate(str);
+        WorkList workList = work.getSortedFilterWork();
+               
+        for (int i = workList.size() - 1; i >= 0; i--) {
+            SIRFilter filter = workList.getFilter(i);
+                    
+            int cousins = getNumCousins(filter); 
+            if (cousins > tiles) {
+                System.out.println(filter + " cousins: " + cousins);
+                return false;                
+            }
+        }
+        return true;
+    }
+    /**
+     * Returns the number of filters in the graph.
+     */
+    public static int countFilters(SIRStream str) {
+        //Don't count identity filters
+        final int[] count = { 0 };
+        IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
+                @Override
+				public void visitFilter(SIRFilter self,
+                                        SIRFilterIter iter) {
+                    if (!(self instanceof SIRIdentity))
+                        count[0]++;
+                }});
+        return count[0];
+    }
+    /**
+     * Returns the number of peeking filters in the graph.
+     */
+    public static int countPeekingFilters(SIRStream str) {
+        //Don't count identity filters
+        final int[] count = { 0 };
+        IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
+                @Override
+				public void visitFilter(SIRFilter self,
+                                        SIRFilterIter iter) {
+                    if (self.getPeekInt() > self.getPopInt())
+                        count[0]++;
+                }});
+        return count[0];
+    }
+    /**
+     * Check to see that all filters in the SIR graph have fewer cousins than there 
+     * are tiles of the chip.
+     * 
+     * @param str The stream graph
+     * @param tiles The number of cores of the target machine
+     */
+    public static SIRStream fuseCousins(SIRStream str, int tiles) {
+        KjcOptions.partition_greedier = true;       
+        KjcOptions.partition_dp = false;
+        WorkEstimate work = WorkEstimate.getWorkEstimate(str);
+        WorkList workList = work.getSortedFilterWork();
+               
+        for (int i = workList.size() - 1; i >= 0; i--) {
+            SIRFilter filter = workList.getFilter(i);
+                    
+            int cousins = 1;
+            
+            SIRContainer container = filter.getParent();
+            
+            while (container != null) {
+                if (container instanceof SIRSplitJoin) {
+                    cousins *= (((SIRSplitJoin)container).getParallelStreams().size());
+                    if (cousins > tiles) {
+                        at.dms.kjc.sir.lowering.partition.Partitioner.doit(container,
+                                tiles, false, false, true);
+                    }
+                }
+                container = container.getParent();
+            }
+        }
+        
+        KjcOptions.partition_greedier = false;
+        return str;
+    }
+    /**
+     * Returns the amount peeking work and total work in array.
+     */
+    public static long[] totalWork(SIRStream str) {
+        WorkEstimate workEst = WorkEstimate.getWorkEstimate(str);
+        WorkList wl = workEst.getSortedFilterWork();
+        long totalWork = 0;
+        long peekingWork = 0;
+        for (int i = 0; i < wl.size(); i++) {
+            totalWork += wl.getWork(i);
+            SIRFilter filter = wl.getFilter(i);
+            if (filter.getPeekInt() > filter.getPopInt()) {
+                peekingWork += wl.getWork(i);
+            }
+        }
+        
+        return new long[]{peekingWork, totalWork};
+    }
+    /**
+    * Returns number of parallel streams that are at same nesting
+    * depth as <filter> relative to the top-level splitjoin.  Assumes
+    * that the splitjoin widths on the path from <filter> to the
+    * top-level splitjoin are symmetric across other siblings.
+    */
+   private static int getNumCousins(SIRFilter filter) {
+       int cousins = 1;
+       SIRContainer container = filter.getParent();
+       while (container != null) {
+           if (container instanceof SIRSplitJoin) {
+               cousins *= (((SIRSplitJoin)container).getParallelStreams().size());
+           }
+           container = container.getParent();
+       }
+       return cousins;
+   }
+    
     private double DUP_THRESHOLD;
+    
+       
     private LevelizeSSG lsg;
+    
     private HashMap<Filter, Integer> fizzAmount;
+    
     public static final int FISS_COMP_COMM_THRESHOLD = 10;
+    
     /** if true, then we have slices with fanout greater than 2 and we do not 
      * have a layout where communicating slices are neighbors, boo
      */
     public boolean fallBackLayout;
+    
     private GreedyBinPacking<Filter> dominatorPacking;
     
     public TMD() {
@@ -53,403 +183,6 @@ public class TMD extends Scheduler {
         dominatorPacking = new GreedyBinPacking<Filter>(SMPBackend.chip.size());
         fizzAmount = new HashMap<Filter, Integer>();
         DUP_THRESHOLD = KjcOptions.dupthresh / 100.0;
-    }
-    
-    /** Get the Core for a Slice 
-     * @param node the {@link at.dms.kjc.slir.InternalFilterNode} to look up. 
-     * @return the Core that should execute the {@link at.dms.kjc.slir.InternalFilterNode}. 
-     */
-    @Override
-	public Core getComputeNode(InternalFilterNode node) {
-        assert layoutMap.keySet().contains(node);
-        return layoutMap.get(node);
-    }
-    
-    
-    /** 
-     * Layout the dominators of each ssg using a global bin packing to try to get 
-     * software pipeline parallelism between them.
-     * 
-     * @param ssg the current ssg
-     * @param filter the dominator to layout
-     */
-    protected void layoutDominator(Filter filter) {
-    	assert filter.isTopFilter();
-    	
-    	HashMap<Filter, Long> workMap = new HashMap<Filter, Long>();
-    	workMap.put(filter, FilterWorkEstimate.getWork(filter));
-    	
-    	dominatorPacking.pack(workMap);
-    	
-    	setComputeNode(filter.getWorkNode(), SMPBackend.chip.getNthComputeNode(dominatorPacking.getBin(filter)));
-    }
-    
-    /** Set the Core for a Slice 
-     * @param node         the {@link at.dms.kjc.slir.InternalFilterNode} to associate with ...
-     * @param core   The tile to assign the node
-     */
-    @Override
-	public void setComputeNode(InternalFilterNode node, Core core) {
-        assert node != null && core != null;
-        layoutMap.put(node, core);
-        //remember what filters each tile has mapped to it
-        //System.out.println("Setting " + node + " to core " + core);
-        if (core.isComputeNode())
-            core.getComputeCode().addFilter(node.getAsFilter());
-    }
-    
-    /**
-     * Assign the filternodes of the slice graph to tiles on the chip based on the levels
-     * of the graph. 
-     */
-    @Override
-	public void runLayout() {
-        assert graphSchedule != null : 
-            "Must set the graph schedule (multiplicities) before running layout";
-        
-        lsg = new LevelizeSSG(graphSchedule.getSSG().getTopFilters());
-        Filter[][] levels = lsg.getLevels();
-        
-        
-        //if the fan out of any non-predefined filter is > 2 then we have to use the fallback
-        //layout algorithm and global barriers...
-        int maxFanout = 0;
-        fallBackLayout = false;
-        for (int l = 0; l < levels.length; l++) {
-            for (int f = 0; f < levels[l].length; f++) {
-                if (levels[l][f].getWorkNode().isPredefined())
-                    continue;
-                if (levels[l][f].getOutputNode().getDestSet(SchedulingPhase.STEADY).size() > maxFanout) {
-                    maxFanout = levels[l][f].getOutputNode().getDestSet(SchedulingPhase.STEADY).size();
-                    if (maxFanout > 2) {
-                        fallBackLayout = true;
-                        System.out.println(levels[l][f] + " has fanout > 2!");
-                    }
-                }
-            }
-        }
-        
-        System.out.println("Max slice fanout: " + maxFanout);
-
-        if (fallBackLayout)
-            fallBackLayout();
-        else 
-            neighborsLayout(levels);
-    }
-    
-    /**
-     * In this optimized layout algorithm communicating filters that are not placed on the
-     * same tile are placed on neighboring tiles.
-     */
-    private void neighborsLayout(Filter[][] levels) {
-        System.out.println("Using neighbors layout");
-
-        //we know fanout <= 2 and each level has number_of_tiles slices
-        
-        //assert that the first level only has a file reader and that we always have a
-        //file reader
-        //assert levels[0].length == 1 && levels[0][0].getFirstFilter().isFileInput();
-        
-        //place each slice in a set that will be mapped to the same tile
-        System.out.println("Partitioning into same tile sets...");
-        Set<Set<Filter>> sameTile = createSameTileSets(levels);
-        assert sameTile.size() <= SMPBackend.chip.size() : 
-            sameTile.size() + " " + SMPBackend.chip.size();
-        Core nextToAssign = SMPBackend.chip.getNthComputeNode(0);
-        Set<Filter> current = sameTile.iterator().next();
-        Set<Set<Filter>> done = new HashSet<Set<Filter>>();
-        System.out.println("Beginning Neighbors Layout...");
-        
-        while (true) {
-            //system.out.println("Assigning " + current + " to " + nextToAssign.getTileNumber());
-            assignSlicesToTile(current, nextToAssign);
-            done.add(current);
-            assert done.contains(current);
-                        
-            //now find the next slice set to assign to the snake
-            //first find a slice that has a nonlocal output, so we can make the set it is in
-            //neighbors with the slice we just assigned...
-            Filter nonLocalOutput = null;
-            for (Filter slice : current) {
-                if (slice.getOutputNode().getDestSet(SchedulingPhase.STEADY).size() > 1) 
-                    nonLocalOutput = slice;
-                else if (slice.getOutputNode().getDestSet(SchedulingPhase.STEADY).size() == 1) {
-                    Filter destSlice = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).iterator().next();
-                    if (current != getSetWithSlice(sameTile, destSlice) && 
-                            getSetWithSlice(sameTile, destSlice) != null) {
-                        nonLocalOutput = slice;
-                    }
-                }
-            }
-            //nothing else to assign
-            if (done.size() == sameTile.size()) {
-                break;
-            }
-            
-            current = null;
-            //set the next set of slice to assign to the next tile in the snake
-            //fis
-            if (nonLocalOutput != null) {
-                //one of the slices does communicate with a slice not of its own set
-                for (Filter slice : nonLocalOutput.getOutputNode().getDestSlices(SchedulingPhase.STEADY)) {
-                    Set<Filter> set = getSetWithSlice(sameTile, slice);
-                    if (set != current && 
-                            !done.contains(set)) {
-                        current = getSetWithSlice(sameTile, slice);
-                        break;
-                    }
-                }
-            }
-            //if we didn't find a communicating set to make a neighbor, then just pick any old set of slices 
-            if (current == null) {
-                for (Set<Filter> next : sameTile) {
-                    if (!done.contains(next))
-                        current = next;
-                }
-            }
-
-            assert current != null;
-            nextToAssign = SMPBackend.chip.getNextCore(nextToAssign);
-        }
-        
-        System.out.println("End Neighbors Layout...");
-        
-    }
-    
-    private void assignSlicesToTile(Set<Filter> slices, Core core) {
-        for (Filter slice : slices) {
-            //System.out.println("Assign " + slice.getFirstFilter() + " to tile " + tile.getTileNumber());
-            setComputeNode(slice.getWorkNode(), core);
-        }
-    }
-    
-    /**
-     * 
-     */
-    private Set<Set<Filter>> createSameTileSets(Filter[][] levels) {
-        HashSet<Set<Filter>> sameTile = new HashSet<Set<Filter>>();
-        for (int l = 0; l < levels.length; l++) {
-            //System.out.println("Level " + l + " has size " + levels[l].length);
-            LinkedList<Filter> alreadyAssigned = new LinkedList<Filter>();
-            for (int s = 0; s < levels[l].length; s++) {
-                Filter slice = levels[l][s];
-                //assign predefined to offchip memory and don't add them to any set
-                if (slice.getWorkNode().isPredefined()) {
-                    setComputeNode(slice.getWorkNode(), SMPBackend.chip.getOffChipMemory());
-                } else {
-                    //find the input with the largest amount of data coming in
-                    //and put this slice in the set that the max input is in
-                    int bestInputs = -1;
-                    Set<Filter> theBest = null;;
-                    
-                    for (InterFilterEdge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
-                        if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) >= bestInputs) {
-                            if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) == bestInputs) {
-                                //want to be careful about when they are equal because you want to place the 
-                                //downstream best that is at the beginning of the round-robin when distributing
-                                if (slice.getInputNode().getSources(SchedulingPhase.STEADY)[0] != edge)
-                                    continue;
-                            }
-                            //the set we want to see if this slice should be added to
-                            Set<Filter> testSet = getSetWithSlice(sameTile, edge.getSrc().getParent());
-                            
-                            //if the test set is null, then we have not put the upstream slice on the chip 
-                            if (testSet == null) {
-                                continue;
-                            }
-                            
-                            //check if the best contains a slice from this level already, if so, we cannot
-                            //assign another slice so continue
-                            boolean canUse = true;
-                            for (Filter seen : alreadyAssigned) {
-                                if (testSet.contains(seen))
-                                    canUse = false;
-                            }
-                            if (!canUse)
-                                continue;
-                            
-                            //otherwise, we have not added a slice from this level to this set, so 
-                            //we can use it
-                            theBest = testSet;
-                            bestInputs = slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY);
-                            
-                 
-                        }
-                    }
-                    //remember that we have assigned this slice in the level
-                    alreadyAssigned.add(slice);
-                    //no upstream slice is in a set
-                    if (theBest == null) {
-                        //System.out.println("no best: " + slice.getFirstFilter());
-                        //create a new set and add it to the set of sets
-                        HashSet<Filter> newSet = new HashSet<Filter>();
-                        newSet.add(slice);
-                        sameTile.add(newSet);
-                    } else {
-                        //we should put slice in the set that is the best
-                        theBest.add(slice);
-                    }
-                }
-            }
-        }
-        return sameTile;
-    }
-    
-    /**
-     * Give a set of set of slices and slice return the set of slices that contains
-     * slice.
-     */
-    private Set<Filter> getSetWithSlice(Set<Set<Filter>> sameTile, Filter slice) {
-        Set<Filter> set = null;
-        for (Set<Filter> current : sameTile) {
-            if (current.contains(slice)) {
-                assert set == null;
-                set = current;
-            }
-        }
-        return set;
-    }
-    
-    /**
-     * This layout algorithm does not try to place communicating slices as neighbors,
-     * it is used when the fanout of any slice is greater than 2.
-     */
-    private void fallBackLayout() {
-        System.out.println("Using fallback layout");
-
-        Filter[][] levels = lsg.getLevels();
-        
-        System.out.println("Levels: " + levels.length);
-        
-        for (int l = 0; l < levels.length; l++) {
-            assert levels[l].length  <= SMPBackend.chip.size() : 
-                "Too many filters in level for TMD layout!";
-            HashSet<Core> allocatedTiles = new HashSet<Core>(); 
-
-            if (levels[l].length == 1 && levels[l][0].getWorkNode().isPredefined()) {
-                //we only support full levels for right now other than predefined filters 
-                //that are not fizzed
-            	setComputeNode(levels[l][0].getWorkNode(), SMPBackend.chip.getOffChipMemory());
-            } else {
-                for (int f = 0; f < levels[l].length; f++) {
-                    Filter slice = levels[l][f];
-                    Core theTile = tileToAssign(slice, SMPBackend.chip, allocatedTiles);
-                    setComputeNode(slice.getWorkNode(), theTile);
-                    allocatedTiles.add(theTile);
-                }
-            }
-        }
-    }
- 
-    private Core tileToAssign(Filter slice, SMPMachine chip, Set<Core> allocatedTiles) {
-        Core theBest = null;
-        int bestInputs = -1;
-
-        //add the tiles to the list that are allocated to upstream inputs
-        for (InterFilterEdge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
-            Core upstreamTile = getComputeNode(edge.getSrc().getPrevious());
-            if (upstreamTile == SMPBackend.chip.getOffChipMemory())
-                continue;
-            if (allocatedTiles.contains(upstreamTile))
-                continue;
-            
-            if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) > bestInputs) {
-                theBest = upstreamTile;
-                bestInputs = slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY);
-            }
-        }
-        
-                
-        if (theBest == null) {
-            //could not find a tile that was allocated to an upstream input
-            //just pick a tile
-            for (Core tile : chip.getCores()) {
-                if (allocatedTiles.contains(tile))
-                    continue;
-                theBest = tile;
-                break;
-            }
-        }
-
-        assert theBest != null;
-        return theBest;
-    }
-    
-    /**
-     * Run the Time-Multiplexing Data-parallel scheduler.  Right now, it assumes 
-     * a pipeline of stateless filters
-     */
-    @Override
-	public void run(int tiles) {
-        //if we are using the SIR data parallelism pass, then don't run TMD
-        if (KjcOptions.dup == 1) {
-		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
-	
-		    for (Filter slice : slices) {
-		    	WorkNodeContent filter = slice.getWorkNode().getWorkNodeContent();
-		    	filter.multSteadyMult(KjcOptions.steadymult);
-		    }
-		    
-		    return;
-        }
-        
-        calculateFizzAmounts(tiles);
-        
-        int factor = multiplicityFactor(tiles);
-        System.out.println("Using fission steady multiplicty factor: " + factor);
-        
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
-        
-        //go through and multiply the steady multiplicity of each filter by factor
-        for (Filter slice : slices) {
-            WorkNodeContent filter = slice.getWorkNode().getWorkNodeContent();
-            filter.multSteadyMult(factor * KjcOptions.steadymult);
-         }
-        //must reset the filter info's because we have changed the schedule
-        WorkNodeInfo.reset();
-        
-        SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("before_fission.dot", 
-                null, false);
-        
-        int maxFission = 0;
-        int i = 0;
-        //go through and perform the fission
-        for (Filter slice : slices) {
-            if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
-                if (Fissioner.doit(slice, graphSchedule.getSSG(), fizzAmount.get(slice)) != null) {
-                    System.out.println("Fissed " + slice.getWorkNode() + " by " + fizzAmount.get(slice));
-                    if (fizzAmount.get(slice) > maxFission)
-                        maxFission = fizzAmount.get(slice);
-                }
-                SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("fission_pass_" + i + ".dot", 
-									 null, false);
-                i++;
-            }
-        }
-        
-        System.out.println("Max fission amount: " + maxFission);
-        
-        //because we have changed the multiplicities of the FilterContents
-        //we have to reset the filter info's because they cache the date of the 
-        //FilterContents
-        WorkNodeInfo.reset();
-        
-        
-    }
-    
-    /**
-     * Return the level that this slice occupies.
-     */
-    public int getLevel(Filter slice) {
-        return lsg.getLevel(slice);
-    }
-    
-    public int numLevels() {
-        return lsg.getLevels().length;
-    }
-    
-    public int getLevelSize(int l) {
-        return lsg.getLevels()[l].length;
     }
     
     /**
@@ -581,6 +314,280 @@ public class TMD extends Scheduler {
     }
     
     /**
+     * Return the level that this slice occupies.
+     */
+    public int getLevel(Filter slice) {
+        return lsg.getLevel(slice);
+    }
+ 
+    public int getLevelSize(int l) {
+        return lsg.getLevels()[l].length;
+    }
+    
+    public int numLevels() {
+        return lsg.getLevels().length;
+    }
+    
+    /**
+     * Run the Time-Multiplexing Data-parallel scheduler.  Right now, it assumes 
+     * a pipeline of stateless filters
+     */
+    @Override
+	public void run(int tiles) {
+        //if we are using the SIR data parallelism pass, then don't run TMD
+        if (KjcOptions.dup == 1) {
+		    LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
+	
+		    for (Filter slice : slices) {
+		    	WorkNodeContent filter = slice.getWorkNode().getWorkNodeContent();
+		    	filter.multSteadyMult(KjcOptions.steadymult);
+		    }
+		    
+		    return;
+        }
+        
+        calculateFizzAmounts(tiles);
+        
+        int factor = multiplicityFactor(tiles);
+        System.out.println("Using fission steady multiplicty factor: " + factor);
+        
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule.getSSG().getTopFilters());
+        
+        //go through and multiply the steady multiplicity of each filter by factor
+        for (Filter slice : slices) {
+            WorkNodeContent filter = slice.getWorkNode().getWorkNodeContent();
+            filter.multSteadyMult(factor * KjcOptions.steadymult);
+         }
+        //must reset the filter info's because we have changed the schedule
+        WorkNodeInfo.reset();
+        
+        SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("before_fission.dot", 
+                null, false);
+        
+        int maxFission = 0;
+        int i = 0;
+        //go through and perform the fission
+        for (Filter slice : slices) {
+            if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
+                if (Fissioner.doit(slice, graphSchedule.getSSG(), fizzAmount.get(slice)) != null) {
+                    System.out.println("Fissed " + slice.getWorkNode() + " by " + fizzAmount.get(slice));
+                    if (fizzAmount.get(slice) > maxFission)
+                        maxFission = fizzAmount.get(slice);
+                }
+                SMPBackend.scheduler.graphSchedule.getSSG().dumpGraph("fission_pass_" + i + ".dot", 
+									 null, false);
+                i++;
+            }
+        }
+        
+        System.out.println("Max fission amount: " + maxFission);
+        
+        //because we have changed the multiplicities of the FilterContents
+        //we have to reset the filter info's because they cache the date of the 
+        //FilterContents
+        WorkNodeInfo.reset();
+        
+        
+    }
+    
+    /**
+     * Assign the filternodes of the slice graph to tiles on the chip based on the levels
+     * of the graph. 
+     */
+	public void runLayout() {
+        assert graphSchedule != null : 
+            "Must set the graph schedule (multiplicities) before running layout";
+        
+        lsg = new LevelizeSSG(graphSchedule.getSSG().getTopFilters());
+        Filter[][] levels = lsg.getLevels();
+        
+        
+        //if the fan out of any non-predefined filter is > 2 then we have to use the fallback
+        //layout algorithm and global barriers...
+        int maxFanout = 0;
+        fallBackLayout = false;
+        for (int l = 0; l < levels.length; l++) {
+            for (int f = 0; f < levels[l].length; f++) {
+                if (levels[l][f].getWorkNode().isPredefined())
+                    continue;
+                if (levels[l][f].getOutputNode().getDestSet(SchedulingPhase.STEADY).size() > maxFanout) {
+                    maxFanout = levels[l][f].getOutputNode().getDestSet(SchedulingPhase.STEADY).size();
+                    if (maxFanout > 2) {
+                        fallBackLayout = true;
+                        System.out.println(levels[l][f] + " has fanout > 2!");
+                    }
+                }
+            }
+        }
+        
+        System.out.println("Max slice fanout: " + maxFanout);
+
+        if (fallBackLayout)
+            fallBackLayout();
+        else 
+            neighborsLayout(levels);
+    }
+    
+    /** Set the Core for a Slice 
+     * @param node         the {@link at.dms.kjc.slir.InternalFilterNode} to associate with ...
+     * @param core   The tile to assign the node
+     */
+//	public void setComputeNode(InternalFilterNode node, Core core) {
+//        assert node != null && core != null;
+//        layoutMap.put(node, core);
+//        //remember what filters each tile has mapped to it
+//        //System.out.println("Setting " + node + " to core " + core);
+//        if (core.isComputeNode())
+//            core.getComputeCode().addFilter(node.getAsFilter());
+//    }
+//    
+    @Override
+    public SIRStream SIRFusion(SIRStream str, int tiles) {
+        if(!allLevelsFit(str, tiles))
+            System.out.println("Have to fuse the graph because at least one level has too many filters...");
+
+        KjcOptions.partition_greedier = true;
+        KjcOptions.partition_dp = false;
+        while (!allLevelsFit(str, tiles)) {
+            int tilesNeeded = countFilters(str);
+            str = at.dms.kjc.sir.lowering.partition.Partitioner.doit(str,
+                    tilesNeeded - 1, false, false, true);
+            StreamItDot.printGraph(str, "tmd_sir_fusion.dot");
+        }
+        KjcOptions.partition_greedier = false;
+        return str;
+    }
+    
+    private void assignSlicesToTile(Set<Filter> slices, Core core) {
+        for (Filter slice : slices) {
+            //System.out.println("Assign " + slice.getFirstFilter() + " to tile " + tile.getTileNumber());
+            SMPBackend.setComputeNode(slice.getWorkNode(), core);
+        }
+    }
+    
+    
+
+    /**
+     * 
+     */
+    private Set<Set<Filter>> createSameTileSets(Filter[][] levels) {
+        HashSet<Set<Filter>> sameTile = new HashSet<Set<Filter>>();
+        for (int l = 0; l < levels.length; l++) {
+            //System.out.println("Level " + l + " has size " + levels[l].length);
+            LinkedList<Filter> alreadyAssigned = new LinkedList<Filter>();
+            for (int s = 0; s < levels[l].length; s++) {
+                Filter slice = levels[l][s];
+                //assign predefined to offchip memory and don't add them to any set
+                if (slice.getWorkNode().isPredefined()) {
+                    SMPBackend.setComputeNode(slice.getWorkNode(), SMPBackend.chip.getOffChipMemory());
+                } else {
+                    //find the input with the largest amount of data coming in
+                    //and put this slice in the set that the max input is in
+                    int bestInputs = -1;
+                    Set<Filter> theBest = null;;
+                    
+                    for (InterFilterEdge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+                        if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) >= bestInputs) {
+                            if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) == bestInputs) {
+                                //want to be careful about when they are equal because you want to place the 
+                                //downstream best that is at the beginning of the round-robin when distributing
+                                if (slice.getInputNode().getSources(SchedulingPhase.STEADY)[0] != edge)
+                                    continue;
+                            }
+                            //the set we want to see if this slice should be added to
+                            Set<Filter> testSet = getSetWithSlice(sameTile, edge.getSrc().getParent());
+                            
+                            //if the test set is null, then we have not put the upstream slice on the chip 
+                            if (testSet == null) {
+                                continue;
+                            }
+                            
+                            //check if the best contains a slice from this level already, if so, we cannot
+                            //assign another slice so continue
+                            boolean canUse = true;
+                            for (Filter seen : alreadyAssigned) {
+                                if (testSet.contains(seen))
+                                    canUse = false;
+                            }
+                            if (!canUse)
+                                continue;
+                            
+                            //otherwise, we have not added a slice from this level to this set, so 
+                            //we can use it
+                            theBest = testSet;
+                            bestInputs = slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY);
+                            
+                 
+                        }
+                    }
+                    //remember that we have assigned this slice in the level
+                    alreadyAssigned.add(slice);
+                    //no upstream slice is in a set
+                    if (theBest == null) {
+                        //System.out.println("no best: " + slice.getFirstFilter());
+                        //create a new set and add it to the set of sets
+                        HashSet<Filter> newSet = new HashSet<Filter>();
+                        newSet.add(slice);
+                        sameTile.add(newSet);
+                    } else {
+                        //we should put slice in the set that is the best
+                        theBest.add(slice);
+                    }
+                }
+            }
+        }
+        return sameTile;
+    }
+    
+
+    /**
+     * This layout algorithm does not try to place communicating slices as neighbors,
+     * it is used when the fanout of any slice is greater than 2.
+     */
+    private void fallBackLayout() {
+        System.out.println("Using fallback layout");
+
+        Filter[][] levels = lsg.getLevels();
+        
+        System.out.println("Levels: " + levels.length);
+        
+        for (int l = 0; l < levels.length; l++) {
+            assert levels[l].length  <= SMPBackend.chip.size() : 
+                "Too many filters in level for TMD layout!";
+            HashSet<Core> allocatedTiles = new HashSet<Core>(); 
+
+            if (levels[l].length == 1 && levels[l][0].getWorkNode().isPredefined()) {
+                //we only support full levels for right now other than predefined filters 
+                //that are not fizzed
+                SMPBackend.setComputeNode(levels[l][0].getWorkNode(), SMPBackend.chip.getOffChipMemory());
+            } else {
+                for (int f = 0; f < levels[l].length; f++) {
+                    Filter slice = levels[l][f];
+                    Core theTile = tileToAssign(slice, SMPBackend.chip, allocatedTiles);
+                    SMPBackend.setComputeNode(slice.getWorkNode(), theTile);
+                    allocatedTiles.add(theTile);
+                }
+            }
+        }
+    }
+    
+  
+    /**
+     * Give a set of set of slices and slice return the set of slices that contains
+     * slice.
+     */
+    private Set<Filter> getSetWithSlice(Set<Set<Filter>> sameTile, Filter slice) {
+        Set<Filter> set = null;
+        for (Set<Filter> current : sameTile) {
+            if (current.contains(slice)) {
+                assert set == null;
+                set = current;
+            }
+        }
+        return set;
+    }
+    
+    /**
      * Determine the factor that we are going to multiple each slice by so that 
      * fission on the slice graph is legal.  Keep trying multiples of the number 
      * tiles until each slice passes the tests for legality.
@@ -639,156 +646,138 @@ public class TMD extends Scheduler {
         return maxFactor;
     }
     
-    
-
     /**
-     * Returns the amount peeking work and total work in array.
+     * In this optimized layout algorithm communicating filters that are not placed on the
+     * same tile are placed on neighboring tiles.
      */
-    public static long[] totalWork(SIRStream str) {
-        WorkEstimate workEst = WorkEstimate.getWorkEstimate(str);
-        WorkList wl = workEst.getSortedFilterWork();
-        long totalWork = 0;
-        long peekingWork = 0;
-        for (int i = 0; i < wl.size(); i++) {
-            totalWork += wl.getWork(i);
-            SIRFilter filter = wl.getFilter(i);
-            if (filter.getPeekInt() > filter.getPopInt()) {
-                peekingWork += wl.getWork(i);
-            }
-        }
+    private void neighborsLayout(Filter[][] levels) {
+        System.out.println("Using neighbors layout");
+
+        //we know fanout <= 2 and each level has number_of_tiles slices
         
-        return new long[]{peekingWork, totalWork};
-    }
-    
-
-    /**
-     * Returns the number of peeking filters in the graph.
-     */
-    public static int countPeekingFilters(SIRStream str) {
-        //Don't count identity filters
-        final int[] count = { 0 };
-        IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                @Override
-				public void visitFilter(SIRFilter self,
-                                        SIRFilterIter iter) {
-                    if (self.getPeekInt() > self.getPopInt())
-                        count[0]++;
-                }});
-        return count[0];
-    }
-    
-    /**
-     * Returns the number of filters in the graph.
-     */
-    public static int countFilters(SIRStream str) {
-        //Don't count identity filters
-        final int[] count = { 0 };
-        IterFactory.createFactory().createIter(str).accept(new EmptyStreamVisitor() {
-                @Override
-				public void visitFilter(SIRFilter self,
-                                        SIRFilterIter iter) {
-                    if (!(self instanceof SIRIdentity))
-                        count[0]++;
-                }});
-        return count[0];
-    }
-    
-    @Override
-    public SIRStream SIRFusion(SIRStream str, int tiles) {
-        if(!allLevelsFit(str, tiles))
-            System.out.println("Have to fuse the graph because at least one level has too many filters...");
-
-        KjcOptions.partition_greedier = true;
-        KjcOptions.partition_dp = false;
-        while (!allLevelsFit(str, tiles)) {
-            int tilesNeeded = countFilters(str);
-            str = at.dms.kjc.sir.lowering.partition.Partitioner.doit(str,
-                    tilesNeeded - 1, false, false, true);
-            StreamItDot.printGraph(str, "tmd_sir_fusion.dot");
-        }
-        KjcOptions.partition_greedier = false;
-        return str;
-    }
-    
-    /**
-     * Check to see that all filters in the SIR graph have fewer cousins than there 
-     * are tiles of the chip.
-     * 
-     * @param str The stream graph
-     * @param tiles The number of cores of the target machine
-     */
-    public static SIRStream fuseCousins(SIRStream str, int tiles) {
-        KjcOptions.partition_greedier = true;       
-        KjcOptions.partition_dp = false;
-        WorkEstimate work = WorkEstimate.getWorkEstimate(str);
-        WorkList workList = work.getSortedFilterWork();
-               
-        for (int i = workList.size() - 1; i >= 0; i--) {
-            SIRFilter filter = workList.getFilter(i);
-                    
-            int cousins = 1;
-            
-            SIRContainer container = filter.getParent();
-            
-            while (container != null) {
-                if (container instanceof SIRSplitJoin) {
-                    cousins *= (((SIRSplitJoin)container).getParallelStreams().size());
-                    if (cousins > tiles) {
-                        at.dms.kjc.sir.lowering.partition.Partitioner.doit(container,
-                                tiles, false, false, true);
+        //assert that the first level only has a file reader and that we always have a
+        //file reader
+        //assert levels[0].length == 1 && levels[0][0].getFirstFilter().isFileInput();
+        
+        //place each slice in a set that will be mapped to the same tile
+        System.out.println("Partitioning into same tile sets...");
+        Set<Set<Filter>> sameTile = createSameTileSets(levels);
+        assert sameTile.size() <= SMPBackend.chip.size() : 
+            sameTile.size() + " " + SMPBackend.chip.size();
+        Core nextToAssign = SMPBackend.chip.getNthComputeNode(0);
+        Set<Filter> current = sameTile.iterator().next();
+        Set<Set<Filter>> done = new HashSet<Set<Filter>>();
+        System.out.println("Beginning Neighbors Layout...");
+        
+        while (true) {
+            //system.out.println("Assigning " + current + " to " + nextToAssign.getTileNumber());
+            assignSlicesToTile(current, nextToAssign);
+            done.add(current);
+            assert done.contains(current);
+                        
+            //now find the next slice set to assign to the snake
+            //first find a slice that has a nonlocal output, so we can make the set it is in
+            //neighbors with the slice we just assigned...
+            Filter nonLocalOutput = null;
+            for (Filter slice : current) {
+                if (slice.getOutputNode().getDestSet(SchedulingPhase.STEADY).size() > 1) 
+                    nonLocalOutput = slice;
+                else if (slice.getOutputNode().getDestSet(SchedulingPhase.STEADY).size() == 1) {
+                    Filter destSlice = slice.getOutputNode().getDestSlices(SchedulingPhase.STEADY).iterator().next();
+                    if (current != getSetWithSlice(sameTile, destSlice) && 
+                            getSetWithSlice(sameTile, destSlice) != null) {
+                        nonLocalOutput = slice;
                     }
                 }
-                container = container.getParent();
+            }
+            //nothing else to assign
+            if (done.size() == sameTile.size()) {
+                break;
+            }
+            
+            current = null;
+            //set the next set of slice to assign to the next tile in the snake
+            //fis
+            if (nonLocalOutput != null) {
+                //one of the slices does communicate with a slice not of its own set
+                for (Filter slice : nonLocalOutput.getOutputNode().getDestSlices(SchedulingPhase.STEADY)) {
+                    Set<Filter> set = getSetWithSlice(sameTile, slice);
+                    if (set != current && 
+                            !done.contains(set)) {
+                        current = getSetWithSlice(sameTile, slice);
+                        break;
+                    }
+                }
+            }
+            //if we didn't find a communicating set to make a neighbor, then just pick any old set of slices 
+            if (current == null) {
+                for (Set<Filter> next : sameTile) {
+                    if (!done.contains(next))
+                        current = next;
+                }
+            }
+
+            assert current != null;
+            nextToAssign = SMPBackend.chip.getNextCore(nextToAssign);
+        }
+        
+        System.out.println("End Neighbors Layout...");
+        
+    }
+   
+    
+    private Core tileToAssign(Filter slice, SMPMachine chip, Set<Core> allocatedTiles) {
+        Core theBest = null;
+        int bestInputs = -1;
+
+        //add the tiles to the list that are allocated to upstream inputs
+        for (InterFilterEdge edge : slice.getInputNode().getSourceSet(SchedulingPhase.STEADY)) {
+            Core upstreamTile = SMPBackend.getComputeNode((WorkNode) edge.getSrc().getPrevious());
+            if (upstreamTile == SMPBackend.chip.getOffChipMemory())
+                continue;
+            if (allocatedTiles.contains(upstreamTile))
+                continue;
+            
+            if (slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY) > bestInputs) {
+                theBest = upstreamTile;
+                bestInputs = slice.getInputNode().getWeight(edge, SchedulingPhase.STEADY);
             }
         }
         
-        KjcOptions.partition_greedier = false;
-        return str;
-    }
-   
-    
-    /**
-     * Check to see that all filters in the SIR graph have fewer cousins than there 
-     * are tiles of the chip.
-     * 
-     * @param str The stream graph
-     * @param tiles The number of cores of the target machine
-     */
-    public static boolean allLevelsFit(SIRStream str, int tiles) {
                 
-        WorkEstimate work = WorkEstimate.getWorkEstimate(str);
-        WorkList workList = work.getSortedFilterWork();
-               
-        for (int i = workList.size() - 1; i >= 0; i--) {
-            SIRFilter filter = workList.getFilter(i);
-                    
-            int cousins = getNumCousins(filter); 
-            if (cousins > tiles) {
-                System.out.println(filter + " cousins: " + cousins);
-                return false;                
+        if (theBest == null) {
+            //could not find a tile that was allocated to an upstream input
+            //just pick a tile
+            for (Core tile : chip.getCores()) {
+                if (allocatedTiles.contains(tile))
+                    continue;
+                theBest = tile;
+                break;
             }
         }
-        return true;
+
+        assert theBest != null;
+        return theBest;
     }
    
-    
-    /**
-    * Returns number of parallel streams that are at same nesting
-    * depth as <filter> relative to the top-level splitjoin.  Assumes
-    * that the splitjoin widths on the path from <filter> to the
-    * top-level splitjoin are symmetric across other siblings.
-    */
-   private static int getNumCousins(SIRFilter filter) {
-       int cousins = 1;
-       SIRContainer container = filter.getParent();
-       while (container != null) {
-           if (container instanceof SIRSplitJoin) {
-               cousins *= (((SIRSplitJoin)container).getParallelStreams().size());
-           }
-           container = container.getParent();
-       }
-       return cousins;
-   }
+        
+    /** 
+     * Layout the dominators of each ssg using a global bin packing to try to get 
+     * software pipeline parallelism between them.
+     * 
+     * @param ssg the current ssg
+     * @param filter the dominator to layout
+     */
+    protected void layoutDominator(Filter filter) {
+    	assert filter.isTopFilter();
+    	
+    	HashMap<Filter, Long> workMap = new HashMap<Filter, Long>();
+    	workMap.put(filter, FilterWorkEstimate.getWork(filter));
+    	
+    	dominatorPacking.pack(workMap);
+    	
+    	SMPBackend.setComputeNode(filter.getWorkNode(), SMPBackend.chip.getNthComputeNode(dominatorPacking.getBin(filter)));
+    }
    
    
 }

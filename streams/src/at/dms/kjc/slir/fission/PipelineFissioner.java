@@ -319,6 +319,9 @@ public class PipelineFissioner {
      */
     public static boolean fizzSlice(Filter slice, int fizzAmount) {
         
+        
+        System.out.println("PipelineFissioner.fizzSlice");
+        
         if (!KjcOptions.nofizz) {
             return false;
         }
@@ -406,6 +409,8 @@ public class PipelineFissioner {
         // Give each Slice clone a unique name
         String origName = sliceClones[0].getWorkNode().getWorkNodeContent().getName();
         for(int x = 0 ; x < fizzAmount ; x++) {
+            System.out.println("PipelineFissioner.fizzSlice " + origName + "_fizz");
+            
             sliceClones[x].getWorkNode().getWorkNodeContent().setName(origName + "_fizz" + x);
         }
                

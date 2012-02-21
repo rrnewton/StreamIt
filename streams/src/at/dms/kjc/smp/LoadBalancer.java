@@ -130,7 +130,7 @@ public class LoadBalancer {
 
     public static String getStartIterRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
-        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
+        Core core = SMPBackend.getComputeNode(fizzedSlice.getWorkNode());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
 
         return startItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
@@ -138,7 +138,7 @@ public class LoadBalancer {
 
     public static String getNumItersRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
-        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
+        Core core = SMPBackend.getComputeNode(fizzedSlice.getWorkNode());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
 
         return numItersArrayPrefix + "_" + id + "[" + coreIndex + "]";
@@ -146,7 +146,7 @@ public class LoadBalancer {
 
     public static String getFilterCycleCountRef(FissionGroup group, Filter fizzedSlice) {
         int id = groupIDs.get(group).intValue();
-        Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice.getWorkNode());
+        Core core = SMPBackend.getComputeNode(fizzedSlice.getWorkNode());
         int coreIndex = SMPBackend.chip.getCoreIndex(core);
 
         return filterCycleCountsArrayPrefix + "_" + id + "[" + coreIndex + "]";
@@ -479,7 +479,7 @@ public class LoadBalancer {
 
     private static Filter getFizzedSliceOnCore(FissionGroup group, Core core) {
         for(Filter slice : group.fizzedSlices) {
-            if(SMPBackend.scheduler.getComputeNode(slice.getWorkNode()).equals(core)) {
+            if(SMPBackend.getComputeNode(slice.getWorkNode()).equals(core)) {
                 return slice;
             }
         }

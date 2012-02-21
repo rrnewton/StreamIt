@@ -92,7 +92,7 @@ public class Fissioner {
      * Attempt to fiss <slice> by <fissAmount>.  Return true if the fission was successful.
      */
     public static FissionGroup doit(Filter slice, StaticSubGraph slicer, int fissAmount) {
-        System.out.println("Performing fission on: " + slice.getWorkNode() + ", fizzAmount: " + fissAmount);
+        System.out.println("Fissioner Performing fission on: " + slice.getWorkNode() + ", fizzAmount: " + fissAmount);
         Fissioner fissioner = new Fissioner(slice, slicer, fissAmount);
         if(canFizz(slice, false) && (!KjcOptions.nofizz)) {
         	System.out.println("Fissioner.doit Can Fizz");
@@ -748,6 +748,9 @@ public class Fissioner {
     
     private void createFissedSlices() {
 
+        
+        //assert fail : "Fissioner.createFissedSlices need to add filters to the ssg";
+        
         // Fill array with clones of Slice, put original copy first in array
         sliceClones = new Filter[fizzAmount];
         for(int x = 0 ; x < fizzAmount ; x++) {
@@ -761,11 +764,15 @@ public class Fissioner {
             for(int x = 0 ; x < fizzAmount ; x++)
                 slicer.addTopSlice(sliceClones[x]);
         }
+       
 
         // Give each Slice clone a unique name
         String origName = slice.getWorkNode().getWorkNodeContent().getName();
         
         StaticSubGraph ssg = sliceClones[0].getStaticSubGraph();
+        
+     
+        
         Filter dominator = ssg.getFilterGraph()[0];
         Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();        
         

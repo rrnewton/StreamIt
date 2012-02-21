@@ -97,7 +97,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 		if (!slice.getInputNode().noInputs()) {
 			assert slice.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
-			Core parent = SMPBackend.scheduler.getComputeNode(slice
+			Core parent = SMPBackend.getComputeNode(slice
 					.getWorkNode());
 
 			// create the new buffer, the constructor will put the buffer in the
@@ -202,7 +202,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	 * @param phase The phase of the schedule that is executing
 	 */
 	private List<JStatement> addTokenWait(WorkNode filter, SchedulingPhase phase,  List<JStatement> list) {
-		Core filterCore = SMPBackend.scheduler.getComputeNode(filter);
+		Core filterCore = SMPBackend.getComputeNode(filter);
 		InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
 				.getSources(phase);
 		Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
@@ -217,7 +217,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 			if (src.isFileInput()) {
 				continue;
 			}
-			Core srcCore = SMPBackend.scheduler.getComputeNode(src);						
+			Core srcCore = SMPBackend.getComputeNode(src);						
 
 	
 					
@@ -391,7 +391,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(src)) {
 				FissionGroup group = FissionGroupStore.getFissionGroup(src);
 				for (Filter fizzedSlice : group.fizzedSlices) {
-					Core core = SMPBackend.scheduler.getComputeNode(fizzedSlice
+					Core core = SMPBackend.getComputeNode(fizzedSlice
 							.getWorkNode());
 					SourceAddressRotation rot = new SourceAddressRotation(core,
 							this, filterNode, edge);
@@ -399,7 +399,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 					addrBufMap.put(fizzedSlice.getWorkNode(), rot);
 				}
 			} else {
-				Core core = SMPBackend.scheduler.getComputeNode(src
+				Core core = SMPBackend.getComputeNode(src
 						.getWorkNode());
 				SourceAddressRotation rot = new SourceAddressRotation(core,
 						this, filterNode, edge);

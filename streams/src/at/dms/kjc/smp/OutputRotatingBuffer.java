@@ -38,7 +38,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 
 		if (!filter.getOutputNode().noOutputs()) {
 			assert filter.getOutputNode().totalWeights(SchedulingPhase.STEADY) > 0;
-			Core parent = SMPBackend.scheduler.getComputeNode(filter
+			Core parent = SMPBackend.getComputeNode(filter
 					.getWorkNode());
 
 			// create the new buffer, the constructor will put the buffer in the
@@ -147,12 +147,12 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	 */
 	private List<JStatement> getTokenWrite(WorkNode filter, SchedulingPhase phase) {
 	    List<JStatement> list = new ArrayList<JStatement>();
-	    Core filterCore =  SMPBackend.scheduler.getComputeNode(filter);					
+	    Core filterCore =  SMPBackend.getComputeNode(filter);					
 		Set<InterFilterEdge> destEdges = filter.getParent()
 				.getOutputNode().getDestSet(phase);						
 		for (InterFilterEdge e : destEdges) {			
 			WorkNode dst = e.getDest().getParent().getWorkNode();	
-			Core dstCore = SMPBackend.scheduler.getComputeNode(dst);
+			Core dstCore = SMPBackend.getComputeNode(dst);
 			if (!dstCore.equals(filterCore)) {								
 				String tokenName = filter + "_to_" + dst + "_token";	
 				SMPComputeCodeStore.addTokenName(tokenName);

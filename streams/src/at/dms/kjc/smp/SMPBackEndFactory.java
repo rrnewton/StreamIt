@@ -19,6 +19,7 @@ import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.LevelizeSSG;
 import at.dms.kjc.slir.OutputNode;
 import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNode;
 
 /**
@@ -58,13 +59,12 @@ public class SMPBackEndFactory extends
 	 */
 	private static HashMap<Integer, Integer> levelLeftToProcessPP;
 
-	public SMPBackEndFactory(SMPMachine chip, Scheduler scheduler) {
+	public SMPBackEndFactory(SMPMachine chip, Scheduler scheduler, StreamGraph streamGraph) {
 			//Map<String, List<String>> dominators,
 			//Map<Filter, Integer> filterToThreadId) {
 		this.chip = chip;
 		SMPBackEndFactory.scheduler = scheduler;
-		this.setLayout(scheduler);
-	
+		this.setLayout(streamGraph);
 	
 		if (scheduler.isTMD()) {
 			// levelize the slicegraph
@@ -136,8 +136,8 @@ public class SMPBackEndFactory extends
 	public CodeStoreHelper getCodeStoreHelper(InternalFilterNode node) {
 		if (node instanceof WorkNode) {
 			// simply do appropriate wrapping of calls...
-			return new SMPCodeStoreHelper((WorkNode) node, this, scheduler
-					.getComputeNode(node).getComputeCode());
+			return new SMPCodeStoreHelper((WorkNode) node, this, 
+			        SMPBackend.getComputeNode((WorkNode)node).getComputeCode());
 		} else {
 			return null;
 		}

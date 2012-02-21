@@ -59,7 +59,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	public static Set<InputRotatingBuffer> getInputBuffersOnCore(Core t) {
 		HashSet<InputRotatingBuffer> set = new HashSet<InputRotatingBuffer>();
 		for (InputRotatingBuffer b : inputBuffers.values()) {
-			if (SMPBackend.scheduler.getComputeNode(b.getFilterNode())
+			if (SMPBackend.getComputeNode(b.getFilterNode())
 					.equals(t))
 				set.add(b);
 		}
@@ -85,7 +85,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	public static Set<RotatingBuffer> getOutputBuffersOnCore(Core t) {
 		HashSet<RotatingBuffer> set = new HashSet<RotatingBuffer>();
 		for (RotatingBuffer b : outputBuffers.values()) {
-			if (SMPBackend.scheduler.getComputeNode(b.getFilterNode())
+			if (SMPBackend.getComputeNode(b.getFilterNode())
 					.equals(t))
 				set.add(b);
 		}

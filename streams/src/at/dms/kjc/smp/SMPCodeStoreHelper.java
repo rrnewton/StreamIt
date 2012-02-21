@@ -322,7 +322,7 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 			statements.addStatement(new JIfStatement(null,
 					new JEqualityExpression(null, true,
 							new JLocalVariableExpression(LoadBalancer
-									.getSampleBoolVar(SMPBackend.scheduler
+									.getSampleBoolVar(SMPBackend
 											.getComputeNode(filterNode))),
 							new JBooleanLiteral(true)),
 					new JExpressionStatement(new JAssignmentExpression(
@@ -368,7 +368,7 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 			JStatement ifSampleStatement = new JIfStatement(null,
 					new JEqualityExpression(null, true,
 							new JLocalVariableExpression(LoadBalancer
-									.getSampleBoolVar(SMPBackend.scheduler
+									.getSampleBoolVar(SMPBackend
 											.getComputeNode(filterNode))),
 							new JBooleanLiteral(true)), ifSampleThen,
 					new JBlock(), new JavaStyleComment[0]);

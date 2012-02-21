@@ -31,6 +31,9 @@ public class ThreadMapper {
     }
 
     public static int coreToThread(int core) {
+        if (core == -1) {
+            return MAIN_THREAD;
+        }        
         int index = 0;
         for (int c : SMPBackend.coreOrder) {
             if (c == core) return index;
@@ -174,14 +177,20 @@ public class ThreadMapper {
             // If the first thread is not dynamic, then 
             // it doesn't dominate anything, and it will 
             // be on the main thread.
+            int thread = threadId;
             if (!isDynamicInput) {
-                filterToThreadId.put(filter, MAIN_THREAD);
+                //filterToThreadId.put(filter, MAIN_THREAD);
+                thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);  
+                filterToThreadId.put(filter, thread);
                 System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + MAIN_THREAD);                
                 continue;
             }   
-            int thread = threadId;
+          
             if (isProgramSource(filter) || isProgramSink(filter) || isFirstAfterFileInput(firstFilter)) {
-                thread = MAIN_THREAD;
+                
+                thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);  
+                
+                //thread = MAIN_THREAD;
             }            
             filterToThreadId.put(filter, thread);
             System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                

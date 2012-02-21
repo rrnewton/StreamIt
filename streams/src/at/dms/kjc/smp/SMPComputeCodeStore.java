@@ -145,7 +145,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         Filter srcFilter = outputPort.getSSG().getFilterGraph()[outputPort
                 .getSSG().getFilterGraph().length - 1];
 
-        Core srcCore = SMPBackend.scheduler.getComputeNode(srcFilter
+        Core srcCore = SMPBackend.getComputeNode(srcFilter
                 .getWorkNode());
      
         SMPComputeCodeStore codeStore = srcCore.getComputeCode();
@@ -183,7 +183,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                     .getFizzedSlices(firstInputFilter.getParent())[0]
                     .getWorkNode();
 
-        Core core = SMPBackend.scheduler.getComputeNode(firstInputFilter);
+        Core core = SMPBackend.getComputeNode(firstInputFilter);
 
         SMPComputeCodeStore codeStore = core.getComputeCode();
 

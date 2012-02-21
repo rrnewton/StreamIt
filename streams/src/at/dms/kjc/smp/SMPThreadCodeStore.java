@@ -265,7 +265,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                 Filter prevFilter = ProcessFilterWorkNode
                         .getPreviousFilter(inputPort.getSSG().getTopFilters()[0]
                                 .getWorkNode());
-                Core core = SMPBackend.scheduler.getComputeNode(prevFilter
+                Core core = SMPBackend.getComputeNode(prevFilter
                         .getWorkNode());
                 threadIndex = ThreadMapper.coreToThread(core.coreID);
             }
@@ -431,7 +431,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                                                   .size()];
             coreCodeStore.getFilters().toArray(
                     filterArray);
-            Core core = SMPBackend.scheduler.getComputeNode(filterArray[0]);
+            Core core = SMPBackend.getComputeNode(filterArray[0]);
             int coreNum = core.getCoreID();
             methodBody.addStatement(new JExpressionStatement(
                     new JEmittedTextExpression("setCPUAffinity(" + coreNum
@@ -506,7 +506,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                                                   .size()];
             coreCodeStore.getFilters().toArray(
                     filterArray);
-            Core core = SMPBackend.scheduler.getComputeNode(filterArray[0]);
+            Core core = SMPBackend.getComputeNode(filterArray[0]);
             int coreNum = core.getCoreID();
             methodBody.addStatement(new JExpressionStatement(
                     new JEmittedTextExpression("setCPUAffinity(" + coreNum

@@ -249,10 +249,10 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
 
                 System.out
                 .println("InterSSGChannel.getInputBuffersOnCore computeNode="
-                        + SMPBackend.scheduler.getComputeNode(
+                        + SMPBackend.getComputeNode(
                                 f.getWorkNode()).getCoreID());
 
-                if (SMPBackend.scheduler.getComputeNode(f.getWorkNode())
+                if (SMPBackend.getComputeNode(f.getWorkNode())
                         .equals(t)) {
                     System.out
                     .println("InterSSGChannel.getInputBuffersOnCore adding b");
@@ -299,7 +299,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
             StaticSubGraph ssg = port.getSSG();
             Filter top[] = ssg.getFilterGraph();
 
-            if (SMPBackend.scheduler.getComputeNode(top[0].getWorkNode())
+            if (SMPBackend.getComputeNode(top[0].getWorkNode())
                     .equals(t))
                 set.add(b);
         }

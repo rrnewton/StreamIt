@@ -261,7 +261,7 @@ public class ProcessFilterWorkNode {
         }
 
         private int getCoreID(InputPort inputPort) {
-            Core core = SMPBackend.scheduler.getComputeNode(inputPort.getSSG()
+            Core core = SMPBackend.getComputeNode(inputPort.getSSG()
                     .getTopFilters()[0].getWorkNode());
             return core.coreID;
         }
@@ -498,18 +498,25 @@ public class ProcessFilterWorkNode {
         return helper;
     }
     
-    static int getFilterThread(WorkNode workNode) {    
+    static int getFilterThread(WorkNode w, Filter filter) {    
+        
+       if (filter == null) {
+           return getFilterThread(w, w.getParent());
+       }
+       
+        WorkNode workNode = filter.getWorkNode();
+        
         // A FileInput is always on the core of its next filter
         if (workNode.isFileInput()) {
             Filter next = getNextFilter(workNode);
-            Core nextCore = SMPBackend.scheduler.getComputeNode(next.getWorkNode());
+            Core nextCore = SMPBackend.getComputeNode(next.getWorkNode());
             return ThreadMapper.coreToThread(nextCore.coreID);
         }
         
         // A FileOutput is always on the core of its next filter
         if (workNode.isFileOutput()) {
             Filter prev = getPreviousFilter(workNode);
-            Core prevCore = SMPBackend.scheduler.getComputeNode(prev.getWorkNode());
+            Core prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
             return ThreadMapper.coreToThread(prevCore.coreID);
         }
         
@@ -517,7 +524,7 @@ public class ProcessFilterWorkNode {
                 .getFilterToThreadId();
         int threadIndex = filterToThreadId.get(workNode.getParent());       
         if (threadIndex == ThreadMapper.MAIN_THREAD) {
-            Core core = SMPBackend.scheduler.getComputeNode(workNode);
+            Core core = SMPBackend.getComputeNode(workNode);
             threadIndex = ThreadMapper.coreToThread(core.coreID);
         }
         return threadIndex;   
@@ -557,7 +564,7 @@ public class ProcessFilterWorkNode {
         if (workNode.isFileOutput()) {
             return null;
         }        
-        Core core = SMPBackend.scheduler.getComputeNode(workNode);
+        Core core = SMPBackend.getComputeNode(workNode);
         Filter next = workNode.getParent();
         Core nextCore;
         while (true) {
@@ -566,7 +573,7 @@ public class ProcessFilterWorkNode {
                 return null;
             } else {
                 System.out.println("ProcessFilterWorkNode.getNextFilterOnCore next=" + next.getWorkNode());
-                nextCore = SMPBackend.scheduler.getComputeNode(next.getWorkNode());
+                nextCore = SMPBackend.getComputeNode(next.getWorkNode());
                 if (nextCore.coreID == core.coreID || next.getWorkNode().isFileOutput()) {
                     System.out.println("ProcessFilterWorkNode.getNextFilterOnCore returning =" + next.getWorkNode());
                     return next;
@@ -606,7 +613,7 @@ public class ProcessFilterWorkNode {
         if (workNode.isFileOutput()) {
             return null;
         }        
-        Core core = SMPBackend.scheduler.getComputeNode(workNode);
+        Core core = SMPBackend.getComputeNode(workNode);
         Filter prev;
         Core prevCore;
         while (true) {
@@ -614,7 +621,7 @@ public class ProcessFilterWorkNode {
             if (prev == null) {
                 return null;
             } else {
-                prevCore = SMPBackend.scheduler.getComputeNode(prev.getWorkNode());
+                prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
                 if (prevCore.coreID == core.coreID || prev.getWorkNode().isFileInput()) {
                     return prev;
                 }
@@ -811,18 +818,19 @@ public class ProcessFilterWorkNode {
         if (isDynamicPop && !isFirst) {
 
 
-            int threadIndex = getFilterThread(workNode);                      
+            int threadIndex = getFilterThread(workNode, workNode.getParent());                      
             String threadId = Integer.toString(threadIndex);
 
             if (KjcOptions.threadopt) {
 
                 Filter nextFilter = getNextFilterOnCore(workNode);        
-                int nextThread = getFilterThread(nextFilter.getWorkNode());  
+                int nextThread = getFilterThread(workNode, nextFilter);  
                                 
                 Filter prevFilter = getPreviousFilterOnCore(workNode);
-                Core prevCore = SMPBackend.scheduler.getComputeNode(prevFilter
-                        .getWorkNode());
-                int prevThread = getFilterThread(prevFilter.getWorkNode());   
+                
+                Core prevCore = getCore(workNode, prevFilter);
+                
+                int prevThread = getFilterThread(workNode, prevFilter);   
                               
 //
 //                System.out
@@ -932,6 +940,15 @@ public class ProcessFilterWorkNode {
             System.err.println(")");
         }
 
+    }
+
+    private Core getCore(WorkNode workNode1, Filter filter) {        
+        if (filter == null) {
+            System.out.println("ProcessFilterWorkNode.getCore workNode1=" + workNode1 + " workNode2=null");
+            return SMPBackend.getComputeNode(workNode1);
+        }        
+        System.out.println("ProcessFilterWorkNode.getCore workNode1=" + workNode1 + " workNode2=" + filter.getWorkNode());
+        return SMPBackend.getComputeNode(filter.getWorkNode());
     }
 
 }

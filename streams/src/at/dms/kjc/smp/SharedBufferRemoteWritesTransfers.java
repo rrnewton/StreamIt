@@ -106,8 +106,8 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
                 
             if (output.oneOutput(SchedulingPhase.STEADY) && 
                     (output.oneOutput(SchedulingPhase.INIT) || output.noOutputs(SchedulingPhase.INIT)) &&
-                    SMPBackend.scheduler.getComputeNode(parent.filterNode) !=
-                        SMPBackend.scheduler.getComputeNode(output.getSingleEdge(SchedulingPhase.STEADY).getDest().getNextFilter()) &&
+                    SMPBackend.getComputeNode(parent.filterNode) !=
+                        SMPBackend.getComputeNode(output.getSingleEdge(SchedulingPhase.STEADY).getDest().getNextFilter()) &&
                         //now make sure that it is single appearance or downstream has only one input for both steady and init
                         (output.getSingleEdge(SchedulingPhase.STEADY).getDest().singleAppearance() &&
                                 //check steady for only one input downstream or only one rotation
@@ -1009,7 +1009,7 @@ public class SharedBufferRemoteWritesTransfers extends BufferTransfers {
         if (directFileWrite && SMPBackend.FAKE_IO) {
             //if we are faking the io and this writes to a file writer assign val to volatile value
             body.addStatement(Util.toStmt(FAKE_IO_VAR + "__n" + 
-					  SMPBackend.scheduler.getComputeNode(parent.filterNode).getCoreID() + " = " + valName));
+					  SMPBackend.getComputeNode(parent.filterNode).getCoreID() + " = " + valName));
         } else {
             JExpression bufRef = null;
             
