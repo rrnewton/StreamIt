@@ -18,8 +18,7 @@ import at.dms.kjc.slir.StaticSubGraph;
  *
  */
 public class ThreadMapper {
-
-    public static final int    MAIN_THREAD = -1;
+   
     private static ThreadMapper mapper      = null;
     private static int          threadId;
     static {
@@ -32,7 +31,7 @@ public class ThreadMapper {
 
     public static int coreToThread(int core) {
         if (core == -1) {
-            return MAIN_THREAD;
+            return -1;
         }        
         int index = 0;
         for (int c : SMPBackend.coreOrder) {
@@ -182,15 +181,18 @@ public class ThreadMapper {
                 //filterToThreadId.put(filter, MAIN_THREAD);
                 thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);  
                 filterToThreadId.put(filter, thread);
-                System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + MAIN_THREAD);                
+                System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                
                 continue;
             }   
-          
-            if (isProgramSource(filter) || isProgramSink(filter) || isFirstAfterFileInput(firstFilter)) {
-                
-                thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);  
-                
-                //thread = MAIN_THREAD;
+                      
+            if ( isProgramSink(filter)) {                
+                Filter prev = ProcessFilterWorkNode.getPreviousFilter(filter.getWorkNode());                
+                int core = SMPBackend.getComputeNode(prev.getWorkNode()).coreID;                                                
+                thread = coreToThread(core);                                    
+            } 
+            
+            if (isProgramSource(filter) || isFirstAfterFileInput(firstFilter)) {                
+                thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);                  
             }            
             filterToThreadId.put(filter, thread);
             System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                
@@ -202,7 +204,7 @@ public class ThreadMapper {
                 dominatorsAdd(firstFilter, ProcessFilterWorkNode.getNextFilter(filter.getWorkNode()));
             }
             
-            if (thread != MAIN_THREAD) {
+            if (thread < KjcOptions.smp) {
                 threadIdToType.put(threadId,getFilterInputType(firstFilter).toString());
             }
                 

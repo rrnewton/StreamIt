@@ -98,11 +98,15 @@ public class ProcessFilterWorkNode {
                 String buffer = "dyn_buf_" + threadId;
 
                 int next = -1;
-                if (KjcOptions.threadopt) {
+                if (KjcOptions.threadopt) {                                                            
                     int channelId = ((InterSSGChannel) inputChannel).getId();
-                    Filter nextFilter = getNextFilter(workNode);
-                    assert nextFilter != null : "ERROR: ProcessFilterWorkNode: Next Filter after dynamic pop is null!";
-                    next = filterToThreadId.get(nextFilter);
+                    Filter nextFilter = getNextFilterOnCore(workNode);                                                 
+                    next = getFilterThread(workNode, nextFilter);                                  
+                    // If there is no next filter on this core
+                    // then we want to return to the main.
+                    if (nextFilter == null) {                            
+                        next = ThreadMapper.coreToThread(getCoreID(inputPort));
+                    }
                     buffer = "dyn_buf_" + channelId;
                 }
 
@@ -202,20 +206,19 @@ public class ProcessFilterWorkNode {
             int next = -1;
             if (KjcOptions.threadopt) {
                 int channelId = ((InterSSGChannel) inputChannel).getId();
-                Filter nextFilter = getNextFilter(workNode);
-                assert nextFilter != null : "ERROR: ProcessFilterWorkNode: Next Filter after dynamic pop is null!";
-                next = filterToThreadId.get(nextFilter);
-                buffer = "dyn_buf_" + channelId;
 
-                System.out.println("PushPopReplacing workNode="
-                        + workNode.toString() + "next=" + next);
-
-                if (next == -1) {
-                    System.out.println("PushPopReplacing workNode="
-                            + workNode.toString() + " codeID="
-                            + getCoreID(inputPort));
+                
+                Filter nextFilter = getNextFilterOnCore(workNode);                                                 
+                next = getFilterThread(workNode, nextFilter);                                  
+                // If there is no next filter on this core
+                // then we want to return to the main.
+                if (nextFilter == null) {                            
                     next = ThreadMapper.coreToThread(getCoreID(inputPort));
                 }
+                
+                buffer = "dyn_buf_" + channelId;
+                System.out.println("PushPopReplacing workNode="
+                        + workNode.toString() + "next=" + next);
 
             }
 
@@ -522,11 +525,7 @@ public class ProcessFilterWorkNode {
         
         Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                 .getFilterToThreadId();
-        int threadIndex = filterToThreadId.get(workNode.getParent());       
-        if (threadIndex == ThreadMapper.MAIN_THREAD) {
-            Core core = SMPBackend.getComputeNode(workNode);
-            threadIndex = ThreadMapper.coreToThread(core.coreID);
-        }
+        int threadIndex = filterToThreadId.get(workNode.getParent());              
         return threadIndex;   
     }
 
@@ -574,10 +573,16 @@ public class ProcessFilterWorkNode {
             } else {
                 System.out.println("ProcessFilterWorkNode.getNextFilterOnCore next=" + next.getWorkNode());
                 nextCore = SMPBackend.getComputeNode(next.getWorkNode());
-                if (nextCore.coreID == core.coreID || next.getWorkNode().isFileOutput()) {
+                if (nextCore.coreID == core.coreID) {
                     System.out.println("ProcessFilterWorkNode.getNextFilterOnCore returning =" + next.getWorkNode());
                     return next;
                 }
+                if (next.getWorkNode().isFileOutput()) {
+                    if (nextCore.coreID != core.coreID) {
+                        return null;
+                    } 
+                }
+                
             }
         }
     }
@@ -823,39 +828,31 @@ public class ProcessFilterWorkNode {
 
             if (KjcOptions.threadopt) {
 
-                Filter nextFilter = getNextFilterOnCore(workNode);        
-                int nextThread = getFilterThread(workNode, nextFilter);  
-                                
-                Filter prevFilter = getPreviousFilterOnCore(workNode);
+                Filter nextFilter = getNextFilterOnCore(workNode);                                                 
+                int nextThread = getFilterThread(workNode, nextFilter);                                  
+                Filter prevFilter = getPreviousFilterOnCore(workNode);                
+                Core prevCore = getCore(workNode, prevFilter);                
+                int prevThread = getFilterThread(workNode, prevFilter);                   
+                // If there is no next filter on this core
+                // then we want to return to the main.
+                if (nextFilter == null) {                            
+                    nextThread = ThreadMapper.coreToThread(location.coreID);
+                }
                 
-                Core prevCore = getCore(workNode, prevFilter);
-                
-                int prevThread = getFilterThread(workNode, prevFilter);   
-                              
-//
-//                System.out
-//                        .println("ProcessFilterWorkNode.standardSteadyProcessing filter="
-//                                + workNode.getParent().getWorkNode()
-//                                + "("
-//                                + threadId
-//                                + ")"
-//                                + " --> nextFilter = "
-//                                + nextFilter.getWorkNode()
-//                                + "("
-//                                + nextThread
-//                                + ")");
-//
-//                
-//                System.out
-//                        .println("ProcessFilterWorkNode.standardSteadyProcessing filter="
-//                                + workNode.getParent().getWorkNode()
-//                                + "("
-//                                + threadId
-//                                + ")"
-//                                + " <-- prevFilter = "
-//                                + prevFilter.getWorkNode() + "( " + prevThread + " )");
 
-                
+                System.out
+                        .println("ProcessFilterWorkNode.standardSteadyProcessing "
+                                + "prevFilter = "
+                                + (prevFilter != null ? prevFilter.getWorkNode() : "null")  + "( " + prevThread + " )"                              
+                        		+ " --> filter="
+                                + workNode.getParent().getWorkNode()
+                                + "("
+                                + threadId
+                                + ")"
+                                + " --> nextFilter = "
+                                + (nextFilter != null ? nextFilter.getWorkNode() : "null")  + "( " + nextThread + " )" );    
+                                
+                                               
                 codeStore.addThreadHelper(
                         threadIndex,
                         nextThread,
@@ -863,6 +860,15 @@ public class ProcessFilterWorkNode {
 
                 
                 boolean addCall = false;
+                
+                
+                
+                // If the previous filter is null, then it means this
+                // is the first filter on the core, and we need a call.
+                if (prevFilter == null) {
+                    addCall = true;
+                }
+                
                 // If the previous filter is on a different core,
                 // Then the main thread should call this thread.
                 if (prevCore.coreID != location.coreID) {
