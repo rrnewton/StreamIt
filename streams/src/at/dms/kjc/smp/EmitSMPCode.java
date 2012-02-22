@@ -454,8 +454,7 @@ public class EmitSMPCode extends EmitCode {
             p.println();
 
             if (KjcOptions.threadopt) {
-                int numThreads = threadIdToType.keySet().size()
-                        + KjcOptions.smp;
+                int numThreads = ThreadMapper.getNumThreads();                
                 p.println("#define NUM_THREADS  " + numThreads);
             } else {
                 p.println("#define DYNAMIC_READERS  " + numDynamicReaders);

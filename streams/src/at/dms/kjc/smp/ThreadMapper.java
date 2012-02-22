@@ -28,6 +28,10 @@ public class ThreadMapper {
             threadId = 0;
         }
     }
+    
+    public static int getNumThreads() {
+        return threadId ;
+    }
 
     public static int coreToThread(int core) {
         if (core == -1) {
@@ -191,9 +195,16 @@ public class ThreadMapper {
                 thread = coreToThread(core);                                    
             } 
             
-            if (isProgramSource(filter) || isFirstAfterFileInput(firstFilter)) {                
+            if (isProgramSource(filter)) {                
+                Filter next = ProcessFilterWorkNode.getNextFilter(filter.getWorkNode());    
+                thread = coreToThread(SMPBackend.getComputeNode(next.getWorkNode()).coreID);                  
+            }            
+
+            if (isFirstAfterFileInput(firstFilter)) {                
                 thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);                  
             }            
+
+            
             filterToThreadId.put(filter, thread);
             System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                
             dominatorsAdd(firstFilter, filter);
