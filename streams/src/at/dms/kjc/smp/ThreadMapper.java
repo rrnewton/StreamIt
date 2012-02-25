@@ -62,8 +62,6 @@ public class ThreadMapper {
     /** a mapping from filter to thread id */
     private Map<Filter, Integer>      filterToThreadId;
 
-   
-
     /** a mapping of dominator filter to dominated filter */
     private Map<String, List<String>> dominators;
 
@@ -219,67 +217,8 @@ public class ThreadMapper {
                 threadIdToType.put(threadId,getFilterInputType(firstFilter).toString());
             }
                 
-        }
-      
-    
-        
+        }              
     }
-//        
-//        
-//        Filter f = ssg.getTopFilters()[0];
-//        boolean isDynamicInput = ssg.hasDynamicInput();
-//        boolean isFileOutput = f.getWorkNode().isFileOutput();
-//
-//        if (!isDynamicInput) {
-//            filterToThreadId.put(f, MAIN_THREAD);
-//            System.out.println("ThreadMapper.assignThreadsOpt 1 filter=" + getFilterName(f) + " thread=" + MAIN_THREAD);
-//        } else {
-//            /* Check if it has a dynamic pop rate */               
-//            for (Filter topFilter : ssg.getTopFilters()) {              
-//                
-//                Filter[] filterGraph = ssg.getFilterGraph();
-//
-//                if (isVoidInputType(topFilter)) {
-//                    for (Filter filter : filterGraph) {
-//                        dominatorsInitEmptyIfNotEqual(
-//                                topFilter,
-//                                filter);
-//                        filterToThreadId.put(
-//                                filter,
-//                                MAIN_THREAD);
-//                        System.out.println("ThreadMapper.assignThreadsOpt 2 filter=" + getFilterName(filter) + " thread=" + MAIN_THREAD);                    
-//                    }
-//                } else {
-//                    int thread = threadId;  
-//                    if (isFileOutput) {
-//                        thread = MAIN_THREAD;
-//                    } 
-//                    filterToThreadId.put(topFilter,thread);
-//                    System.out.println("ThreadMapper.assignThreadsOpt filter=" + getFilterName(topFilter) + " thread=" + thread);                    
-//                    if (!isVoidInputType(topFilter)
-//                            && !isNullType(topFilter)) {
-//                        threadIdToType.put(
-//                                threadId,
-//                                getFilterInputType(
-//                                        topFilter).toString());
-//                        for (Filter filter : filterGraph) {
-//                            dominatorsAdd(
-//                                    topFilter,
-//                                    filter);
-//                        }
-//                    }
-//                    
-//                    if (!topFilter.getWorkNode().isFileInput()) {
-//                        threadId++;                        
-//                    }
-//                    
-//
-//
-//                
-//                }
-//            } // end for loop
-//        }
-//    }
     
     private void dominatorsAdd(Filter f1, Filter f2) {
         if (!dominators.containsKey(getFilterName(f1))) {

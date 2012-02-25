@@ -787,3 +787,9 @@ longname 		"preoutputs"
 	requireArgument
 	help		"Only start counting outputs after <n> outputs (for performance tests)."
 
+longname 		"threadbatch"
+	type		int
+	default 	"1"
+	requireArgument
+	help		"Multiple the number of iterations in each thread by <n>."
+

@@ -834,11 +834,21 @@ public class EmitSMPCode extends EmitCode {
             }
         }
 
+        Set<String> dominators = ThreadMapper.getMapper().getDominators().keySet();
+        
         for (Core core : SMPBackend.chip.getCores()) {
             for (JFieldDeclaration fieldDecl : core.getComputeCode()
                     .getExternFields().values()) {
-                String ident = fieldDecl.getVariable().getIdent();             
-                p.println(ident + " = 1;");             
+                String ident = fieldDecl.getVariable().getIdent();                         
+                System.out.println ("EmitSMPCode ident=" + ident);                
+
+                if (dominators.contains(ident.substring(0, ident.lastIndexOf("_multiplier")))) {
+                    System.out.println ("EmitSMPCode ident=" + ident.substring(0, ident.lastIndexOf("_multiplier")));  
+                    p.println(ident + " = " + KjcOptions.threadbatch + ";");      
+                    System.out.println ("EmitSMPCode ident=" + ident + " = " + KjcOptions.threadbatch + ";");  
+                } else {
+                    p.println(ident + " = 1;");      
+                }                                
             }
         }
 
