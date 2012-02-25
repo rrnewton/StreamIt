@@ -6,7 +6,7 @@ import re
 import math
 
 class Configs:
-    nofusion, fusion, dynamic, lockfree, threadopt = range(5)
+    nofusion, fusion, dynamic, lockfree, threadopt, threadbatch = range(6)
 
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
@@ -16,7 +16,8 @@ tests        = [
     (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse'], './smp1' ),
     (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
     (Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' )
+    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' ),
+    (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt'], './smp1' )
     ]
 
 def generate(test, num_filters, work):
@@ -32,6 +33,8 @@ def generate(test, num_filters, work):
     elif test[0] == Configs.lockfree:        
         op += '        add Fdynamic();\n'        
     elif test[0] == Configs.threadopt:        
+        op += '        add Fdynamic();\n'
+    elif test[0] == Configs.threadbatch:        
         op += '        add Fdynamic();\n'
     op += '    add FileWriter<float>("./test.out");\n'
     op += '}\n'
@@ -85,6 +88,8 @@ def run_one(test):
         test_type = 'lockfree'
     elif test[0] == Configs.threadopt:
         test_type = 'threadopt' 
+    elif test[0] == Configs.threadbatch:
+        test_type = 'threadbatch' 
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
     for m in regex.finditer(stdout):
@@ -106,24 +111,24 @@ def run(test, attempts):
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
 
-def print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results):
+def print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results):
     file = 'fusion' + str(work) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'dynamic', 'dev', 'lockfree', 'dev', 'threadopt', 'dev')
+        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'dynamic', 'dev', 'lockfree', 'dev', 'threadopt', 'dev', 'threadbatch', 'dev')
         print s
         f.write(s + '\n')  
-        for x, y, z, l, t in zip(nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], z[3], z[4], l[3], l[4], t[3], t[4])
+        for x, y, z, l, t, b in zip(nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results):
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], z[3], z[4], l[3], l[4], t[3], t[4], b[3], b[4])
             print s
             f.write(s + '\n')
     file = 'fusion-normalized' + str(work) + '.dat'
     nofusion = nofusion_results[0]
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion','dynamic', 'lockfree', 'threadopt')
+        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion','dynamic', 'lockfree', 'threadopt', 'threadbatch')
         print s
         f.write(s + '\n')
-        for fusion, dynamic, lockfree, threadopt in zip(fusion_results, dynamic_results, lockfree_results, threadopt_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (dynamic[3]/nofusion[3]), (lockfree[3]/nofusion[3]), (threadopt[3]/nofusion[3]))
+        for fusion, dynamic, lockfree, threadopt, threadbatch in zip(fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results):
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (dynamic[3]/nofusion[3]), (lockfree[3]/nofusion[3]), (threadopt[3]/nofusion[3]), (threadbatch[3]/nofusion[3]))
             print s
             f.write(s + '\n')
 
@@ -141,7 +146,10 @@ def plot(work, outputs):
     cmd += data + "\" u 1:9 t \'lockfree\' w linespoints, \""
     cmd += "\" u 1:9:10 notitle w yerrorbars, \""
     cmd += data + "\" u 1:11 t \'threadopt\' w linespoints, \""
-    cmd += "\" u 1:11:12 notitle w yerrorbars"
+    cmd += "\" u 1:11:12 notitle w yerrorbars, \""
+    cmd += data + "\" u 1:13 t \'threadbatch\' w linespoints, \""
+    cmd += "\" u 1:13:14 notitle w yerrorbars"
+
     
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
@@ -160,6 +168,7 @@ def plot_normalized(work, outputs):
     cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
     cmd += data + "\" u 1:5 t \'lockfree\' w linespoints, \""
     cmd += data + "\" u 1:6 t \'threadopt\' w linespoints, \""
+    cmd += data + "\" u 1:7 t \'threadbatch\' w linespoints, \""
     cmd += "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
@@ -186,6 +195,7 @@ def main():
         dynamic_results = []
         lockfree_results = []
         threadopt_results = []
+        threadbatch_results = []
         for num_filters in filters:
             for test in tests:
                 generate(test, num_filters, work)
@@ -211,8 +221,13 @@ def main():
                     threadopt_results.append(('threadopt', work, num_filters, avg, dev))
                     x = ('threadopt', work, num_filters, avg, dev)
                     print x
+                elif test[0] == Configs.threadbatch:
+                    threadbatch_results.append(('threadbatch', work, num_filters, avg, dev))
+                    x = ('threadbatch', work, num_filters, avg, dev)
+                    print x
+
                     
-        print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results)
+        print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results)
         plot(work, outputs)
         plot_normalized(work, outputs)
                     
