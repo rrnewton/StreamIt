@@ -160,8 +160,8 @@ def main():
     ignore = 1000
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    batching = range(1000)[0::100]
-    total_work = [100]
+    batching = [100, 250, 500, 750, 1000]
+    total_work = [1000]
     for work in total_work:
         static_results = []      
         threadbatch_results = []
