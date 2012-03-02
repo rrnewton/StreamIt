@@ -35,7 +35,7 @@ float->float pipeline CFARNoiseLevelCalcPipe(int cols)
   add CFARNoiseLevelMeanCalcGather(cols, 12);
 }
 
-float->float filter CFARNoiseLevelMeanCalc(int cols, int rows)
+float->float stateful filter CFARNoiseLevelMeanCalc(int cols, int rows)
 {
   int column;
   

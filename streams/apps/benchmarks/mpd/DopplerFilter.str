@@ -50,7 +50,7 @@ float->float pipeline VideoPipe(int n)
 // description: calculates an array of weights and multiplies the real values of the stream with these
 // input: real and imaginary float numbers from the generated radar stream
 // output: real and imaginary float numbers multiplied with the calculated weight
-float->float filter WeightCalc(int n)
+float->float stateful filter WeightCalc(int n)
 {
   float[n] window;
   int windowPos;

@@ -69,7 +69,7 @@ float->float filter CFARDetectGuard()
   }
 }
 
-float->float filter CFARDetectFilter(int rows, int cols)
+float->float stateful filter CFARDetectFilter(int rows, int cols)
 {
   int currentCol;
   int currentRow;

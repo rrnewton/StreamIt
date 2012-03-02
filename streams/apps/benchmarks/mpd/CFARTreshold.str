@@ -69,7 +69,7 @@ float->float filter CFARTreshReorganize(int rows)
   }
 }
 
-float->float filter CFARTreshCumSumFilter(int rows)
+float->float stateful filter CFARTreshCumSumFilter(int rows)
 {
   float cumSum;
   int counter;

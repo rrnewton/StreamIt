@@ -78,7 +78,7 @@ float->float filter GuardMultiplier()
   }
 }
 
-void->float filter ValueCreator()
+void->float stateful filter ValueCreator()
 {
   float nRsPulse;
   float[11] weight;
