@@ -1,0 +1,22 @@
+void->void pipeline aggregation {
+    add FileReader<float>("../inputs/floats.in");
+    add aggregate();
+    add FileWriter<float>(stdout);
+}
+
+float->float stateful filter aggregate() {
+    float sum;
+    float count;
+    init {
+        sum = 0;
+        count = 0;
+    } 
+    work pop 1 push * {
+        float x = pop();
+        count++;
+        sum += x;
+        float avg = sum / count;
+        push(avg);
+    }
+}
+
