@@ -1,5 +1,5 @@
 void->void pipeline aggregation {
-    add FileReader<float>("../inputs/floats.in");
+    add FileReader<float>("../inputs/tmp.bin");
     add aggregate();
     add FileWriter<float>(stdout);
 }
@@ -7,16 +7,30 @@ void->void pipeline aggregation {
 float->float stateful filter aggregate() {
     float sum;
     float count;
+    float delta;
+    float last_time;
     init {
         sum = 0;
         count = 0;
+        delta = 1;
+        last_time = 1;
     } 
     work pop 1 push * {
-        float x = pop();
-        count++;
-        sum += x;
-        float avg = sum / count;
-        push(avg);
+        float time = pop();
+        float val = pop();
+        if (time - last_time >= delta) {
+            push(count); 
+            push(sum); 
+            float avg = sum / count;
+            push(avg);
+            count = 1;
+            sum = val;
+            last_time = time;
+        } else {
+            count++;
+            sum += val;
+        }
+
     }
 }
 
