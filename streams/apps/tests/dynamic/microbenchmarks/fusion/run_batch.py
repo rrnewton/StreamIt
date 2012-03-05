@@ -160,7 +160,7 @@ def main():
     ignore = 1000
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    batching = [100, 250, 500, 750, 1000]
+    batching = [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000]
     total_work = [1000]
     for work in total_work:
         static_results = []      
@@ -176,7 +176,8 @@ def main():
             generate(test, num_filters, work)
             results = []
             for batch in batching:
-                compile(test, batch, outputs, ignore)
+                #compile(test, batch, outputs, ignore)
+                compile(test, batch, outputs, batch-1)
                 (avg, dev) =  run(test, attempts)
                 x = ('threadbatch', work, batch, num_filters, avg, dev)
                 print x

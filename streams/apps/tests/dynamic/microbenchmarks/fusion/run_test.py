@@ -184,7 +184,7 @@ def main():
     ignore = 1000
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    total_work = [100, 1000, 10000, 100000]
+    total_work = [1, 100, 1000, 10000, 100000]
     #ignore = 10
     #outputs = 1000
     #filters = [2, 4]
