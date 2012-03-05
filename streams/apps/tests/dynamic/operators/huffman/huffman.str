@@ -69,6 +69,9 @@ int->int filter encoder() {
             push(1);
             push(0);
         } else if (c == 115) {
+            push(1);            
+            push(0);
+            push(1);
             push(1);
         } else if (c == 116) {
             push(0);
