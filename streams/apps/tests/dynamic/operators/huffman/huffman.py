@@ -38,12 +38,11 @@ def pop_task():
     raise KeyError('pop from an empty priority queue')
 
 def freq(text):
-    arr=numpy.zeros(26,numpy.float64)  
+    arr=numpy.zeros(128,numpy.float64)  
     for l in text:  
         x=ord(l)  
-        if (x>=97 and x<=122):  
-            arr[x-97]+=1.0  
-    arr/=max(arr)
+        arr[x]+=1.0  
+            #arr/=sum(arr)
     return arr
 
 def main():
@@ -52,9 +51,9 @@ def main():
     uidx = -1.0
     h = []
     for idx, val in enumerate(arr):
-        print val, idx+97
+        print val, idx
         if (val > 0):
-            add_task(idx+97, val)
+            add_task(idx, val)
     print "---------"
     while len(pq) > 1:
         (p1, n1) = pop_task()
