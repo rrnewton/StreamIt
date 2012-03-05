@@ -1,10 +1,11 @@
-void->void pipeline aggregation {
-    add FileReader<float>("../inputs/tmp.bin");
-    add aggregate();
+void->void pipeline huffman {
+    add FileReader<float>("./tmp.bin");
+    add encoder();
+    add decoder();
     add FileWriter<float>(stdout);
 }
 
-float->float stateful filter aggregate() {
+int->int stateful filter encoder() {
     float sum;
     float count;
     float delta;
@@ -32,5 +33,9 @@ float->float stateful filter aggregate() {
         }
 
     }
+}
+
+int->int stateful filter decoder() {
+    push(pop())
 }
 
