@@ -116,8 +116,87 @@ int->int filter encoder() {
 }
 
 int->int stateful filter decoder() {
-    work pop 1 push 1 {
-      push(pop());
+    work pop * push 1 {
+        int c1 = pop();
+        int c2 = pop();
+        int c3 = pop();
+        int c4 = 0;
+        int c5 = 0;
+        int match = 0;
+
+        if ((c1 == 1) && (c2 == 1) && (c3 == 1)) {
+           push(32);
+           match = 1;
+        }
+
+        else if ((c1 == 0) && (c2 == 1) && (c3 == 0)) {
+           push(97);
+           match = 1;
+        }
+
+        else if ((c1 == 0) && (c2 == 0) && (c3 == 0)) {
+           push(101);
+           match = 1;
+        }
+
+        if (0 == match) {
+            c4 = pop();
+            if ((c1 == 1) && (c2 == 1) && (c3 == 0) && (c4 == 1)) {
+                push(102);
+                match = 1;
+            }
+            else if ((c1 == 1) && (c2 == 0) && (c3 == 1) && (c4 == 0)) {
+               push(104);
+               match = 1;
+            }
+            else if ((c1 == 1) && (c2 == 0) && (c3 == 0) && (c4 == 0)) {
+               push(105);
+               match = 1;
+            }
+            else if ((c1 == 0) && (c2 == 1) && (c3 == 1) && (c4 == 1)) {
+               push(109);
+               match = 1;
+            }
+            else if ((c1 == 0) && (c2 == 0) && (c3 == 1) && (c4 == 0)) {
+               push(110);
+               match = 1;
+            }
+            else if ((c1 == 1) && (c2 == 0) && (c3 == 1) && (c4 == 1)) {
+               push(115);
+               match = 1;
+            }
+            else if ((c1 == 0) && (c2 == 1) && (c3 == 1) && (c4 == 0)) {
+               push(116);
+               match = 1;
+            }
+        }
+        if (0 == match) {
+            c5 = pop();
+            if ((c1 == 1) && (c2 == 1) && (c3 == 0) && (c4 == 0) && (c5 == 1)) {
+                push(108);
+                match = 1;
+            }
+            else if ((c1 == 0) && (c2 == 0) && (c3 == 1) && (c4 == 1) && (c5 == 0)) {
+                push(111);
+                match = 1;
+            }
+            else if ((c1 == 1) && (c2 == 0) && (c3 == 0) && (c4 == 1) && (c5 == 1)) {
+                push(112);
+                match = 1;
+            }
+            else if ((c1 == 1) && (c2 == 1) && (c3 == 0) && (c4 == 0) && (c5 == 0)) {
+                push(114);
+                match = 1;
+            }
+            else if ((c1 == 0) && (c2 == 0) && (c3 == 1) && (c4 == 1) && (c5 == 1)) {
+                push(117);
+                match = 1;
+            }
+            else if ((c1 == 1) && (c2 == 0) && (c3 == 0) && (c4 == 1) && (c5 == 0)) {
+                push(120);
+                match = 1;
+            }
+        }
     }
 }
 
