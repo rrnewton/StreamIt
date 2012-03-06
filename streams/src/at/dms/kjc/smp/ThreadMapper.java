@@ -24,13 +24,14 @@ public class ThreadMapper {
     static {
         if (KjcOptions.threadopt) {
             threadId = KjcOptions.smp - 1;
+            //threadId = 0;
         } else {
             threadId = 0;
         }
     }
     
     public static int getNumThreads() {
-        return threadId ;
+        return threadId + 1;
     }
 
     public static int coreToThread(int core) {
@@ -67,6 +68,8 @@ public class ThreadMapper {
 
     /** a mapping of thread to its input type */
     private Map<Integer, String>      threadIdToType;
+    
+    private Map<Integer, Integer>     coreToThread;
 
     /**
      * Private constructor for singleton
@@ -75,6 +78,7 @@ public class ThreadMapper {
         filterToThreadId = new HashMap<Filter, Integer>();     
         dominators = new HashMap<String, List<String>>();
         threadIdToType = new HashMap<Integer, String>();
+        coreToThread = new HashMap<Integer, Integer>();
     }
 
     /**
@@ -165,14 +169,16 @@ public class ThreadMapper {
         boolean isDynamicInput = ssg.hasDynamicInput();
         Filter firstFilter = ssg.getFilterGraph()[0];
         
+        System.out.println("++> ThreadMapper.assignThreadsOpt  firstFilter=" + getFilterName(firstFilter));                
+        
         // The first filter of an SSG always gets its own thread, 
         // with the exception of the first filter in the program.
         // Therefore, increment the count, unless we were at the 
         // first one.
         if (!isProgramSource(firstFilter) && !isFirstAfterFileInput(firstFilter)) {
-            threadId++;
+        	threadId++;
         }
-                
+                                   
         for (Filter filter : ssg.getFilterGraph()) {
             
             // If the first thread is not dynamic, then 
@@ -198,13 +204,13 @@ public class ThreadMapper {
                 thread = coreToThread(SMPBackend.getComputeNode(next.getWorkNode()).coreID);                  
             }            
 
-            if (isFirstAfterFileInput(firstFilter)) {                
+            if (isFirstAfterFileInput(filter)) {                
                 thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);                  
             }            
 
             
             filterToThreadId.put(filter, thread);
-            System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                
+            System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                
             dominatorsAdd(firstFilter, filter);
             
             // We need another special case here. A FileWriter should be dominated by the
@@ -217,7 +223,8 @@ public class ThreadMapper {
                 threadIdToType.put(threadId,getFilterInputType(firstFilter).toString());
             }
                 
-        }              
+        }    
+       
     }
     
     private void dominatorsAdd(Filter f1, Filter f2) {
@@ -293,5 +300,9 @@ public class ThreadMapper {
     private boolean isVoidInputType(Filter f) {
         return (getFilterInputType(f) == CStdType.Void);
     }
+
+	public static boolean isMain(int thread) {
+		 return (thread < KjcOptions.smp);
+	}
     
 }

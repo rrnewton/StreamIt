@@ -881,7 +881,7 @@ public class ProcessFilterWorkNode {
                 }                
                 // If the previous thread is on a main, then lookup what the
                 // core is
-                if (prevThread < KjcOptions.smp) {  
+                if (ThreadMapper.isMain(prevThread)) {  
                     addCall = true;
                 }
                 
@@ -893,7 +893,7 @@ public class ProcessFilterWorkNode {
                             threadIndex);
                 }                              
                        
-                if (nextThread < KjcOptions.smp) {
+                if (ThreadMapper.isMain(nextThread)) {               
                     codeStore.addSteadyThreadWait(nextThread);
                 }
 
