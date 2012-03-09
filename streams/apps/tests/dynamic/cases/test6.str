@@ -1,34 +1,34 @@
 
 void->int stateful filter A {
-  int count;
+  int acount;
   init {
-     count = 0;
+     acount = 0;
   }
   work push 1 {
-    count++;
-    push(count++);
+    acount++;
+    push(acount++);
   }
 }
 
 int->int stateful filter B {
-  int count;
+  int bcount;
   init {
-     count = 0;
+     bcount = 0;
   }
     work pop 1 push * {
       int i;     
       int amount = pop(); 
       push(amount);     
       for(i=0; i < amount; i++)
-          push(count++);
+          push(bcount++);
    
    }
 }
 
 int->int stateful filter C {
-  int count;
+  int ccount;
   init {
-     count = 0;
+     ccount = 0;
   }    
     work pop * push 1 {
       int amount = pop();
@@ -36,7 +36,7 @@ int->int stateful filter C {
       for(i=0; i < amount; i++) {
         pop();
       }
-      count++;
+      ccount++;
       push(amount);      
    }
 }

@@ -1,0 +1,49 @@
+void->void pipeline test {
+    add FileReader<float>("./floats.in");
+    add Fdynamic();
+    add Fdummy();
+    add Fstatic();
+    add FileWriter<float>(stdout);
+}
+
+float->float filter Fstatic() {
+    work pop 1 push 1 {
+        int i;
+        float x;
+        x = pop();
+        for (i = 0; i < 10; i++) {
+            x += i * 3.0 - 1.0;
+        }
+        push(x);
+    }
+}
+
+float->float filter FstaticX() {
+    work pop 1 push 1 {
+        int i;
+        float x;
+        x = pop();
+        for (i = 0; i < 90; i++) {
+            x += i * 3.0 - 1.0;
+        }
+        push(x);
+    }
+}
+
+float->float filter Fdummy() {
+    work pop 1 push 1 {
+        push(pop())
+;    }
+}
+
+float->float filter Fdynamic() {
+    work pop * push * {
+        int i;
+        float x;
+        x = pop();
+        for (i = 0; i < 90; i++) {
+            x += i * 3.0 - 1.0;
+        }
+        push(x);
+    }
+}
