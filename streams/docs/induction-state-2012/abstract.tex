@@ -1,0 +1,28 @@
+With multicore architectures becoming more prominent in computing
+systems, there is a growing need to adapt programs to use these
+available resources.  Stream programming is a programming 
+paradigm that can yield high-performance programs by effectively
+mapping computations across many cores.  Such programs are naturally
+expressible as graphs of independently executing filters communicating 
+over data channels.  
+
+Even with such inherent parallelism in this paradigm, data parallelism
+may be inhibited in filters due largely to how they are written.  
+Most commonly, filters may be "`stateful"', meaning they retain mutable 
+state between filter execution.  Such filters must be executed in a 
+serial fashion and cannot be replicated and run in parallel in order
+to maintain correctness.  A common category of filter state is that of 
+induction state.  Such state keeps track of how often the filter has 
+been invoked, allowing it to perform some special action at certain 
+iterations.  
+
+In this work, we attempt to eliminate such throughput bottlenecks on 
+data parallelism that may be caused by induction state usage.  This 
+process uses an internal induction variable and provides slight 
+modifications to filter fission, a transformation that increases the 
+granularity of stream graphs to improve parallelism in the stream program.
+
+The proposed modifications to filter fission are implemented in the 
+StreamIt language.  StreamIt Users can improve data parallelism on 
+filters that use induction variables by modifying common induction 
+variable patterns to use the added StreamIt language features. 

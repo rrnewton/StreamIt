@@ -1,0 +1,110 @@
+\documentclass[]{IEEEtran}
+
+% The following \documentclass options may be useful:
+%
+% 10pt          To set in 10-point type instead of 9-point.
+% 11pt          To set in 11-point type instead of 9-point.
+% authoryear    To obtain author/year citation style instead of numeric.
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amssymb}
+\usepackage{subfigure}
+\usepackage{algorithm} 
+\usepackage{algpseudocode}
+%\usepackage{times}
+
+% make an environment for subfigures with verbatim
+\newbox\subfigbox	% Create a box to hold the subfigure. 
+\makeatletter
+  \newenvironment{subfloat}% % Create the new environment. 
+    {\def\caption##1{\gdef\subcapsave{\relax##1}}%
+    \let\subcapsave=\@empty % Save the subcaption text.  
+    \let\sf@oldlabel=\label 
+    \def\label##1{\xdef\sublabsave{\noexpand\label{##1}}}%
+    \let\sublabsave\relax  %
+    \setbox\subfigbox\hbox 
+        \bgroup}% 
+     {\egroup   %
+    \let\label=\sf@oldlabel
+    \subfigure[\subcapsave]{\box\subfigbox}}% 
+\makeatother
+
+\newcommand{\eightpoint}{\fontsize{8pt}{10pt}\selectfont}
+\newcommand{\ninepoint}{\fontsize{9pt}{11pt}\selectfont}
+
+%\advance \baselineskip by 0.4pt
+
+% do not indent paragraphs of enumerated lists (my lists go on for pages...)
+% numbers flush left to paragraph text: \leftmargin=17pt
+\newcommand{\mybegin}{\begin{list}{\labelenumi}{\leftmargin=\parindent}\usecounter{enumi}}
+%\newcommand{\myitem}[1]{\item {\textit{\textbf{#1}}}}
+\newcommand{\myitem}[1]{\item {\bf #1}}
+\newcommand{\myend}{\end{list}}
+\newcommand{\mt}[1]{\mbox{\it #1}}
+\newcommand{\todo}[1]{\framebox {\bf #1}}
+
+\begin{document}
+
+%\conferenceinfo{PLDI  2011}{June 2011, San Jose, CA.} 
+%\copyrightyear{2010} 
+%\copyrightdata{[to be supplied]} 
+
+%\titlebanner{banner above paper title}        % These are ignored unless
+%\preprintfooter{short description of paper}   % 'preprint' option specified.
+
+\title{}
+
+%\author{}
+%           {}
+%            {}
+% \authorinfo{Name2\and Name3}
+%            {Affiliation2/3}
+%            {Email2/3}
+
+\maketitle
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+%\category{CR-number}{subcategory}{third-level}
+
+%\terms
+%term1, term2
+
+%\keywords
+%keyword1, keyword2
+
+%\input{intro}
+%\input{model}
+%\input{slide-win}
+%\input{fission}
+%\input{common}
+%\input{sharing-red}
+%\input{data-par}
+%\input{results}
+%\input{related}
+%\input{conclusion}
+
+% \acks
+% Acknowledgments, if needed.
+
+% We recommend abbrvnat bibliography style.
+\footnotesize
+%\bibliography{references}
+%\bibliographystyle{IEEEtran}
+
+\clearpage
+%\appendix
+%\begin{figure*}
+%\centering
+%\includegraphics[width=\textwidth]{figures/general-fission.pdf}
+%\caption[Fission of a node in the general stream graph.]{Appendix: Fission of a
+%  node $f$ by $P$ in the general stream
+%  graph.\label{fig:general-fission}}
+%\end{figure*}
+
+
+\end{document}
+
