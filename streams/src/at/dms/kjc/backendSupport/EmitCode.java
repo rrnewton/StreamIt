@@ -166,7 +166,7 @@ public class EmitCode {
         p.println("");
         
         // generate declarations for fields
-        for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
+        for (JFieldDeclaration field : fieldsAndMethods.getFields()) {                                  
             field.accept(codegen);
         }
         p.println("");

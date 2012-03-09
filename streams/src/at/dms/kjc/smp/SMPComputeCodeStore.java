@@ -56,6 +56,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         if (SMPBackend.chip.size() == 1)
             return;
 
+        System.out.println("ERROR ERROR ERROR: TODO: too many barriers added!");
+
         for (int t = 0; t < SMPBackend.chip.size(); t++) {
             SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(
                     t).getComputeCode();
@@ -145,9 +147,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         Filter srcFilter = outputPort.getSSG().getFilterGraph()[outputPort
                 .getSSG().getFilterGraph().length - 1];
 
-        Core srcCore = SMPBackend.getComputeNode(srcFilter
-                .getWorkNode());
-     
+        Core srcCore = SMPBackend.getComputeNode(srcFilter.getWorkNode());
+
         SMPComputeCodeStore codeStore = srcCore.getComputeCode();
         OutputContent fileOutput = (OutputContent) destFilter
                 .getWorkNodeContent();
@@ -254,6 +255,12 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     /** set of JMethodDeclaration for the helper thread on this core */
     protected Set<JMethodDeclaration>        helperThreadMethods = new HashSet<JMethodDeclaration>();
 
+    /** The "main" thread on this core. */
+    private SMPThreadCodeStore               mainThread;
+
+    /** The core that this CodeStore holds code for */
+    private Core                             core                = null;
+
     /**
      * Constructor: steady state loops indefinitely, no pointer back to compute
      * node.
@@ -262,11 +269,12 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         super();
         setMyMainName("__main__");
         removeDefaultMain();
-        createMainThread();      
+        createMainThread();
     }
 
     public SMPComputeCodeStore(Core nodeType) {
         super(nodeType);
+        this.core = nodeType;
         setMyMainName("__main__");
         removeDefaultMain();
         createMainThread(nodeType);
@@ -286,13 +294,21 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      */
     public SMPComputeCodeStore(Core parent, ALocalVariable iterationBound) {
         super(parent, iterationBound);
+        this.core = parent;
         setMyMainName("__main__");
         removeDefaultMain();
         createMainThread(
                 parent,
                 iterationBound);
         filters = new HashSet<WorkNode>();
-        createBufferInitMethod();      
+        createBufferInitMethod();
+    }
+
+    public void addCallNextToThread(int threadIndex, int nextThread) {
+        threads.get(
+                threadIndex).addCallNextToMain(
+                threadIndex,
+                nextThread);
     }
 
     public void addExpressionFirst(JExpression expr) {
@@ -326,6 +342,10 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     public void addFunctionCallFirst(int threadId, JMethodDeclaration func,
             JExpression[] args) {
+
+        assert threads.get(threadId) != null : "SMPComputeCodeStore.addFunctionCallFirst threadId="
+                + threadId + " not found.";
+
         threads.get(
                 threadId).addFunctionCallFirst(
                 func,
@@ -334,6 +354,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     public void addFunctionCallFirst(int threadId, String funcName,
             JExpression[] args) {
+        assert threads.get(threadId) != null : "SMPComputeCodeStore.addFunctionCallFirst threadId="
+                + threadId + " not found.";
+
         threads.get(
                 threadId).addFunctionCallFirst(
                 funcName,
@@ -341,15 +364,14 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     }
 
     public void addFunctionCallFirst(JMethodDeclaration func, JExpression[] args) {
-        this.addFunctionCallFirst(
-                1,
+
+        getMain().addFunctionCallFirst(
                 func,
                 args);
     }
 
     public void addFunctionCallFirst(String funcName, JExpression[] args) {
-        this.addFunctionCallFirst(
-                1,
+        getMain().addFunctionCallFirst(
                 funcName,
                 args);
     }
@@ -449,8 +471,18 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     public void addStatementToSteadyLoop(JStatement statement) {
         this.addStatementToSteadyLoop(
-                1,
+                0,
                 statement);
+    }
+
+    public void addSteadyLoopStatement(int index, JStatement stmt) {
+
+        assert threads.get(index) != null : "SMPComputeCodeStore.addSteadyLoopStatement() thread index "
+                + index + " does not exist on core " + core.coreID;
+
+        threads.get(
+                index).addSteadyLoopStatement(
+                stmt);
     }
 
     @Override
@@ -481,12 +513,34 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 threadIndex);
     }
 
+    /**
+     * Find the correct thread, add the code to the steadyLoop of the correct
+     * thread.
+     * 
+     * @param threadIndex
+     * @param nextIndex
+     * @param steadyBlock
+     */
     public void addThreadHelper(int threadIndex, int nextIndex,
             JStatement steadyBlock) {
-        getMain().addThreadHelper(
+
+        System.out.println("SMPThreadCodeStore.addThreadHelper threadIndex="
+                + threadIndex + " nextIndex=" + nextIndex);
+
+        SMPThreadCodeStore thread;
+        if (threads.containsKey(threadIndex)) {
+            thread = threads.get(threadIndex);
+        } else {
+            thread = new SMPThreadCodeStore(this, threadIndex);
+            threads.put(
+                    threadIndex,
+                    thread);
+        }
+        thread.addSteadyBlock(
                 threadIndex,
                 nextIndex,
                 steadyBlock);
+
     }
 
     public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
@@ -545,6 +599,15 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     }
 
     /**
+     * Return the core that this compute store is associated with.
+     * @return the core that this compute store is associated with.
+     */
+    public Core getCore() {
+        assert core != null : "Compute store has a null core.";
+        return core;
+    }
+
+    /**
      * Return the helper thread methods in this store;
      * 
      * @return the helper thread methods in this store;
@@ -553,13 +616,16 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         return helperThreadMethods;
     }
 
+    /**
+     * Return the external fields.
+     * @return the external fields.
+     */
     public Map<String, JFieldDeclaration> getExternFields() {
         return externFields;
     }
 
     /**
-     * return all of the filters that are mapped to this core.
-     * 
+     * return all of the filters that are mapped to this core.     
      * @return all of the filters that are mapped to this core.
      */
     public Set<WorkNode> getFilters() {
@@ -567,8 +633,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     }
 
     /**
-     * Return the string to add to the global portion of the c file
-     * 
+     * Return the string to add to the global portion of the c files
      * @return the string to add to the global portion of the c file
      */
     public String getGlobalText() {
@@ -584,7 +649,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     }
 
     @Override
-    public JMethodDeclaration[] getMethods() {      
+    public JMethodDeclaration[] getMethods() {
         return methods;
     }
 
@@ -692,26 +757,39 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     private SMPThreadCodeStore createMainThread() {
         SMPThreadCodeStore thread = new SMPThreadCodeStore(this, "__main__");
-        return createMainThreadHelper(thread);
+        int coreId = ThreadMapper.getFirstCore();
+        return createMainThreadHelper(
+                coreId,
+                thread);
     }
 
     private SMPThreadCodeStore createMainThread(Core nodeType) {
         SMPThreadCodeStore thread = new SMPThreadCodeStore(this, "__main__",
                 nodeType);
-        return createMainThreadHelper(thread);
+        return createMainThreadHelper(
+                nodeType.coreID,
+                thread);
     }
 
     private SMPThreadCodeStore createMainThread(Core parent,
             ALocalVariable iterationBound) {
         SMPThreadCodeStore thread = new SMPThreadCodeStore(this, "__main__",
                 parent, iterationBound);
-        return createMainThreadHelper(thread);
+        return createMainThreadHelper(
+                parent.coreID,
+                thread);
     }
 
-    private SMPThreadCodeStore createMainThreadHelper(SMPThreadCodeStore thread) {
+    private SMPThreadCodeStore createMainThreadHelper(int coreId,
+            SMPThreadCodeStore thread) {
         addMethod(thread.getMethod());
+        mainThread = thread;
+        int threadId = ThreadMapper.coreToThread(coreId);
+        System.out
+                .println("**** SMPComputeCodeStore.createMainThreadHelper threadId="
+                        + threadId);
         threads.put(
-                1,
+                threadId,
                 thread);
         return thread;
     }
@@ -722,10 +800,10 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * @return
      */
     private SMPThreadCodeStore getMain() {
-        return threads.get(1);
+        return mainThread;
     }
 
-    private void removeDefaultMain() {       
+    private void removeDefaultMain() {
         List<JMethodDeclaration> cleanMethods = new ArrayList<JMethodDeclaration>();
         for (JMethodDeclaration method : methods) {
             if (!method.getName().equals(

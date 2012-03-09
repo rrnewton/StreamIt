@@ -222,6 +222,9 @@ public class SMPBackend {
 
         streamGraph.runLayout();
 
+           
+        
+        
         for (StaticSubGraph ssg : streamGraph.getSSGs()) {
             ThreadMapper.getMapper().assignThreads(ssg);
         }

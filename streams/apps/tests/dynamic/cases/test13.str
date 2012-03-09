@@ -1,5 +1,5 @@
-void->void pipeline test {
-    add FileReader<float>("./floats.in");
+void->void pipeline test13 {
+    add FileReader<float>("./cases/floats.in");
     add Fdynamic();
     add Fdummy();
     add Fstatic();

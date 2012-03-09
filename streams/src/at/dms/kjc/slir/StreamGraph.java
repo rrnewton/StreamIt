@@ -81,6 +81,10 @@ public class StreamGraph implements Layout<Core> {
     @Override
     public Core getComputeNode(InternalFilterNode node) {
         
+        if (node.isInputSlice()) {
+            System.out.println("StreamGraph.getComputeNode node is isInputSlice =");
+        }
+        
         if (null == layoutMap.get(node)) {
             System.out.println("Current contents of layout map:");
             for (InternalFilterNode f : layoutMap.keySet()) {
@@ -258,7 +262,7 @@ public class StreamGraph implements Layout<Core> {
 
     @Override
     public void setComputeNode(InternalFilterNode node, Core core) {
-        System.out.println("StreamGraph.setComputeNode " + node + " to core " + core);
+        System.out.println("==> StreamGraph.setComputeNode " + node + " to core " + core.getCoreID());
         assert node != null && core != null;
         // remember what filters each tile has mapped to it
 

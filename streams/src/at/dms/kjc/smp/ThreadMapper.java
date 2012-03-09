@@ -2,10 +2,8 @@ package at.dms.kjc.smp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.KjcOptions;
@@ -35,7 +33,7 @@ public class ThreadMapper {
     }
 
     public static int coreToThread(int core) {
-        if (core == -1) {
+        if (core == -1) {            
             return -1;
         }        
         int index = 0;
@@ -45,6 +43,10 @@ public class ThreadMapper {
         }
         assert (false) : "Core " + core +" not mapped to a thread!";
         return -1;
+    }
+    
+    public static int getFirstCore() {
+        return SMPBackend.coreOrder[0];
     }
 
     /**
@@ -164,48 +166,76 @@ public class ThreadMapper {
      * @param ssg
      */
     private void assignThreadsOpt(StaticSubGraph ssg) {
-        System.out.println("ThreadMapper.assignThreadsOpt");
 
         boolean isDynamicInput = ssg.hasDynamicInput();
         Filter firstFilter = ssg.getFilterGraph()[0];
         
-        System.out.println("++> ThreadMapper.assignThreadsOpt  firstFilter=" + getFilterName(firstFilter));                
+        int firstCore = SMPBackend.getComputeNode(firstFilter.getWorkNode()).coreID;    
+        
+        System.out.println("ThreadMapper.assignThreadsOpt  firstFilter=" + getFilterName(firstFilter) + " isDynamicInput=" + isDynamicInput);                
         
         // The first filter of an SSG always gets its own thread, 
         // with the exception of the first filter in the program.
         // Therefore, increment the count, unless we were at the 
         // first one.
-        if (!isProgramSource(firstFilter) && !isFirstAfterFileInput(firstFilter)) {
+        if (!isProgramSource(firstFilter) && !isFirstAfterFileInput(firstFilter)
+                && !isProgramSink(firstFilter)) {
         	threadId++;
         }
+        
+
                                    
         for (Filter filter : ssg.getFilterGraph()) {
+            
+            int filterCore = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;
             
             // If the first thread is not dynamic, then 
             // it doesn't dominate anything, and it will 
             // be on the main thread.
             int thread = threadId;
-            if (!isDynamicInput) {
-                //filterToThreadId.put(filter, MAIN_THREAD);
-                thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);  
+            if (!isDynamicInput || ((ssg.getParent().getNumSSGs() == 1))) {
+                thread = coreToThread(filterCore);  
                 filterToThreadId.put(filter, thread);
-                System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                
+                System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread + " core=" + filterCore);                
                 continue;
             }   
-                      
-            if ( isProgramSink(filter)) {                
-                Filter prev = ProcessFilterWorkNode.getPreviousFilter(filter.getWorkNode());                
-                int core = SMPBackend.getComputeNode(prev.getWorkNode()).coreID;                                                
-                thread = coreToThread(core);                                    
+            
+            // Check to see if we have a fizzed filter. If a filter has
+            // been fizzed, then it should have been assigned to a different
+            // core.
+            if (filterCore != firstCore) {
+                thread = coreToThread(filterCore);  
+            }
+            else if ( isProgramSink(filter)) {                
+                Filter prev = ProcessFilterWorkNode.getPreviousFilter(filter.getWorkNode());     
+                // Need to special case when the program is just a source and sink.
+                if (isProgramSource(prev)) {                    
+                    thread = coreToThread(getFirstCore());
+                } else {                
+                    int core = SMPBackend.getComputeNode(prev.getWorkNode()).coreID;                                                
+                    thread = coreToThread(core);
+                }
             } 
             
-            if (isProgramSource(filter)) {                
+            else if (isProgramSource(filter)) {                                                
                 Filter next = ProcessFilterWorkNode.getNextFilter(filter.getWorkNode());    
-                thread = coreToThread(SMPBackend.getComputeNode(next.getWorkNode()).coreID);                  
+                // Need to special case when the program is just a source and sink.s
+                
+                System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isProgramSource(filter)");                
+                
+                if (isProgramSink(next)) {                    
+                    thread = coreToThread(getFirstCore());
+                } else if (filter.getWorkNode().isFileInput()) {                
+                    thread = coreToThread(SMPBackend.getComputeNode(next.getWorkNode()).coreID);
+                } else {
+                    thread = coreToThread(filterCore);
+                }
             }            
 
-            if (isFirstAfterFileInput(filter)) {                
-                thread = coreToThread(SMPBackend.getComputeNode(filter.getWorkNode()).coreID);                  
+            else if (isFirstAfterFileInput(filter)) {       
+                
+                System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isFirstAfterFileInput(filter)");                
+                thread = coreToThread(filterCore);                  
             }            
 
             

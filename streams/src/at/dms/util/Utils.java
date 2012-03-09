@@ -1677,18 +1677,34 @@ public abstract class Utils implements Serializable, DeepCloneable {
      * @param cond The condition to check in the condition wait statement
      * @return the modified block
      */
-    public static JBlock addCondWait(JBlock block, int index, JExpression cond) {     
+    public static JBlock addCondWaitFirst(JBlock block, int index, JExpression cond) {     
         JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + index + "]");       
         JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + index + "]");                       
         block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock}))); 
         JBlock loopBody = new JBlock();
         loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{condVar, lock})));       
-        JWhileStatement whileStmt = new JWhileStatement(null, cond, loopBody, new JavaStyleComment[0]);     
-        block.addStatement(whileStmt);  
-        block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
+        JWhileStatement whileStmt = new JWhileStatement(null, cond, loopBody, new JavaStyleComment[0]);             
+        // Add both to index 1, so that the whileStatement is first
+        
+        block.addStatement(1, new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
+        block.addStatement(1, whileStmt);  
         return block;
     }
 	
+    public static JBlock addCondWait(JBlock block, int index, JExpression cond) {     
+        JEmittedTextExpression lock = new JEmittedTextExpression("&thread_mutexes[" + index + "]");       
+        JEmittedTextExpression condVar = new JEmittedTextExpression("&thread_conds[" + index + "]");                       
+        JBlock loopBody = new JBlock();
+        loopBody.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_cond_wait", new JExpression[]{condVar, lock})));               
+        JWhileStatement whileStmt = new JWhileStatement(null, cond, loopBody, new JavaStyleComment[0]);             
+        
+        block.addStatement(new JExpressionStatement(new JMethodCallExpression("pthread_mutex_lock", new JExpression[]{lock}))); 
+        block.addStatement( whileStmt);  
+        block.addStatement( new JExpressionStatement(new JMethodCallExpression("pthread_mutex_unlock", new JExpression[]{lock})));
+        
+        return block;
+    }
+    
 
 	/**
 	 * 

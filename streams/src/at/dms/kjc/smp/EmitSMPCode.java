@@ -300,8 +300,8 @@ public class EmitSMPCode extends EmitCode {
 
         // generate declarations for fields
         for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
-            // System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: "
-            // + field.getVariable().getIdent());
+                System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: "
+                        + field.getVariable().getIdent());
             field.accept(codegen);
         }
         p.println("");
