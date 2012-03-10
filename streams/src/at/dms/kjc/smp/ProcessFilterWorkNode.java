@@ -1,20 +1,15 @@
 package at.dms.kjc.smp;
 
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
-import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.Channel;
@@ -23,13 +18,9 @@ import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.sir.SIRBeginMarker;
 import at.dms.kjc.sir.SIREndMarker;
 import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.InputPort;
-import at.dms.kjc.slir.InterFilterEdge;
-import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.IntraSSGEdge;
 import at.dms.kjc.slir.OutputContent;
-import at.dms.kjc.slir.OutputPort;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.WorkNode;
@@ -97,7 +88,7 @@ public class ProcessFilterWorkNode {
         if (isProgramSource(filter)) {
             return false;
         }
-        Filter prev = ProcessFilterWorkNode.getPreviousFilter(filter
+        Filter prev = ProcessFilterUtils.getPreviousFilter(filter
                 .getWorkNode());
         return prev.getWorkNode().isFileInput();
     }
@@ -106,7 +97,7 @@ public class ProcessFilterWorkNode {
         if (isProgramSink(filter)) {
             return false;
         }
-        Filter next = ProcessFilterWorkNode.getNextFilter(filter.getWorkNode());
+        Filter next = ProcessFilterUtils.getNextFilter(filter.getWorkNode());
         return next.getWorkNode().isFileOutput();
     }
 
@@ -260,200 +251,7 @@ public class ProcessFilterWorkNode {
         return helper;
     }
 
-    static int getFilterThread(WorkNode w, Filter filter) {
-
-        if (filter == null) {
-            return getFilterThread(
-                    w,
-                    w.getParent());
-        }
-
-        WorkNode workNode = filter.getWorkNode();
-
-        // A FileInput is always on the core of its next filter
-        if (workNode.isFileInput()) {
-            Filter next = getNextFilter(workNode);
-            Core nextCore = SMPBackend.getComputeNode(next.getWorkNode());
-            return ThreadMapper.coreToThread(nextCore.coreID);
-        }
-
-        // A FileOutput is always on the core of its next filter
-        if (workNode.isFileOutput()) {
-            Filter prev = getPreviousFilter(workNode);
-            Core prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
-            return ThreadMapper.coreToThread(prevCore.coreID);
-        }
-
-        Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
-                .getFilterToThreadId();
-        int threadIndex = filterToThreadId.get(workNode.getParent());
-        return threadIndex;
-    }
-
-
-    static List<Filter> getNextFilters(WorkNode filter) {
-        List<Filter> nextFilters = new LinkedList<Filter>();
-        StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
-        if (filter == ssg.getFilterGraph()[ssg.getFilterGraph().length - 1]
-                .getWorkNode()) {
-            OutputPort outputPort = ssg.getOutputPort();
-            if (outputPort == null) {
-                return nextFilters;
-            }
-            for (InterSSGEdge edge : outputPort.getLinks()) {
-                Filter dstTop = edge.getDest().getSSG().getTopFilters()[0];
-                nextFilters.add(dstTop);
-            }
-
-        } else {
-            InterFilterEdge[] dstEdges = filter.getParent().getOutputNode()
-                    .getDestList(
-                            SchedulingPhase.STEADY);
-            Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
-            for (InterFilterEdge e : dstEdges) {
-                edgeSet.add(e);
-            }
-            for (InterFilterEdge e : edgeSet) {
-                nextFilters.add(e.getDest().getParent());             
-            }            
-        }
-        return nextFilters;
-    }
-
-
-    static Filter getNextFilter(WorkNode filter) {
-        StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
-        if (filter == ssg.getFilterGraph()[ssg.getFilterGraph().length - 1]
-                .getWorkNode()) {
-            OutputPort outputPort = ssg.getOutputPort();
-            if (outputPort == null) {
-                return null;
-            }
-            for (InterSSGEdge edge : outputPort.getLinks()) {
-                Filter dstTop = edge.getDest().getSSG().getTopFilters()[0];
-                return dstTop;
-            }
-
-        } else {
-            InterFilterEdge[] dstEdges = filter.getParent().getOutputNode()
-                    .getDestList(
-                            SchedulingPhase.STEADY);
-            Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
-            for (InterFilterEdge e : dstEdges) {
-                edgeSet.add(e);
-            }
-            for (InterFilterEdge e : edgeSet) {
-                return e.getDest().getParent();
-            }
-            return null;
-        }
-        return null;
-    }
-
-    static Filter getNextFilterOnCoreDifferentThread(WorkNode workNode) {
-
-        int filterThread = getFilterThread(
-                workNode,
-                workNode.getParent());
-
-        Filter next =  getNextFilterOnCore(workNode);
-        while  (next != null) {            
-            int nextThread = getFilterThread(
-                    next.getWorkNode(),
-                    next);                       
-            if (filterThread != nextThread) {
-                return next;
-            }
-            next = getNextFilterOnCore(next.getWorkNode());    
-        }
-
-
-        return null;
-    }
-
-    static Filter getNextFilterOnCore(WorkNode workNode) {
-        System.out
-        .println("ProcessFilterWorkNode.getNextFilterOnCore workNode="
-                + workNode);
-        if (workNode.isFileOutput()) {
-            return null;
-        }
-        Core core = SMPBackend.getComputeNode(workNode);
-        Filter next = workNode.getParent();
-        Core nextCore;
-        while (true) {
-            next = getNextFilter(next.getWorkNode());
-            if (next == null) {
-                return null;
-            } else {
-                System.out
-                .println("ProcessFilterWorkNode.getNextFilterOnCore next="
-                        + next.getWorkNode());
-                nextCore = SMPBackend.getComputeNode(next.getWorkNode());
-                if (nextCore.coreID == core.coreID) {
-                    System.out
-                    .println("ProcessFilterWorkNode.getNextFilterOnCore returning ="
-                            + next.getWorkNode());
-                    return next;
-                }
-                if (next.getWorkNode().isFileOutput()) {
-                    if (nextCore.coreID != core.coreID) {
-                        return null;
-                    }
-                }
-
-            }
-        }
-    }
-
-    static Filter getPreviousFilter(WorkNode filter) {
-        StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
-        if (filter == ssg.getFilterGraph()[0].getWorkNode()) {
-            InputPort inputPort = ssg.getInputPort();
-            if (inputPort == null) {
-                return null;
-            }
-            for (InterSSGEdge edge : inputPort.getLinks()) {
-                Filter src = edge.getSrc().getSSG().getLastFilter();
-                return src;
-            }
-        } else {
-            InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
-                    .getSources(
-                            SchedulingPhase.STEADY);
-            Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
-            for (InterFilterEdge e : srcEdges) {
-                edgeSet.add(e);
-            }
-            for (InterFilterEdge e : edgeSet) {
-                return e.getSrc().getParent();
-            }
-            return null;
-        }
-        return null;
-    }
-
-    static Filter getPreviousFilterOnCore(WorkNode workNode) {
-        if (workNode.isFileOutput()) {
-            return null;
-        }
-        Core core = SMPBackend.getComputeNode(workNode);
-        Filter prev;
-        Core prevCore;
-        while (true) {
-            prev = getPreviousFilter(workNode);
-            if (prev == null) {
-                return null;
-            } else {
-                prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
-                if (prevCore.coreID == core.coreID
-                        || prev.getWorkNode().isFileInput()) {
-                    return prev;
-                }
-            }
-            workNode = prev.getWorkNode();
-        }
-    }
+ 
 
     protected CodeStoreHelper     filterCode;
     protected SMPComputeCodeStore codeStore;
@@ -567,16 +365,83 @@ public class ProcessFilterWorkNode {
         }
     }
 
-    private Core getCore(WorkNode workNode1, Filter filter) {
-        if (filter == null) {
-            System.out.println("ProcessFilterWorkNode.getCore workNode1="
-                    + workNode1 + " workNode2=null");
-            return SMPBackend.getComputeNode(workNode1);
+    private void addTokenWait() {
+        if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
+                JExpressionStatement stmt = new JExpressionStatement(
+                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
+                codeStore.addSteadyLoopStatement(                              
+                        stmt);
+                stmt = new JExpressionStatement(
+                        new JEmittedTextExpression(tokenName + " = 0"));                                                
+                codeStore.addSteadyLoopStatement(
+                        stmt);
+            }                
         }
-        System.out.println("ProcessFilterWorkNode.getCore workNode1="
-                + workNode1 + " workNode2=" + filter.getWorkNode());
-        return SMPBackend.getComputeNode(filter.getWorkNode());
     }
+
+    private void addTokenWait(int threadIndex) {
+        if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
+                JExpressionStatement stmt = new JExpressionStatement(
+                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
+                codeStore.addSteadyLoopStatement(
+                        threadIndex,                  
+                        stmt);
+                stmt = new JExpressionStatement(
+                        new JEmittedTextExpression(tokenName + " = 0"));                                                
+                codeStore.addSteadyLoopStatement(
+                        threadIndex,                  
+                        stmt);
+            }                
+        }
+    }
+
+    private void addTokenWrite() {
+//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
+//        for (Filter filter : ssg.getFilterGraph()) {
+//
+//            WorkNode wnode = filter.getWorkNode();
+            if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
+                for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
+                    JExpressionStatement stmt = new JExpressionStatement(                            
+                            new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
+                    codeStore.addSteadyLoopStatement(                                          
+                            stmt);
+                }                 
+            }
+//        }
+    }
+
+    private void addTokenWrite(int threadIndex) {
+
+//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
+//        for (Filter filter : ssg.getFilterGraph()) {
+//            WorkNode wnode = filter.getWorkNode();
+//            int wnodeIndex = getFilterThread(
+//                    wnode,
+//                    wnode.getParent());
+//            if (wnodeIndex == threadIndex) {
+        
+        System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode);
+
+                if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
+                    
+                    System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode + " ThreadMapper.getMapper().getTokenWrites().containsKe");
+                    
+                    for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
+                        JExpressionStatement stmt = new JExpressionStatement(                            
+                                new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
+                        codeStore.addSteadyLoopStatement(
+                                threadIndex,                  
+                                stmt);
+                    }                 
+                }
+//            }
+//        }
+    }
+
+   
 
     protected void standardInitProcessing() {
         // Have the main function for the CodeStore call out init.
@@ -650,8 +515,8 @@ public class ProcessFilterWorkNode {
         // Special case: If the dynamic filter is the first filter
         // then it doesn't need to be on a separate thread.
         boolean isFirst = false;
-        if (null != getPreviousFilter(workNode)) {
-            isFirst = getPreviousFilter(
+        if (null != ProcessFilterUtils.getPreviousFilter(workNode)) {
+            isFirst = ProcessFilterUtils.getPreviousFilter(
                     workNode).getWorkNode().isFileInput();
         }
         if (!isFirst) {
@@ -660,7 +525,7 @@ public class ProcessFilterWorkNode {
 
         if (isDynamicPop && !isFirst) {
 
-            int threadIndex = getFilterThread(
+            int threadIndex = ProcessFilterUtils.getFilterThread(
                     workNode,
                     workNode.getParent());
 
@@ -723,82 +588,6 @@ public class ProcessFilterWorkNode {
 
     }
 
-    private void addTokenWait() {
-        if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
-            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
-                JExpressionStatement stmt = new JExpressionStatement(
-                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
-                codeStore.addSteadyLoopStatement(                              
-                        stmt);
-                stmt = new JExpressionStatement(
-                        new JEmittedTextExpression(tokenName + " = 0"));                                                
-                codeStore.addSteadyLoopStatement(
-                        stmt);
-            }                
-        }
-    }
-
-    private void addTokenWait(int threadIndex) {
-        if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
-            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
-                JExpressionStatement stmt = new JExpressionStatement(
-                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
-                codeStore.addSteadyLoopStatement(
-                        threadIndex,                  
-                        stmt);
-                stmt = new JExpressionStatement(
-                        new JEmittedTextExpression(tokenName + " = 0"));                                                
-                codeStore.addSteadyLoopStatement(
-                        threadIndex,                  
-                        stmt);
-            }                
-        }
-    }
-
-    private void addTokenWrite(int threadIndex) {
-
-//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
-//        for (Filter filter : ssg.getFilterGraph()) {
-//            WorkNode wnode = filter.getWorkNode();
-//            int wnodeIndex = getFilterThread(
-//                    wnode,
-//                    wnode.getParent());
-//            if (wnodeIndex == threadIndex) {
-        
-        System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode);
-
-                if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
-                    
-                    System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode + " ThreadMapper.getMapper().getTokenWrites().containsKe");
-                    
-                    for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
-                        JExpressionStatement stmt = new JExpressionStatement(                            
-                                new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
-                        codeStore.addSteadyLoopStatement(
-                                threadIndex,                  
-                                stmt);
-                    }                 
-                }
-//            }
-//        }
-    }
-
-    private void addTokenWrite() {
-//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
-//        for (Filter filter : ssg.getFilterGraph()) {
-//
-//            WorkNode wnode = filter.getWorkNode();
-            if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
-                for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
-                    JExpressionStatement stmt = new JExpressionStatement(                            
-                            new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
-                    codeStore.addSteadyLoopStatement(                                          
-                            stmt);
-                }                 
-            }
-//        }
-    }
-
 
     protected void standardSteadyProcessingOpt(boolean isDynamicPop) {
         JBlock steadyBlock = filterCode.getSteadyBlock();
@@ -819,8 +608,8 @@ public class ProcessFilterWorkNode {
         // Special case: If the dynamic filter is the first filter
         // then it doesn't need to be on a separate thread.
         boolean isFirst = false;
-        if (null != getPreviousFilter(workNode)) {
-            isFirst = getPreviousFilter(
+        if (null != ProcessFilterUtils.getPreviousFilter(workNode)) {
+            isFirst = ProcessFilterUtils.getPreviousFilter(
                     workNode).getWorkNode().isFileInput();
         }
         if (!isFirst) {
@@ -829,20 +618,20 @@ public class ProcessFilterWorkNode {
 
         if (isDynamicPop && !isFirst) {
 
-            int threadIndex = getFilterThread(
+            int threadIndex = ProcessFilterUtils.getFilterThread(
                     workNode,
                     workNode.getParent());
             String threadId = Integer.toString(threadIndex);
 
-            Filter nextFilter = getNextFilterOnCoreDifferentThread(workNode);
-            int nextThread = getFilterThread(
+            Filter nextFilter = ProcessFilterUtils.getNextFilterOnCoreDifferentThread(workNode);
+            int nextThread = ProcessFilterUtils.getFilterThread(
                     workNode,
                     nextFilter);
-            Filter prevFilter = getPreviousFilterOnCore(workNode);
-            Core prevCore = getCore(
+            Filter prevFilter = ProcessFilterUtils.getPreviousFilterOnCore(workNode);
+            Core prevCore = ProcessFilterUtils.getCore(
                     workNode,
                     prevFilter);
-            int prevThread = getFilterThread(
+            int prevThread = ProcessFilterUtils.getFilterThread(
                     workNode,
                     prevFilter);
             // If there is no next filter on this core
@@ -925,12 +714,12 @@ public class ProcessFilterWorkNode {
             System.out
             .println("ProcessFilterWorkNode.standardSteadyProcessingOpt... about to add to steadyloop");
 
-            int threadIndex = getFilterThread(
+            int threadIndex = ProcessFilterUtils.getFilterThread(
                     workNode,
                     workNode.getParent());
 
-            Filter nextFilter = getNextFilterOnCore(workNode);
-            int nextThread = getFilterThread(
+            Filter nextFilter = ProcessFilterUtils.getNextFilterOnCore(workNode);
+            int nextThread = ProcessFilterUtils.getFilterThread(
                     workNode,
                     nextFilter);
 

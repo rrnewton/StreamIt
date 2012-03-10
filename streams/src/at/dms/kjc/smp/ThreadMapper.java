@@ -231,7 +231,7 @@ public class ThreadMapper {
             
             System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + " is not file output");
             
-            for ( Filter nextFilter : ProcessFilterWorkNode.getNextFilters(filter.getWorkNode())) {
+            for ( Filter nextFilter : ProcessFilterUtils.getNextFilters(filter.getWorkNode())) {
                 System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + " and next=" + getFilterName(nextFilter));                                
                 if (ssg.containsFilter(nextFilter)) {
                     int nextCore = SMPBackend.getComputeNode(nextFilter.getWorkNode()).coreID;      
@@ -309,7 +309,7 @@ public class ThreadMapper {
                 thread = coreToThread(filterCore);  
             }
             else if ( isProgramSink(filter)) {                
-                Filter prev = ProcessFilterWorkNode.getPreviousFilter(filter.getWorkNode());     
+                Filter prev = ProcessFilterUtils.getPreviousFilter(filter.getWorkNode());     
                 // Need to special case when the program is just a source and sink.
                 if (isProgramSource(prev)) {                    
                     thread = coreToThread(getFirstCore());
@@ -320,7 +320,7 @@ public class ThreadMapper {
             } 
 
             else if (isProgramSource(filter)) {                                                
-                Filter next = ProcessFilterWorkNode.getNextFilter(filter.getWorkNode());    
+                Filter next = ProcessFilterUtils.getNextFilter(filter.getWorkNode());    
                 // Need to special case when the program is just a source and sink.s
 
                 System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isProgramSource(filter)");                
@@ -348,7 +348,7 @@ public class ThreadMapper {
             // We need another special case here. A FileWriter should be dominated by the
             // last dynamic reader, even though they will be in separate SSGs.
             if (isLastBeforeFileOutput(filter)) {
-                dominatorsAdd(firstFilter, ProcessFilterWorkNode.getNextFilter(filter.getWorkNode()));
+                dominatorsAdd(firstFilter, ProcessFilterUtils.getNextFilter(filter.getWorkNode()));
             }
 
             if (thread < KjcOptions.smp) {

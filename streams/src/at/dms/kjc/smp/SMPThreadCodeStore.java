@@ -386,7 +386,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
         if (KjcOptions.threadopt) {
             if (threadIndex == -1) {
-                Filter prevFilter = ProcessFilterWorkNode
+                Filter prevFilter = ProcessFilterUtils
                         .getPreviousFilter(inputPort.getSSG().getTopFilters()[0]
                                 .getWorkNode());
                 Core core = SMPBackend.getComputeNode(prevFilter
