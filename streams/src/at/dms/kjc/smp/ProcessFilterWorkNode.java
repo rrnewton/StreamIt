@@ -764,8 +764,13 @@ public class ProcessFilterWorkNode {
 //                    wnode,
 //                    wnode.getParent());
 //            if (wnodeIndex == threadIndex) {
+        
+        System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode);
 
                 if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
+                    
+                    System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode + " ThreadMapper.getMapper().getTokenWrites().containsKe");
+                    
                     for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
                         JExpressionStatement stmt = new JExpressionStatement(                            
                                 new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
@@ -869,10 +874,14 @@ public class ProcessFilterWorkNode {
             .println("AAAA ProcessFilterWorkNode.standardSteadyProcessingOpt calling addThreadHelper threadIndex="
                     + threadIndex + " nextIndex=" + nextThread);
 
+            addTokenWait(threadIndex);
+                        
             codeStore.addThreadHelper(
                     threadIndex,
                     nextThread,
                     steadyBlock);
+            
+            addTokenWrite(threadIndex);
 
             boolean addCall = false;
 
