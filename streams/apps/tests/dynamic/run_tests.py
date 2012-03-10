@@ -9,7 +9,7 @@ import filecmp
 import sys
 
 class Configs:
-    threadopt, dynamic = range(2)
+    nofuse, threadopt, dynamic = range(3)
 
 class Command(object):
     def __init__(self, cmd):
@@ -33,6 +33,8 @@ def run_strc(filename, cores, test):
     cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", filename]    
     if test == Configs.threadopt:
         cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", filename]    
+    elif test == Configs.nofuse:
+        cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt",  "--nofuse", filename]    
     print ' '.join(cmd)
     return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
@@ -78,6 +80,8 @@ def run_test(infile, cores, test):
     cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", infile]    
     if test == Configs.threadopt:
         cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", infile]    
+    elif test == Configs.nofuse:
+        cmd = ["strc", "-smp", str(cores), "--outputs", "10", "-regtest", "--threadopt", "--nofuse", infile]    
     ret = ' '.join(cmd) + ' : ' + compare(infile + '.out', infile + '.exp')
     cleanup()
     return ret
@@ -85,8 +89,8 @@ def run_test(infile, cores, test):
 def run_all():
     path = 'cases/'
     results = []
-    cores = [1,2]
-    for test in [Configs.threadopt, Configs.dynamic]:
+    cores = [1,2,4]
+    for test in [Configs.nofuse, Configs.threadopt, Configs.dynamic]:
         for core in cores:
             for infile in glob.glob( os.path.join(path, '*.str') ):
                 results.append(run_test(infile, core, test))
