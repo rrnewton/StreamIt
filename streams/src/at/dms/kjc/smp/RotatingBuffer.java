@@ -468,7 +468,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	/** Create an array reference given an offset */
 	public abstract JFieldAccessExpression writeBufRef();
 
-    public List<JStatement> getTokenWrites() {        
-        return new ArrayList<JStatement>();
-    }
+//    public List<JStatement> getTokenWrites() {        
+//        return new ArrayList<JStatement>();
+//    }
 }

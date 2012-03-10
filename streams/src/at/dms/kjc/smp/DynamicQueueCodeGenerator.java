@@ -117,8 +117,8 @@ public class DynamicQueueCodeGenerator {
         }
 
         public void addPeek(String type) {
-            hBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index);\n");            
-            cBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index) {\n");               
+            hBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens);\n");            
+            cBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens) {\n");               
             cBuffer.append("  pthread_mutex_lock(&thread_mutexes[threadIndex]);\n");
             cBuffer.append("  int i = 0;\n");
             cBuffer.append("  int size = 0;\n");
@@ -129,6 +129,9 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("    for (i = 0; i < num_multipliers; i++) {\n");
             cBuffer.append("       *multipliers[i] = 0;\n");
             cBuffer.append("    }\n");      
+            cBuffer.append("    for (i = 0; i < num_tokens; i++) {\n");
+            cBuffer.append("       *tokens[i] = 1;\n");
+            cBuffer.append("    }\n");
             cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
             cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
             cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
@@ -158,8 +161,8 @@ public class DynamicQueueCodeGenerator {
         }
 
         public void addPop(String type) {
-            hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers);\n");            
-            cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers) {\n");       
+            hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens);\n");            
+            cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens) {\n");       
             cBuffer.append("  pthread_mutex_lock(&thread_mutexes[threadIndex]);\n");
             cBuffer.append("  int i = 0;\n");
             cBuffer.append("  int size = 0;\n");
@@ -169,6 +172,9 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  while ((size == 0)) {\n");
             cBuffer.append("    for (i = 0; i < num_multipliers; i++) {\n");
             cBuffer.append("       *multipliers[i] = 0;\n");
+            cBuffer.append("    }\n");
+            cBuffer.append("    for (i = 0; i < num_tokens; i++) {\n");
+            cBuffer.append("       *tokens[i] = 1;\n");
             cBuffer.append("    }\n");
             cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
             cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
@@ -193,11 +199,11 @@ public class DynamicQueueCodeGenerator {
         }
 
         public void addPopMany(String type) {
-            hBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int amount);\n");          
-            cBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int amount) {\n");             
+            hBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int amount, int num_tokens, volatile int ** tokens);\n");          
+            cBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int amount, int num_tokens, volatile int ** tokens) {\n");             
             cBuffer.append("  int i = 0;\n");
             cBuffer.append("  for (i = 0; i < amount; i++) {\n");
-            cBuffer.append("    " + type + "_queue_pop(q, threadIndex, nextIndex, num_multipliers, multipliers);\n");              
+            cBuffer.append("    " + type + "_queue_pop(q, threadIndex, nextIndex, num_multipliers, multipliers, num_tokens, tokens);\n");              
             cBuffer.append("  }\n");        
             cBuffer.append("}\n\n");        
         }

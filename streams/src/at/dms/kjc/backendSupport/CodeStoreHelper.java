@@ -348,9 +348,9 @@ public abstract class CodeStoreHelper {
 		return null;
 	}
 	
-	public List<JStatement> getTokenWrite() {
-	    return new ArrayList<JStatement>();
-	}   
+//	public List<JStatement> getTokenWrite() {
+//	    return new ArrayList<JStatement>();
+//	}   
 
 	/********** TODO Refactoring all of this code! ************/
 	

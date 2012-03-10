@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import at.dms.kjc.JInterfaceDeclaration;
 import at.dms.kjc.KjcOptions;
@@ -196,14 +195,7 @@ public class SMPBackend {
             isDynamic = true;
         }
 
-        InterSSGChannel.createBuffers(streamGraph);
-
-        /***
-         * TODO: HERE IS THE PROBLEMTIC CODE:
-         * I am trying to have the layout assigned for all 
-         * filters before generating the code in ProcessFilterWorkNode.
-         * This version puts all filters on the same core.
-         */
+        InterSSGChannel.createBuffers(streamGraph);      
 
         List<BasicSpaceTimeSchedule> graphSchedules = 
                 new ArrayList<BasicSpaceTimeSchedule>();
@@ -220,10 +212,7 @@ public class SMPBackend {
             i++;
         }
 
-        streamGraph.runLayout();
-
-           
-        
+        streamGraph.runLayout();                   
         
         for (StaticSubGraph ssg : streamGraph.getSSGs()) {
             ThreadMapper.getMapper().assignThreads(ssg);
@@ -246,42 +235,7 @@ public class SMPBackend {
 
     }
 
-    private static void runSSG(StaticSubGraph ssg, int ssgNum) {              
-
-        // dump slice graph to dot file
-        ssg.dumpGraph("traces_ssg" + ssgNum +".dot", null);
-
-        // partition the slice graph based on the scheduling policy
-        BasicSpaceTimeSchedule graphSchedule = new BasicSpaceTimeSchedule(ssg);
-        scheduler.setGraphSchedule(graphSchedule);
-        scheduler.run(chip.size());
-        WorkNodeInfo.reset();
-
-        // generate schedules for initialization, primepump and steady-state
-        scheduleSlices(graphSchedule);
-
-        // generate layout for filters
-        streamGraph.runLayout();
-
-        // if load balancing, find candidiate fission groups to load balance
-        if (KjcOptions.loadbalance) {
-            LoadBalancer.findCandidates();
-            LoadBalancer.instrumentMainMethods();
-        }
-
-        // create all buffers and set the rotation lengths
-        RotatingBuffer.createBuffers(graphSchedule);
-
-        // now convert to Kopi code plus communication commands
-        backEndFactory = new SMPBackEndFactory(chip, scheduler, streamGraph);
-        backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
-
-        // calculate computation to communication ratio
-        if (KjcOptions.sharedbufs && KjcOptions.numbers > 0) {
-            calculateCompCommRatio(graphSchedule);
-        }
-
-    }
+   
 
 
     private static BasicSpaceTimeSchedule generateSchedules(StaticSubGraph ssg, int ssgNum) {	          

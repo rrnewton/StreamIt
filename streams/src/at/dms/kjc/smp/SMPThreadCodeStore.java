@@ -277,6 +277,9 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         // primepump stage
 
 
+        
+        
+        
         int outputs = fileW.getWorkNodeContent().getSteadyMult();
         String type = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
                 : "%f";
@@ -285,6 +288,15 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
         // create the loop
         String stmt = "";
+        
+        
+        if (ThreadMapper.getMapper().getTokenReads().containsKey(fileW)) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(fileW)) {                   
+                stmt += "    while (" + tokenName + " == 0); /* RJS */\n";    
+                stmt += "    " + tokenName + " = 0; /* RJS */\n"; 
+            }                
+        }
+        
 
         String multiplierName = fileW.getWorkNodeContent().getName()
                 + "_multiplier";
@@ -293,13 +305,13 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         coreCodeStore.addExternField(new JFieldDeclaration(multiplierVar));
 
         if (KjcOptions.outputs < 0) {
-            stmt = "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
+            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
                     + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
                     + "fprintf(output, \"" + type + "\\n\", " + cast
                     + bufferName + "[_i_]); \n" + "  }\n" + "}\n";
 
         } else {
-            stmt = "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
+            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
                     + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
                     + "  fprintf(output, \"" + type + "\\n\", " + cast
                     + bufferName + "[_i_]); \n";
@@ -387,7 +399,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         String popCall;
         if (KjcOptions.threadopt) {
             popCall = popName + "(" + buffer + ", " + threadIndex + ", "
-                    + threadIndex + ", 0,  NULL)";
+                    + threadIndex + ", 0,  NULL, 0,  NULL)";
         } else {
             popCall = popName + "(" + buffer + ", " + threadId + ", 0, NULL)";
         }

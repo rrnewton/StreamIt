@@ -547,9 +547,16 @@ public class EmitSMPCode extends EmitCode {
 
         p.println();
         p.println("// Intra-SSG synchronization tokens");
-        for (String str : SMPComputeCodeStore.getTokenNames()) {
-            p.println("extern volatile int " + str + ";");
+//        for (String str : SMPComputeCodeStore.getTokenNames()) {
+//            p.println("extern volatile int " + str + ";");
+//        }
+        
+        for ( WorkNode key : ThreadMapper.getMapper().getTokenReads().keySet()) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(key)) {
+                p.println("extern volatile int " + tokenName + ";");
+            }
         }
+        
 
         p.println("#endif");
         p.close();
@@ -736,9 +743,15 @@ public class EmitSMPCode extends EmitCode {
 
         p.println();
         p.println("// Intra-SSG synchronization tokens");
-        for (String str : SMPComputeCodeStore.getTokenNames()) {
-            p.println("volatile int " + str + ";");
+//        for (String str : SMPComputeCodeStore.getTokenNames()) {
+//            p.println("volatile int " + str + ";");
+//        }
+        for ( WorkNode key : ThreadMapper.getMapper().getTokenReads().keySet()) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(key)) {
+                p.println("volatile int " + tokenName + ";");              
+            }
         }
+        
         p.println();
 
         generateSetAffinity(p);
@@ -860,9 +873,16 @@ public class EmitSMPCode extends EmitCode {
         }
 
         p.println("// Intra-SSG synchronization tokens");
-        for (String str : SMPComputeCodeStore.getTokenNames()) {
-            p.println(str + " = 0;");
+//        for (String str : SMPComputeCodeStore.getTokenNames()) {
+//            p.println(str + " = 0;");
+//        }
+//        
+        for ( WorkNode key : ThreadMapper.getMapper().getTokenReads().keySet()) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(key)) {
+                p.println(tokenName + " = 0;");
+            }
         }
+        
         p.println();
 
         if (KjcOptions.loadbalance) {

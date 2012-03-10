@@ -274,16 +274,16 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	}
 
 	
-	@Override
-    public List<JStatement> getTokenWrite() {
-	    if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
-	            .getParent())) {
-	        return RotatingBuffer.getOutputBuffer(filterNode).getTokenWrites();	    
-	    }
-	    else {
-	        return new ArrayList<JStatement>();
-	    }
-	}
+//	@Override
+//    public List<JStatement> getTokenWrite() {
+//	    if (backEndFactory.sliceHasDownstreamChannel(internalFilterNode
+//	            .getParent())) {
+//	        return RotatingBuffer.getOutputBuffer(filterNode).getTokenWrites();	    
+//	    }
+//	    else {
+//	        return new ArrayList<JStatement>();
+//	    }
+//	}
 	
 	@Override
 	public JBlock getSteadyBlock() {

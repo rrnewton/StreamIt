@@ -2,6 +2,7 @@ package at.dms.kjc.smp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import at.dms.kjc.CStdType;
@@ -9,6 +10,7 @@ import at.dms.kjc.CType;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.WorkNode;
 
 /**
  * A singleton class for mapping filters to threads.
@@ -16,7 +18,7 @@ import at.dms.kjc.slir.StaticSubGraph;
  *
  */
 public class ThreadMapper {
-   
+
     private static ThreadMapper mapper      = null;
     private static int          threadId;
     static {
@@ -26,10 +28,6 @@ public class ThreadMapper {
         } else {
             threadId = 0;
         }
-    }
-    
-    public static int getNumThreads() {
-        return threadId + 1;
     }
 
     public static int coreToThread(int core) {
@@ -44,7 +42,7 @@ public class ThreadMapper {
         assert (false) : "Core " + core +" not mapped to a thread!";
         return -1;
     }
-    
+
     public static int getFirstCore() {
         return SMPBackend.coreOrder[0];
     }
@@ -60,8 +58,16 @@ public class ThreadMapper {
         }
         return mapper;
     }
-    
-    
+
+    public static int getNumThreads() {
+        return threadId + 1;
+    }
+
+
+    public static boolean isMain(int thread) {
+        return (thread < KjcOptions.smp);
+    }
+
     /** a mapping from filter to thread id */
     private Map<Filter, Integer>      filterToThreadId;
 
@@ -70,8 +76,17 @@ public class ThreadMapper {
 
     /** a mapping of thread to its input type */
     private Map<Integer, String>      threadIdToType;
-    
+
     private Map<Integer, Integer>     coreToThread;
+
+    /** a mapping to filter to a token that it writes to */
+    private Map<WorkNode, List<String>>      tokenWrites;
+
+    /** a mapping to filter to a token that it reads from */
+    private Map<WorkNode, List<String>>      tokenReads;
+
+    /** a mapping to dominators to a token that it writes to */
+    private Map<WorkNode, List<String>>      dominatorToTokens;
 
     /**
      * Private constructor for singleton
@@ -81,6 +96,9 @@ public class ThreadMapper {
         dominators = new HashMap<String, List<String>>();
         threadIdToType = new HashMap<Integer, String>();
         coreToThread = new HashMap<Integer, Integer>();
+        tokenWrites = new HashMap<WorkNode, List<String>>();
+        tokenReads = new HashMap<WorkNode, List<String>> ();
+        dominatorToTokens = new HashMap<WorkNode, List<String>> ();
     }
 
     /**
@@ -110,10 +128,38 @@ public class ThreadMapper {
         return threadIdToType;
     }
 
+    /**
+     * @return the tokenReads
+     */
+    public Map<WorkNode, List<String>> getTokenReads() {
+        return tokenReads;
+    }
+
+    /**
+     * @return the dominatorToTokens
+     */
+    public Map<WorkNode, List<String>> getDominatorToTokens() {
+        return dominatorToTokens;
+    }
+
+    /**
+     * @return the tokenWrites
+     */
+    public Map<WorkNode, List<String>> getTokenWrites() {
+        return tokenWrites;
+    }
+
     public void setDominators(Map<String, List<String>> dominators) {
         this.dominators = dominators;
     }
-    
+
+    private void addToListInMap( Map<WorkNode, List<String>> tokenWrites2, WorkNode key, String value ) {
+        if (!tokenWrites2.containsKey(key)) {
+            tokenWrites2.put(key, new LinkedList<String>());
+        }
+        tokenWrites2.get(key).add(value);
+    }
+
     /**
      * Assign thread ids only to dynamic readers
      * 
@@ -124,12 +170,18 @@ public class ThreadMapper {
         Filter f = ssg.getTopFilters()[0];
         boolean isDynamicInput = ssg.hasDynamicInput();
         boolean isStateful = f.getWorkNodeContent().isStateful();
-
+        
+        for (Filter filter : ssg.getFilterGraph()) {               
+            checkForTokens(filter, ssg); 
+        }
+        
         /* Check if it has a dynamic pop rate */
         if (isDynamicInput || isStateful) {
             Filter[] topFilters = ssg.getTopFilters();
 
             for (Filter dynamicReader : topFilters) {              
+               
+                
                 Filter[] filterGraph = ssg.getFilterGraph();
 
                 if (isVoidInputType(dynamicReader)) {
@@ -159,7 +211,57 @@ public class ThreadMapper {
             } // end for loop
         }
     }
-   
+
+
+    /**
+     * Check to see if we need any synchronization. We need synchronization
+     * if three conditions are met:
+     * 1. Two filters are in the same SSG
+     * 2. The two filters are on separate cores
+     * 3. Neither filter is a dominator
+     * @param filter
+     * @param ssg
+     */
+    private void checkForTokens(Filter filter, StaticSubGraph ssg) {
+        System.out.println("ThreadMapper.checkForTokens filter=" + getFilterName(filter) );
+        
+        Filter firstFilter = ssg.getFilterGraph()[0];
+        int filterCore = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;
+        if (!filter.getWorkNode().isFileOutput()) {       
+            
+            System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + " is not file output");
+            
+            for ( Filter nextFilter : ProcessFilterWorkNode.getNextFilters(filter.getWorkNode())) {
+                System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + " and next=" + getFilterName(nextFilter));                                
+                if (ssg.containsFilter(nextFilter)) {
+                    int nextCore = SMPBackend.getComputeNode(nextFilter.getWorkNode()).coreID;      
+                    System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + " core=" + filterCore + " " + getFilterName(filter) + " and next=" + getFilterName(nextFilter) + "next core =" + nextCore);                                                    
+                    if (filterCore != nextCore) {
+
+                        System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + " firstFilter=" + getFilterName(firstFilter) );
+                        System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + " isProgramSource(firstFilter)=" + isProgramSource(firstFilter) );
+                        
+                       
+                        
+                       // if (firstFilter != filter || isProgramSource(firstFilter)) {
+
+                            if (!filter.getWorkNode().isFileInput()) {
+                                                        
+                                System.out.println("    ThreadMapper.checkForTokens TOKEN BETWEEN filter=" + getFilterName(filter) + " and next=" + getFilterName(nextFilter));                
+                                String tokenName = getFilterName(filter) + "_to_" + getFilterName(nextFilter) + "_token";                            
+                                addToListInMap(dominatorToTokens, firstFilter.getWorkNode(), tokenName);
+                                addToListInMap(tokenWrites, filter.getWorkNode(), tokenName);
+                                addToListInMap(tokenReads, nextFilter.getWorkNode(), tokenName);
+                            }
+                        //}                       
+                    }
+                } else {
+                    System.out.println("    ThreadMapper.checkForTokens filter=" + getFilterName(filter) + getFilterName(filter) + "  next=" + getFilterName(nextFilter) + " is not in the same SSG");                
+                }
+            }
+        }
+    }
+
     /**
      * Assign thread ids to all filters
      * 
@@ -169,26 +271,26 @@ public class ThreadMapper {
 
         boolean isDynamicInput = ssg.hasDynamicInput();
         Filter firstFilter = ssg.getFilterGraph()[0];
-        
+
         int firstCore = SMPBackend.getComputeNode(firstFilter.getWorkNode()).coreID;    
-        
+
         System.out.println("ThreadMapper.assignThreadsOpt  firstFilter=" + getFilterName(firstFilter) + " isDynamicInput=" + isDynamicInput);                
-        
+
         // The first filter of an SSG always gets its own thread, 
         // with the exception of the first filter in the program.
         // Therefore, increment the count, unless we were at the 
         // first one.
         if (!isProgramSource(firstFilter) && !isFirstAfterFileInput(firstFilter)
                 && !isProgramSink(firstFilter)) {
-        	threadId++;
+            threadId++;
         }
-        
 
-                                   
         for (Filter filter : ssg.getFilterGraph()) {
-            
+
             int filterCore = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;
-            
+
+            checkForTokens(filter, ssg); 
+         
             // If the first thread is not dynamic, then 
             // it doesn't dominate anything, and it will 
             // be on the main thread.
@@ -199,7 +301,7 @@ public class ThreadMapper {
                 System.out.println("ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread + " core=" + filterCore);                
                 continue;
             }   
-            
+
             // Check to see if we have a fizzed filter. If a filter has
             // been fizzed, then it should have been assigned to a different
             // core.
@@ -216,13 +318,13 @@ public class ThreadMapper {
                     thread = coreToThread(core);
                 }
             } 
-            
+
             else if (isProgramSource(filter)) {                                                
                 Filter next = ProcessFilterWorkNode.getNextFilter(filter.getWorkNode());    
                 // Need to special case when the program is just a source and sink.s
-                
+
                 System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isProgramSource(filter)");                
-                
+
                 if (isProgramSink(next)) {                    
                     thread = coreToThread(getFirstCore());
                 } else if (filter.getWorkNode().isFileInput()) {                
@@ -233,30 +335,30 @@ public class ThreadMapper {
             }            
 
             else if (isFirstAfterFileInput(filter)) {       
-                
+
                 System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isFirstAfterFileInput(filter)");                
                 thread = coreToThread(filterCore);                  
             }            
 
-            
+
             filterToThreadId.put(filter, thread);
             System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " thread=" + thread);                
             dominatorsAdd(firstFilter, filter);
-            
+
             // We need another special case here. A FileWriter should be dominated by the
             // last dynamic reader, even though they will be in separate SSGs.
             if (isLastBeforeFileOutput(filter)) {
                 dominatorsAdd(firstFilter, ProcessFilterWorkNode.getNextFilter(filter.getWorkNode()));
             }
-            
+
             if (thread < KjcOptions.smp) {
                 threadIdToType.put(threadId,getFilterInputType(firstFilter).toString());
             }
-                
+
         }    
-       
+
     }
-    
+
     private void dominatorsAdd(Filter f1, Filter f2) {
         if (!dominators.containsKey(getFilterName(f1))) {
             dominatorsInitEmpty(f1);
@@ -273,7 +375,7 @@ public class ThreadMapper {
                 f2)) {
             dominators.get(
                     getFilterName(f1)).add(
-                    getFilterName(f2));
+                            getFilterName(f2));
         }
     }
 
@@ -296,7 +398,7 @@ public class ThreadMapper {
     private boolean equalNames(Filter f1, Filter f2) {
         return getFilterName(
                 f1).equals(
-                getFilterName(f2));
+                        getFilterName(f2));
     }
 
     private CType getFilterInputType(Filter f) {
@@ -306,7 +408,7 @@ public class ThreadMapper {
     private String getFilterName(Filter f) {
         return f.getWorkNodeContent().getName();
     }
-  
+
     private boolean isFirstAfterFileInput(Filter filter) {      
         return ProcessFilterWorkNode.isFirstAfterFileInput(filter);                   
     }
@@ -322,17 +424,13 @@ public class ThreadMapper {
     private boolean isProgramSink(Filter f) {
         return ProcessFilterWorkNode.isProgramSink(f);              
     }
-    
+
     private boolean isProgramSource(Filter f) {
         return ProcessFilterWorkNode.isProgramSource(f);          
     }
-    
+
     private boolean isVoidInputType(Filter f) {
         return (getFilterInputType(f) == CStdType.Void);
     }
 
-	public static boolean isMain(int thread) {
-		 return (thread < KjcOptions.smp);
-	}
-    
 }

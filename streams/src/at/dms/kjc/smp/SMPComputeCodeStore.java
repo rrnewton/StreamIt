@@ -469,20 +469,18 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 statement);
     }
 
-    public void addStatementToSteadyLoop(JStatement statement) {
-        this.addStatementToSteadyLoop(
-                0,
-                statement);
-    }
+//    public void addStatementToSteadyLoop(JStatement statement) {
+//        this.addStatementToSteadyLoop(
+//                0,
+//                statement);
+//    }
 
     public void addSteadyLoopStatement(int index, JStatement stmt) {
-
-        assert threads.get(index) != null : "SMPComputeCodeStore.addSteadyLoopStatement() thread index "
-                + index + " does not exist on core " + core.coreID;
-
+                
         threads.get(
                 index).addSteadyLoopStatement(
                 stmt);
+
     }
 
     @Override

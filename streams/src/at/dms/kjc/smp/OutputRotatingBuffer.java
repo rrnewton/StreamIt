@@ -497,7 +497,7 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 			list.addAll(addrRot.rotateStatements());
 		}
 		
-		list.addAll(getTokenWrite(filterNode, SchedulingPhase.PRIMEPUMP));
+		//list.addAll(getTokenWrite(filterNode, SchedulingPhase.PRIMEPUMP));
 				
 		return list;
 	}
@@ -532,10 +532,10 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 	/**
 	 * Return synchronization for non-pipelined filters
 	 */
-	@Override
-	public List<JStatement> getTokenWrites() {        
-	    return getTokenWrite(filterNode, SchedulingPhase.STEADY);	      
-	}
+//	@Override
+//	public List<JStatement> getTokenWrites() {        
+//	    return getTokenWrite(filterNode, SchedulingPhase.STEADY);	      
+//	}
 	
 
 	/**

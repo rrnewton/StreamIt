@@ -221,12 +221,14 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 	
 					
-			if (!srcCore.equals(filterCore) ) {
-				String tokenName = src + "_to_" + filter + "_token";
-				list.add(Util.toStmt("while (" + tokenName
-						+ " == 0)"));
-				list.add(Util.toStmt(tokenName + " = 0"));
-			}
+//			if (!srcCore.equals(filterCore) ) {
+//				String tokenName = src + "_to_" + filter + "_token";
+//				list.add(Util.toStmt("while (" + tokenName
+//						+ " == 0)"));
+//				list.add(Util.toStmt(tokenName + " = 0"));
+//			}
+			
+			
 		}
 		return list;
 	}
@@ -347,7 +349,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	public List<JStatement> beginPrimePumpRead() {
 		List<JStatement> list = new LinkedList<JStatement>();
 		list.add(transferCommands.zeroOutTail(SchedulingPhase.PRIMEPUMP));
-		list = addTokenWait(filterNode, SchedulingPhase.PRIMEPUMP, list);
+		//list = addTokenWait(filterNode, SchedulingPhase.PRIMEPUMP, list);
 		return list;
 	}
 
@@ -362,7 +364,7 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		List<JStatement> list = new LinkedList<JStatement>();
 		//list.add(new SIRBeginMarker("beginSteadyRead"));
 		list.add(transferCommands.zeroOutTail(SchedulingPhase.STEADY));
-		list = addTokenWait(filterNode, SchedulingPhase.STEADY, list);		
+		//list = addTokenWait(filterNode, SchedulingPhase.STEADY, list);		
 		return list;
 	}
 

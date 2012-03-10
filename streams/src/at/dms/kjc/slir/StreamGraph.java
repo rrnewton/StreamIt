@@ -3,10 +3,8 @@ package at.dms.kjc.slir;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.GreedyBinPacking;
 import at.dms.kjc.backendSupport.Layout;
@@ -23,12 +21,10 @@ public class StreamGraph implements Layout<Core> {
 
     protected HashMap<InternalFilterNode, Core> layoutMap = new HashMap<InternalFilterNode, Core>();
     private GreedyBinPacking<Filter>            dominatorPacking;
-    Set<Filter>                                 allFilters = new HashSet<Filter>();
-    
+    List<Filter>                                allFilters = new LinkedList<Filter>();
+        
     protected int                               steadyMult;
-
-    // TODO: We need to fix the hierarchy. StreamGraph is being used
-    // more like an ssg, but it should represent multiple ssgs.
+    
     List<StaticSubGraph>                        ssgs;
 
     public StreamGraph() {
@@ -125,10 +121,11 @@ public class StreamGraph implements Layout<Core> {
         System.out.println("TMDBinPackFissAll.runLayout()");
 
         List<Filter> slices = DataFlowOrder.getTraversal(getAllFilter());
-        HashSet<Filter> fizzedSlices = new HashSet<Filter>();
-        HashSet<Filter> unfizzedSlices = new HashSet<Filter>();
-        HashSet<Filter> dominators = new HashSet<Filter>();
-
+        List<Filter> fizzedSlices = new LinkedList<Filter>();
+        List<Filter> unfizzedSlices = new LinkedList<Filter>();
+        List<Filter> dominators = new LinkedList<Filter>();
+        
+        
         // Get work estimates for all slices
         HashMap<WorkNode, Long> workEsts = new HashMap<WorkNode, Long>();
         for (Filter slice : slices) {
@@ -216,7 +213,8 @@ public class StreamGraph implements Layout<Core> {
 
         // Schedule fizzed slices by assigning fizzed copies sequentially
         // across cores
-        HashSet<Filter> alreadyAssigned = new HashSet<Filter>();
+        List<Filter> alreadyAssigned = new LinkedList<Filter>();
+                
         for (Filter slice : fizzedSlices) {
             // If slice already assigned, skip it
             if (alreadyAssigned.contains(slice))
@@ -383,13 +381,7 @@ public class StreamGraph implements Layout<Core> {
                 SMPBackend.chip.getNthComputeNode(dominatorPacking
                         .getBin(filter)));
     }
-
-    
-    public void addFilter(Filter f0) {
-        System.out.println("StreamGraph.addFilter " + f0.getWorkNode());
-        //allFilters.add(f0);        
-    }
-    
+ 
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 

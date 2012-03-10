@@ -76,7 +76,7 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
             int next = -1;
             if (KjcOptions.threadopt) {                                                            
                 int channelId = ((InterSSGChannel) inputChannel).getId();
-                Filter nextFilter = ProcessFilterWorkNode.getNextFilterOnCore(workNode);                                                 
+                Filter nextFilter = ProcessFilterWorkNode.getNextFilterOnCoreDifferentThread(workNode);                                                 
                 next = ProcessFilterWorkNode.getFilterThread(workNode, nextFilter);                                  
                 // If there is no next filter on this core
                 // then we want to return to the main.
@@ -94,13 +94,20 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
             int num_multipliers = (dominators.get(workNode.toString()) == null) ? 0
                     : dominators.get(
                             workNode.toString()).size();
+            
+            int num_tkns = (ThreadMapper.getMapper().getDominatorToTokens().get(workNode) == null) ? 0
+                    : ThreadMapper.getMapper().getDominatorToTokens().get(workNode).size();            
+            JExpression tokens = new JEmittedTextExpression(
+                    "tokens");            
+            JExpression num_tokens = new JIntLiteral(num_tkns);
+            
             JExpression num_dominated = new JIntLiteral(num_multipliers);
             if (KjcOptions.threadopt) {
                 JExpression nextThread = new JIntLiteral(next);
                 JExpression methodCall = new JMethodCallExpression(
                         peekName, new JExpression[] { dyn_queue, index,
                                 nextThread, num_dominated, dominated,
-                                newArg });
+                                newArg, num_tokens, tokens });
                 methodCall.setType(tapeType);
                 return methodCall;
             }
@@ -184,7 +191,10 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
             int channelId = ((InterSSGChannel) inputChannel).getId();
 
             
-            Filter nextFilter = ProcessFilterWorkNode.getNextFilterOnCore(workNode);                                                 
+            //Filter nextFilter = ProcessFilterWorkNode.getNextFilterOnCore(workNode);     
+            
+            Filter nextFilter = ProcessFilterWorkNode.getNextFilterOnCoreDifferentThread(workNode);    
+                        
             next = ProcessFilterWorkNode.getFilterThread(workNode, nextFilter);                                  
             // If there is no next filter on this core
             // then we want to return to the main.
@@ -207,6 +217,14 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
 
         JExpression num_dominated = new JIntLiteral(num_multipliers);
         JExpression dominated = new JEmittedTextExpression("multipliers");
+        
+        int num_tkns = (ThreadMapper.getMapper().getDominatorToTokens().get(workNode) == null) ? 0
+                : ThreadMapper.getMapper().getDominatorToTokens().get(workNode).size();            
+        JExpression tokens = new JEmittedTextExpression(
+                "tokens");            
+        JExpression num_tokens = new JIntLiteral(num_tkns);
+
+        
         if (self.getNumPop() > 1) {
             if (KjcOptions.threadopt) {
 
@@ -214,7 +232,7 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
                 return new JMethodCallExpression(popManyName,
                         new JExpression[] { dyn_queue, index, nextThread,
                                 num_dominated, dominated,
-                                new JIntLiteral(self.getNumPop()) });
+                                new JIntLiteral(self.getNumPop()), num_tokens, tokens });
             } else {
                 return new JMethodCallExpression(popManyName,
                         new JExpression[] { dyn_queue, index,
@@ -226,13 +244,13 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
                 JExpression nextThread = new JIntLiteral(next);
                 JExpression methodCall = new JMethodCallExpression(popName,
                         new JExpression[] { dyn_queue, index, nextThread,
-                                num_dominated, dominated });
+                                num_dominated, dominated, num_tokens, tokens });
                 methodCall.setType(tapeType);
                 return methodCall;
             } else {
                 JExpression methodCall = new JMethodCallExpression(popName,
                         new JExpression[] { dyn_queue, index,
-                                num_dominated, dominated });
+                                num_dominated, dominated});
                 methodCall.setType(tapeType);
                 return methodCall;
             }
