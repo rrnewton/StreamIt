@@ -540,7 +540,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
      * 
      * @param steadyBlock
      */
-    public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
+    public void addThreadHelperNonOpt(WorkNode workNode, int threadIndex, JStatement steadyBlock) {
 
         System.out.println("SMPThreadCodeStore.addThreadHelper called()");
 
@@ -568,7 +568,16 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                 Utils.makeEqualityCondition(
                         "ASLEEP",
                         "thread_to_sleep[" + threadIndex + "][DYN_READER]"));
+        
+       
+        
+        ProcessFilterWorkNode.addTokenWait(workNode, coreCodeStore);
+
         loopBody.addStatement(steadyBlock);
+        
+        ProcessFilterWorkNode.addTokenWrite(workNode, coreCodeStore);
+        
+        
         Utils.addSetFlag(
                 loopBody,
                 threadIndex,
@@ -615,6 +624,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         JMethodDeclaration threadHelper = new JMethodDeclaration(
                 CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
                 methodBody);
+        
         addHelperThreadMethod(threadHelper);
     }
 

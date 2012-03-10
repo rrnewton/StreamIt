@@ -253,11 +253,44 @@ public class ProcessFilterWorkNode {
 
  
 
+    static void addTokenWait(WorkNode workNode, SMPComputeCodeStore codeStore) {
+        if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
+                JExpressionStatement stmt = new JExpressionStatement(
+                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
+                codeStore.addSteadyLoopStatement(                              
+                        stmt);
+                stmt = new JExpressionStatement(
+                        new JEmittedTextExpression(tokenName + " = 0"));                                                
+                codeStore.addSteadyLoopStatement(
+                        stmt);
+            }                
+        }
+    }
+    static void addTokenWrite(WorkNode workNode, SMPComputeCodeStore codeStore) {
+        
+        
+//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
+//        for (Filter filter : ssg.getFilterGraph()) {
+//
+//            WorkNode wnode = filter.getWorkNode();
+            if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
+                for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
+                    JExpressionStatement stmt = new JExpressionStatement(                            
+                            new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
+                    codeStore.addSteadyLoopStatement(                                          
+                            stmt);
+                }                 
+            }
+//        }
+    }
     protected CodeStoreHelper     filterCode;
     protected SMPComputeCodeStore codeStore;
     protected WorkNode            workNode;
     protected SchedulingPhase     whichPhase;
+
     protected SMPBackEndFactory   backEndFactory;
+
     protected Core                location;
 
     /**
@@ -365,21 +398,6 @@ public class ProcessFilterWorkNode {
         }
     }
 
-    private void addTokenWait() {
-        if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
-            for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
-                JExpressionStatement stmt = new JExpressionStatement(
-                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
-                codeStore.addSteadyLoopStatement(                              
-                        stmt);
-                stmt = new JExpressionStatement(
-                        new JEmittedTextExpression(tokenName + " = 0"));                                                
-                codeStore.addSteadyLoopStatement(
-                        stmt);
-            }                
-        }
-    }
-
     private void addTokenWait(int threadIndex) {
         if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
             for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
@@ -395,22 +413,6 @@ public class ProcessFilterWorkNode {
                         stmt);
             }                
         }
-    }
-
-    private void addTokenWrite() {
-//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
-//        for (Filter filter : ssg.getFilterGraph()) {
-//
-//            WorkNode wnode = filter.getWorkNode();
-            if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
-                for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
-                    JExpressionStatement stmt = new JExpressionStatement(                            
-                            new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
-                    codeStore.addSteadyLoopStatement(                                          
-                            stmt);
-                }                 
-            }
-//        }
     }
 
     private void addTokenWrite(int threadIndex) {
@@ -490,17 +492,12 @@ public class ProcessFilterWorkNode {
 
     protected void standardSteadyProcessing(boolean isDynamicPop) {
         JBlock steadyBlock = filterCode.getSteadyBlock();
-        //List<JStatement> tokenWrites = filterCode.getTokenWrite();
 
         System.out
         .println("=== ProcessFilterWorkNode.standardSteadyProcessing filter="
                 + workNode.getParent().getWorkNode());
 
         if (!basicCodeWritten.containsKey(workNode)) {
-
-            System.out
-            .println("=== !basicCodeWritten.containsKey(workNode)");
-
             codeStore.addFields(filterCode.getFields());
             codeStore.addMethods(filterCode.getUsefulMethods());
             if (workNode.getWorkNodeContent() instanceof OutputContent) {
@@ -529,30 +526,20 @@ public class ProcessFilterWorkNode {
                     workNode,
                     workNode.getParent());
 
-            codeStore.addThreadHelper(
+            codeStore.addThreadHelperNonOpt(
+                    workNode,
                     threadIndex,
                     steadyBlock);
+            
             codeStore.addSteadyThreadCall(threadIndex);
 
-
-            //            for (JStatement stmt : tokenWrites) {
-            //                codeStore.addSteadyLoopStatement(stmt);
-            //            }
-
         } else {
-            //            for (JStatement stmt : tokenWrites) {
-            //                steadyBlock.addStatement(stmt);
-            //            }
 
-            System.out
-            .println("ProcessFilterWorkNode.standardSteadyProcessing... about to add to steadyloop");
-
-
-            addTokenWait();
+            addTokenWait(workNode, codeStore);
 
             codeStore.addSteadyLoopStatement(steadyBlock);
 
-            addTokenWrite();
+            addTokenWrite(workNode, codeStore);
 
         }
         if (debug) {
@@ -658,11 +645,7 @@ public class ProcessFilterWorkNode {
                                     .getWorkNode() : "null")
                                     + "( "
                                     + nextThread + " )");
-
-            System.out
-            .println("AAAA ProcessFilterWorkNode.standardSteadyProcessingOpt calling addThreadHelper threadIndex="
-                    + threadIndex + " nextIndex=" + nextThread);
-
+           
             addTokenWait(threadIndex);
                         
             codeStore.addThreadHelper(
@@ -691,28 +674,13 @@ public class ProcessFilterWorkNode {
                 codeStore.addCallNextToThread(
                         mainThread, threadIndex);                
             }          
-
-            //            for (JStatement stmt : tokenWrites) {
-            //                codeStore.addSteadyLoopStatement(stmt);
-            //            }
-
+           
             if (ThreadMapper.isMain(nextThread)) {
                 codeStore.addSteadyThreadWait(nextThread);
             }
 
 
         } else {
-
-            System.out
-            .println("=== ProcessFilterWorkNode.standardSteadyProcessingOpt filter="
-                    + workNode.getParent().getWorkNode() + "  else {");
-
-            //            for (JStatement stmt : tokenWrites) {
-            //                steadyBlock.addStatement(stmt);
-            //            }
-
-            System.out
-            .println("ProcessFilterWorkNode.standardSteadyProcessingOpt... about to add to steadyloop");
 
             int threadIndex = ProcessFilterUtils.getFilterThread(
                     workNode,
@@ -723,23 +691,15 @@ public class ProcessFilterWorkNode {
                     workNode,
                     nextFilter);
 
-            System.out
-            .println("BBBB: ProcessFilterWorkNode.standardSteadyProcessingOpt... threadIndex="
-                    + threadIndex + " workNode=" + workNode + " codeStore.getCore="            
-                    + codeStore.getCore().coreID);
-
             addTokenWait(threadIndex);
 
             codeStore.addSteadyLoopStatement(
                     threadIndex,                  
                     steadyBlock);
-
+            
             addTokenWrite(threadIndex);
 
-            if (threadIndex != nextThread) {
-                System.out
-                .println("ProcessFilterWorkNode.standardSteadyProcessingOpt... addCallNextToMain");
-
+            if (threadIndex != nextThread) {              
                 codeStore.addCallNextToThread(
                         threadIndex,
                         nextThread);

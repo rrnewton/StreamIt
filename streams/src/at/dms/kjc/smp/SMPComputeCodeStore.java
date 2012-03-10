@@ -541,8 +541,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     }
 
-    public void addThreadHelper(int threadIndex, JStatement steadyBlock) {
-        getMain().addThreadHelper(
+    public void addThreadHelperNonOpt(WorkNode workNode, int threadIndex, JStatement steadyBlock) {
+        getMain().addThreadHelperNonOpt(
+                workNode,
                 threadIndex,
                 steadyBlock);
     }
