@@ -186,14 +186,14 @@ def plot_normalized(work, outputs):
     
 def main():
     attempts = 3
-    # ignore = 1000
-    # outputs = 100000
-    # filters = [1, 2, 4, 8, 16, 32]
-    # total_work = [1, 100, 1000, 10000, 100000]
-    ignore = 10
-    outputs = 1000
-    filters = [2, 4]
-    total_work = [1000]   
+    ignore = 1000
+    outputs = 100000
+    filters = [1, 2, 4, 8, 16, 32]
+    total_work = [1, 100, 1000, 10000, 100000]
+    #ignore = 10
+    #outputs = 1000
+    #filters = [2, 4]
+    #total_work = [1000]   
     for work in total_work:
         nofusion_results = []
         fusion_results = []
