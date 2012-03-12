@@ -141,10 +141,10 @@ def plot(work, outputs):
     cmd += "\" u 1:3:4 notitle w yerrorbars, \""
     cmd += data + "\" u 1:5 t \'fusion\' w linespoints, \""
     cmd += "\" u 1:5:6 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:7 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 1:7:8 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:9 t \'lockfree\' w linespoints, \""
-    cmd += "\" u 1:9:10 notitle w yerrorbars, \""
+    #cmd += data + "\" u 1:7 t \'dynamic\' w linespoints, \""
+    #cmd += "\" u 1:7:8 notitle w yerrorbars, \""
+    #cmd += data + "\" u 1:9 t \'lockfree\' w linespoints, \""
+    #cmd += "\" u 1:9:10 notitle w yerrorbars, \""
     cmd += data + "\" u 1:11 t \'threadopt\' w linespoints, \""
     cmd += "\" u 1:11:12 notitle w yerrorbars, \""
     cmd += data + "\" u 1:13 t \'threadbatch\' w linespoints, \""
@@ -154,6 +154,7 @@ def plot(work, outputs):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
+        f.write('set key left top\n');
         f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Filters\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
@@ -163,19 +164,22 @@ def plot(work, outputs):
 def plot_normalized(work, outputs):
     data = 'fusion-normalized' + str(work) + '.dat'
     output = 'fusion-normalized' + str(work) + '.ps'
-    cmd = "plot \""
-    cmd += data + "\" u 1:3 t \'fusion\' w linespoints, \""
-    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
-    cmd += data + "\" u 1:5 t \'lockfree\' w linespoints, \""
-    cmd += data + "\" u 1:6 t \'threadopt\' w linespoints, \""
-    cmd += data + "\" u 1:7 t \'threadbatch\' w linespoints, \""
-    cmd += "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels"
+    cmd = "plot "
+    cmd += "\"" + data + "\" u 1:7 t \'batching=100\' w linespoints,"
+    cmd += "\"" + "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels offset 0.25,1.75,"
+    cmd += "\"" + data + "\" u 1:3 t \'fusion\' w linespoints,"
+    cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints,"
+    cmd += "\"" + data + "\" u 1:5 t \'lockfree\' w linespoints,"
+    cmd += "\"" + data + "\" u 1:6 t \'threadopt\' w linespoints"
+
+    
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
+        f.write('set key left top\n');
         f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Filters\"\n');
-        f.write('set ylabel \"Times Non-Fusion\"\n');
+        f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
     
