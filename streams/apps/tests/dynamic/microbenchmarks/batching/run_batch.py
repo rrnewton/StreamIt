@@ -133,6 +133,7 @@ def plot(work, outputs, batching):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
+        f.write('set key left top"\n')
         f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Filters\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
@@ -149,9 +150,10 @@ def plot_normalized(work, outputs, batching):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
+        f.write('set key left top"\n')
+        f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Filters\"\n');
-        f.write('set ylabel \"Times Non-Fusion\"\n');
+        f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write( 'plot ' + ','.join(cmds))
     os.system('gnuplot ./tmp.gnu')
 
