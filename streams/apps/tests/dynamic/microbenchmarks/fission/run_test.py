@@ -142,6 +142,7 @@ def plot(ratio, work, outputs):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
+        f.write('set key left top\n');
         f.write('set title \"Fission Experiment, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
@@ -160,9 +161,10 @@ def plot_normalized(ratio, work, outputs):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
+        f.write('set key left top\n');
         f.write('set title \"Fission Experiment Normalized, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
         f.write('set xlabel \"Cores\"\n');
-        f.write('set ylabel \"Times Static\"\n');
+        f.write('set ylabel \"Throughput normalized to static throughput\"\n');
         f.write(cmd)
     os.system('gnuplot ./tmp.gnu')
 
