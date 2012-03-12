@@ -11,8 +11,8 @@ class Configs:
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-static_test = (Configs.nofusion, [strc, '-smp', '2', '--perftest', '--noiter', '--nofuse'], './smp1' )
-dynamic_test = (Configs.threadbatch, [strc, '-smp', '2', '--perftest', '--noiter', '--threadopt'], './smp1' )
+static_test = (Configs.nofusion, [strc, '-smp', '2', '--perftest', '--noiter', '--nofuse'], './smp2' )
+dynamic_test = (Configs.threadbatch, [strc, '-smp', '2', '--perftest', '--noiter', '--threadopt'], './smp2' )
 
 def generate(test, num_filters, work):
     op = 'void->void pipeline test {\n';
