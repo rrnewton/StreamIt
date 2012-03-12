@@ -133,7 +133,7 @@ def plot(work, outputs, batching):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key left top"\n')
+        f.write('set key left top\n')
         f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Filters\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
@@ -150,7 +150,7 @@ def plot_normalized(work, outputs, batching):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key left top"\n')
+        f.write('set key left top\n')
         f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Filters\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
@@ -162,7 +162,8 @@ def main():
     ignore = 1000
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    batching = [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000]
+    #batching = [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000]
+    batching = [1, 10, 100, 1000, 10000, 100000]
     total_work = [1000]
     for work in total_work:
         static_results = []      
