@@ -155,9 +155,9 @@ def plot_normalized(ratio, work, outputs):
     output = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
-    cmd += "\" u 2:3:(sprintf(\"[%.0f,%.1f]\",$2,$3)) notitle with labels, \""
+    cmd += "\" u 2:3:(sprintf(\"[%.0f,%.1f]\",$2,$3)) notitle with labels offset 0.25,1.75, \""
     cmd += data + "\" u 2:4 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 2:4:(sprintf(\"[%.0f,%.1f]\",$2,$4)) notitle with labels"
+    cmd += "\" u 2:4:(sprintf(\"[%.0f,%.1f]\",$2,$4)) notitle with labels offset 0.25,1.75"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
