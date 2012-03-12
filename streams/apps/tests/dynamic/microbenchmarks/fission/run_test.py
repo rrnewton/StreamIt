@@ -74,7 +74,7 @@ def compile(test, outputs, ignore, core):
         cmd = [strc, '--perftest', '--noiter',
                '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
     else:
-        cmd = [strc, '--perftest', '--noiter', '--nofuse',
+        cmd = [strc, '--perftest', '--noiter', '--nofuse', '--threadopt',
                '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
     print cmd
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
@@ -104,12 +104,12 @@ def run(core, attempts):
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
 
-def print_all(ratio, static_results, dynamic_results):
+def print_all(work, ratio, static_results, dynamic_results):
     base = static_results[0]
     total_work = base[2]
     dynamic_work = total_work * (1 - ratio)
     static_work = total_work - dynamic_work
-    file = 'fission' + str(int(ratio * 100)) + '.dat'
+    file = 'fission' + str(int(ratio * 100)) + '_' + str(work)  + '.dat'
     with open(file, 'w') as f:
         s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'static-dev', 'dynamic', 'dynamic-dev', 'ideal' )
         print s
@@ -119,7 +119,7 @@ def print_all(ratio, static_results, dynamic_results):
             s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], x[3], ideal)
             print s
             f.write(s + '\n')
-    file = 'fission-normalized' + str(int(ratio * 100)) + '.dat'
+    file = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.dat'
     with open(file, 'w') as f:
         s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static','dynamic')
         print s
@@ -131,8 +131,8 @@ def print_all(ratio, static_results, dynamic_results):
 
 
 def plot(ratio, work, outputs):
-    data = 'fission' + str(int(ratio * 100)) + '.dat'
-    output = 'fission' + str(int(ratio * 100)) + '.ps'
+    data = 'fission' + str(int(ratio * 100)) + '_' + str(work) + '.dat'
+    output = 'fission' + str(int(ratio * 100)) + '_' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
     cmd += "\" u 2:3:4 notitle w yerrorbars, \""
@@ -150,8 +150,8 @@ def plot(ratio, work, outputs):
 
 
 def plot_normalized(ratio, work, outputs):
-    data = 'fission-normalized' + str(int(ratio * 100)) + '.dat'
-    output = 'fission-normalized' + str(int(ratio * 100)) + '.ps'
+    data = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.dat'
+    output = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.ps'
     cmd = "plot \""
     cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
     cmd += "\" u 2:3:(sprintf(\"[%.0f,%.1f]\",$2,$3)) notitle with labels, \""
@@ -174,7 +174,7 @@ def main():
     #cores = [1, 2, 4, 8, 16, 32]
     cores = [1, 2, 4, 8, 16]
     ratios = [0.10, 0.50, 0.90]
-    total_work = [100, 1000]
+    total_work = [100, 1000, 10000]
     # ignore = 10
     # outputs = 100
     # cores = [1, 2, 4]
@@ -195,7 +195,7 @@ def main():
                         static_results.append((ratio, core, avg, dev))
                     else:
                         dynamic_results.append((ratio, core, avg, dev))
-                    print_all(ratio, static_results, dynamic_results);
+                    print_all(work, ratio, static_results, dynamic_results);
             plot(ratio, work, outputs)
             plot_normalized(ratio, work, outputs)
                     
