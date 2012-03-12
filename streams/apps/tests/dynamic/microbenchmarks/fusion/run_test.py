@@ -12,10 +12,10 @@ streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
 tests        = [
-    (Configs.lockfree, [strc, '-smp', '1', '--perftest', '--noiter', '--lockfree'], './smp1' ),
+    #(Configs.lockfree, [strc, '-smp', '1', '--perftest', '--noiter', '--lockfree'], './smp1' ),
     (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse'], './smp1' ),
     (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
+    #(Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
     (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' ),
     (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt'], './smp1' )
     ]
@@ -111,24 +111,24 @@ def run(test, attempts):
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
 
-def print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results):
+def print_all(work, nofusion_results, fusion_results, threadopt_results, threadbatch_results):
     file = 'fusion' + str(work) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'dynamic', 'dev', 'lockfree', 'dev', 'threadopt', 'dev', 'threadbatch', 'dev')
+        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'threadopt', 'dev', 'threadbatch', 'dev')
         print s
         f.write(s + '\n')  
-        for x, y, z, l, t, b in zip(nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], z[3], z[4], l[3], l[4], t[3], t[4], b[3], b[4])
+        for x, y, t, b in zip(nofusion_results, fusion_results, threadopt_results, threadbatch_results):
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], t[3], t[4], b[3], b[4])
             print s
             f.write(s + '\n')
     file = 'fusion-normalized' + str(work) + '.dat'
     nofusion = nofusion_results[0]
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion','dynamic', 'lockfree', 'threadopt', 'threadbatch')
+        s = '#%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion', 'threadopt', 'threadbatch')
         print s
         f.write(s + '\n')
-        for fusion, dynamic, lockfree, threadopt, threadbatch in zip(fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (dynamic[3]/nofusion[3]), (lockfree[3]/nofusion[3]), (threadopt[3]/nofusion[3]), (threadbatch[3]/nofusion[3]))
+        for fusion, threadopt, threadbatch in zip(fusion_results,threadopt_results, threadbatch_results):
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (threadopt[3]/nofusion[3]), (threadbatch[3]/nofusion[3]))
             print s
             f.write(s + '\n')
 
@@ -145,10 +145,10 @@ def plot(work, outputs):
     #cmd += "\" u 1:7:8 notitle w yerrorbars, \""
     #cmd += data + "\" u 1:9 t \'lockfree\' w linespoints, \""
     #cmd += "\" u 1:9:10 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:11 t \'threadopt\' w linespoints, \""
-    cmd += "\" u 1:11:12 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:13 t \'threadbatch\' w linespoints, \""
-    cmd += "\" u 1:13:14 notitle w yerrorbars"
+    cmd += data + "\" u 1:7 t \'threadopt\' w linespoints, \""
+    cmd += "\" u 1:7:8 notitle w yerrorbars, \""
+    cmd += data + "\" u 1:9 t \'threadbatch\' w linespoints, \""
+    cmd += "\" u 1:9:10 notitle w yerrorbars"
 
     
     with open('./tmp.gnu', 'w') as f:        
@@ -165,12 +165,13 @@ def plot_normalized(work, outputs):
     data = 'fusion-normalized' + str(work) + '.dat'
     output = 'fusion-normalized' + str(work) + '.ps'
     cmd = "plot "
-    cmd += "\"" + data + "\" u 1:7 t \'batching=100\' w linespoints,"
+    cmd += "\"" + data + "\" u 1:5 t \'batching=100\' w linespoints,"
     cmd += "\"" + "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels offset 0.25,1.75,"
     cmd += "\"" + data + "\" u 1:3 t \'fusion\' w linespoints,"
-    cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints,"
-    cmd += "\"" + data + "\" u 1:5 t \'lockfree\' w linespoints,"
-    cmd += "\"" + data + "\" u 1:6 t \'threadopt\' w linespoints"
+    cmd += "\"" + data + "\" u 1:4 t \'threadopt\' w linespoints"
+
+    #cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints,"
+    #cmd += "\"" + data + "\" u 1:5 t \'lockfree\' w linespoints,"
 
     
     with open('./tmp.gnu', 'w') as f:        
@@ -185,14 +186,14 @@ def plot_normalized(work, outputs):
     
 def main():
     attempts = 3
-    ignore = 1000
-    outputs = 100000
-    filters = [1, 2, 4, 8, 16, 32]
-    total_work = [1, 100, 1000, 10000, 100000]
-    #ignore = 10
-    #outputs = 1000
-    #filters = [2, 4]
-    #total_work = [1000]   
+    # ignore = 1000
+    # outputs = 100000
+    # filters = [1, 2, 4, 8, 16, 32]
+    # total_work = [1, 100, 1000, 10000, 100000]
+    ignore = 10
+    outputs = 1000
+    filters = [2, 4]
+    total_work = [1000]   
     for work in total_work:
         nofusion_results = []
         fusion_results = []
@@ -231,7 +232,7 @@ def main():
                     print x
 
                     
-        print_all(work, nofusion_results, fusion_results, dynamic_results, lockfree_results, threadopt_results, threadbatch_results)
+        print_all(work, nofusion_results, fusion_results, threadopt_results, threadbatch_results)
         plot(work, outputs)
         plot_normalized(work, outputs)
                     
