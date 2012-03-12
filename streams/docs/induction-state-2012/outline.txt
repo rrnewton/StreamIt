@@ -1,0 +1,48 @@
+
+Introduction
+
+
+Background
+  -> Streaming Programs
+     * characteristics & benefits of usage
+     * promoting parallelism (task/data/pipeline)
+
+  -> StreamIt Language
+     * Filters: how data parallelism can be exploited
+         how statefulness inhibits data parallelism
+
+  -> Induction variables
+     * Definition & use cases
+     * How it applies to streaming
+         sample templates
+         sample benchmarks
+
+  -> Fission process
+     * (asplos02 sec.5.3, asplos06 sec.3)
+
+
+Proposed Solution
+  -> Use fission to improve data parallelism
+  
+  -> Keeping internal induction variable
+     * Modifications to update each work call
+     * Keeping values consistent between rounds
+     * Potential Scheduler updates
+     * Figures: example code injections && fission
+
+  -> Common transformations
+     * Stateful induction variables into Iteration filters
+       (Single induction variable, 2D, etc.)
+
+
+Results
+  -> FIRBank? 
+     Sample-trellis? 
+     MPEGEncoder (Motion Estimation subset)
+     ??
+
+  -> Stream graphs && how induction variables are used
+     (Work load in induction vars)
+
+
+
