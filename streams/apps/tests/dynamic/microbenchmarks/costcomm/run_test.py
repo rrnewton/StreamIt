@@ -153,6 +153,7 @@ def plot(ratio, work, outputs):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
+        f.write('set key left top\n');
         f.write('set title \"Cost/Communication, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Ratio\"\n')
         f.write('set ylabel \"Nanoseconds\"\n')
@@ -164,12 +165,13 @@ def plot_normalized(ratio, work, outputs):
     output = 'costcomm-normalized' + str(work) + '.ps'    
     cmd = "plot \""
     cmd += data + "\" u 1:3 t \'static\' w linespoints, \""
-    cmd += "\" u 1:3:(sprintf(\"[%.1f,%.1f]\",$1,$3)) notitle with labels, \""
+    cmd += "\" u 1:3:(sprintf(\"[%.1f,%.1f]\",$1,$3)) notitle with labels offset 0.25,1.75, \""
     cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 1:4:(sprintf(\"[%.1f,%.1f]\",$1,$4)) notitle with labels"
+    cmd += "\" u 1:4:(sprintf(\"[%.1f,%.1f]\",$1,$4)) notitle with labels offset 0.25,1.75"
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
+        f.write('set key left top\n');
         f.write('set title \"Cost/Communication Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Ratio\"\n');
         f.write('set ylabel \"Times Static\"\n');
