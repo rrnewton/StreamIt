@@ -135,7 +135,7 @@ def plot(work, outputs, batching):
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n')
         f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
-        f.write('set xlabel \"Filters\"\n');
+        f.write('set xlabel \"Operators\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write( ','.join(cmds))
     os.system('gnuplot ./tmp.gnu')
@@ -152,7 +152,7 @@ def plot_normalized(work, outputs, batching):
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n')
         f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
-        f.write('set xlabel \"Filters\"\n');
+        f.write('set xlabel \"Operators\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write( 'plot ' + ','.join(cmds))
     os.system('gnuplot ./tmp.gnu')
