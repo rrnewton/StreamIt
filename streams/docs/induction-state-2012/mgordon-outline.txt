@@ -1,0 +1,100 @@
+<<<<<<< .mine
+Outline:
+
+Intro
+* intro to streaming
+* paralleization and data parallelism
+* don't want to obscure data parallelism opportunities
+* prevalence of iteration state in apps
+
+The StreamIt Language
+* Copy from one of the older papers, include descriptions of fission and fusion.
+* For good parallelization: need data parallelism - it is load balanced and limitless as long as there is data
+
+Iteration State
+* description of the types of state we are capturing
+* prevalence in streaming programs
+* where the work concentrated in these applications
+* 
+
+Example
+* pick your favorite example
+* show before and after
+* Why before was cumbersome to write and why it could not be data parallelized
+* Numbers for before
+* Why after is easier to write
+
+Design Rationale
+* Why did we add a keyword to the language versus an automatic analysis?
+* Programs are easier to write now
+* Limitations of automated analyses
+
+Desugaring 
+* Conversion of iteration filter to normal filter
+
+Filter Fission
+* Fissing and filter with iteration state
+* hooks for passes that modify the schedule
+
+Implementation and Methodology
+* describe the compiler and changes that were made to the compiler
+* describe the evaluation architecture
+* describe the applications
+
+Experimental Evaluation
+* results and analysis
+* graphs for the benchmarks, speedups over sequential
+
+Related Work
+
+Conclusions
+=======
+
+Introduction
+
+
+Background
+  -> Streaming Programs
+     * characteristics & benefits of usage
+     * promoting parallelism (task/data/pipeline)
+
+  -> StreamIt Language
+     * Filters: how data parallelism can be exploited
+         how statefulness inhibits data parallelism
+
+  -> Induction variables
+     * Definition & use cases
+     * How it applies to streaming
+         sample templates
+         sample benchmarks
+
+  -> Fission process
+     * (asplos02 sec.5.3, asplos06 sec.3)
+
+
+Proposed Solution
+  -> Use fission to improve data parallelism
+  
+  -> Keeping internal induction variable
+     * Modifications to update each work call
+     * Keeping values consistent between rounds
+     * Potential Scheduler updates
+     * Figures: example code injections && fission
+
+  -> Common transformations
+     * Stateful induction variables into Iteration filters
+       (Single induction variable, 2D, etc.)
+
+
+Results
+  -> FIRBank? 
+     Sample-trellis? 
+     MPEGEncoder (Motion Estimation subset)
+     ??
+
+  -> Stream graphs && how induction variables are used
+     (Work load in induction vars)
+
+
+
+>>>>>>> .r11742
