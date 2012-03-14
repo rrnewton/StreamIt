@@ -218,7 +218,8 @@ public class CommonPasses {
 
             DuplicateBottleneck dup = new DuplicateBottleneck();
             dup.percentStateless(str);
-            str = FusePipelines.fusePipelinesOfStatelessStreams(str);
+            if (!KjcOptions.nofuse)
+            	str = FusePipelines.fusePipelinesOfStatelessStreams(str);
             StreamItDot.printGraph(
                     str,
                     "after-fuse-stateless-ssg" + ssgNum + ".dot");

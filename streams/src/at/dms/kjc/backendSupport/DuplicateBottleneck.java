@@ -367,7 +367,7 @@ public class DuplicateBottleneck {
             if (StatelessDuplicate.hasMutableState(sortedFilters.get(i)))
                     statefulWork += sortedWorkEsts.get(i).longValue();
         }
-        System.out.println(" stateful work / total work = " + 
+        System.out.println(" stateful work / total work = " + statefulWork + " / " + totalWork + " = " +
                 (((double)statefulWork)) / (((double)totalWork)));
         
       
