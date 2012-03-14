@@ -369,6 +369,15 @@ public class StreamGraph implements Layout<Core> {
     protected void layoutDominator(Filter filter) {
         assert filter.isTopFilter();
 
+        if (KjcOptions.nofuse) {
+        	//if we have turned off fusion, then we assume that we don't 
+        	//want to take advantage of any pipeline parallelism between the
+        	//dominators, do just map them to the 0th core.
+        	 setComputeNode(
+                     filter.getWorkNode(),
+                     SMPBackend.chip.getNthComputeNode(0));
+        }
+        
         HashMap<Filter, Long> workMap = new HashMap<Filter, Long>();
         workMap.put(
                 filter,
