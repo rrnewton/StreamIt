@@ -7,11 +7,12 @@ is to take advantage of data parallelism present in filters that do
 not maintain state.  One form of state that is common in streaming
 applications is induction variable state.  An example of which is a
 filter that maintains a counter of the number of times it has
-executed, and performs behavior dependent on this state.  Examples of
-filters with induction variable state can be found in applications
-such as MPEG2 encoding, beamforming, FIR filtering, and doppler radar.
-Filters with induction variable state in these applications represent
-a bottleneck to scalable parallelization of these applications.
+executed, and performs behavior dependent on this state.  In the
+StreamIt Benchmark Suite, examples of filters with induction variable
+state can be found in applications such as MPEG2 encoding,
+beamforming, FIR filtering, and doppler radar.  Filters with induction
+variable state in these applications represent a bottleneck to
+scalable parallelization of these applications.
 
 This paper demonstrates that it is essential to recognize and
 parallelize filters with induction variable state to enable scalable
@@ -26,6 +27,7 @@ parallelization transformation for filters that employ the new
 iteration idiom.  The necessity of parallelizing induction variable
 state is demonstrated by a case study of the motion estimation stage
 of MPEG2 encoding.
+
  % With multicore architectures becoming more prominent in computing
 % systems, there is a growing need to adapt programs to use these
 % available resources.  Stream programming is a programming 
