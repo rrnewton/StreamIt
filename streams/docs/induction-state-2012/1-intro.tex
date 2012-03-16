@@ -1,4 +1,4 @@
-{\large INTRODUCTION}
+\section{Introduction}
 
 With a growing need to scale programs more effectively with multicore 
 architectures, programs need to be written such that they efficiently exploit 
@@ -26,6 +26,6 @@ Data parallelism can be inhibited when presented with actors that must maintain 
 
 A common category of state that actors maintain is that of induction state.  Several actors are written so that execution is dependent on the number of times the actor is executed.  Common usage of induction state includes ..... [thies pact10]
 
-In this paper, we propose eliminating induction variable from actor state by providing a new language construct.  This construct provides the current iteration value of the corresponding actor, indicating how many times this actor has been invoked.  This construct introduces internal state to the actor that acts as an iteration counter.  The compiler is able to leverage built-in capabilities to expose data parallelism in actors on filters that maintain this internal state.   
+In this paper, we propose eliminating induction variable from actor state by providing a new language construct.  This construct provides the current iteration value of the corresponding actor, indicating how many times this actor has been invoked.  This construct introduces internal state to the actor that acts as an iteration counter.  The compiler is able to leverage built-in capabilities to expose data parallelism in actors on filters that maintain this internal state.\cite{mgordon-phd}   
 
 
