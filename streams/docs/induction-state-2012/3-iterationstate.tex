@@ -1,0 +1,9 @@
+{\large ITERATION STATE}
+
+Traditional induction variables encapsulate all variables that are increased or decreased with iterations of a loop.  Induction variable state as applied to stream programming is a class of state that requires keeping count of how often a filter has been invoked.  Common usage of induction variable state include performing some special action after a certain number of iterations and keeping track of array index positions.  Many filters maintain multiple induction variables as well, which may be either dependent or independent of each other.
+
+As is most commonly used now, induction variable state is maintained by creating a mutable state field in the corresponding filter.  This state can be set to the desired starting value.  The induction variable is consistently updated at some point during the work call.  For many use cases, this induction variable may need to be reset if it reaches a certain threshold. [can put example code here] 
+
+As presently constructed, induction variable state forces the corresponding filter to be run in sequential order.  In providing a mutable state whose value is dependent on the previous execution step, it is necessary to run a filter execution step and establish the induction variable value before moving on to the next execution step.  The sequential order of execution for this filter inhibits data parallelism, as it is impossible to partition the filter's execution steps into independently running cores.
+
+
