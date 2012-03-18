@@ -5,6 +5,8 @@ import time
 import re
 import math
 
+FNULL = open('/dev/null', 'w')
+
 class Configs:
     static, dynamic = range(2)
 
