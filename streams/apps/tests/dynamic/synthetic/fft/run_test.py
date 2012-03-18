@@ -6,90 +6,26 @@ import re
 import math
 
 class Configs:
-    nofusion, fusion, dynamic, lockfree, threadopt, threadbatch = range(6)
+    static, dynamic = range(2)
 
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-tests        = [
-    #(Configs.lockfree, [strc, '-smp', '1', '--perftest', '--noiter', '--lockfree'], './smp1' ),
-    (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse'], './smp1' ),
-    (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    #(Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' ),
-    (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt'], './smp1' )
-    ]
-
-def generate(test, num_filters, work):
-    op = 'void->void pipeline test {\n';
-    op += '    add FileReader<float>(\"../input/floats.in\");\n'
-    op += '    for(int i=1; i<=' + str(num_filters) + '; i++)\n'
-    if test[0] == Configs.nofusion:
-        op += '        add Fstatic();\n'
-    elif test[0] == Configs.fusion:
-        op += '        add Fstatic();\n'
-    elif test[0] == Configs.dynamic:        
-        op += '        add Fdynamic();\n'
-    elif test[0] == Configs.lockfree:        
-        op += '        add Fdynamic();\n'        
-    elif test[0] == Configs.threadopt:        
-        op += '        add Fdynamic();\n'
-    elif test[0] == Configs.threadbatch:        
-        op += '        add Fdynamic();\n'
-    op += '    add FileWriter<float>("./test.out");\n'
-    op += '}\n'
-    op += '\n'
-    op += 'float->float filter Fstatic() {\n'
-    op += '    work pop 1 push 1 {\n'
-    op += '        int i;\n'
-    op += '        float x;\n'
-    op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(work/num_filters) + '; i++) {\n'
-    op += '            x += i * 3.0 - 1.0;\n'
-    op += '        }\n'
-    op += '        push(x);\n'
-    op += '    }\n'
-    op += '}\n'
-    op += '\n'
-    op += 'float->float filter Fdynamic() {\n'
-    op += '    work pop * push * {\n'
-    op += '        int i;\n'
-    op += '        float x;\n'
-    op += '        x = pop();\n'
-    op += '        for (i = 0; i < ' + str(work/num_filters) + '; i++) {\n'
-    op += '            x += i * 3.0 - 1.0;\n'
-    op += '        }\n'
-    op += '        push(x);\n'
-    op += '    }\n'
-    op += '}\n'
-
-    with open("test.str", 'w') as f:
-        f.write(op)      
-
-def compile(test, work, ignore):
-    flags = test[1]
-    exe = test[2]
-    cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
-    print cmd
-    subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
-    assert os.path.exists(exe)
+def compile(filename, cores, test, work, ignore):
+    cmd = ["strc", "-smp", str(cores), "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', filename]    
+    if test == Configs.dynamic:
+        cmd = ["strc", "-smp", str(cores), "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', filename]    
+    print ' '.join(cmd)
+    return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
 
 
-def run_one(test):
-    exe = test[2]
+def run_one(test, core):
+    exe = './smp' + str(core)     
     results = []
-    if test[0] == Configs.nofusion:
-        test_type = 'no-fusion'
-    elif test[0] == Configs.fusion:
-        test_type = 'fusion'
-    elif test[0] == Configs.dynamic:
+    if test == Configs.static:
+        test_type = 'static'
+    elif test == Configs.dynamic:
         test_type = 'dynamic'    
-    elif test[0] == Configs.lockfree:
-        test_type = 'lockfree'
-    elif test[0] == Configs.threadopt:
-        test_type = 'threadopt' 
-    elif test[0] == Configs.threadbatch:
-        test_type = 'threadbatch' 
     (stdout, error) = subprocess.Popen([exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
     for m in regex.finditer(stdout):
@@ -186,55 +122,32 @@ def plot_normalized(work, outputs):
     
 def main():
     attempts = 3
-    ignore = 1000
-    outputs = 100000
-    filters = [1, 2, 4, 8, 16, 32]
-    total_work = [1, 100, 1000, 10000, 100000]
-    #ignore = 10
-    #outputs = 1000
-    #filters = [2, 4]
-    #total_work = [1000]   
-    for work in total_work:
-        nofusion_results = []
-        fusion_results = []
-        dynamic_results = []
-        lockfree_results = []
-        threadopt_results = []
-        threadbatch_results = []
-        for num_filters in filters:
-            for test in tests:
-                generate(test, num_filters, work)
-                compile(test, outputs, ignore)
-                (avg, dev) =  run(test, attempts)
-                if test[0] == Configs.nofusion:
-                    x = ('no-fusion', work, num_filters, avg, dev)
-                    print x
-                    nofusion_results.append(('no-fusion', work, num_filters, avg, dev))
-                elif test[0] == Configs.fusion:
-                    fusion_results.append(('fusion', work, num_filters, avg, dev))
-                    x = ('fusion', work, num_filters, avg, dev)
-                    print x
-                elif test[0] == Configs.dynamic:
-                    dynamic_results.append(('dynamic', work, num_filters, avg, dev))
-                    x = ('dynamic', work, num_filters, avg, dev)
-                    print x
-                elif test[0] == Configs.lockfree:
-                    lockfree_results.append(('lockfree', work, num_filters, avg, dev))
-                    x = ('lockfree', work, num_filters, avg, dev)
-                    print x
-                elif test[0] == Configs.threadopt:
-                    threadopt_results.append(('threadopt', work, num_filters, avg, dev))
-                    x = ('threadopt', work, num_filters, avg, dev)
-                    print x
-                elif test[0] == Configs.threadbatch:
-                    threadbatch_results.append(('threadbatch', work, num_filters, avg, dev))
-                    x = ('threadbatch', work, num_filters, avg, dev)
-                    print x
+    ignore = 100
+    outputs = 1000
+    cores = [1]
+    
+    static_results = []
+    dynamic_results = []
 
+    
+    for core in cores:
+        for test in [Configs.static, Configs.dynamic]:
+            compile('FFT5.str', core, test, outputs, ignore)
+            
+          #   compile(test, outputs, ignore)
+        #     (avg, dev) =  run(test, attempts)
+        #     if test[0] == Configs.nofusion:
+        #             x = ('no-fusion', work, num_filters, avg, dev)
+        #             print x
+        #             nofusion_results.append(('no-fusion', work, num_filters, avg, dev))
+        #         elif test[0] == Configs.fusion:
+        #             fusion_results.append(('fusion', work, num_filters, avg, dev))
+        #             x = ('fusion', work, num_filters, avg, dev)
+        #             print x          
                     
-        print_all(work, nofusion_results, fusion_results, threadopt_results, threadbatch_results)
-        plot(work, outputs)
-        plot_normalized(work, outputs)
+        # print_all(work, nofusion_results, fusion_results, threadopt_results, threadbatch_results)
+        # plot(work, outputs)
+        # plot_normalized(work, outputs)
                     
 if __name__ == "__main__":
     main()
