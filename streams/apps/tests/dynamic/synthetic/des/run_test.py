@@ -14,9 +14,9 @@ streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
 def compile(cores, test, work, ignore):
-    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', 'FFT5.str']    
+    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', 'DES2.str']    
     if test == Configs.dynamic:
-        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', 'FFT5Dynamic.str']    
+        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', 'DES2Dynamic.str']    
     print ' '.join(cmd)
     subprocess.call(cmd, stdout=FNULL, stderr=FNULL)
     exe = './smp' + str(cores)     
@@ -52,7 +52,7 @@ def run(test, cores, attempts):
     return (mean, dev)
 
 def print_all(static_results, dynamic_results):
-    file = 'fft.dat'
+    file = 'des.dat'
     with open(file, 'w') as f:
         s = '#%s\t%s\t%s\t%s\t%s' % ( 'cores', 'static', 'dev', 'dynamic', 'dev')
         print s
@@ -61,7 +61,7 @@ def print_all(static_results, dynamic_results):
             s = '%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (static[1], static[2], static[3], dynamic[2], dynamic[3])
             print s
             f.write(s + '\n')
-    file = 'fft-normalized.dat'
+    file = 'des-normalized.dat'
     with open(file, 'w') as f:
         s = '#%s\t%s' % ( 'cores', 'dynamic')
         print s
@@ -73,39 +73,39 @@ def print_all(static_results, dynamic_results):
         
 
 def plot():
-    data = 'fft.dat'
-    output = 'fft.ps'  
+    data = 'des.dat'
+    output = 'des.ps'  
     cmd = "plot \""
     cmd += data + "\" u 1:2 t \'static\' w linespoints, \""
     cmd += "\" u 1:2:3 notitle w yerrorbars, \""
     cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
     cmd += "\" u 1:4:5 notitle w yerrorbars"    
-    with open('./fft.gnu', 'w') as f:        
+    with open('./des.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n');
-        f.write('set title \"Synthetic Dynamism FFT\"\n')
+        f.write('set title \"Synthetic Dynamism DES\"\n')
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
-    os.system('gnuplot ./fft.gnu')
+    os.system('gnuplot ./des.gnu')
 
 
 def plot_normalized():
-    data = 'fft-normalized.dat'
-    output = 'fft-normalized.ps'  
+    data = 'des-normalized.dat'
+    output = 'des-normalized.ps'  
     cmd = "plot "
     cmd += "\"" + data + "\" u 1:2 t \'dynamic\' w linespoints,"
     cmd += "\"" + "\" u 1:2:(sprintf(\"[%d,%.1f]\",$1,$2)) notitle with labels offset 0.25,1.75"
-    with open('./fft-normalized.gnu', 'w') as f:        
+    with open('./des-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n');
-        f.write('set title \"Synthetic Dynamism FFT Normalized\"\n')
+        f.write('set title \"Synthetic Dynamism DES Normalized\"\n')
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
-    os.system('gnuplot ./fft-normalized.gnu')
+    os.system('gnuplot ./des-normalized.gnu')
     
 def main():
     attempts = 3
