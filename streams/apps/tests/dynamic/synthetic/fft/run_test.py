@@ -13,12 +13,14 @@ class Configs:
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-def compile(filename, cores, test, work, ignore):
-    cmd = ["strc", "-smp", str(cores), "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', filename]    
+def compile(cores, test, work, ignore):
+    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', 'FFT5.str']    
     if test == Configs.dynamic:
-        cmd = ["strc", "-smp", str(cores), "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', filename]    
+        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', 'FFT5Dynamic.str']    
     print ' '.join(cmd)
-    return subprocess.Popen(cmd, stdout=FNULL, stderr=FNULL)
+    subprocess.call(cmd, stdout=FNULL, stderr=FNULL)
+    exe = './smp' + str(cores)     
+    assert os.path.exists(exe)
 
 
 def run_one(test, core):
@@ -32,14 +34,14 @@ def run_one(test, core):
     regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
     for m in regex.finditer(stdout):
         results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
+        print results
     return results
 
-def run(test, attempts):
+def run(test, cores, attempts):
     results = []
     for num in range(attempts):
-         result = run_one(test)
+         result = run_one(test, cores)
          results.append(result)
-         #for result in results:
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
@@ -49,107 +51,85 @@ def run(test, attempts):
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
 
-def print_all(work, nofusion_results, fusion_results, threadopt_results, threadbatch_results):
-    file = 'fusion' + str(work) + '.dat'
+def print_all(static_results, dynamic_results):
+    file = 'fft.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'nofusion', 'dev', 'fusion', 'dev', 'threadopt', 'dev', 'threadbatch', 'dev')
+        s = '#%s\t%s\t%s\t%s\t%s' % ( 'cores', 'static', 'dev', 'dynamic', 'dev')
         print s
         f.write(s + '\n')  
-        for x, y, t, b in zip(nofusion_results, fusion_results, threadopt_results, threadbatch_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], y[3], y[4], t[3], t[4], b[3], b[4])
+        for static, dynamic in zip(static_results, dynamic_results):
+            s = '%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (static[1], static[2], static[3], dynamic[2], dynamic[3])
             print s
             f.write(s + '\n')
-    file = 'fusion-normalized' + str(work) + '.dat'
-    nofusion = nofusion_results[0]
+    file = 'fft-normalized.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion', 'threadopt', 'threadbatch')
+        s = '#%s\t%s' % ( 'cores', 'dynamic')
         print s
-        f.write(s + '\n')
-        for fusion, threadopt, threadbatch in zip(fusion_results,threadopt_results, threadbatch_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (threadopt[3]/nofusion[3]), (threadbatch[3]/nofusion[3]))
+        f.write(s + '\n')  
+        for static, dynamic in zip(static_results, dynamic_results):
+            s = '%d\t%0.2f' % (static[1], dynamic[2]/static[2])
             print s
             f.write(s + '\n')
+        
 
-
-def plot(work, outputs):
-    data = 'fusion' + str(work) + '.dat'
-    output = 'fusion' + str(work) + '.ps'
+def plot():
+    data = 'fft.dat'
+    output = 'fft.ps'  
     cmd = "plot \""
-    cmd += data + "\" u 1:3 t \'nofusion\' w linespoints, \""
-    cmd += "\" u 1:3:4 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:5 t \'fusion\' w linespoints, \""
-    cmd += "\" u 1:5:6 notitle w yerrorbars, \""
-    #cmd += data + "\" u 1:7 t \'dynamic\' w linespoints, \""
-    #cmd += "\" u 1:7:8 notitle w yerrorbars, \""
-    #cmd += data + "\" u 1:9 t \'lockfree\' w linespoints, \""
-    #cmd += "\" u 1:9:10 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:7 t \'threadopt\' w linespoints, \""
-    cmd += "\" u 1:7:8 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:9 t \'threadbatch\' w linespoints, \""
-    cmd += "\" u 1:9:10 notitle w yerrorbars"
-
-    
-    with open('./tmp.gnu', 'w') as f:        
+    cmd += data + "\" u 1:2 t \'static\' w linespoints, \""
+    cmd += "\" u 1:2:3 notitle w yerrorbars, \""
+    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
+    cmd += "\" u 1:4:5 notitle w yerrorbars"    
+    with open('./fft.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n');
-        f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
-        f.write('set xlabel \"Operators\"\n');
+        f.write('set title \"Synthetic Dynamism FFT\"\n')
+        f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
-    os.system('gnuplot ./tmp.gnu')
+    os.system('gnuplot ./fft.gnu')
 
-def plot_normalized(work, outputs):
-    data = 'fusion-normalized' + str(work) + '.dat'
-    output = 'fusion-normalized' + str(work) + '.ps'
+
+def plot_normalized():
+    data = 'fft-normalized.dat'
+    output = 'fft-normalized.ps'  
     cmd = "plot "
-    cmd += "\"" + data + "\" u 1:5 t \'batching=100\' w linespoints,"
-    cmd += "\"" + "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels offset 0.25,1.75,"
-    cmd += "\"" + data + "\" u 1:3 t \'fusion\' w linespoints,"
-    cmd += "\"" + data + "\" u 1:4 t \'threadopt\' w linespoints"
-
-    #cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints,"
-    #cmd += "\"" + data + "\" u 1:5 t \'lockfree\' w linespoints,"
-
-    
-    with open('./tmp.gnu', 'w') as f:        
+    cmd += "\"" + data + "\" u 1:2 t \'dynamic\' w linespoints,"
+    cmd += "\"" + "\" u 1:2:(sprintf(\"[%d,%.1f]\",$1,$2)) notitle with labels offset 0.25,1.75"
+    with open('./fft-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n');
-        f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
-        f.write('set xlabel \"Operators\"\n');
+        f.write('set title \"Synthetic Dynamism FFT Normalized\"\n')
+        f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
-    os.system('gnuplot ./tmp.gnu')
+    os.system('gnuplot ./fft-normalized.gnu')
     
 def main():
     attempts = 3
     ignore = 100
     outputs = 1000
-    cores = [1]
-    
+    cores = [1, 2]    
     static_results = []
     dynamic_results = []
-
-    
+    batch_results = []
     for core in cores:
         for test in [Configs.static, Configs.dynamic]:
-            compile('FFT5.str', core, test, outputs, ignore)
-            
-          #   compile(test, outputs, ignore)
-        #     (avg, dev) =  run(test, attempts)
-        #     if test[0] == Configs.nofusion:
-        #             x = ('no-fusion', work, num_filters, avg, dev)
-        #             print x
-        #             nofusion_results.append(('no-fusion', work, num_filters, avg, dev))
-        #         elif test[0] == Configs.fusion:
-        #             fusion_results.append(('fusion', work, num_filters, avg, dev))
-        #             x = ('fusion', work, num_filters, avg, dev)
-        #             print x          
-                    
-        # print_all(work, nofusion_results, fusion_results, threadopt_results, threadbatch_results)
-        # plot(work, outputs)
-        # plot_normalized(work, outputs)
+            compile(core, test, outputs, ignore)
+            (avg, dev) =  run(test, core, attempts)
+            if test == Configs.static:
+                x = ('static', core, avg, dev)
+                print x
+                static_results.append(x)
+            elif test == Configs.dynamic:
+                x = ('dynamic', core, avg, dev)
+                print x          
+                dynamic_results.append(x)                    
+    print_all(static_results, dynamic_results)
+    plot()
+    plot_normalized()
                     
 if __name__ == "__main__":
     main()
