@@ -159,21 +159,32 @@ static {
 // Implements DES encyption algorithm
 // (rodric rabbah, <rabbah@mit.edu>)
 
-void->void pipeline DES2
+void->void pipeline DES2Dynamic
 {
     int testvector = 7;
 
     //add PlainTextSource(testvector);
-    add FileReader<int>("../input/input");
+    add FileReader<int>("./des.in");
     add DEScoder(testvector);
     add FileWriter<int>("des2.out");
     //add HexPrinter(CIPHERTEXT, 64);
+}
+
+
+int->int filter Dummy() {
+ work push 64 pop 64 {
+   for (int i = 0; i < 64; i++) {
+     push(pop());
+   }
+ }
 }
 
 int->int pipeline DEScoder(int vector)
 {
     // initial permutation of 64 bit plain text
     add doIP();
+
+    add Dummy();
 
     for (int i = 0; i < MAXROUNDS; i++) {
         add splitjoin {
@@ -192,7 +203,7 @@ int->int pipeline DEScoder(int vector)
 
 int->int filter doIP()
 {
-    work push 64 pop 64 {
+    work push * pop 64 {
         for (int i = 0; i < 64; i++) {
             push(peek(IP[i] - 1));
         }
