@@ -181,10 +181,10 @@ int->int filter Dummy() {
 
 int->int pipeline DEScoder(int vector)
 {
+    add Dummy();
+
     // initial permutation of 64 bit plain text
     add doIP();
-
-    add Dummy();
 
     for (int i = 0; i < MAXROUNDS; i++) {
         add splitjoin {
@@ -203,7 +203,7 @@ int->int pipeline DEScoder(int vector)
 
 int->int filter doIP()
 {
-    work push * pop 64 {
+    work push 64 pop * {
         for (int i = 0; i < 64; i++) {
             push(peek(IP[i] - 1));
         }
