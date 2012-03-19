@@ -164,7 +164,7 @@ void->void pipeline DES2
     int testvector = 7;
 
     //add PlainTextSource(testvector);
-    add FileReader<int>("../des.in");
+    add FileReader<int>("./des.in");
     add DEScoder(testvector);
     add FileWriter<int>("des2.out");
     //add HexPrinter(CIPHERTEXT, 64);
