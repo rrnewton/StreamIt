@@ -1,0 +1,42 @@
+void->void pipeline SelectionStatic {
+    add FileReader<float>("./floats.in");
+    add Select();
+    add Dummy();
+    add Process();
+    add FileWriter<float>(stdout);
+}
+
+float->float filter Select() {
+    work pop 1 push 1 {
+        float x = pop();
+        println(x);
+        if (x <= 1) {
+            push(x);
+        } else {
+            push(-1);
+        }
+    }
+}
+
+
+float->float filter Dummy() {
+    work pop 1 push 1 {     
+      push(pop());
+    }
+}
+
+float->float filter Process() {
+    work pop 1 push 1 {
+     float x = pop();
+     if (x == -1) {
+         push(x);
+     } else {
+         int i;
+         for (i = 0; i < 10000; i++) {
+          x += i * 3.0 + 1.0;
+         }
+         push(x);
+     }      
+    }
+}
+
