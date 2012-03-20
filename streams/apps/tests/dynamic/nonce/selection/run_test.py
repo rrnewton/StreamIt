@@ -3,6 +3,7 @@ import os
 import subprocess
 import time
 import re
+import struct
 import math
 
 FNULL = open('/dev/null', 'w')
@@ -12,6 +13,17 @@ class Configs:
 
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
+
+
+def generate(selectivity):
+    print 'generate'
+    with open('ints.in', 'wb') as f:                
+        for i in range(1, selectivity):
+            val = struct.pack('i', 100)
+            f.write(val)
+        val = struct.pack('i', 1)
+        f.write(val)
+
 
 def compile(cores, test, work, ignore):
     cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', 'FFT5.str']    
@@ -108,28 +120,29 @@ def plot_normalized():
     os.system('gnuplot ./fft-normalized.gnu')
     
 def main():
-    attempts = 3
-    ignore = 100
-    outputs = 100000
-    cores = [1, 2, 4, 8, 16, 32]    
-    static_results = []
-    dynamic_results = []
-    batch_results = []
-    for core in cores:
-        for test in [Configs.static, Configs.dynamic]:
-            compile(core, test, outputs, ignore)
-            (avg, dev) =  run(test, core, attempts)
-            if test == Configs.static:
-                x = ('static', core, avg, dev)
-                print x
-                static_results.append(x)
-            elif test == Configs.dynamic:
-                x = ('dynamic', core, avg, dev)
-                print x          
-                dynamic_results.append(x)                    
-    print_all(static_results, dynamic_results)
-    plot()
-    plot_normalized()
+    # attempts = 3
+    # ignore = 100
+    # outputs = 100000
+    # cores = [1, 2, 4, 8, 16, 32]    
+    # static_results = []
+    # dynamic_results = []
+    # batch_results = []
+    # for core in cores:
+    #     for test in [Configs.static, Configs.dynamic]:
+    #         compile(core, test, outputs, ignore)
+    #         (avg, dev) =  run(test, core, attempts)
+    #         if test == Configs.static:
+    #             x = ('static', core, avg, dev)
+    #             print x
+    #             static_results.append(x)
+    #         elif test == Configs.dynamic:
+    #             x = ('dynamic', core, avg, dev)
+    #             print x          
+    #             dynamic_results.append(x)                    
+    # print_all(static_results, dynamic_results)
+    # plot()
+    # plot_normalized()
+    generate(10)
                     
 if __name__ == "__main__":
     main()
