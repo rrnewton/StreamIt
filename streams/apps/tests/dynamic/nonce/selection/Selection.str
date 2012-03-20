@@ -1,14 +1,14 @@
 void->void pipeline Selection {
     add FileReader<int>("./ints.in");
     add Select();
-    add Process();
     add FileWriter<int>(stdout);
 }
 
 int->int filter Select() {
     work pop 1 push * {
         int x = pop();
-        if (x < 1) {
+        println(x);
+        if (x <= 1) {
             push(x);
         }
     }

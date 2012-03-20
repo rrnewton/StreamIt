@@ -18,12 +18,15 @@ strc          = os.path.join(streamit_home, 'strc')
 def generate(selectivity):
     print 'generate'
     with open('ints.in', 'wb') as f:                
-        for i in range(1, selectivity):
-            val = struct.pack('i', 100)
+        for j in range(0, 1000):
+            val = struct.pack('i', 1)
+            print '1'
             f.write(val)
-        val = struct.pack('i', 1)
-        f.write(val)
-
+            for i in range(0, selectivity):
+                print '2'
+                val = struct.pack('i', 2)
+                f.write(val)
+       
 
 def compile(cores, test, work, ignore):
     cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', 'FFT5.str']    
@@ -142,7 +145,7 @@ def main():
     # print_all(static_results, dynamic_results)
     # plot()
     # plot_normalized()
-    generate(10)
+    generate(5)
                     
 if __name__ == "__main__":
     main()
