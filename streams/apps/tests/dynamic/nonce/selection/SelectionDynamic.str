@@ -9,6 +9,7 @@ void->void pipeline SelectionDynamic {
 float->float filter Select() {
     work pop 1 push * {
         float x = pop();        
+        println(x);
         if (x <= 1) {
             push(x);
         } 
