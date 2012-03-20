@@ -3,7 +3,7 @@ void->void pipeline SelectionStatic {
     add Select();
     add Dummy();
     add Process();
-    add FileWriter<float>(stdout);
+    add FileWriter<float>("select.out");
 }
 
 float->float filter Select() {
