@@ -17,15 +17,15 @@ strc          = os.path.join(streamit_home, 'strc')
 
 def generate(selectivity):
     print 'generate'
-    with open('ints.in', 'wb') as f:                
-        for j in range(0, 1000):
-            val = struct.pack('i', 1)
-            print '1'
+    with open('floats.in', 'wb') as f:                
+        #for j in range(0, 1000):
+        val = struct.pack('f', 0.5)
+        print '1'
+        f.write(val)
+        for i in range(0, selectivity):
+            print '2'
+            val = struct.pack('f', 2.0)
             f.write(val)
-            for i in range(0, selectivity):
-                print '2'
-                val = struct.pack('i', 2)
-                f.write(val)
        
 
 def compile(cores, test, work, ignore):
