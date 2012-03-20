@@ -503,13 +503,14 @@ sub get_options
 			    "sharedheap",
 			    "regtest",
 			    "perftest",
+			    "selective",
 			    "nofizz",
 			    "nofuse",
 			    "noiter",
-                            "threadopt",
-                            "threadbatch=i",
+          "threadopt",
+          "threadbatch=i",
 			    "lockfree",
-                            "preoutputs=i",
+          "preoutputs=i",
 			    "loadbalance",
 			    "loopcount=i",
 			    "noloopinput",
@@ -973,6 +974,7 @@ sub get_compiler_opts
     $opts{sharedheap} && ($copts .= " --sharedheap");
     $opts{regtest} && ($copts .= " --regtest");
     $opts{perftest} && ($copts .= " --perftest");
+    $opts{selective} && ($copts .= " --selective");
     $opts{nofizz} && ($copts .= " --nofizz");
     $opts{nofuse} && ($copts .= " --nofuse");
     $opts{noiter} && ($copts .= " --noiter");

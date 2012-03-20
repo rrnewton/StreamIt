@@ -219,8 +219,6 @@ public class InputRotatingBuffer extends RotatingBuffer {
 			}
 			Core srcCore = SMPBackend.getComputeNode(src);						
 
-	
-					
 //			if (!srcCore.equals(filterCore) ) {
 //				String tokenName = src + "_to_" + filter + "_token";
 //				list.add(Util.toStmt("while (" + tokenName

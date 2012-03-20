@@ -316,7 +316,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                     + "  fprintf(output, \"" + type + "\\n\", " + cast
                     + bufferName + "[_i_]); \n";
             stmt = addPerfTest(stmt);
-            stmt = addOutputCount(stmt);  
+            stmt = addOutputCountStatic(stmt, bufferName);  
         }
         addSteadyLoopStatement(Util.toStmt(stmt));
     }
@@ -324,16 +324,41 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
     private String addPerfTest(String stmt) {
         if (KjcOptions.perftest) {
-            stmt += "  if (currOutputs == maxIgnored) {  start_time(); } \n";
+            stmt += "        if (currOutputs == maxIgnored) {  start_time(); } \n";
         }
         return stmt;
     }
 
-    private String addOutputCount(String stmt) {
-        stmt += "        currOutputs++;\n"
-                + "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
-                + "    }\n" + "}\n";
-        return stmt;
+    private String addOutputCountStatic(String stmt, String bufferName) {    	
+    	if (KjcOptions.selective) {
+    		stmt += "        if (" + bufferName + "[_i_] > 0) { \n"
+    				+ "          currOutputs++; \n"
+    				+ "      } \n"    		    		    	
+    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";    	
+    		return stmt;
+    	} else {
+    		stmt += "        currOutputs++;\n"
+    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";
+    		return stmt;
+    	}
+    }
+    
+    private String addOutputCountDynamic(String stmt, String peekCall) {
+    	if (KjcOptions.selective) {    		
+    		stmt += "        if (" + peekCall + " > 0) {\n"
+    		      + "            currOutputs++;\n"
+    		      + "        }\n"    		    		    		
+    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";
+    		return stmt;    		
+    	} else {
+    		stmt += "        currOutputs++;\n"
+    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";
+    		return stmt;
+    	}
     }
 
    
@@ -364,6 +389,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         String stmt = "";
 
         String popName = buf.popMethodName();
+        String peekName = buf.peekMethodName();
+
 
         Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                 .getFilterToThreadId();
@@ -404,6 +431,14 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             popCall = popName + "(" + buffer + ", " + threadId + ", 0, NULL)";
         }
 
+        String peekCall;
+        if (KjcOptions.threadopt) {
+        	peekCall = peekName + "(" + buffer + ", " + threadIndex + ", "
+                    + threadIndex + ", 0,  NULL, 0,  NULL, 1)";
+        } else {
+        	peekCall = peekName + "(" + buffer + ", " + threadId + ", 0, NULL, 1)";
+        }
+        
         if (KjcOptions.outputs < 0) {
             stmt = "int _i_ = 0;\n" + "for (int _i_ = 0; _i_ < " + outputs + "*" + multiplierName 
                     + "; _i_++) { \n";
@@ -428,7 +463,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
                     + popCall + ");\n";
             stmt = addPerfTest(stmt);
-            stmt = addOutputCount(stmt);            
+            stmt = addOutputCountDynamic(stmt, peekCall);            
         }
         addSteadyLoopStatement(Util.toStmt(stmt));
     }

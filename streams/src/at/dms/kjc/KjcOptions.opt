@@ -755,6 +755,11 @@ longname		"perftest"
 	default		"false"
 	help		"Tell the compiler to add code for running a performance test."
 
+longname		"selective"
+	type		boolean
+	default		"false"
+	help		"Tell the FileWriter to ignore negative values during performance test."
+
 longname		"nofizz"
 	type		boolean
 	default		"false"
