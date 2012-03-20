@@ -1,143 +1,95 @@
-\section{Generalized Fission of Sliding Window Filters}
-\label{sec:fission}
+\section{Fission}
 
-This section provides an overview of our technique for the fission of
-sliding window filters. A complete description is given in
-Figure~\ref{fig:general-fission} in the Appendix.  Our technique for
-filter fission employs an optimization termed {\it synchronization
-  removal}.  This transformation is applied to nodes calculating the
-identity function in the general graph such that they can be removed,
-but their communication patterns remain embedded in the general
-graph. A description of synchronization removal is beyond the scope of
-this paper, for a complete exposition, please see~\cite{mgordon-phd}.
+The compiler introduces data parallelism to the streaming program through a process known as fission.  Fission is the process of duplicating the stateless filter and wrapping these duplicated in a round-robin splitter and joiner.  The process ensures that input data is distributed correctly and output data is collected in correct order.  The duplicated filters, known as products, can be assigned to individual cores, thus introducing data parallelism.  
 
-The fission transformation applied to $f$ by factor $P$ divides $f$'s
-work among $P$ fission products: $f_1...f_P$.  After the
-transformation, each $f$ performs $M(S,f) /P$ iterations of $f$'s work
-function in the steady-state.  The work of $f$ in the initialization
-stage is preserved and translated to $f_1$.  The following
-preconditions must be met before it $f$ can be fissed by $P$:
-\begin{enumerate}
-\item Fission products divide the work of $f$ evenly:
-{\ninepoint
-\begin{equation}
-M(S,f) \mod P = 0 
-\label{eq:mod-fiss}
-\end{equation}
-}
-\item The items remaining in the input buffer of the original filter
-  after initialization must be less than the number of items that will
-  be dequeued by each fission product:
-{\ninepoint
-\begin{equation}
-C(f) < (M(S,f) / P) \cdot o(W, f)
-\label{eq:fiss-precond1}
-\end{equation}
-}
-\end{enumerate}
+Fission is applicable only to stateless filters, as the duplication process does not guarantee consistent behavior if filters contain state that changes between iterations.  Because the desugared iteration filters actually use mutable state to keep track of iteration values, the fission process must be modified to handle iteration values.  
 
-\noindent The second precondition assures that no item is read by more
-than 2 fission products.  As Section~\ref{sec:data-par} describes,
-both of these preconditions can be enforced on any filter by
-increasing the steady-state of the graph.  Fission includes the
-following steps: 
-\begin{enumerate}
-\item Create $P$ copies of $f$ and set their rates
-and work functions according to Figure~\ref{fig:general-fission}.
-\item Create two identity nodes, $ID_I$ and $ID_O$, that will encode
-  the distribution for the fission.
-\item Move the initialization stage computation of $f$ to $f_1$
-  according to Figure~\ref{fig:general-fission}. 
-\item Move input distribution of $f$ to $ID_I$
-replacing occurrences of $f$ with $ID_I$ in edges.
-\item Move output distribution of $f$ to $ID_O$, replacing
-occurrences of $f$ with $ID_O$ in edges.
-\item Create the fission duplication pattern in the
-output distribution of $ID_I$.
-\item Create a round robin joining pattern for the output identity
-  filter $ID_O$ to receive from each fission product.
-\item For each node $p$ that is a producer of $f$, replace the
- occurrences of $f$ with $O_I$ in the edges of the dupsets of $p$'s
- output distribution.
-\item For each node $c$ that is a consumer of $f$, replace the
- occurrences of $f$ with $O_O$ in incoming edges $c$'s input
- distribution.
-\item \textsc{SynchRemove}($ID_I$)
-\item \textsc{SynchRemove}($ID_O$)
-\end{enumerate}
+\begin{figure}[t]
+{\eightpoint
+\begin{verbatim}
+  int->int filter IterationFilter() {
 
-The details of fission on a filter of the general stream graph are
-given in the Appendix in Figure~\ref{fig:general-fission}: (a) the
-definition of the original filter $f$, (b) the steps of the algorithm,
-and (c) details for steps 1-9.
+      int iter = 0;
+      int start = 0;
+      int reps = 1;
+      int total = 10;
 
-\begin{figure*}
-\centering
-\includegraphics[width=6.3in]{figures/split-pattern.pdf}
-\caption[The output distribution required for general
-fission.]{
-The steady-state output distribution installed for identity node
-$ID_I$ by general fission.  Red edges denote items that are shared
-across fission products via duplication. If $C(f) > dup$, $C(f) - dup$ items at the end of the
-steady-state input are distributed to
-$f_1$. \label{fig:split-pattern}}
-\vspace{-10pt}
-\end{figure*}
+      work push 1 pop 1{
 
-The general fission transformation creates two identity nodes ($ID_I$
-and $ID_O$) that are encoded to implement the data distribution for
-the fission products.  Figure~\ref{fig:split-pattern} illustrates the
-pattern of communication between $ID_I$ and the products of $f$.  This
-pattern is common to the transformation for all filters we seek to
-fiss that meet the preconditions of the transformation.
+          ...
 
-The fission transformation has the following properties:
+          iter++;
+
+          if (iter - start - reps % total == 0) {
+              iter = iter + total - reps;
+          }
+
+      }
+
+  }
+\end{verbatim}
+\caption{Example of a duplicated iteration filter under modified fission.\protect\label{fig:modified-fission-filter-example}}}
+\end{figure}
+
+
+The fission process now modifies the fission products by adding the
+following values as fields of the products:
 \begin{itemize}
-\item No item is read by more than 2 fission products.
-\item A fission product does not need to remember items across
-  steady-state executions of itself. The peeking of the original
-  filter $f$ is now encoded in the sharing across fission products
-  achieved via the duplication pattern.
-\item Only the first fission product $f_1$ is required to receive the $C(f)$
-  initialization  items because $C(F) < (M(S,f) / p) \cdot o(W, f)$,
-  and it will consume the $C(f)$ items on its first invocation.
-\item The presence of the $C(f)$ items in the input buffer after
-  initialization must be accounted for by shifting the read pattern
-  for the fission products.  The first fission product $f_1$ is offset by
-  $C(f)$ items in that it reads its first $C(f)$ items from the
-  previous execution stage.  In the steady-state, $f_1$ executing at
-  steady-state iteration $i$ shares items with $f_P$ executing at
-  steady-state iteration $i-1$.
-\item The computation and communication performed by $f$ during the
-  initialization stage is transferred completely to the first fission
-  product, $f_1$.  
-% Since, by construction, only $f_1$ requires the
-%   items remaining after the initialization stage.  The other fission
-%   products are idle during this stage.
+    \item \texttt{start}: the value of the induction variable each product starts with.
+    \item \texttt{reps}: how often the \texttt{work} function of the product is
+      called between rounds.
+    \item \texttt{total}: the sum of all reps of all fission products. This value is
+      the same amongst all fissed products.
 \end{itemize}
+Accordingly, each fission product should start each round with induction values
+of
+\begin{center}
+\texttt{total}*\texttt{n} + \texttt{start}
+\end{center}
+and range up to the value
+\begin{center}
+\texttt{total}*\texttt{n} + \texttt{start} + \texttt{reps} - 1
+\end{center}
+where \texttt{n} is a nonnegative integer indicating how many rounds have
+been run in the span of the program.  We have to account for the off-by-one
+error as the first iteration is run.
 
-% The final steps of the general fission transformation applies
-% \textsc{SynchRemove} to remove the identity filters, and stitch the
-% communication directly between the fission products and $f$'s
-% producer(s) and consumer(s).
- 
+At the end of each fission product \texttt{work}, after incrementing the
+induction value, a check must be made to see if it is necessary to increment
+the induction variable to the next round of  values.  This will prevent certain
+fissed products from making calls with duplicate induction values.
+\begin{center}
+\texttt{iter} - \texttt{start} - \texttt{reps} \% \texttt{total} == 0
+\end{center}
+The fissed products must check that the current induction value less the
+\texttt{start} and \texttt{reps} of that fissed product is divisible by the
+\texttt{total}.  This is consistent with the maximum value per round as
+indicated above.  Once the fissed product's induction value has reached
+this value, it must be set to:
+\begin{eqnarray*}
+\texttt{iter}_{n+1} &=& \texttt{iter}_{n} + (\texttt{total} - \texttt{reps}) \\
+&=& (\texttt{total}*\texttt{n} + \texttt{start} + \texttt{reps}) \\
+&&  \ \ +\ (\texttt{total} - \texttt{reps}) \\
+&=& (\texttt{total}*(\texttt{n+1}) + \texttt{start})
+\end{eqnarray*}
+which is the starting iteration value of the next round, as defined.
 
+Future passes may modify the schedule, increasing the multiplicity of the fission products.  All of the fission products will have this multiplicity applied. It is necessary to multiply the iteration constants by the provided multiplier.
 
-% To understand the transformation, we first need to understand the item
-% distribution and sharing that is required by fission on a filter $f$
-% that adheres to the preconditions above.
-% Figure~\ref{fig:fission-sharing2} gives another example of the input
-% items required by fission products.  In this example, both:
+Given a multiplier $m$, we expect the filter to start each round with iteration values of 
+\begin{center}
+(\texttt{total}*\texttt{n} + \texttt{start}) * $m$
+\end{center}
+The filter should perform \texttt{reps}*$m$ iterations, thus should range up to value
+\begin{center}
+(\texttt{total}*\texttt{n} + \texttt{start}) * $m$ + \texttt{reps}*$m$ - 1
+\end{center}
 
-% \[ C(f) = \mt{dup}_f < (M(S,f) / p) \cdot o(W, f) \]
-% \[ M(S, f) \mod P = 0\]
+Between rounds, iteration values must be incremented by the actual total number of repetitions that occur.  All fission products perform a total of $\sum(\texttt{reps}_{i}*m)$ repetitions which is simply \texttt{total}*$m$.  Thus, the updating step will still hold:
+\begin{eqnarray*}
+\texttt{iter}_{n+1} &=& \texttt{iter}_{n} + (\texttt{total}*m - \texttt{reps}*m) \\
+&=& (\texttt{total}*\texttt{n}*m + \texttt{start}*m + \texttt{reps}*m) \\
+&&  \ \ +\ (\texttt{total}*m - \texttt{reps}*m) \\
+&=& (\texttt{total}*(\texttt{n+1})*m + \texttt{start}*m)
+\end{eqnarray*}
 
-% \noindent so $f$ adheres to the preconditions stipulated above for
-% general fission.  In the example, the items read for $f$ plus its
-% fission products for $P=4$ are shown for the initialization plus two
-% steady-states.  After the initialization stage, $C(f) = 2$ items are
-% enqueued to the input buffer by the producer(s) to $f$, and $M(S,f)
-% \cdot o(W, f) = 16$ items are enqueued by the producer(s) for each
-% steady-state.  Examining the sharing requirement for fission products of
-% the second steady-state, we can see a pattern emerge with the following
-% features:

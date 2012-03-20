@@ -3,27 +3,23 @@
 \begin{figure}[t]
 {\eightpoint
 \begin{verbatim}
-   float->float filter MovingAverage(int N) {
-     float[N] weights;  // a filter field
+  int->int stateful filter InductionFilter() {
+      int counter;
+      int max;
+  
+      work push 1 pop 1{
 
-     // init function initializes the weights
-     init {
-       for (int i=0; i<N; i++)
-         weights[i] = 1/N;
-     }
+          ...
 
-     // work function declares push, pop, peek rates
-     work push 1 pop 1 peek N {
-       float result = 0;  // a local variable
-       for (int i=0; i<N; i++) {
-         result += weights[i] * peek(i);
-       }
-       push(result);
-       pop();
-     }
-   } 
+          counter = (counter + 1);
+
+          if (counter > max) {
+              counter = 0;
+          } 
+      }
+  }
 \end{verbatim}
-\caption{Example of a StreamIt filter.\protect\label{fig:filter-example}}}
+\caption{Example of a stateful StreamIt filter using induction variable state.\protect\label{fig:filter-example}}}
 \end{figure}
 
 

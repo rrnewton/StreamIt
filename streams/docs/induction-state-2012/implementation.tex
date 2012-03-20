@@ -1,3 +1,5 @@
+\section{Implementation}
+
 Filters that use induction variables inherently use state to keep track of
 how often it has been called through the span of the program.  We attempt 
 to remove this user-facing state by introducing an iteration keyword to the 
@@ -66,3 +68,5 @@ added to the fissed products must, in turn, be updated to reflect this change.
 Since all fissed products will be multiplied by the same steady multiplicity
 factor, we can simply multiply each of the \texttt{start}, \texttt{reps}, and 
 \texttt{total} values by the same steady multiplicity value.
+
+
