@@ -126,6 +126,7 @@ def plot_normalized(cores):
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n');
+        f.write('set logscale x\n');
         f.write('set title \"Selection Operator Normalized\"\n')
         f.write('set xlabel \"Selectivity\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
