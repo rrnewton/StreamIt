@@ -436,7 +436,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         	peekCall = peekName + "(" + buffer + ", " + threadIndex + ", "
                     + threadIndex + ", 0,  NULL, 0,  NULL, 1)";
         } else {
-        	peekCall = peekName + "(" + buffer + ", " + threadId + ", 0, NULL, 1)";
+        	peekCall = peekName + "(" + buffer + ", " + threadId + ", 0, NULL, 0)";
         }
         
         if (KjcOptions.outputs < 0) {
