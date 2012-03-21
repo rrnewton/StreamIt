@@ -135,9 +135,9 @@ def plot_normalized(cores):
     
 def main():
     attempts = 3
-    ignore = 10
-    outputs = 100000
-    selectivities = [1, 10, 100, 1000, 10000]
+    ignore = 1
+    outputs = 10000
+    selectivities = [1, 10, 100, 1000]
     cores = [1,2,4,8]
     static_results = []
     dynamic_results = []
@@ -164,6 +164,7 @@ def main():
                         dynamic.append(x)
             dynamic_results.append(dynamic)
             static_results.append(static)
+        print_all(static_results, dynamic_results)
         plot_normalized(cores)
 
                     
