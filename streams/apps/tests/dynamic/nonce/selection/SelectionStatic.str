@@ -11,7 +11,6 @@ float->float filter Select() {
         float x = pop();
         println(x);
         if (x <= 1) {
-            println(x);
             push(x);
         } else {
             push(-1);

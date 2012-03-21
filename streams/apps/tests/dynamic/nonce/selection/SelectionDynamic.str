@@ -8,11 +8,11 @@ void->void pipeline SelectionDynamic {
 
 float->float filter Select() {
     work pop 1 push * {
+        while (peek(0) > 1) {
+          pop();
+        }
         float x = pop();        
-        println(x);
-        if (x <= 1) {
-            push(x);
-        } 
+        push(x);
     }
 }
 
