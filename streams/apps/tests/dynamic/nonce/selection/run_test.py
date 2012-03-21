@@ -140,28 +140,31 @@ def main():
     selectivities = [1, 10, 100, 1000, 10000]
     cores = [1,2,4,8]
     static_results = []
-    dynamic_results = []   
-    for selectivity in selectivities:
-        static = []
-        dynamic = []
-        for core in cores:        
-            for test in [Configs.static, Configs.dynamic]:
-                generate(selectivity)
-                compile(core, test, outputs, ignore)
-                (avg, dev) =  run(test, core, attempts)
-                if test == Configs.static:
-                    x = ('static', selectivity, core, avg, dev)
-                    print x
-                    static.append(x)
-                elif test == Configs.dynamic:
-                    x = ('dynamic', selectivity, core, avg, dev)
-                    print x          
-                    dynamic.append(x)
-        dynamic_results.append(dynamic)
-        static_results.append(static)
-
-    # print_all(static_results, dynamic_results)        
-    plot_normalized(cores)
+    dynamic_results = []
+    with open('./partial-results.dat', 'w') as f:        
+        for selectivity in selectivities:
+            static = []
+            dynamic = []
+            for core in cores:        
+                for test in [Configs.static, Configs.dynamic]:
+                    generate(selectivity)
+                    compile(core, test, outputs, ignore)
+                    (avg, dev) =  run(test, core, attempts)
+                    if test == Configs.static:
+                        x = ('static', selectivity, core, avg, dev)
+                        s = 'static\t%d\t%d\t%f\t%f' % (selectivity, core, avg, dev)
+                        f.write(s + '\n')   
+                        print x
+                        static.append(x)
+                    elif test == Configs.dynamic:
+                        x = ('dynamic', selectivity, core, avg, dev)
+                        s = 'dynamic\t%d\t%d\t%f\t%f' % (selectivity, core, avg, dev)
+                        f.write(s + '\n')   
+                        print x          
+                        dynamic.append(x)
+            dynamic_results.append(dynamic)
+            static_results.append(static)
+        plot_normalized(cores)
 
                     
 if __name__ == "__main__":
