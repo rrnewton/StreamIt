@@ -1,12 +1,9 @@
 package at.dms.kjc.smp;
 
-import java.util.Map;
-
 import at.dms.kjc.CStdType;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.ComputeNode;
 import at.dms.kjc.common.ALocalVariable;
-import at.dms.kjc.slir.Filter;
 
 public class Core extends ComputeNode<SMPComputeCodeStore> {
     /** the core ID */

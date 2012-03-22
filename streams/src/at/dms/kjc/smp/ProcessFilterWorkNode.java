@@ -267,23 +267,18 @@ public class ProcessFilterWorkNode {
             }                
         }
     }
+    
     static void addTokenWrite(WorkNode workNode, SMPComputeCodeStore codeStore) {
-        
-        
-//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
-//        for (Filter filter : ssg.getFilterGraph()) {
-//
-//            WorkNode wnode = filter.getWorkNode();
-            if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
-                for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
-                    JExpressionStatement stmt = new JExpressionStatement(                            
-                            new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
-                    codeStore.addSteadyLoopStatement(                                          
-                            stmt);
-                }                 
-            }
-//        }
+        if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
+            for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
+                JExpressionStatement stmt = new JExpressionStatement(                            
+                        new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
+                codeStore.addSteadyLoopStatement(                                          
+                        stmt);
+            }                 
+        }
     }
+    
     protected CodeStoreHelper     filterCode;
     protected SMPComputeCodeStore codeStore;
     protected WorkNode            workNode;
@@ -416,35 +411,20 @@ public class ProcessFilterWorkNode {
     }
 
     private void addTokenWrite(int threadIndex) {
-
-//        StaticSubGraph ssg = workNode.getParent().getStaticSubGraph();
-//        for (Filter filter : ssg.getFilterGraph()) {
-//            WorkNode wnode = filter.getWorkNode();
-//            int wnodeIndex = getFilterThread(
-//                    wnode,
-//                    wnode.getParent());
-//            if (wnodeIndex == threadIndex) {
-        
         System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode);
-
-                if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
-                    
-                    System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode + " ThreadMapper.getMapper().getTokenWrites().containsKe");
-                    
-                    for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
-                        JExpressionStatement stmt = new JExpressionStatement(                            
-                                new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
-                        codeStore.addSteadyLoopStatement(
-                                threadIndex,                  
-                                stmt);
-                    }                 
-                }
-//            }
-//        }
+        if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
+            System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode + " ThreadMapper.getMapper().getTokenWrites().containsKe");
+            for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
+                JExpressionStatement stmt = new JExpressionStatement(                            
+                        new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
+                codeStore.addSteadyLoopStatement(
+                        threadIndex,                  
+                        stmt);
+            }                 
+        }
+      
     }
-
    
-
     protected void standardInitProcessing() {
         // Have the main function for the CodeStore call out init.
         codeStore.addInitFunctionCall(filterCode.getInitMethod());

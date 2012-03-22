@@ -3,31 +3,41 @@ package at.dms.kjc.smp;
 import java.util.Map;
 import java.util.Set;
 import at.dms.classfile.Constants;
+import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
+import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JBooleanLiteral;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
 import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JForStatement;
 import at.dms.kjc.JFormalParameter;
+import at.dms.kjc.JIntLiteral;
+import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.JPostfixExpression;
+import at.dms.kjc.JRelationalExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
+import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.common.ALocalVariable;
+import at.dms.kjc.sir.lowering.LoweringConstants;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
 import at.dms.kjc.slir.OutputContent;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.util.Utils;
+
 
 /**
  * This class represents the code stored on a single thread. There may be
@@ -54,6 +64,9 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
     /** block for the steady-state, as calculated currently */
     protected JBlock               threadSteadyLoop;
+    
+    /** block for the batching loop */
+    protected JForStatement               batchingLoop;
 
     /**
      * the block that executes each slicenode's init schedule, as calculated
@@ -126,8 +139,20 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         }                      
         
         
-        JStatement loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
-                threadSteadyLoop, null);        
+        JStatement loop;                    
+        if (KjcOptions.threadbatch > 1) {
+            batchingLoop =  Utils.makeBatchingLoop(threadSteadyLoop);                
+            JStatement[] stmts = {batchingLoop};
+            JBlock block = new JBlock(null, stmts, null);
+            loop = new JWhileStatement(null, new JBooleanLiteral(
+                    null, true), block, null);                    
+        } else {
+            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
+                    threadSteadyLoop, null);    
+        }
+        
+        
+        
         methodBody.addStatement(loop);
         methodBody.addStatement(new JExpressionStatement(
                 new JEmittedTextExpression("pthread_exit(NULL)")));
@@ -276,18 +301,15 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         // make sure that each of the inputs wrote to the file writer in the
         // primepump stage
 
-
-        
-        
         
         int outputs = fileW.getWorkNodeContent().getSteadyMult();
         String type = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
                 : "%f";
         String cast = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
                 : "(float)";
-        
         String typeString = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "int"
-                : "float";        
+                : "float";
+        
         
         String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
         // create the loop
@@ -296,8 +318,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         
         if (ThreadMapper.getMapper().getTokenReads().containsKey(fileW)) {
             for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(fileW)) {                   
-                stmt += "    while (" + tokenName + " == 0); /* RJS */\n";    
-                stmt += "    " + tokenName + " = 0; /* RJS */\n"; 
+                stmt += "    while (" + tokenName + " == 0); \n";    
+                stmt += "    " + tokenName + " = 0; \n"; 
             }                
         }
         
@@ -316,9 +338,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         } else {
             stmt += "if (" + multiplierName + ") {\n";
             stmt += "    fwrite (" + bufferName + ", sizeof("+ typeString +") ," + outputs + "*" + multiplierName + ", output);\n";
-            if (KjcOptions.perftest) {
-                stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
-            }
+            stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
             stmt += "    currOutputs+=" + outputs + "*" + multiplierName + ";\n";
             stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
             stmt += "}\n";
@@ -344,7 +364,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
     private String addPerfTest(String stmt) {
         if (KjcOptions.perftest) {
-            stmt += "        if (currOutputs == maxIgnored) {  start_time(); } \n";
+            stmt += "        if (currOutputs >= maxIgnored) {  start_time(); } \n";
         }
         return stmt;
     }
@@ -354,12 +374,12 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     		stmt += "        if (" + bufferName + "[_i_] > 0) { \n"
     				+ "          currOutputs++; \n"
     				+ "      } \n"    		    		    	
-    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "        if (currOutputs >= maxOutputs) {  streamit_exit(0); } \n"
     				+ "    }\n" + "}\n";    	
     		return stmt;
     	} else {
     		stmt += "        currOutputs++;\n"
-    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "        if (currOutputs >= maxOutputs) {  streamit_exit(0); } \n"
     				+ "    }\n" + "}\n";
     		return stmt;
     	}
@@ -496,6 +516,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         threadSteadyLoop.addStatementFirst(statement);
     }
 
+    
+ 
     public void addSteadyLoop() {
         // enable the profiler right before the steady loop on tilera
         if (KjcOptions.tilera > 0 && KjcOptions.profile) {
@@ -505,13 +527,21 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                     new JEmittedTextExpression("profiler_clear()")));
         }
 
-        // add it to the while statement
-        threadMethod.addStatement(new JWhileStatement(null, new JBooleanLiteral(
-                null, true), threadSteadyLoop, null));
+        if (KjcOptions.threadbatch > 1) {
+            batchingLoop =  Utils.makeBatchingLoop(threadSteadyLoop);      
+            JStatement[] stmts = {batchingLoop};
+            JBlock block = new JBlock(null, stmts, null);
+            threadMethod.addStatement(new JWhileStatement(null, new JBooleanLiteral(
+                    null, true), block, null));            
+        } else {
+            // add it to the while statement
+            threadMethod.addStatement(new JWhileStatement(null, new JBooleanLiteral(
+                    null, true), threadSteadyLoop, null));
+        }
     }
 
     public void addSteadyLoop(ALocalVariable iterationBound) {
-        threadMethod.addStatement(at.dms.util.Utils.makeForLoop(
+        threadMethod.addStatement(Utils.makeForLoop(
                 threadSteadyLoop,
                 iterationBound.getRef()));
     }
