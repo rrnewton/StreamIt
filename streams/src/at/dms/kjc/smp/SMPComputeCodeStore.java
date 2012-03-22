@@ -116,6 +116,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     private static void addOpen(SMPComputeCodeStore codeStore,
             OutputContent fileOutput) {
         codeStore.appendTxtToGlobal("FILE *output;\n");
+        codeStore.appendTxtToGlobal("bool not_initialized = true;\n");
+
         // Special case for strings "stdout" and "stderr"
         // which are treated as keywords in the StreamIt
         // front end, but as converted to string when parsed
