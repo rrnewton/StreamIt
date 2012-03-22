@@ -1,18 +1,8 @@
 \section{Introduction}
 
-With a growing need to scale programs more effectively with multicore 
-architectures, programs need to be written such that they efficiently exploit 
-parallelism across many cores.  Stream programs offer an attractive approach to 
-exposing such parallelism.  Furthermore, this domain is well-suited over many 
-applications including audio, video, and digital signal processing.  
+With a growing need to scale programs more effectively with multicore architectures, programs need to be written such that they efficiently exploit parallelism across many cores.  Stream programs offer an attractive approach to exposing such parallelism. Furthermore, this domain is well-suited over many applications including audio, video, and digital signal processing.  
 
-The stream programming paradigm exposes much parallelism by virtue of the 
-structure of the programs written.  Stream programs are constructed as a set of 
-independently processing actors that communicate via data channels.  These 
-actors are fired repeatedly on a periodic schedule.  Dependencies between 
-actors are derived largely through communication channels.  Accordingly, 
-compilers can very easily introduce parallel execution by leveraging this 
-dependence information and the independent nature of the actors.
+The stream programming paradigm exposes much parallelism by virtue of the structure of the programs written.  Stream programs are constructed as a set of independently processing actors that communicate via data channels.  These actors are fired repeatedly on a periodic schedule.  Dependencies between actors are derived largely through communication channels.  Accordingly, compilers can very easily introduce parallel execution by leveraging this dependence information and the independent nature of the actors.
 
 The parallelism exposed in stream programs can be classified in a variety of different ways.  The stream graph, representing how the actors of the corresponding stream program communicate with one another, can be partitioned in many ways and assigned to cores accordingly.  It is important to partition the graph in such a way that you leverage the right combination of task, data, and pipeline parallelism.  
 
