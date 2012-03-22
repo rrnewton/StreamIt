@@ -285,6 +285,10 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                 : "%f";
         String cast = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "(int)"
                 : "(float)";
+        
+        String typeString = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "int"
+                : "float";        
+        
         String bufferName = buf.getAddressRotation(workNode).currentWriteBufName;
         // create the loop
         String stmt = "";
@@ -304,20 +308,34 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                 CStdType.Integer, multiplierName, null);
         coreCodeStore.addExternField(new JFieldDeclaration(multiplierVar));
 
+        
         if (KjcOptions.outputs < 0) {
-            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-                    + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
-                    + "fprintf(output, \"" + type + "\\n\", " + cast
-                    + bufferName + "[_i_]); \n" + "  }\n" + "}\n";
-
+            stmt += "if (" + multiplierName + ") {\n";
+            stmt += "    fwrite (" + bufferName + ", sizeof("+ typeString +") ," + outputs + "*" + multiplierName + ", output);\n";      
+            stmt += "}\n";
         } else {
-            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-                    + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
-                    + "  fprintf(output, \"" + type + "\\n\", " + cast
-                    + bufferName + "[_i_]); \n";
-            stmt = addPerfTest(stmt);
-            stmt = addOutputCountStatic(stmt, bufferName);  
+            stmt += "if (" + multiplierName + ") {\n";
+            stmt += "    fwrite (" + bufferName + ", sizeof("+ typeString +") ," + outputs + "*" + multiplierName + ", output);\n";
+            stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            stmt += "    currOutputs+=" + outputs + "*" + multiplierName + ";\n";
+            stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
+            stmt += "}\n";
         }
+        
+//        if (KjcOptions.outputs < 0) {
+//            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
+//                    + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
+//                    + "fprintf(output, \"" + type + "\\n\", " + cast
+//                    + bufferName + "[_i_]); \n" + "  }\n" + "}\n";
+//
+//        } else {
+//            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
+//                    + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
+//                    + "  fprintf(output, \"" + type + "\\n\", " + cast
+//                    + bufferName + "[_i_]); \n";
+//            stmt = addPerfTest(stmt);
+//            stmt = addOutputCountStatic(stmt, bufferName);  
+//        }
         addSteadyLoopStatement(Util.toStmt(stmt));
     }
 
