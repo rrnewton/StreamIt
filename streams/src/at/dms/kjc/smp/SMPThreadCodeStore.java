@@ -300,7 +300,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         // assert buf.getRotationLength() == 2: buf.getRotationLength();
         // make sure that each of the inputs wrote to the file writer in the
         // primepump stage
-
+        String fileName = ((OutputContent)fileW.getWorkNodeContent()).getFileName();
         
         int outputs = fileW.getWorkNodeContent().getSteadyMult();
         String type = ((OutputContent) fileW.getWorkNodeContent()).getType() == CStdType.Integer ? "%d"
@@ -329,8 +329,22 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
                 CStdType.Integer, multiplierName, null);
         coreCodeStore.addExternField(new JFieldDeclaration(multiplierVar));
+        if ("stdout".equals(fileName) || "stderr".equals(fileName)) {
+            if (KjcOptions.outputs < 0) {
+                stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
+                        + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
+                        + "fprintf(output, \"" + type + "\\n\", " + cast
+                        + bufferName + "[_i_]); \n" + "  }\n" + "}\n";
 
-        
+            } else {
+                stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
+                        + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
+                        + "  fprintf(output, \"" + type + "\\n\", " + cast
+                        + bufferName + "[_i_]); \n";
+                stmt = addPerfTest(stmt);
+                stmt = addOutputCountStatic(stmt, bufferName);  
+            }
+        } else {                
         if (KjcOptions.outputs < 0) {
             stmt += "if (" + multiplierName + ") {\n";
             stmt += "    fwrite (" + bufferName + ", sizeof("+ typeString +") ," + outputs + "*" + multiplierName + ", output);\n";      
@@ -345,22 +359,9 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
             stmt += "}\n";
         }
-        
+        }
 
-//        if (KjcOptions.outputs < 0) {
-//            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-//                    + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
-//                    + "fprintf(output, \"" + type + "\\n\", " + cast
-//                    + bufferName + "[_i_]); \n" + "  }\n" + "}\n";
-//
-//        } else {
-//            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-//                    + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
-//                    + "  fprintf(output, \"" + type + "\\n\", " + cast
-//                    + bufferName + "[_i_]); \n";
-//            stmt = addPerfTest(stmt);
-//            stmt = addOutputCountStatic(stmt, bufferName);  
-//        }
+
         addSteadyLoopStatement(Util.toStmt(stmt));
     }
 
