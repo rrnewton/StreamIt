@@ -340,7 +340,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             stmt += "    fwrite (" + bufferName + ", sizeof("+ typeString +") ," + outputs + "*" + multiplierName + ", output);\n";
             stmt += "    currOutputs+=" + outputs + "*" + multiplierName + ";\n";
             if (KjcOptions.perftest) {
-              stmt += "    if (currOutputs >= maxIgnored) {  start_time(); not_initialized = false;  }\n";
+              stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
             }
             stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
             stmt += "}\n";
