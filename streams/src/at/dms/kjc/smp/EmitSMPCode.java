@@ -989,8 +989,7 @@ public class EmitSMPCode extends EmitCode {
             p.println();
             p.println("void start_time() {");
             p.println("  if (startedTiming == 0) {");
-            p.println("    if (currOutputs == maxIgnored) {");
-            p.println("      currOutputs == maxIgnored;");
+            p.println("    if (currOutputs >= maxIgnored) {");     
             p.println("      curr_time(&startTime);");
             p.println("      startedTiming = 1;");
             p.println("    }");
