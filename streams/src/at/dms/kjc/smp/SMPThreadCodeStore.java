@@ -338,12 +338,15 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         } else {
             stmt += "if (" + multiplierName + ") {\n";
             stmt += "    fwrite (" + bufferName + ", sizeof("+ typeString +") ," + outputs + "*" + multiplierName + ", output);\n";
-            stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            if (KjcOptions.perftest) {
+              stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            }
             stmt += "    currOutputs+=" + outputs + "*" + multiplierName + ";\n";
             stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
             stmt += "}\n";
         }
         
+
 //        if (KjcOptions.outputs < 0) {
 //            stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
 //                    + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
