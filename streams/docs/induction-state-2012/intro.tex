@@ -24,9 +24,9 @@ state. This is state that is derived from the number of executions of
 the filter. For example, a filter may keep track of how many times it
 has been invoked, in order to perform a special action every N
 iterations. An MPEG encoder has a concrete example of such a
-filter; the frame number is used in assigning the picture type.  The
-presence of induction variable state inhibits data parallelism, and
-represents a bottleneck for parallelization scalability of the
+filter; running counters are used to maintain positions in a two-dimensional
+array.  The presence of induction variable state inhibits data parallelism,
+and represents a bottleneck for parallelization scalability of the
 application.
  
 In this paper we introduce techniques to represent, capture, and
@@ -70,7 +70,7 @@ filter, taking into account fact that the iterations of the original
 filter are now split across the duplicates. Furthermore, we show how
 the modified fission transformation must interact with the
 steady-state scheduling algorithm of the
-compiler~\cite{karczmarek-lctes03} since it man modify the
+compiler~\cite{karczmarek-lctes03} since it may modify the
 distribution of iterations between the parallelization duplicates.
 
 The necessity of representing induction variable state and the
@@ -91,7 +91,7 @@ explicit induction state) targeting a commodity multicore SMP
 processor: 5X for 8 cores, 9X for 16 cores, and 16X for 32 cores.
 
 This work expands the domain of algorithms for which the stream
-programming model, and it associated compiler technologies, is
+programming model, and its associated compiler technologies, is
 effective at automatically managing parallelism. For automatic
 parallelization to become mainstream, computer scientists must
 continue to remove common sensitivities (in this case induction

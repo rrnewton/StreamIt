@@ -54,6 +54,8 @@ where \texttt{n} is a nonnegative integer indicating how many rounds have
 been run in the span of the program.  We have to account for the off-by-one
 error as the first iteration is run.
 
+The \texttt{start} value of every fissed product must also take the initialization schedule into account.  Initialization execution of the original filter is transferred entirely to the first fission product.  Accordingly, \texttt{start} for the first fission product indicates the multiplicity of the initialization schedule.  All subsequent fission products have \texttt{start} as the sum of all multiplicities of prior fission products and the multiplicity of the initialization schedule.
+
 At the end of each fission product \texttt{work}, after incrementing the
 induction value, a check must be made to see if it is necessary to increment
 the induction variable to the next round of  values.  This will prevent certain
