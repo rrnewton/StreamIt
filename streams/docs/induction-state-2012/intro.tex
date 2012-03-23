@@ -58,7 +58,7 @@ cases of induction variable state in the benchmarks.  Furthermore, we
 found that the {\tt iter()} keyword simplified implementation of
 filters that included induction variable calculation or control flow.
 Programmers are enticed to utilize the keyword because it naturally
-captures a common calculation.
+captures a common implementation pattern.
 
 We extend the StreamIt compiler to be fully aware of the new keyword.
 Most importantly, we modify StreamIt's source-to-source filter 
@@ -66,7 +66,7 @@ data-parallelization transformation, termed {\it
   fission}~\cite{streamit-asplos}, to correctly parallelize filters
 that utilize the new keyword. Our formulation correctly calculates the
 iteration number across data parallel duplicates of the original
-filter, taking into account fact that the iterations of the original
+filter, taking into account the fact that the iterations of the original
 filter are now split across the duplicates. Furthermore, we show how
 the modified fission transformation must interact with the
 steady-state scheduling algorithm of the
@@ -81,14 +81,15 @@ is the most computationally intensive stage of encoding, accounting
 for at least a third of the total computation in the entire MPEG2
 encoder~\cite{drake-thesis}. A static estimation calculates that 98\%
 of the work of the stage is concentrated in filters that include
-induction variable state. These filters cannot be data parallelized
-because of the presence of state. After modification of these filters
-to utilize the {\tt iter()} keyword, the entire application is data
-parallel. The StreamIt compiler, employing our modified fission
-transformation is able to get significant speedups for the modified
-version (use of {\tt iter()}) over the unmodified version (with
-explicit induction state) targeting a commodity multicore SMP
-processor: 5X for 8 cores, 9X for 16 cores, and 16X for 32 cores.
+induction variable state. Originally, these filters cannot be data
+parallelized because of the presence of state. After modification of
+these filters to utilize the {\tt iter()} keyword, the entire
+application is data parallel. The StreamIt compiler, employing our
+modified fission transformation is able to get significant speedups
+for the modified version (use of {\tt iter()}) over the unmodified
+version (with explicit induction state) targeting a commodity
+multicore SMP processor: 5X for 8 cores, 9X for 16 cores, and 16X for
+32 cores.
 
 This work expands the domain of algorithms for which the stream
 programming model, and its associated compiler technologies, is
@@ -96,8 +97,6 @@ effective at automatically managing parallelism. For automatic
 parallelization to become mainstream, computer scientists must
 continue to remove common sensitivities (in this case induction
 variable state) that inhibit parallelization.
-
-
 
 This paper makes the following contributions:
 
