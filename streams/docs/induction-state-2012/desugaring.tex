@@ -1,40 +1,47 @@
 \section{Desugaring}
 
-\begin{figure}[t]
-{\eightpoint
-\begin{verbatim}
-  int->int filter IterationFilter() {
+%\begin{figure}[t]
+%{\eightpoint
+%\begin{verbatim}
+%  int->int filter IterationFilter() {
+%
+%      work push 1 pop 1{
+%
+%          int counter = iter();
+%          ...
+%
+%      }
+%  }
+%\end{verbatim}
+%\caption{Example of a StreamIt filter using the iteration keyword.\protect\label{fig:iter-filter-example}}}
+%\end{figure}
+%
+%
+%\begin{figure}[t]
+%{\eightpoint	
+%\begin{verbatim}
+%  int->int filter IterationFilter() {
+%
+%      int __iterationCount = 0;      
+%
+%      work push 1 pop 1{
+%
+%          int counter = __iterationCount;
+%          ...
+%
+%          __iterationCount++;
+%
+%      }
+%  }
+%\end{verbatim}
+%\caption{Example of a StreamIt filter with the iteration keyword desugared.\protect\label{fig:desugar-filter-example}}}
+%\end{figure}
 
-      work push 1 pop 1{
 
-          int counter = iter();
-          ...
-
-      }
-  }
-\end{verbatim}
-\caption{Example of a StreamIt filter using the iteration keyword.\protect\label{fig:iter-filter-example}}}
-\end{figure}
-
-
-\begin{figure}[t]
-{\eightpoint	
-\begin{verbatim}
-  int->int filter IterationFilter() {
-
-      int __iterationCount = 0;      
-
-      work push 1 pop 1{
-
-          int counter = __iterationCount;
-          ...
-
-          __iterationCount++;
-
-      }
-  }
-\end{verbatim}
-\caption{Example of a StreamIt filter with the iteration keyword desugared.\protect\label{fig:desugar-filter-example}}}
+\begin{figure}[t!]
+\centering
+\includegraphics[width=3.5in]{figures/desugaring.png}
+\caption{Desugaring a filter using \texttt{iter()} keyword.\protect\label{fig:desugar}}
 \end{figure}
 
 
@@ -42,7 +49,7 @@ Under the StreamIt framework, filters are classified as iteration filters when t
 
 When the compiler comes across a filter classified as an iteration filter, the iteration keyword is replaced with an access to a field holding the value of the iteration count.  The filter is given a definition for this field only if an iteration keyword use exists in its work or prework definition.  The work and prework function are appended with incrementing statements that update the iteration value.
 
-The introduction of this iteration keyword field creates state in the provided filter.  This, however, is state that the compiler adds to the filter definition.  For future operations, the compiler does not consider this iteration count field as part of the state of filter.  Future processes will maintain this inherent state without introducing the downsides of introducing state.
+The introduction of this iteration keyword field creates state in the provided filter.  For future operations, the compiler does not consider this iteration count field as part of the state of filter.  Future processes will maintain this inherent state without introducing the downsides of introducing state.
 
-It is important to note, these filters are not classified as stateful to the user, even though the filter is actually stateful on the iteration count after the desugaring process.  In classifying filters as stateful, the user is made aware of where data parallelism may be inhibited.  Iteration filters will not inhibit data parallelism because it is identifiable to the compiler during the fission process.   
+It is important to note, these filters are not classified as stateful to the user, even though the filter is actually stateful on the iteration count after the desugaring process.  In classifying filters as stateful, the user is made aware of where data parallelism may be inhibited.  Iteration filters will not inhibit data parallelism because its state is identifiable to the compiler during the fission process.   
 

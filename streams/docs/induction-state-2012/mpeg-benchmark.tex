@@ -25,4 +25,9 @@ The MotionEstimation filter pulls macroblocks at a time, iterating through a two
 
 Reference pictures are set using upstream messaging from later in the stream graph.  Currently the backend does not support the use of upstream messaging, so for the purpose of benchmarking this application, the reference picture is set to a dummy value and is unchanged throughout the program.  This does not detract from the data parallelism introduced after removing the induction state.  Upstream messaging would simply require that sent messages be duplicated to all fissed filters in the stream graph.
 
-Figure~ref{} shows the runtime figures for the original stateful MPEG-2 motion estimation subset compared to the stateless subset.  We can see significant improvements to runtime after making this subset stateless.  
+\begin{figure}[t]
+\includegraphics[width=3.5in]{figures/mpeg-results.png}
+\caption{Speedups for MPEG-2 Encoder Motion Estimation subset, with and without induction variable state.  \protect\label{fig:mpeg-results}}
+\end{figure}
+
+Figure~\ref{fig:mpeg-results} shows the runtime figures for the original stateful MPEG-2 motion estimation subset compared to the stateless subset.  We can see significant improvements to runtime after making this subset stateless.  
