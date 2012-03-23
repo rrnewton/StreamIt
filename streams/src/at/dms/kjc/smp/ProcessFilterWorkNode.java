@@ -309,6 +309,9 @@ public class ProcessFilterWorkNode {
      */
     public void doit(WorkNode filterNode, SchedulingPhase whichPhase,
             SMPBackEndFactory backEndFactory) {
+        
+        System.out.println("ProcessFilterWorkNode.doit filter=" + filterNode);
+        
         this.workNode = filterNode;
         this.whichPhase = whichPhase;
         this.backEndFactory = backEndFactory;
@@ -557,6 +560,11 @@ public class ProcessFilterWorkNode {
 
 
     protected void standardSteadyProcessingOpt(boolean isDynamicPop) {
+        
+        System.out
+        .println("=== ProcessFilterWorkNode.standardSteadyProcessingOpt filter="
+                + workNode.getParent().getWorkNode());
+        
         JBlock steadyBlock = filterCode.getSteadyBlock();
         //List<JStatement> tokenWrites = filterCode.getTokenWrite();
 
