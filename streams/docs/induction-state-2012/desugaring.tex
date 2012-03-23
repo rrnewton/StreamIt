@@ -1,4 +1,5 @@
 \section{Desugaring}
+\label{sec:desugar}
 
 %\begin{figure}[t]
 %{\eightpoint
@@ -37,12 +38,12 @@
 %\caption{Example of a StreamIt filter with the iteration keyword desugared.\protect\label{fig:desugar-filter-example}}}
 %\end{figure}
 
-
-\begin{figure}[t!]
-\centering
-\includegraphics[width=3.3in]{figures/desugaring.png}
-\caption{Desugaring a filter using \texttt{iter()} keyword.\protect\label{fig:desugar}}
-\end{figure}
+%
+%\begin{figure}[t!]
+%\centering
+%\includegraphics[width=3.3in]{figures/desugaring.png}
+%\caption{Desugaring a filter using \texttt{iter()} keyword.\protect\label{fig:desugar}}
+%\end{figure}
 
 
 Under the StreamIt framework, filters are classified as iteration filters when there is use of the iteration keyword in its work function.  A simple lexer and parser can identify the use of this keyword, and it is represented accordingly in the intermediate representation.  To have it actually return the correct iteration value, we first convert the keyword to a compiler-usable construct.

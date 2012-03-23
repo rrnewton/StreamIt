@@ -541,10 +541,10 @@
 \def\bottomfraction{.7}
 \setcounter{totalnumber}{20}
 \def\textfraction{.2}
-\def\floatpagefraction{.66}
-\setcounter{dbltopnumber}{66}
-\def\dbltopfraction{.66}
-\def\dblfloatpagefraction{.66}
+\def\floatpagefraction{.88}
+\setcounter{dbltopnumber}{88}
+\def\dbltopfraction{.88}
+\def\dblfloatpagefraction{.88}
 
 %
 \long\def\@makecaption#1#2{

@@ -1,6 +1,7 @@
 \section{Design Rationale}
+\label{sec:designrationale}
 
-Our approach to removing induction variable state is to introduce a new language construct.  The language construct maintains a value indicating how often the corresponding filter has been invoked.  This approach was chosen over implementing a system to automatically recognize induction variable usage in filter construction.
+Our approach to removing induction variable state is to introduce a new language construct.  The construct maintains a value indicating how often the corresponding filter has been invoked.  This approach was chosen over implementing a system to automatically recognize induction variable usage in filter construction.
 
 The approach of automatic analysis would require detecting induction variables defined in the filter.  The simplest form of this analysis would idiomatically detect a variable modified by a statement similar to \texttt{var=var+1}.  Very few iteration filters (outside of source filters) use induction state in this limited capacity.  Consider Figure~\ref{fig:weight-calc}, where the induction variable is incremented at each iteration step, until a certain threshold value at which it will reset.  This pattern is very common in programs that use induction filters.  MPD and FIRBank use this technique to iterate across a provided array one element per iteration step.  To ensure consistency between iteration steps, the automatic analysis is required to detect these types of updates as well.  
 

@@ -138,7 +138,15 @@ stage of MPEG2 encoding.
 \myend
 
 The remainder of this paper is organized as follows:
-\S\ref{sec:streamit} introduces the StreamIt language, \todo{finish}.
+\S\ref{sec:streamit} introduces the StreamIt language.  
+\S\ref{sec:inductionstate} discusses induction variables and how they are applied to streaming programs.
+\S\ref{sec:designrationale} discusses the rationale behind implementing an iteration keyword as opposed to other approaches for removing induction variable state.  
+\S\ref{sec:desugar} and \S\ref{sec:fission} discusses the modifications made to the compiler to implement our approach.
+\S\ref{sec:analysis} presents our analysis on potential speedups in eliminating induction variable state.
+\S\ref{sec:mpeg} presents a case study of induction variable state as applied to the motion estimation subset of MPEG2 encoding.
+
+\todo{Related work? Conclusion?}
+
 
 % ----
 
