@@ -70,59 +70,18 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     /** the block executed after the steadyLoop */
     protected JBlock               cleanupBlock;
 
-    /******** Inherited from Compute Code Store *************/
-
     /** The core code store that holds this thread */
     SMPComputeCodeStore            coreCodeStore;
 
-    /**
-     * Constructor: steady state loops indefinitely, no pointer back to compute
-     * node.
-     */
-    public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name) {
-        threadMethodName = name;
-        this.coreCodeStore = coreCodeStore;
-        threadMethod = createThreadMethod(threadMethodName);
-        threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        addSteadyLoop();
-
-    }
-
-    public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name,
-            Core nodeType) {
-        threadMethodName = name;
-        this.coreCodeStore = coreCodeStore;
-        threadMethod = createThreadMethod(threadMethodName);
-        threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        this.addSteadyLoop();
-    }
-
-    /**
-     * Constructor: caller will add code to bound number of iterations, code
-     * store has pointer back to a compute node.
-     * 
-     * @param parent
-     *            a ComputeNode.
-     * @param iterationBound
-     *            a variable that will be defined locally in
-     */
-    public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name,
-            Core parent, ALocalVariable iterationBound) {
-        threadMethodName = name;
-        this.coreCodeStore = coreCodeStore;
-        threadMethod = createThreadMethod(threadMethodName);
-        threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        addSteadyLoop(iterationBound);
-    }
-
+    private int threadId;
+    
     
     public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, int threadIndex) {
         System.out.println("SMPThreadCodeStore.SMPThreadCodeStore(coreCodeStore)");
         this.coreCodeStore = coreCodeStore;        
         JBlock methodBody = new JBlock();
         threadSteadyLoop = new JBlock();
-
-        
+        this.threadId = threadIndex;
         if (!KjcOptions.nobind) {                   
             Core core = coreCodeStore.getCore();           
             
@@ -160,40 +119,12 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         addWaitToBlockFirst(threadSteadyLoop, threadIndex);
         addHelperThreadMethod(mainMethod);                
     }
-    
-    
-    void addWaitToBlockFirst(JBlock loopBody, int threadIndex) {
-        Utils.addCondWaitFirst(
-                loopBody,
-                threadIndex,
-                Utils.makeEqualityCondition(
-                        "ASLEEP",
-                        "thread_to_sleep[" + threadIndex + "]"));
-    }
-    
-    void addCallNextToBlock(JBlock loopBody, int threadIndex, int nextIndex) {
-        Utils.addSetFlag(
-                loopBody,
-                threadIndex,
-                "ASLEEP");
-        Utils.addSetFlag(
-                loopBody,
-                nextIndex,
-                "AWAKE");
-        Utils.addSignal(
-                loopBody,
-                nextIndex);
-    }
-    
-    public void addCallNextToMain(int threadIndex, int nextIndex) {
-        addCallNextToBlock(threadSteadyLoop,  threadIndex,  nextIndex);
-    }
-    
+
     public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, int threadIndex, int nextIndex,
             JStatement steadyBlock) {
         
         this.coreCodeStore = coreCodeStore;
-        
+        this.threadId = threadIndex;
         JBlock methodBody = new JBlock();
         JBlock loopBody = new JBlock();
 
@@ -239,10 +170,56 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         
     }
 
+    /**
+     * Constructor: steady state loops indefinitely, no pointer back to compute
+     * node.
+     */
+    public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name) {
+        threadMethodName = name;
+        this.coreCodeStore = coreCodeStore;
+        threadMethod = createThreadMethod(threadMethodName);
+        threadSteadyLoop = new JBlock(null, new JStatement[0], null);
+        addSteadyLoop();
+
+    }
+
+    
+    public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name,
+            Core nodeType) {
+        threadMethodName = name;
+        this.coreCodeStore = coreCodeStore;
+        threadMethod = createThreadMethod(threadMethodName);
+        threadSteadyLoop = new JBlock(null, new JStatement[0], null);
+        this.addSteadyLoop();
+    }
+    
+    
+    /**
+     * Constructor: caller will add code to bound number of iterations, code
+     * store has pointer back to a compute node.
+     * 
+     * @param parent
+     *            a ComputeNode.
+     * @param iterationBound
+     *            a variable that will be defined locally in
+     */
+    public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name,
+            Core parent, ALocalVariable iterationBound) {
+        threadMethodName = name;
+        this.coreCodeStore = coreCodeStore;
+        threadMethod = createThreadMethod(threadMethodName);
+        threadSteadyLoop = new JBlock(null, new JStatement[0], null);
+        addSteadyLoop(iterationBound);
+    }
+    
+    public void addCallNextToMain(int threadIndex, int nextIndex) {
+        addCallNextToBlock(threadSteadyLoop,  threadIndex,  nextIndex);
+    }
+    
     public void addExpressionFirst(JExpression expr) {
         threadMethod.addStatementFirst(new JExpressionStatement(expr));
     }
-
+    
     public void addFunctionCallFirst(JMethodDeclaration func, JExpression[] args) {
         threadMethod.addStatementFirst(new JExpressionStatement(null,
                 new JMethodCallExpression(null, new JThisExpression(null), func
@@ -324,16 +301,18 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         coreCodeStore.addExternField(new JFieldDeclaration(multiplierVar));
         if ("stdout".equals(fileName) || "stderr".equals(fileName) || KjcOptions.printf) {
             if (KjcOptions.outputs < 0) {
-                stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-                        + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
-                        + "fprintf(output, \"" + type + "\\n\", " + cast
-                        + bufferName + "[_i_]); \n" + "  }\n" + "}\n";
+                stmt += "if (" + multiplierName + ") {\n"; 
+                stmt += "            int _i_ = 0;\n";
+                stmt += "            for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n";
+                stmt += "                fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); \n"; 
+                stmt += "            }\n" ;
+                stmt += "            }\n";
 
             } else {
-                stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
-                        + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"
-                        + "  fprintf(output, \"" + type + "\\n\", " + cast
-                        + bufferName + "[_i_]); \n";
+                stmt += "if (" + multiplierName + ") {\n";
+                stmt += "            int _i_ = 0;\n";
+                stmt += "            for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n";
+                stmt += "                fprintf(output, \"" + type + "\\n\", " + cast + bufferName + "[_i_]); \n";
                 stmt = addPerfTest(stmt);
                 stmt = addOutputCountStatic(stmt, bufferName);  
             }
@@ -358,49 +337,15 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         
 
         addSteadyLoopStatement(Util.toStmt(stmt));
-    }
+        
 
-
-    private String addPerfTest(String stmt) {
-        if (KjcOptions.perftest) {
-            stmt += "        if (currOutputs >= maxIgnored) {  start_time(); } \n";
+        if (KjcOptions.threadopt) {          
+            int mainThread = ThreadMapper.coreToThread(coreCodeStore.getCore().coreID);
+            addCallNextToMain(threadId, mainThread);                               
         }
-        return stmt;
+        
     }
 
-    private String addOutputCountStatic(String stmt, String bufferName) {    	
-    	if (KjcOptions.selective) {
-    		stmt += "        if (" + bufferName + "[_i_] > 0) { \n"
-    				+ "          currOutputs++; \n"
-    				+ "      } \n"    		    		    	
-    				+ "        if (currOutputs >= maxOutputs) {  streamit_exit(0); } \n"
-    				+ "    }\n" + "}\n";    	
-    		return stmt;
-    	} else {
-    		stmt += "        currOutputs++;\n"
-    				+ "        if (currOutputs >= maxOutputs) {  streamit_exit(0); } \n"
-    				+ "    }\n" + "}\n";
-    		return stmt;
-    	}
-    }
-    
-    private String addOutputCountDynamic(String stmt, String peekCall) {
-    	if (KjcOptions.selective) {    		
-    		stmt += "        if (" + peekCall + " > 0) {\n"
-    		      + "            currOutputs++;\n"
-    		      + "        }\n"    		    		    		
-    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
-    				+ "    }\n" + "}\n";
-    		return stmt;    		
-    	} else {
-    		stmt += "        currOutputs++;\n"
-    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
-    				+ "    }\n" + "}\n";
-    		return stmt;
-    	}
-    }
-
-   
     public void addPrintOutputCode(InterSSGChannel buf, WorkNode workNode,
             SMPBackEndFactory backEndFactory) {
 
@@ -421,9 +366,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
         String type = tapeType == CStdType.Integer ? "%d" : "%f";
         String cast = tapeType == CStdType.Integer ? "(int)" : "(float)";
-        // String bufferName =
-        // buf.getAddressRotation(workNode).currentWriteBufName;
-
+        
         // create the loop
         String stmt = "";
 
@@ -505,18 +448,30 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             stmt = addOutputCountDynamic(stmt, peekCall);            
         }
         addSteadyLoopStatement(Util.toStmt(stmt));
+        
+        
     }
 
     public void addStatementFirst(JExpressionStatement statement) {
         threadMethod.addStatementFirst(statement);
     }
 
+
     public void addStatementToSteadyLoop(JStatement statement) {
         threadSteadyLoop.addStatementFirst(statement);
     }
 
+    public void addSteadyBlock(int threadIndex, int nextIndex,
+            JStatement steadyBlock) {        
+        
+        threadSteadyLoop.addStatement(steadyBlock);        
+
+        // TODO: Only make this call if it is the last        
+        if (threadIndex != nextIndex && ThreadMapper.getNumThreads() > KjcOptions.smp) {        
+            addCallNextToBlock( threadSteadyLoop,  threadIndex,  nextIndex);
+        }
+    }
     
- 
     public void addSteadyLoop() {
         // enable the profiler right before the steady loop on tilera
         if (KjcOptions.tilera > 0 && KjcOptions.profile) {
@@ -539,19 +494,13 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         }
     }
 
+   
     public void addSteadyLoop(ALocalVariable iterationBound) {
         threadMethod.addStatement(Utils.makeForLoop(
                 threadSteadyLoop,
                 iterationBound.getRef()));
     }
 
-    // /**
-    // * @return the block contatining any cleanup code.
-    // */
-    // public JBlock getCleanupBlock() {
-    // return cleanupBlock;
-    // }
-    //
     /**
      * @param stmt
      *            statement to add after any other statements in steady-state
@@ -568,6 +517,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             threadSteadyLoop.addStatementFirst(stmt);
     }
 
+    
+ 
     public void addSteadyThreadCall(int threadIndex) {
         Utils.addSetFlag(
                 threadSteadyLoop,
@@ -610,6 +561,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
     }
 
+ 
     public void addSteadyThreadWait(int threadIndex) {
         Utils.addCondWait(
                 threadSteadyLoop,
@@ -618,7 +570,6 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                         "ASLEEP",
                         "thread_to_sleep[" + threadIndex + "]"));
     }
-
 
     /**
      * 
@@ -730,6 +681,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         return threadMethodName;
     }
 
+
     /**
      * Set the helper thread methods in this store;
      * 
@@ -750,6 +702,45 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
     }
 
+    private String addOutputCountDynamic(String stmt, String peekCall) {
+    	if (KjcOptions.selective) {    		
+    		stmt += "        if (" + peekCall + " > 0) {\n"
+    		      + "            currOutputs++;\n"
+    		      + "        }\n"    		    		    		
+    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";
+    		return stmt;    		
+    	} else {
+    		stmt += "        currOutputs++;\n"
+    				+ "        if (currOutputs == maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";
+    		return stmt;
+    	}
+    }
+
+    private String addOutputCountStatic(String stmt, String bufferName) {    	
+    	if (KjcOptions.selective) {
+    		stmt += "        if (" + bufferName + "[_i_] > 0) { \n"
+    				+ "          currOutputs++; \n"
+    				+ "      } \n"    		    		    	
+    				+ "        if (currOutputs >= maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";    	
+    		return stmt;
+    	} else {
+    		stmt += "        currOutputs++;\n"
+    				+ "        if (currOutputs >= maxOutputs) {  streamit_exit(0); } \n"
+    				+ "    }\n" + "}\n";
+    		return stmt;
+    	}
+    }
+
+    private String addPerfTest(String stmt) {
+        if (KjcOptions.perftest) {
+            stmt += "        if (currOutputs >= maxIgnored) {  start_time(); } \n";
+        }
+        return stmt;
+    }
+
     private JMethodDeclaration createThreadMethod(String funcName) {
         JMethodDeclaration method = new JMethodDeclaration(null,
                 Constants.ACC_PUBLIC, CStdType.Void, funcName,
@@ -766,15 +757,27 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         threadMethodName = name;
     }
 
-    public void addSteadyBlock(int threadIndex, int nextIndex,
-            JStatement steadyBlock) {        
-        
-        threadSteadyLoop.addStatement(steadyBlock);        
+    void addCallNextToBlock(JBlock loopBody, int threadIndex, int nextIndex) {
+        Utils.addSetFlag(
+                loopBody,
+                threadIndex,
+                "ASLEEP");
+        Utils.addSetFlag(
+                loopBody,
+                nextIndex,
+                "AWAKE");
+        Utils.addSignal(
+                loopBody,
+                nextIndex);
+    }
 
-        // TODO: Only make this call if it is the last        
-        if (threadIndex != nextIndex && ThreadMapper.getNumThreads() > KjcOptions.smp) {        
-            addCallNextToBlock( threadSteadyLoop,  threadIndex,  nextIndex);
-        }
+    void addWaitToBlockFirst(JBlock loopBody, int threadIndex) {
+        Utils.addCondWaitFirst(
+                loopBody,
+                threadIndex,
+                Utils.makeEqualityCondition(
+                        "ASLEEP",
+                        "thread_to_sleep[" + threadIndex + "]"));
     }
 
 }

@@ -257,7 +257,7 @@ public class ProcessFilterWorkNode {
         if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
             for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
                 JExpressionStatement stmt = new JExpressionStatement(
-                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
+                        new JEmittedTextExpression("while (" + tokenName + " == 0)"));                                                
                 codeStore.addSteadyLoopStatement(                              
                         stmt);
                 stmt = new JExpressionStatement(
@@ -272,7 +272,7 @@ public class ProcessFilterWorkNode {
         if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
             for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
                 JExpressionStatement stmt = new JExpressionStatement(                            
-                        new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
+                        new JEmittedTextExpression(tokenName + " = 1"));                        
                 codeStore.addSteadyLoopStatement(                                          
                         stmt);
             }                 
@@ -400,7 +400,7 @@ public class ProcessFilterWorkNode {
         if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
             for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(workNode)) {                
                 JExpressionStatement stmt = new JExpressionStatement(
-                        new JEmittedTextExpression("while (" + tokenName + " == 0); /* RJS */"));                                                
+                        new JEmittedTextExpression("while (" + tokenName + " == 0);"));                                                
                 codeStore.addSteadyLoopStatement(
                         threadIndex,                  
                         stmt);
@@ -419,7 +419,7 @@ public class ProcessFilterWorkNode {
             System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode + " ThreadMapper.getMapper().getTokenWrites().containsKe");
             for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
                 JExpressionStatement stmt = new JExpressionStatement(                            
-                        new JEmittedTextExpression(tokenName + " = 1 /* RJS */"));                        
+                        new JEmittedTextExpression(tokenName + " = 1"));                        
                 codeStore.addSteadyLoopStatement(
                         threadIndex,                  
                         stmt);
@@ -598,10 +598,13 @@ public class ProcessFilterWorkNode {
                     workNode.getParent());
             String threadId = Integer.toString(threadIndex);
 
-            Filter nextFilter = ProcessFilterUtils.getNextFilterOnCoreDifferentThread(workNode);
+            //Filter nextFilterDifferentThread = ProcessFilterUtils.getNextFilterOnCoreDifferentThread(workNode);
+            Filter nextFilterOnCore = ProcessFilterUtils.getNextFilterOnCore(workNode);
+
             int nextThread = ProcessFilterUtils.getFilterThread(
                     workNode,
-                    nextFilter);
+                    nextFilterOnCore);
+            
             Filter prevFilter = ProcessFilterUtils.getPreviousFilterOnCore(workNode);
             Core prevCore = ProcessFilterUtils.getCore(
                     workNode,
@@ -609,11 +612,12 @@ public class ProcessFilterWorkNode {
             int prevThread = ProcessFilterUtils.getFilterThread(
                     workNode,
                     prevFilter);
+            
             // If there is no next filter on this core
             // then we want to return to the main.
-            if (nextFilter == null) {
-                nextThread = ThreadMapper.coreToThread(location.coreID);
-            }
+//            if (nextFilterDifferentThread == null) && (nextFilterSameThread == null) {
+//                nextThread = ThreadMapper.coreToThread(location.coreID);
+//            }
 
             System.out
             .println("ProcessFilterWorkNode.standardSteadyProcessingOpt "
@@ -629,7 +633,7 @@ public class ProcessFilterWorkNode {
                             + threadId
                             + ")"
                             + " --> nextFilter = "
-                            + (nextFilter != null ? nextFilter
+                            + (nextFilterOnCore != null ? nextFilterOnCore
                                     .getWorkNode() : "null")
                                     + "( "
                                     + nextThread + " )");
@@ -644,6 +648,10 @@ public class ProcessFilterWorkNode {
             addTokenWrite(threadIndex);
 
             boolean addCall = false;
+            
+            
+            System.out
+            .println("RJS!!! ProcessFilterWorkNode.standardSteadyProcessingOpt RJS ");
 
             // If the previous filter is null, then it means this
             // is the first filter on the core, and we need a call.

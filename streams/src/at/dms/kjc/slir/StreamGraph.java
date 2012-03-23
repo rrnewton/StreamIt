@@ -10,6 +10,7 @@ import at.dms.kjc.backendSupport.GreedyBinPacking;
 import at.dms.kjc.backendSupport.Layout;
 import at.dms.kjc.smp.Core;
 import at.dms.kjc.smp.FissionGroupStore;
+import at.dms.kjc.smp.ProcessFilterUtils;
 import at.dms.kjc.smp.SMPBackend;
 
 /**
@@ -77,18 +78,29 @@ public class StreamGraph implements Layout<Core> {
     @Override
     public Core getComputeNode(InternalFilterNode node) {
         
-        if (node.isInputSlice()) {
-            System.out.println("StreamGraph.getComputeNode node is isInputSlice =");
-        }
+        //System.out.println("StreamGraph.getComputeNode node=" + node.getAsFilter());
         
         if (null == layoutMap.get(node)) {
-            System.out.println("Current contents of layout map:");
-            for (InternalFilterNode f : layoutMap.keySet()) {
-                System.out.println("    " + f + " -> " + layoutMap.get(f).getCoreID());
-            }            
-            assert false : " Node" + node.toString() + " is not in the layoutMap";    
+            assert false : " StreamGraph.getComputeNode Node" + node.toString() + " is not in the layoutMap";    
         }                      
-        return layoutMap.get(node);
+        
+        if (node.getAsFilter().isFileInput()) {
+
+            
+            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileInput()=" + node.getAsFilter().isFileInput());
+            return layoutMap.get(node);    
+        }
+        else if (node.getAsFilter().isFileOutput()) {
+            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileOutput()=" + node.getAsFilter().isFileOutput() );                        
+            Filter prev = ProcessFilterUtils.getPreviousFilter(node.getAsFilter());                                  
+            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileOutput()=" + node.getAsFilter().isFileOutput() + " prev=" + prev.getWorkNode());                        
+            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileOutput()=" + node.getAsFilter().isFileOutput() + " core is " + layoutMap.get(prev.getWorkNode()).getCoreID());                        
+            return layoutMap.get(prev.getWorkNode());    
+            //return layoutMap.get(node);
+        }        
+        else {
+            return layoutMap.get(node);       
+        }
     }
 
     public int getNumSSGs() {

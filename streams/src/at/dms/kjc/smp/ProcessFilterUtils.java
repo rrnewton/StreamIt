@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterFilterEdge;
@@ -56,24 +57,40 @@ public class ProcessFilterUtils {
 
         WorkNode workNode = filter.getWorkNode();
 
-        // A FileInput is always on the core of its next filter
-        if (workNode.isFileInput()) {
-            Filter next = getNextFilter(workNode);
-            Core nextCore = SMPBackend.getComputeNode(next.getWorkNode());
-            return ThreadMapper.coreToThread(nextCore.coreID);
+        if (KjcOptions.threadopt) {
+
+            // A FileInput is always on the core of its next filter
+            if (workNode.isFileInput()) {
+                Filter next = getNextFilter(workNode);
+                return ThreadMapper.getMapper().getFilterToThreadId().get(next);                               
+            }
+
+            // A FileOutput is always on the core of its next filter
+            if (workNode.isFileOutput()) {
+                Filter prev = getPreviousFilter(workNode);
+                return ThreadMapper.getMapper().getFilterToThreadId().get(prev);                                             
+            }
+
+        
+        } else {
+
+            // A FileInput is always on the core of its next filter
+            if (workNode.isFileInput()) {
+                Filter next = getNextFilter(workNode);
+                Core nextCore = SMPBackend.getComputeNode(next.getWorkNode());
+                return ThreadMapper.coreToThread(nextCore.coreID);
+            }
+
+            // A FileOutput is always on the core of its next filter
+            if (workNode.isFileOutput()) {
+                Filter prev = getPreviousFilter(workNode);
+                Core prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
+                return ThreadMapper.coreToThread(prevCore.coreID);
+            }
         }
 
-        // A FileOutput is always on the core of its next filter
-        if (workNode.isFileOutput()) {
-            Filter prev = getPreviousFilter(workNode);
-            Core prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
-            return ThreadMapper.coreToThread(prevCore.coreID);
-        }
-
-        Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
-                .getFilterToThreadId();
-        int threadIndex = filterToThreadId.get(workNode.getParent());
-        return threadIndex;
+        return ThreadMapper.getMapper().getFilterToThreadId().get(workNode.getParent());
+      
     }
 
     /**
@@ -121,7 +138,10 @@ public class ProcessFilterUtils {
      */
     static Filter getNextFilterOnCore(WorkNode workNode) {
        
+        System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode);
+        
         if (workNode.isFileOutput()) {
+            System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + "workNode.isFileOutput() returning null");
             return null;
         }
         Core core = SMPBackend.getComputeNode(workNode);
@@ -129,15 +149,23 @@ public class ProcessFilterUtils {
         Core nextCore;
         while (true) {
             next = getNextFilter(next.getWorkNode());
+
             if (next == null) {
+                System.out.println("***  ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " next == null returning null");
                 return null;
             } else {                
+                System.out.println("*** ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " next=" + next.getWorkNode());
                 nextCore = SMPBackend.getComputeNode(next.getWorkNode());
+                
+                System.out.println("HERE ProcessFilterUtils.getNextFilterOnCore coreID=" + core.coreID + " nextCore=" + nextCore.coreID);
+
                 if (nextCore.coreID == core.coreID) {
+                    System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " nextCore.coreID == core.coreID returning next=" + next.getWorkNode());
                     return next;
                 }
-                if (next.getWorkNode().isFileOutput()) {
+                if (next.getWorkNode().isFileOutput()) {                                               
                     if (nextCore.coreID != core.coreID) {
+                        System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " nextCore.coreID != core.coreID returning null");
                         return null;
                     }
                 }
@@ -217,7 +245,7 @@ public class ProcessFilterUtils {
      *            the current filter
      * @return the previous filter
      */
-    static Filter getPreviousFilter(WorkNode filter) {
+    public static Filter getPreviousFilter(WorkNode filter) {
         StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
         if (filter == ssg.getFilterGraph()[0].getWorkNode()) {
             InputPort inputPort = ssg.getInputPort();
