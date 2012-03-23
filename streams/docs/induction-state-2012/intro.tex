@@ -18,29 +18,45 @@ and SPL~\cite{spl09}.
 
 The key to effectively parallelizing stream programs is to take
 advantage of data parallelism present in filters that do not maintain
-state~\cite{gordon-asplos06}. However, many real-world streaming
-applications include filters with explicit {\it induction variable}
-state. This is state that is derived from the number of executions of
-the filter. For example, a filter may keep track of how many times it
-has been invoked, in order to perform a special action every N
-iterations. An MPEG encoder has a concrete example of such a
-filter; running counters are used to maintain positions in a two-dimensional
-array.  The presence of induction variable state inhibits data parallelism,
-and represents a bottleneck for parallelization scalability of the
+state~\cite{gordon-asplos06}.  Data parallelism provides load-balanced
+and limitless parallelism (as long as input data is
+available). However, many real-world streaming applications include
+filters with explicit {\it induction variable} state. This is state
+that is derived from the number of executions of the filter. For
+example, a filter may keep track of how many times it has been
+invoked, in order to perform a special action every N iterations. An
+MPEG encoder has a concrete example of such a filter; running counters
+are used to maintain positions in a two-dimensional array.  The
+presence of induction variable state inhibits data parallelism, and
+represents a bottleneck for parallelization scalability of the
 application.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=3.4in]{figures/state-figure.pdf}
+\caption{A summary of the findings of~\cite{streamit-suite}.  Of the
+  763 filters of 65 programs (over 35k lines of code), 55\% of
+  stateful filters include avoidable state, and much of that is due to
+  induction variable state in real world
+  applications.\protect\label{fig:state}}
+\end{figure}
+
  
 In this paper we introduce techniques to represent, capture, and
 parallelize induction variable state in stream programs. Our research
 is conducted in the context of the StreamIt programming
-language~\cite{streamitcc}. Employing the StreamIt Benchmark
-Suite~\cite{streamit-suite}, we demonstrate that real world
-applications are implemented to include induction variable state. It
-is important to represent induction variable state because it is a
+language~\cite{streamitcc}.  Figure~\ref{fig:state} summarizes the
+finding of~\cite{streamit-suite} in regards to induction variable
+state on the StreamIt benchmark suite.  Of the 65 benchmarks included
+in the suite many of the real world applications include induction
+variable state, including MPEG encoder, beamforming, Trellis, and MPD.
+It is important to represent induction variable state because it is a
 common implementation idiom and parallelizing such state removes
 scalability bottlenecks to drastically improve parallelization
-performance. Even a small amount of stateful computation will severely
-limit parallelization scalability as we quickly transition to the
-manycore era with hundreds and thousands of cores.
+performance. As we will show, even a small amount of stateful
+computation will severely limit parallelization scalability as we
+quickly transition to the manycore era with hundreds and thousands of
+cores.
 
 We represent induction variable state by introducing a new expression
 keyword to the StreamIt language. The new expression, {\tt iter()},
