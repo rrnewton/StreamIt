@@ -13,34 +13,6 @@ The approach of automatic analysis would require looking for an induction variab
 \begin{figure}[t]
 {\eightpoint
 \begin{verbatim}
-float->float stateful filter WeightCalc(int n)
-{
-  float[n] window;
-  int windowPos;
-
-  ...
-
-  // the input stream is multiplied with the weights
-  work push 2 pop 2
-  {
-
-    push(pop() * window[windowPos]);
-    push(pop() * window[windowPos]);
-
-    windowPos++;
-    if(windowPos >= n)
-    {
-      windowPos = 0;
-    }
-  }
-}
-\end{verbatim}
-\caption{MPD filter that multiplies stream values with weights.\protect\label{fig:weight-calc}}}
-\end{figure}
-
-\begin{figure}[t]
-{\eightpoint
-\begin{verbatim}
 float->float stateful filter CFARDetectFilter(int rows, int cols)
 {
   int currentCol;
