@@ -8,7 +8,7 @@
 \caption{Example of an iteration filter fissed into three fission products each with multiplicity 2.  The chart indicates the values used to determine the next value of the iteration field.  \protect\label{fig:fission-example}}
 \end{figure*}
 
-The compiler introduces data parallelism to the streaming program through a process known as {\it fission}.  Fission is the process of duplicating the stateless filter and wrapping these duplicated in a round-robin splitter and joiner.  The process ensures that input data is distributed correctly and output data is collected in correct order.  The duplicated filters, known as products, can be assigned to individual cores, thus introducing data parallelism.  
+The compiler introduces data parallelism to the streaming program through a process known as {\it fission}.  Fission is the process of duplicating the stateless filter and wrapping these duplicates in a round-robin splitter and joiner.  The process ensures that input data is distributed correctly and output data is collected in correct order.  The duplicated filters, known as products, can be assigned to individual cores, thus introducing data parallelism.  
 
 Fission is applicable only to stateless filters, as the duplication process does not guarantee consistent behavior if filters contain state that changes between iterations.  Because the desugared iteration filters actually use mutable state to keep track of iteration values, the fission process must be modified to handle iteration values.  
 
@@ -53,7 +53,7 @@ this value, it must be set to:
 \end{eqnarray*}
 which is the starting iteration value of the next round, as defined.
 
-The scheduler may modify the stead-state schedule after fission, increasing the multiplicity of the fission products.  All of the fission products will have this multiplicity applied. It is necessary to multiply the iteration constants by the provided multiplier.
+The scheduler may modify the steady-state schedule after fission, increasing the multiplicity of the fission products.  All of the fission products will have this multiplicity applied. It is necessary to multiply the iteration constants by the provided multiplier.
 
 Given a multiplier $m$, we expect the filter to start each round with iteration values of 
 \begin{center}

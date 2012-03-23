@@ -45,11 +45,11 @@
 \end{figure}
 
 
-Under the StreamIt framework, filters are classified as iteration filters when there is use of the iteration keyword in its work function.  A simple lexer and parser can identify the use of this keyword, and it will be represented accordingly in the intermediate representation.  To have it actually return the correct iteration value, we first convert the keyword to a compiler-usable construct.
+Under the StreamIt framework, filters are classified as iteration filters when there is use of the iteration keyword in its work function.  A simple lexer and parser can identify the use of this keyword, and it is represented accordingly in the intermediate representation.  To have it actually return the correct iteration value, we first convert the keyword to a compiler-usable construct.
 
-When the compiler comes across a filter classified as an iteration filter, the iteration keyword is replaced with an access to a field holding the value of the iteration count.  The filter is given a definition for this field only if an iteration keyword use exists in its work or prework definition.  The work and prework function are appended with incrementing statements that update the iteration value.
+{\tt iter()} is replaced with an access to a field holding the value of the iteration count.  The filter is given a definition for this field only if an {\tt iter()} use exists in its work or prework definition.  The work and prework function are appended with incrementing statements that update the iteration value.
 
-The introduction of this iteration keyword field creates state in the provided filter.  For future operations, the compiler does not consider this iteration count field as part of the state of filter.  Future processes will maintain this inherent state without introducing the downsides of introducing state.
+The introduction of this iteration field creates state in the provided filter.  For future operations, the compiler does not consider this iteration field as part of the state of filter.  Future processes will maintain this inherent state without the downsides of introducing state.
 
 It is important to note, these filters are not classified as stateful to the user, even though the filter is actually stateful on the iteration count after the desugaring process.  In classifying filters as stateful, the user is made aware of where data parallelism may be inhibited.  Iteration filters will not inhibit data parallelism because its state is identifiable to the compiler during the fission process.   
 
