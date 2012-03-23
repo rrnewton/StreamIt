@@ -2,6 +2,13 @@
 \label{sec:fission}
 
 
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=6.5in]{figures/fission-example.pdf}
+\caption{.\protect\label{fig:fission-example}}
+\end{figure*}
+
+
 The compiler introduces data parallelism to the streaming program through a process known as fission.  Fission is the process of duplicating the stateless filter and wrapping these duplicated in a round-robin splitter and joiner.  The process ensures that input data is distributed correctly and output data is collected in correct order.  The duplicated filters, known as products, can be assigned to individual cores, thus introducing data parallelism.  
 
 Fission is applicable only to stateless filters, as the duplication process does not guarantee consistent behavior if filters contain state that changes between iterations.  Because the desugared iteration filters actually use mutable state to keep track of iteration values, the fission process must be modified to handle iteration values.  

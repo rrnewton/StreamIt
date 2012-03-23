@@ -1,6 +1,11 @@
 \section{Analysis}
 
-The above table indicates programs in the StreamIt benchmark suite that use induction variable filters (not including source filters).  The StreamIt compiler provides static estimations of work performed in filters.  The above table indicates the work performed in specifically the induction variable filters.
+\begin{figure}[t]
+\includegraphics[width=3.5in]{figures/induction-benchmarks.png}
+\caption{Benchmarks using induction variable state and estimations on work performed in filters with induction state.\protect\label{fig:benchmarks}}
+\end{figure}
+
+Figure~\ref{fig:benchmarks} indicates programs in the StreamIt benchmark suite that use induction variable filters (not including source filters).  The StreamIt compiler provides static estimations of work performed in filters.  The above table indicates the work performed in specifically the induction variable filters.
 
 While the majority of programs do not have substantial work performed in filters using induction variables, the MPEG-2 motion estimation subset being the exception, eliminating such state will have a large impact on runtime performance even on programs with low work concentration in stateful filters.  We can model the potential speedups of a particular stateful program.  For the purpose of this analysis, we will assume no communication cost between filters.  We will also assume the compiler exposes no pipeline parallelism.  This assumption forces the serialization of stateful filters on the stream graph.
 
@@ -15,7 +20,23 @@ For filters that contain stateful work, we can describe the program in terms of 
 
 We can characterize the amount of speedup between a completely stateless program to an equivalent stateful program with $\sigma$ percentage of stateful work.  This can be represented as:
 \begin{eqnarray*}
-\dfrac{N}{\frac{1 + \sigma(N-1)}{N}} &=& N \cdot \dfrac{1 + \sigma(N-1)}{N} \\
-&=& 1 + \sigma(N-1)
+\dfrac{N}{\frac{1 + \sigma(N-1)}{N}} &=& 1 + \sigma(N-1)
 \end{eqnarray*}
-Figure~ref{} indicates the potential speedups over stateful programs given stateful work percentages and a varying number of cores.  Even benchmarks in the suite that exhibit only 3\% work in stateful filters can exhibit 8x speedups with 256 cores.  
+
+
+
+\begin{figure}[t]
+\includegraphics[width=3.5in]{figures/theoretical-speedups.png}
+\caption{Theoretical speedups for stateless filters over corresponding stateful filters with $\sigma$\% work.  \protect\label{fig:theo-speedups}}
+\end{figure}
+
+Figure~\ref{fig:theo-speedups} indicates the potential speedups over stateful programs given stateful work percentages and a varying number of cores.  Even benchmarks in the suite that exhibit only 3\% work in stateful filters can exhibit 8x speedups with 256 cores.  
+
+
+
+\begin{figure}[t]
+\includegraphics[width=3.5in]{figures/firbank-results.png}
+\caption{Speedups for FIRBankPipeline, with and without induction variable state.  \protect\label{fig:firbank-results}}
+\end{figure}
+
+FIRBankPipeline contains one filter that uses induction variable state.  According to Figure~\ref{fig:benchmarks}, there is 3.94\% of work performed in the induction filter, which represents the only state in this benchmark.  Figure~\ref{fig:firbank-results} indicates the speedups over 1 core for both stateful and stateless implementations.  Between stateful and stateless implementations, there is 1.35X speedup on 8 cores, 1.58X speedup on 16 cores, and 1.84X speedup on 32 cores, which abides fairly closely to the model.

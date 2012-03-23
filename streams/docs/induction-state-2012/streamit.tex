@@ -7,7 +7,7 @@ float->float pipeline Main {
   add Output();  // code for Output not shown
 }
 
-int->int stateful filter AssignPictureType(int width, 
+int->int filter AssignPictureType(int width, 
         int height, 
         int numpictures) {
     int frameno;
@@ -34,7 +34,8 @@ int->int stateful filter AssignPictureType(int width,
             pushval = 3;
         }
 
-        if ((frameno == (numpictures-1)) && (pushval == 3)) {
+        if ((frameno == (numpictures-1)) 
+            && (pushval == 3)) {
             pushval = 2;
         }
 

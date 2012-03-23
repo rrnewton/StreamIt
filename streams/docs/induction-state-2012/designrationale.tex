@@ -1,11 +1,5 @@
 \section{Design Rationale}
 
-\begin{figure*}[t!]
-\centering
-\includegraphics[width=6.5in]{figures/fission-example.pdf}
-\caption{NEED CAPTION.\protect\label{fig:fission-example}}
-\end{figure*}
-
 Our approach in removing induction variable state is to introduce a new language construct.  The language construct maintains a value indicating how often the corresponding filter has been invoked.  This approach was chosen over implementing a system to automatically recognize induction variable usage in filter construction.
 
 The approach of automatic analysis would require looking for an induction variable defined in the filter.  The simplest form of this analysis would require first idiomatically detecting for a variable modified by a statement similar to \texttt{var = var + 1}.  Very few iteration filters (outside of source filters) use induction state in this limited capacity.  Consider Figure~\ref{fig:weight-calc}, where the induction variable is incremented at each iteration step, until a certain threshold value at which it will reset.  This pattern is very common in programs that use induction filters.  MPD and FIRBank use this technique to iterate across a provided array one element per iteration step.  To ensure consistency between iteration steps, the automatic analysis is required to detect these types of updates as well.  
@@ -13,7 +7,35 @@ The approach of automatic analysis would require looking for an induction variab
 \begin{figure}[t]
 {\eightpoint
 \begin{verbatim}
-float->float stateful filter CFARDetectFilter(int rows, int cols)
+float->float filter WeightCalc(int n)
+{
+  float[n] window;
+  int windowPos;
+
+  ...
+
+  // the input stream is multiplied with the weights
+  work push 2 pop 2
+  {
+
+    push(pop() * window[windowPos]);
+    push(pop() * window[windowPos]);
+
+    windowPos++;
+    if(windowPos >= n)
+    {
+      windowPos = 0;
+    }
+  }
+}
+\end{verbatim}
+\caption{MPD filter that multiplies stream values with weights.\protect\label{fig:weight-calc}}}
+\end{figure}
+
+\begin{figure}[t]
+{\eightpoint
+\begin{verbatim}
+float->float filter CFARDetectFilter(int rows, int cols)
 {
   int currentCol;
   int currentRow;
