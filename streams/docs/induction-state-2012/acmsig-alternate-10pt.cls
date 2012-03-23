@@ -535,16 +535,16 @@
 \long\def\@maketitlenotetext#1#2{\noindent
             \hbox to 1.8em{\hss$^{#1}$}#2}
 
-\setcounter{topnumber}{2}
-\def\topfraction{.7}
-\setcounter{bottomnumber}{1}
-\def\bottomfraction{.3}
-\setcounter{totalnumber}{3}
+\setcounter{topnumber}{9}
+\def\topfraction{.85}
+\setcounter{bottomnumber}{9}
+\def\bottomfraction{.7}
+\setcounter{totalnumber}{20}
 \def\textfraction{.2}
-\def\floatpagefraction{.5}
-\setcounter{dbltopnumber}{2}
-\def\dbltopfraction{.7}
-\def\dblfloatpagefraction{.5}
+\def\floatpagefraction{.66}
+\setcounter{dbltopnumber}{66}
+\def\dbltopfraction{.66}
+\def\dblfloatpagefraction{.66}
 
 %
 \long\def\@makecaption#1#2{

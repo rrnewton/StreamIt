@@ -8,37 +8,9 @@
 \caption{Example of an iteration filter fissed into three fission products each with multiplicity 2.  The chart indicates the values used to determine the next value of the iteration field.  \protect\label{fig:fission-example}}
 \end{figure*}
 
-
 The compiler introduces data parallelism to the streaming program through a process known as {\it fission}.  Fission is the process of duplicating the stateless filter and wrapping these duplicated in a round-robin splitter and joiner.  The process ensures that input data is distributed correctly and output data is collected in correct order.  The duplicated filters, known as products, can be assigned to individual cores, thus introducing data parallelism.  
 
 Fission is applicable only to stateless filters, as the duplication process does not guarantee consistent behavior if filters contain state that changes between iterations.  Because the desugared iteration filters actually use mutable state to keep track of iteration values, the fission process must be modified to handle iteration values.  
-
-\begin{figure}[t]
-{\eightpoint
-\begin{verbatim}
-  int->int filter IterationFilter() {
-
-      int iter = 0;
-      int start = 0;
-      int reps = 1;
-      int total = 10;
-
-      work push 1 pop 1{
-
-          ...
-
-          iter++;
-
-          if (iter - start - reps % total == 0) {
-              iter = iter + total - reps;
-          }
-
-      }
-
-  }
-\end{verbatim}
-\caption{Example of a duplicated iteration filter under modified fission.\protect\label{fig:modified-fission-filter-example}}}
-\end{figure}
 
 
 The fission process now modifies the fission products by adding the
