@@ -133,6 +133,22 @@
 
 
 
+\begin{figure}[t]
+\includegraphics[width=3.3in]{figures/transformation1.pdf}
+\caption{Translation of a simple filter with induction variable state that resets after a certain value. \protect\label{fig:transform-after-simple}}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[width=3.3in]{figures/transformation2.pdf}
+\caption{Translation of a simple filter with induction variable state that resets to a special value. \protect\label{fig:transform-after-start}}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[width=3.3in]{figures/transformation3.pdf}
+\caption{Translation of a filter with nested induction variables. \protect\label{fig:transform-after-twonested}}
+\end{figure}
+
+
 However, programmers should not have to worry about the technical details on how to introduce data parallelism into their programs.  With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can take measures to write their programs to expose data parallelism.  Use of {\tt iter()} potentially provides further benefits in programmability and code readability as well.
 
 The transformation from filters using induction variable state to using {\tt iter()} is fairly simple for users to implement.  Many of these transformations simply require the user to translate their induction variables in terms of another, in this case one that increments by one on every filter invocation.  User defined induction variables can all be derived from the number of times the filter has been invoked.  Accordingly, the induction variable can be expressed as an arithmetic manipulation of {\tt iter()}.  
@@ -142,20 +158,3 @@ Induction variable state also requires the user to maintain mutable state, updat
 For filters that define multiple induction variables, as with Figure~\ref{fig:transform-after-twonested}, it is possible to redefine these values in terms of {\tt iter()} as well.  It is not necessary to maintain multiple separate values for state.  Independent and nested induction variable state alike can be defined with use of {\tt iter()}.
 
 This approach of using {\tt iter} to define induction variable state helps users write filters in a stateless manner.  The user can think about programming their filters in a stateless manner, and thereby exposing data parallelism. 
-
-
-
-\begin{figure}[t]
-\includegraphics[width=3.5in]{figures/transformation1.pdf}
-\caption{Translation of a simple filter with induction variable state that resets after a certain value. \protect\label{fig:transform-after-simple}}
-\end{figure}
-
-\begin{figure}[t]
-\includegraphics[width=3.5in]{figures/transformation2.pdf}
-\caption{Translation of a simple filter with induction variable state that resets to a special value. \protect\label{fig:transform-after-start}}
-\end{figure}
-
-\begin{figure}[t]
-\includegraphics[width=3.5in]{figures/transformation3.pdf}
-\caption{Translation of a filter with nested induction variables. \protect\label{fig:transform-after-twonested}}
-\end{figure}

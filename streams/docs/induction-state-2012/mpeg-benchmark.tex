@@ -2,7 +2,7 @@
 
 
 \begin{figure}[t]
-\includegraphics[width=3.5in]{work_estimate_mpeg_motionestimation.pdf}
+\includegraphics[width=3.3in]{work_estimate_mpeg_motionestimation.pdf}
 \caption{MPEG Motion Estimation stream graph.\protect\label{fig:mpegMEgraph}}
 \end{figure}
 
@@ -26,7 +26,7 @@ The MotionEstimation filter pulls macroblocks at a time, iterating through a two
 Reference pictures are set using upstream messaging from later in the stream graph.  Currently the backend does not support the use of upstream messaging, so for the purpose of benchmarking this application, the reference picture is set to a dummy value and is unchanged throughout the program.  This does not detract from the data parallelism introduced after removing the induction state.  Upstream messaging would simply require that sent messages be duplicated to all fissed filters in the stream graph.
 
 \begin{figure}[t]
-\includegraphics[width=3.5in]{figures/mpeg-results.pdf}
+\includegraphics[width=3.3in]{figures/mpeg-results.pdf}
 \caption{Speedups for MPEG-2 Encoder Motion Estimation subset, with and without induction variable state.  \protect\label{fig:mpeg-results}}
 \end{figure}
 
