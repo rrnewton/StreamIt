@@ -361,6 +361,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         }
         }
 
+        
+        
 
         addSteadyLoopStatement(Util.toStmt(stmt));
     }

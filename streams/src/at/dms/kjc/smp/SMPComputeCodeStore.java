@@ -190,15 +190,28 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         SMPComputeCodeStore codeStore = core.getComputeCode();
 
         OutputContent fileOutput = (OutputContent) fileW.getWorkNodeContent();
-
-        codeStore.addPrintOutputCode(
+        
+        if (KjcOptions.threadopt) {
+            int threadId = ThreadMapper.getMapper().getFilterToThreadId().get(fileW.getParent());           
+            System.out.println("SMPComputeCodeStore.generatePrintOutputCodeStatic thread=" + threadId );
+            codeStore.addPrintOutputCode(
+                    threadId,
                 buf,
                 firstInputFilter);
+        } else {
+            codeStore.addPrintOutputCode(
+                    buf,
+                    firstInputFilter);            
+        }
+        
+        
         addOpen(
                 codeStore,
                 fileOutput);
 
     }
+
+  
 
     /* A map of all the threads on this core */
     protected Map<Integer, SMPThreadCodeStore> threads            = new HashMap<Integer, SMPThreadCodeStore>();
@@ -728,11 +741,24 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * core.
      */
     private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode workNode) {
+                
         getMain().addPrintOutputCode(
                 buf,
                 workNode);
     }
 
+    /**
+     * Add code to print the output written to the file writer mapped to this
+     * thread.
+     */
+    private void addPrintOutputCode(int threadId, InputRotatingBuffer buf,
+            WorkNode workNode) {        
+        threads.get(threadId).addPrintOutputCode(
+                buf,
+                workNode);              
+    }
+    
+    
     /**
      * Add code to print the output written to the file writer mapped to this
      * core.

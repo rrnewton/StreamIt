@@ -287,6 +287,9 @@ public class ThreadMapper {
 
         for (Filter filter : ssg.getFilterGraph()) {
 
+            System.out.println("LOOP: ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) );
+
+            
             int filterCore = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;
 
             checkForTokens(filter, ssg); 
@@ -306,16 +309,27 @@ public class ThreadMapper {
             // been fizzed, then it should have been assigned to a different
             // core.
             if (filterCore != firstCore) {
+                System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " filterCore != firstCore");                
+
                 thread = coreToThread(filterCore);  
             }
-            else if ( isProgramSink(filter)) {                
+            
+            if ( isProgramSink(filter)) {                
+                System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isProgramSink(filter)");                
+
                 Filter prev = ProcessFilterUtils.getPreviousFilter(filter.getWorkNode());     
+                
+                System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isProgramSink(filter) prev=" + prev.getWorkNode());                
+
+                
                 // Need to special case when the program is just a source and sink.
-                if (isProgramSource(prev)) {                    
+                if (isProgramSource(prev)) {        
+                    System.out.println("==> ThreadMapper.assignThreadsOpt  filter=" + getFilterName(filter) + " isProgramSink(filter) prev=" + prev.getWorkNode() + " isProgramSource(prev)==true");                
                     thread = coreToThread(getFirstCore());
                 } else {                
-                    int core = SMPBackend.getComputeNode(prev.getWorkNode()).coreID;                                                
-                    thread = coreToThread(core);
+                    //int core = SMPBackend.getComputeNode(prev.getWorkNode()).coreID;                                                
+                    //thread = coreToThread(core);                    
+                    thread = filterToThreadId.get(prev);                    
                 }
             } 
 
