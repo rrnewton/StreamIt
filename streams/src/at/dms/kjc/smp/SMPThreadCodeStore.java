@@ -2,12 +2,11 @@ package at.dms.kjc.smp;
 
 import java.util.Map;
 import java.util.Set;
+
 import at.dms.classfile.Constants;
-import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
-import at.dms.kjc.JAssignmentExpression;
 import at.dms.kjc.JBlock;
 import at.dms.kjc.JBooleanLiteral;
 import at.dms.kjc.JEmittedTextExpression;
@@ -16,21 +15,15 @@ import at.dms.kjc.JExpressionStatement;
 import at.dms.kjc.JFieldDeclaration;
 import at.dms.kjc.JForStatement;
 import at.dms.kjc.JFormalParameter;
-import at.dms.kjc.JIntLiteral;
-import at.dms.kjc.JLocalVariableExpression;
 import at.dms.kjc.JMethodCallExpression;
 import at.dms.kjc.JMethodDeclaration;
-import at.dms.kjc.JPostfixExpression;
-import at.dms.kjc.JRelationalExpression;
 import at.dms.kjc.JStatement;
 import at.dms.kjc.JThisExpression;
-import at.dms.kjc.JVariableDeclarationStatement;
 import at.dms.kjc.JVariableDefinition;
 import at.dms.kjc.JWhileStatement;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.InterSSGChannel;
 import at.dms.kjc.common.ALocalVariable;
-import at.dms.kjc.sir.lowering.LoweringConstants;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.InputPort;
 import at.dms.kjc.slir.InterSSGEdge;
@@ -329,7 +322,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
                 CStdType.Integer, multiplierName, null);
         coreCodeStore.addExternField(new JFieldDeclaration(multiplierVar));
-        if ("stdout".equals(fileName) || "stderr".equals(fileName)) {
+        if ("stdout".equals(fileName) || "stderr".equals(fileName) || KjcOptions.printf) {
             if (KjcOptions.outputs < 0) {
                 stmt += "if (" + multiplierName + ") {\n" + "  int _i_ = 0;\n"
                         + "  for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n"

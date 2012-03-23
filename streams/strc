@@ -508,6 +508,7 @@ sub get_options
 			    "nofuse",
 			    "noiter",
           "threadopt",
+          "printf",
           "threadbatch=i",
 			    "lockfree",
           "preoutputs=i",
@@ -979,6 +980,7 @@ sub get_compiler_opts
     $opts{nofuse} && ($copts .= " --nofuse");
     $opts{noiter} && ($copts .= " --noiter");
     $opts{threadopt} && ($copts .= " --threadopt");
+    $opts{printf} && ($copts .= " --printf");
     $opts{threadbatch} && ($copts .= " --threadbatch " . $opts{threadbatch});
     $opts{lockfree} && ($copts .= " --lockfree");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});

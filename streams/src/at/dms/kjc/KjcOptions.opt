@@ -775,6 +775,10 @@ longname		"noiter"
 	default		"false"
 	help		"Disable iteration optimization."
 
+longname		"printf"
+	type		boolean
+	default		"false"
+	help		"Print data with printf (i.e. human readable) instead of binary."
 
 longname		"threadopt"
 	type		boolean
