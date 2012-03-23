@@ -1,26 +1,26 @@
-\section{Iteration State}
+\section{Induction State}
 
-\begin{figure}[t]
-{\eightpoint
-\begin{verbatim}
-  int->int stateful filter InductionFilter() {
-      int counter;
-      int max;
+% \begin{figure}[t]
+% {\eightpoint
+% \begin{verbatim}
+%   int->int stateful filter InductionFilter() {
+%       int counter;
+%       int max;
   
-      work push 1 pop 1{
+%       work push 1 pop 1{
 
-          ...
+%           ...
 
-          counter = (counter + 1);
+%           counter = (counter + 1);
 
-          if (counter > max) {
-              counter = 0;
-          } 
-      }
-  }
-\end{verbatim}
-\caption{Example of a stateful StreamIt filter using induction variable state.\protect\label{fig:filter-example}}}
-\end{figure}
+%           if (counter > max) {
+%               counter = 0;
+%           } 
+%       }
+%   }
+% \end{verbatim}
+% \caption{Example of a stateful StreamIt filter using induction variable state.\protect\label{fig:filter-example}}}
+% \end{figure}
 
 
 Traditional induction variables encapsulate all variables that are
