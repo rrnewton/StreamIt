@@ -1,6 +1,14 @@
 \section{Related Work}
 
 
+These capabilities enable a programmer to write an application and its
+filters at a natural granularity that is independent of
+parallelization considerations enabling portable, reusable, and
+malleable code.  Furthermore, fine-grained implementations of filters
+enables the compiler to perform guided filter fusion that balances
+data and instruction cache behavior~\cite{sermulins-lctes05}.
+
+
 Need to address the coarsening issue.  Brook, which disallows state
 would force the user to just coarsen the filter.  Why wouldn't someone
 just coarsen?  

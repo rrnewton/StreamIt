@@ -1,4 +1,6 @@
 \section{Fission}
+\label{sec:fission}
+
 
 The compiler introduces data parallelism to the streaming program through a process known as fission.  Fission is the process of duplicating the stateless filter and wrapping these duplicated in a round-robin splitter and joiner.  The process ensures that input data is distributed correctly and output data is collected in correct order.  The duplicated filters, known as products, can be assigned to individual cores, thus introducing data parallelism.  
 
