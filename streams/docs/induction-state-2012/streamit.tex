@@ -3,43 +3,49 @@
 \begin{verbatim}
 float->float pipeline Main {
   add Source();  // code for Source not shown
-  add FIR();
+  add AssignPictureType();
   add Output();  // code for Output not shown
 }
 
-float->float filter FIR (float sampRate, int N) {
-    float[N] weights;
+int->int stateful filter AssignPictureType(int width, 
+        int height, 
+        int numpictures) {
+    int frameno;
 
     init {
-        weights = calcImpulseResponse(sampRate, N);
+        frameno = 0;
     }
 
-    prework push N-1 pop 0 peek N {
-        for (int i=1; i<N; i++) {
-            push(doFIR(i));
+    work pop (width*height*3) push 2 {
+        push(frameno);
+        for (int i = 0; i < width*height*3; i++) {
+            pop();
         }
-    }
 
-    work push 1 pop 1 peek N {
-        push(doFIR(N));
-        pop();
-    }
-
-    float doFIR(int k) {
-        float val = 0;
-        for (int i=0; i<k; i++) {
-            val += weights[i] * peek(k-i-1);
+        int pushval;
+        int framecount = frameno % 12;
+        if (framecount == 0) {
+            pushval = 1;
+        } else if (framecount == 3 
+                || framecount == 6 
+                || framecount == 9) {
+            pushval = 2;
+        } else {
+            pushval = 3;
         }
-        return val;
-    }
 
-    handler changeWeights(float[N] newWeights) {
-        weights = newWeights;
+        if ((frameno == (numpictures-1)) && (pushval == 3)) {
+            pushval = 2;
+        }
+
+        push(pushval);
+        frameno++;
     }
 }
+
 \end{verbatim}
 
-\caption{Example StreamIt program with FIR filter.\protect\label{fig:fir-pipeline}}
+\caption{Example StreamIt program with AssignPictureType filter, used in MPEG Encoder.\protect\label{fig:apt-pipeline}}
 \end{figure}
 
 \section{The StreamIt Language}
@@ -58,14 +64,15 @@ of synchronous dataflow is that the number of items consumed and
 produced during each execution of a filter is known at compile time,
 allowing the compiler to perform static scheduling and optimization.
 
-An example StreamIt program appears in Figure~\ref{fig:fir-pipeline}.
-It is based on an FIR filter, which contains three units of execution.
-The most important is the {\it work} function, which represents the
-steady-state execution step.  Within the work function, a filter may
-{\it peek} at a given element on the input tape, {\it pop} an item off
-the input tape, or {\it push} an item to the output tape.  The total
-number of items peeked, popped, and pushed are declared as part of the
-work function.  Note that if the peek rate exceeds the pop rate, it
+An example StreamIt program appears in Figure~\ref{fig:apt-pipeline}.
+It is based on the AssignPictureType filter in the MPEG-2 encoder, which
+contains three stages of execution.  The most important is the {\it work}
+function, which represents the steady-state execution step and is called
+repeatedly by the runtime system.  Within the work function, a filter may
+{\it peek} at a given element on the input tape, {\it pop} an item off the 
+input tape, or {\it push} an item to the output tape.  The total number of
+items peeked, popped, and pushed are declared as part of the work
+function.  Note that if the peek rate exceeds the pop rate, it
 represents a sliding window computation in which some input elements
 are accessed across multiple invocations of the filter.
 
