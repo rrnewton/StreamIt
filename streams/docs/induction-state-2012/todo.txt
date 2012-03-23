@@ -3,8 +3,6 @@ overall:
 * better introduce the concept of an initialization and steady-state schedule
 * move the analysis section to before the mpeg2 case study, add the tables for the other benchmarks to this section.
 
-  
-
 * describe figure 3 in the "iteration state section"
 * put concrete examples in section 3 that illustrate the problem with state, in that it prevents parallelization, maybe the mpeg2 encoding number.  
 
@@ -22,5 +20,9 @@ Fission section:
 Need conclusion
 
 Need related work
+
+put graph in intro about where state is 
+also more on data parallelization and its advantages
+break down of state, large part is from induction variable state.
 
 
