@@ -2,21 +2,20 @@
 \label{sec:related}
 
 
-The process of eliminating traditional induction variables has been extensively researched.  These particular optimizations help eliminate instructions by redefining all induction variables in terms of a single induction variable.  Many automatically parallelizing compiler systems, including Rice Fortran D, SUIF, Polaris, have also done work to automatically eliminate such traditional induction variables.  
+The process of eliminating traditional induction variables has been
+extensively researched~\cite{Bacon:1994,RM99:RRV}.  These particular
+optimizations help eliminate instructions by redefining all induction
+variables in terms of a single induction variable.  Many automatically
+parallelizing compiler systems, including Rice Fortran D
+~\cite{Hiranandani:1992}, SUIF ~\cite{Wilson:1994}, Polaris
+~\cite{Blume:1996}, have also done work to automatically eliminate
+such traditional induction variables.
 
-%-- eliminate induction variables
-%[cite http://dspace.mit.edu/handle/1721.1/3674]
-%[cite http://dl.acm.org/citation.cfm?id=197406]
-%
-%--Rice Fortran D
-%[cite http://dl.acm.org/citation.cfm?id=135230]
-%--SUIF
-%[cite http://dl.acm.org/citation.cfm?id=193217]
-%-- Polaris
-%[cite http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=546612&tag=1]
-
-
-Data parallelism is an important class of parallelism that many stream programming languages attempt to expose.  Other streaming languages attempt to expose data parallelism that may be inhibited by state in different ways.  Brook~\cite{brook04} in particular disallows stateful programs, thus allowing for extensive data parallelism.  
+Data parallelism is an important class of parallelism that many stream
+programming languages attempt to expose.  Other streaming languages
+attempt to expose data parallelism that may be inhibited by state in
+different ways.  Brook~\cite{brook04} in particular disallows stateful
+programs, thus allowing for extensive data parallelism.
 
 
 
