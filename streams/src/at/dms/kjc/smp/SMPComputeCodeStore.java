@@ -41,12 +41,19 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         for (int t = 0; t < SMPBackend.chip.size(); t++) {
             SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(
                     t).getComputeCode();
-            cs.addSteadyLoopStatement(Util.toStmt("/* Steady-State Barrier */"));
-            cs.addSteadyLoopStatement(Util.toStmt("barrier_wait(&barrier)"));
+            //cs.addSteadyLoopStatement(Util.toStmt("/* Steady-State Barrier */"));
+            //cs.addSteadyLoopStatement(Util.toStmt("XXX barrier_wait(&barrier)"));
+            cs.addBarrierWait();
             cs.setHasCode();
         }
     }
 
+    public void addBarrierWait() {
+        getMain().addBarrierWait();
+      
+    }
+    
+    
     /**
      * Append a barrier instruction to all of the cores in the buffer init
      * method.
@@ -154,10 +161,21 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         OutputContent fileOutput = (OutputContent) destFilter
                 .getWorkNodeContent();
 
-        codeStore.addPrintOutputCode(
-                buf,
-                srcFilter.getWorkNode(),
-                backEndFactory);
+        
+        if (KjcOptions.threadopt) {
+            int threadId = ThreadMapper.getMapper().getFilterToThreadId().get(destFilter);           
+            System.out.println("SMPComputeCodeStore.generatePrintOutputCodeStatic thread=" + threadId );
+            codeStore.addPrintOutputCode(
+                    threadId,
+                    buf,
+                    srcFilter.getWorkNode(),
+                    backEndFactory);
+        } else {            
+            codeStore.addPrintOutputCode(
+                    buf,
+                    srcFilter.getWorkNode(),
+                    backEndFactory);
+        }
         addOpen(
                 codeStore,
                 fileOutput);
@@ -753,6 +771,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      */
     private void addPrintOutputCode(int threadId, InputRotatingBuffer buf,
             WorkNode workNode) {        
+        
+        assert threads.get(threadId) != null : "SMPComputeCodeStore.addPrintOutputCode threads.get(" + threadId + ") is null. The worknode=" + workNode;
+        
         threads.get(threadId).addPrintOutputCode(
                 buf,
                 workNode);              
@@ -771,6 +792,21 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 backEndFactory);
     }
 
+    
+    /**
+     * Add code to print the output written to the file writer mapped to this
+     * core.
+     */
+    private void addPrintOutputCode(int threadId, InterSSGChannel buf, WorkNode workNode,
+            SMPBackEndFactory backEndFactory) {
+        threads.get(threadId).addPrintOutputCode(
+                buf,
+                workNode,
+                backEndFactory);
+    }
+
+    
+    
     /**
      * Create the method that will malloc the buffers and receive the (
      * addresses from downstream cores
