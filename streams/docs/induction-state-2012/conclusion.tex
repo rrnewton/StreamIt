@@ -1,0 +1,7 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this paper, we describe a technique to eliminate induction variable state in stream programs.  Eliminating induction variable state allows for the data parallelizing of several programs in the StreamIt framework.  The introduction of a expression keyword can help simplify written code and provides automatic parallelization of induction variable state.  
+
+We also perform an analysis of the potential speedups on stateful programs.  Statefulness is a key inhibitor of data parallelism, which provides load-balanced and limitless parallelism.  It is important to expose data parallelism as processing power scales more with the number of available cores.  We found that even with proportionally small amounts of work performed in stateful filters, it is possible to obtain drastic runtime improvements if the corresponding state were removed.  As more processing cores are made available, filter state serves as a significant throughput bottleneck to scalable parallelization.
+
