@@ -55,6 +55,7 @@ import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
+import at.dms.kjc.smp.SMPBackend;
 
 /**
  * Common passes, useful in new back ends.
@@ -113,22 +114,14 @@ public class CommonPasses {
         optimizedGraph.setConnections(segmentedGraph.getConnections());
 
         // Print the optimized graph for debugging
-        i = 0;
-        for (SIRStream str : optimizedGraph.getStaticSubGraphs()) {
-            StreamItDot.printGraph(
-                    str,
-                    "optimized-ssg" + i + ".dot");
-            i++;
-        }
-
+        optimizedGraph.printGraph("optimized.dot");
+        
         System.out
                 .println("CommonPasses.doStaticPasses optimizedGraph.getStaticSubGraphs().size()="
                         + optimizedGraph.getStaticSubGraphs().size());
         streamGraph = new SIRToSLIR().translate(
                 optimizedGraph,
-                numCores);
-
-        // System.out.println("CommonPasses.doStaticPassesSegmentedSIRGraph exit");
+                numCores);     
 
         return streamGraph;
 

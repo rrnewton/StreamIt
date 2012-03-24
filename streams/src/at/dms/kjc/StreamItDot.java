@@ -1,6 +1,8 @@
 package at.dms.kjc;
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -90,7 +92,9 @@ public class StreamItDot implements AttributeStreamVisitor
      */
     public static void printGraph(SIRStream str, String filename) {
         try {
-            FileOutputStream out = new FileOutputStream(filename);
+            File file = new File("./dotfiles", filename);
+            file.getParentFile().mkdirs();                        
+            FileOutputStream out = new FileOutputStream(file);
             StreamItDot dot = new StreamItDot(new PrintStream(out));
             dot.print("digraph streamit {\n");
             str.accept(dot);

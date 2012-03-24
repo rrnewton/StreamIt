@@ -1,5 +1,6 @@
 package at.dms.kjc.slir;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +68,9 @@ public class StreamGraph implements Layout<Core> {
         }
         buf.append("}\n");
         try {
-            FileWriter fw = new FileWriter(filename);
+            File file = new File("./dotfiles", filename);
+            file.getParentFile().mkdirs();
+            FileWriter fw = new FileWriter(file);           
             fw.write(buf.toString());
             fw.close();
         } catch (Exception e) {
@@ -298,10 +301,12 @@ public class StreamGraph implements Layout<Core> {
      * generates its own code for file readers and file writers.
      */
     public void simplifyFilters(int numCores) {
+        int i = 0;
         for (StaticSubGraph ssg : ssgs) {
             simplifyStaticSubGraph(
                     ssg,
-                    numCores);
+                    numCores, i);
+            i++;
         }
     }
 
@@ -313,9 +318,10 @@ public class StreamGraph implements Layout<Core> {
      * 
      * Spacetime does not use this code since it allows general slices and
      * generates its own code for file readers and file writers.
+     * @param ssgNum 
      */
     public StaticSubGraph simplifyStaticSubGraph(StaticSubGraph ssg,
-            int numCores) {
+            int numCores, int ssgNum) {
         // Create code for predefined content: file readers, file writers.
         ssg.createPredefinedContent();
         // guarantee that we are not going to hack properties of filters in the
@@ -335,7 +341,7 @@ public class StreamGraph implements Layout<Core> {
         // remove synchronization from the graph (remove ids added by the
         // conversion
         // to flatgraph
-        SynchRemoval.doit(ssg);
+        SynchRemoval.doit(ssg, ssgNum);
 
         InstallInitDistributions.doit(ssg.getFilterGraph());
         // fix any rate skew introduced in conversion to Slice graph.

@@ -40,122 +40,8 @@ public class SMPBackend {
 
     private static StreamGraph streamGraph;
 
-    private static void calculateCompCommRatio(
-            BasicSpaceTimeSchedule graphSchedule) {
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule
-                .getSSG().getTopFilters());
-        HashSet<Filter> compProcessed = new HashSet<Filter>();
-        HashSet<Filter> commProcessed = new HashSet<Filter>();
-
-        long comp = 0;
-        long comm = 0;
-
-        for (Filter slice : slices) {
-            if (compProcessed.contains(slice))
-                continue;
-
-            comp += FilterWorkEstimate.getWork(slice);
-            compProcessed.add(slice);
-        }
-
-        // Simple communication estimation
-        for (Filter slice : slices) {
-            if (commProcessed.contains(slice))
-                continue;
-
-            WorkNodeInfo info = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
-            int totalItemsReceived = info
-                    .totalItemsReceived(SchedulingPhase.STEADY);
-
-            if (totalItemsReceived == 0)
-                continue;
-
-            comm += totalItemsReceived;
-
-            if (FissionGroupStore.isFizzed(slice)) {
-                assert info.peek >= info.pop;
-                comm += (info.peek - info.pop) * KjcOptions.smp;
-            }
-
-            commProcessed.add(slice);
-        }
-
-        System.out.println("Final Computation: " + comp);
-        System.out.println("Final Communication: " + comm);
-        System.out.println("Final Comp/Comm Ratio: " + (float) comp
-                / (float) comm);
-
-    }
-
-    /**
-     * Check arguments to backend to make sure that they are valid
-     */
-    private static void checkArguments() {
-        // if debugging and number of iterations unspecified, limit number of
-        // iterations
-        if (KjcOptions.debug && KjcOptions.iterations == -1)
-            KjcOptions.iterations = 100;
-
-        // if load-balancing, enable shared buffers
-        if (KjcOptions.loadbalance)
-            KjcOptions.sharedbufs = true;
-
-        // if load-balancing, but only 1 core, disable load-balancing
-        if (KjcOptions.loadbalance && KjcOptions.smp == 1)
-            KjcOptions.loadbalance = false;
-
-        // if using old TMD, make sure not using sharedbufs since they're
-        // incompatible
-        if (KjcOptions.partitioner.equals("oldtmd")) {
-            if (KjcOptions.sharedbufs) {
-                System.out
-                .println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
-                KjcOptions.sharedbufs = false;
-            }
-        }
-    }
-
-    private static void emitCode() {
-
-        // generate code for file writer
-        SMPComputeCodeStore.generatePrintOutputCode(backEndFactory);
-
-        if (KjcOptions.numbers > 0)
-            chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
-
-        // emit c code for all cores
-        new EmitSMPCode(backEndFactory, isDynamic).doit();
-
-        // dump structs.h file
-        structs_h.writeToFile();
-
-        printFinalWorkAssignments();
-
-        if (isDynamic) {
-            dynamicQueueCodeGenerator.writeToFiles();
-        }
-
-        System.exit(0);
-    }
-
-    private static void printFinalWorkAssignments() {
-        // display final assignment of filters to cores
-        System.out.println("Final filter assignments:");
-        System.out.println("========================================");
-        for (int x = 0; x < KjcOptions.smp; x++) {
-            Core core = chip.getNthComputeNode(x);
-            Set<WorkNode> filters = core.getComputeCode().getFilters();
-            long totalWork = 0;
-
-            System.out.println("Core " + core.getCoreID() + ": ");
-            for (WorkNode filter : filters) {
-                long work = FilterWorkEstimate.getWork(filter.getParent());
-                System.out.format("%16d | " + filter + "\n", work);
-                totalWork += work;
-            }
-            System.out.format("%16d | Total\n", totalWork);
-        }
-
+    public static Core getComputeNode(WorkNode filterNode) {
+        return streamGraph.getComputeNode(filterNode);
     }
 
     public static void run(SIRStream str, JInterfaceDeclaration[] interfaces,
@@ -235,48 +121,6 @@ public class SMPBackend {
 
     }
 
-   
-
-
-    private static BasicSpaceTimeSchedule generateSchedules(StaticSubGraph ssg, int ssgNum) {	          
-
-        // dump slice graph to dot file
-        ssg.dumpGraph("traces_ssg" + ssgNum +".dot", null);
-
-        // partition the slice graph based on the scheduling policy
-        BasicSpaceTimeSchedule graphSchedule = new BasicSpaceTimeSchedule(ssg);
-        scheduler.setGraphSchedule(graphSchedule);
-        scheduler.run(chip.size());
-        WorkNodeInfo.reset();
-
-        // generate schedules for initialization, primepump and steady-state
-        scheduleSlices(graphSchedule);
-
-        // if load balancing, find candidiate fission groups to load balance
-        if (KjcOptions.loadbalance) {
-            LoadBalancer.findCandidates();
-            LoadBalancer.instrumentMainMethods();
-        }
-
-        return graphSchedule;
-    }
-
-    private static void generateCode(BasicSpaceTimeSchedule graphSchedule) {     
-
-        // create all buffers and set the rotation lengths
-        RotatingBuffer.createBuffers(graphSchedule);
-
-        // now convert to Kopi code plus communication commands
-        backEndFactory = new SMPBackEndFactory(chip, scheduler, streamGraph);
-        backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
-
-        // calculate computation to communication ratio
-        if (KjcOptions.sharedbufs && KjcOptions.numbers > 0) {
-            calculateCompCommRatio(graphSchedule);
-        }
-
-    }
-
     /**
      * Create schedules for init, prime-pump and steady phases.
      * 
@@ -309,6 +153,170 @@ public class SMPBackend {
 
     }
 
+    public static void setComputeNode(WorkNode workNode, Core core) {
+        streamGraph.setComputeNode(workNode, core);              
+    }
+
+    private static void calculateCompCommRatio(
+            BasicSpaceTimeSchedule graphSchedule) {
+        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule
+                .getSSG().getTopFilters());
+        HashSet<Filter> compProcessed = new HashSet<Filter>();
+        HashSet<Filter> commProcessed = new HashSet<Filter>();
+
+        long comp = 0;
+        long comm = 0;
+
+        for (Filter slice : slices) {
+            if (compProcessed.contains(slice))
+                continue;
+
+            comp += FilterWorkEstimate.getWork(slice);
+            compProcessed.add(slice);
+        }
+
+        // Simple communication estimation
+        for (Filter slice : slices) {
+            if (commProcessed.contains(slice))
+                continue;
+
+            WorkNodeInfo info = WorkNodeInfo.getFilterInfo(slice.getWorkNode());
+            int totalItemsReceived = info
+                    .totalItemsReceived(SchedulingPhase.STEADY);
+
+            if (totalItemsReceived == 0)
+                continue;
+
+            comm += totalItemsReceived;
+
+            if (FissionGroupStore.isFizzed(slice)) {
+                assert info.peek >= info.pop;
+                comm += (info.peek - info.pop) * KjcOptions.smp;
+            }
+
+            commProcessed.add(slice);
+        }
+
+        System.out.println("Final Computation: " + comp);
+        System.out.println("Final Communication: " + comm);
+        System.out.println("Final Comp/Comm Ratio: " + (float) comp
+                / (float) comm);
+
+    }
+
+   
+
+
+    /**
+     * Check arguments to backend to make sure that they are valid
+     */
+    private static void checkArguments() {
+        // if debugging and number of iterations unspecified, limit number of
+        // iterations
+        if (KjcOptions.debug && KjcOptions.iterations == -1)
+            KjcOptions.iterations = 100;
+
+        // if load-balancing, enable shared buffers
+        if (KjcOptions.loadbalance)
+            KjcOptions.sharedbufs = true;
+
+        // if load-balancing, but only 1 core, disable load-balancing
+        if (KjcOptions.loadbalance && KjcOptions.smp == 1)
+            KjcOptions.loadbalance = false;
+
+        // if using old TMD, make sure not using sharedbufs since they're
+        // incompatible
+        if (KjcOptions.partitioner.equals("oldtmd")) {
+            if (KjcOptions.sharedbufs) {
+                System.out
+                .println("WARNING: Disabling shared buffers due to incompatibility with old TMD scheduler");
+                KjcOptions.sharedbufs = false;
+            }
+        }
+    }
+
+    private static void emitCode() {
+
+        // generate code for file writer
+        SMPComputeCodeStore.generatePrintOutputCode(backEndFactory);
+
+        if (KjcOptions.numbers > 0)
+            chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
+
+        // emit c code for all cores
+        new EmitSMPCode(backEndFactory, isDynamic).doit();
+
+        // dump structs.h file
+        structs_h.writeToFile();
+
+        printFinalWorkAssignments();
+
+        if (isDynamic) {
+            dynamicQueueCodeGenerator.writeToFiles();
+        }
+
+        System.exit(0);
+    }
+
+    private static void generateCode(BasicSpaceTimeSchedule graphSchedule) {     
+
+        // create all buffers and set the rotation lengths
+        RotatingBuffer.createBuffers(graphSchedule);
+
+        // now convert to Kopi code plus communication commands
+        backEndFactory = new SMPBackEndFactory(chip, scheduler, streamGraph);
+        backEndFactory.getBackEndMain().run(graphSchedule, backEndFactory);
+
+        // calculate computation to communication ratio
+        if (KjcOptions.sharedbufs && KjcOptions.numbers > 0) {
+            calculateCompCommRatio(graphSchedule);
+        }
+
+    }
+
+    private static BasicSpaceTimeSchedule generateSchedules(StaticSubGraph ssg, int ssgNum) {	          
+
+        // dump slice graph to dot file
+        ssg.dumpGraph("traces_ssg" + ssgNum +".dot", null);
+
+        // partition the slice graph based on the scheduling policy
+        BasicSpaceTimeSchedule graphSchedule = new BasicSpaceTimeSchedule(ssg);
+        scheduler.setGraphSchedule(graphSchedule);
+        scheduler.run(chip.size());
+        WorkNodeInfo.reset();
+
+        // generate schedules for initialization, primepump and steady-state
+        scheduleSlices(graphSchedule);
+
+        // if load balancing, find candidiate fission groups to load balance
+        if (KjcOptions.loadbalance) {
+            LoadBalancer.findCandidates();
+            LoadBalancer.instrumentMainMethods();
+        }
+
+        return graphSchedule;
+    }
+
+    private static void printFinalWorkAssignments() {
+        // display final assignment of filters to cores
+        System.out.println("Final filter assignments:");
+        System.out.println("========================================");
+        for (int x = 0; x < KjcOptions.smp; x++) {
+            Core core = chip.getNthComputeNode(x);
+            Set<WorkNode> filters = core.getComputeCode().getFilters();
+            long totalWork = 0;
+
+            System.out.println("Core " + core.getCoreID() + ": ");
+            for (WorkNode filter : filters) {
+                long work = FilterWorkEstimate.getWork(filter.getParent());
+                System.out.format("%16d | " + filter + "\n", work);
+                totalWork += work;
+            }
+            System.out.format("%16d | Total\n", totalWork);
+        }
+
+    }
+
     /**
      * Set the scheduler field to the correct leaf class that implements a
      * scheduling policy.
@@ -335,13 +343,5 @@ public class SMPBackend {
                 8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31 };
         coreOrder = cores;
 
-    }
-
-    public static Core getComputeNode(WorkNode filterNode) {
-        return streamGraph.getComputeNode(filterNode);
-    }
-
-    public static void setComputeNode(WorkNode workNode, Core core) {
-        streamGraph.setComputeNode(workNode, core);              
     }
 }

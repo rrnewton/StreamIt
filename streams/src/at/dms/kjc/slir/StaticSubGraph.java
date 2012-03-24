@@ -1,5 +1,6 @@
 package at.dms.kjc.slir;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,7 +132,9 @@ public class StaticSubGraph {
 		buf.append("}\n");
 		// write the file
 		try {
-			FileWriter fw = new FileWriter(filename);
+		    File file = new File("./dotfiles", filename);
+		    file.getParentFile().mkdirs();
+			FileWriter fw = new FileWriter(file);
 			fw.write(buf.toString());
 			fw.close();
 		} catch (Exception e) {
@@ -184,8 +187,10 @@ public class StaticSubGraph {
 
 		buf.append("}\n");
 		// write the file
-		try {
-			FileWriter fw = new FileWriter(filename);
+		try {		    
+		    File file = new File("./dotfiles", filename);
+            file.getParentFile().mkdirs();   		    
+			FileWriter fw = new FileWriter(file);
 			fw.write(buf.toString());
 			fw.close();
 		} catch (Exception e) {

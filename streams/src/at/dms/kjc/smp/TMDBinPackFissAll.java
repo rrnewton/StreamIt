@@ -11,7 +11,6 @@ import at.dms.kjc.sir.lowering.partition.WorkEstimate;
 import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.FilterWorkEstimate;
-import at.dms.kjc.slir.InternalFilterNode;
 import at.dms.kjc.slir.SchedulingPhase;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeContent;

@@ -14,14 +14,15 @@ public class SynchRemoval {
 	 * that is a IDFilterContent.
 	 * 
 	 * @param ssg The SSG to remove synchronization from
+	 * @param ssgNum 
 	 */
-	public static void doit(StaticSubGraph ssg) {
+	public static void doit(StaticSubGraph ssg, int ssgNum) {
 		//loop over all the nodes in the ssg
 		//for the identity nodes, call IDRemoval on them
 		
 		System.out.println("Calling SynchRemoval on " + ssg);
 		
-		ssg.dumpGraph("before-synchremoval-" + ssg.toString() + ".dot");
+		ssg.dumpGraph("before-synchremoval-ssg" + ssgNum + ".dot");
 		
 		for (Filter filter : ssg.getFilterGraph()) {
 			if (filter.getWorkNodeContent().isIdentityContent()) {
@@ -29,7 +30,7 @@ public class SynchRemoval {
 			}
 		}
 		
-		ssg.dumpGraph("after-synchremoval-" + ssg.toString() + ".dot");
+		ssg.dumpGraph("after-synchremoval-ssg" + ssgNum + ".dot");
 	}
 	
 }

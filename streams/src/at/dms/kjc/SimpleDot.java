@@ -1,5 +1,6 @@
 package at.dms.kjc;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -35,7 +36,9 @@ public class SimpleDot extends StreamItDot
      */
     public static void printGraph(SIRStream str, String filename) {
         try {
-            FileOutputStream out = new FileOutputStream(filename);
+            File file = new File("./dotfiles", filename);
+            file.getParentFile().mkdirs();                     
+            FileOutputStream out = new FileOutputStream(file);
             SimpleDot dot = new SimpleDot(new PrintStream(out));
             dot.print("digraph streamit {\n");
             str.accept(dot);
