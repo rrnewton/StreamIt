@@ -52,8 +52,10 @@ corresponding filter to be run in sequential order.  In providing a
 mutable state whose value is dependent on the previous execution step,
 it is necessary to run a filter execution step and establish the
 induction variable value before moving on to the next execution step.
-The sequential order of execution for this filter inhibits data
-parallelism, as it is impossible to partition the filter's execution
-steps into independently running cores.
-
-
+The tradition fission transformation would not be able to parallelize
+this filter without understanding how to properly distribute the
+calculation of the state.  As we mention in the introduction, this
+could be accomplished using an automatic induction variable
+recognizer, but its idiomatic nature may miss many opportunities for
+parallelization.  This motivates our iteration keyword solution
+introduced in the next section.
