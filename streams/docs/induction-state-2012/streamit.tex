@@ -1,6 +1,6 @@
 \begin{figure}[t]
 \eightpoint
-\begin{verbatim}
+\begin{Verbatim}[numbers = left]
 float->float pipeline Main {
   add Source();  // code for Source not shown
   add AssignPictureType();
@@ -43,8 +43,7 @@ int->int filter AssignPictureType(int width,
         frameno++;
     }
 }
-
-\end{verbatim}
+\end{Verbatim}
 
 \caption{Example StreamIt program with AssignPictureType filter, used in MPEG Encoder.\protect\label{fig:apt-pipeline}}
 \end{figure}
@@ -67,23 +66,25 @@ produced during each execution of a filter is known at compile time,
 allowing the compiler to perform static scheduling and optimization.
 
 An example StreamIt program appears in Figure~\ref{fig:apt-pipeline}.
-It is based on the AssignPictureType filter in the MPEG-2 encoder, which
-contains three stages of execution.  The most important is the {\it work}
-function, which represents the steady-state execution step and is called
-repeatedly by the runtime system.  Within the work function, a filter may
-{\it peek} at a given element on the input tape, {\it pop} an item off the 
-input tape, or {\it push} an item to the output tape.  The total number of
-items peeked, popped, and pushed are declared as part of the work
-function.  Note that if the peek rate exceeds the pop rate, it
-represents a sliding window computation in which some input elements
-are accessed across multiple invocations of the filter.
+It is based on the AssignPictureType filter in the MPEG-2 encoder.
+StreamIt filters contain three stages of execution.  The most
+important is the {\it work} function, which represents the
+steady-state execution step and is called repeatedly by the runtime
+system.  Within the work function, a filter may {\it peek} at a given
+element on the input tape, {\it pop} an item off the input tape, or
+{\it push} an item to the output tape.  The total number of items
+peeked, popped, and pushed are declared as part of the work function.
+Note that if the peek rate exceeds the pop rate, it represents a
+sliding window computation in which some input elements are accessed
+across multiple invocations of the filter.
 
 In addition to the work function, a filter may declare an {\it init}
 function to initialize internal data structures, as well as a {\it
-  prework} function to perform specialized processing of data items
-prior to the steady state.  The prework function is needed in cases
-where the initial processing has a different input or output rate than
-the steady-state processing.
+  prework} function (not given in Figure~\ref{fig:apt-pipeline}) to
+perform specialized processing of data items prior to the steady
+state.  The prework function is needed in cases where the initial
+processing has a different input or output rate than the steady-state
+processing.
 
 A {\it schedule} gives a multiplicity for each filter in a stream
 graph.  The multiplicity that denotes how many times to fire each

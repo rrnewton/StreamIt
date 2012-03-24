@@ -1,4 +1,4 @@
-\section{Induction State}
+\section{Induction Variable State}
 \label{sec:inductionstate}
 
 % \begin{figure}[t]
@@ -40,7 +40,14 @@ variable is consistently updated at some point during the work call.
 For many use cases, this induction variable may need to be reset if it
 reaches a certain threshold. 
 
-As presently constructed, induction variable state forces the
+Figure~\ref{fig:apt-pipeline} illustrates a common pattern of explicit
+induction variable state.  The implementation of the filter maintains
+a filter variable {\tt frameno} (line 10) that is incremented on each call of
+the {\tt AssignPictureType}'s work function.  This variable
+represents state.  The {\tt framecount} variable (line 23) is derived
+from this state and used in control flow.
+
+As presently constructed, induction variable state for\-ces the
 corresponding filter to be run in sequential order.  In providing a
 mutable state whose value is dependent on the previous execution step,
 it is necessary to run a filter execution step and establish the
