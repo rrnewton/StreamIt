@@ -1,4 +1,4 @@
-\section{Why Coarsening a Filter is Bad}
+\section{Comparison to Coarsening}
 \label{sec:coarsen}
 
 % \begin{figure}[t]
@@ -29,27 +29,55 @@
 % \caption{MPD filter that multiplies stream values with weights.\protect\label{fig:weight-calc}}}
 % \end{figure}
 
-n = 32
+In cases of explicit induction variable state where the induction
+variable is reset after a certain number of iterations, the filter can
+be converted into a stateless filter by {\it coarsening} the filter,
+increasing the number of input items that are required for the work
+function execution.  Figure~\ref{fig:wc-example}(a) lists the weight
+calculation filter from the Medium Pulse Dopler (MPD) benchmark.  The
+filter includes explicit induction variable state as originally
+implemented by the programmer.  This filter can be rewritten without
+state (and without using the {\tt iter()} keyword) by coarsening the
+filter such that each work function execution operates on a larger
+subset of the input.  Figure~\ref{fig:wc-example}(b) lists a coarsened
+implementation that is stateless.  In the coarsened implementation the
+filter requires $2n$ input items.
 
-One could write the induction filters given above at a more coarse granularity
-such that the filter is pushing and popping ???? number of items.
-Since the period of the filter is known at compile-time, though
-parameterized, the push and pop rate could be equal to the period and
-[explain how to coarsen].  This approach, however, is inferior because
-of the following:
+Figure~\ref{fig:wc-example}(c) lists the implementation of the weights
+calculation filter utilizing the {\tt iter()} keyword.  Notice that
+the filter operates at a finer granularity versus the coarsened
+version and that it operates at the same granularity as the original
+filter.  Although the {\tt iter()} implementation includes a modulo
+operation per output, calculation of outputs will be parallelized
+(see Section~\ref{sec:fission}).
 
-* The programmer grasped the algorithm and implemented the application
-at the fine granularity.  A language should constrain the programmer
-as little as possible for the sake of performance.
+The mantra of stream programming is that the programmer should not be
+burdened with parallelization, granularity, communication or
+synchronization concerns.  Implementing a filter at a fine granularity
+allows the compiler or runtime to decide on the best granularity for a
+given architectural target.  In practice the use of the {\tt iter()}
+keyword is preferred over a coarsening conversion because:
 
-* The coarse-granularity implementation requires larger input and
+\begin{itemize}
+
+\item The programmer grasped the algorithm and implemented the
+  application at the fine granularity.  A language should constrain
+  the programmer as little as possible for the sake of performance.
+
+\item The coarse granularity implementation requires larger input and
 output buffers to implement because of the larger push and pop rates.
 Larger buffers occupy more of the cache and could evict filter data or
 instructions are needed during execution.  Thus there could be more
-access to longer latency memory hierarchies.
+accesses to longer latency memory hierarchies~\cite{sermulins-lctes05}.
 
-* Larger input and output rates also interact with the steady-state
-scheduling algorithm.  Since the scheduling algorithm is performing
-many cascading LCMs, a single filter with large input and output rates
-will increase the multiplies of all filters of the application,
-requiring more buffering and increasing latency.
+\item Larger input and output rates also interact with the
+  steady-state scheduling algorithm.  Since the scheduling algorithm
+  is performing many cascading LCMs, a single filter with large input
+  and output rates will increase the multiplies of all filters of the
+  application, requiring more buffering and increasing
+  latency~\cite{karczmarek-lctes03}.  The use of the {\tt iter()}
+  keyword does not force the programmer to sacrifice latency for
+  parallelization.
+
+\end{itemize}
+
