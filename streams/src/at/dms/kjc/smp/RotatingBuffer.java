@@ -1,12 +1,10 @@
 package at.dms.kjc.smp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import at.dms.kjc.CType;
 import at.dms.kjc.JArrayAccessExpression;
 import at.dms.kjc.JExpression;
@@ -145,7 +143,6 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 * @param schedule
 	 */
 	protected static void communicateAddresses(BasicSpaceTimeSchedule schedule) {
-	    System.out.println("RotatingBuffer.communicateAddresses");
 
 		// handle all the filters that are mapped to compute cores
 		// this will handle all filters except file writers and file readers
@@ -156,9 +153,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 			SMPComputeCodeStore cs = ownerCore.getComputeCode();
 									
 			for (WorkNode filter : cs.getFilters()) {
-				if (ssg.containsFilter(filter.getParent())) {
-					// System.out.println("RotatingBuffer.communicateAddresses filter="
-					// + filter.toString());
+				if (ssg.containsFilter(filter.getParent())) {					
 					communicateAddressesForFilter(filter, ownerCore);
 				}
 			}
@@ -215,9 +210,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 *            The spacetime schedule of the application
 	 */
 
-	public static void createBuffers(BasicSpaceTimeSchedule schedule) {
-	    
-	    System.out.println("RotatingBuffer.createBuffers");
+	public static void createBuffers(BasicSpaceTimeSchedule schedule) {	    	 
 	    
 		// have to create input buffers first because when we have a lack of a
 		// shared input buffer, we create an output buffer
@@ -275,7 +268,6 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	 * Allocate the constituent buffers of this rotating buffer structure
 	 */
 	protected void allocBuffers() {
-	    System.out.println("RotatingBuffer.allocBuffers");
 	    for (int i = 0; i < rotationLength; i++) {
 			SMPComputeCodeStore cs;
 

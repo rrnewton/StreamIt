@@ -343,8 +343,7 @@ public class InterSSGChannel extends Channel<InterSSGEdge> {
         OutputPort outputPort = edge.getSrc();
         StaticSubGraph outputSSG = outputPort.getSSG();
         Filter[] filterGraph = outputSSG.getFilterGraph();
-        if (filterGraph.length == 1) {
-            System.out.println("InterSSGChannel.popMethodName");
+        if (filterGraph.length == 1) {        
             if (filterGraph[0].getWorkNode().isFileInput()) {
                 return true;
             }                                                                     

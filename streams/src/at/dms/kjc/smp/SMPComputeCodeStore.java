@@ -63,8 +63,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         if (SMPBackend.chip.size() == 1)
             return;
 
-        System.out.println("ERROR ERROR ERROR: TODO: too many barriers added!");
-
         for (int t = 0; t < SMPBackend.chip.size(); t++) {
             SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(
                     t).getComputeCode();
@@ -164,7 +162,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         
         if (KjcOptions.threadopt) {
             int threadId = ThreadMapper.getMapper().getFilterToThreadId().get(destFilter);           
-            System.out.println("SMPComputeCodeStore.generatePrintOutputCodeStatic thread=" + threadId );
             codeStore.addPrintOutputCode(
                     threadId,
                     buf,
@@ -211,7 +208,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         
         if (KjcOptions.threadopt) {
             int threadId = ThreadMapper.getMapper().getFilterToThreadId().get(fileW.getParent());           
-            System.out.println("SMPComputeCodeStore.generatePrintOutputCodeStatic thread=" + threadId );
             codeStore.addPrintOutputCode(
                     threadId,
                 buf,
@@ -846,10 +842,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
             SMPThreadCodeStore thread) {
         addMethod(thread.getMethod());
         mainThread = thread;
-        int threadId = ThreadMapper.coreToThread(coreId);
-        System.out
-                .println("**** SMPComputeCodeStore.createMainThreadHelper threadId="
-                        + threadId);
+        int threadId = ThreadMapper.coreToThread(coreId);     
         threads.put(
                 threadId,
                 thread);

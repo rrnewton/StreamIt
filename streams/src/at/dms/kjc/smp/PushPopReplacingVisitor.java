@@ -202,9 +202,7 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
                 next = ThreadMapper.coreToThread(getCoreID(inputPort));
             }
             
-            buffer = "dyn_buf_" + channelId;
-            System.out.println("PushPopReplacing workNode="
-                    + workNode.toString() + "next=" + next);
+            buffer = "dyn_buf_" + channelId;      
 
         }
 

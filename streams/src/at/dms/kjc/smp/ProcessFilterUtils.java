@@ -137,11 +137,8 @@ public class ProcessFilterUtils {
      * @return the next filter on the same core
      */
     static Filter getNextFilterOnCore(WorkNode workNode) {
-       
-        System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode);
         
         if (workNode.isFileOutput()) {
-            System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + "workNode.isFileOutput() returning null");
             return null;
         }
         Core core = SMPBackend.getComputeNode(workNode);
@@ -151,21 +148,15 @@ public class ProcessFilterUtils {
             next = getNextFilter(next.getWorkNode());
 
             if (next == null) {
-                System.out.println("***  ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " next == null returning null");
                 return null;
             } else {                
-                System.out.println("*** ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " next=" + next.getWorkNode());
-                nextCore = SMPBackend.getComputeNode(next.getWorkNode());
-                
-                System.out.println("HERE ProcessFilterUtils.getNextFilterOnCore coreID=" + core.coreID + " nextCore=" + nextCore.coreID);
+                nextCore = SMPBackend.getComputeNode(next.getWorkNode());                                
 
                 if (nextCore.coreID == core.coreID) {
-                    System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " nextCore.coreID == core.coreID returning next=" + next.getWorkNode());
                     return next;
                 }
                 if (next.getWorkNode().isFileOutput()) {                                               
                     if (nextCore.coreID != core.coreID) {
-                        System.out.println("ProcessFilterUtils.getNextFilterOnCore workNode=" + workNode + " nextCore.coreID != core.coreID returning null");
                         return null;
                     }
                 }

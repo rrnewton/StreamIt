@@ -1,7 +1,5 @@
 package at.dms.kjc.smp;
 
-import java.util.ArrayList;
-import java.util.List;
 import at.dms.classfile.Constants;
 import at.dms.compiler.JavaStyleComment;
 import at.dms.kjc.CClassType;
@@ -414,29 +412,13 @@ public class SMPCodeStoreHelper extends CodeStoreHelper {
 	 */
 	@Override
 	protected JBlock getWorkFunctionBlock(int mult) {
-
-        System.out
-        .println("SMPCodeStoreHelper.getWorkFunctionBlock: filter=" + filterNode);
-
-	    if (getWorkMethod() == null) {
-		    
-
-	        System.out
-	                .println("SMPCodeStoreHelper.getWorkFunctionBlock: filter=" + filterNode + "  getWorkMethod=null");
-
-		    
-
-		}
+      
 		JBlock block = new JBlock();
 		JStatement workStmt = getWorkFunctionCall();
 		JVariableDefinition loopCounter = new JVariableDefinition(null, 0,
 				CStdType.Integer, workCounter, null);
 
 		String multiplierName = filterNode.toString() + "_multiplier";
-
-		System.out
-				.println("SMPCodeStoreHelper.getWorkFunctionBlock: addField multiplier "
-						+ multiplierName);
 
 		JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
 				CStdType.Integer, multiplierName, null);

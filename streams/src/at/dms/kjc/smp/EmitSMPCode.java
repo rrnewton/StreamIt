@@ -299,9 +299,7 @@ public class EmitSMPCode extends EmitCode {
         p.println("");
 
         // generate declarations for fields
-        for (JFieldDeclaration field : fieldsAndMethods.getFields()) {
-                System.out.println("EmitSMPCode.emitCodeForComputeStore generating field: "
-                        + field.getVariable().getIdent());
+        for (JFieldDeclaration field : fieldsAndMethods.getFields()) {               
             field.accept(codegen);
         }
         p.println("");
@@ -852,13 +850,9 @@ public class EmitSMPCode extends EmitCode {
         for (Core core : SMPBackend.chip.getCores()) {
             for (JFieldDeclaration fieldDecl : core.getComputeCode()
                     .getExternFields().values()) {
-                String ident = fieldDecl.getVariable().getIdent();                         
-                System.out.println ("EmitSMPCode ident=" + ident);                
-
+                String ident = fieldDecl.getVariable().getIdent();                                                   
                 if (dominators.contains(ident.substring(0, ident.lastIndexOf("_multiplier")))) {
-                    System.out.println ("EmitSMPCode ident=" + ident.substring(0, ident.lastIndexOf("_multiplier")));  
                     p.println(ident + " = " + KjcOptions.threadbatch + ";");      
-                    System.out.println ("EmitSMPCode ident=" + ident + " = " + KjcOptions.threadbatch + ";");  
                 } else {
                     p.println(ident + " = 1;");      
                 }                                
@@ -873,10 +867,6 @@ public class EmitSMPCode extends EmitCode {
         }
 
         p.println("// Intra-SSG synchronization tokens");
-//        for (String str : SMPComputeCodeStore.getTokenNames()) {
-//            p.println(str + " = 0;");
-//        }
-//        
         for ( WorkNode key : ThreadMapper.getMapper().getTokenReads().keySet()) {
             for (String tokenName : ThreadMapper.getMapper().getTokenReads().get(key)) {
                 p.println(tokenName + " = 0;");

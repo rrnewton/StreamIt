@@ -160,11 +160,7 @@ public class ProcessFilterWorkNode {
             peekName = inputChannel.peekMethodName();
             popName = inputChannel.popMethodName();
             popManyName = inputChannel.popManyMethodName();
-        } else {
-
-            System.out.println("ProcessFilterWorkNode filter=" + workNode
-                    + " Channel Is Null!!!!");
-
+        } else {           
             peekName = "/* peek from non-existent channel */";
             popName = "/* pop() from non-existent channel */";
             popManyName = "/* pop(N) from non-existent channel */";
@@ -414,9 +410,7 @@ public class ProcessFilterWorkNode {
     }
 
     private void addTokenWrite(int threadIndex) {
-        System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode);
         if (ThreadMapper.getMapper().getTokenWrites().containsKey(workNode)) {
-            System.out.println("ProcessFilterWorkNode.addTokenWrite workNode=" + workNode + " ThreadMapper.getMapper().getTokenWrites().containsKe");
             for (String tokenName : ThreadMapper.getMapper().getTokenWrites().get(workNode)) {                
                 JExpressionStatement stmt = new JExpressionStatement(                            
                         new JEmittedTextExpression(tokenName + " = 1"));                        
@@ -477,7 +471,7 @@ public class ProcessFilterWorkNode {
         JBlock steadyBlock = filterCode.getSteadyBlock();
 
         System.out
-        .println("=== ProcessFilterWorkNode.standardSteadyProcessing filter="
+        .println("ProcessFilterWorkNode.standardSteadyProcessing filter="
                 + workNode.getParent().getWorkNode());
 
         if (!basicCodeWritten.containsKey(workNode)) {
@@ -648,11 +642,7 @@ public class ProcessFilterWorkNode {
             addTokenWrite(threadIndex);
 
             boolean addCall = false;
-            
-            
-            System.out
-            .println("RJS!!! ProcessFilterWorkNode.standardSteadyProcessingOpt RJS ");
-
+                                    
             // If the previous filter is null, then it means this
             // is the first filter on the core, and we need a call.
             if (prevFilter == null) {

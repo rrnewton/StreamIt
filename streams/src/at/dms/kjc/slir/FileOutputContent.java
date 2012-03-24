@@ -68,7 +68,6 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
      */
     public FileOutputContent(SIRWriter filter) {
         super(filter);
-        System.out.println("**TODO** FileOutputContent(SIRWriter)");
         outputs = -1;
         filename=filter.getFileName();
     }
@@ -141,10 +140,7 @@ public class FileOutputContent extends OutputContent implements at.dms.kjc.DeepC
         // bogus work function exists
         // methods set to the two bogus functions.
         
-        System.out.println("**TODO** FileOutputContent.createContent()");
-        System.out.println("**TODO** FileOutputContent.createContent() KjcOptions.outputs=" + KjcOptions.outputs);
- 
-        
+          
         String fileVar = "_fileWriter_" + my_unique_ID;
         
         this.outputType = CStdType.Void;

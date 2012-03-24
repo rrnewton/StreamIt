@@ -17,6 +17,7 @@
 package streamit.frontend;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -126,8 +127,8 @@ public class ToJava
         List helpers = new java.util.ArrayList();
         
         // Complex structure type:
-        List fields = new java.util.ArrayList();
-        List ftypes = new java.util.ArrayList();
+        List<String> fields = new java.util.ArrayList<String>();
+        List<Type> ftypes = new java.util.ArrayList<Type>();
         Type floattype = new TypePrimitive(TypePrimitive.TYPE_FLOAT);
         fields.add("real");
         ftypes.add(floattype);
@@ -138,8 +139,8 @@ public class ToJava
         structs.add(complexStruct);
 
         // float2
-        fields = new java.util.ArrayList();
-        ftypes = new java.util.ArrayList();
+        fields = new java.util.ArrayList<String>();
+        ftypes = new java.util.ArrayList<Type>();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -147,8 +148,8 @@ public class ToJava
         structs.add(new TypeStruct(null, "float2", fields, ftypes));
 
         // float3
-        fields = new java.util.ArrayList();
-        ftypes = new java.util.ArrayList();
+        fields = new java.util.ArrayList<String>();
+        ftypes = new java.util.ArrayList<Type>();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -158,8 +159,8 @@ public class ToJava
         structs.add(new TypeStruct(null, "float3", fields, ftypes));
 
         // float4
-        fields = new java.util.ArrayList();
-        ftypes = new java.util.ArrayList();
+        fields = new java.util.ArrayList<String>();
+        ftypes = new java.util.ArrayList<Type>();
         fields.add("x");
         ftypes.add(floattype);
         fields.add("y");
@@ -170,8 +171,8 @@ public class ToJava
         ftypes.add(floattype);
         structs.add(new TypeStruct(null, "float4", fields, ftypes));
         
-        fields = new java.util.ArrayList(); 
-        ftypes = new java.util.ArrayList(); 
+        fields = new java.util.ArrayList<String>(); 
+        ftypes = new java.util.ArrayList<Type>(); 
         TypeStruct stringStruct = new TypeStruct(null, "String", fields, ftypes);
         structs.add(stringStruct);
 
@@ -205,10 +206,14 @@ public class ToJava
                antlr.TokenStreamException
     {
         Program prog = emptyProgram();
-        for (Iterator<String> iter = inputFiles.iterator(); iter.hasNext(); )
-            {
-                String fileName = iter.next();
-                InputStream inStream = new FileInputStream(fileName);
+            for(String fileName : inputFiles) {
+                InputStream inStream = null;
+                try {
+                    inStream = new FileInputStream(fileName);
+                } catch (FileNotFoundException e) {
+                    System.err.println("Unable to open file: " + fileName);
+                    System.exit(-1);
+                }
                 DataInputStream dis = new DataInputStream(inStream);
                 StreamItLex lexer = new StreamItLex(dis);
                 StreamItParserFE parser = new StreamItParserFE(lexer);

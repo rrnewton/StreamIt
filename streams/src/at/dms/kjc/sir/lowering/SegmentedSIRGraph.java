@@ -147,14 +147,16 @@ public class SegmentedSIRGraph implements StreamVisitor {
         if (pipeline.getParent() != null) {
             return;
         }
-
-        System.out.println("SegmentedSIRGraph.postVisitPipeline called");
         List<SIROperator> allChildren = getAllChildren(pipeline);
         String name = uniquePipelineName();
         SIRPipeline currentPipeline = new SIRPipeline(null, name);
 
         for (int i = 0; i < allChildren.size() - 1; i++) {
 
+            System.out.println("SegmentedSIRGraph postVisitPipeline allChildren.get(i)=" + allChildren.get(i).getName());
+            System.out.println("SegmentedSIRGraph postVisitPipeline allChildren.get(i+1)=" + allChildren.get(i+1).getName());
+            
+            
             // First we want to check for illegal graphs. For now,
             // we will say that if a component is followed or preceded
             // by a dynamic filter, then the graph is illegal
@@ -214,17 +216,17 @@ public class SegmentedSIRGraph implements StreamVisitor {
     @Override
     public void preVisitFeedbackLoop(SIRFeedbackLoop self,
             SIRFeedbackLoopIter iter) {
-
+        /* Do nothing */
     }
 
     @Override
     public void preVisitPipeline(SIRPipeline self, SIRPipelineIter iter) {
-        System.out.println("SegmentedSIRGraph.preVisitPipeline called");
+        /* Do nothing */
     }
 
     @Override
     public void preVisitSplitJoin(SIRSplitJoin self, SIRSplitJoinIter iter) {
-        /* Do nothing yet */
+        /* Do nothing */
     }
 
     /**
@@ -251,7 +253,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
     }
 
     public void visitPipeline(SIRFilter self, SIRFilterIter iter) {
-        System.out.println("SegmentedSIRGraph.visitPipeline called");
+      /* Do nothing */
     }
 
     /**
@@ -311,11 +313,19 @@ public class SegmentedSIRGraph implements StreamVisitor {
         return allChildren;
     }
 
-    private boolean isCut(SIRFilter sirStream, SIRFilter sirStream2) {
+    /**
+     * Returns true if there should be a cut between two SIRFilters
+     * @param sirStream the first filter
+     * @param sirStream2 the second filter
+     * @return true if there should be a cut, false otherwise
+     */
+    private boolean isCut(SIRFilter sirStream, SIRFilter sirStream2) {                
+        /* Cut if there is a dynamic rate between the filters */
         if (isDynamicPush(sirStream) || isDynamicPop(sirStream2)) {
             return true;
         }
-        if (sirStream.isStateful() || sirStream2.isStateful()) {
+        /* Cut if the second filter is stateful */
+        if (sirStream2.isStateful()) {
             return true;
         }
         return false;

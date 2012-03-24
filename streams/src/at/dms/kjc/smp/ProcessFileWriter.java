@@ -41,14 +41,10 @@ public class ProcessFileWriter {
      * Return the core that this file writer's buffer should be allocated on.
      * @param fo  The file writer
      */
-    public static Core getAllocatingCore(WorkNode fo) {
-        System.out.println("ProcessFileWriter.getAllocatingCore fo=" + fo);
-        
-        assert fo.isFileOutput();
-        
+    public static Core getAllocatingCore(WorkNode fo) {        
+        assert fo.isFileOutput();        
         if (!allocatingCores.containsKey(fo)) {
             Core allocatingCore = nextAllocatingCore(fo);
-            System.out.println("ProcessFileWriter.getAllocatingCore fo=" + fo + " assigned to Core " + allocatingCore.getCoreID());
             allocatingCores.put(fo, allocatingCore);
         }
         
@@ -63,7 +59,6 @@ public class ProcessFileWriter {
         //do nothing if faking io
         if (phase == SchedulingPhase.INIT) {
             int outputs = filterNode.getWorkNodeContent().getSteadyMult();
-            System.out.println("Outputs for " + filterNode + ": " + outputs);
             totalOutputs += outputs;
             assert allocatingCores.containsKey(filterNode);
             allocatingCore = allocatingCores.get(filterNode);

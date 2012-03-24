@@ -88,18 +88,11 @@ public class StreamGraph implements Layout<Core> {
         }                      
         
         if (node.getAsFilter().isFileInput()) {
-
-            
-            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileInput()=" + node.getAsFilter().isFileInput());
             return layoutMap.get(node);    
         }
         else if (node.getAsFilter().isFileOutput()) {
-            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileOutput()=" + node.getAsFilter().isFileOutput() );                        
             Filter prev = ProcessFilterUtils.getPreviousFilter(node.getAsFilter());                                  
-            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileOutput()=" + node.getAsFilter().isFileOutput() + " prev=" + prev.getWorkNode());                        
-            System.out.println("StreamGraph.getComputeNode node.getAsFilter().isFileOutput()=" + node.getAsFilter().isFileOutput() + " core is " + layoutMap.get(prev.getWorkNode()).getCoreID());                        
             return layoutMap.get(prev.getWorkNode());    
-            //return layoutMap.get(node);
         }        
         else {
             return layoutMap.get(node);       

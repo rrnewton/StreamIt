@@ -4,9 +4,6 @@
 package at.dms.kjc.smp;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.backendSupport.BackEndFactory;
 import at.dms.kjc.backendSupport.BackEndScaffold;
@@ -119,7 +116,8 @@ public class SMPBackEndFactory extends
 	 * at.dms.kjc.backendSupport.BackEndFactory#getChannel(at.dms.kjc.slicegraph
 	 * .Edge)
 	 */
-	@Override
+	@SuppressWarnings("rawtypes")
+    @Override
 	public IntraSSGChannel getChannel(IntraSSGEdge e) {
 		assert false;
 		return null;
@@ -244,13 +242,9 @@ public class SMPBackEndFactory extends
 
 		if (filter.isPredefined()) {
 			if (filter.isFileInput()) {
-				System.out
-						.println("SMPBackEndFactory.processFilterWorkNode filter.isFileInput()=true");
 				(new ProcessFileReader(filter, whichPhase, this))
 						.processFileReader();
 			} else if (filter.isFileOutput()) {
-			    System.out
-                .println("SMPBackEndFactory.processFilterWorkNode filter=" + filter + " filter.isFileOutput()=true");
 				(new ProcessFileWriter(filter, whichPhase, this))
 						.processFileWriter();
 			}

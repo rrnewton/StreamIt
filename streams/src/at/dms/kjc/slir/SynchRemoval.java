@@ -20,7 +20,7 @@ public class SynchRemoval {
 		//loop over all the nodes in the ssg
 		//for the identity nodes, call IDRemoval on them
 		
-		System.out.println("Calling SynchRemoval on " + ssg);
+		System.out.println("Calling SynchRemoval on " + ssgNum);
 		
 		ssg.dumpGraph("before-synchremoval-ssg" + ssgNum + ".dot");
 		

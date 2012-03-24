@@ -93,8 +93,7 @@ public class SMPBackend {
         for (StaticSubGraph ssg : streamGraph.getSSGs()) {		    
             schedulers.add(new TMDBinPackFissAll());
             scheduler = schedulers.get(i);
-            graphSchedules.add(generateSchedules(ssg, i)); 
-            System.out.println("SMPBackend.run after runSSG");
+            graphSchedules.add(generateSchedules(ssg, i));           
             i++;
         }
 

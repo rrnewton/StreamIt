@@ -24,8 +24,7 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 
 	/** Create a new Link */
 	public InterSSGEdge(OutputPort src, InputPort dst) {
-		super(src, dst);
-		System.out.println("InterSSGEdge(src,dst)");		
+		super(src, dst);	
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class InterSSGEdge extends Edge<OutputPort, InputPort> {
 		type = srcType;
 		
 		System.out.println( "InterSSGEdge.getType() calculating type: " + 
-				srcContent + " -> " + dstContent + "has type=" + type);		
+				srcContent + " -> " + dstContent + " type=" + type);		
 		
 		assert srcType.equals(dstType) : "InterSSGEdge.getType() Error calculating type: " + 
 		srcContent + "(" + srcType  + ") -> " + dstContent + "(" + dstType  + ")";

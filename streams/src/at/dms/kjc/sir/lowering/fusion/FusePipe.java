@@ -56,9 +56,7 @@ public class FusePipe {
 			maxLength = pipe.size();
 		} else {
 			maxLength = (int) Math.ceil(((float) numElim)
-					/ ((float) (numElim - targetElim)));
-			// System.err.println("numElim = " + numElim + " targetElim=" +
-			// targetElim + " maxLength=" + maxLength);
+					/ ((float) (numElim - targetElim)));			
 		}
 		return internalFuse(pipe, maxLength, targetElim);
 	}
@@ -113,8 +111,6 @@ public class FusePipe {
 		// fuse the filters...
 		int firstIndex = parent.indexOf(first);
 		int lastIndex = parent.indexOf(last);
-		// System.err.println("Fusing " + (lastIndex-firstIndex+1) +
-		// " Pipeline filters.");
 		if (firstIndex == 0 && lastIndex == parent.size() - 1) {
 			// optimization: if we're fusing an entire pipeline, just
 			// call directly
@@ -210,15 +206,10 @@ public class FusePipe {
 			// second filter is peeking
 
 			int n = pipe.size();
-
-			// System.out.println("Internal fuse! size: "+n);
-
 			for (int i = 1; i < n; i++) {
 
 				SIRFilter f = (SIRFilter) pipe.get(i);
 				if (f.getPeekInt() > f.getPopInt()) {
-
-					// System.out.println("Found A Peeking Filter! at: "+i);
 
 					// recursively:
 					// 1. first fuse rest of the pipeline
@@ -284,8 +275,8 @@ public class FusePipe {
 	 */
 	public static boolean isFusable(SIRStream str) {
 
-	    if (KjcOptions.nofuse) {
-	        System.out.println("FusePipe.isFusable is true!");
+	    /* The fusing optimization has been disabled */
+	    if (KjcOptions.nofuse) {	        
 	        return false;   
 	    }
 	    

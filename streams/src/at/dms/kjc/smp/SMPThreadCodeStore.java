@@ -77,8 +77,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     private int                    threadId;
 
     public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, int threadIndex) {
-        System.out
-                .println("SMPThreadCodeStore.SMPThreadCodeStore(coreCodeStore)");
+    
         this.coreCodeStore = coreCodeStore;
         JBlock methodBody = new JBlock();
         threadSteadyLoop = new JBlock();
@@ -264,12 +263,14 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         // written to 2 steady-states ago
 
         WorkNode fileW = buf.filterNode;
-        System.out.println("SMPThreadCodeStore.addPrintOutputCode workNode="
-                + workNode.toString() + " fileW=" + fileW.toString());
-        System.out.println("SMPThreadCodeStore.addPrintOutputCode filter="
-                + workNode.toString() + " fileW.isFileOutput()="
-                + fileW.isFileOutput() + " buf=" + buf.toString()
-                + " buf.getRotationLength()=" + buf.getRotationLength());
+                
+//        System.out.println("SMPThreadCodeStore.addPrintOutputCode workNode="
+//                + workNode.toString() + " fileW=" + fileW.toString());
+//        System.out.println("SMPThreadCodeStore.addPrintOutputCode filter="
+//                + workNode.toString() + " fileW.isFileOutput()="
+//                + fileW.isFileOutput() + " buf=" + buf.toString()
+//                + " buf.getRotationLength()=" + buf.getRotationLength());
+        
         assert fileW.isFileOutput();
         // because of this scene we need a rotation length of 2
         // assert buf.getRotationLength() == 2: buf.getRotationLength();
