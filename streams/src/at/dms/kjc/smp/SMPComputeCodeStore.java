@@ -595,14 +595,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * @param str
      *            The string to add
      */
-    public void appendTxtToGlobal(String str) {   
-    	
-    	System.out.println("-------------- START ----------------");
-    	System.out.println("SMPComputeCodeStore.appendTxtToGlobal");
-    	System.out.println(str);
-    	new Exception().printStackTrace();
-    	System.out.println("-------------- END ----------------");
-    	
+    public void appendTxtToGlobal(String str) {       	    
         globalTxt.append(str);
         this.setHasCode();
     }

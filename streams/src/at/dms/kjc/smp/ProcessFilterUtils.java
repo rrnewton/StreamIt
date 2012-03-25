@@ -59,17 +59,17 @@ public class ProcessFilterUtils {
 
         if (KjcOptions.threadopt) {
 
-            // A FileInput is always on the core of its next filter
-            if (workNode.isFileInput()) {
-                Filter next = getNextFilter(workNode);
-                return ThreadMapper.getMapper().getFilterToThreadId().get(next);                               
-            }
-
-            // A FileOutput is always on the core of its next filter
-            if (workNode.isFileOutput()) {
-                Filter prev = getPreviousFilter(workNode);
-                return ThreadMapper.getMapper().getFilterToThreadId().get(prev);                                             
-            }
+//            // A FileInput is always on the core of its next filter
+//            if (workNode.isFileInput()) {
+//                Filter next = getNextFilter(workNode);
+//                return ThreadMapper.getMapper().getFilterToThreadId().get(next);                               
+//            }
+//
+//            // A FileOutput is always on the core of its next filter
+//            if (workNode.isFileOutput()) {
+//                Filter prev = getPreviousFilter(workNode);
+//                return ThreadMapper.getMapper().getFilterToThreadId().get(prev);                                             
+//            }
 
         
         } else {
@@ -128,6 +128,8 @@ public class ProcessFilterUtils {
         }
         return null;
     }
+    
+          
 
     /**
      * Get the next filter in the dataflow graph that is on the same core
@@ -164,6 +166,40 @@ public class ProcessFilterUtils {
             }
         }
     }
+    
+
+    static Filter getNextFiltersOnCore(WorkNode workNode) {
+
+    	if (workNode.isFileOutput()) {
+    		return null;
+    	}
+
+    	Core core = SMPBackend.getComputeNode(workNode);
+    	return checkList(workNode, core);
+
+    }
+
+ private static Filter checkList(WorkNode workNode, Core core) {
+	 List<Filter> nextFilters = getNextFilters(workNode);
+	 if (nextFilters.isEmpty()) {
+		 return null;
+	 }                    	  
+	 Core nextCore;
+	 for (Filter f : nextFilters) {
+		 nextCore = SMPBackend.getComputeNode(f.getWorkNode());  
+		 if (nextCore.coreID == core.coreID) {
+			 return f;              	
+		 }
+	 }
+	 for (Filter f : nextFilters) {
+		 Filter next = checkList(f.getWorkNode(), core);
+		 if (next != null) {
+			 return next;
+		 }
+	 }
+	 return null;  
+ }
+    
 
     /**
      * Get the next filter in the dataflow graph that is on a different core

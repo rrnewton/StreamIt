@@ -593,7 +593,7 @@ public class ProcessFilterWorkNode {
             String threadId = Integer.toString(threadIndex);
 
             //Filter nextFilterDifferentThread = ProcessFilterUtils.getNextFilterOnCoreDifferentThread(workNode);
-            Filter nextFilterOnCore = ProcessFilterUtils.getNextFilterOnCore(workNode);
+            Filter nextFilterOnCore = ProcessFilterUtils.getNextFiltersOnCore(workNode);
 
             int nextThread = ProcessFilterUtils.getFilterThread(
                     workNode,
@@ -609,9 +609,9 @@ public class ProcessFilterWorkNode {
             
             // If there is no next filter on this core
             // then we want to return to the main.
-//            if (nextFilterDifferentThread == null) && (nextFilterSameThread == null) {
-//                nextThread = ThreadMapper.coreToThread(location.coreID);
-//            }
+            if (nextFilterOnCore == null) {
+                nextThread = ThreadMapper.coreToThread(location.coreID);
+            }
 
             System.out
             .println("ProcessFilterWorkNode.standardSteadyProcessingOpt "
@@ -668,15 +668,42 @@ public class ProcessFilterWorkNode {
 
         } else {
 
+        	Filter prevFilter = null;
+        	
             int threadIndex = ProcessFilterUtils.getFilterThread(
                     workNode,
                     workNode.getParent());
 
-            Filter nextFilter = ProcessFilterUtils.getNextFilterOnCore(workNode);
+            Filter nextFilter = ProcessFilterUtils.getNextFiltersOnCore(workNode);
             int nextThread = ProcessFilterUtils.getFilterThread(
                     workNode,
                     nextFilter);
 
+            // If there is no next filter on this core
+            // then we want to return to the main.
+            if (nextFilter == null) {
+                nextThread = ThreadMapper.coreToThread(location.coreID);
+            }
+            
+            System.out
+            .println("ProcessFilterWorkNode.standardSteadyProcessingOpt "
+                    + "prevFilter = "
+                    + (prevFilter != null ? prevFilter
+                            .getWorkNode() : "N/A")
+                            + "( N/A"                            
+                            + " )"
+                            + " --> filter="
+                            + workNode.getParent().getWorkNode()
+                            + "("
+                            + threadIndex
+                            + ")"
+                            + " --> nextFilter = "
+                            + (nextFilter != null ? nextFilter
+                                    .getWorkNode() : "null")
+                                    + "( "
+                                    + nextThread + " )");
+            
+            
             addTokenWait(threadIndex);
 
             codeStore.addSteadyLoopStatement(
