@@ -41,10 +41,13 @@ public class ProcessFileWriter {
      * Return the core that this file writer's buffer should be allocated on.
      * @param fo  The file writer
      */
-    public static Core getAllocatingCore(WorkNode fo) {        
-        assert fo.isFileOutput();        
+    public static Core getAllocatingCore(WorkNode fo) {      
+        assert fo.isFileOutput();    
+    
         if (!allocatingCores.containsKey(fo)) {
-            Core allocatingCore = nextAllocatingCore(fo);
+            //Core allocatingCore = nextAllocatingCore(fo);
+            Core allocatingCore = SMPBackend.getComputeNode(fo);
+            
             allocatingCores.put(fo, allocatingCore);
         }
         

@@ -152,11 +152,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
         SIRPipeline currentPipeline = new SIRPipeline(null, name);
 
         for (int i = 0; i < allChildren.size() - 1; i++) {
-
-            System.out.println("SegmentedSIRGraph postVisitPipeline allChildren.get(i)=" + allChildren.get(i).getName());
-            System.out.println("SegmentedSIRGraph postVisitPipeline allChildren.get(i+1)=" + allChildren.get(i+1).getName());
-            
-            
+             
             // First we want to check for illegal graphs. For now,
             // we will say that if a component is followed or preceded
             // by a dynamic filter, then the graph is illegal

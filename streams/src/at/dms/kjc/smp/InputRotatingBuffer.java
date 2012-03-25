@@ -92,18 +92,18 @@ public class InputRotatingBuffer extends RotatingBuffer {
 		fileWriterBuffers = new HashSet<InputRotatingBuffer>();
 	}
 
-	public static void createInputBuffer(Filter slice,
+	public static void createInputBuffer(Filter filter,
 			BasicSpaceTimeSchedule schedule) {
-
-		if (!slice.getInputNode().noInputs()) {
-			assert slice.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
-			Core parent = SMPBackend.getComputeNode(slice
+	    	   	    
+		if (!filter.getInputNode().noInputs()) {
+			assert filter.getInputNode().totalWeights(SchedulingPhase.STEADY) > 0;
+			Core parent = SMPBackend.getComputeNode(filter
 					.getWorkNode());
 
 			// create the new buffer, the constructor will put the buffer in the
 			// hashmap
 			InputRotatingBuffer buf = new InputRotatingBuffer(
-					slice.getWorkNode(), parent);
+					filter.getWorkNode(), parent);
 
 			buf.setRotationLength(schedule);
 			buf.setBufferSize();
@@ -125,19 +125,16 @@ public class InputRotatingBuffer extends RotatingBuffer {
 
 		StaticSubGraph ssg = schedule.getSSG();
 
-		// for (Filter slice : schedule.getScheduleList()) {
-		for (Filter slice : ssg.getFilterGraph()) {
-			// System.out.println("InputRotatingBuffer.createInputBuffers calling on slice="
-			// + slice.getWorkNode().toString());
+		for (Filter filter : ssg.getFilterGraph()) {			 
 
-			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(slice)) {
-				assert FissionGroupStore.isUnfizzedSlice(slice);
+			if (KjcOptions.sharedbufs && FissionGroupStore.isFizzed(filter)) {
+				assert FissionGroupStore.isUnfizzedSlice(filter);
 
-				FissionGroup group = FissionGroupStore.getFissionGroup(slice);
+				FissionGroup group = FissionGroupStore.getFissionGroup(filter);
 				for (Filter fizzedSlice : group.fizzedSlices)
 					createInputBuffer(fizzedSlice, schedule);
 			} else {
-				createInputBuffer(slice, schedule);
+				createInputBuffer(filter, schedule);
 			}
 		}
 	}
@@ -769,7 +766,6 @@ public class InputRotatingBuffer extends RotatingBuffer {
 	 */
 	@Override
 	protected void setupRotation() {
-	    System.out.println("RotatingBuffer.setupRotation");
 
 		String temp = "__temp__";
 		SMPComputeCodeStore cs;

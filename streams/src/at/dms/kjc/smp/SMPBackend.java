@@ -81,8 +81,7 @@ public class SMPBackend {
             isDynamic = true;
         }
 
-        InterSSGChannel.createBuffers(streamGraph);      
-
+     
         List<BasicSpaceTimeSchedule> graphSchedules = 
                 new ArrayList<BasicSpaceTimeSchedule>();
 
@@ -99,10 +98,12 @@ public class SMPBackend {
 
         streamGraph.runLayout();                   
         
-        for (StaticSubGraph ssg : streamGraph.getSSGs()) {
-            ThreadMapper.getMapper().assignThreads(ssg);
-        }
-
+        ThreadMapper.getMapper().assignThreads(streamGraph);
+        
+       
+        
+        InterSSGChannel.createBuffers(streamGraph);      
+        
         i = 0;    
         for (BasicSpaceTimeSchedule graphSchedule : graphSchedules) {
             scheduler = schedulers.get(i);
@@ -236,15 +237,16 @@ public class SMPBackend {
 
     private static void emitCode() {
 
-        // generate code for file writer
+     // generate code for file writer
         SMPComputeCodeStore.generatePrintOutputCode(backEndFactory);
-
+       
         if (KjcOptions.numbers > 0)
             chip.getNthComputeNode(0).getComputeCode().generateNumbersCode();
 
         // emit c code for all cores
         new EmitSMPCode(backEndFactory, isDynamic).doit();
-
+                
+        
         // dump structs.h file
         structs_h.writeToFile();
 

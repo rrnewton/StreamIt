@@ -92,7 +92,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 	}
 
 	public static void setInputBuffer(WorkNode node, InputRotatingBuffer buf) {
-		inputBuffers.put(node, buf);
+	    inputBuffers.put(node, buf);
 	}
 
 	public static void setOutputBuffer(WorkNode node, OutputRotatingBuffer buf) {
@@ -160,9 +160,9 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 		}
 
 		// now handle the file writers
-		for (WorkNode fileWriter : ProcessFileWriter.getFileWriterFilters())
-			communicateAddressesForFilter(fileWriter,
-					ProcessFileWriter.getAllocatingCore(fileWriter));
+//		for (WorkNode fileWriter : ProcessFileWriter.getFileWriterFilters())
+//			communicateAddressesForFilter(fileWriter,
+//					ProcessFileWriter.getAllocatingCore(fileWriter));
 
 		// now handle the file readers
 

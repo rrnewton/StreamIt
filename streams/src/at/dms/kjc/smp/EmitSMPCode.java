@@ -189,6 +189,8 @@ public class EmitSMPCode extends EmitCode {
         p.println("// code for core " + n.getUniqueId());
         p.println(((Core) n).getComputeCode().getGlobalText());
 
+        p.println("// past global text " + n.getUniqueId());
+        
         // generate function prototypes for methods so that they can call each
         // other in C.
         codegen.setDeclOnly(true);
@@ -197,7 +199,9 @@ public class EmitSMPCode extends EmitCode {
         }
         p.println("");
         codegen.setDeclOnly(false);
-
+        
+        p.println("// past fields and methods  " + n.getUniqueId());
+        
         // generate code for ends of channels that connect to code on this
         // ComputeNode
         Set<RotatingBuffer> outputBuffers = RotatingBuffer
@@ -206,6 +210,7 @@ public class EmitSMPCode extends EmitCode {
                 .getInputBuffersOnCore((Core) n);
 
         // externs
+        p.println("// write buffers ");
         for (RotatingBuffer c : outputBuffers) {
             if (c.writeDeclsExtern() != null) {
                 for (JStatement d : c.writeDeclsExtern()) {
@@ -213,7 +218,7 @@ public class EmitSMPCode extends EmitCode {
                 }
             }
         }
-
+        p.println("// read buffers ");
         for (RotatingBuffer c : inputBuffers) {
             if (c.readDeclsExtern() != null) {
                 for (JStatement d : c.readDeclsExtern()) {
@@ -222,6 +227,8 @@ public class EmitSMPCode extends EmitCode {
             }
         }
 
+        p.println("// done read buffers ");
+        
         for (RotatingBuffer c : outputBuffers) {
             if (c.dataDecls() != null) {
                 // wrap in #ifndef for case where different ends have

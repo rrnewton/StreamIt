@@ -240,6 +240,9 @@ public class SMPBackEndFactory extends
 	public void processFilterWorkNode(WorkNode filter,
 			SchedulingPhase whichPhase, SMPMachine chip) {	    	   		
 
+	    
+	    //new Exception().printStackTrace();
+	    
 		if (filter.isPredefined()) {
 			if (filter.isFileInput()) {
 				(new ProcessFileReader(filter, whichPhase, this))

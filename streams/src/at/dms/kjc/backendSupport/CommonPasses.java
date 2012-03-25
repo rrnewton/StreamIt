@@ -96,10 +96,7 @@ public class CommonPasses {
      */
     private StreamGraph doStaticPassesSegmentedSIRGraph(
             SegmentedSIRGraph segmentedGraph) {
-
-        System.out
-                .println("CommonPasses.doStaticPasses segmentedGraph.getStaticSubGraphs().size()="
-                        + segmentedGraph.getStaticSubGraphs().size());
+      
         int i = 0;
         SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
         for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {

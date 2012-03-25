@@ -306,7 +306,7 @@ public class ProcessFilterWorkNode {
     public void doit(WorkNode filterNode, SchedulingPhase whichPhase,
             SMPBackEndFactory backEndFactory) {
         
-        System.out.println("ProcessFilterWorkNode.doit filter=" + filterNode);
+        System.out.println("ProcessFilterWorkNode.doit filter=" + filterNode + " phase=" + whichPhase);
         
         this.workNode = filterNode;
         this.whichPhase = whichPhase;

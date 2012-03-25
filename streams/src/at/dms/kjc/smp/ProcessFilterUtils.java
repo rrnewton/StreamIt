@@ -100,7 +100,7 @@ public class ProcessFilterUtils {
      *            the current filters
      * @return the next filter
      */
-    static Filter getNextFilter(WorkNode filter) {
+    public static Filter getNextFilter(WorkNode filter) {
         StaticSubGraph ssg = filter.getParent().getStaticSubGraph();
         if (filter == ssg.getFilterGraph()[ssg.getFilterGraph().length - 1]
                 .getWorkNode()) {

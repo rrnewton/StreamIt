@@ -10,6 +10,7 @@ import at.dms.kjc.CType;
 import at.dms.kjc.KjcOptions;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNode;
 
 /**
@@ -78,8 +79,6 @@ public class ThreadMapper {
     /** a mapping of thread to its input type */
     private Map<Integer, String>        threadIdToType;
 
-    private Map<Integer, Integer>       coreToThread;
-
     /** a mapping to filter to a token that it writes to */
     private Map<WorkNode, List<String>> tokenWrites;
 
@@ -96,7 +95,6 @@ public class ThreadMapper {
         filterToThreadId = new HashMap<Filter, Integer>();
         dominators = new HashMap<String, List<String>>();
         threadIdToType = new HashMap<Integer, String>();
-        coreToThread = new HashMap<Integer, Integer>();
         tokenWrites = new HashMap<WorkNode, List<String>>();
         tokenReads = new HashMap<WorkNode, List<String>>();
         dominatorToTokens = new HashMap<WorkNode, List<String>>();
@@ -105,16 +103,18 @@ public class ThreadMapper {
     /**
      * Assign a unique id to each thread for dynamic readers
      * 
-     * @param ssg
+     * @param streamGraph
      *            The static subgraph that contains the dynamic reader
      */
-    public void assignThreads(StaticSubGraph ssg) {
-        if (KjcOptions.threadopt) {
-            assignThreadsOpt(ssg);
-        } else {
-            assignThreadsNonOpt(ssg);
+    public void assignThreads(StreamGraph streamGraph) {
+        System.out.println("ThreadMapper.assignThreads...");
+        for (StaticSubGraph ssg : streamGraph.getSSGs()) {              
+            if (KjcOptions.threadopt) {
+                assignThreadsOpt(ssg);
+            } else {
+                assignThreadsNonOpt(ssg);
+            }
         }
-
     }
 
     public Map<String, List<String>> getDominators() {
@@ -246,27 +246,16 @@ public class ThreadMapper {
                 if (ssg.containsFilter(nextFilter)) {
                     int nextCore = SMPBackend.getComputeNode(nextFilter
                             .getWorkNode()).coreID;
-                    // System.out.println("    ThreadMapper.checkForTokens filter="
-                    // + getFilterName(filter) + " core=" + filterCore + " " +
-                    // getFilterName(filter) + " and next=" +
-                    // getFilterName(nextFilter) + "next core =" + nextCore);
+                   
                     if (filterCore != nextCore) {
-
-                        // System.out.println("    ThreadMapper.checkForTokens filter="
-                        // + getFilterName(filter) + " firstFilter=" +
-                        // getFilterName(firstFilter) );
-                        // System.out.println("    ThreadMapper.checkForTokens filter="
-                        // + getFilterName(filter) +
-                        // " isProgramSource(firstFilter)=" +
-                        // isProgramSource(firstFilter) );
 
                         if (!filter.getWorkNode().isFileInput()) {
 
-                            System.out
-                                    .println("    ThreadMapper.checkForTokens TOKEN BETWEEN filter="
-                                            + getFilterName(filter)
-                                            + " and next="
-                                            + getFilterName(nextFilter));
+//                            System.out
+//                                    .println("    ThreadMapper.checkForTokens TOKEN BETWEEN filter="
+//                                            + getFilterName(filter)
+//                                            + " and next="
+//                                            + getFilterName(nextFilter));
                             String tokenName = getFilterName(filter) + "_to_"
                                     + getFilterName(nextFilter) + "_token";
                             addToListInMap(
@@ -380,7 +369,7 @@ public class ThreadMapper {
             filterToThreadId.put(
                     filter,
                     thread);
-            System.out.println("==> ThreadMapper.assignThreadsOpt  filter="
+            System.out.println("    + filter="
                     + getFilterName(filter) + " thread=" + thread);
             dominatorsAdd(
                     firstFilter,

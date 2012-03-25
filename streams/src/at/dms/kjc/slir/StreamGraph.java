@@ -24,9 +24,9 @@ public class StreamGraph implements Layout<Core> {
     protected HashMap<InternalFilterNode, Core> layoutMap = new HashMap<InternalFilterNode, Core>();
     private GreedyBinPacking<Filter>            dominatorPacking;
     List<Filter>                                allFilters = new LinkedList<Filter>();
-        
+
     protected int                               steadyMult;
-    
+
     List<StaticSubGraph>                        ssgs;
 
     public StreamGraph() {
@@ -80,13 +80,13 @@ public class StreamGraph implements Layout<Core> {
 
     @Override
     public Core getComputeNode(InternalFilterNode node) {
-        
+
         //System.out.println("StreamGraph.getComputeNode node=" + node.getAsFilter());
-        
+
         if (null == layoutMap.get(node)) {
             assert false : " StreamGraph.getComputeNode Node" + node.toString() + " is not in the layoutMap";    
         }                      
-        
+
         if (node.getAsFilter().isFileInput()) {
             return layoutMap.get(node);    
         }
@@ -128,48 +128,65 @@ public class StreamGraph implements Layout<Core> {
     public void runLayout() {
         System.out.println("TMDBinPackFissAll.runLayout()");
 
-        List<Filter> slices = DataFlowOrder.getTraversal(getAllFilter());
+        List<Filter> filters = DataFlowOrder.getTraversal(getAllFilter());
         List<Filter> fizzedSlices = new LinkedList<Filter>();
         List<Filter> unfizzedSlices = new LinkedList<Filter>();
         List<Filter> dominators = new LinkedList<Filter>();
-        
-        
+
+
         // Get work estimates for all slices
         HashMap<WorkNode, Long> workEsts = new HashMap<WorkNode, Long>();
-        for (Filter slice : slices) {
+        for (Filter slice : filters) {
             long workEst = FilterWorkEstimate.getWork(slice);
             workEsts.put(
                     slice.getWorkNode(),
                     workEst);
-        }
-
+        }      
+        
         // Categorize slices into predefined, dominators, fizzed and unfizzed
         // slices
         // Predefined filters are automatically added to off-chip memory
-        for (Filter slice : slices) {
-            if (slice.getWorkNode().isPredefined())
-                setComputeNode(
-                        slice.getWorkNode(),
-                        SMPBackend.chip.getOffChipMemory());
-            else if (slice.getStaticSubGraph().isTopFilter(
-                    slice))
-                dominators.add(slice);
-            else if (FissionGroupStore.isFizzed(slice))
-                fizzedSlices.add(slice);
-            else
-                unfizzedSlices.add(slice);
+        
+        for (Filter filter : filters) {                             
+            if (filter.getWorkNode().isPredefined()) {
+//                if (filter.getWorkNode().isFileOutput()) {                                        
+//                    Filter prev = ProcessFilterUtils.getPreviousFilter(filter.getWorkNode());
+//                    System.out.println("StreamGraph.runLayout filter=" + filter.getWorkNode() + " prev=" + prev.getWorkNode());
+//                    
+//                    Core prevCore = ProcessFilterUtils.getCore(prev.getWorkNode(), prev);                                        
+//                    setComputeNode(
+//                            filter.getWorkNode(),
+//                            prevCore);                
+//
+//                } else {
+//                    setComputeNode(
+//                            filter.getWorkNode(),
+//                            SMPBackend.chip.getOffChipMemory());
+//                }
+            }
+
+            else if (filter.getStaticSubGraph().isTopFilter(
+                    filter)) {
+                dominators.add(filter);
+            } else if (FissionGroupStore.isFizzed(filter)) {
+                fizzedSlices.add(filter);
+            } else {
+                unfizzedSlices.add(filter);
+            }
         }
 
         System.out.println("Number of fizzed slices: " + fizzedSlices.size());
         System.out.println("Number of unfizzed slices: "
                 + unfizzedSlices.size());
 
+        
         // use a global greedy bin packing across all ssgs and cores for the
         // dominators of the ssgs
         for (Filter filter : dominators) {
             layoutDominator(filter);
         }
-
+        
+                        
         // Sort unfizzed slices by estimated work, most work first
         LinkedList<Filter> sortedUnfizzedSlices = new LinkedList<Filter>();
         for (Filter slice : unfizzedSlices) {
@@ -215,14 +232,13 @@ public class StreamGraph implements Layout<Core> {
                     SMPBackend.chip.getNthComputeNode(minCore));
             workAmounts[minCore] += workEsts.get(slice.getWorkNode());
         }
-
-        for (int x = 0; x < workAmounts.length; x++)
-            System.out.println("Core " + x + " has work: " + workAmounts[x]);
+        
+       
 
         // Schedule fizzed slices by assigning fizzed copies sequentially
         // across cores
         List<Filter> alreadyAssigned = new LinkedList<Filter>();
-                
+
         for (Filter slice : fizzedSlices) {
             // If slice already assigned, skip it
             if (alreadyAssigned.contains(slice))
@@ -236,15 +252,16 @@ public class StreamGraph implements Layout<Core> {
                 setComputeNode(
                         fizzedCopies[x].getWorkNode(),
                         SMPBackend.chip.getNthComputeNode(x));
-                System.out.println("Assigning " + fizzedCopies[x].getWorkNode()
-                        + " to core " + SMPBackend.chip.getNthComputeNode(
-                                x).getCoreID());
+//                System.out.println("Assigning " + fizzedCopies[x].getWorkNode()
+//                        + " to core " + SMPBackend.chip.getNthComputeNode(
+//                                x).getCoreID());
             }
 
             // Mark fizzed set as assigned
             for (Filter fizzedSlice : fizzedCopies)
                 alreadyAssigned.add(fizzedSlice);
-
+                    
+            
             // If using shared buffers, then fission does not replace the
             // original
             // unfizzed slice with fizzed slices. The current 'slice' is the
@@ -264,13 +281,46 @@ public class StreamGraph implements Layout<Core> {
                 alreadyAssigned.add(slice);
             }
         }
+        
+        
+        // Finally, assign the predefined filters
+        for (Filter filter : filters) {                                      
+            if (filter.getWorkNode().isPredefined()) {
+                if (filter.getWorkNode().isFileOutput()) {                                        
+                    Filter prev = ProcessFilterUtils.getPreviousFilter(filter.getWorkNode());                    
+                    Core prevCore = ProcessFilterUtils.getCore(prev.getWorkNode(), prev);                                        
+                    setComputeNode(
+                            filter.getWorkNode(),
+                            prevCore);                
+
+                } else if (filter.getWorkNode().isFileInput()) {        
+                    Filter next = ProcessFilterUtils.getNextFilter(filter.getWorkNode());                    
+                    Core nextCore = ProcessFilterUtils.getCore(next.getWorkNode(), next); 
+                    setComputeNode(
+                            filter.getWorkNode(),
+                            nextCore);    
+                } else {
+                    setComputeNode(
+                            filter.getWorkNode(),
+                            SMPBackend.chip.getOffChipMemory());
+                }
+            }
+        }
+        
+        for (int x = 0; x < workAmounts.length; x++)
+            System.out.println("Core " + x + " has work: " + workAmounts[x]);
+        
     }
 
     @Override
     public void setComputeNode(InternalFilterNode node, Core core) {
-        System.out.println("==> StreamGraph.setComputeNode " + node + " to core " + core.getCoreID());
+        System.out.println("    * filter=" + node + " to core " + core.getCoreID());
         assert node != null && core != null;
         // remember what filters each tile has mapped to it
+
+        if (core.getCoreID() == -1) {
+            new Exception().printStackTrace();
+        }        
 
         layoutMap.put(
                 node,
@@ -377,31 +427,19 @@ public class StreamGraph implements Layout<Core> {
         return allFilters.toArray(new Filter[0]);
     }
 
-    protected void layoutDominator(Filter filter) {
+    protected void layoutDominator(Filter filter) {        
         assert filter.isTopFilter();
-
-        if (KjcOptions.nofuse) {
-        	//if we have turned off fusion, then we assume that we don't 
-        	//want to take advantage of any pipeline parallelism between the
-        	//dominators, do just map them to the 0th core.
-        	 setComputeNode(
-                     filter.getWorkNode(),
-                     SMPBackend.chip.getNthComputeNode(0));
-        }
-        
         HashMap<Filter, Long> workMap = new HashMap<Filter, Long>();
         workMap.put(
                 filter,
                 FilterWorkEstimate.getWork(filter));
-
         dominatorPacking.pack(workMap);
-
         setComputeNode(
                 filter.getWorkNode(),
                 SMPBackend.chip.getNthComputeNode(dominatorPacking
                         .getBin(filter)));
     }
- 
+
 
     /** THE FOLLOWING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 
@@ -419,8 +457,8 @@ public class StreamGraph implements Layout<Core> {
         other.ssgs = (java.util.List)at.dms.kjc.AutoCloner.cloneToplevel(this.ssgs);
     }
 
-  
+
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
-    
+
 }

@@ -79,7 +79,7 @@ public class StatelessFissioner {
 
         // Dominators can't be fizzed 
         if (filter.isTopFilter()) {
-        	System.out.println("Can't fizz: Filter is a dominator: " + filter);
+        	System.out.println("Can't fizz: Filter is a dominator: " + filter.getWorkNode());
         	return false;
         }
         

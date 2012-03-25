@@ -306,6 +306,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
                 CStdType.Integer, multiplierName, null);
         coreCodeStore.addExternField(new JFieldDeclaration(multiplierVar));
+        
         if ("stdout".equals(fileName) || "stderr".equals(fileName)
                 || KjcOptions.printf) {
             if (KjcOptions.outputs < 0) {

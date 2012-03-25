@@ -68,9 +68,7 @@ public class TMDBinPackFissAll extends TMD {
                             slice,
                             totalTiles);
                 }
-            } else {
-                System.out.println("Cannot fiss: " + fsn);
-            }
+            } 
         }
     }
 

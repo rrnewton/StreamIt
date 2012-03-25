@@ -583,7 +583,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * @param str
      *            The string to add
      */
-    public void appendTxtToGlobal(String str) {
+    public void appendTxtToGlobal(String str) {               
         globalTxt.append(str);
         this.setHasCode();
     }
