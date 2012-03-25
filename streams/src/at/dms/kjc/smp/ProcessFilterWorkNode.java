@@ -718,6 +718,10 @@ public class ProcessFilterWorkNode {
                         nextThread);
             }
 
+            if (ThreadMapper.isMain(nextThread) && (threadIndex != nextThread)) {
+                codeStore.addSteadyThreadWait(nextThread);
+            }
+            
 
         }        
     }

@@ -359,9 +359,11 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
                 int mainThread = ThreadMapper.coreToThread(coreCodeStore
                         .getCore().coreID);
-                addCallNextToMain(
-                        threadId,
-                        mainThread);
+                if (threadId != mainThread) { 
+                	addCallNextToMain(
+                			threadId,
+                			mainThread);
+                }
             }
         }
 
