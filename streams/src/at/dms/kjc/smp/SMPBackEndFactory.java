@@ -239,10 +239,7 @@ public class SMPBackEndFactory extends
 	@Override
 	public void processFilterWorkNode(WorkNode filter,
 			SchedulingPhase whichPhase, SMPMachine chip) {	    	   		
-
-	    
-	    new Exception().printStackTrace();
-	    
+	    	   	    
 		if (filter.isPredefined()) {
 			if (filter.isFileInput()) {
 				(new ProcessFileReader(filter, whichPhase, this))

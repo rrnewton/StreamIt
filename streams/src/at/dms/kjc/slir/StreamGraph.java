@@ -80,23 +80,11 @@ public class StreamGraph implements Layout<Core> {
 
     @Override
     public Core getComputeNode(InternalFilterNode node) {
-
-        //System.out.println("StreamGraph.getComputeNode node=" + node.getAsFilter());
-
         if (null == layoutMap.get(node)) {
             assert false : " StreamGraph.getComputeNode Node" + node.toString() + " is not in the layoutMap";    
         }                      
+        return layoutMap.get(node);       
 
-        if (node.getAsFilter().isFileInput()) {
-            return layoutMap.get(node);    
-        }
-        else if (node.getAsFilter().isFileOutput()) {
-            Filter prev = ProcessFilterUtils.getPreviousFilter(node.getAsFilter());                                  
-            return layoutMap.get(prev.getWorkNode());    
-        }        
-        else {
-            return layoutMap.get(node);       
-        }
     }
 
     public int getNumSSGs() {
@@ -287,7 +275,8 @@ public class StreamGraph implements Layout<Core> {
         for (Filter filter : filters) {                                      
             if (filter.getWorkNode().isPredefined()) {
                 if (filter.getWorkNode().isFileOutput()) {                                        
-                    Filter prev = ProcessFilterUtils.getPreviousFilter(filter.getWorkNode());                    
+                    Filter prev = ProcessFilterUtils.getPreviousFilter(filter.getWorkNode());                                        
+                    
                     Core prevCore = ProcessFilterUtils.getCore(prev.getWorkNode(), prev);                                        
                     setComputeNode(
                             filter.getWorkNode(),

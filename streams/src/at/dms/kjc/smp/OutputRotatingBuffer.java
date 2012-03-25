@@ -38,13 +38,13 @@ public class OutputRotatingBuffer extends RotatingBuffer {
 
 		if (!filter.getOutputNode().noOutputs()) {
 			assert filter.getOutputNode().totalWeights(SchedulingPhase.STEADY) > 0;
-			Core parent = SMPBackend.getComputeNode(filter
+			Core core = SMPBackend.getComputeNode(filter
 					.getWorkNode());
 
 			// create the new buffer, the constructor will put the buffer in the
 			// hashmap
 			OutputRotatingBuffer buf = new OutputRotatingBuffer(
-					filter.getWorkNode(), parent);
+					filter.getWorkNode(), core);
 
 			buf.setRotationLength(schedule);
 			buf.setBufferSize();

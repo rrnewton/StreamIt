@@ -251,11 +251,15 @@ public class ProcessFilterUtils {
             InterFilterEdge[] srcEdges = filter.getParent().getInputNode()
                     .getSources(
                             SchedulingPhase.STEADY);
-            Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
+//            Set<InterFilterEdge> edgeSet = new HashSet<InterFilterEdge>();
+//            for (InterFilterEdge e : srcEdges) {
+//                edgeSet.add(e);
+//            }
+            //for (InterFilterEdge e : edgeSet) {
+            	
             for (InterFilterEdge e : srcEdges) {
-                edgeSet.add(e);
-            }
-            for (InterFilterEdge e : edgeSet) {
+            	
+            	
                 return e.getSrc().getParent();
             }
             return null;
