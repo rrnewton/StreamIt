@@ -171,7 +171,7 @@ def plot_normalized(ratio, work, outputs):
 
 def main():         
     attempts = 3
-    ignore = 1000
+    ignore = 1024
     outputs = 100000
     #cores = [1, 2, 4, 8, 16, 32]
     cores = [1, 2, 4, 8, 16]
