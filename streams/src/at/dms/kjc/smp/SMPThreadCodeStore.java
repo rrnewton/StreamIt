@@ -388,7 +388,9 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
         String type = tapeType == CStdType.Integer ? "%d" : "%f";
         String cast = tapeType == CStdType.Integer ? "(int)" : "(float)";
-
+        String typeString = ((OutputContent) fileW.getWorkNodeContent())
+                .getType() == CStdType.Integer ? "int" : "float";
+        
         // create the loop
         String stmt = "";
 
@@ -425,6 +427,10 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             buffer = "dyn_buf_" + buf.getId();
         }
 
+        
+        String fileName = ((OutputContent) fileW.getWorkNodeContent())
+                .getFileName();
+        
         String popCall;
         if (KjcOptions.threadopt) {
             popCall = popName + "(" + buffer + ", " + threadIndex + ", "
@@ -441,36 +447,20 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         } else {
             peekCall = peekName + "(" + buffer + ", " + threadIdStr
                     + ", 0, NULL, 0)";
-        }
-
-        if (KjcOptions.outputs < 0) {
-            stmt = "int _i_ = 0;\n" + "for (int _i_ = 0; _i_ < " + outputs
-                    + "*" + multiplierName + "; _i_++) { \n";
-            if (KjcOptions.lockfree) {
-                stmt += "    if (" + buffer + "->head != " + buffer
-                        + "->tail) {\n";
-            } else {
-                stmt += "    if (" + buffer + "->size > 0) {\n";
-            }
-            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
-                    + popCall + ");\n " + "    }\n" + "}\n";
-
-        } else {
-            stmt = "int _i_ = 0;\n" + "for (_i_ = 0; _i_ < " + outputs + "*"
-                    + multiplierName + "; _i_++) {\n";
-            if (KjcOptions.lockfree) {
-                stmt += "    if (" + buffer + "->head != " + buffer
-                        + "->tail) {\n";
-            } else {
-                stmt += "    if (" + buffer + "->size > 0) {\n";
-            }
-            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
-                    + popCall + ");\n";
-            stmt = addPerfTest(stmt);
-            stmt = addOutputCountDynamic(
-                    stmt,
-                    peekCall);
-        }
+        }        
+        
+        if (KjcOptions.lockfree) {
+    		stmt = getLockFreePrint( outputs,  multiplierName,  buffer, 
+    	    		 type,  cast,  popCall,  peekCall);
+    	} else if ("stdout".equals(fileName) || "stderr".equals(fileName)
+                   || KjcOptions.printf) {    		   
+    		stmt = getLockPrint( outputs,  multiplierName,  buffer, 
+   	    		 type,  cast,  popCall,  peekCall);
+    	} else {
+    		stmt = getFWritePrint( outputs,  multiplierName,  buffer, 
+    				typeString,  cast,  popCall,  peekCall);
+    	}
+                
         addSteadyLoopStatement(Util.toStmt(stmt));
 
         if (KjcOptions.threadopt) {
@@ -484,7 +474,76 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         }
     }
 
-    public void addStatementFirst(JExpressionStatement statement) {
+    private String getFWritePrint(int outputs, String multiplierName, String buffer, 
+    		String type, String cast, String popCall, String peekCall) {    	
+    	String stmt = "";
+    	stmt += "if (" + buffer + "->last >= " + buffer + "->first) {\n";
+    	stmt += "    fwrite(&" + buffer + "[" + buffer + "->first], sizeof(" + type + "), ((" + buffer + "->last - " + buffer + "->first) + 1), output);\n";      
+    	stmt += "} else {\n";
+    	stmt += "    fwrite(&" + buffer + "[" + buffer + "->first], sizeof(" + type + "), (" + buffer + "->max - " + buffer + "->first), output);\n";      
+    	stmt += "    fwrite(&" + buffer + "[0], sizeof(" + type + "), (" + buffer + "->last +1), output);\n";      
+    	stmt += "}\n";
+    	if (KjcOptions.outputs >= 0) {
+    		stmt += "currOutputs +=" + buffer + "->size;\n";
+    		if (KjcOptions.perftest) {
+    			stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
+    		}
+    		stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
+    	}
+    	stmt += "" + buffer + "->size = 0;\n";
+    	stmt += "" + buffer + "->first = 1;\n";
+    	stmt += "" + buffer + "->last = 0;\n";
+    	
+    	return stmt;
+    }
+    
+    private String getLockPrint(int outputs, String multiplierName, String buffer, 
+    		String type, String cast, String popCall, String peekCall) {
+    	String stmt = "";
+    	if (KjcOptions.outputs < 0) {
+    		stmt += "int _i_ = 0;\n";
+    		stmt += "for (int _i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n";
+    		stmt += "    if (" + buffer + "->size > 0) {\n";
+    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast  + popCall + ");\n ";
+    		stmt += "    }\n"; 
+    		stmt += "}\n";
+
+    	} else {
+    		stmt += "int _i_ = 0;\n"; 
+    	    stmt += "for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) {\n";
+    		stmt += "    if (" + buffer + "->size > 0) {\n";
+    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n";
+    		stmt = addPerfTest(stmt);
+    		stmt = addOutputCountDynamic(stmt, peekCall);
+    	}
+		return stmt;
+	}
+
+	private String getLockFreePrint(int outputs, String multiplierName, String buffer, 
+    		String type, String cast, String popCall, String peekCall) {
+    	String stmt = "";
+    	if (KjcOptions.outputs < 0) {
+    		stmt += "int _i_ = 0;\n";
+    		stmt += "for (int _i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n";
+    		stmt += "    if (" + buffer + "->head != " + buffer + "->tail) {\n";    		
+    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast  + popCall + ");\n "; 
+    		stmt += "    }\n" + "}\n";
+
+    	} else {
+    		stmt += "int _i_ = 0;\n";
+    		stmt += "for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) {\n";
+    		stmt += "    if (" + buffer + "->head != " + buffer  + "->tail) {\n";    	
+    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n";
+    		stmt = addPerfTest(stmt);
+    		stmt = addOutputCountDynamic(
+    				stmt,
+    				peekCall);
+    	}
+    		
+		return stmt;
+	}
+
+	public void addStatementFirst(JExpressionStatement statement) {
         threadMethod.addStatementFirst(statement);
     }
 
