@@ -50,10 +50,10 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     public void addBarrierWait() {
         getMain().addBarrierWait();
-      
+
     }
-    
-    
+
+
     /**
      * Append a barrier instruction to all of the cores in the buffer init
      * method.
@@ -151,7 +151,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         OutputPort outputPort = edge.getSrc();
         Filter destFilter = inputPort.getSSG().getTopFilters()[0];
         Filter srcFilter = outputPort.getSSG().getFilterGraph()[outputPort
-                .getSSG().getFilterGraph().length - 1];
+                                                                .getSSG().getFilterGraph().length - 1];
 
         Core srcCore = SMPBackend.getComputeNode(srcFilter.getWorkNode());
 
@@ -159,7 +159,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         OutputContent fileOutput = (OutputContent) destFilter
                 .getWorkNodeContent();
 
-        
+
         if (KjcOptions.threadopt) {
             int threadId = ThreadMapper.getMapper().getFilterToThreadId().get(destFilter);           
             codeStore.addPrintOutputCode(
@@ -178,6 +178,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 fileOutput);
     }
 
+    /* Keep track of which FileWriters have been generated */
+    static Set<WorkNode> generatedPrintCode = new HashSet<WorkNode>();
+
     /**
      * Generate the print output code for the static communication channel;
      * 
@@ -186,46 +189,55 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      */
     private static void generatePrintOutputCodeStatic(InputRotatingBuffer buf) {
 
-        WorkNode fileW = buf.filterNode;
+        WorkNode fileW = buf.filterNode;        
+        if (generatedPrintCode.contains(fileW)) {
+            return;
+        }
+        generatedPrintCode.add(fileW);
 
         // find the core of the first input to the file writer
         WorkNode firstInputFilter = fileW.getParent().getInputNode()
                 .getSources(
                         SchedulingPhase.STEADY)[0].getSrc().getParent()
-                .getWorkNode();
+                        .getWorkNode();
 
         if (KjcOptions.sharedbufs
                 && FissionGroupStore.isFizzed(firstInputFilter.getParent()))
             firstInputFilter = FissionGroupStore
-                    .getFizzedSlices(firstInputFilter.getParent())[0]
+            .getFizzedSlices(firstInputFilter.getParent())[0]
                     .getWorkNode();
 
-        Core core = SMPBackend.getComputeNode(firstInputFilter);
-
+        //Core core = SMPBackend.getComputeNode(firstInputFilter);
+        Core core = SMPBackend.getComputeNode(fileW);
+        
         SMPComputeCodeStore codeStore = core.getComputeCode();
 
         OutputContent fileOutput = (OutputContent) fileW.getWorkNodeContent();
-        
+
+
+
         if (KjcOptions.threadopt) {
             int threadId = ThreadMapper.getMapper().getFilterToThreadId().get(fileW.getParent());           
+
             codeStore.addPrintOutputCode(
                     threadId,
-                buf,
-                firstInputFilter);
+                    buf,
+                    firstInputFilter);
+
         } else {
             codeStore.addPrintOutputCode(
                     buf,
                     firstInputFilter);            
         }
-        
-        
+
+
         addOpen(
                 codeStore,
                 fileOutput);
 
     }
 
-  
+
 
     /* A map of all the threads on this core */
     protected Map<Integer, SMPThreadCodeStore> threads            = new HashMap<Integer, SMPThreadCodeStore>();
@@ -335,8 +347,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     public void addCallNextToThread(int threadIndex, int nextThread) {
         threads.get(
                 threadIndex).addCallNextToMain(
-                threadIndex,
-                nextThread);
+                        threadIndex,
+                        nextThread);
     }
 
     public void addExpressionFirst(JExpression expr) {
@@ -376,8 +388,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
         threads.get(
                 threadId).addFunctionCallFirst(
-                func,
-                args);
+                        func,
+                        args);
     }
 
     public void addFunctionCallFirst(int threadId, String funcName,
@@ -387,8 +399,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
         threads.get(
                 threadId).addFunctionCallFirst(
-                funcName,
-                args);
+                        funcName,
+                        args);
     }
 
     public void addFunctionCallFirst(JMethodDeclaration func, JExpression[] args) {
@@ -494,20 +506,20 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     public void addStatementToSteadyLoop(int threadId, JStatement statement) {
         threads.get(
                 threadId).addStatementToSteadyLoop(
-                statement);
+                        statement);
     }
 
-//    public void addStatementToSteadyLoop(JStatement statement) {
-//        this.addStatementToSteadyLoop(
-//                0,
-//                statement);
-//    }
+    //    public void addStatementToSteadyLoop(JStatement statement) {
+    //        this.addStatementToSteadyLoop(
+    //                0,
+    //                statement);
+    //    }
 
     public void addSteadyLoopStatement(int index, JStatement stmt) {
-                
+
         threads.get(
                 index).addSteadyLoopStatement(
-                stmt);
+                        stmt);
 
     }
 
@@ -755,7 +767,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      * core.
      */
     private void addPrintOutputCode(InputRotatingBuffer buf, WorkNode workNode) {
-                
+
         getMain().addPrintOutputCode(
                 buf,
                 workNode);
@@ -767,15 +779,28 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
      */
     private void addPrintOutputCode(int threadId, InputRotatingBuffer buf,
             WorkNode workNode) {        
-        
-        assert threads.get(threadId) != null : "SMPComputeCodeStore.addPrintOutputCode threads.get(" + threadId + ") is null. The worknode=" + workNode;
-        
+
+        // Note that there could be more than one InputRotatingBuffer
+        // for a FileWriter (such as occurs with fission). As a result,
+        // we might not be calling the code generation on the right 
+        // buffer. This is a HACK, and it would be better not to call, 
+       
+        if (threads.get(threadId) == null) {
+            //  
+            assert threads.get(threadId) != null : "SMPComputeCodeStore.addPrintOutputCode threads.get(" + threadId + ") is null. The worknode=" + workNode;
+            //            System.out.println("========= ERROR!!!!!! SMPComputeCodeStore.addPrintOutputCode threads.get(" + threadId + ") is null. The worknode=" + workNode);
+            //            
+            return;
+        }
+
+
+
         threads.get(threadId).addPrintOutputCode(
                 buf,
                 workNode);              
     }
-    
-    
+
+
     /**
      * Add code to print the output written to the file writer mapped to this
      * core.
@@ -788,7 +813,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 backEndFactory);
     }
 
-    
+
     /**
      * Add code to print the output written to the file writer mapped to this
      * core.
@@ -801,8 +826,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 backEndFactory);
     }
 
-    
-    
+
+
     /**
      * Create the method that will malloc the buffers and receive the (
      * addresses from downstream cores

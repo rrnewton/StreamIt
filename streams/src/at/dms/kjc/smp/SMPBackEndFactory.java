@@ -241,7 +241,7 @@ public class SMPBackEndFactory extends
 			SchedulingPhase whichPhase, SMPMachine chip) {	    	   		
 
 	    
-	    //new Exception().printStackTrace();
+	    new Exception().printStackTrace();
 	    
 		if (filter.isPredefined()) {
 			if (filter.isFileInput()) {
