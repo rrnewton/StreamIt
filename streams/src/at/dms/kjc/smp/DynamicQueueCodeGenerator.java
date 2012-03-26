@@ -146,7 +146,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  int x = (q->first + index) & q->max;\n");
             cBuffer.append("  " + type + " elem = q->buffer[x];\n");        
             cBuffer.append("  for (i = 0; i < num_multipliers; i++) {\n");
-            cBuffer.append("     *multipliers[i] = " + KjcOptions.threadbatch  + ";\n");
+            cBuffer.append("     *multipliers[i] = 1;\n");
             cBuffer.append("  }\n");        
             cBuffer.append("  pthread_mutex_unlock(&q->lock);\n");
             cBuffer.append("  return elem;\n");
@@ -191,7 +191,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  q->size--;\n");
             cBuffer.append("  q->first = (q->first + 1) & q->max;\n");
             cBuffer.append("  for (i = 0; i < num_multipliers; i++) {\n");
-            cBuffer.append("      *multipliers[i] = " + KjcOptions.threadbatch  + ";\n");
+            cBuffer.append("      *multipliers[i] = 1;\n");
             cBuffer.append("  }\n");
             cBuffer.append("  pthread_mutex_unlock(&q->lock);\n");
             cBuffer.append("  return elem;\n");
@@ -365,7 +365,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  int x = (q->first + index) & q->max;\n");
             cBuffer.append("  " + type + " elem = q->buffer[x];\n");        
             cBuffer.append("  for (i = 0; i < num_multipliers; i++) {\n");
-            cBuffer.append("      *multipliers[i] = " + KjcOptions.threadbatch  + ";\n");
+            cBuffer.append("      *multipliers[i] = 1;\n");
             cBuffer.append("  }\n");        
             cBuffer.append("  pthread_mutex_unlock(&q->lock);\n");
             cBuffer.append("  return elem;\n");
@@ -407,7 +407,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  q->size--;\n");
             cBuffer.append("  q->first = (q->first + 1) & q->max;\n");
             cBuffer.append("  for (i = 0; i < num_multipliers; i++) {\n");
-            cBuffer.append("     *multipliers[i] = " + KjcOptions.threadbatch  + ";\n");
+            cBuffer.append("     *multipliers[i] = 1;\n");
             cBuffer.append("  }\n");
             cBuffer.append("  pthread_mutex_unlock(&q->lock);\n");
             cBuffer.append("  return elem;\n");

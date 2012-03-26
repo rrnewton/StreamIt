@@ -79,10 +79,22 @@ public class TMDBinPackFissAll extends TMD {
     @Override
     public void run(int tiles) {
 
+        
+        // Increase the multiplicity for thread batching
+        if (KjcOptions.threadbatch > 1) {
+            for (Filter filter : graphSchedule.getSSG().getFilterGraph()) {
+                WorkNodeContent content = filter.getWorkNode()
+                        .getWorkNodeContent();
+                content.multSteadyMult(KjcOptions.threadbatch);
+            }
+        }
+        
+        
         if (KjcOptions.nofizz) {
             return;
         }
 
+               
         // if we are using the SIR data parallelism pass, then don't run TMD
         if (KjcOptions.dup == 1 || KjcOptions.optfile != null) {
             System.out
@@ -98,6 +110,8 @@ public class TMDBinPackFissAll extends TMD {
                 filter.multSteadyMult(KjcOptions.steadymult);
             }
 
+          
+            
             // must reset the filter info's because we have changed the schedule
             WorkNodeInfo.reset();
             return;

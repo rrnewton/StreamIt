@@ -91,17 +91,17 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         }
 
         JStatement loop;
-        if (KjcOptions.threadbatch > 1) {
-            batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
-            JStatement[] stmts = { batchingLoop };
-            JBlock block = new JBlock(null, stmts, null);
-            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
-                    block, null);
-            outerLoop = block;
-        } else {
+//        if (KjcOptions.threadbatch > 1) {
+//            batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
+//            JStatement[] stmts = { batchingLoop };
+//            JBlock block = new JBlock(null, stmts, null);
+//            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
+//                    block, null);
+//            outerLoop = block;
+//        } else {
             loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
                     threadSteadyLoop, null);
-        }
+       // }
 
         methodBody.addStatement(loop);
         methodBody.addStatement(new JExpressionStatement(
@@ -575,18 +575,18 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                     new JEmittedTextExpression("profiler_clear()")));
         }
 
-        if (KjcOptions.threadbatch > 1) {
-            batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
-            JStatement[] stmts = { batchingLoop };
-            JBlock block = new JBlock(null, stmts, null);
-            threadMethod.addStatement(new JWhileStatement(null,
-                    new JBooleanLiteral(null, true), block, null));
-            outerLoop = block;
-        } else {
+//        if (KjcOptions.threadbatch > 1) {
+//            batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
+//            JStatement[] stmts = { batchingLoop };
+//            JBlock block = new JBlock(null, stmts, null);
+//            threadMethod.addStatement(new JWhileStatement(null,
+//                    new JBooleanLiteral(null, true), block, null));
+//            outerLoop = block;
+//        } else {
             // add it to the while statement
             threadMethod.addStatement(new JWhileStatement(null,
                     new JBooleanLiteral(null, true), threadSteadyLoop, null));
-        }
+      //  }
     }
 
     public void addSteadyLoop(ALocalVariable iterationBound) {
