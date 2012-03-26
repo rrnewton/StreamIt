@@ -11,6 +11,7 @@ class Configs:
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
+
 def generate(test, work, ratio):
     op = 'void->void pipeline test {\n';
     op += '    add FileReader<float>(\"../input/floats.in\");\n'
@@ -35,10 +36,15 @@ def generate(test, work, ratio):
     op += '    }\n'
     op += '}\n'
     op += '\n'
-    op += 'float->float filter FstaticX() {\n'
+    op += 'float->float stateful filter FstaticX() {\n'
+    op += '    int count;'
+    op += '     init {'
+    op += '        count = 0;'
+    op += '    }'
     op += '    work pop 1 push 1 {\n'
     op += '        int i;\n'
     op += '        float x;\n'
+    op += '        count++;\n'
     op += '        x = pop();\n'
     op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
@@ -53,10 +59,15 @@ def generate(test, work, ratio):
     op += '    }\n'
     op += '}\n'
     op += '\n'    
-    op += 'float->float filter Fdynamic() {\n'
+    op += 'float->float stateful filter Fdynamic() {\n'
+    op += '    int count;'
+    op += '     init {'
+    op += '        count = 0;'
+    op += '    }'
     op += '    work pop * push * {\n'
     op += '        int i;\n'
     op += '        float x;\n'
+    op += '        count++;\n'
     op += '        x = pop();\n'
     op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
@@ -72,7 +83,7 @@ def compile(test, outputs, ignore, core):
     exe = './smp' + str(core)
     if test == Configs.static:
         cmd = [strc, '--perftest', '--noiter',
-               '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
+               '--outputs', str(outputs), '--preoutputs', str(ignore), '--nofuse', '-smp', str(core), 'test.str' ]
     else:
         cmd = [strc, '--perftest', '--noiter', '--nofuse', '--threadopt',
                '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
