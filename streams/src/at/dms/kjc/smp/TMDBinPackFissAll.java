@@ -346,12 +346,9 @@ public class TMDBinPackFissAll extends TMD {
         // the percentage change
         double workChange;
 
-        // System.out.println("TMDBinPackFissAll.SIRFusion called on str=" +
-        // str.getName() );
-        // if (str instanceof SIRFilter) {
-        // System.out.println("TMDBinPackFissAll.SIRFusion before str=" +
-        // str.getName() + " isStateful=" + ((SIRFilter)str).isStateful());
-        // }
+        System.out.println("TMDBinPackFissAll.SIRFusion called on str=" +
+                str.getName() );
+        
 
         if (StatefulFusion.countStatefulFilters(str) < KjcOptions.smp) {
             return str;

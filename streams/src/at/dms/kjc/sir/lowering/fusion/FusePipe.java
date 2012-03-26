@@ -274,7 +274,7 @@ public class FusePipe {
 	 * FuseSplit are suspect.
 	 */
 	public static boolean isFusable(SIRStream str) {
-
+	    
 	    /* The fusing optimization has been disabled */
 	    if (KjcOptions.nofuse) {	        
 	        return false;   
@@ -285,6 +285,8 @@ public class FusePipe {
             return false;
 		}
 		SIRFilter filter = (SIRFilter) str;
+		
+		System.out.println("    ==> FusePipe.isFusable str=" + str.getName() + " dynamicPop=" + filter.isDynamicPop() + " dynamicPush=" + filter.isDynamicPush());
 			
 		if (filter.hasIO() && KjcOptions.regtest) {
 			System.err.println("filter " + filter.getName()
@@ -314,10 +316,9 @@ public class FusePipe {
 			}
 			return false;
 		}
-
-		
-		if (filter.getDynamic()) {
-		    System.err.println("FusePipe.isFusable filter " + filter.getName()
+				
+		if (filter.isDynamicPop() || filter.isDynamicPush()) {
+		    System.out.println("FusePipe.isFusable filter " + filter.getName()
                     + " is not fusable because has dynamic rates");
 		    return false;
 		}

@@ -55,7 +55,6 @@ import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.SIRToSLIR;
 import at.dms.kjc.slir.StaticSubGraph;
 import at.dms.kjc.slir.StreamGraph;
-import at.dms.kjc.smp.SMPBackend;
 
 /**
  * Common passes, useful in new back ends.
@@ -96,7 +95,7 @@ public class CommonPasses {
      */
     private StreamGraph doStaticPassesSegmentedSIRGraph(
             SegmentedSIRGraph segmentedGraph) {
-      
+
         int i = 0;
         SegmentedSIRGraph optimizedGraph = new SegmentedSIRGraph();
         for (SIRStream str : segmentedGraph.getStaticSubGraphs()) {
@@ -112,10 +111,10 @@ public class CommonPasses {
 
         // Print the optimized graph for debugging
         optimizedGraph.printGraph("optimized.dot");
-        
+
         System.out
-                .println("CommonPasses.doStaticPasses optimizedGraph.getStaticSubGraphs().size()="
-                        + optimizedGraph.getStaticSubGraphs().size());
+        .println("CommonPasses.doStaticPasses optimizedGraph.getStaticSubGraphs().size()="
+                + optimizedGraph.getStaticSubGraphs().size());
         streamGraph = new SIRToSLIR().translate(
                 optimizedGraph,
                 numCores);     
@@ -187,7 +186,7 @@ public class CommonPasses {
                     str,
                     KjcOptions.tilera * KjcOptions.tilera)) {
                 System.out
-                        .println("Have to fuse the graph because at least one level has too many filters...");
+                .println("Have to fuse the graph because at least one level has too many filters...");
                 str = at.dms.kjc.tilera.TMD.SIRFusion(
                         str,
                         KjcOptions.tilera * KjcOptions.tilera);
@@ -208,8 +207,10 @@ public class CommonPasses {
 
             DuplicateBottleneck dup = new DuplicateBottleneck();
             dup.percentStateless(str);
-            if (!KjcOptions.nofuse)
-            	str = FusePipelines.fusePipelinesOfStatelessStreams(str);
+            if (!KjcOptions.nofuse) {
+                str = FusePipelines.fusePipelinesOfStatelessStreams(str);
+            }
+            
             StreamItDot.printGraph(
                     str,
                     "after-fuse-stateless-ssg" + ssgNum + ".dot");
@@ -326,9 +327,9 @@ public class CommonPasses {
             }
         } else if (KjcOptions.vectorize > 0) {
             System.err
-                    .println("Linear analysis + vectorization unsupported, because 3-address\n"
-                            + "code cannot infer types of some expressions created.  Can fix\n"
-                            + "by setting types in linear analysis, or by adding type inference.");
+            .println("Linear analysis + vectorization unsupported, because 3-address\n"
+                    + "code cannot infer types of some expressions created.  Can fix\n"
+                    + "by setting types in linear analysis, or by adding type inference.");
             System.exit(1);
         }
 
@@ -497,11 +498,11 @@ public class CommonPasses {
 
         // VarDecl Raise to move array assignments up
         new VarDeclRaiser().raiseVars(str);
-        
+
         if (!KjcOptions.noiter) {
             LowerIterationExpression.doIt(str);
         }
-		
+
         // do constant propagation on fields
         System.out.println("Running Constant Field Propagation...");
         FieldProp.doPropagate(str);
@@ -510,8 +511,7 @@ public class CommonPasses {
         // expand array initializers loaded from a file
         ArrayInitExpander.doit(str);
 
-        // Currently do not support messages in these back ends.
-        // TODO: add support for messages.
+        // Currently do not support messages in these back ends.       
         if (SIRPortal.findMessageStatements(str)) {
             throw new AssertionError(
                     "Teleport messaging is not yet supported in the Raw backend.");

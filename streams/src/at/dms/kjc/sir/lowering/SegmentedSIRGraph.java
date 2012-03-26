@@ -178,6 +178,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
                         (SIRFilter) allChildren.get(i),
                         (SIRFilter) allChildren.get(i + 1))) {
                     SIRFilter filter = (SIRFilter) allChildren.get(i);
+                  
                     filter.setPush(new JIntLiteral(1));
                     SIRFilter sink = createSink(filter);
                     currentPipeline.add(sink);
@@ -187,6 +188,10 @@ public class SegmentedSIRGraph implements StreamVisitor {
                     currentPipeline = new SIRPipeline(null,
                             uniquePipelineName());
                     SIRFilter next = (SIRFilter) allChildren.get(i + 1);
+                    
+                    filter.setDynamicPush(true);
+                    next.setDynamicPop(true);
+                    
                     SIRFilter source = createSource(next);
                     addConnection(
                             connections,
@@ -234,12 +239,16 @@ public class SegmentedSIRGraph implements StreamVisitor {
     }
 
     @Override
-    public void visitFilter(SIRFilter filter, SIRFilterIter iter) {
-        if (isDynamicPush(filter) || isDynamicPop(filter)) {
-            setDynamic(
-                    filter,
-                    true);
-        }
+    public void visitFilter(SIRFilter filter, SIRFilterIter iter) {      
+        
+        System.out.println("  * SegmentedSIRGraph.visitFilter filter=" + filter.getName() + " isDynamicPop=" + isDynamicPop(filter) +
+                " isDynamicPush=" +isDynamicPush(filter));
+        
+        setDynamic(
+                filter,
+                isDynamicPop(filter),
+                isDynamicPush(filter) );
+              
     }
 
     @Override
@@ -335,11 +344,13 @@ public class SegmentedSIRGraph implements StreamVisitor {
         return self.getPush().isDynamic();
     }
 
-    private void setDynamic(SIRStream filter, boolean dynamic) {
-        filter.setDynamic(dynamic);
+    private void setDynamic(SIRStream filter, boolean dynamicPop, boolean dynamicPush) {
+        filter.setDynamicPop(dynamicPop);
+        filter.setDynamicPush(dynamicPush);
         SIRStream parent = filter.getParent();
-        while (null != parent) {
-            parent.setDynamic(dynamic);
+        while (null != parent) {           
+            parent.setDynamicPop(dynamicPop);
+            parent.setDynamicPush(dynamicPush);
             parent = parent.getParent();
         }
     }

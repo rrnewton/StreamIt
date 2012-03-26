@@ -107,6 +107,9 @@ public class FusePipelines {
      * 
      */
     public static SIRStream fusePipelinesOfStatelessStreams(SIRStream str) {
+        
+        System.out.println("FusePipelines.fusePipelinesOfStatelessStreams str=" + str);
+        
         // first eliminate wrapper pipelines, as they obscure
         // continuous pipeline sections
         Lifter.lift(str);
@@ -202,6 +205,8 @@ public class FusePipelines {
                                     JFieldDeclaration[] fields,
                                     JMethodDeclaration[] methods,
                                     JMethodDeclaration init) {
+                                    
+            
             // first visit children
             self = (SIRPipeline)super.visitPipeline(self, fields, methods, init);
 
