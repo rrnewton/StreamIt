@@ -77,12 +77,16 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
             if (KjcOptions.threadopt) {                                                            
                 int channelId = ((InterSSGChannel) inputChannel).getId();
                 Filter nextFilter = ProcessFilterUtils.getNextFilterOnCoreDifferentThread(workNode);                                                 
-                next = ProcessFilterUtils.getFilterThread(nextFilter);                                  
+                                                                              
                 // If there is no next filter on this core
                 // then we want to return to the main.
                 if (nextFilter == null) {                            
                     next = ThreadMapper.coreToThread(getCoreID(inputPort));
+                } else {
+                    next = ProcessFilterUtils.getFilterThread(nextFilter);                 
                 }
+                
+                
                 buffer = "dyn_buf_" + channelId;
             }
 
