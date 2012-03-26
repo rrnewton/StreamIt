@@ -76,7 +76,7 @@ def compile(test, outputs, ignore, core):
     else:
         cmd = [strc, '--perftest', '--noiter', '--nofuse', '--threadopt',
                '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
-    print cmd
+    print ' '.join(cmd)
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
 
@@ -173,8 +173,8 @@ def main():
     attempts = 3
     ignore = 1024
     outputs = 100000
-    #cores = [1, 2, 4, 8, 16, 32]
-    cores = [1, 2, 4, 8, 16]
+    cores = [1, 2, 4, 8, 16, 32]
+    #cores = [1, 2, 4, 8, 16]
     ratios = [0.10, 0.50, 0.90]
     total_work = [100, 1000, 10000]
     # ignore = 10
