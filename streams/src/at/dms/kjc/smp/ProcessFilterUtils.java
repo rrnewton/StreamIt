@@ -47,49 +47,58 @@ public class ProcessFilterUtils {
      *            filter that contains the worknode
      * @return thread id number
      */
-    static int getFilterThread(WorkNode w, Filter filter) {
+    static int getFilterThread(Filter filter) {
 
-        if (filter == null) {
-            return getFilterThread(
-                    w,
-                    w.getParent());
-        }
 
-        WorkNode workNode = filter.getWorkNode();
+//
+//        
+//        if (filter == null) {
+//            return getFilterThread(
+//                    w,
+//                    w.getParent());
+//        }
+//
 
-        if (KjcOptions.threadopt) {
+        
+        assert filter != null : "Null filter passed to getFilterThread!";
+        
+       
 
+        return ThreadMapper.getMapper().getFilterToThreadId().get(filter);
+        
+//        if (KjcOptions.threadopt) {
+//
+////            // A FileInput is always on the core of its next filter
+////            if (workNode.isFileInput()) {
+////                Filter next = getNextFilter(workNode);
+////                return ThreadMapper.getMapper().getFilterToThreadId().get(next);                               
+////            }
+////
+////            // A FileOutput is always on the core of its next filter
+////            if (workNode.isFileOutput()) {
+////                Filter prev = getPreviousFilter(workNode);
+////                return ThreadMapper.getMapper().getFilterToThreadId().get(prev);                                             
+////            }
+//
+//        
+//        } else {
+//
 //            // A FileInput is always on the core of its next filter
 //            if (workNode.isFileInput()) {
 //                Filter next = getNextFilter(workNode);
-//                return ThreadMapper.getMapper().getFilterToThreadId().get(next);                               
+//                Core nextCore = SMPBackend.getComputeNode(next.getWorkNode());
+//                return ThreadMapper.coreToThread(nextCore.coreID);
 //            }
 //
 //            // A FileOutput is always on the core of its next filter
 //            if (workNode.isFileOutput()) {
 //                Filter prev = getPreviousFilter(workNode);
-//                return ThreadMapper.getMapper().getFilterToThreadId().get(prev);                                             
+//                Core prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
+//                return ThreadMapper.coreToThread(prevCore.coreID);
 //            }
+//        }
 
-        
-        } else {
-
-            // A FileInput is always on the core of its next filter
-            if (workNode.isFileInput()) {
-                Filter next = getNextFilter(workNode);
-                Core nextCore = SMPBackend.getComputeNode(next.getWorkNode());
-                return ThreadMapper.coreToThread(nextCore.coreID);
-            }
-
-            // A FileOutput is always on the core of its next filter
-            if (workNode.isFileOutput()) {
-                Filter prev = getPreviousFilter(workNode);
-                Core prevCore = SMPBackend.getComputeNode(prev.getWorkNode());
-                return ThreadMapper.coreToThread(prevCore.coreID);
-            }
-        }
-
-        return ThreadMapper.getMapper().getFilterToThreadId().get(workNode.getParent());
+       
       
     }
 
@@ -210,15 +219,11 @@ public class ProcessFilterUtils {
      */
     static Filter getNextFilterOnCoreDifferentThread(WorkNode workNode) {
 
-        int filterThread = getFilterThread(
-                workNode,
-                workNode.getParent());
+        int filterThread = getFilterThread(workNode.getParent());
 
         Filter next = getNextFilterOnCore(workNode);
         while (next != null) {
-            int nextThread = getFilterThread(
-                    next.getWorkNode(),
-                    next);
+            int nextThread = getFilterThread(next);
             if (filterThread != nextThread) {
                 return next;
             }
@@ -311,7 +316,7 @@ public class ProcessFilterUtils {
      * @return the previous filter on the same core
      */
     static Filter getPreviousFilterOnCore(WorkNode workNode) {
-        if (workNode.isFileOutput()) {
+        if (workNode.isFileInput()) {
             return null;
         }
         Core core = SMPBackend.getComputeNode(workNode);
