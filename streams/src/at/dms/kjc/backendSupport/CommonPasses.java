@@ -115,10 +115,7 @@ public class CommonPasses {
         System.out
         .println("CommonPasses.doStaticPasses optimizedGraph.getStaticSubGraphs().size()="
                 + optimizedGraph.getStaticSubGraphs().size());
-        streamGraph = new SIRToSLIR().translate(
-                optimizedGraph,
-                numCores);     
-
+        streamGraph = new SIRToSLIR().translate(optimizedGraph);                
         return streamGraph;
 
     }
