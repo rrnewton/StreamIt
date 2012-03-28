@@ -131,7 +131,29 @@
 %\caption{Stateless StreamIt filter using iteration keyword starting at and resetting to a special starting value.\protect\label{fig:transform-after-twonested}}}
 %\end{figure}
 
+\section{The Iteration Keyword}
+\label{sec:iteration}
+\subsection{Language Construct Approach}
+We introduce a new language construct that maintains a value 
+indicating how often the corresponding filter has been invoked.  
+With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can take measures to write their programs to expose data parallelism.  
 
+Induction variable state requires the user to maintain mutable state, updating such state within the filter invocation, and potentially resetting them when required. The programmer can eliminate much of this code simply by arithmetically manipulating {\tt iter()} usage, as illustrated in Figures~\ref{fig:transform-after-simple} and~\ref{fig:transform-after-start}.
+
+Multiple induction variables, as used with the stateful filter in Figure~\ref{fig:transform-after-twonested}, can be redefined in terms of {\tt iter()} as well.  It is not necessary to maintain multiple separate values for state.  Independent and nested induction variable state alike can be defined in terms of {\tt iter()}.
+
+The transformations from filters using induction variable state to using {\tt iter()} are fairly simple for users to implement.  Many of these transformations simply require the user to translate their induction variables in terms how often the filter has been invoked.  User defined induction variables can all be derived from this value arithmetically.  
+
+Some of the most common transformations used in the StreamIt benchmark suite can be summarized below.  
+\begin{itemize}
+\item Incrementing the induction variable by $C$ for each invocation scales the running value by $C$, as illustrated in Figure~\ref{fig:transform-after-simple}.
+
+\item Placing an upper bound on the induction variable value establishes a range of values it may take.  This requires taking the running value modulo the size of this range, as illustrated in Figure~\ref{fig:transform-after-simple}.
+
+\item Initializing and resetting the induction variable to a special starting value reduces the total range of values the induction variable can take.  The running value is taken modulo the size of this new range to calculate the current excess over the special starting value.  We add this value to the special starting value, as illustrated in Figure~\ref{fig:transform-after-start}.
+
+\item A nested induction variable updates only when another induction variable reaches a certain threshold.  We scale the running value down according to this threshold to indicate it is incremented only once every time this threshold is reached by the other induction variable, as illustrated in Figure~\ref{fig:transform-after-twonested}.
+\end{itemize}
 
 \begin{figure}[t]
 \includegraphics[width=3.3in]{figures/transformation1.pdf}
@@ -149,12 +171,3 @@
 \end{figure}
 
 
-However, programmers should not have to worry about the technical details on how to introduce data parallelism into their programs.  With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can take measures to write their programs to expose data parallelism.  
-
-The transformation from filters using induction variable state to using {\tt iter()} is fairly simple for users to implement.  Many of these transformations simply require the user to translate their induction variables in terms of one that increments by one on every filter invocation.  User defined induction variables can all be derived from this value arithmetically.  
-
-Induction variable state also requires the user to maintain mutable state, updating such state within the filter invocation, and potentially resetting them when required. The programmer can eliminate much of this code simply by arithmetically manipulating {\tt iter()} usage, as illustrated in Figures~\ref{fig:transform-after-simple} and~\ref{fig:transform-after-start}.
-
-For filters that define multiple induction variables, as with Figure~\ref{fig:transform-after-twonested}, it is possible to redefine these values in terms of {\tt iter()} as well.  It is not necessary to maintain multiple separate values for state.  Independent and nested induction variable state alike can be defined with use of {\tt iter()}.
-
-This approach of using {\tt iter} to define induction variable state helps users write filters in a stateless manner.  The user can think about programming their filters in a stateless manner, and thereby exposing data parallelism. 

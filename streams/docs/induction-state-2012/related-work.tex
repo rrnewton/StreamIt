@@ -9,25 +9,23 @@ variables in terms of a single induction variable.  Many automatically
 parallelizing compiler systems, including Rice Fortran D
 ~\cite{Hiranandani:1992}, SUIF ~\cite{Wilson:1994}, Polaris
 ~\cite{Blume:1996}, have also done work to automatically eliminate
-such traditional induction variables.
+such traditional derived induction variables.  Such works motivate 
+the transformations that must be performed to redefine induction variables
+in terms of {\tt iter()}.
 
 Data parallelism is an important class of parallelism that many stream
-programming languages attempt to expose.  Other streaming languages
-attempt to expose data parallelism that may be inhibited by state in
-different ways.  Brook~\cite{brook04} in particular disallows stateful
-programs, thus allowing for extensive data parallelism.
+programming languages attempt to expose, including Brook~\cite{brook04},
+StreamC/KernelC~\cite{imagine03ieee}, SPUR~\cite{spur05samos}, and Cg~\cite{cg03}.
+Other streaming languages
+have also attempted to expose data parallelism inhibited by state.  
+Brook~\cite{brook04} in particular disallows stateful
+programs, thus allowing for extensive data parallelism.  Under this
+paradigm, it would be necessary to coarsen the filter in order to
+produce a compilable program with the same functionality.  
 
-
-
-These capabilities enable a programmer to write an application and its
+As discussed, the capabilities enable a programmer to write an application and its
 filters at a natural granularity that is independent of
 parallelization considerations enabling portable, reusable, and
 malleable code.  Furthermore, fine-grained implementations of filters
 enables the compiler to perform guided filter fusion that balances
 data and instruction cache behavior~\cite{sermulins-lctes05}.
-
-
-Need to address the coarsening issue.  Brook, which disallows state
-would force the user to just coarsen the filter.  Why wouldn't someone
-just coarsen?  
-

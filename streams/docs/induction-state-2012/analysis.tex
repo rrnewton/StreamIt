@@ -1,11 +1,6 @@
 \section{Analysis}
 \label{sec:analysis}
 
-\begin{table}[t]
-\caption{Benchmarks using induction variable state and estimations on work performed in filters with induction state.\protect\label{fig:benchmarks}}
-\includegraphics[width=3.3in]{figures/induction-benchmarks.pdf}
-\end{table}
-
 Table~\ref{fig:benchmarks} indicates programs in the StreamIt benchmark suite that use induction variable filters (not including source filters).  The StreamIt compiler provides static estimations of work performed in filters.  The above table indicates the work performed in specifically the induction variable filters.
 
 The majority of programs do not have substantial work performed in filters using induction variables, the MPEG-2 motion estimation subset being the exception.  However, eliminating state will have a large impact on runtime performance even on programs with low work concentration in stateful filters.  We model the potential speedups of a particular stateful program in this section.  For the purpose of this analysis, we will assume no communication cost between filters.  We will also assume the compiler exposes no pipeline parallelism.  This assumption forces the serialization of stateful filters on the stream graph.
@@ -35,5 +30,13 @@ Figure~\ref{fig:theo-speedups} indicates the potential speedups over stateful pr
 \includegraphics[width=3.3in]{figures/firbank-results.pdf}
 \caption{Speedups for FIRBankPipeline, with and without induction variable state.  \protect\label{fig:firbank-results}}
 \end{figure}
+
+
+
+\begin{table}[t]
+\caption{Benchmarks using induction variable state and estimations on work performed in filters with induction state.\protect\label{fig:benchmarks}}
+\includegraphics[width=3.3in]{figures/induction-benchmarks.pdf}
+\end{table}
+
 
 FIRBankPipeline contains one filter that uses induction variable state with 3.94\% of program's work.   Figure~\ref{fig:firbank-results} indicates the speedups over 1 core for both stateful and stateless implementations.  Between stateful and stateless implementations, there is 1.35X speedup on 8 cores, 1.58X speedup on 16 cores, and 1.84X speedup on 32 cores, which abides fairly closely to the model.
