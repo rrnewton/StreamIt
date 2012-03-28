@@ -2,6 +2,7 @@ package at.dms.kjc.slir;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class IDFilterRemoval {
@@ -27,11 +28,22 @@ public class IDFilterRemoval {
         idInput = idSlice.getInputNode();
         idOutput = idSlice.getOutputNode();
 
+        System.out.print("Trying to remove " + idSlice + ": ");
+        
         if (!idInput.balancedInput(SchedulingPhase.INIT) ||
         		!idInput.balancedInput(SchedulingPhase.STEADY)) {
-        	System.out.println("Cannot remove ID filter: " + idSlice);
+        	System.out.println("cannot remove.");
         	return;
         }
+    
+        if 	(!(checkIDFilter(SchedulingPhase.STEADY) && checkIDFilter(SchedulingPhase.INIT))) {
+        	System.out.println("cannot remove (count not fix multiplicity to match input and output)");
+        	return;
+        }
+        	
+        
+        System.out.println("Removing ID");
+        
         //some special cases
         if (s.getOutputNode().noOutputs() || s.getInputNode().noInputs())  
         	removeIDNoIO();
@@ -59,8 +71,7 @@ public class IDFilterRemoval {
     
     private void removeID(SchedulingPhase phase) {
 
-    	//check to see if there is buffering in the id, if so, need to change multiplicities
-    	checkAndFixIDFilter(phase); 
+    
     	//unroll 
     	unroll(phase);
     	//remove
@@ -70,14 +81,52 @@ public class IDFilterRemoval {
     }
     
     
-    private void checkAndFixIDFilter(SchedulingPhase phase) {
+    /**
+     * Check if we can remove the identity filter or if it is necessary to keep around for buffering.
+     * 
+     * In the backend we cannot buffer different numbers of items at different inputs to a joiner, this pass
+     * will make sure that all outputs to a ID filter can accept the items that would be sent if the ID were removed.
+     * 
+     * @param phase
+     * @return true if it is ok to remove the ID, i.e., it is not necessary for buffering.
+     */
+    private boolean checkIDFilter(SchedulingPhase phase) {
     	WorkNodeInfo fi = WorkNodeInfo.getFilterInfo(idSlice.getWorkNode());
-    	if (fi.totalItemsReceived(phase) > fi.totalItemsSent(phase)) {
     		
-    		//System.out.println("Needed to adjust ID multiplicity to remove it: " + idSlice + " " + phase + " " + max);
-    		idSlice.getWorkNode().getWorkNodeContent().setMult(phase, fi.totalItemsReceived(phase));
-    		WorkNodeInfo.reset();
+    	if (idSlice.getInputNode().isJoiner(phase)) {
+    		if (fi.totalItemsReceived(phase) > fi.totalItemsSent(phase))
+    			return false;
     	}
+    	
+    	//first check if any of the filters downstream are joiner {
+    	HashSet<InterFilterEdge> joinerEdges = new HashSet<InterFilterEdge>();
+    	for (InterFilterEdge edge : idSlice.getOutputNode().getDestSet(phase)) {
+    		if (edge.getDest().isJoiner(phase)) 
+    			joinerEdges.add(edge);
+    	}
+    	
+    	//no downstream joiners, so we are free to alter the steady state of this id because all downstream filters
+    	//will buffer appropriately
+    	if (joinerEdges.size() == 0) {
+    		//if we receive more than we send out, then alter the steady state so the removal algorithm can unroll things properly.
+    		if (fi.totalItemsReceived(phase) > fi.totalItemsSent(phase)) {
+    			//System.out.println("Needed to adjust ID multiplicity to remove it: " + idSlice + " " + phase + " " + max);
+    			idSlice.getWorkNode().getWorkNodeContent().setMult(phase, fi.totalItemsReceived(phase));
+    			WorkNodeInfo.reset();
+    		}
+    		return true;
+    	}
+
+    	//now check that all the downstream filters can actually receive all these items
+    	//if not back out the change and don't remove the id filter
+    	for (InterFilterEdge edge : joinerEdges) {
+    		//System.out.println(idSlice.getOutputNode().itemsSentOn(edge, phase) + " " + edge.getDest().itemsReceivedOn(edge, phase));
+    		if (idSlice.getOutputNode().itemsSentOn(edge, phase) > edge.getDest().itemsReceivedOn(edge, phase)) {
+    			return false;
+    		}
+    	}
+    		
+    	return true;
     }
     
     private void remove(SchedulingPhase phase) {    	

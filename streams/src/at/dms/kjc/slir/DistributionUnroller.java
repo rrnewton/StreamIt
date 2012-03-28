@@ -157,15 +157,34 @@ public class DistributionUnroller {
         if (weightsSum == 0)
             return;
         
-        assert unrolled.length % weightsSum == 0;
+        //assert unrolled.length % weightsSum == 0;
         int index = 0;
-        
+       /* 
         for (int rep = 0; rep < unrolled.length / weightsSum; rep++) {
-            for (int w = 0; w < weights.length; w++) {
+        	for (int w = 0; w < weights.length; w++) {
                 InterFilterEdge obj = src[w];
                 for (int i = 0; i < weights[w]; i++) {
                     unrolled[index++] = obj; 
                 }                 
+            }
+        }*/
+        
+        /** 
+         * to fill the unrolled distribution array, go through the weight array
+         * as many times as possible and unroll each weight
+         */
+        while (index < unrolled.length) {
+        	for (int w = 0; w < weights.length; w++) {
+                InterFilterEdge obj = src[w];
+                for (int i = 0; i < weights[w]; i++) {
+                	if (index < unrolled.length)	
+                		unrolled[index++] = obj;
+                	else  //escape out of loop if nothing left to do
+                		break;
+                }         
+                //escape out of loop if nothing left to do
+                if (index >= unrolled.length)
+                	break;
             }
         }
         

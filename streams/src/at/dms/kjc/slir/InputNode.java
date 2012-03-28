@@ -524,7 +524,8 @@ public class InputNode extends InternalFilterNode implements at.dms.kjc.DeepClon
         double totalItems = WorkNodeInfo.getFilterInfo(getNextFilter()).totalItemsReceived(phase);
         
         double items = totalItems * ratio(edge, phase);
-        assert items == Math.floor(items);
+        //System.out.println("\n =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= WARNING  =-=-=-=-=-=-=-=-=-=-=-==-=- \n");
+        assert items == Math.floor(items) : this.getParent() + " " + items + " " + Math.floor(items) + " " + phase;
         
         return (int)items;
     }

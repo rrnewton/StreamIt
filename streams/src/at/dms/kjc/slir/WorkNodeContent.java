@@ -139,7 +139,6 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         isIterating = filter.isIterationFilter(); 
         hasIO = filter.hasIO();
 //    	System.out.println("WorkNodeContent.WorkNodeContent(SIRPhasedFilter filter) isStateful="+ filter.isStateful());
-
     }
 
     public boolean hasIO() {
