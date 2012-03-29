@@ -87,9 +87,8 @@ processing has a different input or output rate than the steady-state
 processing.
 
 A {\it schedule} gives a multiplicity for each filter in a stream
-graph.  The multiplicity that denotes how many times to fire each
-filter where a firing denotes a call to a filter's {\it work} function
-(or {\it prework} function on the first iteration of the filter).  The
+graph.  The multiplicity indicates how often a filter's {\it work} function
+should be invoked (or {\it prework} function on the first iteration of the filter).  The
 {\it steady-state schedule} can be calculated such that all filters
 fire in the schedule, and the schedule can be repeated
 indefinitely~\cite{lee87}.  Steady-state execution of the graph

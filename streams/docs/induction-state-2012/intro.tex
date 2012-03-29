@@ -25,8 +25,9 @@ filters with explicit {\it induction variable} state. This is state
 that is derived from the number of executions of the filter. For
 example, a filter may keep track of how many times it has been
 invoked, in order to perform a special action every N iterations. An
-MPEG encoder has a concrete example of such a filter; running counters
-are used to maintain positions in a two-dimensional array.  The
+MPEG encoder has a concrete example of such a filter; motion estimation
+use running counters to maintain positions in a two-dimensional array,
+representative of blocks of pixels for a picture frame.  The
 presence of induction variable state inhibits data parallelism, and
 represents a bottleneck for parallelization scalability of the
 application.
@@ -49,7 +50,8 @@ language~\cite{streamitcc}.  Figure~\ref{fig:state} summarizes the
 finding of~\cite{streamit-suite} in regards to induction variable
 state on the StreamIt benchmark suite.  Of the 65 benchmarks included
 in the suite many of the real world applications include induction
-variable state, including MPEG encoder, beamforming, Trellis, and MPD.
+variable state, including MPEG encoder, beamforming, Trellis, and Medium
+Pulse Doppler.
 It is important to represent induction variable state because it is a
 common implementation idiom and parallelizing such state removes
 scalability bottlenecks to drastically improve parallelization
@@ -65,10 +67,13 @@ Induction variable state and control flow can be represented as simple
 expressions that include the {\tt iter()} expression, precluding the
 need for the programmer to explicitly maintain induction state. We
 provide a simple desugaring that converts a filter that employs the
-{\tt iter()} expression into a filter maintains explicit induction
-variable state.
+{\tt iter()} expression into a filter with explicit induction
+variable state.  Such state is maintainable by the compiler in 
+exposing future data parallelism opportunities.
 
-Automatic induction variable recognition algorithms are inadequate
+The keyword approach was chosen over an automatic recognition approach
+for detecting all user defined induction variables. Automatic induction 
+variable recognition algorithms are inadequate
 because their idiomatic nature could not capture all the real-world
 cases of induction variable state in the benchmarks.  Furthermore, we
 found that the {\tt iter()} keyword simplified implementation of
