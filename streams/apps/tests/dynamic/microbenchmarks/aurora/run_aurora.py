@@ -134,7 +134,7 @@ def plot_tests_by_batching(batching, all_tests):
     for test in batch_list:
         cmd = " \"" + data + "\" u 1:" + str(i) +  " t \'" + test.name + "\' w linespoints"
         cmds.append(cmd)
-        i = i+1
+        i = i+2
     print ','.join(cmds)
     with open(gnu, 'w') as f:        
         f.write('set terminal postscript\n')
