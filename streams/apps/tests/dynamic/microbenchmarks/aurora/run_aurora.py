@@ -178,7 +178,7 @@ def main():
     ratio = 0.50
     all_tests = []
     batching = [1, 10, 100]
-    cores = [1, 4, 8]
+    cores = [1, 4, 8, 16]
 
     for batch in batching:
         for core in cores:
