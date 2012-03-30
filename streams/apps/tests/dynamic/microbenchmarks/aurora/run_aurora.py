@@ -132,14 +132,14 @@ def plot_tests_by_batching(batching, all_tests):
     cmds = []
     i = 2
     for test in batch_list:
-        cmd = " \"" + data + "\" u 1:" + str(i) +  " t \'" + test.name + "\' w linespoints"
+        cmd = " \"" + data + "\" u 1:" + str(i) +  " t \'" + test.name + ' cores' + "\' w linespoints"
         cmds.append(cmd)
         i = i+2
     print ','.join(cmds)
     with open(gnu, 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key left top\n')
+        f.write('set key right top\n')
         f.write('set title \"Aurora Experiment\"\n')
         f.write('set log x\n')
         f.write('set xlabel \"Batch Size\"\n');
