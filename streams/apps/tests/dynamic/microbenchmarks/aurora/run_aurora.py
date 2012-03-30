@@ -141,6 +141,7 @@ def plot_tests_by_batching(batching, all_tests):
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n')
         f.write('set title \"Aurora Experiment\"\n')
+        f.write('set log x\n')
         f.write('set xlabel \"Batch Size\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write( plot + ','.join(cmds))
@@ -157,6 +158,7 @@ def plot_normalized(work, outputs, batching):
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n')
+        f.write('set log x\n')
         f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Operators\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
@@ -170,13 +172,13 @@ def do_test(test):
 
 def main():
     attempts = 3
-    preoutputs = 100
-    outputs = 1000
+    preoutputs = 1000
+    outputs = 2000
     work = 2000
     ratio = 0.50
     all_tests = []
     batching = [1, 10, 100]
-    cores = [1, 2, 4, 8, 16, 32]
+    cores = [1, 4, 8]
 
     for batch in batching:
         for core in cores:
