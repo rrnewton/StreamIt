@@ -69,7 +69,7 @@ def print_all(static_results, dynamic_results):
         print s
         f.write(s + '\n')  
         for static, dynamic in zip(static_results, dynamic_results):
-            s = '%d\t%0.2f' % (static[1], dynamic[2]/base[2])
+            s = '%d\t%0.2f\t%0.2f' % (static[1], static[2]/base[2], dynamic[2]/base[2])
             print s
             f.write(s + '\n')
         
@@ -97,7 +97,9 @@ def plot_normalized():
     data = 'des-normalized.dat'
     output = 'des-normalized.ps'  
     cmd = "plot "
-    cmd += "\"" + data + "\" u 1:2 t \'dynamic\' w linespoints,"
+    cmd += "\"" + data + "\" u 1:3 t \'dynamic\' w linespoints,"
+    cmd += "\"" + "\" u 1:2:(sprintf(\"[%d,%.1f]\",$1,$3)) notitle with labels offset 0.25,1.75,"
+    cmd += "\"" + data + "\" u 1:2 t \'static\' w linespoints,"
     cmd += "\"" + "\" u 1:2:(sprintf(\"[%d,%.1f]\",$1,$2)) notitle with labels offset 0.25,1.75"
     with open('./des-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
