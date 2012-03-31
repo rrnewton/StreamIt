@@ -12,6 +12,8 @@ import at.dms.kjc.slir.DataFlowOrder;
 import at.dms.kjc.slir.Filter;
 import at.dms.kjc.slir.FilterWorkEstimate;
 import at.dms.kjc.slir.SchedulingPhase;
+import at.dms.kjc.slir.StaticSubGraph;
+import at.dms.kjc.slir.StreamGraph;
 import at.dms.kjc.slir.WorkNode;
 import at.dms.kjc.slir.WorkNodeContent;
 import at.dms.kjc.slir.WorkNodeInfo;
@@ -68,18 +70,17 @@ public class TMDBinPackFissAll extends TMD {
                             slice,
                             totalTiles);
                 }
-            } 
+            }
         }
     }
 
     /**
      * Run the Time-Multiplexing Data-parallel scheduler. Right now, it assumes
      * a pipeline of stateless filters
-     */
+     */   
     @Override
-    public void run(int tiles) {
-
-        
+    public void run(int numCores) {
+              
         // Increase the multiplicity for thread batching
         if (KjcOptions.threadbatch > 1) {
             for (Filter filter : graphSchedule.getSSG().getFilterGraph()) {
@@ -88,13 +89,14 @@ public class TMDBinPackFissAll extends TMD {
                 content.multSteadyMult(KjcOptions.threadbatch);
             }
         }
-        
-        
+
         if (KjcOptions.nofizz) {
             return;
         }
 
-               
+        
+        StreamGraph streamGraph = graphSchedule.getSSG().getStreamGraph();
+        
         // if we are using the SIR data parallelism pass, then don't run TMD
         if (KjcOptions.dup == 1 || KjcOptions.optfile != null) {
             System.out
@@ -110,29 +112,43 @@ public class TMDBinPackFissAll extends TMD {
                 filter.multSteadyMult(KjcOptions.steadymult);
             }
 
-          
-            
             // must reset the filter info's because we have changed the schedule
             WorkNodeInfo.reset();
             return;
         }
 
         // calculate how much to fizz each filter
-        calculateFizzAmounts(tiles);
+        calculateFizzAmounts(numCores);
 
         // calculate multiplicity factor necessary to fizz filters
-        int factor = multiplicityFactor(tiles);
+        int factor = multiplicityFactor(numCores);
         System.out.println("Using fission steady multiplicity factor: "
                 + factor);
 
         // go through and multiply the steady multiplicity of each filter by
         // factor
-        LinkedList<Filter> slices = DataFlowOrder.getTraversal(graphSchedule
+        LinkedList<Filter> filters = DataFlowOrder.getTraversal(graphSchedule
                 .getSSG().getTopFilters());
 
-        for (Filter slice : slices) {
-            WorkNodeContent filter = slice.getWorkNode().getWorkNodeContent();
-            filter.multSteadyMult(factor * KjcOptions.steadymult);
+        for (Filter filter : filters) {
+            WorkNodeContent content = filter.getWorkNode().getWorkNodeContent();
+            content.multSteadyMult(factor * KjcOptions.steadymult);
+        }
+                      
+        int currentId = graphSchedule.getSSG().getId();
+        
+        // We also need to increase the multiplicity of the upstread filters
+        // that are in a different SSG
+        // TODO: Add that code here
+        for (StaticSubGraph ssg : streamGraph.getSSGs()) {           
+            int ssgId = ssg.getId();
+            if (ssgId <  currentId) {
+                for (Filter filter : ssg.getFilterGraph()) {
+                    System.out.println("TMDBinPackFissAll.run: setting the multiplicity of filter=" + filter.getWorkNode());
+                    WorkNodeContent content = filter.getWorkNode().getWorkNodeContent();
+                    content.multSteadyMult(factor * KjcOptions.steadymult);
+                }
+            }
         }
 
         // must reset the filter info's because we have changed the schedule
@@ -148,7 +164,7 @@ public class TMDBinPackFissAll extends TMD {
         // go through and perform the fission
 
         if (!KjcOptions.nofizz) {
-            for (Filter slice : slices) {
+            for (Filter slice : filters) {
                 if (fizzAmount.containsKey(slice) && fizzAmount.get(slice) > 1) {
                     FissionGroup fissionGroup = StatelessFissioner.doit(
                             slice,
@@ -346,9 +362,8 @@ public class TMDBinPackFissAll extends TMD {
         // the percentage change
         double workChange;
 
-        System.out.println("TMDBinPackFissAll.SIRFusion called on str=" +
-                str.getName() );
-        
+        System.out.println("TMDBinPackFissAll.SIRFusion called on str="
+                + str.getName());
 
         if (StatefulFusion.countStatefulFilters(str) < KjcOptions.smp) {
             return str;

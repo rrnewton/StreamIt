@@ -276,7 +276,7 @@ public class SMPBackend {
     }
 
     private static BasicSpaceTimeSchedule generateSchedules(StaticSubGraph ssg, int ssgNum) {	          
-
+                     
         // dump slice graph to dot file
         ssg.dumpGraph("traces_ssg" + ssgNum +".dot", null);
 

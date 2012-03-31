@@ -312,7 +312,7 @@ public class ThreadMapper {
             // it doesn't dominate anything, and it will
             // be on the main thread.
             int thread = threadId;
-            if (!isDynamicInput || ((ssg.getParent().getNumSSGs() == 1))) {
+            if (!isDynamicInput || ((ssg.getStreamGraph().getNumSSGs() == 1))) {
                 thread = coreToThread(filterCore);
                 filterToThreadId.put(
                         filter,
