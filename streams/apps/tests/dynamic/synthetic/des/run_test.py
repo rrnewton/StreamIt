@@ -98,7 +98,7 @@ def plot_normalized():
     output = 'des-normalized.ps'  
     cmd = "plot "
     cmd += "\"" + data + "\" u 1:3 t \'dynamic\' w linespoints,"
-    cmd += "\"" + "\" u 1:2:(sprintf(\"[%d,%.1f]\",$1,$3)) notitle with labels offset 0.25,1.75,"
+    cmd += "\"" + "\" u 1:3:(sprintf(\"[%d,%.1f]\",$1,$3)) notitle with labels offset 0.25,1.75,"
     cmd += "\"" + data + "\" u 1:2 t \'static\' w linespoints,"
     cmd += "\"" + "\" u 1:2:(sprintf(\"[%d,%.1f]\",$1,$2)) notitle with labels offset 0.25,1.75"
     with open('./des-normalized.gnu', 'w') as f:        
