@@ -193,48 +193,13 @@ public class ProcessFilterWorkNode {
                 isDynamicPop,
                 isDynamicPush);
 
+   ;
+        
+        
+        
+        
         for (JMethodDeclaration method : methods) {
-
-            int num_multipliers = (dominators.get(workNode.toString()) == null) ? 0
-                    : dominators.get(
-                            workNode.toString()).size();
-
-            int num_tokens = (ThreadMapper.getMapper().getDominatorToTokens().get(workNode) == null) ? 0
-                    : ThreadMapper.getMapper().getDominatorToTokens().get(workNode).size();
-
-            String tokenCall = "volatile int* tokens[" + num_tokens + "] = {";
-            if (ThreadMapper.getMapper().getDominatorToTokens().containsKey(workNode)) {
-                int j = 0;
-                for (String tokenName : ThreadMapper.getMapper().getDominatorToTokens().get(workNode)) {                
-                    if (j != 0) {
-                        tokenCall += ", ";
-                    }
-                    tokenCall += "&" + tokenName;
-                    j++;      
-
-                }                 
-            }
-            tokenCall += "}";
-
-            String call = "int* multipliers[" + num_multipliers + "] = {";
-            if (dominators.get(workNode.toString()) != null) {
-                int j = 0;
-                for (String d : dominators.get(workNode.toString())) {
-                    if (j != 0) {
-                        call += ", ";
-                    }
-                    call += "&" + d + "_multiplier";
-                    j++;
-                }
-            }
-            call += "}";
-
-            method.addStatementFirst(new JExpressionStatement(
-                    new JEmittedTextExpression(tokenCall)));
-
-            method.addStatementFirst(new JExpressionStatement(
-                    new JEmittedTextExpression(call)));
-
+           
             method.accept(pushPopReplacingVisitor);
             // Add markers to code for debugging of emitted code:
             String methodName = "filter "
@@ -244,10 +209,68 @@ public class ProcessFilterWorkNode {
             method.addStatement(new SIREndMarker(methodName));
         }
 
+        
+
+        Core core = ProcessFilterUtils.getCore(workNode);
+        SMPComputeCodeStore cs = backEndFactory.getComputeCodeStore(core);
+      
+        cs.appendTxtToGlobal(makeMultipliers(workNode));
+        cs.appendTxtToGlobal(makeTokens(workNode));
+       
+//        cs.addStatementFirst(new JExpressionStatement(
+//                new JEmittedTextExpression(makeMultipliers(workNode))));
+//
+//        method.addStatementFirst(new JExpressionStatement(
+//                new JEmittedTextExpression( makeTokens(workNode))));
+
+        
         return helper;
     }
 
  
+    private static String makeMultipliers(WorkNode workNode) {
+        Map<String, List<String>> dominators = ThreadMapper.getMapper()
+                .getDominators();
+        int num_multipliers = (dominators.get(workNode.toString()) == null) ? 0
+                : dominators.get(
+                        workNode.toString()).size();
+        String call = "int* " + workNode.toString() + "_multipliers[" + num_multipliers + "] = {";
+        if (dominators.get(workNode.toString()) != null) {
+            int j = 0;
+            for (String d : dominators.get(workNode.toString())) {
+                if (j != 0) {
+                    call += ", ";
+                }
+                call += "&" + d + "_multiplier";
+                j++;
+            }
+        }
+        call += "};\n";
+        return call;
+    }
+    
+    
+    private static String makeTokens(WorkNode workNode) {
+             
+        int num_tokens = (ThreadMapper.getMapper().getDominatorToTokens().get(workNode) == null) ? 0
+                : ThreadMapper.getMapper().getDominatorToTokens().get(workNode).size();
+
+        String tokenCall = "volatile int* " + workNode.toString() + "_tokens[" + num_tokens + "] = {";
+        if (ThreadMapper.getMapper().getDominatorToTokens().containsKey(workNode)) {
+            int j = 0;
+            for (String tokenName : ThreadMapper.getMapper().getDominatorToTokens().get(workNode)) {                
+                if (j != 0) {
+                    tokenCall += ", ";
+                }
+                tokenCall += "&" + tokenName;
+                j++;      
+
+            }                 
+        }
+        tokenCall += "};\n";
+        return tokenCall;
+    }
+    
 
     static void addTokenWait(WorkNode workNode, SMPComputeCodeStore codeStore) {
         if (ThreadMapper.getMapper().getTokenReads().containsKey(workNode)) {
@@ -603,8 +626,7 @@ public class ProcessFilterWorkNode {
         
         Filter prevFilter = ProcessFilterUtils.getPreviousFilterOnCore(workNode);
         Core prevCore = ProcessFilterUtils.getCore(
-                workNode,
-                prevFilter);          
+                workNode);          
         
         int prevThread;
         if (prevFilter == null) {

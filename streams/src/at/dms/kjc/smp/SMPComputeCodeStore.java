@@ -41,8 +41,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         for (int t = 0; t < SMPBackend.chip.size(); t++) {
             SMPComputeCodeStore cs = SMPBackend.chip.getNthComputeNode(
                     t).getComputeCode();
-            //cs.addSteadyLoopStatement(Util.toStmt("/* Steady-State Barrier */"));
-            //cs.addSteadyLoopStatement(Util.toStmt("XXX barrier_wait(&barrier)"));
+         
             cs.addBarrierWait();
             cs.setHasCode();
         }

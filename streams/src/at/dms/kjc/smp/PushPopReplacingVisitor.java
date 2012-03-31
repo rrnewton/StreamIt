@@ -94,15 +94,14 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
             JExpression index = new JEmittedTextExpression(threadId);
             JExpression newArg = (JExpression) arg.accept(this);
             JExpression dominated = new JEmittedTextExpression(
-                    "multipliers");
+                    workNode.toString() + "_multipliers");
             int num_multipliers = (dominators.get(workNode.toString()) == null) ? 0
-                    : dominators.get(
-                            workNode.toString()).size();
+                    : dominators.get(workNode.toString()).size();
             
             int num_tkns = (ThreadMapper.getMapper().getDominatorToTokens().get(workNode) == null) ? 0
                     : ThreadMapper.getMapper().getDominatorToTokens().get(workNode).size();            
             JExpression tokens = new JEmittedTextExpression(
-                    "tokens");            
+                    workNode.toString() + "_tokens");            
             JExpression num_tokens = new JIntLiteral(num_tkns);
             
             JExpression num_dominated = new JIntLiteral(num_multipliers);
@@ -221,12 +220,12 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
                         workNode.toString()).size();
 
         JExpression num_dominated = new JIntLiteral(num_multipliers);
-        JExpression dominated = new JEmittedTextExpression("multipliers");
+        JExpression dominated = new JEmittedTextExpression(workNode.toString() + "_multipliers");
         
         int num_tkns = (ThreadMapper.getMapper().getDominatorToTokens().get(workNode) == null) ? 0
                 : ThreadMapper.getMapper().getDominatorToTokens().get(workNode).size();            
         JExpression tokens = new JEmittedTextExpression(
-                "tokens");            
+                workNode.toString() + "_tokens");            
         JExpression num_tokens = new JIntLiteral(num_tkns);
 
         

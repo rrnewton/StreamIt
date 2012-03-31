@@ -31,12 +31,9 @@ public class ProcessFilterUtils {
      * @param filter teh parent of the worknode
      * @return
      */
-    public static Core getCore(WorkNode workNode1, Filter filter) {
-        if (filter == null) {           
-            return SMPBackend.getComputeNode(workNode1);
-        }
-        return SMPBackend.getComputeNode(filter.getWorkNode());
-    }
+    public static Core getCore(WorkNode workNode1) {       
+        return SMPBackend.getComputeNode(workNode1);
+     }
     
     /**
      * Get the thread that a filter is on

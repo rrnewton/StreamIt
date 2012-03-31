@@ -277,14 +277,14 @@ public class StreamGraph implements Layout<Core> {
                 if (filter.getWorkNode().isFileOutput()) {                                        
                     Filter prev = ProcessFilterUtils.getPreviousFilter(filter.getWorkNode());                                        
                     
-                    Core prevCore = ProcessFilterUtils.getCore(prev.getWorkNode(), prev);                                        
+                    Core prevCore = ProcessFilterUtils.getCore(prev.getWorkNode());                                        
                     setComputeNode(
                             filter.getWorkNode(),
                             prevCore);                
 
                 } else if (filter.getWorkNode().isFileInput()) {        
                     Filter next = ProcessFilterUtils.getNextFilter(filter.getWorkNode());                    
-                    Core nextCore = ProcessFilterUtils.getCore(next.getWorkNode(), next); 
+                    Core nextCore = ProcessFilterUtils.getCore(next.getWorkNode()); 
                     setComputeNode(
                             filter.getWorkNode(),
                             nextCore);    
