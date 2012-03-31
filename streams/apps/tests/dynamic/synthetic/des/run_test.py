@@ -8,15 +8,15 @@ import math
 FNULL = open('/dev/null', 'w')
 
 class Configs:
-    static, dynamic, batching = range(3)
+    static, dynamic = range(2)
 
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
 def compile(cores, test, work, ignore):
-    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', '--printf', 'DES2.str']    
+    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--noiter', 'DES2.str']    
     if test == Configs.dynamic:
-        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', '--printf', 'DES2Dynamic.str']    
+        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', 'DES2Dynamic.str']    
     print ' '.join(cmd)
     subprocess.call(cmd, stdout=FNULL, stderr=FNULL)
     exe = './smp' + str(cores)     
