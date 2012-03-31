@@ -62,12 +62,14 @@ def print_all(static_results, dynamic_results):
             print s
             f.write(s + '\n')
     file = 'des-normalized.dat'
+    base = static_results[0]
+    total_work = base[2]
     with open(file, 'w') as f:
         s = '#%s\t%s' % ( 'cores', 'dynamic')
         print s
         f.write(s + '\n')  
         for static, dynamic in zip(static_results, dynamic_results):
-            s = '%d\t%0.2f' % (static[1], dynamic[2]/static[2])
+            s = '%d\t%0.2f' % (static[1], dynamic[2]/base[2])
             print s
             f.write(s + '\n')
         
