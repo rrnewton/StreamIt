@@ -107,8 +107,8 @@ def print_all(work, batching, static_results, threadbatch_results):
             raw += '\t' + ('\t'.join('%d' % x[i] for i in [3, 4]))
             raw += '\t' + ('\t'.join('%f' % y[i] for i in [4, 5]))            
             print raw
-            f.write(raw + '\n')  
-
+            f.write(raw + '\n')
+            
     print '++++++++++++++++++++'
     file = 'cache-normalized' + str(work) + '.dat'
     with open(file, 'w') as f:
@@ -156,10 +156,11 @@ def plot_normalized(work, outputs, batching):
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set log x\n')
+        f.write('set xtics (16,32,64,128,256,512,1024)\n')
         f.write('set output \"' + output + '\"\n')
         #f.write('set label "Yield Point" at 1.5,.8\n')
         f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
-        f.write('set xlabel \"Batch Size\"\n');
+        f.write('set xlabel \"Batch Size (MB)\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput\"\n');
         f.write( cmd)        
     os.system('gnuplot ./tmp.gnu')
