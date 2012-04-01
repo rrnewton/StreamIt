@@ -117,7 +117,8 @@ def print_all(work, batching, static_results, threadbatch_results):
         f.write(s + '\n')  
         x = static_results[0]
         for y in threadbatch_results:
-            raw =  ('\t'.join('%d' % y[i] for i in [1, 2, 3]))
+            raw =  ('\t'.join('%d' % y[i] for i in [1, 2]))
+            raw += '\t' + '%f' % (y[3]/65536)
             raw += '\t' + '%f' % (y[4]/x[3])
             print raw
             f.write(raw + '\n')  
@@ -154,6 +155,7 @@ def plot_normalized(work, outputs, batching):
     cmd += " \"" + data + "\" u 3:4 notitle w linespoints"        
     with open('./tmp.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
+        f.write('set log x\n')
         f.write('set output \"' + output + '\"\n')
         #f.write('set label "Yield Point" at 1.5,.8\n')
         f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
@@ -167,7 +169,7 @@ def main():
     ignore = 1000
     outputs = 100000000
     filters = [2]
-    batching = [4194303,8388607,16777215, 33554431, 67108863]
+    batching = [1048576, 2097152, 4194303,8388607,16777215, 33554431, 67108863]
     total_work = [1000]
     #attempts = 2
     #ignore = 1
