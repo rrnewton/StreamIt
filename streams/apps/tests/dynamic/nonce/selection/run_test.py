@@ -138,7 +138,7 @@ def main():
     ignore = 1
     outputs = 10000
     selectivities = [1, 10, 100, 1000]
-    cores = [1,2,4,8]
+    cores = [1,8]
     static_results = []
     dynamic_results = []
     with open('./partial-results.dat', 'w') as f:        
