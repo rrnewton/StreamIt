@@ -331,26 +331,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                         stmt,
                         bufferName);
             }
-        } else {
-            if (KjcOptions.outputs < 0) {
-                stmt += "if (" + multiplierName + ") {\n";
-                stmt += "    fwrite (" + bufferName + ", sizeof(" + typeString
-                        + ") ," + outputs + "*" + multiplierName
-                        + ", output);\n";
-                stmt += "}\n";
-            } else {
-                stmt += "if (" + multiplierName + ") {\n";
-                stmt += "    fwrite (" + bufferName + ", sizeof(" + typeString
-                        + ") ," + outputs + "*" + multiplierName
-                        + ", output);\n";
-                stmt += "    currOutputs+=" + outputs + "*" + multiplierName
-                        + ";\n";
-                if (KjcOptions.perftest) {
-                    stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
-                }
-                stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
-                stmt += "}\n";
-            }
+        } else {            
+            stmt += getStaticPrintStatement( multiplierName,  bufferName,  typeString,  outputs);           
         }
 
         addSteadyLoopStatement(Util.toStmt(stmt));
@@ -367,6 +349,54 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
             }
         }
 
+    }
+    
+    private String getStaticPrintStatement(String multiplierName, String bufferName, String typeString, int outputs) {
+        if (KjcOptions.selective) {
+            return getStaticPrintStatementSelective( multiplierName,  bufferName,  typeString,  outputs);
+
+        } 
+        return getStaticPrintStatementNonSelective( multiplierName,  bufferName,  typeString,  outputs);
+    }
+    
+    private String getStaticPrintStatementSelective(String multiplierName, String bufferName, String typeString, int outputs) {
+        String stmt = "";
+        stmt += "if (" + multiplierName + ") {\n";
+        
+        stmt += "int i = 0; \n";     
+        stmt += "    for (i = 0; i < " + outputs + "; i++) {\n";
+        stmt += "        if (" + bufferName + "[i] > 0) {\n";
+        stmt += "            fwrite (&" + bufferName + "[i], sizeof(" + typeString + ") ,1, output);\n";       
+        if (KjcOptions.outputs >= 0) {  
+            stmt += "            currOutputs++; \n";
+            if (KjcOptions.perftest) {
+                stmt += "            if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            }
+            stmt += "            if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
+        }
+        stmt += "        } \n";
+        stmt += "    }\n";
+        stmt += "}\n";
+        return stmt;
+    }
+    
+    private String getStaticPrintStatementNonSelective(String multiplierName, String bufferName, String typeString, int outputs) {
+        String stmt = "";
+        stmt += "if (" + multiplierName + ") {\n";
+        stmt += "    fwrite (" + bufferName + ", sizeof(" + typeString
+                + ") ," + outputs + "*" + multiplierName
+                + ", output);\n";                               
+        if (KjcOptions.outputs >= 0) {           
+            stmt += "    currOutputs+=" + outputs + "*" + multiplierName
+                    + ";\n";
+            if (KjcOptions.perftest) {
+                stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            }
+            stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
+           
+        }
+        stmt += "}\n";
+        return stmt;
     }
 
     public void addPrintOutputCode(InterSSGChannel buf, WorkNode workNode,
