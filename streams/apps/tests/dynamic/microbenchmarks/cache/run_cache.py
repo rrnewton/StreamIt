@@ -165,9 +165,9 @@ def plot_normalized(work, outputs, batching):
 def main():
     attempts = 3
     ignore = 1000
-    outputs = 10000000
+    outputs = 100000000
     filters = [2]
-    batching = [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000]
+    batching = [4194303,8388607,16777215, 33554431, 67108863]
     total_work = [1000]
     #attempts = 2
     #ignore = 1

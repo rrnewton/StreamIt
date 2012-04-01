@@ -13,11 +13,11 @@ strc          = os.path.join(streamit_home, 'strc')
 
 tests        = [
     #(Configs.lockfree, [strc, '-smp', '1', '--perftest', '--noiter', '--lockfree'], './smp1' ),
-    (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse'], './smp1' ),
-    (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
+    (Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse', '--printf'], './smp1' ),
+    (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter', '--printf'], './smp1' ),
     #(Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' ),
-    (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt'], './smp1' )
+    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt', '--printf'], './smp1' ),
+    (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt', '--printf'], './smp1' )
     ]
 
 def generate(test, num_filters, work):
@@ -70,7 +70,7 @@ def compile(test, work, ignore):
     flags = test[1]
     exe = test[2]
     cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
-    print cmd
+    print ' '.join(cmd)
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
     assert os.path.exists(exe)
 
