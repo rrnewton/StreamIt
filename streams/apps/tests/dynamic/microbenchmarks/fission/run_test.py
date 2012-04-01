@@ -19,7 +19,7 @@ def generate(test, work, ratio):
         op += '    add FstaticX();\n'
     else:
         op += '    add Fdynamic();\n'
-    op += '    add Fdummy();\n'
+        op += '    add Fdummy();\n'
     op += '    add Fstatic();\n'
     op += '    add FileWriter<float>(\"test.out\");\n'
     op += '}\n'
@@ -36,15 +36,10 @@ def generate(test, work, ratio):
     op += '    }\n'
     op += '}\n'
     op += '\n'
-    op += 'float->float stateful filter FstaticX() {\n'
-    op += '    int count;'
-    op += '     init {'
-    op += '        count = 0;'
-    op += '    }'
+    op += 'float->float filter FstaticX() {\n'
     op += '    work pop 1 push 1 {\n'
     op += '        int i;\n'
     op += '        float x;\n'
-    op += '        count++;\n'
     op += '        x = pop();\n'
     op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
@@ -59,15 +54,10 @@ def generate(test, work, ratio):
     op += '    }\n'
     op += '}\n'
     op += '\n'    
-    op += 'float->float stateful filter Fdynamic() {\n'
-    op += '    int count;'
-    op += '     init {'
-    op += '        count = 0;'
-    op += '    }'
+    op += 'float->float filter Fdynamic() {\n'
     op += '    work pop * push * {\n'
     op += '        int i;\n'
     op += '        float x;\n'
-    op += '        count++;\n'
     op += '        x = pop();\n'
     op += '        for (i = 0; i < ' + str(int((1 - ratio) * work))  + '; i++) {\n'
     op += '            x += i * 3.0 - 1.0;\n'
@@ -83,7 +73,7 @@ def compile(test, outputs, ignore, core):
     exe = './smp' + str(core)
     if test == Configs.static:
         cmd = [strc, '--perftest', '--noiter',
-               '--outputs', str(outputs), '--preoutputs', str(ignore), '--nofuse', '-smp', str(core), 'test.str' ]
+               '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
     else:
         cmd = [strc, '--perftest', '--noiter', '--nofuse', '--threadopt',
                '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
