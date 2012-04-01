@@ -1,7 +1,6 @@
 package at.dms.kjc.smp;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import at.dms.kjc.CStdType;
@@ -702,6 +701,7 @@ public class ProcessFilterWorkNode {
             codeStore.addSteadyLoopStatement(
                     threadIndex,                  
                     steadyBlock);
+
             
             addTokenWrite(threadIndex);
 

@@ -507,13 +507,11 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 threadId).addStatementToSteadyLoop(
                         statement);
     }
-
-    //    public void addStatementToSteadyLoop(JStatement statement) {
-    //        this.addStatementToSteadyLoop(
-    //                0,
-    //                statement);
-    //    }
-
+  
+    public boolean threadExists(int index) {
+        return threads.containsKey(index);
+    }
+    
     public void addSteadyLoopStatement(int index, JStatement stmt) {
 
         threads.get(

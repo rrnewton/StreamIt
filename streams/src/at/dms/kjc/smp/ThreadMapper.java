@@ -1,12 +1,10 @@
 package at.dms.kjc.smp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.KjcOptions;
@@ -288,8 +286,15 @@ public class ThreadMapper {
     private void assignThreadsOpt(StaticSubGraph ssg) {
 
         boolean isDynamicInput = ssg.hasDynamicInput();
+                            
         Filter firstFilter = ssg.getFilterGraph()[0];
 
+        if (isFirstAfterFileInput(firstFilter)) {
+            isDynamicInput = false;
+        }
+        
+        
+        
         int firstCore = SMPBackend.getComputeNode(firstFilter.getWorkNode()).coreID;
 
         // The first filter of an SSG always gets its own thread,
@@ -306,6 +311,11 @@ public class ThreadMapper {
 
             int filterCore = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;
 
+            
+            System.out.println("#### ThreadMapper.assignThreadsOpt  filter="
+                    + getFilterName(filter) 
+                    + " core=" + filterCore + " firstCore=" + firstCore);
+            
             checkForTokens(
                     filter,
                     ssg);
@@ -330,6 +340,9 @@ public class ThreadMapper {
             // core.
             if (filterCore != firstCore) {              
                 thread = coreToThread(filterCore);
+                System.out.println("#### ThreadMapper.assignThreadsOpt  filter="
+                        + getFilterName(filter) 
+                        + " core=" + filterCore + " firstCore=" + firstCore + " so thread=" + thread);
             }
 
             if (isProgramSink(filter)) {              
