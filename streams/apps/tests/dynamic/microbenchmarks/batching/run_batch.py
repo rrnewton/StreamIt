@@ -106,18 +106,63 @@ def print_all(work, batching, static_results, threadbatch_results):
             print raw
             f.write(raw + '\n')  
 
-    print '++++++++++++++++++++'
+    print '+++++++++ Sorted By Batch size +++++++++++'
+    
     file = 'batch-normalized' + str(work) + '.dat'
+    base = static_results[0]
     with open(file, 'w') as f:
         s = '#work\tfilters\t ' + '\t'.join(["%s-norm" % b for b in batching])
         print s
-        f.write(s + '\n')  
+        f.write(s + '\n')
         for x, y in zip(static_results, threadbatch_results):
             vals = y[3].split('\t')
             averages = map(lambda i: vals[i],filter(lambda i: i%2 == 0,range(len(vals))))
-            normalized = ('\t'.join('%d' % x[i+1] for i in range (2))) + '\t' + '\t'.join('%f' % (float(a)/x[3]) for a in averages) 
+            normalized = ('\t'.join('%d' % x[i+1] for i in range (2))) + '\t' + '\t'.join('%f' % (float(a)/base[3]) for a in averages) 
             print normalized
-            f.write(normalized + '\n')  
+            f.write(normalized + '\n')
+
+ 
+    all_vals = []
+    for r in threadbatch_results:
+        vals = r[3].split('\t')
+        averages = map(lambda i: vals[i],filter(lambda i: i%2 == 0,range(len(vals))))
+        all_vals.append(averages)
+        print r
+
+
+    print '+++++++++ Sorted By Operators +++++++++++'
+
+    file = 'batch-operators' + str(work) + '.dat'
+    with open(file, 'w') as f:
+        s = '#work\tbatching\t' + '\t'.join(["%d-filter" % t[2] for t in threadbatch_results])
+        f.write(s + '\n')
+        print s
+        for j in range(len(all_vals[0])):
+            s = str(work) + '\t' + str(batching[j])
+            for i in range(len(threadbatch_results)):
+                s += '\t' + str(float(all_vals[i][j])/base[3])                
+            print s
+            f.write(s + '\n')
+
+
+
+def plot_operators(work, outputs, filters):
+    data = 'batch-operators' + str(work) + '.dat'
+    output = 'batch-operators' + str(work) + '.ps'
+    cmds = []
+    for i in range(len(filters)):
+        cmds.append("\"" + data + "\" u 2:" + str(i+3) + " t \'filter=" + str(filters[i]) + "\' w linespoints")        
+    with open('./batch-operators.gnu', 'w') as f:        
+        f.write('set terminal postscript\n')
+        f.write('set output \"' + output + '\"\n')
+        f.write('set key left top\n')
+        f.write('set log x\n')
+        f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
+        f.write('set xlabel \"Batch Size\"\n');
+        f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
+        f.write( 'plot ' + ','.join(cmds))
+    os.system('gnuplot ./batch-operators.gnu')
+            
 
             
 def plot(work, outputs, batching):
@@ -147,23 +192,27 @@ def plot_normalized(work, outputs, batching):
     cmds = []
     for i in range(len(batching)):
         cmds.append("\"" + data + "\" u 2:" + str(i+3) + " t \'batch=" + str(batching[i]) + "\' w linespoints")        
-    with open('./tmp.gnu', 'w') as f:        
+    with open('./batch-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n')
+        f.write('set log x\n')
         f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Operators\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write( 'plot ' + ','.join(cmds))
-    os.system('gnuplot ./tmp.gnu')
+    os.system('gnuplot ./batch-normalized.gnu')
 
 def main():
     attempts = 3
     ignore = 1000
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    #batching = [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000]
     batching = [1, 10, 100, 1000, 10000, 100000]
+    #ignore = 10
+    #outputs = 100
+    #filters = [1, 2, 4]
+    #batching = [1, 10, 100]
     total_work = [1000]
     for work in total_work:
         static_results = []      
@@ -179,7 +228,6 @@ def main():
             generate(test, num_filters, work)
             results = []
             for batch in batching:
-                #compile(test, batch, outputs, ignore)
                 compile(test, batch, outputs, batch-1)
                 (avg, dev) =  run(test, attempts)
                 x = ('threadbatch', work, batch, num_filters, avg, dev)
@@ -192,6 +240,8 @@ def main():
         print_all(work, batching, static_results, threadbatch_results)
         plot(work, outputs, batching)
         plot_normalized(work, outputs, batching)
+        plot_operators(work, outputs, filters)
+
                     
 if __name__ == "__main__":
     main()
