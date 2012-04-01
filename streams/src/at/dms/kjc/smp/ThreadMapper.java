@@ -2,9 +2,11 @@ package at.dms.kjc.smp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.KjcOptions;
@@ -74,7 +76,7 @@ public class ThreadMapper {
     private Map<Filter, Integer>        filterToThreadId;
 
     /** a mapping of dominator filter to dominated filter */
-    private Map<String, List<String>>   dominators;
+    private Map<String, LinkedHashSet<String>>   dominators;
 
     /** a mapping of thread to its input type */
     private Map<Integer, String>        threadIdToType;
@@ -93,7 +95,7 @@ public class ThreadMapper {
      */
     private ThreadMapper() {
         filterToThreadId = new HashMap<Filter, Integer>();
-        dominators = new HashMap<String, List<String>>();
+        dominators = new HashMap<String, LinkedHashSet<String>>();
         threadIdToType = new HashMap<Integer, String>();
         tokenWrites = new HashMap<WorkNode, List<String>>();
         tokenReads = new HashMap<WorkNode, List<String>>();
@@ -117,7 +119,7 @@ public class ThreadMapper {
         }
     }
 
-    public Map<String, List<String>> getDominators() {
+    public Map<String, LinkedHashSet<String>> getDominators() {
         return dominators;
     }
 
@@ -150,7 +152,7 @@ public class ThreadMapper {
         return tokenWrites;
     }
 
-    public void setDominators(Map<String, List<String>> dominators) {
+    public void setDominators(Map<String, LinkedHashSet<String>> dominators) {
         this.dominators = dominators;
     }
 
@@ -418,7 +420,7 @@ public class ThreadMapper {
     private void dominatorsInitEmpty(Filter f) {
         dominators.put(
                 f.getWorkNodeContent().getName(),
-                new ArrayList<String>());
+                new LinkedHashSet<String>());
     }
 
     private void dominatorsInitEmptyIfNotEqual(Filter f1, Filter f2) {
@@ -427,7 +429,7 @@ public class ThreadMapper {
                 f2)) {
             dominators.put(
                     getFilterName(f1),
-                    new ArrayList<String>());
+                    new LinkedHashSet<String>());
         }
     }
 

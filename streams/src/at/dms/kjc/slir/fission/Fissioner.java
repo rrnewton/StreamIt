@@ -1,5 +1,6 @@
 package at.dms.kjc.slir.fission;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -774,9 +775,9 @@ public class Fissioner {
      
         
         Filter dominator = ssg.getFilterGraph()[0];
-        Map<String, List<String>> dominators = ThreadMapper.getMapper().getDominators();        
+        Map<String, LinkedHashSet<String>> dominators = ThreadMapper.getMapper().getDominators();        
         
-        List<String> multipliers = dominators.get(dominator.getWorkNode().toString());
+        LinkedHashSet<String> multipliers = dominators.get(dominator.getWorkNode().toString());
 
         System.out.println("Fissioner.createFissedSlices dominator=" + dominator.getWorkNode().toString());
         if (multipliers != null) {            

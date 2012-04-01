@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import at.dms.kjc.CType;
@@ -41,14 +42,14 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
     boolean                   isDynamicPop;
     boolean                   isDynamicPush;
     WorkNode                  workNode;
-    Map<String, List<String>> dominators;
+    Map<String, LinkedHashSet<String>> dominators;
 
     @SuppressWarnings("rawtypes")
     public void init(WorkNode filter, Channel inputChannel,
             Channel outputChannel, String peekName, String popManyName,
             String popName, String pushName,
             Map<Filter, Integer> filterToThreadId,
-            Map<String, List<String>> dominators, boolean isDynamicPop,
+            Map<String, LinkedHashSet<String>> dominators2, boolean isDynamicPop,
             boolean isDynamicPush) {
         this.workNode = filter;
         this.peekName = peekName;
@@ -58,7 +59,7 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
         this.inputChannel = inputChannel;
         this.outputChannel = outputChannel;
         this.filterToThreadId = filterToThreadId;
-        this.dominators = dominators;
+        this.dominators = dominators2;
         this.isDynamicPop = isDynamicPop;
         this.isDynamicPush = isDynamicPush;
     }

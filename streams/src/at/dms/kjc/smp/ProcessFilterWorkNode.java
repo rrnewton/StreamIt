@@ -1,5 +1,6 @@
 package at.dms.kjc.smp;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -177,7 +178,7 @@ public class ProcessFilterWorkNode {
 
         Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                 .getFilterToThreadId();
-        Map<String, List<String>> dominators = ThreadMapper.getMapper()
+        Map<String, LinkedHashSet<String>> dominators = ThreadMapper.getMapper()
                 .getDominators();
 
         pushPopReplacingVisitor.init(
@@ -229,7 +230,7 @@ public class ProcessFilterWorkNode {
 
  
     private static String makeMultipliers(WorkNode workNode) {
-        Map<String, List<String>> dominators = ThreadMapper.getMapper()
+        Map<String, LinkedHashSet<String>> dominators = ThreadMapper.getMapper()
                 .getDominators();
         int num_multipliers = (dominators.get(workNode.toString()) == null) ? 0
                 : dominators.get(
