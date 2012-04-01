@@ -62,7 +62,7 @@ def run(test, cores, attempts):
     return (mean, dev)
 
 def print_all(static_results, dynamic_results):
-    file = 'selection.dat'
+    file = 'selection-pull.dat'
     with open(file, 'w') as f:
         s = '#selectivity\t'
         s += '\t'.join(["%s-sta-avg\t%s-sta-dev" % (s[2], s[2]) for s in static_results[0]])
@@ -75,7 +75,7 @@ def print_all(static_results, dynamic_results):
             s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in dynamic])
             print s
             f.write(s + '\n')      
-    file = 'selection-normalized.dat'
+    file = 'selection-normalized-pull.dat'
     with open(file, 'w') as f:
         s = '#selectivity\t'
         s += '\t'.join(["%s-sta-norm" % (x[2]) for x in static_results[0]])
@@ -91,14 +91,14 @@ def print_all(static_results, dynamic_results):
             f.write(s + '\n')    
          
 def plot():
-    data = 'selection.dat'
-    output = 'selection.ps'  
+    data = 'selection-pull.dat'
+    output = 'selection-pull.ps'  
     cmd = "plot \""
     cmd += data + "\" u 1:2 t \'static\' w linespoints, \""
     cmd += "\" u 1:2:3 notitle w yerrorbars, \""
     cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
     cmd += "\" u 1:4:5 notitle w yerrorbars"    
-    with open('./selection.gnu', 'w') as f:        
+    with open('./selection-pull.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n');
@@ -106,12 +106,12 @@ def plot():
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
-    os.system('gnuplot ./selection.gnu')
+    os.system('gnuplot ./selection-pull.gnu')
 
 
 def plot_normalized(cores):
-    data = 'selection-normalized.dat'
-    output = 'selection-normalized.ps'  
+    data = 'selection-normalized-pull.dat'
+    output = 'selection-normalized-pull.ps'  
     cmd = "plot "
     i = 2    
     for core in cores:
@@ -122,7 +122,7 @@ def plot_normalized(cores):
     for core in cores:
         cmd += ", \"" + data + "\" u 1:" + str(i) + " t \'dynamic-" + str(core) + "\' w linespoints"
         i = i + 1
-    with open('./selection-normalized.gnu', 'w') as f:        
+    with open('./selection-normalized-pull.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key left top\n');
@@ -131,7 +131,7 @@ def plot_normalized(cores):
         f.write('set xlabel \"Selectivity\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
-    os.system('gnuplot ./selection-normalized.gnu')
+    os.system('gnuplot ./selection-normalized-pull.gnu')
     
 def main():
     attempts = 3
