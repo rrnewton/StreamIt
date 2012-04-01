@@ -1,4 +1,4 @@
-void->void pipeline SelectionDynamic {
+void->void pipeline SelectionDynamicPull {
     add FileReader<float>("./floats.in");
     add Select();  
     add Dummy();
