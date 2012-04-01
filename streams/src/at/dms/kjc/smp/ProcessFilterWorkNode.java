@@ -625,19 +625,19 @@ public class ProcessFilterWorkNode {
                              
         
         Filter prevFilter = ProcessFilterUtils.getPreviousFilterOnCore(workNode);
-        Core prevCore = ProcessFilterUtils.getCore(
-                workNode);          
-        
+        Core prevCore;
+       
         int prevThread;
         if (prevFilter == null) {
             prevThread = ThreadMapper.coreToThread(location.coreID);
+            prevCore = location;
         } else {
              prevThread = ProcessFilterUtils.getFilterThread(
                     prevFilter);                    
+             prevCore = ProcessFilterUtils.getCore(prevFilter.getWorkNode());  
         }
                              
-       
-
+        
         System.out
         .println("ProcessFilterWorkNode.standardSteadyProcessingOpt "
                 + "prevFilter = "
