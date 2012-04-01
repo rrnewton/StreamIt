@@ -24,7 +24,7 @@ def generate(selectivity):
             f.write(val)       
 
 def compile(cores, test, outputs, ignore):
-    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), '--noiter', '--nofuse', '--selective', 'SelectionStatic.str']    
+    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), '--noiter', '--selective', 'SelectionStatic.str']    
     if test == Configs.dynamic:
         cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), "--threadopt", '--noiter', '--nofuse', '--selective', 'SelectionDynamic.str']    
     print ' '.join(cmd)

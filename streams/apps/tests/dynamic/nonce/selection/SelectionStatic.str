@@ -9,7 +9,6 @@ void->void pipeline SelectionStatic {
 float->float filter Select() {
     work pop 1 push 1 {
         float x = pop();
-        println(x);
         if (x <= 1) {
             push(x);
         } else {
