@@ -19,7 +19,7 @@ def generate(test, work, ratio):
         op += '    add FstaticX();\n'
     else:
         op += '    add Fdynamic();\n'
-        op += '    add Fdummy();\n'
+    op += '    add Fdummy();\n'
     op += '    add Fstatic();\n'
     op += '    add FileWriter<float>(\"test.out\");\n'
     op += '}\n'
