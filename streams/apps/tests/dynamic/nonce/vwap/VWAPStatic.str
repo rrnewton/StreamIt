@@ -23,13 +23,9 @@ float->float stateful filter Aggregate() {
                 float avg = sum / count;
                 push(avg);
             }
-            println("---"); 
-            println(count);             
-            println(sum);             
             count = 1;
             sum = val;               
         } else {
-            println("else"); 
             count++;
             sum += val;
             push(-1);
