@@ -22,7 +22,6 @@ def generate(selectivity):
         val = struct.pack('f', 1.0)
         f.write(val)
         for i in range(1, selectivity):
-            print i
             val = struct.pack('f', 1.0) # time
             f.write(val)       
             val = struct.pack('f', 1.0) # val
