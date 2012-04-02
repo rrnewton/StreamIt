@@ -16,7 +16,7 @@ dynamic_test = (Configs.threadbatch, [strc, '-smp', '2', '--perftest', '--noiter
 
 def generate(test, num_filters, work):
     op = 'void->void pipeline test {\n';
-    op += '    add FileReader<float>(\"../input/floats.in\");\n'
+    op += '    add Beacon();\n'
     op += '    for(int i=1; i<=' + str(num_filters) + '; i++)\n'
     if test[0] == Configs.nofusion:
         op += '        add Fstatic();\n'
@@ -25,6 +25,12 @@ def generate(test, num_filters, work):
     op += '    add FileWriter<float>("./test.out");\n'
     op += '}\n'
     op += '\n'
+    op += 'void->float stateful filter Beacon() {\n'
+    op += '   work pop 0 push 1 {\n'
+    op += '        push(1.0);\n'
+    op += '   }\n'
+    op += '}\n'
+    op += '\n'    
     op += 'float->float filter Fstatic() {\n'
     op += '    work pop 1 push 1 {\n'
     op += '        int i;\n'
@@ -112,7 +118,7 @@ def print_all(work, batching, static_results, threadbatch_results):
     print '++++++++++++++++++++'
     file = 'cache-normalized' + str(work) + '.dat'
     with open(file, 'w') as f:
-        s = '#work\tfilters\tbatch\tnorm'
+        s = '#work\tfilters\tmb\tnorm\tdev'
         print s
         f.write(s + '\n')  
         x = static_results[0]
@@ -120,6 +126,7 @@ def print_all(work, batching, static_results, threadbatch_results):
             raw =  ('\t'.join('%d' % y[i] for i in [1, 2]))
             raw += '\t' + '%f' % (y[3]/65536)
             raw += '\t' + '%f' % (y[4]/x[3])
+            raw += '\t' + '%f' % (y[5]/x[3])
             print raw
             f.write(raw + '\n')  
  
@@ -137,47 +144,48 @@ def plot(work, outputs, batching):
     #    cmds.append(" \"" + data + "\" u 2:" + str((i*2)+5) + " t \'batch=" + str(batching[i]) + "\' w linespoints, \"" + "\" u 2:" + str((i*2)+6) + ":" + str((i*2)+6) + " notitle w yerrorbars")       
     #print ','.join(cmds)
     print cmd
-    with open('./tmp.gnu', 'w') as f:        
+    with open('./cache.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
+        f.write('set log x\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Batch Size\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         #f.write( ','.join(cmds))
         f.write( cmd)
-    os.system('gnuplot ./tmp.gnu')
+    os.system('gnuplot ./cache.gnu')
 
 
 def plot_normalized(work, outputs, batching):
     data = 'cache-normalized' + str(work) + '.dat'
     output = 'cache-normalized' + str(work) + '.ps'
     cmd = "plot"
-    cmd += " \"" + data + "\" u 3:4 notitle w linespoints"        
-    with open('./tmp.gnu', 'w') as f:        
+    cmd += " \"" + data + "\" u 3:4 notitle w linespoints, "
+    cmd += "\"\" u 3:4:5 notitle w yerrorbars "
+    with open('./cache-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set log x\n')
-        f.write('set xtics (16,32,64,128,256,512,1024)\n')
+        f.write('set yrange [0:]\n')
+        f.write('set xtics (4,8,16,32,64,128,256,512,1024)\n')
         f.write('set output \"' + output + '\"\n')
-        #f.write('set label "Yield Point" at 1.5,.8\n')
         f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Batch Size (MB)\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput\"\n');
         f.write( cmd)        
-    os.system('gnuplot ./tmp.gnu')
+    os.system('gnuplot ./cache-normalized.gnu')
 
 def main():
     attempts = 3
-    ignore = 1000
-    outputs = 100000000
+    ignore = 10
+    outputs = 671088630
     filters = [2]
     batching = [262144, 524288, 1048576, 2097152, 4194303,8388607,16777215, 33554431, 67108863]
-    total_work = [1000]
-    #attempts = 2
+    total_work = [1]
     #ignore = 1
-    #outputs = 100
+    #outputs = 1000
     #filters = [2]
     #batching = [1, 2]
-    #total_work = [1000]
+    #total_work = [1]
     for work in total_work:
         static_results = []      
         threadbatch_results = []
@@ -192,7 +200,7 @@ def main():
             generate(test, num_filters, work)
             results = []
             for batch in batching:
-                compile(test, batch, outputs, batch-1)
+                compile(test, batch, outputs, batch)
                 (avg, dev) =  run(test, attempts)                
                 results.append((batch, str(avg), str(dev)))
                 x = ('threadbatch', work, num_filters, batch, avg, dev)
