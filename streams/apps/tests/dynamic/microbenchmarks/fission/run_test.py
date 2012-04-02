@@ -55,7 +55,7 @@ def generate(test, work, ratio):
     op += '}\n'
     op += '\n'    
     op += 'float->float filter Fdynamic() {\n'
-    op += '    work pop * push * {\n'
+    op += '    work pop 1 push * {\n'
     op += '        int i;\n'
     op += '        float x;\n'
     op += '        x = pop();\n'
