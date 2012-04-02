@@ -55,7 +55,7 @@ def generate(test, work, ratio):
     op += '}\n'
     op += '\n'    
     op += 'float->float filter Fdynamic() {\n'
-    op += '    work pop 1 push * {\n'
+    op += '    work pop * push * {\n'
     op += '        int i;\n'
     op += '        float x;\n'
     op += '        x = pop();\n'
@@ -75,7 +75,7 @@ def compile(test, outputs, ignore, core):
         cmd = [strc, '--perftest', '--noiter',
                '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
     else:
-        cmd = [strc, '--perftest', '--noiter', '--nofuse', '--threadopt',
+        cmd = [strc, '--perftest', '--noiter', '--threadopt',
                '--outputs', str(outputs), '--preoutputs', str(ignore), '-smp', str(core), 'test.str' ]
     print ' '.join(cmd)
     subprocess.call(cmd, stdout=open(os.devnull, "w"), stderr=subprocess.STDOUT)
