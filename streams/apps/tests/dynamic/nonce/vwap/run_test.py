@@ -17,10 +17,15 @@ strc          = os.path.join(streamit_home, 'strc')
 def generate(selectivity):
     print 'generate ' + str(selectivity)
     with open('floats.in', 'wb') as f:                
-        val = struct.pack('f', 0.5)
+        val = struct.pack('f', 2.0)  # time
+        f.write(val)                 # val
+        val = struct.pack('f', 1.0)
         f.write(val)
-        for i in range(0, selectivity):
-            val = struct.pack('f', 2.0)
+        for i in range(1, selectivity):
+            print i
+            val = struct.pack('f', 1.0) # time
+            f.write(val)       
+            val = struct.pack('f', 1.0) # val
             f.write(val)       
 
 def compile(cores, test, outputs, ignore):
@@ -134,38 +139,40 @@ def plot_normalized(cores):
     os.system('gnuplot ./selection-normalized.gnu')
     
 def main():
-    attempts = 3
-    ignore = 1
-    outputs = 10000
-    selectivities = [1, 10, 100, 1000]
-    cores = [1,8]
-    static_results = []
-    dynamic_results = []
-    with open('./partial-results.dat', 'w') as f:        
-        for selectivity in selectivities:
-            static = []
-            dynamic = []
-            for core in cores:        
-                for test in [Configs.static, Configs.dynamic]:
-                    generate(selectivity)
-                    compile(core, test, outputs, ignore)
-                    (avg, dev) =  run(test, core, attempts)
-                    if test == Configs.static:
-                        x = ('static', selectivity, core, avg, dev)
-                        s = 'static\t%d\t%d\t%f\t%f' % (selectivity, core, avg, dev)
-                        f.write(s + '\n')   
-                        print x
-                        static.append(x)
-                    elif test == Configs.dynamic:
-                        x = ('dynamic', selectivity, core, avg, dev)
-                        s = 'dynamic\t%d\t%d\t%f\t%f' % (selectivity, core, avg, dev)
-                        f.write(s + '\n')   
-                        print x          
-                        dynamic.append(x)
-            dynamic_results.append(dynamic)
-            static_results.append(static)
-        print_all(static_results, dynamic_results)
-        plot_normalized(cores)
+    
+    generate(10)
+    # attempts = 3
+    # ignore = 1
+    # outputs = 10000
+    # selectivities = [1, 10, 100, 1000]
+    # cores = [1,8]
+    # static_results = []
+    # dynamic_results = []
+    # with open('./partial-results.dat', 'w') as f:        
+    #     for selectivity in selectivities:
+    #         static = []
+    #         dynamic = []
+    #         for core in cores:        
+    #             for test in [Configs.static, Configs.dynamic]:
+    #                 generate(selectivity)
+    #                 compile(core, test, outputs, ignore)
+    #                 (avg, dev) =  run(test, core, attempts)
+    #                 if test == Configs.static:
+    #                     x = ('static', selectivity, core, avg, dev)
+    #                     s = 'static\t%d\t%d\t%f\t%f' % (selectivity, core, avg, dev)
+    #                     f.write(s + '\n')   
+    #                     print x
+    #                     static.append(x)
+    #                 elif test == Configs.dynamic:
+    #                     x = ('dynamic', selectivity, core, avg, dev)
+    #                     s = 'dynamic\t%d\t%d\t%f\t%f' % (selectivity, core, avg, dev)
+    #                     f.write(s + '\n')   
+    #                     print x          
+    #                     dynamic.append(x)
+    #         dynamic_results.append(dynamic)
+    #         static_results.append(static)
+    #     print_all(static_results, dynamic_results)
+    #     plot_normalized(cores)
 
                     
 if __name__ == "__main__":
