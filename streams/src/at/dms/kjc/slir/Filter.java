@@ -14,6 +14,8 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     protected OutputNode tail;
     protected WorkNode workNode;
     protected StaticSubGraph parent;
+    protected boolean dynamicPop;
+    protected boolean dynamicPush;
     
     public static final String[] DO_NOT_CLONE_THESE_FIELDS = { "parent" };
     
@@ -31,10 +33,36 @@ public class Filter implements at.dms.kjc.DeepCloneable {
 	/**
      * Create filter with no internal nodes.
      */
-    public Filter(StaticSubGraph parent) {
+    public Filter(StaticSubGraph parent, boolean dynamicPop, boolean dynamicPush) {
     	this.parent = parent;
+    	this.dynamicPop = dynamicPop;
+    	this.dynamicPush = dynamicPush;  
+    }
+    
+    /**
+     * Create filter with no internal nodes.
+     */
+    public Filter(StaticSubGraph parent) {
+        this.parent = parent;
+        this.dynamicPop = false;
+        this.dynamicPush = false;  
     }
 
+    public boolean isDynamicPop() {        
+        return dynamicPop;
+    }
+    
+    public boolean isDynamicPush() {        
+        return dynamicPush;
+    }
+    
+    public void setDynamicPop(boolean dynamicPop) {        
+       this.dynamicPop = dynamicPop;
+    }
+    
+    public void setDynamicPush(boolean dynamicPush) {        
+        this.dynamicPush = dynamicPush;      
+    }
     
     public StaticSubGraph getStaticSubGraph() {
     	return parent;
@@ -189,7 +217,7 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     /** Returns a deep clone of this object. */
     @Override
 	public Object deepClone() {
-        at.dms.kjc.slir.Filter other = new at.dms.kjc.slir.Filter(parent);
+        at.dms.kjc.slir.Filter other = new at.dms.kjc.slir.Filter(parent, dynamicPop, dynamicPop);
         at.dms.kjc.AutoCloner.register(this, other);
         deepCloneInto(other);
         return other;
@@ -201,6 +229,9 @@ public class Filter implements at.dms.kjc.DeepCloneable {
         other.tail = (at.dms.kjc.slir.OutputNode)at.dms.kjc.AutoCloner.cloneToplevel(this.tail);
         other.workNode = (at.dms.kjc.slir.WorkNode)at.dms.kjc.AutoCloner.cloneToplevel(this.workNode);
     }
+
+
+   
 
     /** THE PRECEDING SECTION IS AUTO-GENERATED CLONING CODE - DO NOT MODIFY! */
 }

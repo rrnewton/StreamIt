@@ -2,7 +2,6 @@ package at.dms.kjc.sir.lowering;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -28,8 +27,6 @@ import at.dms.kjc.sir.SIRPipeline;
 import at.dms.kjc.sir.SIRSplitJoin;
 import at.dms.kjc.sir.SIRStream;
 import at.dms.kjc.sir.StreamVisitor;
-import at.dms.kjc.slir.Filter;
-import at.dms.kjc.slir.StaticSubGraph;
 
 /**
  * A SegmentedGraph is a structure that contains each of the static subgraphs
@@ -133,6 +130,7 @@ public class SegmentedSIRGraph implements StreamVisitor {
         System.out
                 .println("SegmentedSIRGraph.init() isDynamic=true, number of partitions="
                         + staticSubGraphs.size());
+        printGraph("after-segmenting.dot");
         return this;
     }
 

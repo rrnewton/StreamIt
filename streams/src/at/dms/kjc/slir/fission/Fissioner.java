@@ -134,7 +134,23 @@ public class Fissioner {
             if(debug) System.out.println("Can't fizz: Slice contains linear filter, presently unsupported");
             return false;
         }
-             
+        
+        // TODO: Investigate why the dynamic operators are getting fizzed here
+        
+        
+        if (filter.isDynamicPop() || filter.isDynamicPush()) {
+            
+        }
+        
+        
+//        System.out.println("XXXX Fissioner.canFizz filter=" + filter.getWorkNode() + " isTopFilter= " + filter.isTopFilter());
+//             
+//        
+//        if (filter.isTopFilter()) {
+//            System.out.println("Can't fizz: Filter is a dominator: " + filter.getWorkNode());
+//            return false;
+//        }
+//        
         //TODO: make sure the rates match between the slice and its inputs and the slices 
         //and its outputs
 

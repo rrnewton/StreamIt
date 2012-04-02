@@ -507,11 +507,12 @@ sub get_options
 			    "nofizz",
 			    "nofuse",
 			    "noiter",
-          "threadopt",
-          "printf",
-          "threadbatch=i",
+                            "threadopt",
+                            "printf",
+                            "threadbatch=i",
 			    "lockfree",
-          "preoutputs=i",
+			    "fastread",
+                            "preoutputs=i",
 			    "loadbalance",
 			    "loopcount=i",
 			    "noloopinput",
@@ -983,6 +984,7 @@ sub get_compiler_opts
     $opts{printf} && ($copts .= " --printf");
     $opts{threadbatch} && ($copts .= " --threadbatch " . $opts{threadbatch});
     $opts{lockfree} && ($copts .= " --lockfree");
+    $opts{fastread} && ($copts .= " --fastread");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
     $opts{preoutputs} && ($copts .= " --preoutputs " . $opts{preoutputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");

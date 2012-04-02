@@ -302,7 +302,7 @@ public class StaticSubGraph {
 			WorkNode workNode = filterNodes.filterNodes.get(node.contents);
 
 			assert input != null && output != null && workNode != null;
-
+						
 			// set up the slice
 			Filter filter = new Filter(this);
 			input.setNext(workNode);
