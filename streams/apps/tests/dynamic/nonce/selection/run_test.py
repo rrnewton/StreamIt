@@ -19,7 +19,7 @@ def generate(selectivity):
     with open('floats.in', 'wb') as f:                
         val = struct.pack('f', 0.5)
         f.write(val)
-        for i in range(0, selectivity):
+        for i in range(1, selectivity):
             val = struct.pack('f', 2.0)
             f.write(val)       
 
