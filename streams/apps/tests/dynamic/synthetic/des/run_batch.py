@@ -14,9 +14,9 @@ streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
 def compile(cores, test, work, ignore):
-    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), --threadbatch', '512', '--noiter', 'DES2.str']    
+    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--threadbatch', '512', '--noiter', 'DES2.str']    
     if test == Configs.dynamic:
-        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), "--threadopt", '--noiter', '--threadbatch', '512', 'DES2Dynamic.str']    
+        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(work), '--preoutputs', str(ignore), '--threadopt', '--noiter', '--threadbatch', '512', 'DES2Dynamic.str']    
     print ' '.join(cmd)
     subprocess.call(cmd, stdout=FNULL, stderr=FNULL)
     exe = './smp' + str(cores)     
