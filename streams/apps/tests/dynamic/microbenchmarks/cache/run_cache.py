@@ -166,7 +166,7 @@ def plot_normalized(work, outputs, batching):
         f.write('set terminal postscript\n')
         f.write('set log x\n')
         f.write('set yrange [0:]\n')
-        f.write('set xtics (4,8,16,32,64,128,256,512,1024)\n')
+        f.write('set xtics (8,16,32,64,128,256,512,1024)\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Batch Size (MB)\"\n');
@@ -179,7 +179,7 @@ def main():
     ignore = 10
     outputs = 134217726
     filters = [2]
-    batching = [262144, 524288, 1048576, 2097152, 4194303,8388607,16777215, 33554431, 67108863]
+    batching = [524288, 1048576, 2097152, 4194303,8388607,16777215, 33554431, 67108863]
     total_work = [1]
     #ignore = 1
     #outputs = 1000
