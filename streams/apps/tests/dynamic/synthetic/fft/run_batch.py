@@ -113,8 +113,8 @@ def plot_normalized():
     
 def main():
     attempts = 3
-    ignore = 2048
-    outputs = 512000
+    ignore = 1048576
+    outputs = 2097152
     cores = [1, 2, 4, 8, 16, 32]    
     static_results = []
     dynamic_results = []
