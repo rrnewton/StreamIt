@@ -511,7 +511,6 @@ sub get_options
                             "printf",
                             "threadbatch=i",
 			    "lockfree",
-			    "fastread",
                             "preoutputs=i",
 			    "loadbalance",
 			    "loopcount=i",
@@ -984,7 +983,6 @@ sub get_compiler_opts
     $opts{printf} && ($copts .= " --printf");
     $opts{threadbatch} && ($copts .= " --threadbatch " . $opts{threadbatch});
     $opts{lockfree} && ($copts .= " --lockfree");
-    $opts{fastread} && ($copts .= " --fastread");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
     $opts{preoutputs} && ($copts .= " --preoutputs " . $opts{preoutputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");

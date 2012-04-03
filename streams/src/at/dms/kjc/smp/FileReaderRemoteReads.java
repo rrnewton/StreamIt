@@ -137,20 +137,9 @@ public class FileReaderRemoteReads extends FileReaderCode {
         case INIT: statements = commandsInit; break;
         default: statements = commandsSteady; break;
         }
-        
-        if (KjcOptions.fastread) {
-            if (phase == SchedulingPhase.STEADY) {       
-                statements.add(Util.toStmt("/*"));                       
-                statements.addAll(aaStmts.toCompressedJStmts());        
-                statements.add(Util.toStmt("*/"));                       
-                int offset = 0; /* TODO I don't know where to get the offset */
-                String copy = parent.currentFileReaderBufName  + " = &fileReadBuffer[" + offset + "] /* FASTREAD */";
-                statements.add(Util.toStmt(copy));       
-            }
-        } else {       
-            statements.addAll(aaStmts.toCompressedJStmts());        
-        }
-        
+                
+        statements.addAll(aaStmts.toCompressedJStmts());        
+               
         if (phase != SchedulingPhase.INIT) {
             //we must rotate the buffer when not in init
             statements.add(Util.toStmt(parent.currentFileReaderRotName + " = " + 

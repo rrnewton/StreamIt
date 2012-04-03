@@ -802,7 +802,3 @@ longname 		"threadbatch"
 	requireArgument
 	help		"Multiple the number of iterations in each thread by <n>."
 
-longname		"fastread"
-	type		boolean
-	default		"false"
-	help		"Optimize the FileReader code."
