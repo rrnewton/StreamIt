@@ -31,7 +31,7 @@ public class FileReaderRemoteReads extends FileReaderCode {
         //we are assuming that the downstream filter has only the file reader as input
         
         ArrayAssignmentStatements aaStmts = new ArrayAssignmentStatements();
-
+                        
         //System.out.println("FileReaderRemoteReads, totalItemsReceived: " + dstInfo.totalItemsReceived(phase));
 
         //if we don't receive anything, don't generate code
@@ -99,6 +99,7 @@ public class FileReaderRemoteReads extends FileReaderCode {
 
                 // Calculate fission offset based upon number of previous output rotations
                 srcFissionOffset = numPrevOutputRots * fileOutput.totalWeights(phase);
+                
             }
 
             //System.out.println("FileReaderRemoteReads, destFissionOffset: " + destFissionOffset);
@@ -125,8 +126,8 @@ public class FileReaderRemoteReads extends FileReaderCode {
                         //add to the array assignment loop
                         int dstElement = (copyDown + destFissionOffset + destIndex++);
                         int srcIndex = ((rot * fileOutput.totalWeights(phase)) + srcFissionOffset + fileOutput.weightBefore(weight, phase) + item);
-                        aaStmts.addAssignment(dst_buffer, "", dstElement, "fileReadBuffer", "fileReadIndex__" + id, srcIndex);
-                    }
+                        aaStmts.addAssignment(dst_buffer, "", dstElement, "fileReadBuffer", "fileReadIndex__" + id, srcIndex);                                                  
+                    }                   
                 }
             }
         }
@@ -137,7 +138,18 @@ public class FileReaderRemoteReads extends FileReaderCode {
         default: statements = commandsSteady; break;
         }
         
-        statements.addAll(aaStmts.toCompressedJStmts());
+        if (KjcOptions.fastread) {
+            if (phase == SchedulingPhase.STEADY) {       
+                statements.add(Util.toStmt("/*"));                       
+                statements.addAll(aaStmts.toCompressedJStmts());        
+                statements.add(Util.toStmt("*/"));                       
+                int offset = 0; /* TODO I don't know where to get the offset */
+                String copy = parent.currentFileReaderBufName  + " = &fileReadBuffer[" + offset + "] /* FASTREAD */";
+                statements.add(Util.toStmt(copy));       
+            }
+        } else {       
+            statements.addAll(aaStmts.toCompressedJStmts());        
+        }
         
         if (phase != SchedulingPhase.INIT) {
             //we must rotate the buffer when not in init
