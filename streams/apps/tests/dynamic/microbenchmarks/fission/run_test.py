@@ -175,13 +175,10 @@ def main():
     ignore = 1024
     outputs = 100000
     cores = [1, 2, 4, 8, 16, 32]
-    ratios = [0.10, 0.50, 0.90]
-    total_work = [100, 1000, 10000]
-    # ignore = 10
-    # outputs = 100
-    # cores = [1, 2, 4]
-    # ratios = [0.10, 0.50, 0.90]
-    # total_work = [100]     
+    #ratios = [0.10, 0.50, 0.90]
+    ratios = [0.90]
+    #total_work = [100, 1000, 10000]
+    total_work = [1000]
     for work in total_work:
         for ratio in ratios:
             static_results = []
