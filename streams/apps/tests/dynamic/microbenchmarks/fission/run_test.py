@@ -50,7 +50,7 @@ def generate(test, work, ratio):
     op += '\n'
     op += 'float->float filter Fdummy() {\n'
     op += '    work pop 1 push 1 {\n'
-    op += '        push(pop())\n;'
+    op += '        push(pop());\n'
     op += '    }\n'
     op += '}\n'
     op += '\n'    
@@ -175,7 +175,6 @@ def main():
     ignore = 1024
     outputs = 100000
     cores = [1, 2, 4, 8, 16, 32]
-    #cores = [1, 2, 4, 8, 16]
     ratios = [0.10, 0.50, 0.90]
     total_work = [100, 1000, 10000]
     # ignore = 10
