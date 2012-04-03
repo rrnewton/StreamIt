@@ -65,7 +65,7 @@ def print_all(static_results, dynamic_results):
     base = static_results[0]
     total_work = base[2]
     with open(file, 'w') as f:
-        s = '#\t%s\t%s\t%s\t%s' % ( 'cores', 'static', 'dev', 'dynamic', 'dev')
+        s = '#\t%s\t%s\t%s\t%s\t%s' % ( 'cores', 'static', 'dev', 'dynamic', 'dev')
         print s
         f.write(s + '\n')  
         for static, dynamic in zip(static_results, dynamic_results):
@@ -101,7 +101,7 @@ def plot_normalized():
     cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints, "
     cmd += "\"" + "\" u 1:4:5 notitle w yerrorbars, "
     cmd += "\"" + data + "\" u 1:2 t \'static\' w linespoints,"
-    cmd += "\"" + "\" u 1:2:3 notitle w yerrorbars, "
+    cmd += "\"" + "\" u 1:2:3 notitle w yerrorbars"
     with open('./des-batch-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
@@ -114,8 +114,8 @@ def plot_normalized():
     
 def main():
     attempts = 3
-    ignore = 2048
-    outputs = 51200
+    ignore = 1048576
+    outputs = 2097152
     cores = [1, 2, 4, 8, 16, 32]    
     #cores = [1, 2, 4]    
     static_results = []
