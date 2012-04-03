@@ -227,7 +227,7 @@ public class DynamicQueueCodeGenerator {
             if (KjcOptions.perftest) {
                 cBuffer.append("  perfTestNumInputs++;\n");        
             }
-            cBuffer.append("  if(fileReadIndex__0 + 1 >= num_inputs) fileReadIndex__0 = 0;\n");
+            cBuffer.append("  if(fileReadIndex__0 + 1 > num_inputs) fileReadIndex__0 = 0;\n");
             cBuffer.append("  return elem;\n");
             cBuffer.append("}\n");
         }
@@ -443,7 +443,7 @@ public class DynamicQueueCodeGenerator {
             if (KjcOptions.perftest) {
                 cBuffer.append("  perfTestNumInputs++;\n");        
             }
-            cBuffer.append("  if(fileReadIndex__0 + 1 >= num_inputs) fileReadIndex__0 = 0;\n");
+            cBuffer.append("  if(fileReadIndex__0 + 1 > num_inputs) fileReadIndex__0 = 0;\n");
             cBuffer.append("  return elem;\n");
             cBuffer.append("}\n");
         }
