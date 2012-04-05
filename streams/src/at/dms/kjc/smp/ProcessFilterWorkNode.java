@@ -327,9 +327,7 @@ public class ProcessFilterWorkNode {
      *            a BackEndFactory to access layout, etc.
      */
     public void doit(WorkNode filterNode, SchedulingPhase whichPhase,
-            SMPBackEndFactory backEndFactory) {
-        
-        System.out.println("ProcessFilterWorkNode.doit filter=" + filterNode + " phase=" + whichPhase);
+            SMPBackEndFactory backEndFactory) {              
         
         this.workNode = filterNode;
         this.whichPhase = whichPhase;
@@ -578,7 +576,7 @@ public class ProcessFilterWorkNode {
     protected void standardSteadyProcessingOpt(boolean isDynamicPop) {
         
         System.out
-        .println("=== ProcessFilterWorkNode.standardSteadyProcessingOpt filter="
+        .println("ProcessFilterWorkNode.standardSteadyProcessingOpt filter="
                 + workNode.getParent().getWorkNode());
         
         JBlock steadyBlock = filterCode.getSteadyBlock();
@@ -599,7 +597,10 @@ public class ProcessFilterWorkNode {
         // Special case: If the dynamic filter is the first filter
         // then it doesn't need to be on a separate thread.
         boolean isFirst = false;
-        if (null != ProcessFilterUtils.getPreviousFilter(workNode)) {
+                       
+        if (null == ProcessFilterUtils.getPreviousFilterOnCore(workNode)) {
+            isFirst = true;
+        } else {
             isFirst = ProcessFilterUtils.getPreviousFilter(
                     workNode).getWorkNode().isFileInput();
         }
@@ -615,9 +616,16 @@ public class ProcessFilterWorkNode {
         
         Filter nextFilter = ProcessFilterUtils.getNextFiltersOnCore(workNode);            
 
+        
+        boolean addBarrier = false;        
+        if (nextFilter == null) {           
+            addBarrier = true;
+        }
+        
         int nextThread;
         if (nextFilter == null) {
-            nextThread = ThreadMapper.coreToThread(location.coreID);
+            nextThread = ThreadMapper.getMapper().coreToThread(location.coreID);
+           
         } else {
              nextThread = ProcessFilterUtils.getFilterThread(                
                      nextFilter);
@@ -625,21 +633,19 @@ public class ProcessFilterWorkNode {
                              
         
         Filter prevFilter = ProcessFilterUtils.getPreviousFilterOnCore(workNode);
-        Core prevCore;
-       
         int prevThread;
         if (prevFilter == null) {
-            prevThread = ThreadMapper.coreToThread(location.coreID);
-            prevCore = location;
+            prevThread = ThreadMapper.getMapper().coreToThread(location.coreID);
         } else {
              prevThread = ProcessFilterUtils.getFilterThread(
-                    prevFilter);                    
-             prevCore = ProcessFilterUtils.getCore(prevFilter.getWorkNode());  
+                    prevFilter);  
         }
                              
         
+
+        
         System.out
-        .println("ProcessFilterWorkNode.standardSteadyProcessingOpt "
+        .println("    + ProcessFilterWorkNode.standardSteadyProcessingOpt "
                 + "prevFilter = "
                 + (prevFilter != null ? prevFilter
                         .getWorkNode() : "null")
@@ -662,61 +668,100 @@ public class ProcessFilterWorkNode {
 
         
         if (isDynamicPop && !isFirst) {
-           
-                        
             codeStore.addThreadHelper(
                     threadIndex,
                     nextThread,
                     steadyBlock);
-            
-            addTokenWrite(threadIndex);
-
-            boolean addCall = false;
-                                    
-            // If the previous filter is null, then it means this
-            // is the first filter on the core, and we need a call.
-            if (prevFilter == null) {
-                addCall = true;
-            }
-
-            // If the previous filter is on a different core,
-            // Then the main thread should call this thread.
-            if (prevCore.coreID != location.coreID && ThreadMapper.getNumThreads() > KjcOptions.smp) {
-                addCall = true;
-            }
-
-            if (addCall) {                
-                int mainThread = ThreadMapper.coreToThread(location.coreID);
-                codeStore.addCallNextToThread(
-                        mainThread, threadIndex);                
-            }          
-           
-            if (ThreadMapper.isMain(nextThread)) {
-                codeStore.addSteadyThreadWait(nextThread);
-            }
-
-
         } else {
-         
             codeStore.addSteadyLoopStatement(
                     threadIndex,                  
                     steadyBlock);
 
+        }
+
+
             
-            addTokenWrite(threadIndex);
+        addTokenWrite(threadIndex);
 
-            if (threadIndex != nextThread) {              
-                codeStore.addCallNextToThread(
-                        threadIndex,
-                        nextThread);
-            }
+        boolean addCall = false;
+                                    
+//        // If the previous filter is null, then it means this
+//        // is the first filter on the core, and we need a call.
+//        if (prevFilter == null) {
+//            addCall = true;
+//        }
 
-            if (ThreadMapper.isMain(threadIndex) && (threadIndex != nextThread)) {
-                codeStore.addSteadyThreadWait(threadIndex);
-            }
+        // If the previous filter is on a different core,
+        // Then the main thread should call this thread.
+//        if (prevCore.coreID != location.coreID && ThreadMapper.getNumThreads() > KjcOptions.smp) {
+//            addCall = true;
+//        }
+
+        // If the next thread is on a different thread, call that thread
+        if (threadIndex != nextThread) {        
+            addCall = true;
+        }
+
+
+        if (addBarrier) {
+            codeStore.addBarrierWait(threadIndex);
+        }
+
+
+        
+        if (addCall) {                                                 
+            codeStore.addCallNextToThread(
+                    threadIndex, nextThread);                
+        }          
+        
+        
+        if (( threadIndex != nextThread) && (ThreadMapper.isMain(threadIndex)))  {
+            codeStore.addSteadyThreadWait(threadIndex, threadIndex);
+        }
+        
+
+//            if (ThreadMapper.isMain(nextThread)) {
+//                codeStore.addSteadyThreadWait(nextThread);
+//            }
+
+            //            if ( threadIndex != nextThread) {
+            //                codeStore.addSteadyThreadWait(threadIndex);
+            //            }
+              
             
 
-        }        
+//        } else {
+//         
+//            codeStore.addSteadyLoopStatement(
+//                    threadIndex,                  
+//                    steadyBlock);
+//
+//            
+//            addTokenWrite(threadIndex);
+//
+//            if (addBarrier) {
+//                codeStore.addBarrierWait(threadIndex);
+//            }
+//            
+//            if (threadIndex != nextThread) {              
+//                codeStore.addCallNextToThread(
+//                        threadIndex,
+//                        nextThread);
+//            }
+//                   
+//            
+//            if ( threadIndex != nextThread) {
+//              codeStore.addSteadyThreadWait(threadIndex);
+//            }
+//            
+////            if (ThreadMapper.isMain(nextThread) && (threadIndex != nextThread)) {
+////                codeStore.addSteadyThreadWait(nextThread);
+////            }
+//            
+//
+//        }
+        
+       
     }
 
 

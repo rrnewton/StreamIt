@@ -170,10 +170,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 
 	private static void communicateAddressesForFilter(WorkNode filter,
 			Core ownerCore) {
-		
-		System.out.println("RotatingBuffer.communicateAddressesForFilter filter=" + filter + " code=" + ownerCore.coreID);
-		
-		
+				
 		InputRotatingBuffer buf = RotatingBuffer.getInputBuffer(filter);
 
 		// if this filter does not have an input buffer, then continue
@@ -182,12 +179,7 @@ public abstract class RotatingBuffer extends IntraSSGChannel {
 
 		for (SourceAddressRotation addr : buf.getAddressBuffers()) {
 			Core srcCore = addr.parent;
-
-			//Core srcCore = ownerCore;
-
-			
-			System.out.println("RotatingBuffer.communicateAddressesForFilter filter=" + filter + " ownerCore=" + ownerCore.coreID + " srcCore=" + srcCore.coreID);
-			
+		
 			// we might have a file reader as a source, if so, don't send the
 			// addresses to it
 			

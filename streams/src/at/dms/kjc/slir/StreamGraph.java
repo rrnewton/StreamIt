@@ -24,9 +24,7 @@ public class StreamGraph implements Layout<Core> {
     protected HashMap<InternalFilterNode, Core> layoutMap = new HashMap<InternalFilterNode, Core>();
     private GreedyBinPacking<Filter>            dominatorPacking;
     List<Filter>                                allFilters = new LinkedList<Filter>();
-
     protected int                               steadyMult;
-
     List<StaticSubGraph>                        ssgs;
 
     public StreamGraph() {

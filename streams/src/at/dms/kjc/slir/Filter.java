@@ -49,10 +49,12 @@ public class Filter implements at.dms.kjc.DeepCloneable {
     }
 
     public boolean isDynamicPop() {        
+        assert false : "Filter.dynamicPop not set yet";
         return dynamicPop;
     }
     
-    public boolean isDynamicPush() {        
+    public boolean isDynamicPush() {     
+        assert false : "Filter.dynamicPush not set yet";
         return dynamicPush;
     }
     

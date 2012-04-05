@@ -69,12 +69,7 @@ public class SMPBackEndScaffold extends BackEndScaffold {
     @Override
     protected void iterateInorder(Filter filters[], SchedulingPhase whichPhase,
                                        ComputeNodesI computeNodes) {
-        
-        System.out.println("SMPBackEndScaffold iterateInorder...");
-        for (Filter filter : filters) {
-            System.out.println("    - filter=" + filter.getWorkNode());
-        }        
-                
+                             
         for (Filter filter : filters) {
             //create code for joining input to the trace
             backEndFactory.processFilterInputNode(filter.getInputNode(),

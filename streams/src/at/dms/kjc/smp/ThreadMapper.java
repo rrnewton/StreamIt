@@ -1,10 +1,13 @@
 package at.dms.kjc.smp;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
 import at.dms.kjc.KjcOptions;
@@ -32,7 +35,7 @@ public class ThreadMapper {
         }
     }
 
-    public static int coreToThread(int core) {
+    public int coreToThread(int core) {
         if (core == -1) {
             return -1;
         }
@@ -46,7 +49,7 @@ public class ThreadMapper {
         return -1;
     }
 
-    public static int getFirstCore() {
+    public int getFirstCore() {
         return SMPBackend.coreOrder[0];
     }
 
@@ -87,7 +90,13 @@ public class ThreadMapper {
 
     /** a mapping to dominators to a token that it writes to */
     private Map<WorkNode, List<String>> dominatorToTokens;
-
+    
+    /** maps a core, to all the threads on it */
+    private Map<Integer, Set<Integer>> threadsOnCore;
+       
+    /** maps a core, to all the filters on it */
+    private Map<Integer, Set<WorkNode>> filtersOnCore;
+    
     /**
      * Private constructor for singleton
      */
@@ -98,8 +107,15 @@ public class ThreadMapper {
         tokenWrites = new HashMap<WorkNode, List<String>>();
         tokenReads = new HashMap<WorkNode, List<String>>();
         dominatorToTokens = new HashMap<WorkNode, List<String>>();
+        threadsOnCore = new HashMap<Integer, Set<Integer>>();
+        filtersOnCore = new HashMap<Integer, Set<WorkNode>>();
     }
 
+    
+    public Map<Integer, Set<WorkNode>> getFiltersOnCore() {
+        return filtersOnCore;
+    }
+    
     /**
      * Assign a unique id to each thread for dynamic readers
      * 
@@ -292,34 +308,33 @@ public class ThreadMapper {
         if (isFirstAfterFileInput(firstFilter)) {
             isDynamicInput = false;
         }
-        
-        
+                
         
         int firstCore = SMPBackend.getComputeNode(firstFilter.getWorkNode()).coreID;
 
+        
         // The first filter of an SSG always gets its own thread,
         // with the exception of the first filter in the program.
         // Therefore, increment the count, unless we were at the
         // first one.
         if (!isProgramSource(firstFilter)
                 && !isFirstAfterFileInput(firstFilter)
-                && !isProgramSink(firstFilter)) {
+                && !isProgramSink(firstFilter)
+                && !isFirstThreadOnCore(firstFilter)) {
             threadId++;
         }
 
         for (Filter filter : ssg.getFilterGraph()) {
 
-            int filterCore = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;
-
+            int filterCore = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;                        
             
-            System.out.println("#### ThreadMapper.assignThreadsOpt  filter="
-                    + getFilterName(filter) 
-                    + " core=" + filterCore + " firstCore=" + firstCore);
+            addFilterToCore(filterCore, filter.getWorkNode());
             
             checkForTokens(
                     filter,
                     ssg);
 
+            
             // If the first thread is not dynamic, then
             // it doesn't dominate anything, and it will
             // be on the main thread.
@@ -329,9 +344,8 @@ public class ThreadMapper {
                 filterToThreadId.put(
                         filter,
                         thread);
-                System.out.println("ThreadMapper.assignThreadsOpt  filter="
-                        + getFilterName(filter) + " thread=" + thread
-                        + " core=" + filterCore);
+                System.out.println("   (-) filter="
+                        + getFilterName(filter) + " thread=" + thread);                        
                 continue;
             }
 
@@ -340,12 +354,20 @@ public class ThreadMapper {
             // core.
             if (filterCore != firstCore) {              
                 thread = coreToThread(filterCore);
-                System.out.println("#### ThreadMapper.assignThreadsOpt  filter="
-                        + getFilterName(filter) 
-                        + " core=" + filterCore + " firstCore=" + firstCore + " so thread=" + thread);
-            }
+                System.out.println("   (XXX) filter="
+                        + getFilterName(filter) + " thread=" + thread + " filterCore=" + filterCore);         
+              
+            } 
+            
+      
+            
+            else if (isFirstThreadOnCore(filter)) {
+                thread = coreToThread(filterCore);
+                System.out.println("   (OOO) filter="
+                        + getFilterName(filter) + " thread=" + thread + " filterCore=" + filterCore); 
+            } 
 
-            if (isProgramSink(filter)) {              
+            else if (isProgramSink(filter)) {              
 
                 Filter prev = ProcessFilterUtils.getPreviousFilter(filter
                         .getWorkNode());               
@@ -380,6 +402,12 @@ public class ThreadMapper {
             else if (isFirstAfterFileInput(filter)) {              
                 thread = coreToThread(filterCore);
             }
+            
+            // If this is a static filter, it won't be first
+            else if (filter != firstFilter) {                
+                thread = filterToThreadId.get(firstFilter);
+            }
+            
 
             filterToThreadId.put(
                     filter,
@@ -390,6 +418,8 @@ public class ThreadMapper {
                     firstFilter,
                     filter);
 
+            addThreadToCore(filterCore, thread);
+            
             // We need another special case here. A FileWriter should be
             // dominated by the
             // last dynamic reader, even though they will be in separate SSGs.
@@ -410,6 +440,29 @@ public class ThreadMapper {
 
     }
 
+    private boolean isFirstThreadOnCore(Filter filter) {              
+        int core = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;        
+        if (threadsOnCore.containsKey(core)) {
+            return (threadsOnCore.get(core).size() > 1);
+        }
+        return true;    
+    }
+
+    private void addThreadToCore(int core, int thread) {
+        if (!threadsOnCore.containsKey(core)) {                        
+            threadsOnCore.put(core, new TreeSet<Integer>());            
+        }
+        threadsOnCore.get(core).add(thread);     
+    }
+    
+    private void addFilterToCore(int core, WorkNode workNode) {
+                       
+        if (!filtersOnCore.containsKey(core)) {                        
+            filtersOnCore.put(core, new HashSet<WorkNode>());            
+        }
+        filtersOnCore.get(core).add(workNode);     
+    }
+    
     private void dominatorsAdd(Filter f1, Filter f2) {
         if (!dominators.containsKey(getFilterName(f1))) {
             dominatorsInitEmpty(f1);

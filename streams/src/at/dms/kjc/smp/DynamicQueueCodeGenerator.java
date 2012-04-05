@@ -20,6 +20,8 @@ public class DynamicQueueCodeGenerator {
         void addPeek(String type);
         void addPeekSource(String type);
         void addPop(String type);      
+        void addPopBarrier(String type);      
+        void addPeekBarrier(String type);      
         void addPopMany(String type);
         void addPopManySource(String type);
         void addPopSource(String type);
@@ -33,6 +35,7 @@ public class DynamicQueueCodeGenerator {
      */
     public class LockedGeneratorThreadOpt implements Generator {
 
+        @Override
         public void addCreate(String type) {
             hBuffer.append(type + "_queue_ctx_ptr " + type +"_queue_create();\n");              
             cBuffer.append(type + "_queue_ctx_ptr\n");
@@ -58,6 +61,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");
         }
 
+        @Override
         public void addCtx(String type) {
             hBuffer.append("struct " + type +"_queue_ctx {\n");
             hBuffer.append("  " + type + "* buffer;\n");
@@ -71,6 +75,7 @@ public class DynamicQueueCodeGenerator {
             hBuffer.append("typedef struct " + type +"_queue_ctx * "+ type +"_queue_ctx_ptr;\n\n");
         }
 
+        @Override
         public void addGrow(String type) {
             hBuffer.append("int " + type + "_queue_grow(" + type + "_queue_ctx_ptr q);\n");
             cBuffer.append("int\n");
@@ -104,6 +109,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");
         }
 
+        @Override
         public void addIncludes() { 
             hBuffer.append("#ifndef DYNAMIC_QUEUE_H\n");
             hBuffer.append("#define DYNAMIC_QUEUE_H\n\n");
@@ -116,9 +122,19 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("#define CAPACITY 1024\n\n");
         }
 
+        @Override
         public void addPeek(String type) {
-            hBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens);\n");            
-            cBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens) {\n");               
+            addPeek(type, false);
+        }
+        
+        private void addPeek(String type, boolean addBarrier) {
+            if (addBarrier) {
+                hBuffer.append(type + " " + type + "_queue_peek_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens);\n");            
+                cBuffer.append(type + " " + type + "_queue_peek_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens) {\n");               
+            } else {
+                hBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens);\n");            
+                cBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int index, int num_tokens, volatile int ** tokens) {\n");                               
+            }
             cBuffer.append("  pthread_mutex_lock(&thread_mutexes[threadIndex]);\n");
             cBuffer.append("  int i = 0;\n");
             cBuffer.append("  int size = 0;\n");
@@ -132,11 +148,16 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("    for (i = 0; i < num_tokens; i++) {\n");
             cBuffer.append("       *tokens[i] = 1;\n");
             cBuffer.append("    }\n");
-            cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
-            cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
-            cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
-            cBuffer.append("    pthread_cond_signal(&thread_conds[nextIndex]);\n");
-            cBuffer.append("    pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+            if (addBarrier) {
+                cBuffer.append("  barrier_wait(&barrier);\n");
+            } else {
+                cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
+                cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("    pthread_cond_signal(&thread_conds[nextIndex]);\n");
+                cBuffer.append("    pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+            }
+            
             cBuffer.append("    pthread_mutex_lock(&q->lock);\n");
             cBuffer.append("    size = q->size;\n");
             cBuffer.append("    pthread_mutex_unlock(&q->lock);\n");                
@@ -153,6 +174,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");        
         }
 
+        @Override
         public void addPeekSource(String type) {
             hBuffer.append(type + " " + type + "_queue_peek_source(int index);\n");                 
             cBuffer.append(type + " " + type + "_queue_peek_source(int index) {\n");    
@@ -160,9 +182,22 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n");
         }
 
+        @Override
         public void addPop(String type) {
-            hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens);\n");            
-            cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens) {\n");       
+           addPop(type,false);
+        }
+        
+        private void addPop(String type, boolean addBarrier) {
+
+            if (addBarrier) {
+                hBuffer.append(type + " " + type + "_queue_pop_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens);\n");            
+                cBuffer.append(type + " " + type + "_queue_pop_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens) {\n");       
+                
+            } else {            
+                hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens);\n");            
+                cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int num_tokens, volatile int ** tokens) {\n");       
+            }
+                        
             cBuffer.append("  pthread_mutex_lock(&thread_mutexes[threadIndex]);\n");
             cBuffer.append("  int i = 0;\n");
             cBuffer.append("  int size = 0;\n");
@@ -176,11 +211,15 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("    for (i = 0; i < num_tokens; i++) {\n");
             cBuffer.append("       *tokens[i] = 1;\n");
             cBuffer.append("    }\n");
-            cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
-            cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
-            cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
-            cBuffer.append("    pthread_cond_signal(&thread_conds[nextIndex]);\n");
-            cBuffer.append("    pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+            if (addBarrier) {
+                cBuffer.append("  barrier_wait(&barrier);\n");        
+            } else {
+                cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
+                cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("    pthread_cond_signal(&thread_conds[nextIndex]);\n");
+                cBuffer.append("    pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+            }
             cBuffer.append("    pthread_mutex_lock(&q->lock);\n");
             cBuffer.append("    size = q->size;\n");
             cBuffer.append("    pthread_mutex_unlock(&q->lock);\n");
@@ -198,6 +237,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n");
         }
 
+        @Override
         public void addPopMany(String type) {
             hBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int amount, int num_tokens, volatile int ** tokens);\n");          
             cBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int nextIndex, int num_multipliers, int ** multipliers, int amount, int num_tokens, volatile int ** tokens) {\n");             
@@ -208,6 +248,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");        
         }
 
+        @Override
         public void addPopManySource(String type) {
             hBuffer.append("void " + type + "_queue_pop_many_source(int amount);\n");          
             cBuffer.append("void " + type + "_queue_pop_many_source(int amount) {\n");             
@@ -218,6 +259,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");        
         }
 
+        @Override
         public void addPopSource(String type) {
             hBuffer.append(type + " " + type + "_queue_pop_source();\n");          
             cBuffer.append("static int fileReadIndex__0 = 0;\n");
@@ -232,6 +274,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n");
         }
 
+        @Override
         public void addPush(String type) {
             hBuffer.append("void " + type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem);\n");
             cBuffer.append("void\n");
@@ -246,6 +289,18 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  pthread_mutex_unlock(&q->lock);\n");
             cBuffer.append("}\n\n");
         }
+
+        @Override
+        public void addPopBarrier(String type) {           
+            addPop(type,true);
+            
+        }
+
+        @Override
+        public void addPeekBarrier(String type) {
+            addPeek(type, true);
+            
+        }
     }
     
     /**
@@ -255,6 +310,7 @@ public class DynamicQueueCodeGenerator {
      */
     public class LockedGenerator implements Generator {
 
+        @Override
         public void addCreate(String type) {
             hBuffer.append(type + "_queue_ctx_ptr " + type +"_queue_create();\n");              
             cBuffer.append(type + "_queue_ctx_ptr\n");
@@ -280,6 +336,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");
         }
 
+        @Override
         public void addCtx(String type) {
             hBuffer.append("struct " + type +"_queue_ctx {\n");
             hBuffer.append("  " + type + "* buffer;\n");
@@ -293,6 +350,7 @@ public class DynamicQueueCodeGenerator {
             hBuffer.append("typedef struct " + type +"_queue_ctx * "+ type +"_queue_ctx_ptr;\n\n");
         }
 
+        @Override
         public void addGrow(String type) {
             hBuffer.append("int " + type + "_queue_grow(" + type + "_queue_ctx_ptr q);\n");
             cBuffer.append("int\n");
@@ -326,6 +384,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");
         }
 
+        @Override
         public void addIncludes() { 
             hBuffer.append("#ifndef DYNAMIC_QUEUE_H\n");
             hBuffer.append("#define DYNAMIC_QUEUE_H\n\n");
@@ -338,9 +397,20 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("#define CAPACITY 1024\n\n");
         }
 
+        @Override
         public void addPeek(String type) {
-            hBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int index);\n");            
-            cBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int index) {\n");               
+            addPeek(type, false);
+        }
+        
+        private void addPeek(String type, boolean addBarrier) {
+            if (addBarrier) {
+                hBuffer.append(type + " " + type + "_queue_peek_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int index);\n");            
+                cBuffer.append(type + " " + type + "_queue_peek_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int index) {\n");               
+            } else {
+                hBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int index);\n");            
+                cBuffer.append(type + " " + type + "_queue_peek(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int index) {\n");               
+                
+            }
             cBuffer.append("  pthread_mutex_lock(&thread_mutexes[threadIndex][DYN_READER]);\n");
             cBuffer.append("  int i = 0;\n");
             cBuffer.append("  int size = 0;\n");
@@ -372,16 +442,27 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");        
         }
 
+        @Override
         public void addPeekSource(String type) {
             hBuffer.append(type + " " + type + "_queue_peek_source(int index);\n");                 
             cBuffer.append(type + " " + type + "_queue_peek_source(int index) {\n");    
             cBuffer.append("  return fileReadBuffer[(fileReadIndex__0 + index) & num_inputs];\n");
             cBuffer.append("}\n");
         }
-
+        
+        @Override
         public void addPop(String type) {
-            hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers);\n");            
-            cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers) {\n");       
+            addPop(type, false);
+        }
+
+        private void addPop(String type, boolean addBarrier) {
+            if (addBarrier) {
+                hBuffer.append(type + " " + type + "_queue_pop_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers);\n");            
+                cBuffer.append(type + " " + type + "_queue_pop_barrier(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers) {\n");       
+            } else {
+                hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers);\n");            
+                cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers) {\n");                       
+            }            
             cBuffer.append("  pthread_mutex_lock(&thread_mutexes[threadIndex][DYN_READER]);\n");
             cBuffer.append("  int i = 0;\n");
             cBuffer.append("  int size = 0;\n");
@@ -414,6 +495,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n");
         }
 
+        @Override
         public void addPopMany(String type) {
             hBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int amount);\n");          
             cBuffer.append("void " + type + "_queue_pop_many(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers, int amount) {\n");             
@@ -424,6 +506,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");        
         }
 
+        @Override
         public void addPopManySource(String type) {
             hBuffer.append("void " + type + "_queue_pop_many_source(int amount);\n");          
             cBuffer.append("void " + type + "_queue_pop_many_source(int amount) {\n");             
@@ -434,6 +517,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n\n");        
         }
 
+        @Override
         public void addPopSource(String type) {
             hBuffer.append(type + " " + type + "_queue_pop_source();\n");          
             cBuffer.append("static int fileReadIndex__0 = 0;\n");
@@ -448,6 +532,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("}\n");
         }
 
+        @Override
         public void addPush(String type) {
             hBuffer.append("void " + type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem);\n");
             cBuffer.append("void\n");
@@ -462,6 +547,18 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  pthread_mutex_unlock(&q->lock);\n");
             cBuffer.append("}\n\n");
         }
+        
+        @Override
+        public void addPopBarrier(String type) {           
+            addPop(type,true);
+            
+        }
+
+        @Override
+        public void addPeekBarrier(String type) {
+            addPeek(type, true);
+            
+        }
     }
 
     /**
@@ -471,6 +568,7 @@ public class DynamicQueueCodeGenerator {
      */
     public class LockFreeGenerator implements Generator {
 
+        @Override
         public void addCreate(String type)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addCreate()");
             hBuffer.append(type + "_queue_ctx_ptr " + type +"_queue_create();\n");              
@@ -487,6 +585,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("    }\n");
         }
         
+        @Override
         public void addCtx(String type) { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addCtx()");
             hBuffer.append("struct " + type + "_queue_ctx {\n");
@@ -499,10 +598,12 @@ public class DynamicQueueCodeGenerator {
             hBuffer.append("typedef struct " + type +"_queue_ctx * "+ type +"_queue_ctx_ptr;\n\n");
         }
 
+        @Override
         public void addGrow(String type) { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addGrow()");
         }
         
+        @Override
         public void addIncludes() {
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addIncludes()");
             hBuffer.append("#ifndef DYNAMIC_QUEUE_H\n");
@@ -516,13 +617,27 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("#include <string.h>\n\n");
             cBuffer.append("#define SIZE 1023\n\n");
         }
+        
+        @Override
         public void addPeek(String type)   { 
+            addPeek(type, false);
+        }
+        
+        public void addPeek(String type, boolean addBarrier)   { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPeek()");
         }
+        
+        @Override
         public void addPeekSource(String type)   { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPeekSource()");
         }
+        
+        @Override
         public void addPop(String type)  { 
+            addPop(type, false);
+        }
+        
+        private void addPop(String type, boolean addBarrier)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPop()");
             hBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers);\n");            
             cBuffer.append(type + " " + type + "_queue_pop(" + type + "_queue_ctx_ptr q, int threadIndex, int num_multipliers, int ** multipliers) {\n");       
@@ -543,12 +658,15 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("    return item_;\n");
             cBuffer.append("}\n");
         }    
+        @Override
         public void addPopMany(String type)   { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPopMany()");
         }
+        @Override
         public void addPopManySource(String type)   { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPopManySource()");
         }
+        @Override
         public void addPopSource(String type)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPopSource()");
             hBuffer.append(type + " " + type + "_queue_pop_source();\n");          
@@ -563,6 +681,7 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("  return elem;\n");
             cBuffer.append("}\n");
         }
+        @Override
         public void addPush(String type)  { 
             System.out.println("DynamicQueueCodeGenerator.LockFreeGenerator.addPush()");
             hBuffer.append("void " + type + "_queue_push(" + type + "_queue_ctx_ptr q, " + type + " elem);\n");
@@ -578,6 +697,18 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("        assert(false);\n");
             cBuffer.append("    }\n");
             cBuffer.append("}\n");
+        }
+        
+        @Override
+        public void addPopBarrier(String type) {           
+            addPop(type,true);
+            
+        }
+
+        @Override
+        public void addPeekBarrier(String type) {
+            addPeek(type, true);
+            
         }
     }  
 
@@ -607,6 +738,8 @@ public class DynamicQueueCodeGenerator {
         generator.addPop(type);       
         generator.addPopMany(type);       
         generator.addPeek(type);      
+        generator.addPopBarrier(type);   
+        generator.addPeekBarrier(type);   
     }
 
     public void addSource(String type) {

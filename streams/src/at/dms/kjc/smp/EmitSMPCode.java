@@ -60,8 +60,10 @@ public class EmitSMPCode extends EmitCode {
             // for all the cores, add a barrier at the end of the steady state,
             // do it here
             // because we are done with all code gen
-            SMPComputeCodeStore.addBarrierSteady();
-
+            if (!KjcOptions.threadopt) {
+                SMPComputeCodeStore.addBarrierSteady();
+            }
+                
             // if load balancing, instrument steady-state loop after
             // steady-state barrier
             if (KjcOptions.loadbalance) {
@@ -781,10 +783,18 @@ public class EmitSMPCode extends EmitCode {
 
         // figure out how many cores will participate in barrier
         int barrier_count = 0;
-        for (Core core : SMPBackend.chip.getCores())
-            if (core.getComputeCode().shouldGenerateCode())
-                barrier_count++;
 
+        if (KjcOptions.threadopt) {
+            for (Core core : SMPBackend.chip.getCores())
+                if (null != ThreadMapper.getMapper().getFiltersOnCore().get(core.coreID)) {
+                    barrier_count++;
+                }
+        } else {
+            for (Core core : SMPBackend.chip.getCores())
+                if (core.getComputeCode().shouldGenerateCode())
+                    barrier_count++;
+        }
+            
         p.println();
         p.println("// Initialize barrier");
         p.println("barrier_init(&barrier, " + barrier_count + ");");

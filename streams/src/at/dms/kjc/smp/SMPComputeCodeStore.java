@@ -51,6 +51,15 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         getMain().addBarrierWait();
 
     }
+    
+    public void addBarrierWait(int threadIndex) {
+        
+        assert threads.get(threadIndex) != null : "SMPComputeCodeStore.addBarrierWait threadId="
+                + threadIndex + " not found.";
+
+        threads.get(threadIndex).addBarrierWait();;
+        
+    }
 
 
     /**
@@ -514,6 +523,8 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
     
     public void addSteadyLoopStatement(int index, JStatement stmt) {
 
+        assert  threads.get(index) != null : " addSteadyLoopStatement Index " + index + " does not exist in threads map";
+        
         threads.get(
                 index).addSteadyLoopStatement(
                         stmt);
@@ -543,6 +554,12 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 nextIndex);
     }
 
+    public void addSteadyThreadWait(int currentThread, int threadIndex) {
+        
+        threads.get(currentThread).addSteadyThreadWait(
+                threadIndex);
+    }
+    
     public void addSteadyThreadWait(int threadIndex) {
         getMain().addSteadyThreadWait(
                 threadIndex);
@@ -795,6 +812,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         threads.get(threadId).addPrintOutputCode(
                 buf,
                 workNode);              
+        
+        threads.get(threadId).addBarrierWait();
+        
     }
 
 
@@ -821,6 +841,9 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
                 buf,
                 workNode,
                 backEndFactory);
+        
+        threads.get(threadId).addBarrierWait();
+                
     }
 
 
@@ -837,7 +860,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
 
     private SMPThreadCodeStore createMainThread() {
         SMPThreadCodeStore thread = new SMPThreadCodeStore(this, "__main__");
-        int coreId = ThreadMapper.getFirstCore();
+        int coreId = ThreadMapper.getMapper().getFirstCore();
         return createMainThreadHelper(
                 coreId,
                 thread);
@@ -864,7 +887,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
             SMPThreadCodeStore thread) {
         addMethod(thread.getMethod());
         mainThread = thread;
-        int threadId = ThreadMapper.coreToThread(coreId);     
+        int threadId = ThreadMapper.getMapper().coreToThread(coreId);     
         threads.put(
                 threadId,
                 thread);
@@ -890,5 +913,7 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         }
         setMethods(cleanMethods.toArray(new JMethodDeclaration[0]));
     }
+
+   
 
 }

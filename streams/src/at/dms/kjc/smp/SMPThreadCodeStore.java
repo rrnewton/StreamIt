@@ -182,8 +182,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         this.coreCodeStore = coreCodeStore;
         threadMethod = createThreadMethod(threadMethodName);
         threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        addSteadyLoop();
-
+        this.addSteadyLoop();                    
     }
 
     public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name,
@@ -192,7 +191,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         this.coreCodeStore = coreCodeStore;
         threadMethod = createThreadMethod(threadMethodName);
         threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        this.addSteadyLoop();
+        this.addSteadyLoop();    
     }
 
     /**
@@ -210,7 +209,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         this.coreCodeStore = coreCodeStore;
         threadMethod = createThreadMethod(threadMethodName);
         threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        addSteadyLoop(iterationBound);
+        addSteadyLoop(iterationBound);    
     }
 
     public void addCallNextToMain(int threadIndex, int nextIndex) {
@@ -337,17 +336,18 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
         addSteadyLoopStatement(Util.toStmt(stmt));
 
-        if (KjcOptions.threadopt) {
-            if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
-                int mainThread = ThreadMapper.coreToThread(coreCodeStore
-                        .getCore().coreID);
-                if (threadId != mainThread) { 
-                	addCallNextToMain(
-                			threadId,
-                			mainThread);
-                }
-            }
-        }
+//        if (KjcOptions.threadopt) {
+//            if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
+//                int mainThread = ThreadMapper.getMapper()
+//                        .coreToThread(coreCodeStore
+//                        .getCore().coreID);
+//                if (threadId != mainThread) { 
+//                	addCallNextToMain(
+//                			threadId,
+//                			mainThread);
+//                }
+//            }
+//        }
 
     }
     
@@ -424,8 +424,8 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         // create the loop
         String stmt = "";
 
-        String popName = buf.popMethodName();
-        String peekName = buf.peekMethodName();
+        String popName = buf.popMethodName() + "_barrier";
+        String peekName = buf.peekMethodName() + "_barrier";
 
         Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                 .getFilterToThreadId();
@@ -452,7 +452,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                         .getPreviousFilter(inputPort.getSSG().getTopFilters()[0]
                                 .getWorkNode());
                 Core core = SMPBackend.getComputeNode(prevFilter.getWorkNode());
-                threadIndex = ThreadMapper.coreToThread(core.coreID);
+                threadIndex = ThreadMapper.getMapper().coreToThread(core.coreID);
             }
             buffer = "dyn_buf_" + buf.getId();
         }
@@ -493,15 +493,15 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                 
         addSteadyLoopStatement(Util.toStmt(stmt));
 
-        if (KjcOptions.threadopt) {
-            if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
-                int mainThread = ThreadMapper.coreToThread(coreCodeStore
-                        .getCore().coreID);
-                addCallNextToMain(
-                        threadId,
-                        mainThread);
-            }
-        }
+//        if (KjcOptions.threadopt) {
+//            if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
+//                int mainThread = ThreadMapper.getMapper().coreToThread(coreCodeStore
+//                        .getCore().coreID);
+//                addCallNextToMain(
+//                        threadId,
+//                        mainThread);
+//            }
+//        }
     }
 
     private String getFWritePrint(int outputs, String multiplierName, String buffer, 
@@ -586,14 +586,14 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
         threadSteadyLoop.addStatement(steadyBlock);
 
-        // TODO: Only make this call if it is the last
-        if (threadIndex != nextIndex
-                && ThreadMapper.getNumThreads() > KjcOptions.smp) {
-            addCallNextToBlock(
-                    threadSteadyLoop,
-                    threadIndex,
-                    nextIndex);
-        }
+//        // TODO: Only make this call if it is the last
+//        if (threadIndex != nextIndex
+//                && ThreadMapper.getNumThreads() > KjcOptions.smp) {
+//            addCallNextToBlock(
+//                    threadSteadyLoop,
+//                    threadIndex,
+//                    nextIndex);
+//        }
     }
 
     public void addSteadyLoop() {
@@ -684,6 +684,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     }
 
     public void addSteadyThreadWait(int threadIndex) {
+                
         Utils.addCondWait(
                 threadSteadyLoop,
                 threadIndex,
@@ -698,8 +699,6 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
      */
     public void addThreadHelperNonOpt(WorkNode workNode, int threadIndex,
             JStatement steadyBlock) {
-
-        System.out.println("SMPThreadCodeStore.addThreadHelper called()");
 
         JBlock methodBody = new JBlock();
         JBlock loopBody = new JBlock();
@@ -774,11 +773,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
 
         String threadName = "helper_" + threadIndex;
-
-        System.out
-                .println("SMPThreadCodeStore.addThreadHelper creating JMethodDeclaration="
-                        + threadName);
-
+     
         JMethodDeclaration threadHelper = new JMethodDeclaration(
                 CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
                 methodBody);
@@ -884,6 +879,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     }
 
     void addCallNextToBlock(JBlock loopBody, int threadIndex, int nextIndex) {
+                
         Utils.addSetFlag(
                 loopBody,
                 threadIndex,
@@ -907,8 +903,10 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     }
 
     public void addBarrierWait() {
-        System.out.println("SMPThreadCodeStore.addBarrierWait");
-
+                
+        if (SMPBackend.chip.size() == 1)
+            return;
+               
         if (batchingLoop != null) {
             // System.out.println("SMPThreadCodeStore.addBarrierWait batchingLoop != NULL");
             // JStatement body = batchingLoop.getBody();
@@ -927,5 +925,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         }
 
     }
+
+  
 
 }

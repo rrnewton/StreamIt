@@ -1,10 +1,7 @@
 package at.dms.kjc.slir.fission;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import at.dms.kjc.CClassType;
 import at.dms.kjc.CStdType;
 import at.dms.kjc.CType;
@@ -138,9 +135,9 @@ public class Fissioner {
         // TODO: Investigate why the dynamic operators are getting fizzed here
         
         
-        if (filter.isDynamicPop() || filter.isDynamicPush()) {
-            
-        }
+//        if (filter.isDynamicPop() || filter.isDynamicPush()) {
+//            
+//        }
         
         
 //        System.out.println("XXXX Fissioner.canFizz filter=" + filter.getWorkNode() + " isTopFilter= " + filter.isTopFilter());

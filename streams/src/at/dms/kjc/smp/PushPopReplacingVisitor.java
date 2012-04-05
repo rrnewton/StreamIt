@@ -3,6 +3,7 @@ package at.dms.kjc.smp;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import at.dms.kjc.CType;
 import at.dms.kjc.JEmittedTextExpression;
 import at.dms.kjc.JExpression;
@@ -82,7 +83,7 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
                 // If there is no next filter on this core
                 // then we want to return to the main.
                 if (nextFilter == null) {                            
-                    next = ThreadMapper.coreToThread(getCoreID(inputPort));
+                    next = ThreadMapper.getMapper().coreToThread(getCoreID(inputPort));
                 } else {
                     next = ProcessFilterUtils.getFilterThread(nextFilter);                 
                 }
@@ -181,6 +182,40 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
 
         }
     }
+    
+    private boolean addBarrierCall() {
+        
+        int coreId = SMPBackend.getComputeNode(workNode).coreID;
+        
+        // We want to add a barrier pop if we are in the same thread
+        // as the last filter on the core.
+        Set<WorkNode> filtersOnCore = ThreadMapper.getMapper().getFiltersOnCore().get(coreId);
+        Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper().getFilterToThreadId();
+
+       
+        
+        int currentThread = filterToThreadId.get(workNode.getParent());
+        int nextThread;
+        
+        for (WorkNode w : filtersOnCore) {
+            
+            nextThread = filterToThreadId.get(w.getParent());
+
+            if (currentThread == nextThread ) {
+                if (w.isFileOutput()) {
+                    return true;
+                }
+              
+                if (null == ProcessFilterUtils.getNextFilterOnCore(w)) {
+                    return true;
+                }
+                
+            }
+           
+        }
+        
+        return false;
+    }
 
     private JExpression dynamicPop(SIRPopExpression self, CType tapeType) {
         InputPort inputPort = ((InterSSGChannel) inputChannel).getEdge()
@@ -191,21 +226,21 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
         String threadId = Integer.toString(threadIndex);
         String buffer = "dyn_buf_" + threadId;
         int next = -1;
+        boolean addBarrier = false;
         if (KjcOptions.threadopt) {
-            int channelId = ((InterSSGChannel) inputChannel).getId();
-
+            int channelId = ((InterSSGChannel) inputChannel).getId();     
+                                    
+            Filter nextFilterDifferentThread = ProcessFilterUtils.getNextFilterOnCoreDifferentThread(workNode);                                                        
+                      
+            addBarrier = addBarrierCall();
             
-            //Filter nextFilter = ProcessFilterWorkNode.getNextFilterOnCore(workNode);     
-            
-            Filter nextFilter = ProcessFilterUtils.getNextFilterOnCoreDifferentThread(workNode);    
-                        
-                            
             // If there is no next filter on this core
             // then we want to return to the main.
-            if (nextFilter == null) {                            
-                next = ThreadMapper.coreToThread(getCoreID(inputPort));
+            if (nextFilterDifferentThread == null) {         
+                System.out.println("PushPopReplacingVisitor filter=" + workNode + " nextFilter=null");
+                next = ThreadMapper.getMapper().coreToThread(getCoreID(inputPort));
             } else {
-                next = ProcessFilterUtils.getFilterThread(nextFilter);                 
+                next = ProcessFilterUtils.getFilterThread(nextFilterDifferentThread);                 
             }
            
             
@@ -246,8 +281,9 @@ class PushPopReplacingVisitor extends SLIRReplacingVisitor {
             }
         } else {
             if (KjcOptions.threadopt) {
+                String funcCall = addBarrier ? popName + "_barrier" : popName;
                 JExpression nextThread = new JIntLiteral(next);
-                JExpression methodCall = new JMethodCallExpression(popName,
+                JExpression methodCall = new JMethodCallExpression(funcCall,
                         new JExpression[] { dyn_queue, index, nextThread,
                                 num_dominated, dominated, num_tokens, tokens });
                 methodCall.setType(tapeType);
