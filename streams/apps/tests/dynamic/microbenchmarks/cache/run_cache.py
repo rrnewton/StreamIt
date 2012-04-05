@@ -93,7 +93,7 @@ def run(test, attempts):
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    tputs =  map(lambda x: 134217726/x * 1000000000L ), times    
+    tputs =  map(lambda x: 134217726/x * 1000000000L , times)
     mean = reduce(lambda x, y: float(x) + float(y), times) / len(tputs)    
     deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
