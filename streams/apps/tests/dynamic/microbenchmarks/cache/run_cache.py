@@ -93,8 +93,9 @@ def run(test, attempts):
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-    deviations = map(lambda x: x - mean, times)
+    tputs =  map(lambda x: 134217726/x * 1000000000L ), times    
+    mean = reduce(lambda x, y: float(x) + float(y), times) / len(tputs)    
+    deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
@@ -180,7 +181,7 @@ def main():
     outputs = 134217726
     filters = [2]
     batching = [262144, 524288, 1048576, 2097152, 4194303,8388607,16777215, 33554431, 67108863]
-    total_work = [1000]
+    total_work = [1]
     #ignore = 1
     #outputs = 1000
     #filters = [2]
