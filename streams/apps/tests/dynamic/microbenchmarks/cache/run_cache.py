@@ -126,8 +126,8 @@ def print_all(work, batching, static_results, threadbatch_results):
         for y in threadbatch_results:
             raw =  ('\t'.join('%d' % y[i] for i in [1, 2]))
             raw += '\t' + '%f' % (y[3]/65536)
-            raw += '\t' + '%f' % (134217726/y[4] * 1000000000L)
-            raw += '\t' + '%f' % (134217726/y[5] * 1000000000L)
+            raw += '\t' + '%f' % (y[4])
+            raw += '\t' + '%f' % (y[5])
             print raw
             f.write(raw + '\n')  
  
