@@ -161,7 +161,7 @@ def main():
     outputs = 640000
     filters = [1, 2, 4, 8, 16, 32]
     batching = [1, 10, 100, 1000, 10000 ]
-    total_work = [1000]
+    total_work = [1]
     for work in total_work:
         static_results = []      
         threadbatch_results = []
