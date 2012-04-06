@@ -186,11 +186,11 @@ def plot_normalized(work, outputs):
     
 def main():
     attempts = 3
-    ignore = 1000
+    ignore = 3200
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    #total_work = [1, 10, 100, 1000, 10000, 100000]
-    total_work = [1]
+    total_work = [1, 10, 100, 1000, 10000, 100000]
+    #total_work = [1]
     #ignore = 10
     #outputs = 1000
     #filters = [2, 4]
