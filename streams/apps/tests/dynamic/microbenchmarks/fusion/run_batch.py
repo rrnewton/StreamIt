@@ -107,6 +107,7 @@ def print_all(work, batching, static_results, threadbatch_results):
             f.write(raw + '\n')  
 
     print '++++++++++++++++++++'
+    base = static_results[0]
     file = 'batch-normalized' + str(work) + '.dat'
     with open(file, 'w') as f:
         s = '#work\tfilters\t ' + '\t'.join(["%s-norm" % b for b in batching])
@@ -115,7 +116,7 @@ def print_all(work, batching, static_results, threadbatch_results):
         for x, y in zip(static_results, threadbatch_results):
             vals = y[3].split('\t')
             averages = map(lambda i: vals[i],filter(lambda i: i%2 == 0,range(len(vals))))
-            normalized = ('\t'.join('%d' % x[i+1] for i in range (2))) + '\t' + '\t'.join('%f' % (float(a)/x[3]) for a in averages) 
+            normalized = ('\t'.join('%d' % x[i+1] for i in range (2))) + '\t' + '\t'.join('%f' % (float(a)/base[3]) for a in averages) 
             print normalized
             f.write(normalized + '\n')  
 

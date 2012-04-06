@@ -128,7 +128,7 @@ def print_all(work, nofusion_results, fusion_results, threadopt_results, threadb
         print s
         f.write(s + '\n')
         for fusion, threadopt, threadbatch in zip(fusion_results,threadopt_results, threadbatch_results):
-            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (fusion[3]/nofusion[3]), (threadopt[3]/nofusion[3]), (threadbatch[3]/nofusion[3]))
+            s = '%d\t%d\t%0.2f\t%0.2f\t%0.2f' % (fusion[2], fusion[1], (1/fusion[3]/nofusion[3]), (1/threadopt[3]/nofusion[3]), (1/threadbatch[3]/nofusion[3]))
             print s
             f.write(s + '\n')
 
@@ -165,13 +165,11 @@ def plot_normalized(work, outputs):
     data = 'fusion-normalized' + str(work) + '.dat'
     output = 'fusion-normalized' + str(work) + '.ps'
     cmd = "plot "
-    cmd += "\"" + data + "\" u 1:5 t \'batching=100\' w linespoints,"
-    cmd += "\"" + "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels offset 0.25,1.75,"
-    cmd += "\"" + data + "\" u 1:3 t \'fusion\' w linespoints,"
-    cmd += "\"" + data + "\" u 1:4 t \'threadopt\' w linespoints"
+    cmd += "\"" + data + "\" u 1:5 t \'dynamic w/ batching=100\' w linespoints,"
+    #cmd += "\"" + "\" u 1:4:(sprintf(\"[%.0f,%.1f]\",$1,$4)) notitle with labels offset 0.25,1.75,"
+    #cmd += "\"" + data + "\" u 1:3 t \'fusion\' w linespoints,"
+    cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints"
 
-    #cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints,"
-    #cmd += "\"" + data + "\" u 1:5 t \'lockfree\' w linespoints,"
 
     
     with open('./tmp.gnu', 'w') as f:        
