@@ -97,9 +97,9 @@ def plot_normalized():
     data = 'des-normalized.dat'
     output = 'des-normalized.ps'  
     cmd = "plot "
-    cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints"
-    cmd += "\"" + "\" u 1:4:5 notitle w yerrorbars"    
-    cmd += "\"" + data + "\" u 1:2 t \'static\' w linespoints"
+    cmd += "\"" + data + "\" u 1:4 t \'dynamic\' w linespoints, "
+    cmd += "\"" + "\" u 1:4:5 notitle w yerrorbars, "    
+    cmd += "\"" + data + "\" u 1:2 t \'static\' w linespoints, "
     cmd += "\"" + "\" u 1:2:3 notitle w yerrorbars"    
     with open('./des-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
