@@ -96,7 +96,7 @@ def run_one(test):
         results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
     return results
 
-def run(test, attempts):
+def run(test, attempts, outputs):
     results = []
     for num in range(attempts):
          result = run_one(test)
@@ -105,8 +105,9 @@ def run(test, attempts):
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-    deviations = map(lambda x: x - mean, times)
+    tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
+    mean = reduce(lambda x, y: float(x) + float(y), tputs) / len(tputs)    
+    deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
@@ -128,7 +129,7 @@ def print_all(work, fusion_results, threadopt_results, threadbatch_results):
         print s
         f.write(s + '\n')
         for fusion, threadopt, threadbatch in zip(fusion_results,threadopt_results, threadbatch_results):
-            s = '\t%d\t%d\t%f\t%f\t%f\t%f' % (fusion[2], fusion[1], (1/(threadopt[3]/base[3])), (1/(threadopt[4]/base[3])), (1/(threadbatch[3]/base[3])), (1/(threadbatch[3]/base[3]))   )
+            s = '\t%d\t%d\t%f\t%f\t%f\t%f' % (fusion[2], fusion[1], (threadopt[3]/base[3]), (threadopt[4]/base[3]), (threadbatch[3]/base[3]), (threadbatch[4]/base[3])   )
             print s
             f.write(s + '\n')
 
@@ -146,10 +147,10 @@ def plot(work, outputs):
     with open('./fusion.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key left top\n');
+        f.write('set key right top\n');
         f.write('set title \"Fusion Experiment, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Operators\"\n');
-        f.write('set ylabel \"Nanoseconds\"\n');
+        f.write('set ylabel \"Throughput (data items/second)\"\n');
         f.write(cmd)
     os.system('gnuplot ./fusion.gnu')
     os.system('ps2pdf ' + output)
@@ -165,7 +166,8 @@ def plot_normalized(work, outputs):
     with open('./fusion-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key left top\n');
+        f.write('set key right\n');
+        f.write('set yrange [ 0 : ]\n');
         f.write('set title \"Fusion Experiment Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Operators\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
@@ -178,12 +180,11 @@ def main():
     ignore = 3200
     outputs = 100000
     filters = [1, 2, 4, 8, 16, 32]
-    #total_work = [1, 10, 100, 1000, 10000, 100000]
-    total_work = [1]
-    #ignore = 10
-    #outputs = 1000
-    #filters = [2, 4]
-    #total_work = [1000]   
+    total_work = [1, 10, 100, 1000, 100000]
+    # total_work = [1]
+    # ignore = 10
+    # outputs = 1000
+    # filters = [2, 4]
     for work in total_work:        
         fusion_results = []
         threadopt_results = []
@@ -192,7 +193,7 @@ def main():
             for test in tests:
                 generate(test, num_filters, work)
                 compile(test, outputs, ignore)
-                (avg, dev) =  run(test, attempts)
+                (avg, dev) =  run(test, attempts, outputs)
                 if test[0] == Configs.fusion:
                     x = ('fusion', work, num_filters, avg, dev)
                     print x
