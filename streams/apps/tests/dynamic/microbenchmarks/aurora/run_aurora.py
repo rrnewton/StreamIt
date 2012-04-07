@@ -169,10 +169,10 @@ def plot_normalized(work, outputs, batching):
     os.system('gnuplot ./tmp.gnu')
     os.system('ps2pdf ' + output)
 
-def do_test(test):
+def do_test(test, outputs):
     test.generate()
     test.compile()
-    return test.run()
+    return test.run(outputs)
 
 def main():
     attempts = 3
@@ -190,7 +190,7 @@ def main():
         for core in cores:
             all_tests.append(Test('streamit-' + str(core), Configs.nofusion, 'test.str', core, preoutputs, outputs, work, ratio, batch, attempts, ['--threadopt']))
         
-    all_results = map(lambda test: do_test(test), all_tests)
+    all_results = map(lambda test: do_test(test, outputs), all_tests)
 
     print_tests_by_batching(batching, all_tests)
     plot_tests_by_batching(batching, all_tests)
