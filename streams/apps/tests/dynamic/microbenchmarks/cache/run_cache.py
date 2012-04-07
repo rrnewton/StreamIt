@@ -11,7 +11,7 @@ class Configs:
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-static_test = (Configs.nofusion, [strc, '-smp', '2', '--perftest', '--noiter', '--nofuse'], './smp2' )
+static_test = (Configs.nofusion, [strc, '-smp', '2', '--perftest', '--noiter'], './smp2' )
 dynamic_test = (Configs.threadbatch, [strc, '-smp', '2', '--perftest', '--noiter', '--threadopt'], './smp2' )
 
 def generate(test, num_filters, work):
@@ -84,7 +84,8 @@ def run_one(test):
         results = ([test_type] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
     return results
 
-def run(test, attempts):
+
+def run(test, attempts, outputs):
     results = []
     for num in range(attempts):
          result = run_one(test)
@@ -93,7 +94,7 @@ def run(test, attempts):
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    tputs =  map(lambda x: 134217726/x * 1000000000L , times)
+    tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
     mean = reduce(lambda x, y: float(x) + float(y), tputs) / len(tputs)    
     deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
@@ -155,6 +156,7 @@ def plot(work, outputs, batching):
         #f.write( ','.join(cmds))
         f.write( cmd)
     os.system('gnuplot ./cache.gnu')
+    os.system('ps2pdf ' + output)
 
 
 def plot_normalized(work, outputs, batching):
@@ -174,6 +176,7 @@ def plot_normalized(work, outputs, batching):
         f.write('set ylabel \"Throughput (Data Items / Sec) \"\n');
         f.write( cmd)        
     os.system('gnuplot ./cache-normalized.gnu')
+    os.system('ps2pdf ' + output)
 
 def main():
     attempts = 3
@@ -195,14 +198,14 @@ def main():
             test = static_test
             generate(test, num_filters, work)
             compile(test, 0, outputs, ignore)
-            (avg, dev) =  run(test, attempts)
+            (avg, dev) =  run(test, attempts, outputs)
             static_results.append(('no-fusion', work, num_filters, avg, dev))
             test = dynamic_test
             generate(test, num_filters, work)
             results = []
             for batch in batching:
                 compile(test, batch, outputs, batch)
-                (avg, dev) =  run(test, attempts)                
+                (avg, dev) =  run(test, attempts, outputs)                
                 results.append((batch, str(avg), str(dev)))
                 x = ('threadbatch', work, num_filters, batch, avg, dev)
                 print x
