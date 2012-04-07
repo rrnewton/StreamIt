@@ -146,7 +146,7 @@ def plot(ratio, work, outputs):
     with open('./fission.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key center top\n');
+        f.write('set key right top\n');
         f.write('set title \"Fission Experiment, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
@@ -167,7 +167,8 @@ def plot_normalized(ratio, work, outputs):
         f.write('set terminal postscript\n')
         f.write('set termoption enhanced\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key center left\n');
+        f.write('set key at 8,7\n');
+        f.write('set set key spacing 1.5\n');
         f.write('set yrange [ 0 : ]\n');
         f.write('set xtics (1,2,4,8,16,32) font "Helvetica,20"\n');
         # f.write('set title \"Fission Experiment Normalized, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
