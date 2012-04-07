@@ -11,8 +11,8 @@ class Configs:
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-static_test = (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' )
-dynamic_test = (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' )
+static_test = (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter', '--printf'], './smp1' )
+dynamic_test = (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt', '--printf'], './smp1' )
 
 def generate(test, num_filters, work):
     op = 'void->void pipeline test {\n';
@@ -213,14 +213,14 @@ def plot_normalized(work, outputs, batching):
 
 def main():
     attempts = 3
-    # ignore = 320000
-    # outputs = 640000
-    # filters = [1, 2, 4, 8, 16, 32]
-    # batching = [1, 10, 100, 1000, 10000 ]
-    ignore = 10
-    outputs = 100
-    filters = [1, 2, 4]
-    batching = [1, 10, 100]
+    ignore = 320000
+    outputs = 640000
+    filters = [1, 2, 4, 8, 16, 32]
+    batching = [1, 10, 100, 1000, 10000 ]
+    # ignore = 10
+    # outputs = 100
+    # filters = [1, 2, 4]
+    # batching = [1, 10, 100]
     total_work = [1, 1000]
     for work in total_work:
         static_results = []      
