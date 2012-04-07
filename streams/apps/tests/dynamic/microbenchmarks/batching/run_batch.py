@@ -87,9 +87,11 @@ def run(test, attempts, outputs):
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
-    mean = reduce(lambda x, y: float(x) + float(y), tputs) / len(tputs)    
-    deviations = map(lambda x: x - mean, tputs)
+    #tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
+
+    
+    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
+    deviations = map(lambda x: x - mean, times)
     squares = map(lambda x: x * x, deviations)
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
@@ -201,7 +203,7 @@ def plot_normalized(work, outputs, batching):
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key right bottom\n')
-        f.write('set log x\n')
+        #f.write('set log x\n')
         f.write('set yrange [ 0 :  ]\n');
         f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Operators\"\n');
