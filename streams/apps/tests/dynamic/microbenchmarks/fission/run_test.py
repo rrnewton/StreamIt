@@ -91,16 +91,18 @@ def run_one(core):
         results = ([core] + [m.group(1)] + [m.group(2)] + [m.group(3)] + [m.group(4)] + [m.group(5)])       
     return results
 
-def run(core, attempts):
+def run(test, attempts, outputs):
     results = []
     for num in range(attempts):
-         result = run_one(core)
+         result = run_one(test)
          results.append(result)
-         print result
-   # 1000000000 nanoseconds in 1 second    
-    times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)    
-    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-    deviations = map(lambda x: x - mean, times)
+         #for result in results:
+         print result         
+    # 1000000000 nanoseconds in 1 second    
+    times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
+    tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
+    mean = reduce(lambda x, y: float(x) + float(y), tputs) / len(tputs)    
+    deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
@@ -112,21 +114,22 @@ def print_all(work, ratio, static_results, dynamic_results):
     static_work = total_work - dynamic_work
     file = 'fission' + str(int(ratio * 100)) + '_' + str(work)  + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'static-dev', 'dynamic', 'dynamic-dev', 'ideal' )
+        s = '#\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'static-dev', 'dynamic', 'dynamic-dev', 'ideal' )
         print s
         f.write(s + '\n')  
         for x, y in zip(static_results, dynamic_results):
             ideal = dynamic_work + ( static_work /  x[1])
-            s = '%0.2f\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[0], x[1], x[2], x[3], y[2], x[3], ideal)
+            s = '\t%f\t%d\t%f\t%f\t%f\t%f\t%f' % (x[0], x[1], x[2], x[3], y[2], y[3], ideal)
             print s
             f.write(s + '\n')
     file = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.dat'
     with open(file, 'w') as f:
-        s = '#%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static','dynamic')
+        s = '#\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'ratio', 'cores', 'static', 'dev', 'dynamic', 'dev', 'ideal')
         print s
         f.write(s + '\n')
         for static, dynamic in zip(static_results, dynamic_results):
-            s = '%0.2f\t%d\t%0.2f\t%0.2f' % (static[0], static[1], (static[2]/base[2]), (dynamic[2]/base[2]))
+            ideal = dynamic_work + ( static_work /  static[1])
+            s = '\t%f\t%d\t%f\t%f\t%f\t%f\t%f' % (static[0], static[1], (static[2]/base[2]), (static[3]/base[2]), (dynamic[2]/base[2]), (dynamic[3]/base[2]), (1/(ideal/base[2])) )
             print s
             f.write(s + '\n')
 
@@ -140,7 +143,7 @@ def plot(ratio, work, outputs):
     cmd += data + "\" u 2:5 t \'dynamic\' w linespoints, \""
     cmd += "\" u 2:5:6 notitle w yerrorbars, \""
     cmd += data + "\" u 2:7 t \'ideal\' w linespoints"
-    with open('./tmp.gnu', 'w') as f:        
+    with open('./fission.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key center top\n');
@@ -148,18 +151,19 @@ def plot(ratio, work, outputs):
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
-    os.system('gnuplot ./tmp.gnu')
+    os.system('gnuplot ./fission.gnu')
 
 
 def plot_normalized(ratio, work, outputs):
     data = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.dat'
     output = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.ps'
-    cmd = "plot \""
-    cmd += data + "\" u 2:3 t \'static\' w linespoints, \""
-    cmd += "\" u 2:3:(sprintf(\"[%.0f,%.1f]\",$2,$3)) notitle with labels offset 0.25,1.75, \""
-    cmd += data + "\" u 2:4 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 2:4:(sprintf(\"[%.0f,%.1f]\",$2,$4)) notitle with labels offset 0.25,1.75"
-    with open('./tmp.gnu', 'w') as f:        
+    cmd = "plot "
+    cmd += "\"" + data + "\" u 2:3 t \'static\' w linespoints, \\\n"
+    cmd += "\"" + data + "\" u 2:3:4 notitle w yerrorbars, \\\n"
+    cmd += "\"" + data + "\" u 2:5  t \'dynamic\' w linespoints,\\\n"
+    cmd += "\"" + data + "\" u 2:5:6 notitle w yerrorbars, \\\n"    
+    cmd += "\"" + data + "\" u 2:7  t \'ideal\' w linespoints"
+    with open('./fission-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
         f.write('set key center top\n');
@@ -167,14 +171,19 @@ def plot_normalized(ratio, work, outputs):
         f.write('set xlabel \"Cores\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput\"\n');
         f.write(cmd)
-    os.system('gnuplot ./tmp.gnu')
+    os.system('gnuplot ./fission-normalized.gnu')
 
 
 def main():         
     attempts = 3
-    ignore = 1024
-    outputs = 100000
-    cores = [1, 2, 4, 8, 16, 32]
+    #ignore = 1024
+    #outputs = 100000
+    #cores = [1, 2, 4, 8, 16, 32]
+
+    ignore = 32
+    outputs = 10000
+    cores = [1, 2, 4]
+
     #ratios = [0.10, 0.50, 0.90]
     ratios = [0.90]
     #total_work = [100, 1000, 10000]
@@ -187,7 +196,7 @@ def main():
                 for core in cores:
                     generate(test, work, ratio)
                     compile(test, outputs, ignore, core)
-                    (avg, dev) = run(core, attempts)
+                    (avg, dev) = run(core, attempts, outputs)
                     print 'avg=' + str(avg)
                     print 'dev=' + str(dev)
                     if test == Configs.static:
