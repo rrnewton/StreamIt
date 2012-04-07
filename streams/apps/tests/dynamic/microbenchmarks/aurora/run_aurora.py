@@ -144,8 +144,8 @@ def plot_tests_by_batching(batching, all_tests):
         f.write('set key right top\n')
         f.write('set title \"Aurora Experiment\"\n')
         f.write('set log x\n')
-        f.write('set xlabel \"Batch Size\"\n');
-        f.write('set ylabel \"Nanoseconds\"\n');
+        f.write('set xlabel \"Batch Size\"\n');        
+        f.write('set ylabel \"Throughput (data items / sec )\"\n');
         f.write( plot + ','.join(cmds))
     os.system('gnuplot ' + gnu)
     os.system('ps2pdf ' + output)
