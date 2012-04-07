@@ -158,18 +158,21 @@ def plot_normalized(ratio, work, outputs):
     data = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.dat'
     output = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.ps'
     cmd = "plot "
-    cmd += "\"" + data + "\" u 2:3 t \'static\' w linespoints, \\\n"
+    cmd += "\"" + data + "\" u 2:7 t \"{/Helvetica=20  ideal}\" w linespoints, \\\n"
+    cmd += "\"" + data + "\" u 2:3 t \"{/Helvetica=20  static}\" w linespoints, \\\n"
     cmd += "\"" + data + "\" u 2:3:4 notitle w yerrorbars, \\\n"
-    cmd += "\"" + data + "\" u 2:5  t \'dynamic\' w linespoints,\\\n"
-    cmd += "\"" + data + "\" u 2:5:6 notitle w yerrorbars, \\\n"    
-    cmd += "\"" + data + "\" u 2:7  t \'ideal\' w linespoints"
+    cmd += "\"" + data + "\" u 2:5t \"{/Helvetica=20  dynamic}\" w linespoints,\\\n"
+    cmd += "\"" + data + "\" u 2:5:6 notitle w yerrorbars"    
     with open('./fission-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
+        f.write('set termoption enhanced\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key center top\n');
+        f.write('set key center left\n');
+        f.write('set yrange [ 0 : ]\n');
+        f.write('set xtics (1,2,4,8,16,32) font "Helvetica,20"\n');
         f.write('set title \"Fission Experiment Normalized, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
-        f.write('set xlabel \"Cores\"\n');
-        f.write('set ylabel \"Throughput normalized to static throughput\"\n');
+        f.write('set xlabel \"Cores\" font \"Helvetica,20\"\n');
+        f.write('set ylabel \"Throughput normalized to static throughput on 1 core\" font \"Helvetica,20\"\n');
         f.write(cmd)
     os.system('gnuplot ./fission-normalized.gnu')
 
