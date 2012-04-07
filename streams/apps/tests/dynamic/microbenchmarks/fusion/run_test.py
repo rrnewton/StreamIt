@@ -129,7 +129,7 @@ def print_all(work, fusion_results, threadopt_results):
         print s
         f.write(s + '\n')
         for fusion, threadopt in zip(fusion_results,threadopt_results ):
-            s = '\t%d\t%d\t%f\t%f' % (fusion[2], fusion[1], (threadopt[3]/base[3]), (threadopt[4]/base[3])  )
+            s = '\t%d\t%d\t%f\t%f' % (fusion[2], fusion[1], (1/(threadopt[3]/base[3])), (1/(threadopt[4]/base[3]))  )
             print s
             f.write(s + '\n')
 
