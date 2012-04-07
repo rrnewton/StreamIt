@@ -146,6 +146,7 @@ def plot_tests_by_batching(batching, all_tests):
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write( plot + ','.join(cmds))
     os.system('gnuplot ' + gnu)
+    os.system('ps2pdf ' + output)
 
 
 def plot_normalized(work, outputs, batching):
@@ -164,6 +165,8 @@ def plot_normalized(work, outputs, batching):
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write( 'plot ' + ','.join(cmds))
     os.system('gnuplot ./tmp.gnu')
+    os.system('ps2pdf ' + output)
+
 
 def do_test(test):
     test.generate()
@@ -178,7 +181,7 @@ def main():
     ratio = 0.50
     all_tests = []
     batching = [1, 10, 100]
-    cores = [1, 4, 8, 16]
+    cores = [1, 4, 8]
 
     for batch in batching:
         for core in cores:
