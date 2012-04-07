@@ -113,6 +113,8 @@ def plot():
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
     os.system('gnuplot ./vwap.gnu')
+    os.system('ps2pdf ' + output)
+
 
 
 def plot_normalized(cores):
@@ -138,7 +140,8 @@ def plot_normalized(cores):
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
     os.system('gnuplot ./vwap-normalized.gnu')
-    
+    os.system('ps2pdf ' + output)
+
 def main():    
     attempts = 3
     ignore = 1
