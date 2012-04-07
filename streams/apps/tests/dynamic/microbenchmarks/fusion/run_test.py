@@ -16,8 +16,8 @@ tests        = [
     #(Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse', '--printf'], './smp1' ),
     #(Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
     # (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt'], './smp1' )
-    (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' )
+    (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter', '--printf'], './smp1' ),
+    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt', '-printf'], './smp1' )
     ]
 
 def generate(test, num_filters, work):
