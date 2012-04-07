@@ -152,7 +152,7 @@ def plot(ratio, work, outputs):
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
     os.system('gnuplot ./fission.gnu')
-
+    os.system('ps2pdf ' + output)
 
 def plot_normalized(ratio, work, outputs):
     data = 'fission-normalized' + str(int(ratio * 100)) + '_' + str(work) + '.dat'
@@ -170,11 +170,12 @@ def plot_normalized(ratio, work, outputs):
         f.write('set key center left\n');
         f.write('set yrange [ 0 : ]\n');
         f.write('set xtics (1,2,4,8,16,32) font "Helvetica,20"\n');
-        f.write('set title \"Fission Experiment Normalized, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
+        # f.write('set title \"Fission Experiment Normalized, Ratio=%f static, Work=%d, Outputs=%d\"\n' % (ratio, work, outputs))
         f.write('set xlabel \"Cores\" font \"Helvetica,20\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput on 1 core\" font \"Helvetica,20\"\n');
         f.write(cmd)
     os.system('gnuplot ./fission-normalized.gnu')
+    os.system('ps2pdf ' + output)
 
 
 def main():         
