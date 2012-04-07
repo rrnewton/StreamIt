@@ -64,14 +64,15 @@ class Test:
             results = (m.group(1), m.group(2), m.group(3), m.group(4), m.group(5))       
         print results
         return results
-    def run(self):
+    def run(self, outputs):
         results = []
         for num in range(self.attempts):
-            results.append(self.run_one())            
+            results.append(self.run_one())
         # 1000000000 nanoseconds in 1 second    
         times = map(lambda x:  (long(x[3]) * 1000000000L) + long(x[4]) , results)
-        mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-        deviations = map(lambda x: x - mean, times)
+        tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
+        mean = reduce(lambda x, y: float(x) + float(y), tputs) / len(tputs)    
+        deviations = map(lambda x: x - mean, tputs)
         squares = map(lambda x: x * x, deviations)
         dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
         self.mean = mean
@@ -79,7 +80,7 @@ class Test:
         x = (self.name, self.cores, self.preoutputs, self.outputs, self.work, self.ratio, mean, dev)
         print x
         return x
-        
+                       
 
 # def print_all(work, batching, static_results, threadbatch_results):
 #     file = 'batch' + str(work) + '.dat'
