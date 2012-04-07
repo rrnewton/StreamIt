@@ -6,19 +6,19 @@ import re
 import math
 
 class Configs:
-    nofusion, threadbatch = range(2)
+    fusion, threadbatch = range(2)
 
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-static_test = (Configs.nofusion, [strc, '-smp', '2', '--perftest', '--noiter'], './smp2' )
+static_test = (Configs.fusion, [strc, '-smp', '2', '--perftest', '--noiter'], './smp2' )
 dynamic_test = (Configs.threadbatch, [strc, '-smp', '2', '--perftest', '--noiter', '--threadopt'], './smp2' )
 
 def generate(test, num_filters, work):
     op = 'void->void pipeline test {\n';
     op += '    add Beacon();\n'
     op += '    for(int i=1; i<=' + str(num_filters) + '; i++)\n'
-    if test[0] == Configs.nofusion:
+    if test[0] == Configs.fusion:
         op += '        add Fstatic();\n'
     elif test[0] == Configs.threadbatch:        
         op += '        add Fdynamic();\n'
@@ -62,7 +62,7 @@ def compile(test, batch, work, ignore):
     flags = test[1]
     exe = test[2]
     cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
-    if test[0] == Configs.nofusion:
+    if test[0] == Configs.fusion:
         cmd = flags + ['--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
     else:
         cmd = flags + ['--threadbatch', str(batch), '--outputs', str(work), '--preoutputs', str(ignore), 'test.str' ]
@@ -74,7 +74,7 @@ def compile(test, batch, work, ignore):
 def run_one(test):
     exe = test[2]
     results = []
-    if test[0] == Configs.nofusion:
+    if test[0] == Configs.fusion:
         test_type = 'no-fusion'
     elif test[0] == Configs.threadbatch:
         test_type = 'threadbatch' 
@@ -126,7 +126,7 @@ def print_all(work, batching, static_results, threadbatch_results):
         x = static_results[0]
         for y in threadbatch_results:
             raw =  ('\t'.join('%d' % y[i] for i in [1, 2]))
-            raw += '\t' + '%f' % (y[3]/65536)
+            raw += '\t' + '%f' % (y[3]/65536) # convert to MB
             raw += '\t' + '%f' % (y[4])
             raw += '\t' + '%f' % (y[5])
             print raw
@@ -137,7 +137,7 @@ def plot(work, outputs, batching):
     data = 'cache' + str(work) + '.dat'
     output = 'cache' + str(work) + '.ps'
     cmd = "plot"
-    cmd += " \"" + data + "\" u 3:4 t \'nofusion\' w linespoints, \""
+    cmd += " \"" + data + "\" u 3:4 t \'static\' w linespoints, \""
     cmd += "\" u 3:4:5 notitle w yerrorbars, "
     cmd += " \"" + data + "\" u 3:6 t \'batching\' w linespoints, \""
     cmd += "\" u 3:6:7 notitle w yerrorbars"    
@@ -185,11 +185,11 @@ def main():
     filters = [2]
     batching = [262144, 524288, 1048576, 2097152, 4194303,8388607,16777215, 33554431, 67108863]
     total_work = [1]
-    #ignore = 1
-    #outputs = 1000
-    #filters = [2]
-    #batching = [1, 2]
-    #total_work = [1]
+    # ignore = 1
+    # outputs = 1000
+    # filters = [2]
+    # batching = [1, 2]
+    # total_work = [1]
     for work in total_work:
         static_results = []      
         threadbatch_results = []
