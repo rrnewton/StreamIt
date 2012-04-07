@@ -164,7 +164,7 @@ def plot_normalized(work, outputs, batching):
         f.write('set log x\n')
         f.write('set title \"Fusion Experiment With Batching Normalized, Work=%d, Outputs=%d\"\n' % (work, outputs))
         f.write('set xlabel \"Operators\"\n');
-        f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
+        f.write('set ylabel \"Throughput (data items / sec )\"\n');
         f.write( 'plot ' + ','.join(cmds))
     os.system('gnuplot ./tmp.gnu')
     os.system('ps2pdf ' + output)
