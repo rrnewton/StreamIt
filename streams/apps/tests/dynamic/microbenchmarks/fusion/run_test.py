@@ -15,9 +15,9 @@ tests        = [
     #(Configs.lockfree, [strc, '-smp', '1', '--perftest', '--noiter', '--lockfree'], './smp1' ),
     #(Configs.nofusion, [strc, '-smp', '1', '--perftest', '--noiter', '--nofuse', '--printf'], './smp1' ),
     #(Configs.dynamic, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
+    # (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt'], './smp1' )
     (Configs.fusion, [strc, '-smp', '1', '--perftest', '--noiter'], './smp1' ),
-    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' ),
-    (Configs.threadbatch, [strc, '-smp', '1', '--perftest', '--noiter', '--threadbatch', '100', '--threadopt'], './smp1' )
+    (Configs.threadopt, [strc, '-smp', '1', '--perftest', '--noiter', '--threadopt'], './smp1' )
     ]
 
 def generate(test, num_filters, work):
@@ -112,14 +112,14 @@ def run(test, attempts, outputs):
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
 
-def print_all(work, fusion_results, threadopt_results, threadbatch_results):
+def print_all(work, fusion_results, threadopt_results):
     file = 'fusion' + str(work) + '.dat'
     with open(file, 'w') as f:
         s = '#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'fusion', 'dev', 'threadopt', 'dev', 'threadbatch', 'dev')
         print s
         f.write(s + '\n')  
-        for x, t, b in zip(fusion_results, threadopt_results, threadbatch_results):
-            s = '\t%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], t[3], t[4], b[3], b[4])
+        for x, t in zip(fusion_results, threadopt_results):
+            s = '\t%d\t%d\t%0.2f\t%0.2f\t%0.2f\t%0.2f' % (x[2], x[1], x[3], x[4], t[3], t[4])
             print s
             f.write(s + '\n')
     file = 'fusion-normalized' + str(work) + '.dat'
@@ -128,8 +128,8 @@ def print_all(work, fusion_results, threadopt_results, threadbatch_results):
         s = '#%s\t%s\t%s\t%s\t%s\t%s' % ( 'filters', 'work', 'threadopt', 'dev', 'threadbatch', 'dev')
         print s
         f.write(s + '\n')
-        for fusion, threadopt, threadbatch in zip(fusion_results,threadopt_results, threadbatch_results):
-            s = '\t%d\t%d\t%f\t%f\t%f\t%f' % (fusion[2], fusion[1], (threadopt[3]/base[3]), (threadopt[4]/base[3]), (threadbatch[3]/base[3]), (threadbatch[4]/base[3])   )
+        for fusion, threadopt in zip(fusion_results,threadopt_results ):
+            s = '\t%d\t%d\t%f\t%f' % (fusion[2], fusion[1], (threadopt[3]/base[3]), (threadopt[4]/base[3])  )
             print s
             f.write(s + '\n')
 
@@ -140,8 +140,8 @@ def plot(work, outputs):
     cmd = "plot "
     cmd += "\"" + data + "\" u 1:3 t \'static\' w linespoints,"
     cmd += "\"\" u 1:3:4 notitle w yerrorbars, "
-    cmd += "\"" + data + "\" u 1:7 t \'dynamic w/ batching=100\' w linespoints, "
-    cmd += "\"\" u 1:7:8 notitle w yerrorbars, "
+    #cmd += "\"" + data + "\" u 1:7 t \'dynamic w/ batching=100\' w linespoints, "
+    #cmd += "\"\" u 1:7:8 notitle w yerrorbars, "
     cmd += "\"" + data + "\" u 1:5 t \'dynamic\' w linespoints, "
     cmd += "\"\" u 1:5:6 notitle w yerrorbars"
     with open('./fusion.gnu', 'w') as f:        
@@ -159,9 +159,7 @@ def plot_normalized(work, outputs):
     data = 'fusion-normalized' + str(work) + '.dat'
     output = 'fusion-normalized' + str(work) + '.ps'
     cmd = "plot "
-    cmd += "\"" + data + "\" u 1:5 t \'dynamic\' w linespoints, "
-    cmd += "\"\" u 1:5:6 notitle w yerrorbars, "    
-    cmd += "\"" + data + "\" u 1:3 t \'dynamic w/ batching=100\' w linespoints,"
+    cmd += "\"" + data + "\" u 1:3 notitle w linespoints,"
     cmd += "\"\" u 1:3:4 notitle w yerrorbars"
     with open('./fusion-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
@@ -188,7 +186,6 @@ def main():
     for work in total_work:        
         fusion_results = []
         threadopt_results = []
-        threadbatch_results = []
         for num_filters in filters:
             for test in tests:
                 generate(test, num_filters, work)
@@ -201,14 +198,8 @@ def main():
                 elif test[0] == Configs.threadopt:
                     threadopt_results.append(('threadopt', work, num_filters, avg, dev))
                     x = ('threadopt', work, num_filters, avg, dev)
-                    print x
-                elif test[0] == Configs.threadbatch:
-                    threadbatch_results.append(('threadbatch', work, num_filters, avg, dev))
-                    x = ('threadbatch', work, num_filters, avg, dev)
-                    print x
-
-                    
-        print_all(work, fusion_results, threadopt_results, threadbatch_results)
+                    print x                                  
+        print_all(work, fusion_results, threadopt_results)
         plot(work, outputs)
         plot_normalized(work, outputs)
                     
