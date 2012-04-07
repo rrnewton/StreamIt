@@ -47,19 +47,23 @@ def run_one(test, core):
         print results
     return results
 
-def run(test, cores, attempts):
+
+def run(test, cores, attempts, outputs):
     results = []
     for num in range(attempts):
          result = run_one(test, cores)
          results.append(result)
+         #for result in results:
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-    deviations = map(lambda x: x - mean, times)
+    tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
+    mean = reduce(lambda x, y: float(x) + float(y), tputs) / len(tputs)    
+    deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
+
 
 def print_all(static_results, dynamic_results):
     file = 'selection-pull.dat'
@@ -107,6 +111,8 @@ def plot():
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
     os.system('gnuplot ./selection-pull.gnu')
+    os.system('ps2pdf ' + output)
+
 
 
 def plot_normalized(cores):
@@ -132,6 +138,8 @@ def plot_normalized(cores):
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
     os.system('gnuplot ./selection-normalized-pull.gnu')
+    os.system('ps2pdf ' + output)
+
     
 def main():
     attempts = 3
@@ -149,7 +157,7 @@ def main():
                 for test in [Configs.static, Configs.dynamic]:
                     generate(selectivity)
                     compile(core, test, outputs, ignore)
-                    (avg, dev) =  run(test, core, attempts)
+                    (avg, dev) =  run(test, core, attempts, outputs)
                     if test == Configs.static:
                         x = ('static', selectivity, core, avg, dev)
                         s = 'static\t%d\t%d\t%f\t%f' % (selectivity, core, avg, dev)
