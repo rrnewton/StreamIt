@@ -47,7 +47,8 @@ class Test:
         ratio = 0.5
         linestring = open('test.tmpl', 'r').read()
         test_template = string.Template(linestring)        
-        s = test_template.substitute(workstatic=str(int(self.ratio * self.work)),workdynamic=str(int((1 - self.ratio) * self.work)));
+        #s = test_template.substitute(workstatic=str(int(self.ratio * self.work)),workdynamic=str(int((1 - self.ratio) * self.work)));
+        s = test_template.substitute(workstatic=str(int(self.ratio * self.work)),workdynamic=str(self.work));
         with open("test.str", 'w') as f:
             f.write(s)      
             #print s                
@@ -167,7 +168,6 @@ def plot_normalized(work, outputs, batching):
     os.system('gnuplot ./tmp.gnu')
     os.system('ps2pdf ' + output)
 
-
 def do_test(test):
     test.generate()
     test.compile()
@@ -176,12 +176,12 @@ def do_test(test):
 def main():
     attempts = 3
     preoutputs = 1000
-    outputs = 2000
+    outputs = 200000
     work = 2000
-    ratio = 0.50
+    ratio = 0.25
     all_tests = []
     batching = [1, 10, 100]
-    cores = [1, 4, 8]
+    cores = [1, 4, 8 ]
 
     for batch in batching:
         for core in cores:
