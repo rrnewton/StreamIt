@@ -96,26 +96,6 @@ def print_all(static_results, dynamic_results):
             print s
             f.write(s + '\n')    
          
-def plot():
-    data = 'vwap.dat'
-    output = 'vwap.ps'  
-    cmd = "plot \""
-    cmd += data + "\" u 1:2 t \'static\' w linespoints, \""
-    cmd += "\" u 1:2:3 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 1:4:5 notitle w yerrorbars"    
-    with open('./vwap.gnu', 'w') as f:        
-        f.write('set terminal postscript\n')
-        f.write('set output \"' + output + '\"\n')
-        f.write('set key left top\n');
-        f.write('set title \"Synthetic Dynamism VWAP\"\n')
-        f.write('set xlabel \"Cores\"\n');
-        f.write('set ylabel \"Nanoseconds\"\n');
-        f.write(cmd)
-    os.system('gnuplot ./vwap.gnu')
-    os.system('ps2pdf ' + output)
-
-
 
 def plot_normalized(cores):
     data = 'vwap-normalized.dat'
@@ -147,7 +127,7 @@ def plot_normalized(cores):
 def main():    
     attempts = 3
     ignore = 32
-    outputs = 100
+    outputs = 1000
     selectivities = [1, 10, 100, 1000]
     cores = [1,8]
     static_results = []

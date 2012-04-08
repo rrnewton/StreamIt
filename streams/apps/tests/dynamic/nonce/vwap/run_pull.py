@@ -80,39 +80,21 @@ def print_all(static_results, dynamic_results):
             s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in static])
             s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in dynamic])
             print s
-            f.write(s + '\n')      
+            f.write(s + '\n')                 
     file = 'vwap-normalized-pull.dat'
     with open(file, 'w') as f:
         s = '#selectivity\t'
-        s += '\t'.join(["%s-sta-norm" % (x[2]) for x in static_results[0]])
-        s += '\t' + '\t'.join(["%s-dyn-avg" % (x[2]) for x in dynamic_results[0]])
+        s += '\t'.join(["%s-sta-norm\t%s-sta-dev" % (x[2], x[2]) for x in static_results[0]])
+        s += '\t' + '\t'.join(["%s-dyn-avg\t%s-dyn-avg" % (x[2], x[2]) for x in dynamic_results[0]])
         print s
         f.write(s + '\n')    
         for static, dynamic in zip(static_results, dynamic_results):
-            sta_one_core =  static[0][3]
+            base =  static[0][3]
             s = '%d\t' % (static[0][1]) 
-            s += '\t'.join(["%f" % (d[3]/sta_one_core) for d in static])
-            s += '\t' + '\t'.join(["%f" % (d[3]/sta_one_core) for d in dynamic])
+            s += '\t'.join(["%f\t%f" % (d[3]/base, d[4]/base) for d in static])
+            s += '\t' + '\t'.join(["%f\t%f" % (d[3]/base, d[4]/base) for d in dynamic])
             print s
-            f.write(s + '\n')    
-         
-def plot():
-    data = 'vwap-pull.dat'
-    output = 'vwap-pull.ps'  
-    cmd = "plot \""
-    cmd += data + "\" u 1:2 t \'static\' w linespoints, \""
-    cmd += "\" u 1:2:3 notitle w yerrorbars, \""
-    cmd += data + "\" u 1:4 t \'dynamic\' w linespoints, \""
-    cmd += "\" u 1:4:5 notitle w yerrorbars"    
-    with open('./vwap-pull.gnu', 'w') as f:        
-        f.write('set terminal postscript\n')
-        f.write('set output \"' + output + '\"\n')
-        f.write('set key left top\n');
-        f.write('set title \"Synthetic Dynamism VWAP\"\n')
-        f.write('set xlabel \"Cores\"\n');
-        f.write('set ylabel \"Nanoseconds\"\n');
-        f.write(cmd)
-    os.system('gnuplot ./vwap-pull.gnu')
+            f.write(s + '\n')           
 
 
 def plot_normalized(cores):
@@ -124,24 +106,28 @@ def plot_normalized(cores):
         if i != 2:
             cmd += ', '
         cmd += "\"" + data + "\" u 1:" + str(i) + " t \'static-" + str(core) + " \' w linespoints"
-        i = i + 1
+        cmd += ", \"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w yerrorbars"
+        i = i + 2
     for core in cores:
         cmd += ", \"" + data + "\" u 1:" + str(i) + " t \'dynamic-" + str(core) + "\' w linespoints"
-        i = i + 1
+        cmd += ", \"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w yerrorbars"
+        i = i + 2
     with open('./vwap-normalized-pull.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
         f.write('set output \"' + output + '\"\n')
-        f.write('set key left top\n');
+        f.write('set key left center\n');
         f.write('set logscale x\n');
         f.write('set title \"VWAP Operator Normalized\"\n')
         f.write('set xlabel \"Frequency\"\n');
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
     os.system('gnuplot ./vwap-normalized-pull.gnu')
+    os.system('ps2pdf ' + output)
+    
     
 def main():    
     attempts = 3
-    ignore = 1
+    ignore = 32
     outputs = 100000
     selectivities = [1, 10, 100, 1000]
     cores = [1,8]
