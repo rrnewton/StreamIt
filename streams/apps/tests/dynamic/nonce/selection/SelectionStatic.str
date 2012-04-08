@@ -31,7 +31,7 @@ float->float filter Process() {
          push(x);
      } else {
          int i;
-         for (i = 0; i < 1000; i++) {
+         for (i = 0; i < 10000; i++) {
           x += i * 3.0 + 1.0;
          }
          push(x);
