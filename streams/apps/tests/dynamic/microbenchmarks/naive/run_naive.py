@@ -29,7 +29,7 @@ class Test:
         self.mean = 0.0
         self.dev = 0.0
     def get_cmd(self):
-        cmd = [strc, '-smp', str(self.cores), '--perftest', '--noiter',  '--threadopt', '--outputs', str(self.outputs), '--preoutputs', str(self.preoutputs)]
+        cmd = [strc, '-smp', str(self.cores), '--perftest', '--naivetest', '--noiter',  '--threadopt', '--outputs', str(self.outputs), '--preoutputs', str(self.preoutputs)]
         cmd += self.flags
         cmd += [self.source]
 
@@ -126,7 +126,7 @@ def do_test(test, outputs):
 
 def main():
     attempts = 3
-    preoutputs = 100
+    preoutputs = 0 #This must be 0!
     outputs = 10000     
     all_tests = []
     works = [1000]
