@@ -89,10 +89,10 @@ def print_all(static_results, dynamic_results):
         print s
         f.write(s + '\n')    
         for static, dynamic in zip(static_results, dynamic_results):
-            base =  static[0][3]
+            #base =  static[0][3]
             s = '%d\t' % (static[0][1]) 
-            s += '\t'.join(["%f\t%f" % (d[3]/base, d[4]/base) for d in static])
-            s += '\t' + '\t'.join(["%f\t%f" % (d[3]/base, d[4]/base) for d in dynamic])
+            s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in static])
+            s += '\t' + '\t'.join(["%f\t%f" % (d[3], d[4]) for d in dynamic])
             print s
             f.write(s + '\n')    
          
@@ -105,11 +105,11 @@ def plot_normalized(cores):
     for core in cores:
         if i != 2:
             cmd += ', '
-        cmd += "\"" + data + "\" u 1:" + str(i) + " t \'static-" + str(core) + " \' w linespoints"
+        cmd += "\"" + data + "\" u 1:" + str(i) + " t \'static-" + str(core) + " \' w linespoints lc rgb \"blue\""
         cmd += ", \"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w yerrorbars"
         i = i + 2
     for core in cores:
-        cmd += ", \"" + data + "\" u 1:" + str(i) + " t \'dynamic-" + str(core) + "\' w linespoints"
+        cmd += ", \"" + data + "\" u 1:" + str(i) + " t \'dynamic-" + str(core) + "\' w linespoints lc rgb \"red\""
         cmd += ", \"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w yerrorbars"
         i = i + 2
     with open('./vwap-normalized.gnu', 'w') as f:        
