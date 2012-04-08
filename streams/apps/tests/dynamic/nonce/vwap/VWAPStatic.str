@@ -1,6 +1,5 @@
 void->void pipeline VWAPStatic {
     add FileReader<float>("./floats.in");
-    add Dummy();
     add Aggregate();  
     add Dummy();
     add Process();
