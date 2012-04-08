@@ -126,11 +126,11 @@ def plot_normalized(cores):
         if i != 2:
             cmd += ', '
         cmd += "\"" + data + "\" u 1:" + str(i) + " t \'static-" + str(core) + " \' w linespoints"
-        cmd += "\"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w linespoints"
+        cmd += ", \"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w yerrorbars"
         i = i + 2
     for core in cores:
         cmd += ", \"" + data + "\" u 1:" + str(i) + " t \'dynamic-" + str(core) + "\' w linespoints"
-        cmd += ", \"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w linespoints"
+        cmd += ", \"" + data + "\" u 1:" + str(i) + ":" + str(i+1) + " notitle w yerrorbars"
         i = i + 2
     with open('./vwap-normalized.gnu', 'w') as f:        
         f.write('set terminal postscript\n')
