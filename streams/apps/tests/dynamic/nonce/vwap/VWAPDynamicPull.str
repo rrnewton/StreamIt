@@ -1,5 +1,6 @@
 void->void pipeline VWAPDynamicPull {
     add FileReader<float>("./floats.in");
+    add Dummy();
     add Aggregate();  
     add Dummy();
     add Process();
