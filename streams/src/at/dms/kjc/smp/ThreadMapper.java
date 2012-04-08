@@ -345,7 +345,8 @@ public class ThreadMapper {
                         filter,
                         thread);
                 System.out.println("   (-) filter="
-                        + getFilterName(filter) + " thread=" + thread);                        
+                        + getFilterName(filter) + " thread=" + thread);   
+                addThreadToCore(filterCore, thread);
                 continue;
             }
 
@@ -443,7 +444,13 @@ public class ThreadMapper {
     private boolean isFirstThreadOnCore(Filter filter) {              
         int core = SMPBackend.getComputeNode(filter.getWorkNode()).coreID;        
         if (threadsOnCore.containsKey(core)) {
-            return (threadsOnCore.get(core).size() > 1);
+            
+            System.out.println("ThreadMapper.isFirstThreadOnCore called on filter=" + filter.getWorkNode());
+            for (Integer ii : threadsOnCore.get(core) ) {
+                System.out.println("  Core " + core + " has thread " + ii);
+            }
+            
+            return (threadsOnCore.get(core).size() < 1);
         }
         return true;    
     }

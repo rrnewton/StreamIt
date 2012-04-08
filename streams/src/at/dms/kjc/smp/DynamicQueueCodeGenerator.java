@@ -150,13 +150,18 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("    }\n");
             if (addBarrier) {
                 cBuffer.append("  barrier_wait(&barrier);\n");
-            } else {
-                cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
-                cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
-                cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
-                cBuffer.append("    pthread_cond_signal(&thread_conds[nextIndex]);\n");
-                cBuffer.append("    pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+            }// else {
+                               
+            if (!KjcOptions.naive) {
+                cBuffer.append("    if (threadIndex != nextIndex) {;\n");
+                cBuffer.append("        pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("        thread_to_sleep[nextIndex] = AWAKE;\n");
+                cBuffer.append("        pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("        pthread_cond_signal(&thread_conds[nextIndex]);\n");
+                cBuffer.append("        pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+                cBuffer.append("    }\n");
             }
+            
             
             cBuffer.append("    pthread_mutex_lock(&q->lock);\n");
             cBuffer.append("    size = q->size;\n");
@@ -213,12 +218,16 @@ public class DynamicQueueCodeGenerator {
             cBuffer.append("    }\n");
             if (addBarrier) {
                 cBuffer.append("  barrier_wait(&barrier);\n");        
-            } else {
-                cBuffer.append("    pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
-                cBuffer.append("    thread_to_sleep[nextIndex] = AWAKE;\n");
-                cBuffer.append("    pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
-                cBuffer.append("    pthread_cond_signal(&thread_conds[nextIndex]);\n");
-                cBuffer.append("    pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+            }// else {
+            
+            if (!KjcOptions.naive) {
+                cBuffer.append("    if (threadIndex != nextIndex) {;\n");
+                cBuffer.append("        pthread_mutex_lock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("        thread_to_sleep[nextIndex] = AWAKE;\n");
+                cBuffer.append("        pthread_mutex_unlock(&thread_mutexes[nextIndex]);\n");
+                cBuffer.append("        pthread_cond_signal(&thread_conds[nextIndex]);\n");
+                cBuffer.append("        pthread_cond_wait(&thread_conds[threadIndex], &thread_mutexes[threadIndex]);\n");
+                cBuffer.append("    }\n");
             }
             cBuffer.append("    pthread_mutex_lock(&q->lock);\n");
             cBuffer.append("    size = q->size;\n");

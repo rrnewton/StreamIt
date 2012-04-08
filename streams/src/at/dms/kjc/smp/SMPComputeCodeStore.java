@@ -807,8 +807,6 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
             return;
         }
 
-
-
         threads.get(threadId).addPrintOutputCode(
                 buf,
                 workNode);              
@@ -844,6 +842,16 @@ public class SMPComputeCodeStore extends ComputeCodeStore<Core> {
         
         threads.get(threadId).addBarrierWait();
                 
+        if (KjcOptions.threadopt) {
+            if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
+                int mainThread = ThreadMapper.getMapper().coreToThread(
+                        getCore().coreID);
+                threads.get(threadId).addCallNextToMain(
+                        threadId,
+                        mainThread);
+            }
+        }
+        
     }
 
 

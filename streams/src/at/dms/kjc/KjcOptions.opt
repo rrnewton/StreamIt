@@ -802,3 +802,7 @@ longname 		"threadbatch"
 	requireArgument
 	help		"Multiple the number of iterations in each thread by <n>."
 
+longname		"naive"
+	type		boolean
+	default		"false"
+	help		"Use the naive thread scheduling scheme."

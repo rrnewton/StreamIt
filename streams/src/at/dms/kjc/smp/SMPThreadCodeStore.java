@@ -77,7 +77,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     private int                    threadId;
 
     public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, int threadIndex) {
-    
+
         this.coreCodeStore = coreCodeStore;
         JBlock methodBody = new JBlock();
         threadSteadyLoop = new JBlock();
@@ -91,17 +91,17 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         }
 
         JStatement loop;
-//        if (KjcOptions.threadbatch > 1) {
-//            batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
-//            JStatement[] stmts = { batchingLoop };
-//            JBlock block = new JBlock(null, stmts, null);
-//            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
-//                    block, null);
-//            outerLoop = block;
-//        } else {
-            loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
-                    threadSteadyLoop, null);
-       // }
+        // if (KjcOptions.threadbatch > 1) {
+        // batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
+        // JStatement[] stmts = { batchingLoop };
+        // JBlock block = new JBlock(null, stmts, null);
+        // loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
+        // block, null);
+        // outerLoop = block;
+        // } else {
+        loop = new JWhileStatement(null, new JBooleanLiteral(null, true),
+                threadSteadyLoop, null);
+        // }
 
         methodBody.addStatement(loop);
         methodBody.addStatement(new JExpressionStatement(
@@ -182,7 +182,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         this.coreCodeStore = coreCodeStore;
         threadMethod = createThreadMethod(threadMethodName);
         threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        this.addSteadyLoop();                    
+        this.addSteadyLoop();
     }
 
     public SMPThreadCodeStore(SMPComputeCodeStore coreCodeStore, String name,
@@ -191,7 +191,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         this.coreCodeStore = coreCodeStore;
         threadMethod = createThreadMethod(threadMethodName);
         threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        this.addSteadyLoop();    
+        this.addSteadyLoop();
     }
 
     /**
@@ -209,7 +209,32 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         this.coreCodeStore = coreCodeStore;
         threadMethod = createThreadMethod(threadMethodName);
         threadSteadyLoop = new JBlock(null, new JStatement[0], null);
-        addSteadyLoop(iterationBound);    
+        addSteadyLoop(iterationBound);
+    }
+
+    public void addBarrierWait() {
+
+        // * Disable scheduling for the naive case
+        if (KjcOptions.naive) {
+            return;
+        }
+
+        if (SMPBackend.chip.size() == 1)
+            return;
+
+        if (batchingLoop != null) {
+            // System.out.println("SMPThreadCodeStore.addBarrierWait batchingLoop != NULL");
+            // JStatement body = batchingLoop.getBody();
+            // JStatement comment = Util.toStmt("/* Steady-State Barrier */");
+            outerLoop.addStatement(Util.toStmt("/* Steady-State Barrier */"));
+            outerLoop.addStatement(Util.toStmt("barrier_wait(&barrier)"));
+        } else {
+            threadSteadyLoop.addStatement(Util
+                    .toStmt("/* Steady-State Barrier */"));
+            threadSteadyLoop
+                    .addStatement(Util.toStmt("barrier_wait(&barrier)"));
+        }
+
     }
 
     public void addCallNextToMain(int threadIndex, int nextIndex) {
@@ -262,14 +287,14 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         // written to 2 steady-states ago
 
         WorkNode fileW = buf.filterNode;
-                
-//        System.out.println("SMPThreadCodeStore.addPrintOutputCode workNode="
-//                + workNode.toString() + " fileW=" + fileW.toString());
-//        System.out.println("SMPThreadCodeStore.addPrintOutputCode filter="
-//                + workNode.toString() + " fileW.isFileOutput()="
-//                + fileW.isFileOutput() + " buf=" + buf.toString()
-//                + " buf.getRotationLength()=" + buf.getRotationLength());
-        
+
+        // System.out.println("SMPThreadCodeStore.addPrintOutputCode workNode="
+        // + workNode.toString() + " fileW=" + fileW.toString());
+        // System.out.println("SMPThreadCodeStore.addPrintOutputCode filter="
+        // + workNode.toString() + " fileW.isFileOutput()="
+        // + fileW.isFileOutput() + " buf=" + buf.toString()
+        // + " buf.getRotationLength()=" + buf.getRotationLength());
+
         assert fileW.isFileOutput();
         // because of this scene we need a rotation length of 2
         // assert buf.getRotationLength() == 2: buf.getRotationLength();
@@ -305,7 +330,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         JVariableDefinition multiplierVar = new JVariableDefinition(null, 0,
                 CStdType.Integer, multiplierName, null);
         coreCodeStore.addExternField(new JFieldDeclaration(multiplierVar));
-        
+
         if ("stdout".equals(fileName) || "stderr".equals(fileName)
                 || KjcOptions.printf) {
             if (KjcOptions.outputs < 0) {
@@ -330,8 +355,12 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                         stmt,
                         bufferName);
             }
-        } else {            
-            stmt += getStaticPrintStatement( multiplierName,  bufferName,  typeString,  outputs);           
+        } else {
+            stmt += getStaticPrintStatement(
+                    multiplierName,
+                    bufferName,
+                    typeString,
+                    outputs);
         }
 
         addSteadyLoopStatement(Util.toStmt(stmt));
@@ -340,63 +369,15 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 //            if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
 //                int mainThread = ThreadMapper.getMapper()
 //                        .coreToThread(coreCodeStore
-//                        .getCore().coreID);
-//                if (threadId != mainThread) { 
-//                	addCallNextToMain(
-//                			threadId,
-//                			mainThread);
+//                                .getCore().coreID);
+//                if (threadId != mainThread) {
+//                    addCallNextToMain(
+//                            threadId,
+//                            mainThread);
 //                }
 //            }
 //        }
 
-    }
-    
-    private String getStaticPrintStatement(String multiplierName, String bufferName, String typeString, int outputs) {
-        if (KjcOptions.selective) {
-            return getStaticPrintStatementSelective( multiplierName,  bufferName,  typeString,  outputs);
-
-        } 
-        return getStaticPrintStatementNonSelective( multiplierName,  bufferName,  typeString,  outputs);
-    }
-    
-    private String getStaticPrintStatementSelective(String multiplierName, String bufferName, String typeString, int outputs) {
-        String stmt = "";
-        stmt += "if (" + multiplierName + ") {\n";
-        
-        stmt += "int i = 0; \n";     
-        stmt += "    for (i = 0; i < " + outputs + "; i++) {\n";
-        stmt += "        if (" + bufferName + "[i] > 0) {\n";
-        stmt += "            fwrite (&" + bufferName + "[i], sizeof(" + typeString + ") ,1, output);\n";       
-        if (KjcOptions.outputs >= 0) {  
-            stmt += "            currOutputs++; \n";
-            if (KjcOptions.perftest) {
-                stmt += "            if (currOutputs >= maxIgnored) {  start_time(); }\n";
-            }
-            stmt += "            if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
-        }
-        stmt += "        } \n";
-        stmt += "    }\n";
-        stmt += "}\n";
-        return stmt;
-    }
-    
-    private String getStaticPrintStatementNonSelective(String multiplierName, String bufferName, String typeString, int outputs) {
-        String stmt = "";
-        stmt += "if (" + multiplierName + ") {\n";
-        stmt += "    fwrite (" + bufferName + ", sizeof(" + typeString
-                + ") ," + outputs + "*" + multiplierName
-                + ", output);\n";                               
-        if (KjcOptions.outputs >= 0) {           
-            stmt += "    currOutputs+=" + outputs + "*" + multiplierName
-                    + ";\n";
-            if (KjcOptions.perftest) {
-                stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
-            }
-            stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
-           
-        }
-        stmt += "}\n";
-        return stmt;
     }
 
     public void addPrintOutputCode(InterSSGChannel buf, WorkNode workNode,
@@ -420,12 +401,19 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         String cast = tapeType == CStdType.Integer ? "(int)" : "(float)";
         String typeString = ((OutputContent) fileW.getWorkNodeContent())
                 .getType() == CStdType.Integer ? "int" : "float";
-        
+
         // create the loop
         String stmt = "";
 
-        String popName = buf.popMethodName() + "_barrier";
-        String peekName = buf.peekMethodName() + "_barrier";
+        String popName;
+        String peekName;
+        if (KjcOptions.naive) {
+            popName = buf.popMethodName();
+            peekName = buf.peekMethodName();
+        } else {
+            popName = buf.popMethodName() + "_barrier";
+            peekName = buf.peekMethodName() + "_barrier";
+        }
 
         Map<Filter, Integer> filterToThreadId = ThreadMapper.getMapper()
                 .getFilterToThreadId();
@@ -433,6 +421,9 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         int threadIndex = filterToThreadId.get(inputPort.getSSG()
                 .getTopFilters()[0]);
 
+        Core writerCore = SMPBackend.getComputeNode(fileW);
+        int nextIndex = ThreadMapper.getMapper().coreToThread(writerCore.coreID);
+        
         String threadIdStr = Integer.toString(threadIndex);
 
         String buffer = "dyn_buf_" + threadIdStr;
@@ -452,19 +443,19 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                         .getPreviousFilter(inputPort.getSSG().getTopFilters()[0]
                                 .getWorkNode());
                 Core core = SMPBackend.getComputeNode(prevFilter.getWorkNode());
-                threadIndex = ThreadMapper.getMapper().coreToThread(core.coreID);
+                threadIndex = ThreadMapper.getMapper().coreToThread(
+                        core.coreID);
             }
             buffer = "dyn_buf_" + buf.getId();
         }
 
-        
         String fileName = ((OutputContent) fileW.getWorkNodeContent())
                 .getFileName();
-        
+
         String popCall;
         if (KjcOptions.threadopt) {
             popCall = popName + "(" + buffer + ", " + threadIndex + ", "
-                    + threadIndex + ", 0,  NULL, 0,  NULL)";
+                    + nextIndex + ", 0,  NULL, 0,  NULL)";
         } else {
             popCall = popName + "(" + buffer + ", " + threadIdStr
                     + ", 0, NULL)";
@@ -473,107 +464,48 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         String peekCall;
         if (KjcOptions.threadopt) {
             peekCall = peekName + "(" + buffer + ", " + threadIndex + ", "
-                    + threadIndex + ", 0,  NULL, 0,  NULL, 1)";
+                    + nextIndex + ", 0,  NULL, 0,  NULL, 1)";
         } else {
             peekCall = peekName + "(" + buffer + ", " + threadIdStr
                     + ", 0, NULL, 0)";
-        }        
-        
+        }
+
         if (KjcOptions.lockfree) {
-    		stmt = getLockFreePrint( outputs,  multiplierName,  buffer, 
-    	    		 type,  cast,  popCall,  peekCall);
-    	} else if ("stdout".equals(fileName) || "stderr".equals(fileName)
-                   || KjcOptions.printf) {    		   
-    		stmt = getLockPrint( outputs,  multiplierName,  buffer, 
-   	    		 type,  cast,  popCall,  peekCall);
-    	} else {
-    		stmt = getFWritePrint( outputs,  multiplierName,  buffer, 
-    				typeString,  cast,  popCall,  peekCall);
-    	}
-                
+            stmt = getLockFreePrint(
+                    outputs,
+                    multiplierName,
+                    buffer,
+                    type,
+                    cast,
+                    popCall,
+                    peekCall);
+        } else if ("stdout".equals(fileName) || "stderr".equals(fileName)
+                || KjcOptions.printf) {
+            stmt = getLockPrint(
+                    outputs,
+                    multiplierName,
+                    buffer,
+                    type,
+                    cast,
+                    popCall,
+                    peekCall);
+        } else {
+            stmt = getFWritePrint(
+                    outputs,
+                    multiplierName,
+                    buffer,
+                    typeString,
+                    cast,
+                    popCall,
+                    peekCall);
+        }
+
         addSteadyLoopStatement(Util.toStmt(stmt));
 
-//        if (KjcOptions.threadopt) {
-//            if (ThreadMapper.getNumThreads() > KjcOptions.smp) {
-//                int mainThread = ThreadMapper.getMapper().coreToThread(coreCodeStore
-//                        .getCore().coreID);
-//                addCallNextToMain(
-//                        threadId,
-//                        mainThread);
-//            }
-//        }
+        
     }
 
-    private String getFWritePrint(int outputs, String multiplierName, String buffer, 
-    		String type, String cast, String popCall, String peekCall) {    	
-    	String stmt = "";
-    	stmt += "if (" + buffer + "->last >= " + buffer + "->first) {\n";
-    	stmt += "    fwrite(&" + buffer + "[" + buffer + "->first], sizeof(" + type + "), ((" + buffer + "->last - " + buffer + "->first) + 1), output);\n";      
-    	stmt += "} else {\n";
-    	stmt += "    fwrite(&" + buffer + "[" + buffer + "->first], sizeof(" + type + "), (" + buffer + "->max - " + buffer + "->first), output);\n";      
-    	stmt += "    fwrite(&" + buffer + "[0], sizeof(" + type + "), (" + buffer + "->last +1), output);\n";      
-    	stmt += "}\n";
-    	if (KjcOptions.outputs >= 0) {
-    		stmt += "currOutputs +=" + buffer + "->size;\n";
-    		if (KjcOptions.perftest) {
-    			stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
-    		}
-    		stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
-    	}
-    	stmt += "" + buffer + "->size = 0;\n";
-    	stmt += "" + buffer + "->first = 1;\n";
-    	stmt += "" + buffer + "->last = 0;\n";
-    	
-    	return stmt;
-    }
-    
-    private String getLockPrint(int outputs, String multiplierName, String buffer, 
-    		String type, String cast, String popCall, String peekCall) {
-    	String stmt = "";
-    	if (KjcOptions.outputs < 0) {
-    		stmt += "int _i_ = 0;\n";
-    		stmt += "for (int _i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n";
-    		stmt += "    if (" + buffer + "->size > 0) {\n";
-    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast  + popCall + ");\n ";
-    		stmt += "    }\n"; 
-    		stmt += "}\n";
-
-    	} else {
-    		stmt += "int _i_ = 0;\n"; 
-    	    stmt += "for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) {\n";
-    		stmt += "    if (" + buffer + "->size > 0) {\n";
-    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n";
-    		stmt = addPerfTest(stmt);
-    		stmt = addOutputCountDynamic(stmt, peekCall);
-    	}
-		return stmt;
-	}
-
-	private String getLockFreePrint(int outputs, String multiplierName, String buffer, 
-    		String type, String cast, String popCall, String peekCall) {
-    	String stmt = "";
-    	if (KjcOptions.outputs < 0) {
-    		stmt += "int _i_ = 0;\n";
-    		stmt += "for (int _i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) { \n";
-    		stmt += "    if (" + buffer + "->head != " + buffer + "->tail) {\n";    		
-    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast  + popCall + ");\n "; 
-    		stmt += "    }\n" + "}\n";
-
-    	} else {
-    		stmt += "int _i_ = 0;\n";
-    		stmt += "for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName + "; _i_++) {\n";
-    		stmt += "    if (" + buffer + "->head != " + buffer  + "->tail) {\n";    	
-    		stmt += "        fprintf(output, \"" + type + "\\n\", " + cast + popCall + ");\n";
-    		stmt = addPerfTest(stmt);
-    		stmt = addOutputCountDynamic(
-    				stmt,
-    				peekCall);
-    	}
-    		
-		return stmt;
-	}
-
-	public void addStatementFirst(JExpressionStatement statement) {
+    public void addStatementFirst(JExpressionStatement statement) {
         threadMethod.addStatementFirst(statement);
     }
 
@@ -586,14 +518,14 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
 
         threadSteadyLoop.addStatement(steadyBlock);
 
-//        // TODO: Only make this call if it is the last
-//        if (threadIndex != nextIndex
-//                && ThreadMapper.getNumThreads() > KjcOptions.smp) {
-//            addCallNextToBlock(
-//                    threadSteadyLoop,
-//                    threadIndex,
-//                    nextIndex);
-//        }
+        // // TODO: Only make this call if it is the last
+        // if (threadIndex != nextIndex
+        // && ThreadMapper.getNumThreads() > KjcOptions.smp) {
+        // addCallNextToBlock(
+        // threadSteadyLoop,
+        // threadIndex,
+        // nextIndex);
+        // }
     }
 
     public void addSteadyLoop() {
@@ -605,18 +537,18 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                     new JEmittedTextExpression("profiler_clear()")));
         }
 
-//        if (KjcOptions.threadbatch > 1) {
-//            batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
-//            JStatement[] stmts = { batchingLoop };
-//            JBlock block = new JBlock(null, stmts, null);
-//            threadMethod.addStatement(new JWhileStatement(null,
-//                    new JBooleanLiteral(null, true), block, null));
-//            outerLoop = block;
-//        } else {
-            // add it to the while statement
-            threadMethod.addStatement(new JWhileStatement(null,
-                    new JBooleanLiteral(null, true), threadSteadyLoop, null));
-      //  }
+        // if (KjcOptions.threadbatch > 1) {
+        // batchingLoop = Utils.makeBatchingLoop(threadSteadyLoop);
+        // JStatement[] stmts = { batchingLoop };
+        // JBlock block = new JBlock(null, stmts, null);
+        // threadMethod.addStatement(new JWhileStatement(null,
+        // new JBooleanLiteral(null, true), block, null));
+        // outerLoop = block;
+        // } else {
+        // add it to the while statement
+        threadMethod.addStatement(new JWhileStatement(null,
+                new JBooleanLiteral(null, true), threadSteadyLoop, null));
+        // }
     }
 
     public void addSteadyLoop(ALocalVariable iterationBound) {
@@ -684,7 +616,12 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     }
 
     public void addSteadyThreadWait(int threadIndex) {
-                
+
+        // * Disable scheduling for the naive case
+        if (KjcOptions.naive) {
+            return;
+        }
+
         Utils.addCondWait(
                 threadSteadyLoop,
                 threadIndex,
@@ -773,7 +710,7 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         JFormalParameter p = new JFormalParameter(CVoidPtrType.VoidPtr, "x");
 
         String threadName = "helper_" + threadIndex;
-     
+
         JMethodDeclaration threadHelper = new JMethodDeclaration(
                 CVoidPtrType.VoidPtr, threadName, new JFormalParameter[] { p },
                 methodBody);
@@ -874,12 +811,163 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
         return method;
     }
 
+    private String getFWritePrint(int outputs, String multiplierName,
+            String buffer, String type, String cast, String popCall,
+            String peekCall) {
+        String stmt = "";
+        stmt += "if (" + buffer + "->last >= " + buffer + "->first) {\n";
+        stmt += "    fwrite(&" + buffer + "[" + buffer + "->first], sizeof("
+                + type + "), ((" + buffer + "->last - " + buffer
+                + "->first) + 1), output);\n";
+        stmt += "} else {\n";
+        stmt += "    fwrite(&" + buffer + "[" + buffer + "->first], sizeof("
+                + type + "), (" + buffer + "->max - " + buffer
+                + "->first), output);\n";
+        stmt += "    fwrite(&" + buffer + "[0], sizeof(" + type + "), ("
+                + buffer + "->last +1), output);\n";
+        stmt += "}\n";
+        if (KjcOptions.outputs >= 0) {
+            stmt += "currOutputs +=" + buffer + "->size;\n";
+            if (KjcOptions.perftest) {
+                stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            }
+            stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
+        }
+        stmt += "" + buffer + "->size = 0;\n";
+        stmt += "" + buffer + "->first = 1;\n";
+        stmt += "" + buffer + "->last = 0;\n";
+
+        return stmt;
+    }
+
+    private String getLockFreePrint(int outputs, String multiplierName,
+            String buffer, String type, String cast, String popCall,
+            String peekCall) {
+        String stmt = "";
+        if (KjcOptions.outputs < 0) {
+            stmt += "int _i_ = 0;\n";
+            stmt += "for (int _i_ = 0; _i_ < " + outputs + "*" + multiplierName
+                    + "; _i_++) { \n";
+            stmt += "    if (" + buffer + "->head != " + buffer + "->tail) {\n";
+            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
+                    + popCall + ");\n ";
+            stmt += "    }\n" + "}\n";
+
+        } else {
+            stmt += "int _i_ = 0;\n";
+            stmt += "for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName
+                    + "; _i_++) {\n";
+            stmt += "    if (" + buffer + "->head != " + buffer + "->tail) {\n";
+            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
+                    + popCall + ");\n";
+            stmt = addPerfTest(stmt);
+            stmt = addOutputCountDynamic(
+                    stmt,
+                    peekCall);
+        }
+
+        return stmt;
+    }
+
+    private String getLockPrint(int outputs, String multiplierName,
+            String buffer, String type, String cast, String popCall,
+            String peekCall) {
+        String stmt = "";
+        if (KjcOptions.outputs < 0) {
+            stmt += "int _i_ = 0;\n";
+            stmt += "for (int _i_ = 0; _i_ < " + outputs + "*" + multiplierName
+                    + "; _i_++) { \n";
+            stmt += "    if (" + buffer + "->size > 0) {\n";
+            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
+                    + popCall + ");\n ";
+            stmt += "    }\n";
+            stmt += "}\n";
+
+        } else {
+            stmt += "int _i_ = 0;\n";
+            stmt += "for (_i_ = 0; _i_ < " + outputs + "*" + multiplierName
+                    + "; _i_++) {\n";
+            stmt += "    if (" + buffer + "->size > 0) {\n";
+            stmt += "        fprintf(output, \"" + type + "\\n\", " + cast
+                    + popCall + ");\n";
+            stmt = addPerfTest(stmt);
+            stmt = addOutputCountDynamic(
+                    stmt,
+                    peekCall);
+        }
+        return stmt;
+    }
+
+    private String getStaticPrintStatement(String multiplierName,
+            String bufferName, String typeString, int outputs) {
+        if (KjcOptions.selective) {
+            return getStaticPrintStatementSelective(
+                    multiplierName,
+                    bufferName,
+                    typeString,
+                    outputs);
+
+        }
+        return getStaticPrintStatementNonSelective(
+                multiplierName,
+                bufferName,
+                typeString,
+                outputs);
+    }
+
+    private String getStaticPrintStatementNonSelective(String multiplierName,
+            String bufferName, String typeString, int outputs) {
+        String stmt = "";
+        stmt += "if (" + multiplierName + ") {\n";
+        stmt += "    fwrite (" + bufferName + ", sizeof(" + typeString + ") ,"
+                + outputs + "*" + multiplierName + ", output);\n";
+        if (KjcOptions.outputs >= 0) {
+            stmt += "    currOutputs+=" + outputs + "*" + multiplierName
+                    + ";\n";
+            if (KjcOptions.perftest) {
+                stmt += "    if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            }
+            stmt += "    if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
+
+        }
+        stmt += "}\n";
+        return stmt;
+    }
+
+    private String getStaticPrintStatementSelective(String multiplierName,
+            String bufferName, String typeString, int outputs) {
+        String stmt = "";
+        stmt += "if (" + multiplierName + ") {\n";
+
+        stmt += "int i = 0; \n";
+        stmt += "    for (i = 0; i < " + outputs + "; i++) {\n";
+        stmt += "        if (" + bufferName + "[i] > 0) {\n";
+        stmt += "            fwrite (&" + bufferName + "[i], sizeof("
+                + typeString + ") ,1, output);\n";
+        if (KjcOptions.outputs >= 0) {
+            stmt += "            currOutputs++; \n";
+            if (KjcOptions.perftest) {
+                stmt += "            if (currOutputs >= maxIgnored) {  start_time(); }\n";
+            }
+            stmt += "            if (currOutputs >= maxOutputs) {  streamit_exit(0); }\n";
+        }
+        stmt += "        } \n";
+        stmt += "    }\n";
+        stmt += "}\n";
+        return stmt;
+    }
+
     private void setMyMainName(String name) {
         threadMethodName = name;
     }
 
     void addCallNextToBlock(JBlock loopBody, int threadIndex, int nextIndex) {
-                
+
+        // * Disable scheduling for the naive case
+        if (KjcOptions.naive) {
+            return;
+        }
+
         Utils.addSetFlag(
                 loopBody,
                 threadIndex,
@@ -894,6 +982,12 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
     }
 
     void addWaitToBlockFirst(JBlock loopBody, int threadIndex) {
+
+        // * Disable scheduling for the naive case
+        if (KjcOptions.naive) {
+            return;
+        }
+
         Utils.addCondWaitFirst(
                 loopBody,
                 threadIndex,
@@ -901,31 +995,5 @@ public class SMPThreadCodeStore { // extends ComputeCodeStore<Core> {
                         "ASLEEP",
                         "thread_to_sleep[" + threadIndex + "]"));
     }
-
-    public void addBarrierWait() {
-                
-        if (SMPBackend.chip.size() == 1)
-            return;
-               
-        if (batchingLoop != null) {
-            // System.out.println("SMPThreadCodeStore.addBarrierWait batchingLoop != NULL");
-            // JStatement body = batchingLoop.getBody();
-            // JStatement comment = Util.toStmt("/* Steady-State Barrier */");
-            outerLoop.addStatement(Util.toStmt("/* Steady-State Barrier */"));
-            outerLoop.addStatement(Util.toStmt("barrier_wait(&barrier)"));
-            // JStatement barrier = Util.toStmt("XXX barrier_wait(&barrier)");
-            // JStatement[] stmts = {body, comment, barrier};
-            // JBlock block = new JBlock(null, stmts, null);
-            // batchingLoop.setBody(block);
-        } else {
-            threadSteadyLoop.addStatement(Util
-                    .toStmt("/* Steady-State Barrier */"));
-            threadSteadyLoop
-                    .addStatement(Util.toStmt("barrier_wait(&barrier)"));
-        }
-
-    }
-
-  
 
 }

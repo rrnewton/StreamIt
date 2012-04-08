@@ -185,7 +185,7 @@ int->int pipeline DEScoder(int vector)
 
     // initial permutation of 64 bit plain text
     add doIP();
-
+  
     for (int i = 0; i < MAXROUNDS; i++) {
         add splitjoin {
             split duplicate;
