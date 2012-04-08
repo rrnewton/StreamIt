@@ -37,16 +37,19 @@ def run_one(test, core):
         print results
     return results
 
-def run(test, cores, attempts):
+
+def run(test, cores, attempts, outputs):
     results = []
     for num in range(attempts):
          result = run_one(test, cores)
          results.append(result)
+         #for result in results:
          print result         
     # 1000000000 nanoseconds in 1 second    
     times = map(lambda x:  (long(x[4]) * 1000000000L) + long(x[5]) , results)
-    mean = reduce(lambda x, y: float(x) + float(y), times) / len(times)    
-    deviations = map(lambda x: x - mean, times)
+    tputs =  map(lambda x: (float(outputs)/float(x)) * 1000000000L , times)
+    mean = reduce(lambda x, y: float(x) + float(y), tputs) / len(tputs)    
+    deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
     return (mean, dev)
@@ -127,7 +130,7 @@ def main():
     for core in cores:
         for test in [Configs.static, Configs.dynamic]:
             compile(core, test, outputs, ignore)
-            (avg, dev) =  run(test, core, attempts)
+            (avg, dev) =  run(test, core, attempts, outputs)
             if test == Configs.static:
                 x = ('static', core, avg, dev)
                 print x
