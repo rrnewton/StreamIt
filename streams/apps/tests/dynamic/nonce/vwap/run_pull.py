@@ -78,7 +78,7 @@ def print_all(static_results, dynamic_results):
         for static, dynamic in zip(static_results, dynamic_results):
             s = '%d\t' % (static[0][1]) 
             s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in static])
-            s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in dynamic])
+            s += '\t' + '\t'.join(["%f\t%f" % (d[3], d[4]) for d in dynamic])
             print s
             f.write(s + '\n')                 
     file = 'vwap-normalized-pull.dat'
@@ -128,7 +128,7 @@ def plot_normalized(cores):
 def main():    
     attempts = 3
     ignore = 32
-    outputs = 100000
+    outputs = 10000
     selectivities = [1, 10, 100, 1000]
     cores = [1,8]
     static_results = []
