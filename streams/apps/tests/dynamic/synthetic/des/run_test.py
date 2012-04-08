@@ -114,7 +114,8 @@ def plot_normalized():
 def main():
     attempts = 3
     ignore = 131072
-    outputs = 655360
+    # outputs = 655360
+    outputs = 1310720
     cores = [1, 2, 4, 8, 16, 32]    
     #cores = [1, 2, 4]    
     static_results = []
