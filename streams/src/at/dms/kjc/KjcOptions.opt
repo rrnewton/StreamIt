@@ -806,3 +806,8 @@ longname		"naive"
 	type		boolean
 	default		"false"
 	help		"Use the naive thread scheduling scheme."
+
+longname		"naivetest"
+	type		boolean
+	default		"false"
+	help		"Start timeing when threads start."

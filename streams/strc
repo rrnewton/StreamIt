@@ -512,6 +512,7 @@ sub get_options
                             "threadbatch=i",
 			    "lockfree",
 			    "naive",
+			    "naivetest",
                             "preoutputs=i",
 			    "loadbalance",
 			    "loopcount=i",
@@ -985,6 +986,7 @@ sub get_compiler_opts
     $opts{threadbatch} && ($copts .= " --threadbatch " . $opts{threadbatch});
     $opts{lockfree} && ($copts .= " --lockfree");
     $opts{naive} && ($copts .= " --naive");
+    $opts{naivetest} && ($copts .= " --naivetest");
     $opts{outputs} && ($copts .= " --outputs " . $opts{outputs});
     $opts{preoutputs} && ($copts .= " --preoutputs " . $opts{preoutputs});
     $opts{loadbalance} && ($copts .= " --loadbalance");

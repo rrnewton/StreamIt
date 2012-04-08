@@ -804,7 +804,8 @@ public class EmitSMPCode extends EmitCode {
             p.println("startedTiming = 0;");
             p.println();
         }
-
+     
+        
         if (isDynamic) {
             p.println();
             p.println("// Initialize dynamic queues");
@@ -907,6 +908,13 @@ public class EmitSMPCode extends EmitCode {
         p.println("pthread_attr_init(&attr);");
         p.println("pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);");
 
+        
+        if (KjcOptions.naivetest) {
+            p.println();
+            p.println("start_time();");
+            p.println();
+        }
+        
         for (Core core : SMPBackend.chip.getCores()) {
             if (!core.getComputeCode().shouldGenerateCode())
                 continue;
