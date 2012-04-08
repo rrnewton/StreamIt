@@ -126,8 +126,8 @@ def do_test(test, outputs):
 
 def main():
     attempts = 3
-    preoutputs = 10
-    outputs = 100     
+    preoutputs = 100
+    outputs = 10000     
     all_tests = []
     works = [1000]
     threads = [2, 4, 8, 16, 32]
