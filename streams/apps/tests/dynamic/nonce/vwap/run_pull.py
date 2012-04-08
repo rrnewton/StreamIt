@@ -128,7 +128,7 @@ def plot_normalized(cores):
 def main():    
     attempts = 3
     ignore = 32
-    outputs = 100000
+    outputs = 10000
     selectivities = [1, 10, 100, 1000, 10000]
     cores = [1,8]
     static_results = []
