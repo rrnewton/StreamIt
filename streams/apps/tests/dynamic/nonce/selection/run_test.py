@@ -75,7 +75,7 @@ def print_all(static_results, dynamic_results):
         for static, dynamic in zip(static_results, dynamic_results):
             s = '%d\t' % (static[0][1]) 
             s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in static])
-            s += '\t'.join(["%f\t%f" % (d[3], d[4]) for d in dynamic])
+            s += '\t' + '\t'.join(["%f\t%f" % (d[3], d[4]) for d in dynamic])
             print s
             f.write(s + '\n')
     file = 'selection-normalized.dat'
