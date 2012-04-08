@@ -92,6 +92,7 @@ def plot():
         f.write('set ylabel \"Nanoseconds\"\n');
         f.write(cmd)
     os.system('gnuplot ./des-batch.gnu')
+    os.system('ps2pdf ' + output)
 
 
 def plot_normalized():
@@ -111,6 +112,8 @@ def plot_normalized():
         f.write('set ylabel \"Throughput normalized to static throughput with 1 core\"\n');
         f.write(cmd)
     os.system('gnuplot ./des-batch-normalized.gnu')
+    os.system('ps2pdf ' + output)
+
     
 def main():
     attempts = 3
