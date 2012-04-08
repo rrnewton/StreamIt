@@ -56,8 +56,6 @@ class Test:
     def run_one(self):
         (stdout, error) = subprocess.Popen([self.exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         regex = re.compile('input=(\d+) outputs=(\d+) ignored=(\d+) start=\d+:\d+ end=\d+:\d+ delta=(\d+):(\d+)')
-
-        print 'RUN ONE'
         for m in regex.finditer(stdout):
             results = (m.group(1), m.group(2), m.group(3), m.group(4), m.group(5))       
             print results
