@@ -132,7 +132,7 @@ def main():
     outputs = 100     
     all_tests = []
     works = [1000]
-    threads = [2, 4]
+    threads = [2, 4, 8, 16, 32]
     cores = [1]
 
     for work in works:
