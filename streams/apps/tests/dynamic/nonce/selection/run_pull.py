@@ -129,7 +129,7 @@ def plot_normalized(cores):
     
 def main():
     attempts = 3
-    ignore = 1
+    ignore = 32
     outputs = 10000
     selectivities = [1, 10, 100, 1000, 10000]
     cores = [1,8]
@@ -141,7 +141,7 @@ def main():
             dynamic = []
             for core in cores:        
                 for test in [Configs.static, Configs.dynamic]:
-                    generate(selectivity)
+                    generate(selectivity, outputs)
                     compile(core, test, outputs, ignore)
                     (avg, dev) =  run(test, core, attempts, outputs)
                     if test == Configs.static:
