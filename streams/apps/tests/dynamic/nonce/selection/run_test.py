@@ -14,14 +14,15 @@ class Configs:
 streamit_home = os.environ['STREAMIT_HOME']
 strc          = os.path.join(streamit_home, 'strc')
 
-def generate(selectivity):
+def generate(selectivity, outputs):
     print 'generate ' + str(selectivity)
     with open('floats.in', 'wb') as f:                
-        val = struct.pack('f', 0.5)
-        f.write(val)
-        for i in range(1, selectivity):
-            val = struct.pack('f', 2.0)
-            f.write(val)       
+        for j in range(outputs):
+            val = struct.pack('f', 0.5)
+            f.write(val)
+            for i in range(1, selectivity):
+                val = struct.pack('f', 2.0)
+                f.write(val)       
 
 def compile(cores, test, outputs, ignore):
     cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), '--noiter', '--selective', 'SelectionStatic.str']    
@@ -137,7 +138,7 @@ def main():
             dynamic = []
             for core in cores:        
                 for test in [Configs.static, Configs.dynamic]:
-                    generate(selectivity)
+                    generate(selectivity, outputs)
                     compile(core, test, outputs, ignore)
                     (avg, dev) =  run(test, core, attempts, outputs)
                     if test == Configs.static:
