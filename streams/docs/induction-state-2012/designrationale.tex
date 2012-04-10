@@ -5,13 +5,19 @@ stream programmers involves automatically
 recognizing induction variable usage in filter construction. 
 
 The approach of automatic analysis would idiomatically detect 
-a variable modified by a statement similar to \texttt{var=var+1}. 
+a variable modified by a statement similar to \texttt{var=var+1}. For programs
+such as the MPEG2 picture preprocessing subset, as depicted in Figure~\ref{fig:apt-pipeline},
+there is only one update to the induction state.
+
 Very few iteration filters, outside of source filters, use induction state 
 in this limited capacity. Consider Figure~\ref{fig:transform-after-simple}, where
 the induction variable is incremented at each iteration step but resets at 
 a threshold value. This pattern is very common in programs that use
 induction filters; MPD and FIRBank use this technique to iterate
-across a provided array one element per iteration step. 
+across a provided array one element per iteration step.  Trellis uses this
+technique to perform a special action once this threshold is reached.
+There is more than one location where the induction state can be updated.
+Furthermore, the induction state may not be updated at every invocation.
 
 % \begin{figure}[t]
 % {\eightpoint

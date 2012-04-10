@@ -1,14 +1,23 @@
 \subsection{Fission of Induction State}
 \label{sec:fission}
 
+\begin{figure}[t!]
+\centering
+\includegraphics[width=3.4in]{figures/duplicate-fission.pdf}
+\caption{Fission of a filter that peeks. \protect\label{fig:duplicate-fission-example}}
+\end{figure}
+
 
 \begin{figure*}[t!]
 \centering
 \includegraphics[width=6.5in]{figures/fission-example.pdf}
-\caption{Example of an iteration filter fissed into three fission products each with multiplicity 2.  The chart indicates the values used to determine the next value of the iteration field.  \protect\label{fig:fission-example}}
+\caption{Example of an iteration filter fissed into three fission products each with multiplicity 2.  The chart indicates the values used to determine the next value of the iteration field.  
+\protect\label{fig:fission-example}}
 \end{figure*}
 
 The compiler introduces data parallelism to the streaming program through a process known as {\it fission}.  Fission is the process of duplicating the stateless filter and wrapping these duplicates in a round-robin splitter and joiner.  The process ensures that input data is distributed correctly and output data is collected in correct order.  The duplicated filters, known as products, can be assigned to individual cores, thus introducing data parallelism.  
+
+Graphically, fission yields a stream graph result as depicted in Figure~\ref{fig:duplicate-fission-example}.  The base filter, MovingAverage, is duplicated into a duplicate splitjoin and joined in a roundrobin fashion.  Each individual MovingAverage$_j$ product has the work function of the base filter with additional bookkeeping measures to maintain the consistency of the channel inputs and outputs.
 
 Fission is applicable only to stateless filters, as the duplication process does not guarantee consistent behavior if filters contain state that changes between iterations.  Because the desugared iteration filters actually use mutable state to keep track of iteration values, the fission process must be modified to handle iteration values.  
 
@@ -59,7 +68,7 @@ which is the starting iteration value of the next round, as defined.
 
 \subsubsection{Accounting for Steady-state Schedule Modification}
 
-Other passes may modify the steady-state schedule after fission, increasing the multiplicity of the fission products.  This scales the $\texttt{reps}_i$ field for all products.  $\texttt{start}_i$ and $\texttt{total}_i$ are dependent on $\texttt{reps}_i$ and must be scaled accordingly.
+Other passes may modify the steady-state schedule after fission, increasing the multiplicity of the fission products.  This scales the $\texttt{reps}_i$ field for all products.  $\texttt{start}_i$ and $\texttt{total}$ are dependent on $\texttt{reps}_i$ and must be scaled accordingly.
 
 Assume a pass increases hte steady-state multiplicity of our filter to $m$.  We expect the fission product $F_i$ to start round $k$ with iteration values of 
 \begin{eqnarray*}
@@ -77,3 +86,12 @@ Between rounds, iteration values must be incremented by the actual total number 
 &&  \ \ +\ (\texttt{total}*m - \texttt{reps}_i*m) \\
 &=& \texttt{total}*(\texttt{k+1})*m + (\texttt{start}_i*m + \texttt{init})
 \end{eqnarray*}
+
+Figure~\ref{fig:fission-example} shows the filter from Figure~\ref{fig:desugar} fissed into three fission products, each with multiplicity 2.  The accompanying charts for each fissed product are as follows:
+\begin{itemize}
+\item{\tt iter} indicates the value of the {\tt iter} field at the start of the filter invocation.  
+\item{\tt iter++} indicates the value of the {\tt iter} field incremented by 1 (which is the value {\tt iter} takes prior to the check.  
+\item{\tt check} indicates the value of $(\texttt{iter}_{i,k} - (\texttt{start}_i + \texttt{init}) - \texttt{reps}_i)$, which must be divisible by {\tt total} in order to advance to the next round.  
+\item{\tt next} indicates the value {\tt iter} will take at the next invocation of the fissed product.
+\end{itemize}
+Note that the value of \texttt{iter} jumps to the next round of values with multiplicity 2, as expected.

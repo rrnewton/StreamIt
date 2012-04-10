@@ -94,6 +94,13 @@ steady-state scheduling algorithm of the
 compiler~\cite{karczmarek-lctes03} since it may modify the
 distribution of iterations between the parallelization duplicates.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.4in]{figures/streamit-filter-example.pdf}
+\caption{(a) Example StreamIt filter based on AssignPictureType, used in MPEG Encoder. Uses induction variable state.  (b) The AssignPictureType filter rewritten using the iteration keyword. \protect\label{fig:apt-pipeline}}
+\end{figure}
+
+
 The existence of state in a filter inhibits data parallelism opportunities.
 Consider the example StreamIt filter in Figure~\ref{fig:apt-pipeline}.
 It is based on the AssignPictureType filter in the MPEG2 encoder.
@@ -104,11 +111,11 @@ filter uses a value for {\it frameno} dependent on what the value of
 to create duplicates and run them in a parallel fashion.  
 With induction variable state, it is possible to make the 
 compiler aware of such state through the keyword solution.  
-Figure~\ref{fig:apt-pipeline} shows how the same NoiseSource filter can be 
+Figure~\ref{fig:apt-pipeline} shows how the same AssignPictureType filter can be 
 rewritten to use the keyword.  The compiler can generate the value
-for {\tt iter()} for each iteration of the NoiseSource filter independent
-of previous iterations.  Accordingly, it is possible
-to data parallelize the filter.  
+for {\tt iter()} for each iteration of the AssignPictureType filter independent
+of previous iterations.  Duplicates of the filter can be made and
+data parallelism opportunities can be exploited.
 
 The necessity of representing induction variable state and the
 effectiveness of our parallelization technique is demonstrated via a

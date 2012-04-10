@@ -133,7 +133,8 @@
 
 \section{The Iteration Keyword}
 \label{sec:iteration}
-We introduce a new language construct that maintains a value 
+We attempt to remove this potential throughput bottleneck by 
+introducing a new language construct that maintains a value 
 indicating how often the corresponding filter has been invoked.  
 With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can implement a common idiom much more easily.  Furthermore, it allows programmers to circumvent the scalability limitations caused by stateful filters.
 
@@ -159,17 +160,18 @@ Some of the most common transformations used in the StreamIt benchmark suite can
 
 \begin{figure}[t]
 \includegraphics[width=3.3in]{figures/transformation1.pdf}
-\caption{Translation of a simple filter with induction variable state that resets after a certain value. \protect\label{fig:transform-after-simple}}
+\caption{Translation of a simple filter with induction variable state that resets after a certain value.  MPD, FHRFeedback, and FIRBankPipeline use this pattern to keep an index as it iterates through an array of values, one value for each stream input.  CoarseSerializedBeamFormer and Sample-Trellis use this value to trigger an event when the value reaches a certain threshold.
+ \protect\label{fig:transform-after-simple}}
 \end{figure}
 
 \begin{figure}[t]
 \includegraphics[width=3.3in]{figures/transformation2.pdf}
-\caption{Translation of a simple filter with induction variable state that resets to a special value. \protect\label{fig:transform-after-start}}
+\caption{Translation of a simple filter with induction variable state that resets to a special value.  This is an extension on Figure~\ref{fig:transform-after-simple}.  \protect\label{fig:transform-after-start}}
 \end{figure}
 
 \begin{figure}[t]
 \includegraphics[width=3.3in]{figures/transformation3.pdf}
-\caption{Translation of a filter with nested induction variables. \protect\label{fig:transform-after-twonested}}
+\caption{Translation of a filter with nested induction variables. MPD and MPEG2 motion estimation use this pattern to keep track of a logical two-dimensional array being read off the stream.  \protect\label{fig:transform-after-twonested}}
 \end{figure}
 
 

@@ -33,7 +33,7 @@ index positions.  Many filters maintain multiple induction variables
 as well, which may be either dependent or independent of each other.
 
 Many applications in the StreamIt benchmark suite, including MPEG2 encoder,
-MPD, Trellis, and FIRBank (pipelined version), maintain induction variable state 
+Medium Pulse Doppler, Trellis, and FIRBank (pipelined version), maintain induction variable state 
 by creating a mutable state field in the corresponding filter.  This
 state can be set to the desired starting value.  The induction
 variable is consistently updated at some point during the work call.
@@ -57,19 +57,17 @@ this filter without understanding how to properly distribute the
 calculation of the state.  As we mention in the introduction, this
 could be accomplished using an automatic induction variable
 recognizer, but its idiomatic nature may miss many opportunities for
-parallelization.  This motivates our iteration keyword solution
-introduced in the next section.
+parallelization.  
 
 \subsection{Potential Data Parallelism in Eliminating State}
+Table~\ref{fig:benchmarks} indicates programs in the StreamIt benchmark suite that use induction variable filters (not including source filters) in the manner described above.  The StreamIt compiler provides static estimations of work performed in filters.  The above table indicates the work performed in specifically the induction variable filters.
+
+The majority of programs do not have substantial work performed in filters using induction variables; FIRBankPipeline and MPD contain only a few stateful filters whose total work concentration is fairly low.  The MPEG-2 motion estimation subset is the only exception because its stream graph is comprised mostly with stateful filters.  However, eliminating any form of state will have a large impact on runtime performance even on programs with low work concentration in stateful filters.  We model the potential speedups of a particular stateful program in this subsection.  For the purpose of this analysis, we will assume no communication cost between filters.  We will also assume the compiler exposes no pipeline parallelism.  This assumption forces the serialization of stateful filters on the stream graph.
 
 \begin{table}[t]
-\caption{Benchmarks using induction variable state and estimations on work performed in filters with induction state.\protect\label{fig:benchmarks}}
 \includegraphics[width=3.3in]{figures/induction-benchmarks.pdf}
+\caption{Benchmarks using induction variable state and estimations on work performed in filters with induction state.\protect\label{fig:benchmarks}}
 \end{table}
-
-Table~\ref{fig:benchmarks} indicates programs in the StreamIt benchmark suite that use induction variable filters (not including source filters).  The StreamIt compiler provides static estimations of work performed in filters.  The above table indicates the work performed in specifically the induction variable filters.
-
-The majority of programs do not have substantial work performed in filters using induction variables, the MPEG-2 motion estimation subset being the exception.  However, eliminating state will have a large impact on runtime performance even on programs with low work concentration in stateful filters.  We model the potential speedups of a particular stateful program in this section.  For the purpose of this analysis, we will assume no communication cost between filters.  We will also assume the compiler exposes no pipeline parallelism.  This assumption forces the serialization of stateful filters on the stream graph.
 
 Let $N$ be the number of cores we are planning to parallelize over.  Let $\sigma$ be the percentage of work performed in stateful filters that can have its state eliminated, in this case solely filters that use induction variable state.  
 

@@ -1,40 +1,10 @@
 \section{The StreamIt Compiler}
 \label{sec:compiler}
-
-
-\begin{table*}[t]
-\begin{center}
-\scriptsize
-\begin{tabular}{|l|l|} \hline
-{\bf Phase} & {\bf Function} \\
-\hline \hline
-KOPI Front-end & Parses syntax into a Java-like abstract syntax tree. \\
-\hline
-SIR Conversion & Converts the AST to the StreamIt IR (SIR). \\
-\hline
-Graph Expansion & Expands all parameterized structures in the stream graph. \\
-\hline
-Scheduling & Calculates initialization and steady-state execution orderings for filter firings. \\
-\hline
-Partitioning & Performs fission and fusion transformations for load balancing. \\
-\hline
-Layout & Determines minimum-cost placement of filters on grid of Raw tiles. \\
-\hline
-Communication Scheduling & Orchestrates fine-grained communication between tiles via simulation of the stream graph. \\
-\hline
-Code generation & Generates code for the tile and switch processors. \\
-\hline
-\end{tabular}
-\caption{\protect\small Phases of the StreamIt compiler.
-\label{tab:phases}}
-\end{center}
-\end{table*}
-
 The phases of the StreamIt compiler are described in
 Table~\ref{tab:phases}.  The details of each stage can be found in
 ~\cite{streamit-asplos}.  The following subsections provide an
 overview on the phases of the StreamIt compiler and the changes made
-to the corresponding phases to implement the iteration keyword.
+to the corresponding phases in implementing the iteration keyword.
 
 \subsection{StreamIt Compiler Overview}
 \label{sec:compiler-overview}
@@ -55,10 +25,47 @@ the graph.  Accordingly, there is a {\it steady-state} schedule that is
 periodic which maintains this invariant.  Peeking filters, however, 
 introduce another layer of complication.
 A filter with {\it peek $>$ pop} leaves {\it peek - pop} items on the
-input channel after every firing.  If the periodic schedule contains
-these extra items, every firing would leave leftover items
-in the channel.  Accordingly, peeking filters require a separate,
+input channel after every firing.  If the periodic schedule also
+contains this schedule, every firing would leave extra leftover items
+in the channel per invocation.  Accordingly, peeking filters require a separate,
 non-periodic {\it intialization} schedule.  
+
+
+
+
+\begin{table}[t]
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|} \hline
+{\bf Phase} & {\bf Function} \\
+\hline \hline
+KOPI Front-end & Parses syntax into a Java-like abstract syntax tree. \\ &\\
+\hline
+SIR Conversion & Converts the AST to the StreamIt IR (SIR). \\ &\\
+\hline
+Graph Expansion & Expands all parameterized structures in the \\
+                & stream graph. \\
+\hline
+Scheduling & Calculates initialization and steady-state \\
+           & execution orderings for filter firings. \\
+\hline
+Partitioning & Performs fission and fusion transformations \\
+             & for load balancing. \\
+\hline
+Layout & Determines minimum-cost placement of filters \\
+       & on grid of Raw tiles. \\
+\hline
+Communication Scheduling & Orchestrates fine-grained communication \\
+                         & between tiles via simulation of the stream graph. \\
+\hline
+Code generation & Generates code for the tile and switch processors. \\
+&\\
+\hline
+\end{tabular}
+\caption{\protect\small Phases of the StreamIt compiler. ~\cite{streamit-asplos}
+\label{tab:phases}}
+\end{center}
+\end{table}
 
 {\it Partitioning} is the process of dividing the stream program into
 a set of balanced computation units.  Given a number $N$, representing
@@ -75,4 +82,5 @@ communication scheduling} phase maps the communication explicit
 in the stream graph to the interconnect of the target.  The FIFO
 abstraction of the stream channels is mapped to the limited resources
 of the target.  Finally, {\it code generation} is performed using the
-results of all previous phases.  
+results of all previous phases.  More details about these phases can be 
+found in~\cite{streamit-asplos}
