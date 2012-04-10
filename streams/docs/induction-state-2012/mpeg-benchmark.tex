@@ -22,4 +22,6 @@ Reference pictures are set using upstream messaging from later in the stream gra
 \caption{Speedups for MPEG-2 Encoder Motion Estimation subset, with and without induction variable state.  \protect\label{fig:mpeg-results}}
 \end{figure}
 
-Figure~\ref{fig:mpeg-results} shows the runtime figures for the original stateful MPEG-2 motion estimation subset compared to the stateless subset.  We can see significant improvements to runtime after making this subset stateless and exposing data parallelism.
+Figure~\ref{fig:mpeg-results} shows the runtime figures for the original stateful MPEG-2 motion estimation subset compared to the stateless subset.  There is a noticeable speedup for 2 cores for both induction state and iteration keyword implementations.  This can be attributed to the stream graph, which is composed of two stateful MotionEstimation filters.  With 2 cores, these filters can be task parallelized.  The bottleneck in data parallelism is apparent as we increase the number of cores past 2, as the majority of the work cannot be partitioned and load-balanced effectively across multiple cores.  
+
+We can see significant improvements to runtime after making this subset stateless and exposing data parallelism.  There is a 4.93X speedup on 8 cores, 9.30X speedup on 16 cores, and 15.62X speedup on 32 cores between the base induction variable and iteration keyword implementations.  

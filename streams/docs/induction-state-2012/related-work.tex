@@ -3,12 +3,20 @@
 
 
 The process of eliminating traditional induction variables has been
-extensively researched~\cite{Bacon:1994,RM99:RRV}.  These particular
+extensively researched~\cite{Bacon:1994,RM99:RRV}.  
+Eliminating derived induction variables in traditional 
+loop structures further motivates the effectiveness of running the loop
+iterations in parallel.  Extensive research has been done in
+the field of symbolic dependence analysis to determine if iterations
+in loop structures can be parallelized~\cite{Maydan:1991,Blume:1994}.
+These particular
 optimizations help eliminate instructions by redefining all induction
-variables in terms of a single induction variable.  Many automatically
+variables in terms of a single induction variable.  Induction variable elimination
+and redefinition has been used largely to remove inter-loop dependencies.
+Many automatically
 parallelizing compiler systems, including Rice Fortran D
-~\cite{Hiranandani:1992}, SUIF ~\cite{Wilson:1994}, Polaris
-~\cite{Blume:1996}, have also done work to automatically eliminate
+~\cite{Hiranandani:1992}, SUIF ~\cite{Wilson:1994}, and Polaris
+~\cite{Blume:1996} have also implemented recognizers to automatically eliminate
 such traditional derived induction variables.  Such works motivate 
 the transformations that must be performed to redefine induction variables
 in terms of {\tt iter()}.
@@ -23,7 +31,7 @@ programs, thus allowing for extensive data parallelism.  Under this
 paradigm, it would be necessary to coarsen the filter in order to
 produce a compilable program with the same functionality.  
 
-As discussed, the capabilities enable a programmer to write an application and its
+As discussed, the keyword capabilities enable a programmer to write an application and its
 filters at a natural granularity that is independent of
 parallelization considerations enabling portable, reusable, and
 malleable code.  Furthermore, fine-grained implementations of filters
