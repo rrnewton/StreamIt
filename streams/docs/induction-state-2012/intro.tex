@@ -94,6 +94,22 @@ steady-state scheduling algorithm of the
 compiler~\cite{karczmarek-lctes03} since it may modify the
 distribution of iterations between the parallelization duplicates.
 
+The existence of state in a filter inhibits data parallelism opportunities.
+Consider the example StreamIt filter in Figure~\ref{fig:apt-pipeline}.
+It is based on the AssignPictureType filter in the MPEG2 encoder.
+The filter maintains state in the variable {\it frameno}, which is
+incremented on each filter invocation.  Each iteration of the 
+filter uses a value for {\it frameno} dependent on what the value of
+{\it frameno} was in the previous iteration. As such, it is not possible 
+to create duplicates and run them in a parallel fashion.  
+With induction variable state, it is possible to make the 
+compiler aware of such state through the keyword solution.  
+Figure~\ref{fig:apt-pipeline} shows how the same NoiseSource filter can be 
+rewritten to use the keyword.  The compiler can generate the value
+for {\tt iter()} for each iteration of the NoiseSource filter independent
+of previous iterations.  Accordingly, it is possible
+to data parallelize the filter.  
+
 The necessity of representing induction variable state and the
 effectiveness of our parallelization technique is demonstrated via a
 case study of the StreamIt implementation of the motion estimation
@@ -145,10 +161,8 @@ stage of MPEG2 encoding.
 In the rest of this paper we describe 
 the StreamIt language (\S\ref{sec:streamit}), 
 induction variable state (\S\ref{sec:inductionstate}), 
-iteration keyword (\S\ref{sec:iteration}), 
-desugaring (\S\ref{sec:desugar}), 
-coarsening vs. iteration (\S\ref{sec:coarsen}),
-fission of induction state (\S\ref{sec:fission}),
+the iteration keyword (\S\ref{sec:iteration}), 
+the StreamIt compiler and changes made to the compiler (\S\ref{sec:compiler}), 
 analysis (\S\ref{sec:analysis}),
 MPEG2 motion estimation (\S\ref{sec:mpeg}), 
 related work (\S\ref{sec:related}),

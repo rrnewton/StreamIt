@@ -74,12 +74,10 @@ a single value that is predictable in its updates. The value that the
 keyword returns is simply the number of times the filter has been 
 invoked. This value is always incremented by one at the end of every work call.
 
-Furthermore, the approach of automatic analysis does little to
-encourage programming with parallelism in mind. On inspection, user
-written code will still maintain state, which actively inhibits data
-parallelism opportunities. In introducing a language construct, user
-written code appears to eliminate explicitly kept state. This approach
-encourages users to knowingly write code that actively exploits
-data parallelism.
-
-
+%Furthermore, the approach of automatic analysis does little to
+%encourage programming with parallelism in mind. On inspection, user
+%written code will still maintain state, which actively inhibits data
+%parallelism opportunities. In introducing a language construct, user
+%written code appears to eliminate explicitly kept state. This approach
+%encourages users to knowingly write code that actively exploits
+%data parallelism.

@@ -135,10 +135,10 @@
 \label{sec:iteration}
 We introduce a new language construct that maintains a value 
 indicating how often the corresponding filter has been invoked.  
-With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can take measures to write their programs to expose data parallelism.  
+With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can implement a common idiom much more easily.  Furthermore, it allows programmers to circumvent the scalability limitations caused by stateful filters.
 
 \subsection{Language Construct Approach}
-Syntactically, {\tt iter()} is equivalent to a field that is incremented on every {\tt prework} and {\tt work} invocation.  The value returned by {\tt iter()} indicates how often the filter has been invoked.  
+{\tt iter()} yields the same value as a field that is incremented on every {\tt prework} and {\tt work} invocation.  The value returned by {\tt iter()} indicates how often the filter has been invoked.  
 
 Induction variable state requires the user to maintain mutable state, updating such state within the filter invocation, and potentially resetting them when required. The programmer can eliminate much of this code simply by arithmetically manipulating {\tt iter()} usage, as illustrated in Figures~\ref{fig:transform-after-simple} and~\ref{fig:transform-after-start}.  The implementation using {\tt iter()} describes the induction variable's full behavior much more succintly.  It is easy to lose track of where or what causes the induction variable to be updated, but the use of {\tt iter()} allows all of this information to be localized.
 

@@ -1,12 +1,6 @@
 \begin{figure}[t]
 \eightpoint
 \begin{Verbatim}[numbers = left]
-float->float pipeline Main {
-  add Source();  // code for Source not shown
-  add AssignPictureType();
-  add Output();  // code for Output not shown
-}
-
 int->int filter AssignPictureType(int width, 
         int height, 
         int numpictures) {
@@ -65,8 +59,8 @@ of synchronous dataflow is that the number of items consumed and
 produced during each execution of a filter is known at compile time,
 allowing the compiler to perform static scheduling and optimization.
 
-An example StreamIt program appears in Figure~\ref{fig:apt-pipeline}.
-It is based on the AssignPictureType filter in the MPEG-2 encoder.
+An example StreamIt filter appears in Figure~\ref{fig:apt-pipeline}.
+It is based on the NoiseSource filter in sample Trellis.
 StreamIt filters contain three stages of execution.  The most
 important is the {\it work} function, which represents the
 steady-state execution step and is called repeatedly by the runtime

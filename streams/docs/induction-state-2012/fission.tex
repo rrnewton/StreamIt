@@ -1,4 +1,4 @@
-\section{Fission of Induction State}
+\subsection{Fission of Induction State}
 \label{sec:fission}
 
 
@@ -12,68 +12,68 @@ The compiler introduces data parallelism to the streaming program through a proc
 
 Fission is applicable only to stateless filters, as the duplication process does not guarantee consistent behavior if filters contain state that changes between iterations.  Because the desugared iteration filters actually use mutable state to keep track of iteration values, the fission process must be modified to handle iteration values.  
 
-\subsection{Modifications to Fission Process}
+\subsubsection{Modifications to Fission Process}
+
+Let $F$ be the stateless filter that will be fissed.  Assume the fission process yields $N$ fissed products.  Accordingly, this yields the fissed products $F_0$, $F_1$, ... , $F_i$, ... , $F_{N-1}$.  The notation $F_{i}$ represents the $(i+1)$th fissed product of filter $F$.
 
 The fission process now modifies the fission products by adding the
 following values as fields to the products:
 \begin{itemize}
-    \item \texttt{init}: the multiplicity of the initialization schedule.  This value is the same for all fissed products.
-    \item \texttt{reps}: how often the \texttt{work} function of the product is
+    \item \texttt{init}: the multiplicity of the initialization schedule.  This value is determined for $F$ and is constant for all fissed products.
+    \item $\texttt{reps}_i$: how often the \texttt{work} function of the product $F_i$ is
       invoked between rounds.
-    \item \texttt{start}: the value of the induction variable each product starts with, less the initialization multiplicity.  Alternatively, the sum of {\tt reps} of all fission products preceding the current product.
-    \item \texttt{total}: the sum of {\tt reps} of {\it all} fission products. This value is
-      the same for all fissed products.
+    \item $\texttt{start}_i$: the value of the induction variable each product $F_i$ starts with, less the initialization multiplicity.  Alternatively, $\sum_{j=0}^{i-1}{\tt reps}_j$ of all fission products preceding the current product.
+    \item \texttt{total}: the periodic multiplicity of $F$.  Alternatively $\sum_{j=0}^{N-1}{\tt reps}_j$. This value is the same for all fissed products.
 \end{itemize}
-Initialization execution of the original filter is transferred entirely to the first fission product.  All fission products must take the multiplicity of the initialization schedule into account.  
+As described in ~\ref{sec:compiler-overview}, initialization execution is required for peeking filters to ensure every firing of the periodic steady-state schedule maintains the same number of leftover items on the channel.  This initialization execution of the original filter is transferred entirely to the first fission product.  However, all fission products must take the multiplicity of the initialization schedule into account in their calculations as the multiplicity is adjusted upwards by this value.
 
-Accordingly, each fission product should start each round with iteration values
-of
-\begin{center}
-\texttt{total}*\texttt{n} + (\texttt{start} + \texttt{init})
-\end{center}
+Accordingly, the fission product $F_i$ should start each round with iteration values of
+\begin{eqnarray*}
+\texttt{total}*\texttt{k} + (\texttt{start}_i + \texttt{init})
+\end{eqnarray*}
 and range up to the value
-\begin{center}
-\texttt{total}*\texttt{n} + (\texttt{start} + \texttt{init}) + \texttt{reps} - 1
-\end{center}
-where \texttt{n} is a nonnegative integer indicating how many rounds have
+\begin{eqnarray*}
+\texttt{total}*\texttt{k} + (\texttt{start}_i + \texttt{init}) + \texttt{reps}_i - 1
+\end{eqnarray*}
+where \texttt{k} is a nonnegative integer indicating how many rounds have
 been run in the span of the program.  
 
 At the end of each fission product's \texttt{work}, a check must be made to see if it is necessary to increment the induction variable to the next round of values.  This will prevent certain fissed products from making calls with duplicate iteration values.  This check is done after the field incrementing statement.
-\begin{center}
-\texttt{iter} - (\texttt{start} + \texttt{init}) - \texttt{reps} \% \texttt{total} == 0
-\end{center}
+\begin{eqnarray*}
+(\texttt{iter}_{i,k} - (\texttt{start}_i + \texttt{init}) - \texttt{reps}_i) \% \texttt{total} &==& 0
+\end{eqnarray*}
 This is consistent with the maximum value per round as
 indicated above.  Only when we reach this maximum value does subtracting 
-\texttt{start}, \texttt{init}, and \texttt{reps} from \texttt{iter} leave a value divisible by
+$\texttt{start}_i$, \texttt{init}, and $\texttt{reps}_i$ from $\texttt{iter}_i$ leave a value divisible by
 \texttt{total}.
 
 Once the fissed product's iteration value has reached
 this value, it must be set to:
 \begin{eqnarray*}
-\texttt{iter}_{n+1} &=& \texttt{iter}_{n} + (\texttt{total} - \texttt{reps}) \\
-&=& \texttt{total}*\texttt{n} + (\texttt{start} + \texttt{init}) + \texttt{reps} \\
-&&  \ \ +\ (\texttt{total} - \texttt{reps}) \\
-&=& \texttt{total}*(\texttt{n+1}) + (\texttt{start} + \texttt{init})
+\texttt{iter}_{i,k+1} &=& \texttt{iter}_{i,k} + (\texttt{total} - \texttt{reps}_i) \\
+&=& \texttt{total}*\texttt{k} + (\texttt{start}_i + \texttt{init}) + \texttt{reps}_i \\
+&&  \ \ +\ (\texttt{total} - \texttt{reps}_i) \\
+&=& \texttt{total}*(\texttt{k+1}) + (\texttt{start}_i + \texttt{init})
 \end{eqnarray*}
 which is the starting iteration value of the next round, as defined.
 
-\subsection{Accounting for Steady-state Schedule Modification}
+\subsubsection{Accounting for Steady-state Schedule Modification}
 
-The scheduler may modify the steady-state schedule after fission, increasing the multiplicity of the fission products.  This scales the \texttt{reps} field for all products.  \texttt{start} and \texttt{total} are dependent on \texttt{reps} and must be scaled accordingly.
+Other passes may modify the steady-state schedule after fission, increasing the multiplicity of the fission products.  This scales the $\texttt{reps}_i$ field for all products.  $\texttt{start}_i$ and $\texttt{total}_i$ are dependent on $\texttt{reps}_i$ and must be scaled accordingly.
 
-Given a multiplier $m$, we expect the filter to start each round with iteration values of 
-\begin{center}
-(\texttt{total}*\texttt{n}*$m$) + (\texttt{start}*$m$ + \texttt{init})
-\end{center}
-The filter should perform \texttt{reps}*$m$ iterations, thus should range up to value
-\begin{center}
-(\texttt{total}*\texttt{n}*$m$) + (\texttt{start}*$m$ + \texttt{init}) + (\texttt{reps}*$m$) - 1
-\end{center}
+Assume a pass increases hte steady-state multiplicity of our filter to $m$.  We expect the fission product $F_i$ to start round $k$ with iteration values of 
+\begin{eqnarray*}
+(\texttt{total}*\texttt{k}*m) + (\texttt{start}_i*m + \texttt{init})
+\end{eqnarray*}
+The filter should perform $\texttt{reps}_i$*$m$ iterations, thus should range up to value
+\begin{eqnarray*}
+(\texttt{total}*\texttt{k}*m) + (\texttt{start}_i*m + \texttt{init}) + (\texttt{reps}_i*m) - 1
+\end{eqnarray*}
 
 Between rounds, iteration values must be incremented by the actual total number of repetitions that occur.  All fission products perform a total of $\sum(\texttt{reps}_{i}*m)$ repetitions which is simply \texttt{total}*$m$.  Thus, the updating step will still hold:
 \begin{eqnarray*}
-\texttt{iter}_{n+1} &=& \texttt{iter}_{n} + (\texttt{total}*m - \texttt{reps}*m) \\
-&=& \texttt{total}*\texttt{n}*m + (\texttt{start}*m + \texttt{init}) + \texttt{reps}*m \\
-&&  \ \ +\ (\texttt{total}*m - \texttt{reps}*m) \\
-&=& \texttt{total}*(\texttt{n+1})*m + (\texttt{start}*m + \texttt{init})
+\texttt{iter}_{i,k+1} &=& \texttt{iter}_{i,k} + (\texttt{total}*m - \texttt{reps}_i*m) \\
+&=& \texttt{total}*\texttt{k}*m + (\texttt{start}_i*m + \texttt{init}) + \texttt{reps}_i*m \\
+&&  \ \ +\ (\texttt{total}*m - \texttt{reps}_i*m) \\
+&=& \texttt{total}*(\texttt{k+1})*m + (\texttt{start}_i*m + \texttt{init})
 \end{eqnarray*}
