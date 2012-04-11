@@ -128,6 +128,15 @@ this value, it must be set to:
 \end{eqnarray*}
 which is the starting iteration value of the next round, as defined.
 
+Figure~\ref{fig:fission-example} shows the filter from Figure~\ref{fig:desugar} fissed into three fission products, each with multiplicity 2.  The accompanying charts for each fissed product are as follows:
+\begin{itemize}
+\item{\tt iter} indicates the value of the {\tt iter} field at the start of the filter invocation.  
+\item{\tt iter++} indicates the value of the {\tt iter} field incremented by 1 (which is the value {\tt iter} takes prior to the check.  
+\item{\tt check} indicates the value of $(\texttt{iter}_{i,k} - (\texttt{start}_i + \texttt{init}) - \texttt{reps}_i)$, which must be divisible by {\tt total} in order to advance to the next round.  
+\item{\tt next} indicates the value {\tt iter} will take at the next invocation of the fissed product.
+\end{itemize}
+Note that the value of \texttt{iter} jumps to the next round of values with multiplicity 2, as expected.
+
 \subsubsection{Accounting for Steady-state Schedule Modification}
 \label{sec:ssmod}
 
@@ -160,39 +169,31 @@ introduced by the transformation are consistent, i.e., the iteration
 values will be correctly redistributed to account for the modification
 to the steady-state multiplicities.  
 
-More specifically, after the increase the steady-state by $m$, the
-fission product $F_i$ starts round $k$ with an iteration value of
+% More specifically, after the increase the steady-state by $m$, the
+% fission product $F_i$ starts round $k$ with an iteration value of
 
-\begin{eqnarray*}
-(\texttt{total}*\texttt{k}*m) + (\texttt{start}_i*m + \texttt{init})
-\end{eqnarray*}
+% \begin{eqnarray*}
+% (\texttt{total}*\texttt{k}*m) + (\texttt{start}_i*m + \texttt{init})
+% \end{eqnarray*}
 
-The filter executes $\texttt{reps}_i$*$m$ iterations, thus the final
-value for $\texttt{iter}_{i,k}$ is 
+% The filter executes $\texttt{reps}_i$*$m$ iterations, thus the final
+% value for $\texttt{iter}_{i,k}$ is 
 
-\begin{eqnarray*}
-(\texttt{total}*\texttt{k}*m) + (\texttt{start}_i*m + \texttt{init}) + (\texttt{reps}_i*m) - 1
-\end{eqnarray*}
+% \begin{eqnarray*}
+% (\texttt{total}*\texttt{k}*m) + (\texttt{start}_i*m + \texttt{init}) + (\texttt{reps}_i*m) - 1
+% \end{eqnarray*}
 
-Between rounds, iteration values must be incremented by the actual
-total number of repetitions that occur.  All fission products perform
-a total of $\sum(\texttt{reps}_{i}*m)$ repetitions which is simply
-\texttt{total}*$m$.  Thus, the updating step will still hold:
+% Between rounds, iteration values must be incremented by the actual
+% total number of repetitions that occur.  All fission products perform
+% a total of $\sum(\texttt{reps}_{i}*m)$ repetitions which is simply
+% \texttt{total}*$m$.  Thus, the updating step will still hold:
 
-\begin{eqnarray*}
-\texttt{iter}_{i,k+1} &=& \texttt{iter}_{i,k} + (\texttt{total}*m - \texttt{reps}_i*m) \\
-&=& \texttt{total}*\texttt{k}*m + (\texttt{start}_i*m + \texttt{init}) + \texttt{reps}_i*m \\
-&&  \ \ +\ (\texttt{total}*m - \texttt{reps}_i*m) \\
-&=& \texttt{total}*(\texttt{k+1})*m + (\texttt{start}_i*m + \texttt{init})
-\end{eqnarray*}
+% \begin{eqnarray*}
+% \texttt{iter}_{i,k+1} &=& \texttt{iter}_{i,k} + (\texttt{total}*m - \texttt{reps}_i*m) \\
+% &=& \texttt{total}*\texttt{k}*m + (\texttt{start}_i*m + \texttt{init}) + \texttt{reps}_i*m \\
+% &&  \ \ +\ (\texttt{total}*m - \texttt{reps}_i*m) \\
+% &=& \texttt{total}*(\texttt{k+1})*m + (\texttt{start}_i*m + \texttt{init})
+% \end{eqnarray*}
 
-\todo{put something here that wraps up the proof}
+% \todo{put something here that wraps up the proof}
 
-Figure~\ref{fig:fission-example} shows the filter from Figure~\ref{fig:desugar} fissed into three fission products, each with multiplicity 2.  The accompanying charts for each fissed product are as follows:
-\begin{itemize}
-\item{\tt iter} indicates the value of the {\tt iter} field at the start of the filter invocation.  
-\item{\tt iter++} indicates the value of the {\tt iter} field incremented by 1 (which is the value {\tt iter} takes prior to the check.  
-\item{\tt check} indicates the value of $(\texttt{iter}_{i,k} - (\texttt{start}_i + \texttt{init}) - \texttt{reps}_i)$, which must be divisible by {\tt total} in order to advance to the next round.  
-\item{\tt next} indicates the value {\tt iter} will take at the next invocation of the fissed product.
-\end{itemize}
-Note that the value of \texttt{iter} jumps to the next round of values with multiplicity 2, as expected.
