@@ -26,18 +26,45 @@ The specification contains various types of compression, one of which is motion 
 
 The Motion estimation stream subgraph of the MPEG-2 encoder is illustrated in Figure~\ref{fig:mpegMEgraph}~\cite{drake-thesis}.  Each block of pixels will be tested against three types of prediction (no prediction, forward predicted, and backward predicted) to determine which is the best method for motion estimation.  The MotionEstimationDecision filter determines which is the best encoding technique for this macroblock.
 
-The work estimation of this compression indicates the filter MotionEstimation is stateful and contains the majority of the work.  The MotionEstimation filter pulls macroblocks at a time, iterating through a two-dimensional array (16x16 macroblocks) along the picture.  The filter relies on induction variables to maintain its array position.  We can apply the induction variable transformation on this filter to remove the state in the filter.
+The work estimation of this compression indicates the filter
+MotionEstimation is stateful and contains the majority of the work.
+The MotionEstimation filter pulls macroblocks at a time, iterating
+through a two-dimensional array (16x16 macroblocks) along the picture.
+The filter relies on induction variables to maintain its array
+position.  We can apply the induction variable transformation on this
+filter to remove the state in the filter.  Conversion to employ the
+\iter keyword involved removing 11 lines and adding 2 lines.
 
-Reference pictures are set using upstream messaging from later in the stream graph.  Currently the backend does not support the use of upstream messaging, so for the purpose of benchmarking this application, the reference picture is set to a dummy value and is unchanged throughout the program.  This does not detract from the data parallelism introduced after removing the induction state.  Upstream messaging would simply require that sent messages be duplicated to all fissed filters in the stream graph.
+Reference pictures are set using upstream messaging from later in the
+stream graph. Currently the backend does not support the use of
+upstream messaging, so for the purpose of benchmarking this
+application, the reference picture is set to a dummy value and is
+unchanged throughout the program. This does not detract from the data
+parallelism introduced after removing the induction state. Upstream
+messaging would simply require that sent messages be duplicated to all
+fissed filters in the stream graph.
 
 \begin{figure}[t]
 \includegraphics[width=3.3in]{figures/mpeg-results.pdf}
 \caption{Speedups for MPEG-2 Encoder Motion Estimation subset, with and without induction variable state.  \protect\label{fig:mpeg-results}}
 \end{figure}
 
-Figure~\ref{fig:mpeg-results} shows the runtime figures for the original stateful MPEG-2 motion estimation subset compared to the stateless subset.  There is a noticeable speedup for 2 cores for both induction state and iteration keyword implementations.  This can be attributed to the stream graph, which is composed of two stateful MotionEstimation filters.  With 2 cores, these filters can be task parallelized.  The bottleneck in data parallelism is apparent as we increase the number of cores past 2, as the majority of the work cannot be partitioned and load-balanced effectively across multiple cores.  
+Figure~\ref{fig:mpeg-results} shows the runtime figures for the
+original stateful MPEG-2 motion estimation subset compared to the
+stateless subset. There is a noticeable speedup for 2 cores for both
+induction state and iteration keyword implementations. This can be
+attributed to the stream graph, which is composed of two stateful
+MotionEstimation filters. With 2 cores, these filters can be task
+parallelized. The bottleneck in data parallelism is apparent as we
+increase the number of cores past 2, as the majority of the work
+cannot be partitioned and load-balanced effectively across multiple
+cores.
 
-We can see significant improvements to runtime after making this subset stateless and exposing data parallelism.  There is a 4.93X speedup on 8 cores, 9.30X speedup on 16 cores, and 15.62X speedup on 32 cores between the base induction variable and iteration keyword implementations.  
+We can see significant improvements to runtime after making this
+subset stateless and exposing data parallelism. There is a 4.93X
+speedup on 8 cores, 9.30X speedup on 16 cores, and 15.62X speedup on
+32 cores between the base induction variable and iteration keyword
+implementations.
 
 \subsection{FIRBank}
 \begin{figure}[t]
@@ -45,20 +72,27 @@ We can see significant improvements to runtime after making this subset stateles
 \caption{Speedups for FIRBank, with and without induction variable state.  \protect\label{fig:firbank-results}}
 \end{figure}
 
+The FIRBank benchmark contains multiple finite impulse response
+filters each with a different impulse response coefficient array. This
+benchmark is used in speech processing applications. FIRBank contains
+one filter that uses induction variable state with 3.94\% of program's
+work. This filter, Multiply, maintains induction state in an index
+that traces through the rows of a two dimensional array. Each
+invocation performs complex multiplication on the stream input values
+and the array elements of that specified row.  The conversion to the
+\iter keyword version removed 5 lines and added 1 line.
 
-FIRBank contains one filter that uses induction variable state
-with 3.94\% of program's work. This filter, Multiply, maintains
-induction state in an index that traces through the rows of a two
-dimensional array. Each invocation performs complex multiplication on
-the stream input values and the array elements of that specified row.
-
-After removing the induction variable state, the compiler chooses to
-vertically fuse down the FIRBank program to a single filter.
-Before the transformation, this is not done because of the induction
-variable state. If the filter were fused down with the rest of the
-program, the end result would have been stateful, thus inhibiting data
-parallelism opportunities. After removing this state, the program is
-stateless and can be fused and fissed to expose data parallelism.
+The original version with explicit state is partitioned into a 3
+filter pipeline: stateless filter, stateful filter (with explicit
+induction state), and a stateless filter. The stateless filters are
+data-parallelized, but the first requires data to be collected in a
+joiner (in a synchronization point) before passing on to the
+unparallelized stateful filter. Furthermore, output from the stateful
+filter must be communicated to all cores of the chip as the last
+stateless filter has fission products on all cores.  In the \iter
+version, the entire application is fused to a single filter that can
+be data parallelized.  There is no inter-core communication in the
+fused and parallelized final version.
 
 Figure~\ref{fig:firbank-results} indicates the speedups over 1 core
 for both induction state and iteration keyword implementations.
