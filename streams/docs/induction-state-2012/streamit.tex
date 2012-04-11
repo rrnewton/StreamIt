@@ -62,27 +62,27 @@ allowing the compiler to perform static scheduling and optimization.
 An example StreamIt filter appears in Figure~\ref{fig:apt-pipeline}.
 It is based on the AssignPictureType filter in the MPEG2 encoder.
 StreamIt filters contain three stages of execution.  The most
-important is the {\it work} function, which represents the
+important is the \work function, which represents the
 steady-state execution step and is called repeatedly by the runtime
-system.  Within the work function, a filter may {\it peek} at a given
+system.  Within the \work function, a filter may {\it peek} at a given
 element on the input tape, {\it pop} an item off the input tape, or
 {\it push} an item to the output tape.  The total number of items
-peeked, popped, and pushed are declared as part of the work function.
+peeked, popped, and pushed are declared as part of the \work function.
 Note that if the peek rate exceeds the pop rate, it represents a
 sliding window computation in which some input elements are accessed
 across multiple invocations of the filter.
 
-In addition to the work function, a filter may declare an {\it init}
-function to initialize internal data structures, as well as a {\it
-  prework} function (not given in Figure~\ref{fig:apt-pipeline}) to
+In addition to the \work function, a filter may declare an {\tt init}
+function to initialize internal data structures, as well as a 
+ \prework function (not given in Figure~\ref{fig:apt-pipeline}) to
 perform specialized processing of data items prior to the steady
-state.  The prework function is needed in cases where the initial
+state.  The \prework function is needed in cases where the initial
 processing has a different input or output rate than the steady-state
 processing.
 
 A {\it schedule} gives a multiplicity for each filter in a stream
-graph.  The multiplicity indicates how often a filter's {\it work} function
-should be invoked (or {\it prework} function on the first iteration of the filter).  The
+graph.  The multiplicity indicates how often a filter's \work function
+should be invoked (or \prework function on the first iteration of the filter).  The
 {\it steady-state schedule} can be calculated such that all filters
 fire in the schedule, and the schedule can be repeated
 indefinitely~\cite{lee87}.  Steady-state execution of the graph

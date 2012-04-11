@@ -1,7 +1,23 @@
-\section{Results}
+\section{Implementation and Evaluation}
 \label{sec:analysis}
 
 The keyword solution and modifications to fission as described in subsections ~\ref{sec:desugar} and ~\ref{sec:fission} was implemented into the StreamIt compiler.  The sample benchmarks in Figure~\ref{fig:theo-speedups} were rewritten to use the {\tt iter()} keyword, allowing the compiler to expose data parallelism in its stream graph.
+
+
+% The introduction of this iteration field creates state in the provided
+% filter.  For future operations, the compiler does not consider this
+% iteration field as part of the state of filter.  Future processes will
+% maintain this inherent state without the downsides of explicitly
+% introduced state.
+
+% It is important to note, these filters are not classified as stateful
+% to the user, even though the filter is actually stateful on the
+% iteration count after the desugaring process.  In classifying filters
+% as stateful, the user is made aware of where data parallelism may be
+% inhibited.  Iteration filters will not inhibit data parallelism
+% because its state is identifiable to the compiler during the fission
+% process.
+
 
 
 \subsection{FIRBankPipeline}

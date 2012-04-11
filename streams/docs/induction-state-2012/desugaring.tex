@@ -1,4 +1,4 @@
-\subsection{Desugaring}
+\section{Desugaring}
 \label{sec:desugar}
 
 %\begin{figure}[t]
@@ -46,12 +46,43 @@
 \end{figure}
 
 
-Under the StreamIt framework, filters are classified as iteration filters when there is use of the iteration keyword in its work function.  A simple lexer and parser identifies the use of this keyword, and it is represented accordingly in the KOPI syntax tree and StreamIt IR.  To have it actually return the correct iteration value, we first convert the keyword to a compiler-usable construct.  This desugaring step is performed in the SIR conversion step.
+A filter is classified as an {\it iteration filter} when there exists a use of
+\iter in its \prework or \work function.  In this section, we
+introduce a simple desugaring transformation that will convert an
+iteration filter into a filter that does not include the \iter
+keyword, but implements the correct semantics of the \iter use.  We
+accomplish this by introducing a state field that records the current
+iteration of this filter.  This state field is updated in a consistent
+and compiler-defined manner, so later transformations and passes (such
+as fission, see \S\ref{sec:fission}) can reason about the
+state.  
 
-The SIR iteration expression is replaced with an access to a field holding the value of the iteration count.  The filter is given a definition for this field only if an {\tt iter()} use exists in its work or prework definition.  The work and prework function (if it exists) are appended with incrementing statements that update the iteration value.
+The \iter expression is replaced with an access to a field holding the
+value of the iteration count.  Again, the filter is given a definition
+of this field only if it is classified as an iteration filter, this
+field is not added to non-iteration filters.  The \work and \prework
+function (if it exists) are appended with incrementing statements that
+update the iteration value.  The name of the state field is compiler
+defined for easy recognition by later passes, for the remainder of
+this paper the field is named {\it iter}.
 
-An example of the desugaring process can be seen in Figure~\ref{fig:desugar}.  The left filter in Figure~\ref{fig:desugar} shows an iteration filter.  The filter is translated into a StreamIt intermediate representation and all references to the keyword are replaced to field accesses to the {\it iter} field. Figure~\ref{fig:desugar} shows the StreamIt code representation of the StreamIt intermediate representation after the iteration keyword is desugared.
 
-The introduction of this iteration field creates state in the provided filter.  For future operations, the compiler does not consider this iteration field as part of the state of filter.  Future processes will maintain this inherent state without the downsides of introducing state.
+Figure~\ref{fig:desugar} provides a code example of the desugaring
+process.  The left filter in Figure~\ref{fig:desugar} shows an
+iteration filter.  All references to the keyword are replaced to field
+accesses to the {\it iter} field.  Figure~\ref{fig:desugar} shows the
+StreamIt code representation after the iteration keyword is desugared.
 
-It is important to note, these filters are not classified as stateful to the user, even though the filter is actually stateful on the iteration count after the desugaring process.  In classifying filters as stateful, the user is made aware of where data parallelism may be inhibited.  Iteration filters will not inhibit data parallelism because its state is identifiable to the compiler during the fission process.   
+% The introduction of this iteration field creates state in the provided
+% filter.  For future operations, the compiler does not consider this
+% iteration field as part of the state of filter.  Future processes will
+% maintain this inherent state without the downsides of explicitly
+% introduced state.
+
+% It is important to note, these filters are not classified as stateful
+% to the user, even though the filter is actually stateful on the
+% iteration count after the desugaring process.  In classifying filters
+% as stateful, the user is made aware of where data parallelism may be
+% inhibited.  Iteration filters will not inhibit data parallelism
+% because its state is identifiable to the compiler during the fission
+% process.

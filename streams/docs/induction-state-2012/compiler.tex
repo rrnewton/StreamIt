@@ -1,37 +1,5 @@
-\section{The StreamIt Compiler}
+\section{Compiler Infrastructure}
 \label{sec:compiler}
-The phases of the StreamIt compiler are described in
-Table~\ref{tab:phases}.  The details of each stage can be found in
-~\cite{streamit-asplos}.  The following subsections provide an
-overview on the phases of the StreamIt compiler and the changes made
-to the corresponding phases in implementing the iteration keyword.
-
-\subsection{StreamIt Compiler Overview}
-\label{sec:compiler-overview}
-
-The front end is built on top of KOPI, an open-source compiler 
-infrastructure for Java~\cite{kopi}.  We translate the KOPI syntax 
-tree into the StreamIt IR (SIR) that encapsulates the hierarchical 
-stream graph.  The graph is then expanded for structures that
-are parametrized.  Constants are propagated through the program
-and the graph is expanded into a static structure.
-
-We can calculate an execution schedule for the nodes of the stream 
-graph.  The schedule indicates a multiplicity for each filter in the
-stream graph, which determines how often the work function should be
-invoked.  The schedule is periodic, meaning its
-execution must preserve the number of live items on each channel in
-the graph.  Accordingly, there is a {\it steady-state} schedule that is 
-periodic which maintains this invariant.  Peeking filters, however, 
-introduce another layer of complication.
-A filter with {\it peek $>$ pop} leaves {\it peek - pop} items on the
-input channel after every firing.  If the periodic schedule also
-contains this schedule, every firing would leave extra leftover items
-in the channel per invocation.  Accordingly, peeking filters require a separate,
-non-periodic {\it intialization} schedule.  
-
-
-
 
 \begin{table}[t]
 \begin{center}
@@ -39,7 +7,7 @@ non-periodic {\it intialization} schedule.
 \begin{tabular}{|l|l|} \hline
 {\bf Phase} & {\bf Function} \\
 \hline \hline
-KOPI Front-end & Parses syntax into a Java-like abstract syntax tree. \\ &\\
+Front-end & Parse StreamIt code and create AST. \\ &\\
 \hline
 SIR Conversion & Converts the AST to the StreamIt IR (SIR). \\ &\\
 \hline
@@ -50,37 +18,82 @@ Scheduling & Calculates initialization and steady-state \\
            & execution orderings for filter firings. \\
 \hline
 Partitioning & Performs fission and fusion transformations \\
-             & for load balancing. \\
+             & for coarsening and parallelism. \\
 \hline
-Layout & Determines minimum-cost placement of filters \\
-       & on grid of Raw tiles. \\
+Layout & Assign filters of the partitioned graph to cores \\
 \hline
-Communication Scheduling & Orchestrates fine-grained communication \\
-                         & between tiles via simulation of the stream graph. \\
+Filter optimizations & Apply traditional optimizations such as
+constant \\
+& propagation, loop unrolling, scalarization and batching. \\
 \hline
-Code generation & Generates code for the tile and switch processors. \\
-&\\
+Code generation & Generates code for synchronization, computation, and \\
+& communication. \\
 \hline
 \end{tabular}
-\caption{\protect\small Phases of the StreamIt compiler. ~\cite{streamit-asplos}
+\caption{\protect\small Phases of the StreamIt compiler's
+  coarse-grained task, data, and software pipeline parallelism backend~\cite{gordon-asplos06}.
 \label{tab:phases}}
 \end{center}
 \end{table}
 
-{\it Partitioning} is the process of dividing the stream program into
-a set of balanced computation units.  Given a number $N$, representing
-the maximum number of computation units that can be supported, the 
-partitioning step transforms a stream graph into a set of at most $N$
-load-balanced filters.  Each filter can be run on a separate processor.
-The partitioning step uses a set of fusion, fission, and reordering 
-transformations to achieve the desired granularity and load-balancing~\cite{streamit-asplos}.
+We have modified the StreamIt compiler
+infrastructure~\cite{streamitweb} to include full support for the
+iteration keyword and to correctly handle the desugared filters in
+passes and transformation that are affected by the presense of state.
+This section provides an overview of the compiler and the changes we
+implemented.
 
-The {\it layout} phase assigns nodes in the stream graph to the
-computation nodes in the target architecture while minimizing the
-communication and synchronization in the final layout.  The {\it
-communication scheduling} phase maps the communication explicit
-in the stream graph to the interconnect of the target.  The FIFO
-abstraction of the stream channels is mapped to the limited resources
-of the target.  Finally, {\it code generation} is performed using the
-results of all previous phases.  More details about these phases can be 
-found in~\cite{streamit-asplos}
+The overall flow of the StreamIt compiler is given in
+Table~\ref{tab:phases}.  Begininning our discussion from the first
+phase, we made modifications to the parser to correctly parse the new
+\iter keyword.  An expression class representing \iter was added to the
+intermediate representation.  The type of this expression is always of
+the base integer type in the language.  We added \iter to the IR so uses of
+it can be type-checked by StreamIt's type checker.
+
+The desugaring step (see \S\ref{sec:desugar}) is performed after Graph
+Expansion and before Scheduling.  The modifications to the Fission
+transformation described in \S\ref{sec:fission} are included and
+called by the partitioning algorithm.  Since the Scheduling phase is
+called before partitioning, the initialization and steady-state
+multiplicities for each filter is available for use by the modified
+fission transformation.
+
+The compiler includes a function that determines if a filter is
+stateful or stateless. Originally, this function looks for a filter
+field that may be assigned a non-constant value, and the field may
+also be read.  If such a field exists the filter is classified as stateful.  We
+do not want desugared iteration filters to be classified as stateful,
+so we modified the function to ignore the {\it iter} field added by
+the desugaring, thus classifying filters that include state that is
+only the generated {\it iter} field as stateless. 
+
+The only filter optimization that needed alteration was batching.  The
+batching optimization increases the steady-state multiplicities of all
+filters to amortize the cost of synchronization at the expense of
+latency~\cite{gordon-asplos06}.  Since this optimization increases the
+steady-state multiplicities by a calculated factor $m$, it must now
+scale the fields of all fissed iteration filters as described in
+\S\ref{sec:ssmod}.  Since the fields are compiler generated, it is
+simple to find them by name and scale them appropriately.
+
+The StreamIt compiler infrastructure includes multiple paths and
+backends.  For the evaluation in the next section, we employ the
+coarse-grained task, data, and software pipelining path as described
+in~\cite{gordon-asplos06}.  This approach aggressively fuses
+filters, careful not to introduce state and obscure data
+parallelism.  For our modifications, desugared iteration filters without
+additional state are classified as stateless and fused with other stateless
+filters during this coarsening step.  
+
+Next, a heuristic algorithm considers each task-parallel slice
+of the graph, introducing data parallelism when available such that a
+slice will occupy all cores of the chip.  Coarse-grained software
+pipelining is introduced by adding appropriate buffering and a prolog
+schedule of execution such that within the steady state, there are no
+dependences between operators.  Finally, a heuristic mapping algorithm
+first groups data parallel filters together into sets, and then
+schedules the sets so that each occupies all cores. Stateful filters
+are greedily bin-packed to take advantage of software pipeline
+parallelism.   The next section gives the experiment results for our
+techniques.  
