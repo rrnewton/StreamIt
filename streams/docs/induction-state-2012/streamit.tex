@@ -45,6 +45,13 @@
 \section{The StreamIt Language}
 \label{sec:streamit}
 
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.4in]{figures/streamit-filter-example.pdf}
+\caption{Example StreamIt filter based on AssignPictureType, used in MPEG Encoder. By removing the grayed lines and inserting the new {\tt iter} keyword, we can remove induction variable state. \protect\label{fig:apt-pipeline}}
+\end{figure}
+
 StreamIt is an architecture-independent language for high-performance
 stream programming~\cite{thies-cc02}.  The compiler is publicly
 available~\cite{streamitweb} and includes backends for multicore
@@ -72,11 +79,6 @@ Note that if the peek rate exceeds the pop rate, it represents a
 sliding window computation in which some input elements are accessed
 across multiple invocations of the filter.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=3.4in]{figures/streamit-filter-example.pdf}
-\caption{Example StreamIt filter based on AssignPictureType, used in MPEG Encoder. By removing the grayed lines and inserting the new {\tt iter} keyword, we can remove induction variable state. \protect\label{fig:apt-pipeline}}
-\end{figure}
 
 In addition to the \work function, a filter may declare an {\tt init}
 function to initialize internal data structures, as well as a 

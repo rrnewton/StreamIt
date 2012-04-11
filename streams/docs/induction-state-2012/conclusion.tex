@@ -1,9 +1,32 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper presents a technique used to eliminate a throughput bottleneck in stream programs brought on by induction variable state.  Though the StreamIt framework allows for state in filter definitions for better expressiveness, the use of state inhibits data parallelism in stream programs.  Even a small amount of stateful work in a stream program can severely limit parallelization scalability.  
+Too often there exists tension between the expressiveness of a
+language and the robustness of automatic parallelization techniques
+for programs written in the language. The StreamIt language chose to
+be expressive in the general case (e.g., allowing stateful computation
+and dynamic rates) but to enable parallelization by offering the
+programmer helpful idioms to capture common program behavior (e.g.,
+static rate definitions and peeking). In this work we continue to add
+to the array of idioms in StreamIt that ease implementation burden
+while exposing parallelism by capturing and parallelizing a common
+form of state: induction variable state.  Our techniques remove a key
+sensitivity of the StreamIt compiler for the goal of robust and
+scalable automatically-managed parallelization.
 
-We introduce a keyword solution to remove such limitations brought on by induction variable state.  The solution allows programmers to easily express programs that use this common idiom and allows the compiler to expose data parallelism for these programs.  We show the necessary changes made to the fission process to maintain consistency in the iteration values.  The keyword solution presents a substantial performance improvement to the MPEG2 motion estimation subset, which uses induction variable state as its only form of state.  
+This paper demonstrates that induction variable state is prevalent in
+real-world applications, and that this type of state, if not
+parallelized, represents a significant bottleneck to scalable
+parallelization. We introduce a keyword expression that can be used as
+the basis of all derived induction variable state. The keyword, when
+executed, returns the current execution iteration of a filter. We
+present a desugaring of the keyword that enables minimal changes to
+the existing StreamIt compiler codebase. We present modifications to
+the fundamental filter fission parallelization transformation that
+extracts data parallelism from filters that included the new keyword.
+Our techniques demonstrate a substantial performance improvement on
+the MPEG2 motion estimation subset when explicit iteration state is
+replaced by our keyword solution.
 
 
 %In this paper, we describe a technique to eliminate induction variable state in stream programs.  Eliminating induction variable state allows for the data parallelizing of several programs in the StreamIt framework.  The introduction of a expression keyword can help simplify written code and provides automatic parallelization of induction variable state.  
