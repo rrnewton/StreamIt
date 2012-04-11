@@ -12,7 +12,7 @@ there is only one update to the induction state.
 Very few iteration filters, outside of source filters, use induction state 
 in this limited capacity. Consider Figure~\ref{fig:transform-after-simple}, where
 the induction variable is incremented at each iteration step but resets at 
-a threshold value. This pattern is very common in programs that use
+a threshold value. This pattern is common in programs that use
 induction filters; MPD and FIRBank use this technique to iterate
 across a provided array one element per iteration step.  Trellis uses this
 technique to perform a special action once this threshold is reached.

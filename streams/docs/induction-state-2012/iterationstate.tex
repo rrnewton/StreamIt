@@ -24,13 +24,13 @@
 % \end{figure}
 
 Traditional induction variables encapsulate all variables that are
-increased or decreased with iterations of a loop.  Induction variable
+increased or decreased with iterations of a loop~\cite{Aho:1986, Fischer:2009}.  Induction variable
 state as applied to stream programming is a class of state that
 requires keeping count of how often a filter has been invoked.  Common
-usage of induction variable state include performing some special
+usage of induction variable state includes performing some special
 action after a certain number of iterations and keeping track of array
 index positions.  Many filters maintain multiple induction variables
-as well, which may be either dependent or independent of each other.
+as well, which may either be dependent or independent of each other.
 
 Many applications in the StreamIt benchmark suite, including MPEG2 encoder,
 Medium Pulse Doppler, Trellis, and FIRBank (pipelined version), maintain induction variable state 
@@ -41,10 +41,13 @@ For many use cases, this induction variable may need to be reset if it
 reaches a certain threshold. 
 
 Figure~\ref{fig:apt-pipeline} illustrates a common pattern of explicit
-induction variable state.  The implementation of the filter maintains
+induction variable state.  It is based on the AssignPictureType filter in 
+the MPEG2 encoder. The implementation of the filter maintains
 a filter variable {\tt frameno} that is incremented on each call of
 the {\tt AssignPictureType}'s work function.  This variable
-represents state.  The {\tt framecount} variable is derived
+represents state.  Each iteration of the 
+filter uses a value for {\it frameno} dependent on what the value of
+{\it frameno} was in the previous iteration.  The {\tt framecount} variable is derived
 from this state and used in control flow.
 
 As presently constructed, induction variable state for\-ces the
@@ -54,12 +57,19 @@ it is necessary to run a filter execution step and establish the
 induction variable value before moving on to the next execution step.
 The tradition fission transformation would not be able to parallelize
 this filter without understanding how to properly distribute the
-calculation of the state.  As we mention in the introduction, this
-could be accomplished using an automatic induction variable
-recognizer, but its idiomatic nature may miss many opportunities for
-parallelization.  
+calculation of the state.  As such, it is not possible 
+to create duplicates and run them in a parallel fashion.  
 
-\subsection{Potential Data Parallelism in Eliminating State}
+With induction variable state, it is possible to make the 
+compiler aware of such state through the keyword solution.  
+Figure~\ref{fig:apt-pipeline} shows how the same AssignPictureType filter can be 
+rewritten to use the keyword.  The compiler can generate the value
+for {\tt iter()} for each iteration of the AssignPictureType filter independent
+of previous iterations.  Duplicates of the filter can be made and
+data parallelism opportunities can be exploited.
+
+
+\subsection{Scalability Implications of Eliminating Induction Variable State}
 \label{sec:model-analysis}
 Table~\ref{fig:benchmarks} indicates programs in the StreamIt benchmark suite that use induction variable filters (not including source filters) in the manner described above.  The StreamIt compiler provides static estimations of work performed in filters.  The above table indicates the work performed in specifically the induction variable filters.
 
@@ -86,7 +96,7 @@ We can characterize the amount of speedup between a completely stateless program
 
 \begin{figure}[t!]
 \includegraphics[width=3.3in]{figures/theoretic-speedup.pdf}
-\caption{Theoretical speedups of stateless programs over corresponding stateful programs with $\sigma$\% stateful work.  \protect\label{fig:theo-speedups}}
+\caption{Theoretical speedups of stateless programs over corresponding stateful programs with $\sigma$\% work in filters using induction variable state.  \protect\label{fig:theo-speedups}}
 \end{figure}
 
 Figure~\ref{fig:theo-speedups} indicates the potential speedups over stateful programs given stateful work percentages and a varying number of cores.  Even benchmarks in the suite that exhibit only 3\% work in stateful filters can exhibit 8x speedups with 256 cores.  Providing a means to remove state from filters that exhibit very small amounts of work relative to the rest of the program can still generate substantial speedups in the near future.

@@ -72,6 +72,12 @@ Note that if the peek rate exceeds the pop rate, it represents a
 sliding window computation in which some input elements are accessed
 across multiple invocations of the filter.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=3.4in]{figures/streamit-filter-example.pdf}
+\caption{Example StreamIt filter based on AssignPictureType, used in MPEG Encoder. By removing the grayed out lines and inserting the new {\tt iter} keyword, we can remove induction variable state. \protect\label{fig:apt-pipeline}}
+\end{figure}
+
 In addition to the \work function, a filter may declare an {\tt init}
 function to initialize internal data structures, as well as a 
  \prework function (not given in Figure~\ref{fig:apt-pipeline}) to
@@ -114,13 +120,6 @@ language; they encompass duplication and weighted round-robin
 behaviors.  Finally, a {\it feedbackloop} represents a cycle in the
 stream graph.
 
-\begin{figure}[t!]
-\centering
-\includegraphics[width=3.3in]{stream-structures.pdf}
-%\psfig{file=stream-structures,width=\columnwidth}
-\caption{Hierarchical stream structures supported by StreamIt.\protect\label{fig:structures}}
-\end{figure}
-
 The StreamIt compiler coarsens the granularity of a stream graph by
 applying the {\it fusion} transformation which merges adjacent filters
 into a single (large) filter (embedding the schedules of execution in
@@ -132,3 +131,11 @@ the original filter are distributed among the duplicates, termed {\it
   fission products}.  In \S\ref{sec:fission}, we describe how to
 extend the fundamental fission transformation to parallelize induction
 variable state.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=3.3in]{stream-structures.pdf}
+%\psfig{file=stream-structures,width=\columnwidth}
+\caption{Hierarchical stream structures supported by StreamIt.\protect\label{fig:structures}}
+\end{figure}
+

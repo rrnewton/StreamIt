@@ -133,7 +133,7 @@
 
 \section{The Iteration Keyword}
 \label{sec:iteration}
-We attempt to remove this potential throughput bottleneck by 
+We remove this potential throughput bottleneck by 
 introducing a new language construct that maintains a value 
 indicating how often the corresponding filter has been invoked.  
 With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can implement a common idiom much more easily.  Furthermore, it allows programmers to circumvent the scalability limitations caused by stateful filters.
@@ -145,7 +145,7 @@ Induction variable state requires the user to maintain mutable state, updating s
 
 Multiple induction variables, as used with the stateful filter in Figure~\ref{fig:transform-after-twonested}, can be redefined in terms of {\tt iter()} as well.  It is not necessary to maintain multiple separate values for state.  Independent and nested induction variable state alike can be defined in terms of {\tt iter()}.
 
-The transformations from filters using induction variable state to using {\tt iter()} are fairly simple for users to implement.  Many of these transformations simply require the user to translate their induction variables in terms how often the filter has been invoked.  User defined induction variables can all be derived from this value arithmetically.  
+Using {\tt iter()} captures a common idiom in a very simple manner.  Programmers can write programs that use induction variable state by simply redefining their induction variables in terms of how often the filter has been invoked.  User defined induction variables can all be derived from this value arithmetically.  The transformations from filters using induction variable state to using {\tt iter()} are also fairly simple for users to implement.  
 
 Some of the most common transformations used in the StreamIt benchmark suite can be summarized below.  
 \begin{itemize}
