@@ -86,14 +86,13 @@ parallelism.  For our modifications, desugared iteration filters without
 additional state are classified as stateless and fused with other stateless
 filters during this coarsening step.  
 
-Next, a heuristic algorithm considers each task-parallel slice
+A heuristic algorithm considers each task-parallel slice
 of the graph, introducing data parallelism when available such that a
 slice will occupy all cores of the chip.  Coarse-grained software
 pipelining is introduced by adding appropriate buffering and a prolog
-schedule of execution such that within the steady state, there are no
+schedule such that within the steady state, there are no
 dependences between operators.  Finally, a heuristic mapping algorithm
 first groups data parallel filters together into sets, and then
 schedules the sets so that each occupies all cores. Stateful filters
 are greedily bin-packed to take advantage of software pipeline
-parallelism.   The next section gives the experiment results for our
-techniques.  
+parallelism.   The next section gives the experiment results.

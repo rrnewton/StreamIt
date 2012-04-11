@@ -138,6 +138,31 @@ introducing a new language construct that maintains a value
 indicating how often the corresponding filter has been invoked.  
 With the introduction of a new language construct, hereafter referred to as {\tt iter()}, the programmer can implement a common idiom much more easily.  Furthermore, it allows programmers to circumvent the scalability limitations caused by stateful filters.
 
+
+\begin{figure}[h]
+\includegraphics[width=3.3in]{figures/transformation1.pdf}
+\caption{Translation of a simple filter with induction variable state that resets after a certain value.  MPD, FHRFeedback, and FIRBank use this pattern to keep an index as it iterates through an array of values, one value for each stream input.  CoarseSerializedBeamFormer and Sample-Trellis use this value to trigger an event when the value reaches a certain threshold.
+ \protect\label{fig:transform-after-simple}}
+\vspace{-10pt}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width=3.3in]{figures/transformation2.pdf}
+\caption{Translation of a simple filter with induction variable state
+  that resets to a special value.  This is an extension on
+  Figure~\ref{fig:transform-after-simple}.
+  \protect\label{fig:transform-after-start}
+}
+\vspace{-10pt}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width=3.3in]{figures/transformation3.pdf}
+\caption{Translation of a filter with nested induction variables. MPD and MPEG2 motion estimation use this pattern to keep track of a logical two-dimensional array being read off the stream.  \protect\label{fig:transform-after-twonested}}
+\end{figure}
+
+
+
 \subsection{Language Construct Approach}
 {\tt iter()} yields the same value as a field that is incremented on every {\tt prework} and {\tt work} invocation.  The value returned by {\tt iter()} indicates how often the filter has been invoked.  
 
@@ -157,21 +182,3 @@ Some of the common transformations of patterns using induction variables to filt
 
 \item A nested induction variable updates only when another induction variable reaches a certain threshold.  We scale the running value down according to this threshold to indicate it is incremented only once every time this threshold is reached by the other induction variable, as illustrated in Figure~\ref{fig:transform-after-twonested}.
 \end{itemize}
-
-\begin{figure}[t]
-\includegraphics[width=3.3in]{figures/transformation1.pdf}
-\caption{Translation of a simple filter with induction variable state that resets after a certain value.  MPD, FHRFeedback, and FIRBank use this pattern to keep an index as it iterates through an array of values, one value for each stream input.  CoarseSerializedBeamFormer and Sample-Trellis use this value to trigger an event when the value reaches a certain threshold.
- \protect\label{fig:transform-after-simple}}
-\end{figure}
-
-\begin{figure}[t]
-\includegraphics[width=3.3in]{figures/transformation2.pdf}
-\caption{Translation of a simple filter with induction variable state that resets to a special value.  This is an extension on Figure~\ref{fig:transform-after-simple}.  \protect\label{fig:transform-after-start}}
-\end{figure}
-
-\begin{figure}[t]
-\includegraphics[width=3.3in]{figures/transformation3.pdf}
-\caption{Translation of a filter with nested induction variables. MPD and MPEG2 motion estimation use this pattern to keep track of a logical two-dimensional array being read off the stream.  \protect\label{fig:transform-after-twonested}}
-\end{figure}
-
-
