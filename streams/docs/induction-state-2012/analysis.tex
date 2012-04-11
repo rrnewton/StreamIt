@@ -1,24 +1,43 @@
-\section{Implementation and Evaluation}
+\section{Empirical Evaluation}
 \label{sec:analysis}
 
-The keyword solution and modifications to fission as described in subsections~\ref{sec:desugar} and~\ref{sec:fission} were implemented into the StreamIt compiler.  The sample benchmarks in Figure~\ref{fig:theo-speedups} were rewritten to use the {\tt iter()} keyword, allowing the compiler to expose data parallelism in its stream graph.  We use an evaluation architecture composed of 4 octal-core 2.00 GHz Intel Xeon x7550 processors, each with 18 MB L3 caches.  The architecture has 128 GB of available memory.
+In this section we evaluate the performance and scalability benefits
+of the \iter keyword and its parallelization by providing empirical
+results for two applications that originally included induction
+variable state. We modified these applications to remove the explicit
+induction variable state, and instead employ the \iter keyword. We
+modified the StreamIt compiler as described in the last section.  The
+experimental architecture is composed of 4 octal-core 2.00 GHz Intel
+Xeon x7550 processors, each with 18 MB L3 caches. The architecture has
+128 GB of available memory.
+
+\subsection{MPEG-2 Motion Estimation}
+\label{sec:mpeg}
+
+\begin{figure}[t]
+\includegraphics[width=3.3in]{figures/work_estimate_mpeg_motionestimation.pdf}
+\caption{MPEG Motion Estimation stream graph.\protect\label{fig:mpegMEgraph}}
+\end{figure}
 
 
-% The introduction of this iteration field creates state in the provided
-% filter.  For future operations, the compiler does not consider this
-% iteration field as part of the state of filter.  Future processes will
-% maintain this inherent state without the downsides of explicitly
-% introduced state.
+This section presents an application of induction variables to the Motion Estimation compression subset of the MPEG-2 encoder.  MPEG-2 is a standard for coding moving pictures and audio information and has a wide variety of multimedia applications.  
 
-% It is important to note, these filters are not classified as stateful
-% to the user, even though the filter is actually stateful on the
-% iteration count after the desugaring process.  In classifying filters
-% as stateful, the user is made aware of where data parallelism may be
-% inhibited.  Iteration filters will not inhibit data parallelism
-% because its state is identifiable to the compiler during the fission
-% process.
+The specification contains various types of compression, one of which is motion prediction.  Motion prediction takes advantage of the fact that frames of a video contain a large amount of duplicated scenes between consecutive frames.  Motion estimation attempts to generate predictions with respect to a set of reference frames obtained from previous or future pictures.  Accordingly, the MPEG-2 encoder can utilize forward and backward motion estimation to achieve this form of compression.  The process of Motion Estimation entails comparing pixel blocks between frames and forming a motion vector indicating a cartesian displacement of a macroblock between reference frames.  
 
+The Motion estimation stream subgraph of the MPEG-2 encoder is illustrated in Figure~\ref{fig:mpegMEgraph}~\cite{drake-thesis}.  Each block of pixels will be tested against three types of prediction (no prediction, forward predicted, and backward predicted) to determine which is the best method for motion estimation.  The MotionEstimationDecision filter determines which is the best encoding technique for this macroblock.
 
+The work estimation of this compression indicates the filter MotionEstimation is stateful and contains the majority of the work.  The MotionEstimation filter pulls macroblocks at a time, iterating through a two-dimensional array (16x16 macroblocks) along the picture.  The filter relies on induction variables to maintain its array position.  We can apply the induction variable transformation on this filter to remove the state in the filter.
+
+Reference pictures are set using upstream messaging from later in the stream graph.  Currently the backend does not support the use of upstream messaging, so for the purpose of benchmarking this application, the reference picture is set to a dummy value and is unchanged throughout the program.  This does not detract from the data parallelism introduced after removing the induction state.  Upstream messaging would simply require that sent messages be duplicated to all fissed filters in the stream graph.
+
+\begin{figure}[t]
+\includegraphics[width=3.3in]{figures/mpeg-results.pdf}
+\caption{Speedups for MPEG-2 Encoder Motion Estimation subset, with and without induction variable state.  \protect\label{fig:mpeg-results}}
+\end{figure}
+
+Figure~\ref{fig:mpeg-results} shows the runtime figures for the original stateful MPEG-2 motion estimation subset compared to the stateless subset.  There is a noticeable speedup for 2 cores for both induction state and iteration keyword implementations.  This can be attributed to the stream graph, which is composed of two stateful MotionEstimation filters.  With 2 cores, these filters can be task parallelized.  The bottleneck in data parallelism is apparent as we increase the number of cores past 2, as the majority of the work cannot be partitioned and load-balanced effectively across multiple cores.  
+
+We can see significant improvements to runtime after making this subset stateless and exposing data parallelism.  There is a 4.93X speedup on 8 cores, 9.30X speedup on 16 cores, and 15.62X speedup on 32 cores between the base induction variable and iteration keyword implementations.  
 
 \subsection{FIRBankPipeline}
 \begin{figure}[t]
@@ -26,9 +45,23 @@ The keyword solution and modifications to fission as described in subsections~\r
 \caption{Speedups for FIRBankPipeline, with and without induction variable state.  \protect\label{fig:firbank-results}}
 \end{figure}
 
-FIRBankPipeline contains one filter that uses induction variable state with 3.94\% of program's work.  This filter, Multiply, maintains induction state in an index that traces through the rows of a two dimensional array.  Each invocation performs complex multiplication on the stream input values and the array elements of that specified row.  
+FIRBankPipeline contains one filter that uses induction variable state
+with 3.94\% of program's work. This filter, Multiply, maintains
+induction state in an index that traces through the rows of a two
+dimensional array. Each invocation performs complex multiplication on
+the stream input values and the array elements of that specified row.
 
-After removing the induction variable state, the compiler chooses to vertically fuse down the FIRBankPipeline program to a single filter.  Before the transformation, this is not done because of the induction variable state.  If the filter were fused down with the rest of the program, the end result would have been stateful, thus inhibiting data parallelism opportunities.  After removing this state, the program is stateless and can be fused and fissed to expose data parallelism.
+After removing the induction variable state, the compiler chooses to
+vertically fuse down the FIRBankPipeline program to a single filter.
+Before the transformation, this is not done because of the induction
+variable state. If the filter were fused down with the rest of the
+program, the end result would have been stateful, thus inhibiting data
+parallelism opportunities. After removing this state, the program is
+stateless and can be fused and fissed to expose data parallelism.
 
-
-Figure~\ref{fig:firbank-results} indicates the speedups over 1 core for both induction state and iteration keyword implementations.  Between the two implementations, there is 1.36X speedup on 8 cores, 1.58X speedup on 16 cores, and 1.83X speedup on 32 cores for the iteration keyword implementation.  This abides fairly closely with the model as described in Section ~\ref{sec:model-analysis}.  
+Figure~\ref{fig:firbank-results} indicates the speedups over 1 core
+for both induction state and iteration keyword implementations.
+Between the two implementations, there is 1.36X speedup on 8 cores,
+1.58X speedup on 16 cores, and 1.83X speedup on 32 cores for the
+iteration keyword implementation. This abides fairly closely with the
+model as described in Section ~\ref{sec:model-analysis}.
