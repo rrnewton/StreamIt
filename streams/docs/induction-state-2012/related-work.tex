@@ -1,39 +1,44 @@
 \section{Related Work}
 \label{sec:related}
 
+Data parallelism is an important class of parallelism that many stream
+programming languages attempt to expose, including
+Brook~\cite{brook04}, StreamC/KernelC~\cite{imagine03ieee},
+SPUR~\cite{spur05samos}, and Cg~\cite{cg03}.  Some streaming languages
+go so far as to disallow stateful computation in all filters (e.g.,
+Brook and StreamC/KernelC) so all filters can be data parallelized.
+StreamIt's philosophy is to allow state for better expressiveness, but to
+include language idioms that capture common forms of state.  Peeking
+is an example of representing  a common form of state (in the form
+of a sliding window) in the language and including compiler
+transformations for parallelization.  Our work adheres to this
+philosophy of capturing common patterns of state in the language.
+
+The Brook language includes an {\tt indexof} expression that returns
+the position of the current element within an input or output
+stream~\ref{brook04}.  Given that Brook kernels are executed once per
+input item index (across all input streams), {\tt indexof} returns the
+execution iteration of the kernel.  However, a study of the importance
+and prevalence of the idiom has not been published.  This work
+motivates the {\tt indexof} keyword in Brook as well as our \iter
+keyword for StreamIt.  x
 
 The process of eliminating traditional induction variables has been
-extensively researched~\cite{Bacon:1994,RM99:RRV}.  
-Eliminating derived induction variables in traditional 
-loop structures further motivates the effectiveness of running the loop
-iterations in parallel.  Extensive research has been done in
-the field of symbolic dependence analysis to determine if iterations
-in loop structures can be parallelized~\cite{Maydan:1991,Blume:1994}.
-These particular
+extensively researched~\cite{Bacon:1994,RM99:RRV}.  Eliminating
+derived induction variables in traditional loop structures further
+motivates the effectiveness of running the loop iterations in
+parallel.  Extensive research has been done in the field of symbolic
+dependence analysis to determine if iterations in loop structures can
+be parallelized~\cite{Maydan:1991,Blume:1994}.  These particular
 optimizations help eliminate instructions by redefining all induction
-variables in terms of a single induction variable.  Induction variable elimination
-and redefinition has been used largely to remove inter-loop dependencies.
-Many automatically
-parallelizing compiler systems, including Rice Fortran D
-~\cite{Hiranandani:1992}, SUIF ~\cite{Wilson:1994}, and Polaris
-~\cite{Blume:1996} have also implemented recognizers to automatically eliminate
-such traditional derived induction variables.  Such works motivate 
-the transformations that must be performed to redefine induction variables
-in terms of {\tt iter()}.
+variables in terms of a single induction variable.  Induction variable
+elimination and redefinition has been used largely to remove
+inter-loop dependencies.  Many automatically parallelizing compiler
+systems, including Rice Fortran D ~\cite{Hiranandani:1992}, SUIF
+~\cite{Wilson:1994}, and Polaris ~\cite{Blume:1996} have also
+implemented recognizers to automatically eliminate such traditional
+derived induction variables.  Such works motivate the transformations
+that must be performed to redefine induction variables in terms of
+{\tt iter()}.
 
-Data parallelism is an important class of parallelism that many stream
-programming languages attempt to expose, including Brook~\cite{brook04},
-StreamC/KernelC~\cite{imagine03ieee}, SPUR~\cite{spur05samos}, and Cg~\cite{cg03}.
-Other streaming languages
-have also attempted to expose data parallelism inhibited by state.  
-Brook~\cite{brook04} in particular disallows stateful
-programs, thus allowing for extensive data parallelism.  Under this
-paradigm, it would be necessary to coarsen the filter in order to
-produce a compilable program with the same functionality.  
 
-As discussed, the keyword capabilities enable a programmer to write an application and its
-filters at a natural granularity that is independent of
-parallelization considerations enabling portable, reusable, and
-malleable code.  Furthermore, fine-grained implementations of filters
-enables the compiler to perform guided filter fusion that balances
-data and instruction cache behavior~\cite{sermulins-lctes05}.
