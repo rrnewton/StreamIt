@@ -29,7 +29,7 @@ assigned to distinct cores, thus introducing data parallelism.
 The unmodified fission transformation is described
 in~\cite{streamit-asplos}. In this section we give some background for
 the transformation. The original fission transformation is applicable
-only to a stateless filter, i.e., a filter that do not include a state
+only to a stateless filter, i.e., a filter that does not include a state
 field to which non-constant values are assigned in the \prework or
 \work functions. The simplest case for fission is when it is applied
 to a filter that does not peek (i.e., the peek rate equals the pop
@@ -77,9 +77,8 @@ after the original fission transformation algorithm introduces the
 splitjoin structure and (for peeking filters) makes it changes to the
 \work and \prework functions.
 
-Let $F$ be the stateless filter that will be fissed. Assume the
-fission process yields $N$ fissed products. Accordingly, this yields
-the fissed products $F_0$, $F_1$, ... , $F_i$, ... , $F_{N-1}$. The
+Let $F$ be the stateless filter that is fissed. Assume the
+fission process yielded $N$ fissed products, namely $F_0$, $F_1$, ... , $F_i$, ... , $F_{N-1}$. The
 notation $F_{i}$ represents the $(i+1)$th fissed product of filter
 $F$.
 
@@ -92,7 +91,7 @@ following values as fields to the products:
     \item $\texttt{start}_i$: the value of the induction variable each product $F_i$ starts with, less the initialization multiplicity.  Alternatively, $\sum_{j=0}^{i-1}{\tt reps}_j$ of all fission products preceding the current product.
     \item \texttt{total}: the periodic multiplicity of $F$.  Alternatively $\sum_{j=0}^{N-1}{\tt reps}_j$. This value is the same for all fissed products.
 \end{itemize}
-As described in~\S\ref{sec:streamit}, initialization execution is required for peeking filters to ensure every firing of the periodic steady-state schedule maintains the same number of leftover items on the channel.  This initialization execution of the original filter is transferred entirely to the first fission product.  However, all fission products must take the multiplicity of the initialization schedule into account in their calculations as the multiplicity is adjusted upwards by this value.
+As described in~\S\ref{sec:streamit}, initialization execution is required for peeking filters to ensure every firing of the periodic steady-state schedule maintains the same number of leftover items on the channel.  The fission transformation guarantees that all initializtion multiplicities are executed by the leftmost filter.  However, all fission products must take the multiplicity of the initialization schedule into account in their calculations as the multiplicity is adjusted upwards by this value.
 
 Accordingly, the fission product $F_i$ should start each round with iteration values of
 \begin{eqnarray*}
@@ -105,7 +104,7 @@ and range up to the value
 where \texttt{k} is a nonnegative integer indicating how many rounds have
 been run in the span of the program.  
 
-At the end of each fission product's \work, a check must be made to
+At the end of each fission product's \work function, a check must be made to
 see if it is necessary to increment the induction variable to the next
 round of values.  This will prevent certain fissed products from
 making calls with duplicate iteration values.  This check is done

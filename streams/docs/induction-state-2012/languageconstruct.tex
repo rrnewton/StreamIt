@@ -145,9 +145,9 @@ Induction variable state requires the user to maintain mutable state, updating s
 
 Multiple induction variables, as used with the stateful filter in Figure~\ref{fig:transform-after-twonested}, can be redefined in terms of {\tt iter()} as well.  It is not necessary to maintain multiple separate values for state.  Independent and nested induction variable state alike can be defined in terms of {\tt iter()}.
 
-Using {\tt iter()} captures a common idiom in a very simple manner.  Programmers can write programs that use induction variable state by simply redefining their induction variables in terms of how often the filter has been invoked.  User defined induction variables can all be derived from this value arithmetically.  The transformations from filters using induction variable state to using {\tt iter()} are also fairly simple for users to implement.  
+Using {\tt iter()} captures a common idiom in a very simple manner.  Programmers can write programs that use induction variable state by simply defining their induction variables in terms of how often the filter has been invoked.  Induction variables can all be derived from this value arithmetically.  The transformations from filters using induction variable state to using {\tt iter()} are also simple for users to implement.  
 
-Some of the most common transformations used in the StreamIt benchmark suite can be summarized below.  
+Some of the common transformations of patterns using induction variables to filters using \iter can be summarized below.  
 \begin{itemize}
 \item Incrementing the induction variable by $C$ for each invocation scales the running value by $C$, as illustrated in Figure~\ref{fig:transform-after-simple}.
 

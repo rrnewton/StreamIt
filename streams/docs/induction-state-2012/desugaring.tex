@@ -50,7 +50,7 @@ A filter is classified as an {\it iteration filter} when there exists a use of
 \iter in its \prework or \work function.  In this section, we
 introduce a simple desugaring transformation that will convert an
 iteration filter into a filter that does not include the \iter
-keyword, but implements the correct semantics of the \iter use.  We
+keyword, but implements the correct semantics of the \iter uses.  We
 accomplish this by introducing a state field that records the current
 iteration of this filter.  This state field is updated in a consistent
 and compiler-defined manner, so later transformations and passes (such

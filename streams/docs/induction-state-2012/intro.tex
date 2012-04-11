@@ -70,14 +70,13 @@ provide a simple desugaring that converts a filter that employs the
 {\tt iter()} expression into a filter with explicit induction
 variable state.  Such state is maintainable by the compiler in 
 exposing future data parallelism opportunities.
-
-The keyword approach was chosen over an automatic recognition approach
-for detecting all user defined induction variables. Automatic induction 
-variable recognition algorithms are inadequate
-because their idiomatic nature could not capture all the real-world
-cases of induction variable state in the benchmarks.  Furthermore, we
-found that the {\tt iter()} keyword simplified implementation of
-filters that included induction variable calculation or control flow.
+%The keyword approach was chosen over an automatic recognition approach
+%for detecting all user defined induction variables. Automatic induction 
+%variable recognition algorithms are inadequate
+%because their idiomatic nature could not capture all the real-world
+%cases of induction variable state in the benchmarks.  Furthermore, we
+%found that the {\tt iter()} keyword simplified implementation of
+%filters that included induction variable calculation or control flow.
 Programmers are enticed to utilize the keyword because it naturally
 captures a common implementation pattern.
 

@@ -29,7 +29,7 @@ state as applied to stream programming is a class of state that
 requires keeping count of how often a filter has been invoked.  Common
 usage of induction variable state includes performing some special
 action after a certain number of iterations and keeping track of array
-index positions.  Many filters maintain multiple induction variables
+index positions.  Many filters, including MPEG2 encoder and MPD, maintain multiple induction variables
 as well, which may either be dependent or independent of each other.
 
 Many applications in the StreamIt benchmark suite, including MPEG2 encoder,
@@ -76,7 +76,7 @@ Table~\ref{fig:benchmarks} indicates programs in the StreamIt
 benchmark suite that use induction variable filters (not including
 source filters) in the manner described above.  The StreamIt compiler
 provides static estimations of work performed in filters.  The above
-table indicates the work performed in specifically the induction
+table indicates the percentage of work performed in specifically the induction
 variable filters.
 
 The majority of programs do not have substantial work performed in
@@ -87,7 +87,7 @@ stream graph is comprised mostly with stateful filters.  However,
 eliminating any form of state will have a large impact on runtime
 performance even on programs with low work concentration in stateful
 filters.  We model the potential speedups of a particular stateful
-program in this subsection.  For the purpose of this analysis, we will
+program in this section.  For the purpose of this analysis, we will
 assume no communication cost between filters.  We will also assume the
 compiler exposes no pipeline parallelism.  This assumption forces the
 serialization of stateful filters on the stream graph.
