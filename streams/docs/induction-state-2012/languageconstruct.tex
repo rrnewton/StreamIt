@@ -160,7 +160,7 @@ Some of the most common transformations used in the StreamIt benchmark suite can
 
 \begin{figure}[t]
 \includegraphics[width=3.3in]{figures/transformation1.pdf}
-\caption{Translation of a simple filter with induction variable state that resets after a certain value.  MPD, FHRFeedback, and FIRBankPipeline use this pattern to keep an index as it iterates through an array of values, one value for each stream input.  CoarseSerializedBeamFormer and Sample-Trellis use this value to trigger an event when the value reaches a certain threshold.
+\caption{Translation of a simple filter with induction variable state that resets after a certain value.  MPD, FHRFeedback, and FIRBank use this pattern to keep an index as it iterates through an array of values, one value for each stream input.  CoarseSerializedBeamFormer and Sample-Trellis use this value to trigger an event when the value reaches a certain threshold.
  \protect\label{fig:transform-after-simple}}
 \end{figure}
 

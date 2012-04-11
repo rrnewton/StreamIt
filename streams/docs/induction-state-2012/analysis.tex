@@ -39,22 +39,21 @@ Figure~\ref{fig:mpeg-results} shows the runtime figures for the original statefu
 
 We can see significant improvements to runtime after making this subset stateless and exposing data parallelism.  There is a 4.93X speedup on 8 cores, 9.30X speedup on 16 cores, and 15.62X speedup on 32 cores between the base induction variable and iteration keyword implementations.  
 
-\subsection{FIRBankPipeline}
+\subsection{FIRBank}
 \begin{figure}[t]
 \includegraphics[width=3.3in]{figures/firbank-results.pdf}
-\caption{Speedups for FIRBankPipeline, with and without induction variable state.  \protect\label{fig:firbank-results}}
+\caption{Speedups for FIRBank, with and without induction variable state.  \protect\label{fig:firbank-results}}
 \end{figure}
 
-\todo{describe the over all firbank application in one sentence}
 
-FIRBankPipeline contains one filter that uses induction variable state
+FIRBank contains one filter that uses induction variable state
 with 3.94\% of program's work. This filter, Multiply, maintains
 induction state in an index that traces through the rows of a two
 dimensional array. Each invocation performs complex multiplication on
 the stream input values and the array elements of that specified row.
 
 After removing the induction variable state, the compiler chooses to
-vertically fuse down the FIRBankPipeline program to a single filter.
+vertically fuse down the FIRBank program to a single filter.
 Before the transformation, this is not done because of the induction
 variable state. If the filter were fused down with the rest of the
 program, the end result would have been stateful, thus inhibiting data
