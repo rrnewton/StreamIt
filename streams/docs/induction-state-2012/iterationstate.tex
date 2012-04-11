@@ -96,7 +96,9 @@ We can characterize the amount of speedup between a completely stateless program
 
 \begin{figure}[t!]
 \includegraphics[width=3.3in]{figures/theoretic-speedup.pdf}
-\caption{Theoretical speedups of stateless programs over corresponding stateful programs with $\sigma$\% work in filters using induction variable state.  \protect\label{fig:theo-speedups}}
+\caption{Theoretical speedups of a stateless programs over corresponding
+  stateful programs with $\sigma$\% work in filters with explicit
+  induction variable state.  \protect\label{fig:theo-speedups}}
 \end{figure}
 
 Figure~\ref{fig:theo-speedups} indicates the potential speedups over stateful programs given stateful work percentages and a varying number of cores.  Even benchmarks in the suite that exhibit only 3\% work in stateful filters can exhibit 8x speedups with 256 cores.  Providing a means to remove state from filters that exhibit very small amounts of work relative to the rest of the program can still generate substantial speedups in the near future.
