@@ -1,0 +1,616 @@
+digraph streamit {
+size="6.5,9"
+subgraph cluster_node1 {
+ color = black
+
+ label="MPDChain";
+node2 [ label="FileReader\nwork=0\nI/O: 0->1" color="0.59166,0.61,0.7" style="filled" ]
+subgraph cluster_node3 {
+ color = black
+
+ label="DopplerFilter";
+node4 [ label="roundrobin(2,2)" color=white style="filled" ]
+node5 [ label="roundrobin(2,2)" color=white style="filled" ]
+subgraph cluster_node6 {
+ color = black
+
+ label="VideoPipe";
+node7 [ label="WeightCalc\nwork=106496\nI/O: 2->2\n*** STATEFUL ***" color="0.59166,0.61,0.7" style="filled" ]
+subgraph cluster_node8 {
+ color = black
+
+ label="FFTKernel";
+node9 [ label="roundrobin(64,64)" color=white style="filled" ]
+node10 [ label="roundrobin(64,64)" color=white style="filled" ]
+subgraph cluster_node11 {
+color = white;
+label = "";
+node12 [ label="FFTReorderSimple\nwork=25116\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node13 [ label="FFTReorderSimple\nwork=25272\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node12 -> node13
+node14 [ label="FFTReorderSimple\nwork=25584\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node13 -> node14
+node15 [ label="FFTReorderSimple\nwork=26208\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node14 -> node15
+node16 [ label="CombineDFT\nwork=64064\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node15 -> node16
+node17 [ label="CombineDFT\nwork=64064\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node16 -> node17
+node18 [ label="CombineDFT\nwork=64064\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node17 -> node18
+node19 [ label="CombineDFT\nwork=64064\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node18 -> node19
+node20 [ label="CombineDFT\nwork=64064\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node19 -> node20
+}
+node9 -> node12
+node20 -> node10
+subgraph cluster_node21 {
+color = white;
+label = "";
+node22 [ label="FFTReorderSimple\nwork=25116\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node23 [ label="FFTReorderSimple\nwork=25272\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node22 -> node23
+node24 [ label="FFTReorderSimple\nwork=25584\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node23 -> node24
+node25 [ label="FFTReorderSimple\nwork=26208\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node24 -> node25
+node26 [ label="CombineDFT\nwork=64064\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node25 -> node26
+node27 [ label="CombineDFT\nwork=64064\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node26 -> node27
+node28 [ label="CombineDFT\nwork=64064\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node27 -> node28
+node29 [ label="CombineDFT\nwork=64064\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node28 -> node29
+node30 [ label="CombineDFT\nwork=64064\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node29 -> node30
+}
+node9 -> node22
+node30 -> node10
+}
+node7 -> node9
+}
+node4 -> node7
+node10 -> node5
+subgraph cluster_node31 {
+ color = black
+
+ label="VideoPipe";
+node32 [ label="WeightCalc\nwork=106496\nI/O: 2->2\n*** STATEFUL ***" color="0.59166,0.61,0.7" style="filled" ]
+subgraph cluster_node33 {
+ color = black
+
+ label="FFTKernel";
+node34 [ label="roundrobin(64,64)" color=white style="filled" ]
+node35 [ label="roundrobin(64,64)" color=white style="filled" ]
+subgraph cluster_node36 {
+color = white;
+label = "";
+node37 [ label="FFTReorderSimple\nwork=25116\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node38 [ label="FFTReorderSimple\nwork=25272\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node37 -> node38
+node39 [ label="FFTReorderSimple\nwork=25584\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node38 -> node39
+node40 [ label="FFTReorderSimple\nwork=26208\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node39 -> node40
+node41 [ label="CombineDFT\nwork=64064\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node40 -> node41
+node42 [ label="CombineDFT\nwork=64064\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node41 -> node42
+node43 [ label="CombineDFT\nwork=64064\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node42 -> node43
+node44 [ label="CombineDFT\nwork=64064\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node43 -> node44
+node45 [ label="CombineDFT\nwork=64064\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node44 -> node45
+}
+node34 -> node37
+node45 -> node35
+subgraph cluster_node46 {
+color = white;
+label = "";
+node47 [ label="FFTReorderSimple\nwork=25116\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node48 [ label="FFTReorderSimple\nwork=25272\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node47 -> node48
+node49 [ label="FFTReorderSimple\nwork=25584\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node48 -> node49
+node50 [ label="FFTReorderSimple\nwork=26208\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node49 -> node50
+node51 [ label="CombineDFT\nwork=64064\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node50 -> node51
+node52 [ label="CombineDFT\nwork=64064\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node51 -> node52
+node53 [ label="CombineDFT\nwork=64064\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node52 -> node53
+node54 [ label="CombineDFT\nwork=64064\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node53 -> node54
+node55 [ label="CombineDFT\nwork=64064\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node54 -> node55
+}
+node34 -> node47
+node55 -> node35
+}
+node32 -> node34
+}
+node4 -> node32
+node35 -> node5
+}
+node2 -> node4
+node56 [ label="Post_CollapsedDataParallel\nwork=147576\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node5 -> node56
+node57 [ label="Identity\nwork=79872\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node56 -> node57
+node58 [ label="Pre_CollapsedDataParallel\nwork=133187\nI/O: 13312->13312" color="0.59166,0.61,0.7" style="filled" ]
+node57 -> node58
+subgraph cluster_node59 {
+ color = black
+
+ label="PulseCompression";
+node60 [ label="roundrobin(2,2)" color=white style="filled" ]
+node61 [ label="roundrobin(2,2)" color=white style="filled" ]
+subgraph cluster_node62 {
+ color = black
+
+ label="SumFIRFilter";
+node63 [ label="FIRReset\nwork=49792\nI/O: 208->228" color="0.59166,0.61,0.7" style="filled" ]
+node64 [ label="FIRZeroAdder\nwork=65664\nI/O: 1->2" color="0.59166,0.61,0.7" style="filled" ]
+node63 -> node64
+node65 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node64 -> node65
+node66 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node65 -> node66
+node67 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node66 -> node67
+node68 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node67 -> node68
+node69 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node68 -> node69
+node70 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node69 -> node70
+node71 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node70 -> node71
+node72 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node71 -> node72
+node73 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node72 -> node73
+node74 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node73 -> node74
+node75 [ label="SingleMultiply\nwork=291840\nI/O: 4->4\n*** PEEKS 2 AHEAD ***" color="0.59166,0.61,0.7" style="filled" ]
+node74 -> node75
+node76 [ label="FIRCleanUp\nwork=65664\nI/O: 2->1" color="0.59166,0.61,0.7" style="filled" ]
+node75 -> node76
+node77 [ label="FIRResetClean\nwork=49792\nI/O: 228->208" color="0.59166,0.61,0.7" style="filled" ]
+node76 -> node77
+}
+node60 -> node63
+node77 -> node61
+subgraph cluster_node78 {
+ color = black
+
+ label="GuardPipe";
+subgraph cluster_node79 {
+ color = black
+
+ label="GuardSplitter";
+node80 [ label="roundrobin(0,2)" color=white style="filled" ]
+node81 [ label="roundrobin(2,2)" color=white style="filled" ]
+subgraph cluster_node82 {
+ color = black
+
+ label="PulsePipe";
+node83 [ label="ValueCreator\nwork=65536\nI/O: 0->2" color="0.59166,0.61,0.7" style="filled" ]
+subgraph cluster_node84 {
+ color = black
+
+ label="FFTKernel";
+node85 [ label="roundrobin(256,256)" color=white style="filled" ]
+node86 [ label="roundrobin(256,256)" color=white style="filled" ]
+subgraph cluster_node87 {
+color = white;
+label = "";
+node88 [ label="FFTReorderSimple\nwork=30768\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node89 [ label="FFTReorderSimple\nwork=30816\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node88 -> node89
+node90 [ label="FFTReorderSimple\nwork=30912\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node89 -> node90
+node91 [ label="FFTReorderSimple\nwork=31104\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node90 -> node91
+node92 [ label="FFTReorderSimple\nwork=31488\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node91 -> node92
+node93 [ label="FFTReorderSimple\nwork=32256\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node92 -> node93
+node94 [ label="CombineDFT\nwork=78848\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node93 -> node94
+node95 [ label="CombineDFT\nwork=78848\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node94 -> node95
+node96 [ label="CombineDFT\nwork=78848\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node95 -> node96
+node97 [ label="CombineDFT\nwork=78848\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node96 -> node97
+node98 [ label="CombineDFT\nwork=78848\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node97 -> node98
+node99 [ label="CombineDFT\nwork=78848\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node98 -> node99
+node100 [ label="CombineDFT\nwork=78848\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node99 -> node100
+}
+node85 -> node88
+node100 -> node86
+subgraph cluster_node101 {
+color = white;
+label = "";
+node102 [ label="FFTReorderSimple\nwork=30768\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node103 [ label="FFTReorderSimple\nwork=30816\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node102 -> node103
+node104 [ label="FFTReorderSimple\nwork=30912\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node103 -> node104
+node105 [ label="FFTReorderSimple\nwork=31104\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node104 -> node105
+node106 [ label="FFTReorderSimple\nwork=31488\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node105 -> node106
+node107 [ label="FFTReorderSimple\nwork=32256\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node106 -> node107
+node108 [ label="CombineDFT\nwork=78848\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node107 -> node108
+node109 [ label="CombineDFT\nwork=78848\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node108 -> node109
+node110 [ label="CombineDFT\nwork=78848\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node109 -> node110
+node111 [ label="CombineDFT\nwork=78848\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node110 -> node111
+node112 [ label="CombineDFT\nwork=78848\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node111 -> node112
+node113 [ label="CombineDFT\nwork=78848\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node112 -> node113
+node114 [ label="CombineDFT\nwork=78848\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node113 -> node114
+}
+node85 -> node102
+node114 -> node86
+}
+node83 -> node85
+node115 [ label="GuardConj\nwork=57344\nI/O: 2->2" color="0.59166,0.61,0.7" style="filled" ]
+node86 -> node115
+}
+node80 -> node83
+node115 -> node81
+subgraph cluster_node116 {
+ color = black
+
+ label="GuardFFTPipe";
+node117 [ label="GuardDataPadder\nwork=60928\nI/O: 208->256" color="0.59166,0.61,0.7" style="filled" ]
+subgraph cluster_node118 {
+ color = black
+
+ label="FFTKernel";
+node119 [ label="roundrobin(256,256)" color=white style="filled" ]
+node120 [ label="roundrobin(256,256)" color=white style="filled" ]
+subgraph cluster_node121 {
+color = white;
+label = "";
+node122 [ label="FFTReorderSimple\nwork=30768\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node123 [ label="FFTReorderSimple\nwork=30816\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node122 -> node123
+node124 [ label="FFTReorderSimple\nwork=30912\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node123 -> node124
+node125 [ label="FFTReorderSimple\nwork=31104\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node124 -> node125
+node126 [ label="FFTReorderSimple\nwork=31488\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node125 -> node126
+node127 [ label="FFTReorderSimple\nwork=32256\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node126 -> node127
+node128 [ label="CombineDFT\nwork=78848\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node127 -> node128
+node129 [ label="CombineDFT\nwork=78848\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node128 -> node129
+node130 [ label="CombineDFT\nwork=78848\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node129 -> node130
+node131 [ label="CombineDFT\nwork=78848\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node130 -> node131
+node132 [ label="CombineDFT\nwork=78848\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node131 -> node132
+node133 [ label="CombineDFT\nwork=78848\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node132 -> node133
+node134 [ label="CombineDFT\nwork=78848\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node133 -> node134
+}
+node119 -> node122
+node134 -> node120
+subgraph cluster_node135 {
+color = white;
+label = "";
+node136 [ label="FFTReorderSimple\nwork=30768\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node137 [ label="FFTReorderSimple\nwork=30816\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node136 -> node137
+node138 [ label="FFTReorderSimple\nwork=30912\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node137 -> node138
+node139 [ label="FFTReorderSimple\nwork=31104\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node138 -> node139
+node140 [ label="FFTReorderSimple\nwork=31488\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node139 -> node140
+node141 [ label="FFTReorderSimple\nwork=32256\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node140 -> node141
+node142 [ label="CombineDFT\nwork=78848\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node141 -> node142
+node143 [ label="CombineDFT\nwork=78848\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node142 -> node143
+node144 [ label="CombineDFT\nwork=78848\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node143 -> node144
+node145 [ label="CombineDFT\nwork=78848\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node144 -> node145
+node146 [ label="CombineDFT\nwork=78848\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node145 -> node146
+node147 [ label="CombineDFT\nwork=78848\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node146 -> node147
+node148 [ label="CombineDFT\nwork=78848\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node147 -> node148
+}
+node119 -> node136
+node148 -> node120
+}
+node117 -> node119
+}
+node80 -> node117
+node120 -> node81
+}
+node149 [ label="GuardMultiplier\nwork=122880\nI/O: 4->2" color="0.59166,0.61,0.7" style="filled" ]
+node81 -> node149
+node150 [ label="Conjugate\nwork=57344\nI/O: 2->2" color="0.59166,0.61,0.7" style="filled" ]
+node149 -> node150
+subgraph cluster_node151 {
+ color = black
+
+ label="FFTKernel";
+node152 [ label="roundrobin(256,256)" color=white style="filled" ]
+node153 [ label="roundrobin(256,256)" color=white style="filled" ]
+subgraph cluster_node154 {
+color = white;
+label = "";
+node155 [ label="FFTReorderSimple\nwork=30768\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node156 [ label="FFTReorderSimple\nwork=30816\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node155 -> node156
+node157 [ label="FFTReorderSimple\nwork=30912\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node156 -> node157
+node158 [ label="FFTReorderSimple\nwork=31104\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node157 -> node158
+node159 [ label="FFTReorderSimple\nwork=31488\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node158 -> node159
+node160 [ label="FFTReorderSimple\nwork=32256\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node159 -> node160
+node161 [ label="CombineDFT\nwork=78848\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node160 -> node161
+node162 [ label="CombineDFT\nwork=78848\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node161 -> node162
+node163 [ label="CombineDFT\nwork=78848\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node162 -> node163
+node164 [ label="CombineDFT\nwork=78848\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node163 -> node164
+node165 [ label="CombineDFT\nwork=78848\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node164 -> node165
+node166 [ label="CombineDFT\nwork=78848\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node165 -> node166
+node167 [ label="CombineDFT\nwork=78848\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node166 -> node167
+}
+node152 -> node155
+node167 -> node153
+subgraph cluster_node168 {
+color = white;
+label = "";
+node169 [ label="FFTReorderSimple\nwork=30768\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node170 [ label="FFTReorderSimple\nwork=30816\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node169 -> node170
+node171 [ label="FFTReorderSimple\nwork=30912\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node170 -> node171
+node172 [ label="FFTReorderSimple\nwork=31104\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node171 -> node172
+node173 [ label="FFTReorderSimple\nwork=31488\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node172 -> node173
+node174 [ label="FFTReorderSimple\nwork=32256\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node173 -> node174
+node175 [ label="CombineDFT\nwork=78848\nI/O: 4->4" color="0.59166,0.61,0.7" style="filled" ]
+node174 -> node175
+node176 [ label="CombineDFT\nwork=78848\nI/O: 8->8" color="0.59166,0.61,0.7" style="filled" ]
+node175 -> node176
+node177 [ label="CombineDFT\nwork=78848\nI/O: 16->16" color="0.59166,0.61,0.7" style="filled" ]
+node176 -> node177
+node178 [ label="CombineDFT\nwork=78848\nI/O: 32->32" color="0.59166,0.61,0.7" style="filled" ]
+node177 -> node178
+node179 [ label="CombineDFT\nwork=78848\nI/O: 64->64" color="0.59166,0.61,0.7" style="filled" ]
+node178 -> node179
+node180 [ label="CombineDFT\nwork=78848\nI/O: 128->128" color="0.59166,0.61,0.7" style="filled" ]
+node179 -> node180
+node181 [ label="CombineDFT\nwork=78848\nI/O: 256->256" color="0.59166,0.61,0.7" style="filled" ]
+node180 -> node181
+}
+node152 -> node169
+node181 -> node153
+}
+node150 -> node152
+node182 [ label="Conjugate\nwork=57344\nI/O: 2->2" color="0.59166,0.61,0.7" style="filled" ]
+node153 -> node182
+node183 [ label="DivideByN\nwork=311296\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node182 -> node183
+node184 [ label="GuardRemovePadded\nwork=60928\nI/O: 256->208" color="0.59166,0.61,0.7" style="filled" ]
+node183 -> node184
+}
+node60 -> node80
+node184 -> node61
+}
+node58 -> node60
+node185 [ label="CFARToDecibelFilter\nwork=3274752\nI/O: 2->1" color="0.00555,0.81,0.84" style="filled" ]
+node61 -> node185
+subgraph cluster_node186 {
+ color = black
+
+ label="CFARNoiseSplitter";
+node187 [ label="duplicate(1,1)" color=white style="filled" ]
+node188 [ label="roundrobin(2,2)" color=white style="filled" ]
+subgraph cluster_node189 {
+ color = black
+
+ label="CFARNoiseLevelPipe";
+subgraph cluster_node190 {
+ color = black
+
+ label="CFARNoiseLevelSplitter";
+node191 [ label="roundrobin(1,1)" color=white style="filled" ]
+node192 [ label="roundrobin(1,1)" color=white style="filled" ]
+subgraph cluster_node193 {
+ color = black
+
+ label="CFARNoiseLevelCalcPipe";
+node194 [ label="CFARNoiseLevelMeanCalc\nwork=20896\nI/O: 104->1" color="0.59166,0.61,0.7" style="filled" ]
+node195 [ label="CFARNoiseLevelMeanCalcGather\nwork=259\nI/O: 32->1" color="0.59166,0.61,0.7" style="filled" ]
+node194 -> node195
+}
+node191 -> node194
+node195 -> node192
+subgraph cluster_node196 {
+ color = black
+
+ label="CFARNoiseLevelCalcPipe";
+node197 [ label="CFARNoiseLevelMeanCalc\nwork=20896\nI/O: 104->1" color="0.59166,0.61,0.7" style="filled" ]
+node198 [ label="CFARNoiseLevelMeanCalcGather\nwork=259\nI/O: 32->1" color="0.59166,0.61,0.7" style="filled" ]
+node197 -> node198
+}
+node191 -> node197
+node198 -> node192
+}
+node199 [ label="CFARNoiseLevelGuardFirst\nwork=26630\nI/O: 2->6656" color="0.59166,0.61,0.7" style="filled" ]
+node192 -> node199
+}
+node187 -> node191
+node199 -> node188
+node200 [ label="CFARPusher\nwork=39936\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node187 -> node200
+node200 -> node188
+}
+node185 -> node187
+subgraph cluster_node201 {
+ color = black
+
+ label="CFARTreshLMaxSplitter_CFARDelayToLMax_Hier";
+node202 [ label="roundrobin(1,3)" color=white style="filled" ]
+node203 [ label="roundrobin(1,4)" color=white style="filled" ]
+subgraph cluster_node204 {
+ color = black
+
+ label="CFARPusher_Delay";
+node205 [ label="CFARPusher\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node206 [ label="Delay\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node205 -> node206
+}
+node202 -> node205
+node206 -> node203
+subgraph cluster_node207 {
+ color = black
+
+ label="CFARTreshLMaxReplicatePipe_CFARDelayToLMax_child";
+node208 [ label="CFARSumReplicateFilter\nwork=79872\nI/O: 3->5" color="0.59166,0.61,0.7" style="filled" ]
+subgraph cluster_node209 {
+ color = black
+
+ label="CFARTreshLMaxSubSplitter_CFARDelayToLMax_child1_Hier";
+node210 [ label="roundrobin(2,1,2)" color=white style="filled" ]
+node211 [ label="roundrobin(1,1,2)" color=white style="filled" ]
+subgraph cluster_node212 {
+ color = black
+
+ label="CFARTreshPipe_Delay";
+subgraph cluster_node213 {
+ color = black
+
+ label="CFARTreshSplitter";
+node214 [ label="roundrobin(1,1)" color=white style="filled" ]
+node215 [ label="roundrobin(1,1)" color=white style="filled" ]
+node216 [ label="CFARPusher\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node214 -> node216
+node216 -> node215
+subgraph cluster_node217 {
+ color = black
+
+ label="CFARTreshGofPipe";
+node218 [ label="CFARTreshReorganize\nwork=35520\nI/O: 104->139" color="0.59166,0.61,0.7" style="filled" ]
+node219 [ label="CFARTreshCumSumFilter\nwork=102304\nI/O: 1->1\n*** STATEFUL ***" color="0.59166,0.61,0.7" style="filled" ]
+node218 -> node219
+node220 [ label="CFARTreshSubFilter\nwork=179680\nI/O: 139->123" color="0.59166,0.61,0.7" style="filled" ]
+node219 -> node220
+node221 [ label="CFARTreshMaxFilter\nwork=46304\nI/O: 123->104" color="0.59166,0.61,0.7" style="filled" ]
+node220 -> node221
+}
+node214 -> node218
+node221 -> node215
+}
+node222 [ label="CFARTreshFilter\nwork=53248\nI/O: 2->1" color="0.59166,0.61,0.7" style="filled" ]
+node215 -> node222
+node223 [ label="Delay\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node222 -> node223
+}
+node210 -> node214
+node223 -> node211
+subgraph cluster_node224 {
+ color = black
+
+ label="LMaxCalc_Identity";
+node225 [ label="LMaxCalc\nwork=312384\nI/O: 104->104\n*** STATEFUL ***" color="0.59166,0.61,0.7" style="filled" ]
+node226 [ label="Identity\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node225 -> node226
+}
+node210 -> node225
+node226 -> node211
+subgraph cluster_node227 {
+ color = black
+
+ label="CFARPusher_CFARDelayToLMax_child1_child";
+node228 [ label="CFARPusher\nwork=39936\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+subgraph cluster_node229 {
+ color = black
+
+ label="CFARDelayToLMax_child1_child";
+node230 [ label="roundrobin(1,1)" color=white style="filled" ]
+node231 [ label="roundrobin(1,1)" color=white style="filled" ]
+node232 [ label="Delay\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node230 -> node232
+node232 -> node231
+node233 [ label="Delay\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node230 -> node233
+node233 -> node231
+}
+node228 -> node230
+}
+node210 -> node228
+node231 -> node211
+}
+node208 -> node210
+}
+node202 -> node208
+node211 -> node203
+}
+node188 -> node202
+node234 [ label="CFARDetectRearrange\nwork=99840\nI/O: 5->5" color="0.59166,0.61,0.7" style="filled" ]
+node203 -> node234
+subgraph cluster_node235 {
+ color = black
+
+ label="CFARDetectPipeSplitter";
+node236 [ label="roundrobin(2,2,1)" color=white style="filled" ]
+node237 [ label="roundrobin(1,1,1)" color=white style="filled" ]
+node238 [ label="CFARDetectSum\nwork=36608\nI/O: 2->1" color="0.59166,0.61,0.7" style="filled" ]
+node236 -> node238
+node238 -> node237
+node239 [ label="CFARDetectGuard\nwork=43264\nI/O: 2->1" color="0.59166,0.61,0.7" style="filled" ]
+node236 -> node239
+node239 -> node237
+node240 [ label="CFARPusher\nwork=19968\nI/O: 1->1" color="0.59166,0.61,0.7" style="filled" ]
+node236 -> node240
+node240 -> node237
+}
+node234 -> node236
+node241 [ label="CFARDetectFilter\nwork=76544\nI/O: 3->1" color="0.59166,0.61,0.7" style="filled" ]
+node237 -> node241
+node242 [ label="Printer\nwork=19968\nI/O: 2->0" color="0.59166,0.61,0.7" style="filled" ]
+node241 -> node242
+}
+}
