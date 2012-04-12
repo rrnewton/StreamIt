@@ -72,7 +72,9 @@ fused and parallelized final version.
 
 Figure~\ref{fig:firbank-results} indicates the speedups over 1 core
 for both induction state and iteration keyword implementations.
-Between the two implementations, there is 1.36X speedup on 8 cores,
+We do not see close-to-perfect scaling in this application because
+I/O costs dominate the computation costs.  However data parallelism
+is exposed.  Between the two implementations, there is 1.36X speedup on 8 cores,
 1.58X speedup on 16 cores, and 1.83X speedup on 32 cores for the
 iteration keyword implementation. This abides fairly closely with the
 model as described in Section ~\ref{sec:model-analysis}.
