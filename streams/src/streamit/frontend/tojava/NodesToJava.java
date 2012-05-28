@@ -1752,6 +1752,9 @@ public class NodesToJava implements FEVisitor {
                 result.append("__param_" + ((Parameter) param).getName());
             }
             result.append(");\n");
+            String stateful = (spec.isStateful()) ? indent + indent
+                    + "setStateful(true);\n" : "";
+            result.append(stateful);
             unIndent();
             result.append(indent + "}\n");
         }

@@ -2,7 +2,9 @@ package at.dms.kjc.slir;
 
 import at.dms.kjc.CType;
 import at.dms.kjc.JFieldDeclaration;
+import at.dms.kjc.JIntLiteral;
 import at.dms.kjc.JMethodDeclaration;
+import at.dms.kjc.common.LowerIterationExpression;
 import at.dms.kjc.sir.SIRCodeUnit;
 import at.dms.kjc.sir.SIRPhasedFilter;
 
@@ -71,6 +73,18 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         fissed filters that were generated from the original linear filter **/
     private int total;
 
+    /** Iteration count variable name */
+    public static final String ITERATION_COUNT_VARNAME =
+        LowerIterationExpression.ITER_VAR_NAME;
+    /** Iteration count start for the individual fissed filter */
+    public static final String ITERATION_COUNT_START_VARNAME =
+        "__iteration_countStart";
+    /** Iteration count total increment (i.e. sum of work of all filters) */
+    public static final String ITERATION_COUNT_TOTAL_VARNAME =
+        "__iteration_countStepIncr";
+    /** Iteration count reps for the individual fissed filter */
+    public static final String ITERATION_COUNT_REPS_VARNAME =
+        "__iteration_countReps";
     
     /**
      * No argument constructor, FOR AUTOMATIC CLONING ONLY.
@@ -400,6 +414,21 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
     public void multSteadyMult(int mult) 
     {
         steadyMult *= mult;
+        if (isIterating) {
+            multiplyIterationConstants(mult);
+        }
+    }
+    
+    private void multiplyIterationConstants(int mult) {
+        for (JFieldDeclaration field : fields) {
+            if (field.getVariable().getIdent().contains(ITERATION_COUNT_REPS_VARNAME)
+                    || field.getVariable().getIdent().contains(ITERATION_COUNT_START_VARNAME)
+                    || field.getVariable().getIdent().contains(ITERATION_COUNT_TOTAL_VARNAME)
+                    || field.getVariable().getIdent().contains(ITERATION_COUNT_VARNAME)) {
+                field.getVariable().setValue(
+                        new JIntLiteral(field.getVariable().getValue().intValue() * mult));
+            }
+        }
     }
     
     public int getMult(SchedulingPhase phase) {
@@ -601,6 +630,15 @@ public class WorkNodeContent implements SIRCodeUnit, at.dms.kjc.DeepCloneable {
         throw new AssertionError("should not call");
     }
 
+    public void addIteratingField(JFieldDeclaration field) {
+        assert field.getVariable().getIdent().equals(ITERATION_COUNT_REPS_VARNAME)
+            || field.getVariable().getIdent().equals(ITERATION_COUNT_START_VARNAME)
+            || field.getVariable().getIdent().equals(ITERATION_COUNT_TOTAL_VARNAME);
+        if (this.isIterating) {
+            addAField(field);
+        }
+    }
+    
     /** but subclasses can add fields */
     protected void addAField(JFieldDeclaration field) {
         JFieldDeclaration[] newFields = 

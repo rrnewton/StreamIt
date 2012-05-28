@@ -43,9 +43,6 @@ import at.dms.kjc.slir.WorkNodeInfo;
 import at.dms.kjc.smp.ThreadMapper;
 
 public class Fissioner {
-    /** Iteration count variable name */
-    private static final String ITERATION_COUNT_VARNAME =
-        LowerIterationExpression.ITER_VAR_NAME;
     
     private static int uniqueID;
     /** the slice we are fissing */
@@ -958,11 +955,35 @@ public class Fissioner {
     private WorkNodeContent wrapFilterWithIterationCountUpdate(WorkNodeContent filter, int i) {
         // the iteration count field may have been renamed.  this variable stores the name of the iteration
         // variable.  When we come across its actual name, it will be updated.
-        String iterationCountVarname = ITERATION_COUNT_VARNAME;
+        String iterationCountVarname = WorkNodeContent.ITERATION_COUNT_VARNAME;
         
         int startValue = i;
         int reps = filter.getSteadyMult();
         int totalWork = sliceSteadyMult;
+        
+        // add the appropriate fields to the Filter
+        // add the work value field.  This will differ from filter to filter because of the number of reps:
+        filter.addIteratingField(
+                new JFieldDeclaration(
+                        new JVariableDefinition(
+                                Constants.ACC_PRIVATE,
+                                CStdType.Integer,
+                                WorkNodeContent.ITERATION_COUNT_REPS_VARNAME,
+                                new JIntLiteral(reps))));
+        filter.addIteratingField(
+                new JFieldDeclaration(
+                        new JVariableDefinition(
+                                Constants.ACC_PRIVATE,
+                                CStdType.Integer,
+                                WorkNodeContent.ITERATION_COUNT_START_VARNAME,
+                                new JIntLiteral(startValue))));
+        filter.addIteratingField(
+                new JFieldDeclaration(
+                        new JVariableDefinition(
+                                Constants.ACC_PRIVATE,
+                                CStdType.Integer,
+                                WorkNodeContent.ITERATION_COUNT_TOTAL_VARNAME,
+                                new JIntLiteral(totalWork))));
         
         for (JFieldDeclaration field : filter.getFields()) {
             if (field.getVariable().getIdent().startsWith(iterationCountVarname)) {
@@ -978,10 +999,13 @@ public class Fissioner {
 
         // ((i - START - REPS) % TOT) == 0
         JFieldAccessExpression iterCount = new JFieldAccessExpression(iterationCountVarname);
-        JIntLiteral iterStart = new JIntLiteral(startValue);
-        JIntLiteral iterReps = new JIntLiteral(reps);
-        JIntLiteral iterTot = new JIntLiteral(totalWork);
+        JFieldAccessExpression iterStart = new JFieldAccessExpression(WorkNodeContent.ITERATION_COUNT_START_VARNAME);
+        JFieldAccessExpression iterReps = new JFieldAccessExpression(WorkNodeContent.ITERATION_COUNT_REPS_VARNAME);
+        JFieldAccessExpression iterTot = new JFieldAccessExpression(WorkNodeContent.ITERATION_COUNT_TOTAL_VARNAME);
         iterCount.setType(CStdType.Integer);
+        iterStart.setType(CStdType.Integer);
+        iterReps.setType(CStdType.Integer);
+        iterTot.setType(CStdType.Integer);
         JEqualityExpression condExpr = 
             new JEqualityExpression(null, 
                 true,

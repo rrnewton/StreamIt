@@ -24,7 +24,6 @@ import at.dms.kjc.sir.EmptyStreamVisitor;
 import at.dms.kjc.sir.SIRFilter;
 import at.dms.kjc.sir.SIRIterationExpression;
 import at.dms.kjc.sir.SIRStream;
-import at.dms.util.SIRPrinter;
 
 
 public class LowerIterationExpression extends SLIRReplacingVisitor {
