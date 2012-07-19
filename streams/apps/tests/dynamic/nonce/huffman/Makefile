@@ -10,17 +10,17 @@ ifeq ($(UNAME), Darwin)
 # do something for OSX
 LIBS = -pthread -lstdc++
 endif
-OBJS = main.o barrier.o dynamic_queue.o core0.o core8.o core1.o core9.o core2.o core10.o core3.o core11.o 
+OBJS = main.o barrier.o dynamic_queue.o core0.o core8.o 
 
 all: $(OBJS)
-	$(CC) $(CFLAGS) $(LIBS) $(OBJS) -o smp8
+	$(CC) $(CFLAGS) $(LIBS) $(OBJS) -o smp2
 
 clean:
-	rm *.o smp8
+	rm *.o smp2
 
 
 realclean:
-	rm -rf *.o dotfiles *.c *.h *.java *.sir smp8
+	rm -rf *.o dotfiles *.c *.h *.java *.sir smp2
 
 main.o: main.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c main.c
@@ -36,22 +36,4 @@ core0.o: core0.c
 
 core8.o: core8.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c core8.c
-
-core1.o: core1.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c core1.c
-
-core9.o: core9.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c core9.c
-
-core2.o: core2.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c core2.c
-
-core10.o: core10.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c core10.c
-
-core3.o: core3.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c core3.c
-
-core11.o: core11.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c core11.c
 

@@ -20,13 +20,13 @@
 //
 
 
-void->void pipeline huffman {
+void->void pipeline HuffmanDynamic {
     add FileReader<int>("./ints.in");
     add encoder();
     add Dummy();
     add Process();
-    // add Dummy();
-    // add decoder();
+    add Dummy();
+    add decoder();
     add FileWriter<int>("huf.out");
 }
 
@@ -37,12 +37,12 @@ int->int filter Dummy() {
 }
 
 int->int filter Process() {
-    work pop 1 push 1 {
+    work pop * push 1 {
      int x = pop();
      int a = x;
      int i;
      for (i = 0; i < 10000; i++) {
-        a += i * 3.0 + 1.0;
+        a += i * 3 + 1;
       }
       if (a < 1) {
           push(x);
