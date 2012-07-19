@@ -64,6 +64,7 @@ def run(test, cores, attempts, outputs):
     deviations = map(lambda x: x - mean, tputs)
     squares = map(lambda x: x * x, deviations)
     dev = math.sqrt(reduce(lambda x, y: x + y, squares) /  (len(squares) - 1))
+    print 'mean=' + str(mean) + ' dev=' + str(dev)
     return (mean, dev)
 
 def print_all(static_results, dynamic_results):
@@ -118,7 +119,7 @@ def main():
     attempts = 3
     ignore = 32
     outputs = 10000
-    cores = [1,2,4,8,16]
+    cores = [1,2,4,8,16,32]
     static_results = []
     dynamic_results = []
     with open('./partial-results.dat', 'w') as f:        
