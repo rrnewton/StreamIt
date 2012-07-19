@@ -1,0 +1,52 @@
+void->void pipeline VWAPDynamicPull {
+    add FileReader<float>("./floats.in");
+    add Aggregate();  
+    add Dummy();
+    add Process();
+    add FileWriter<float>("aggregate.out");
+}
+
+float->float stateful filter Aggregate() {
+    float sum;
+    float count;  
+    init {
+        sum = 0;
+        count = 0;
+    } 
+    work pop * push 1 {
+        float time = pop();
+        float val = pop();
+        while (time != 2) { 
+             count++;
+             sum += val;
+             time = pop();
+             val = pop();
+        }              
+        if (count == 0) {                      
+            push(0);
+        } else {
+            float avg = sum / count;
+            push(avg);
+        }
+        count = 1;
+        sum = val;                        
+    }
+}
+
+float->float filter Dummy() {
+    work pop 1 push 1 {     
+      push(pop());
+    }
+}
+
+float->float filter Process() {
+    work pop 1 push 1 {
+     float x = pop();
+     int i;
+     for (i = 0; i < 10000; i++) {
+        x += i * 3.0 + 1.0;
+      }
+      push(x);
+    }
+}
+

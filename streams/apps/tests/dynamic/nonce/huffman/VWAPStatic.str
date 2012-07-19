@@ -1,0 +1,57 @@
+void->void pipeline VWAPStatic {
+    add FileReader<float>("./floats.in");
+    add Aggregate();  
+    add Dummy();
+    add Process();
+    add FileWriter<float>("aggregate.out");
+}
+
+float->float stateful filter Aggregate() {
+    float sum;
+    float count;  
+    init {
+        sum = 0;
+        count = 0;
+    } 
+    work pop 2 push 1 {
+        float time = pop();
+        float val = pop();
+        if (time == 2) {           
+            if (count == 0) {                      
+                push(0);
+            } else {
+                float avg = sum / count;
+                push(avg);
+            }
+            count = 1;
+            sum = val;               
+        } else {
+            count++;
+            sum += val;
+            push(-1);
+        }
+
+    }
+}
+
+float->float filter Dummy() {
+    work pop 1 push 1 {     
+      push(pop());
+    }
+}
+
+float->float filter Process() {
+    work pop 1 push 1 {
+     float x = pop();
+     if (x == -1) {
+         push(x);
+     } else {
+         int i;
+         for (i = 0; i < 10000; i++) {
+          x += i * 3.0 + 1.0;
+         }
+         push(x);
+     }      
+    }
+}
+
