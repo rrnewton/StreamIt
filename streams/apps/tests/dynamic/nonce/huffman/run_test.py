@@ -27,9 +27,9 @@ def generate(outputs):
                 f.write(val) 
     
 def compile(cores, test, outputs, ignore):
-    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), '--noiter', '--selective', 'HuffmanStatic.str']    
+    cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), '--noiter', 'HuffmanStatic.str']    
     if test == Configs.dynamic:
-        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), "--threadopt", '--noiter', '--selective', 'HuffmanDynamic.str']    
+        cmd = ["strc", "-smp", str(cores), "--perftest", "--outputs", str(outputs), '--preoutputs', str(ignore), "--threadopt", '--noiter', 'HuffmanDynamic.str']    
     print ' '.join(cmd)
     subprocess.call(cmd, stdout=FNULL, stderr=FNULL)
     exe = './smp' + str(cores)     
