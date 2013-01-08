@@ -53,10 +53,10 @@ ${STREAMIT_HOME}/regtest/qmtest/streamitqm clean
 all="<regtest>\n"
 for f in ${tests}
 do
- all+="  <test root=\"${STREAMIT_HOME}/apps/tests/${f}\"/>\n"
+ all=$all"  <test root=\"${STREAMIT_HOME}/apps/tests/${f}\"/>\n"
 done
-all+="  <option target=\"smp2\"/>\n"
-all+="</regtest>"
+all=$all"  <option target=\"smp2\"/>\n"
+all=$all"</regtest>"
 echo ${all} > smp.xml
 
 #set up new test
